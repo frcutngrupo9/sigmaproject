@@ -1,0 +1,14 @@
+<div hflex="1" vflex="1" sclass="header">
+	<hbox hflex="1" vflex="1" align="center">
+		<image src="/img/logo.png" width="90px"/>
+		<div width="400px">
+			<label value="Sigma Project" sclass="header-label" />
+		</div>
+		
+		<hbox apply="ar.edu.utn.sigmaproject.controller.LogoutController" 
+			hflex="1" vflex="1" pack="end" align="end" >
+			<label value="${sessionScope.userCredential.name}" if="${not sessionScope.userCredential.anonymous}"/>
+			<label id="logout" value="Cerrar Sesion" if="${not sessionScope.userCredential.anonymous}" sclass="logout"/>
+		</hbox>
+	</hbox>
+</div>

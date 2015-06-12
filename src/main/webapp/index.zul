@@ -1,0 +1,6 @@
+<?link rel="stylesheet" type="text/css" href="/css/style.css"?>
+<?init class="ar.edu.utn.sigmaproject.initiator.AuthInitiator"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="/layout/template.zul"?>
+<zk>
+    <include id="mainInclude" self="@define(content)" src="/home.zul"/>
+</zk>

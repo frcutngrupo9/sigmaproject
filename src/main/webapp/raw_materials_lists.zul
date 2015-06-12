@@ -1,0 +1,3 @@
+<vbox vflex="1" hflex="1" align="center" pack="center" spacing="20px">
+	<label value="" sclass="head1" />
+</vbox>

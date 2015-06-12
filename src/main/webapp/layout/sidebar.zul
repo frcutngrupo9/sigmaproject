@@ -1,0 +1,9 @@
+<tree id="tree" apply="ar.edu.utn.sigmaproject.controller.SidebarController" hflex="1" vflex="1">
+    <template name="model">
+        <treeitem>
+            <treerow>
+                <treecell label="${each.data.name}" src="${each.data.image}"/>
+            </treerow>
+        </treeitem>
+    </template>
+</tree>

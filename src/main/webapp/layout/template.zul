@@ -1,0 +1,18 @@
+<zk>
+    <borderlayout hflex="1" vflex="1" if="${not sessionScope.userCredential.anonymous}">
+        <north height="100px" border="none" >
+            <include src="/layout/header.zul"/>
+        </north>
+        <west width="260px" border="none" collapsible="true" splittable="true" minsize="300">
+            <include src="/layout/sidebar.zul"/>
+        </west>
+        <center id="mainContent" autoscroll="true" border="none" self="@insert(content)">
+        </center>
+        <south height="50px" border="none">
+            <include src="/layout/footer.zul"/>
+        </south>
+    </borderlayout>
+    <div if="${sessionScope.userCredential.anonymous}">
+        Redireccionando a login.....
+    </div>
+</zk>

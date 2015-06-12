@@ -1,0 +1,36 @@
+<?link rel="stylesheet" type="text/css" href="/style.css"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="/layout/template-anonymous.zul"?>
+<zk>
+	<hbox self="@define(content)" vflex="1" hflex="1" align="center"
+		pack="center" spacing="20px">
+		<vlayout>
+			<window id="loginWin"
+				apply="ar.edu.utn.sigmaproject.controller.LoginController"
+				title="Ingrese con su usuario" border="normal" hflex="min">
+				<vbox hflex="min" align="center">
+					<grid hflex="min">
+						<columns>
+							<column hflex="min" align="right" />
+							<column />
+						</columns>
+						<rows>
+							<row>
+								Usuario :
+								<textbox id="account" width="200px" value="sigma"/>
+							</row>
+							<row>
+								Password :
+								<textbox id="password" type="password"
+									width="200px" value="1234"/>
+							</row>
+						</rows>
+					</grid>
+					<label id="message" sclass="warn" value="&#160;" />
+					<button id="login" label="Login" />
+					
+				</vbox>
+			</window>
+			(use usuario='sigma' y password='1234' para ingresar)
+		</vlayout>
+	</hbox>
+</zk>

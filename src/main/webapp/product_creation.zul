@@ -1,0 +1,111 @@
+<window apply="ar.edu.utn.sigmaproject.controller.ProductCreationController" width="95%" style="background:white">
+	<caption label="Crear Producto"/>
+    <panel title="Producto" id="productCreationBlock" border="rounded">
+        <panelchildren>
+            <vlayout>
+                <grid hflex="1">
+                    <columns>
+                        <column align="right" width="25%"/>
+                        <column align="left"/>
+                    </columns>
+                    <rows>
+                        <row>
+                            <label value="Nombre :"/>
+                            <textbox id="productName" width="50%" placeholder="Nombre del Producto" constraint="no empty" />
+                        </row>
+                        <row>
+                            <label value="Detalles :"/>
+                            <textbox id="productDetails" width="50%" rows="3" height="100px" />
+                        </row>
+                    </rows>
+                </grid>
+                <hlayout>
+                    <button id="createPieceButton" label="Agregar Nueva Pieza"/>
+                    <button id="saveProductButton" label="Guardar"/>
+                </hlayout>
+            </vlayout>
+        </panelchildren>
+    </panel>
+    <separator/>
+    <panel title="Pieza" id="pieceCreationBlock" collapsible="true" closable="true" border="rounded">
+        <panelchildren>
+            <vlayout>
+                <grid hflex="1">
+                    <columns>
+                        <column align="right" width="25%"/>
+                        <column align="left"/>
+                    </columns>
+                    <rows>
+                        <row>
+                            <label value="Nombre :"/>
+                            <textbox id="pieceName" value=""  width="50%" placeholder="Nombre de la Pieza" constraint="no empty"/>
+                        </row>
+                        <row>
+                            <label value="Longitud (cm) :"/>
+                            <textbox id="pieceLong" value="" width="150px" constraint="no empty"/>
+                        </row>
+                        <row>
+                            <label value="Espesor (cm) :"/>
+                            <textbox id="pieceDepth" value="" width="150px" constraint="no empty"/>
+                        </row>
+                        <row>
+                            <label value="Ancho (cm) :"/>
+                            <textbox id="pieceWidth" value="" width="150px" constraint="no empty"/>
+                        </row>
+                        <row>
+                            <label value="Medida 1 (cm) :"/>
+                            <textbox id="pieceSize1" value="" width="150px"/>
+                        </row>
+                        <row>
+                            <label value="Medida 2 (cm) :"/>
+                            <textbox id="pieceSize2" value="" width="150px"/>
+                        </row>
+                        <row>
+                            <label value="Unidades por Producto :"/>
+                            <intbox id="pieceUnitsByProduct" width="150px"/>
+                        </row>
+                        <row>
+                            <label value="Pieza Conjunto? :"/>
+                            <checkbox id="pieceGroup"/>
+                        </row>
+                    </rows>
+                </grid>
+                <hlayout>
+                    <button id="createProcessButton" label="Agregar Procesos"/>
+                    <button id="cancelPieceButton" label="Cancelar"/>
+                </hlayout>
+            </vlayout>
+        </panelchildren>
+    </panel>
+    <separator/>
+    <panel title="Procesos" id="processCreationBlock" collapsible="true" closable="true" border="rounded">
+        <panelchildren>
+            <vlayout>
+                <listbox id="processListbox" hflex="1">
+                	<listhead>
+            			<listheader width="30px"/>
+            			<listheader label="Proceso"/>
+            			<listheader label="Tiempo (seg)" width="100px"/>
+        			</listhead>
+					<template name="model">
+					            <listitem>
+					                <listcell>
+					                    <checkbox forward="onCheck"	checked="false"/>
+					                </listcell>
+					                <listcell>
+					                    <label value="${each.name}"/>
+					                </listcell>
+					                <listcell>
+					                    <textbox width="36px"/>
+					                </listcell>
+					            </listitem>
+					</template>
+                </listbox>
+                <hlayout>
+                    <button id="finishPieceButton" label="Finalizar Pieza"/>
+                    <button id="cancelProcessButton" label="Cancelar"/>
+                </hlayout>
+            </vlayout>
+        </panelchildren>
+    </panel>
+</window>
