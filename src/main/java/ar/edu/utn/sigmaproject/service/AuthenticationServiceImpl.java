@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import ar.edu.utn.sigmaproject.service.AuthenticationServiceImpl;
 import ar.edu.utn.sigmaproject.service.AuthService;
-import ar.edu.utn.sigmaproject.service.UserInfoServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.UserInfoServiceImpl;
 import ar.edu.utn.sigmaproject.service.UserCredential;
 import ar.edu.utn.sigmaproject.service.UserInfoService;
 import ar.edu.utn.sigmaproject.domain.User;

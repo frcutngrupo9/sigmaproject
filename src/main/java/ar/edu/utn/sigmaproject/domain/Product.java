@@ -2,13 +2,15 @@ package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
 
-public class Product implements Serializable,Cloneable {
+public class Product implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
+	
 	Integer id;
 	String name;
 	String details;
 
-	public Product(String name, String details) {
+	public Product(Integer id, String name, String details) {
+		this.id = id;
 		this.name = name;
 		this.details = details;
 	}
@@ -27,6 +29,10 @@ public class Product implements Serializable,Cloneable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public void setDetails(String details) {
+		this.details = details;
 	}
 
 	@Override

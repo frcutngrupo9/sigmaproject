@@ -27,7 +27,7 @@
         </panelchildren>
     </panel>
     <separator/>
-    <panel title="Pieza" id="pieceCreationBlock" collapsible="true" closable="true" border="rounded">
+    <panel title="Pieza" id="pieceCreationBlock" collapsible="true" visible="false" closable="false" border="rounded">
         <panelchildren>
             <vlayout>
                 <grid hflex="1">
@@ -42,7 +42,7 @@
                         </row>
                         <row>
                             <label value="Longitud (cm) :"/>
-                            <textbox id="pieceLong" value="" width="150px" constraint="no empty"/>
+                            <textbox id="pieceHeight" value="" width="150px" constraint="no empty"/>
                         </row>
                         <row>
                             <label value="Espesor (cm) :"/>
@@ -78,7 +78,7 @@
         </panelchildren>
     </panel>
     <separator/>
-    <panel title="Procesos" id="processCreationBlock" collapsible="true" closable="true" border="rounded">
+    <panel title="Procesos" id="processCreationBlock" collapsible="true" visible="false" closable="false" border="rounded">
         <panelchildren>
             <vlayout>
                 <listbox id="processListbox" hflex="1">
@@ -90,7 +90,7 @@
 					<template name="model">
 					            <listitem>
 					                <listcell>
-					                    <checkbox forward="onCheck"	checked="false"/>
+					                    <checkbox forward="onCheck=processListbox.onProcessCheck"	checked="false"/>
 					                </listcell>
 					                <listcell>
 					                    <label value="${each.name}"/>
