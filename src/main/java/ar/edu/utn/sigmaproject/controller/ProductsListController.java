@@ -1,7 +1,12 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.service.ProductListService;
 import ar.edu.utn.sigmaproject.service.ProductService;
+
+import ar.edu.utn.sigmaproject.service.impl.ProductListServiceImpl;
+
 //import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 //import org.springframework.data.domain.Page;
 //import org.springframework.data.domain.PageRequest;
@@ -13,10 +18,13 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Paging;
 import org.zkoss.zul.Textbox;
+
 import java.util.LinkedHashMap;
+import java.util.List;
 
 public class ProductsListController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
@@ -27,17 +35,23 @@ public class ProductsListController extends SelectorComposer<Component>{
     Listbox productListbox;
     @Wire
     Paging pager;
+    
+    ProductListService productListService = new ProductListServiceImpl();
 	
-	private String query;
+    ListModelList<Product> productListModel;
+	//private String query;
     //private SortingPagingHelper<Product> sortingPagingHelper;
 
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
-        LinkedHashMap<String, Boolean> sortProperties = new LinkedHashMap<String, Boolean>();
+        //LinkedHashMap<String, Boolean> sortProperties = new LinkedHashMap<String, Boolean>();
         //sortProperties.put("firstName", Boolean.TRUE);
         //sortProperties.put("lastName", Boolean.TRUE);
         //sortingPagingHelper = new SortingPagingHelper<Product>(clientListbox, pager, sortProperties, this, 1);
+        List<Product> productList = productListService.getProductList();
+        productListModel = new ListModelList<Product>(productList);
+        productListbox.setModel(productListModel);
     }
     
     @Listen("onSelect = #productListbox")
@@ -48,7 +62,7 @@ public class ProductsListController extends SelectorComposer<Component>{
     
     @Listen("onClick = #searchButton")
     public void search() {
-        query = searchTextbox.getValue();
+        //query = searchTextbox.getValue();
         //sortingPagingHelper.resetUnsorted();
     }
     

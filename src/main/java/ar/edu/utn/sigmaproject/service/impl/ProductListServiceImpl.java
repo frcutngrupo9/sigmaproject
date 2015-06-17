@@ -3,7 +3,6 @@ package ar.edu.utn.sigmaproject.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.service.ProductListService;
 
@@ -41,6 +40,12 @@ public class ProductListServiceImpl implements ProductListService {
 	}
 	
 	public synchronized Product updateProduct(Product product) {
+		if(product.getId()!=null && product.getId()==productList.size())
+		{
+			product = saveProduct(product);
+			return product;
+		}
+		else {
 		if(product.getId()==null){
 			throw new IllegalArgumentException("can't update a null-id product, save it first");
 		}else{
@@ -54,7 +59,7 @@ public class ProductListServiceImpl implements ProductListService {
 				}
 			}
 			throw new RuntimeException("Product not found "+product.getId());
-		}
+		}}
 	}
 	
 	public synchronized void deleteProduct(Product product) {
@@ -68,6 +73,10 @@ public class ProductListServiceImpl implements ProductListService {
 				}
 			}
 		}
+	}
+	
+	public synchronized Integer getNewId() {
+		return productList.size();
 	}
 
 }

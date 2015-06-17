@@ -7,6 +7,8 @@ import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.lang.Strings;
+import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
@@ -23,10 +25,16 @@ import ar.edu.utn.sigmaproject.service.impl.PieceListServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProcessListServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProcessTypeListServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductListServiceImpl;
+import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
+import ar.edu.utn.sigmaproject.domain.Product;
 
 public class ProductCreationController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
+	
+	private Product product;
+	private List<Piece> pieceList;
+	private List<Process> processList;
 	
 	@Wire
 	Component productCreationBlock;
@@ -71,8 +79,6 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	PieceListService pieceListService = new PieceListServiceImpl();
 	ProductListService productListService = new ProductListServiceImpl();
 	
-     
-    //data for the view
     ListModelList<ProcessType> processTypeListModel;
      
     @Override
@@ -82,6 +88,25 @@ public class ProductCreationController extends SelectorComposer<Component>{
         List<ProcessType> processTypeList = processTypeListService.getProcessTypeList();
         processTypeListModel = new ListModelList<ProcessType>(processTypeList);
         processListbox.setModel(processTypeListModel);
+    }
+    
+    @Listen("onClick = #saveProductButton")
+    public void SaveProduct() {
+    	if(Strings.isBlank(productName.getValue())){
+			Clients.showNotification("Ingresar Nombre Producto",productName);
+			return;
+		}
+    	Integer product_id = productListService.getNewId();
+    	String product_name = productName.getText();
+    	String product_details = productDetails.getText();
+    	Product product = new Product(product_id, product_name, product_details);
+    	
+    	//save
+    	product = productListService.updateProduct(product);
+    	
+		//show message for user
+		Clients.showNotification("Producto guardado");
+    	
     }
     
     @Listen("onClick = #createPieceButton")
@@ -117,19 +142,9 @@ public class ProductCreationController extends SelectorComposer<Component>{
   		Checkbox cbox = (Checkbox)evt.getOrigin().getTarget();
   		Listitem litem = (Listitem)cbox.getParent().getParent();
   		
-  		boolean checked = cbox.isChecked();
-  		Todo todo = (Todo)litem.getValue();
-  		todo.setComplete(checked);
-  		
-  		//save data
-  		todo = todoListService.updateTodo(todo);
-  		if(todo.equals(selectedTodo)){
-  			selectedTodo = todo;
-  			//refresh detail view
-  			refreshDetailView();
-  		}
-  		//update listitem style
-  		((Listitem)cbox.getParent().getParent()).setSclass(checked?"complete-todo":"");
+  		Textbox tbox = (Textbox)litem.getChildren().get(2).getFirstChild();
+  		tbox.setVisible(true);
+  		//tbox.setText("se selecciono este");
   	}
     
 }

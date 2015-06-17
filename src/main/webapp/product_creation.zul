@@ -96,7 +96,7 @@
 					                    <label value="${each.name}"/>
 					                </listcell>
 					                <listcell>
-					                    <textbox width="36px"/>
+					                    <textbox visible="false" width="36px"/>
 					                </listcell>
 					            </listitem>
 					</template>

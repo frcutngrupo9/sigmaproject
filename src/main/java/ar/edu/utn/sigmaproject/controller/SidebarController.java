@@ -74,18 +74,18 @@ public class SidebarController extends SelectorComposer<Component> {
         @SuppressWarnings("unchecked")
 		TreeNode<MenuTreeRow> rootNode = new DefaultTreeNode<MenuTreeRow>(null, Arrays.asList(
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Productos"), Arrays.asList(
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Search.png", "Lista de Productos", "/products_list.zul")),
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Search.png", "Lista de Productos", "/product_list.zul")),
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Write.png", "Crear Producto", "/product_creation.zul"))
             )),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Produccion"), Arrays.asList(
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Paste.png", "Planes de Produccion", "/production_plans_list.zul")),
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Paste.png", "Planes de Produccion", "/production_plan_list.zul")),
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Write.png", "Crear Plan de Produccion", "/production_plan_creation.zul")),
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Paste.png", "Ordenes de Produccion", "/production_orders_list.zul")),
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Paste.png", "Ordenes de Produccion", "/production_order_list.zul")),
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Write.png", "Crear Orden de Produccion", "/production_order_creation.zul"))
             )),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Stock"), Arrays.asList(
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Template.png", "Stock de Productos Terminados", "/finished_products_list.zul")),
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Template.png", "Stock de Materia Prima", "/raw_materials_lists.zul"))
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Template.png", "Stock de Productos Terminados", "/finished_product_list.zul")),
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Template.png", "Stock de Materia Prima", "/raw_material_list.zul"))
             )),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Reportes"))
         ));
