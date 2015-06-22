@@ -1,29 +1,29 @@
 package ar.edu.utn.sigmaproject.controller;
 
-import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.service.ProductListService;
-import ar.edu.utn.sigmaproject.service.ProductService;
 
 import ar.edu.utn.sigmaproject.service.impl.ProductListServiceImpl;
 
 //import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
+//import java.util.LinkedHashMap;
 //import org.springframework.data.domain.Page;
 //import org.springframework.data.domain.PageRequest;
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.EventQueues;
+//import org.zkoss.zk.ui.select.annotation.WireVariable;
+//import org.zkoss.zk.ui.event.Event;
+//import org.zkoss.zk.ui.event.EventQueues;
+//import org.zkoss.zk.ui.select.annotation.VariableResolver;
+
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
-import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
-import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Paging;
 import org.zkoss.zul.Textbox;
 
-import java.util.LinkedHashMap;
+
 import java.util.List;
 
 public class ProductsListController extends SelectorComposer<Component>{

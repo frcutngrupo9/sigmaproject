@@ -1,5 +1,6 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
@@ -10,6 +11,7 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Intbox;
+import org.zkoss.zul.Label;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Textbox;
@@ -26,15 +28,12 @@ import ar.edu.utn.sigmaproject.service.impl.ProcessListServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProcessTypeListServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductListServiceImpl;
 import ar.edu.utn.sigmaproject.domain.Piece;
+import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
 
 public class ProductCreationController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
-	
-	private Product product;
-	private List<Piece> pieceList;
-	private List<Process> processList;
 	
 	@Wire
 	Component productCreationBlock;
@@ -60,9 +59,11 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	@Wire
 	Textbox pieceSize1;
 	@Wire
-	Intbox pieceUnitsByProduct;
+	Textbox pieceSize2;
 	@Wire
-	Checkbox selectedTodoCheck;
+	Checkbox pieceGroup;
+	@Wire
+	Intbox pieceUnitsByProduct;
 	@Wire
 	Button createProcessButton;
 	@Wire
@@ -72,6 +73,13 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	Component processCreationBlock;
 	@Wire
 	Listbox processListbox;
+	@Wire
+	Listbox productPiecesListbox;
+	
+	private Product product;
+	private Piece piece;
+	private List<Piece> pieceList;
+	private List<Process> processList;
      
     //services
 	ProcessTypeListService processTypeListService = new ProcessTypeListServiceImpl();
@@ -80,6 +88,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	ProductListService productListService = new ProductListServiceImpl();
 	
     ListModelList<ProcessType> processTypeListModel;
+    ListModelList<Piece> productPiecesListModel;
      
     @Override
     public void doAfterCompose(Component comp) throws Exception{
@@ -88,6 +97,11 @@ public class ProductCreationController extends SelectorComposer<Component>{
         List<ProcessType> processTypeList = processTypeListService.getProcessTypeList();
         processTypeListModel = new ListModelList<ProcessType>(processTypeList);
         processListbox.setModel(processTypeListModel);
+        
+        pieceList = new ArrayList<Piece>();
+        List<Piece> productPiecesList = pieceList;
+        productPiecesListModel = new ListModelList<Piece>(productPiecesList);
+        productPiecesListbox.setModel(productPiecesListModel);
     }
     
     @Listen("onClick = #saveProductButton")
@@ -106,7 +120,6 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	
 		//show message for user
 		Clients.showNotification("Producto guardado");
-    	
     }
     
     @Listen("onClick = #createPieceButton")
@@ -121,6 +134,44 @@ public class ProductCreationController extends SelectorComposer<Component>{
     
     @Listen("onClick = #createProcessButton")
     public void createNewProcess() {
+    	if(Strings.isBlank(pieceName.getValue())){
+			Clients.showNotification("Ingrese el Nombre de la Pieza",pieceName);
+			return;
+		}
+    	Integer piece_id = 1;
+    	if(pieceList.isEmpty() == true) {
+    		piece_id = pieceListService.getNewId();
+    	} else {
+    		//navegar pieceList y buscar el ultimo id y agregarle 1
+    		//si se esta editando un producto habria que buscar un nuevo id del servicio
+    	}
+    	
+    	String piece_name = pieceName.getText();
+    	Long piece_height = 0L;
+    	Long piece_width = 0L;
+    	Long piece_depth = 0L;
+    	Long piece_size1 = 0L;
+    	Long piece_size2 = 0L;
+    	if(pieceHeight.getText().compareTo("")!=0) {
+    		piece_height = Long.parseLong(pieceHeight.getText());
+    	}
+    	if(pieceWidth.getText().compareTo("")!=0) {
+    		piece_width = Long.parseLong(pieceWidth.getText());
+    	}
+    	if(pieceDepth.getText().compareTo("")!=0) {
+    		piece_depth = Long.parseLong(pieceDepth.getText());
+    	}
+    	if(pieceSize1.getText().compareTo("")!=0) {
+    		piece_size1 = Long.parseLong(pieceSize1.getText());
+    	}
+    	if(pieceSize2.getText().compareTo("")!=0) {
+    		piece_size2 = Long.parseLong(pieceSize2.getText());
+    	}
+    	Integer piece_units = pieceUnitsByProduct.getValue();
+    	boolean piece_isGroup = pieceGroup.isChecked();
+    	piece = new Piece(piece_id, null, piece_name, piece_height, piece_width, piece_depth, piece_size1, piece_size2, piece_isGroup, piece_units);
+    	pieceList.add(piece);
+    	productPiecesListModel.add(piece);
     	processCreationBlock.setVisible(true);
     }
     
@@ -129,10 +180,32 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	processCreationBlock.setVisible(false);
     }
     
-    @Listen("onClick = #finishPieceButton")
+    @Listen("onClick = #finishProcessButton")
     public void finishPiece() {
-    	pieceCreationBlock.setVisible(false);
-    	processCreationBlock.setVisible(false);
+    	for(int i=1; i<processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
+    		Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
+    		Label lbl = (Label)processListbox.getChildren().get(i).getChildren().get(1).getChildren().get(0);
+    		Textbox txtbox = (Textbox)processListbox.getChildren().get(i).getChildren().get(2).getChildren().get(0);
+    		System.out.print("Proceso " + lbl.getValue());
+    		System.out.print(",texto " + txtbox.getText());
+    		System.out.println(",checkbox " + chkbox.isChecked());
+    		List<ProcessType> processTypeList = processTypeListService.getProcessTypeList();
+    		System.out.println("id proceso " + processTypeList.get(i - 1).getId());
+    		if(chkbox.isChecked() && Strings.isBlank(txtbox.getText())){
+    			Clients.showNotification("Ingrese el Tiempo para el Proceso",txtbox);
+    			return;
+    		}
+    		Process process = null;
+    		if(chkbox.isChecked() && !Strings.isBlank(txtbox.getText())){
+    			int idPiece = piece.getId();
+    			int idProcessType = processTypeListService.getProcessTypeList().get(i - 1).getId();
+    			Long time = Long.parseLong(txtbox.getText());
+    			process = new Process(idPiece, idProcessType, time);
+    		}
+    		if(process != null) {
+    			processList.add(process);
+    		}
+    	}
     }
 	
     //when user checks on the checkbox of each process on the list
@@ -141,10 +214,12 @@ public class ProductCreationController extends SelectorComposer<Component>{
   		//get data from event
   		Checkbox cbox = (Checkbox)evt.getOrigin().getTarget();
   		Listitem litem = (Listitem)cbox.getParent().getParent();
-  		
   		Textbox tbox = (Textbox)litem.getChildren().get(2).getFirstChild();
-  		tbox.setVisible(true);
-  		//tbox.setText("se selecciono este");
+  		if(cbox.isChecked()) {
+  			tbox.setVisible(true);
+  		} else {
+  			tbox.setVisible(false);
+  		}
   	}
     
 }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.Piece;
-import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.service.PieceListService;
 
 public class PieceListServiceImpl implements PieceListService {
@@ -12,7 +11,7 @@ public class PieceListServiceImpl implements PieceListService {
 	static List<Piece> pieceList = new ArrayList<Piece>();
 	
 	static{
-		pieceList.add(new Piece(1, 1, 5L, 5L, 5L, 5L, 5L, true, 1));
+		pieceList.add(new Piece(1, 1, "pata delantera", 5L, 5L, 5L, 5L, 5L, true, 1));
 	}
 	
 	public synchronized List<Piece> getPieceList() {
@@ -68,6 +67,10 @@ public class PieceListServiceImpl implements PieceListService {
 				}
 			}
 		}
+	}
+	
+	public synchronized Integer getNewId() {
+		return pieceList.size() + 1;
 	}
 
 }

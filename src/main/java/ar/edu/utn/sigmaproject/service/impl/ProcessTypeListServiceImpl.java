@@ -8,7 +8,7 @@ import ar.edu.utn.sigmaproject.service.ProcessTypeListService;
 
 public class ProcessTypeListServiceImpl implements ProcessTypeListService {
 
-	static int processTypeId = 0;
+	static int processTypeId = 1;
 	static List<ProcessType> processTypeList = new ArrayList<ProcessType>();  
 	static{
 		processTypeList.add(new ProcessType(processTypeId++,"trozado de tablas"));

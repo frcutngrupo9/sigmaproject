@@ -76,7 +76,7 @@ public class ProductListServiceImpl implements ProductListService {
 	}
 	
 	public synchronized Integer getNewId() {
-		return productList.size();
+		return productList.size() + 1;
 	}
 
 }

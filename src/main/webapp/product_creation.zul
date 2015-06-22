@@ -19,6 +19,19 @@
                         </row>
                     </rows>
                 </grid>
+                <separator/>
+    			<listbox id="productPiecesListbox">
+        			<listhead>
+            			<listheader label="Nombre Pieza"/>
+            			<listheader label="Numero de Procesos"/>
+        			</listhead>
+        			<template name="model">
+            			<listitem>
+                			<listcell label="${each.name}"/>
+                			<listcell label="nro"/>
+            			</listitem>
+        			</template>
+    			</listbox>
                 <hlayout>
                     <button id="createPieceButton" label="Agregar Nueva Pieza"/>
                     <button id="saveProductButton" label="Guardar"/>
@@ -27,12 +40,12 @@
         </panelchildren>
     </panel>
     <separator/>
-    <panel title="Pieza" id="pieceCreationBlock" collapsible="true" visible="false" closable="false" border="rounded">
+    <panel title="Pieza" id="pieceCreationBlock" collapsible="true" visible="true" closable="false" border="rounded">
         <panelchildren>
             <vlayout>
                 <grid hflex="1">
                     <columns>
-                        <column align="right" width="25%"/>
+                        <column align="right" width="35%"/>
                         <column align="left"/>
                     </columns>
                     <rows>
@@ -45,11 +58,11 @@
                             <textbox id="pieceHeight" value="" width="150px" constraint="no empty"/>
                         </row>
                         <row>
-                            <label value="Espesor (cm) :"/>
+                            <label value="Espesor (pulgadas) :"/>
                             <textbox id="pieceDepth" value="" width="150px" constraint="no empty"/>
                         </row>
                         <row>
-                            <label value="Ancho (cm) :"/>
+                            <label value="Ancho (pulgadas) :"/>
                             <textbox id="pieceWidth" value="" width="150px" constraint="no empty"/>
                         </row>
                         <row>
@@ -66,7 +79,7 @@
                         </row>
                         <row>
                             <label value="Pieza Conjunto? :"/>
-                            <checkbox id="pieceGroup"/>
+                            <checkbox id="pieceGroup" checked="false"/>
                         </row>
                     </rows>
                 </grid>
@@ -78,7 +91,7 @@
         </panelchildren>
     </panel>
     <separator/>
-    <panel title="Procesos" id="processCreationBlock" collapsible="true" visible="false" closable="false" border="rounded">
+    <panel title="Procesos" id="processCreationBlock" collapsible="true" visible="true" closable="false" border="rounded">
         <panelchildren>
             <vlayout>
                 <listbox id="processListbox" hflex="1">
@@ -102,7 +115,7 @@
 					</template>
                 </listbox>
                 <hlayout>
-                    <button id="finishPieceButton" label="Finalizar Pieza"/>
+                    <button id="finishProcessButton" label="Finalizar Pieza"/>
                     <button id="cancelProcessButton" label="Cancelar"/>
                 </hlayout>
             </vlayout>

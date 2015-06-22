@@ -1,6 +1,7 @@
 package ar.edu.utn.sigmaproject.service;
 
 import java.util.List;
+
 import ar.edu.utn.sigmaproject.domain.Piece;
 
 public interface PieceListService {
@@ -14,5 +15,7 @@ public interface PieceListService {
 	Piece updatePiece(Piece piece);
 
 	void deletePiece(Piece piece);
+
+	Integer getNewId();
 
 }

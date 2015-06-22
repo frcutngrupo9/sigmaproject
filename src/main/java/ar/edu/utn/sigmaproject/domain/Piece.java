@@ -7,6 +7,7 @@ public class Piece implements Serializable, Cloneable {
 	
 	Integer id;
 	Integer idProduct;
+	String name;
 	Long height;
 	Long width;
 	Long depth;
@@ -15,9 +16,10 @@ public class Piece implements Serializable, Cloneable {
 	boolean isGroup;
 	Integer units;
 
-	public Piece(Integer id, Integer idProduct, Long height, Long width, Long depth, Long size1, Long size2, boolean isGroup, Integer units) {
+	public Piece(Integer id, Integer idProduct, String name, Long height, Long width, Long depth, Long size1, Long size2, boolean isGroup, Integer units) {
 		this.id = id;
 		this.idProduct = idProduct;
+		this.name = name;
 		this.height = height;
 		this.width = width;
 		this.depth = depth;
@@ -41,6 +43,14 @@ public class Piece implements Serializable, Cloneable {
 
 	public void setIdProduct(Integer idProduct) {
 		this.idProduct = idProduct;
+	}
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public Long getHeight() {
