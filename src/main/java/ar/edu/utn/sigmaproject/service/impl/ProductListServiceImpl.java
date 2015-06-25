@@ -40,26 +40,27 @@ public class ProductListServiceImpl implements ProductListService {
 	}
 	
 	public synchronized Product updateProduct(Product product) {
-		if(product.getId()!=null && product.getId()==productList.size())
+		if(product.getId()!=null && product.getId()==getNewId())
 		{
 			product = saveProduct(product);
 			return product;
 		}
 		else {
-		if(product.getId()==null){
-			throw new IllegalArgumentException("can't update a null-id product, save it first");
-		}else{
-			product = Product.clone(product);
-			int size = productList.size();
-			for(int i=0;i<size;i++){
-				Product t = productList.get(i);
-				if(t.getId().equals(product.getId())){
-					productList.set(i, product);
-					return product;
+			if(product.getId()==null){
+				throw new IllegalArgumentException("can't update a null-id product, save it first");
+			}else{
+				product = Product.clone(product);
+				int size = productList.size();
+				for(int i=0;i<size;i++){
+					Product t = productList.get(i);
+					if(t.getId().equals(product.getId())){
+						productList.set(i, product);
+						return product;
+					}
 				}
+				throw new RuntimeException("Product not found "+product.getId());
 			}
-			throw new RuntimeException("Product not found "+product.getId());
-		}}
+		}
 	}
 	
 	public synchronized void deleteProduct(Product product) {

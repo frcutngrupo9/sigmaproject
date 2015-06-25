@@ -77,7 +77,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	Listbox productPiecesListbox;
 	
 	private Product product;
-	private Piece piece;
+	private Piece activePiece;
 	private List<Piece> pieceList;
 	private List<Process> processList;
      
@@ -102,6 +102,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
         List<Piece> productPiecesList = pieceList;
         productPiecesListModel = new ListModelList<Piece>(productPiecesList);
         productPiecesListbox.setModel(productPiecesListModel);
+        
+        processList = new ArrayList<Process>();
     }
     
     @Listen("onClick = #saveProductButton")
@@ -113,13 +115,26 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	Integer product_id = productListService.getNewId();
     	String product_name = productName.getText();
     	String product_details = productDetails.getText();
-    	Product product = new Product(product_id, product_name, product_details);
+    	product = new Product(product_id, product_name, product_details);
     	
     	//save
     	product = productListService.updateProduct(product);
+    	if(pieceList != null && pieceList.isEmpty() == false) {
+    		for(int i=0; i<pieceList.size(); i++) {
+    			pieceList.get(i).setIdProduct(product.getId());
+    			pieceListService.savePiece(pieceList.get(i));
+    		}
+    	}
+    	if(processList != null && processList.isEmpty() == false) {
+    		for(int i=0; i<processList.size(); i++) {
+    			processListService.saveProcess(processList.get(i));
+    		}
+    	}
     	
 		//show message for user
 		Clients.showNotification("Producto guardado");
+		
+		//limpiar todo
     }
     
     @Listen("onClick = #createPieceButton")
@@ -138,11 +153,16 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			Clients.showNotification("Ingrese el Nombre de la Pieza",pieceName);
 			return;
 		}
-    	Integer piece_id = 1;
+    	if(pieceUnitsByProduct.getValue() == null || pieceUnitsByProduct.getValue() <= 0){
+			Clients.showNotification("Ingrese el Nombre de la Pieza",pieceName);
+			return;
+		}
+    	Integer piece_id = 0;
     	if(pieceList.isEmpty() == true) {
     		piece_id = pieceListService.getNewId();
     	} else {
     		//navegar pieceList y buscar el ultimo id y agregarle 1
+    		piece_id = pieceList.get(pieceList.size()-1).getId() + 1;
     		//si se esta editando un producto habria que buscar un nuevo id del servicio
     	}
     	
@@ -169,10 +189,9 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	}
     	Integer piece_units = pieceUnitsByProduct.getValue();
     	boolean piece_isGroup = pieceGroup.isChecked();
-    	piece = new Piece(piece_id, null, piece_name, piece_height, piece_width, piece_depth, piece_size1, piece_size2, piece_isGroup, piece_units);
-    	pieceList.add(piece);
-    	productPiecesListModel.add(piece);
+    	activePiece = new Piece(piece_id, null, piece_name, piece_height, piece_width, piece_depth, piece_size1, piece_size2, piece_isGroup, piece_units);
     	processCreationBlock.setVisible(true);
+    	pieceCreationBlock.setVisible(false);
     }
     
     @Listen("onClick = #cancelProcessButton")
@@ -186,18 +205,18 @@ public class ProductCreationController extends SelectorComposer<Component>{
     		Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
     		Label lbl = (Label)processListbox.getChildren().get(i).getChildren().get(1).getChildren().get(0);
     		Textbox txtbox = (Textbox)processListbox.getChildren().get(i).getChildren().get(2).getChildren().get(0);
-    		System.out.print("Proceso " + lbl.getValue());
-    		System.out.print(",texto " + txtbox.getText());
-    		System.out.println(",checkbox " + chkbox.isChecked());
+    		//System.out.print("Proceso " + lbl.getValue());
+    		//System.out.print(",texto " + txtbox.getText());
+    		//System.out.println(",checkbox " + chkbox.isChecked());
     		List<ProcessType> processTypeList = processTypeListService.getProcessTypeList();
-    		System.out.println("id proceso " + processTypeList.get(i - 1).getId());
+    		//System.out.println("id proceso " + processTypeList.get(i - 1).getId());
     		if(chkbox.isChecked() && Strings.isBlank(txtbox.getText())){
     			Clients.showNotification("Ingrese el Tiempo para el Proceso",txtbox);
     			return;
     		}
     		Process process = null;
     		if(chkbox.isChecked() && !Strings.isBlank(txtbox.getText())){
-    			int idPiece = piece.getId();
+    			int idPiece = activePiece.getId();
     			int idProcessType = processTypeListService.getProcessTypeList().get(i - 1).getId();
     			Long time = Long.parseLong(txtbox.getText());
     			process = new Process(idPiece, idProcessType, time);
@@ -206,6 +225,22 @@ public class ProductCreationController extends SelectorComposer<Component>{
     			processList.add(process);
     		}
     	}
+    	//agregamos la pieza a la lista y actualizamos el view
+    	pieceList.add(activePiece);
+    	productPiecesListModel.add(activePiece);
+    	activePiece = null;
+    	pieceCreationBlock.setVisible(false);
+    	processCreationBlock.setVisible(false);
+    	//limpiar form pieza
+    	pieceName.setText("");
+    	pieceHeight.setText("");
+    	pieceWidth.setText("");
+    	pieceDepth.setText("");
+    	pieceSize1.setText("");
+    	pieceSize2.setText("");
+    	pieceUnitsByProduct.setValue(null);
+    	pieceGroup.setChecked(false);;
+    	//limpiar procesos (ponerlos en vacio y sin check)
     }
 	
     //when user checks on the checkbox of each process on the list

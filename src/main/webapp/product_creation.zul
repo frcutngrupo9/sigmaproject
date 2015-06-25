@@ -40,7 +40,7 @@
         </panelchildren>
     </panel>
     <separator/>
-    <panel title="Pieza" id="pieceCreationBlock" collapsible="true" visible="true" closable="false" border="rounded">
+    <panel title="Pieza" id="pieceCreationBlock" collapsible="true" visible="false" closable="false" border="rounded">
         <panelchildren>
             <vlayout>
                 <grid hflex="1">
@@ -51,19 +51,19 @@
                     <rows>
                         <row>
                             <label value="Nombre :"/>
-                            <textbox id="pieceName" value=""  width="50%" placeholder="Nombre de la Pieza" constraint="no empty"/>
+                            <textbox id="pieceName" value=""  width="50%" placeholder="Nombre de la Pieza"/>
                         </row>
                         <row>
                             <label value="Longitud (cm) :"/>
-                            <textbox id="pieceHeight" value="" width="150px" constraint="no empty"/>
+                            <textbox id="pieceHeight" value="" width="150px"/>
                         </row>
                         <row>
                             <label value="Espesor (pulgadas) :"/>
-                            <textbox id="pieceDepth" value="" width="150px" constraint="no empty"/>
+                            <textbox id="pieceDepth" value="" width="150px"/>
                         </row>
                         <row>
                             <label value="Ancho (pulgadas) :"/>
-                            <textbox id="pieceWidth" value="" width="150px" constraint="no empty"/>
+                            <textbox id="pieceWidth" value="" width="150px"/>
                         </row>
                         <row>
                             <label value="Medida 1 (cm) :"/>
@@ -91,7 +91,7 @@
         </panelchildren>
     </panel>
     <separator/>
-    <panel title="Procesos" id="processCreationBlock" collapsible="true" visible="true" closable="false" border="rounded">
+    <panel title="Procesos" id="processCreationBlock" collapsible="true" visible="false" closable="false" border="rounded">
         <panelchildren>
             <vlayout>
                 <listbox id="processListbox" hflex="1">

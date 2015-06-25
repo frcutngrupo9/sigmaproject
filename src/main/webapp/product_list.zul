@@ -22,4 +22,45 @@
     <paging id="pager" pageSize="5" sclass="sigma-paging"/>
     <separator/>
     <button id="newProductButton" label="Crear Producto Nuevo"/>
+    <separator/>
+    <listbox id="pieceListbox">
+        <listhead>
+            <listheader label="Id"/>
+            <listheader label="Id Producto"/>
+            <listheader label="Nombre"/>
+            <listheader label="Longitud"/>
+            <listheader label="Espesor"/>
+            <listheader label="Ancho"/>
+            <listheader label="Medida 1"/>
+            <listheader label="Medida 2"/>
+            <listheader label="Unidades"/>
+        </listhead>
+        <template name="model">
+            <listitem>
+                <listcell label="${each.id}"/>
+                <listcell label="${each.idProduct}"/>
+                <listcell label="${each.name}"/>
+                <listcell label="${each.height}"/>
+                <listcell label="${each.width}"/>
+                <listcell label="${each.depth}"/>
+                <listcell label="${each.size1}"/>
+                <listcell label="${each.size2}"/>
+                <listcell label="${each.units}"/>
+            </listitem>
+        </template>
+    </listbox>	
+    <listbox id="processListbox">
+        <listhead>
+            <listheader label="Id Pieza"/>
+            <listheader label="Id Tipo Proceso"/>
+            <listheader label="Tiempo"/>
+        </listhead>
+        <template name="model">
+            <listitem>
+                <listcell label="${each.idPiece}"/>
+                <listcell label="${each.idProcessType}"/>
+                <listcell label="${each.time}"/>
+            </listitem>
+        </template>
+    </listbox>	
 </window>

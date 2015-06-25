@@ -1,8 +1,13 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import ar.edu.utn.sigmaproject.domain.Piece;
+import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.service.PieceListService;
+import ar.edu.utn.sigmaproject.service.ProcessListService;
 import ar.edu.utn.sigmaproject.service.ProductListService;
-
+import ar.edu.utn.sigmaproject.service.impl.PieceListServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.ProcessListServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductListServiceImpl;
 
 //import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
@@ -14,6 +19,9 @@ import ar.edu.utn.sigmaproject.service.impl.ProductListServiceImpl;
 //import org.zkoss.zk.ui.event.EventQueues;
 //import org.zkoss.zk.ui.select.annotation.VariableResolver;
 
+
+
+
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
@@ -22,7 +30,6 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Paging;
 import org.zkoss.zul.Textbox;
-
 
 import java.util.List;
 
@@ -35,10 +42,18 @@ public class ProductsListController extends SelectorComposer<Component>{
     Listbox productListbox;
     @Wire
     Paging pager;
+    @Wire
+    Listbox pieceListbox;
+    @Wire
+    Listbox processListbox;
     
     ProductListService productListService = new ProductListServiceImpl();
+	PieceListService pieceListService = new PieceListServiceImpl();
+	ProcessListService processListService = new ProcessListServiceImpl();
 	
     ListModelList<Product> productListModel;
+    ListModelList<Piece> pieceListModel;
+    ListModelList<Process> processListModel;
 	//private String query;
     //private SortingPagingHelper<Product> sortingPagingHelper;
 
@@ -52,6 +67,14 @@ public class ProductsListController extends SelectorComposer<Component>{
         List<Product> productList = productListService.getProductList();
         productListModel = new ListModelList<Product>(productList);
         productListbox.setModel(productListModel);
+        
+        List<Piece> pieceList = pieceListService.getPieceList();
+        pieceListModel = new ListModelList<Piece>(pieceList);
+        pieceListbox.setModel(pieceListModel);
+        
+        List<Process> processList = processListService.getProcessList();
+        processListModel = new ListModelList<Process>(processList);
+        processListbox.setModel(processListModel);
     }
     
     @Listen("onSelect = #productListbox")
