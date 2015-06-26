@@ -20,7 +20,15 @@
                     </rows>
                 </grid>
                 <separator/>
+                <hlayout>
+                    <button id="createPieceButton" label="Agregar Nueva Pieza"/>
+                    <button id="saveProductButton" label="Guardar"/>
+                </hlayout>
+                <separator/>
     			<listbox id="productPiecesListbox">
+    				<auxhead>
+						<auxheader label="Piezas" colspan="2"/>
+					</auxhead>
         			<listhead>
             			<listheader label="Nombre Pieza"/>
             			<listheader label="Numero de Procesos"/>
@@ -32,10 +40,6 @@
             			</listitem>
         			</template>
     			</listbox>
-                <hlayout>
-                    <button id="createPieceButton" label="Agregar Nueva Pieza"/>
-                    <button id="saveProductButton" label="Guardar"/>
-                </hlayout>
             </vlayout>
         </panelchildren>
     </panel>

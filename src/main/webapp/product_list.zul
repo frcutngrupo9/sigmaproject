@@ -5,7 +5,10 @@
         <button id="searchButton" label="Buscar"/>
     </hlayout>
     <separator/>
-    <listbox id="productListbox">
+    <listbox id="productListbox" mold="paging" pageSize="7">
+    	<auxhead>
+			<auxheader label="Productos" colspan="3"/>
+		</auxhead>
         <listhead>
             <listheader label="Id"/>
             <listheader label="Nombre"/>
@@ -18,12 +21,14 @@
                 <listcell label="${each.details}"/>
             </listitem>
         </template>
-    </listbox>	
-    <paging id="pager" pageSize="5" sclass="sigma-paging"/>
+    </listbox>
     <separator/>
     <button id="newProductButton" label="Crear Producto Nuevo"/>
     <separator/>
-    <listbox id="pieceListbox">
+    <listbox id="pieceListbox" mold="paging" pageSize="5">
+    	<auxhead>
+			<auxheader label="Piezas" colspan="9"/>
+		</auxhead>
         <listhead>
             <listheader label="Id"/>
             <listheader label="Id Producto"/>
@@ -48,8 +53,12 @@
                 <listcell label="${each.units}"/>
             </listitem>
         </template>
-    </listbox>	
-    <listbox id="processListbox">
+    </listbox>
+    <separator/>
+    <listbox id="processListbox" mold="paging" pageSize="5">
+    	<auxhead>
+			<auxheader label="Procesos" colspan="3"/>
+		</auxhead>
         <listhead>
             <listheader label="Id Pieza"/>
             <listheader label="Id Tipo Proceso"/>

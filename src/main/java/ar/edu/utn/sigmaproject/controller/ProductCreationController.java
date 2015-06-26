@@ -154,7 +154,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			return;
 		}
     	if(pieceUnitsByProduct.getValue() == null || pieceUnitsByProduct.getValue() <= 0){
-			Clients.showNotification("Ingrese el Nombre de la Pieza",pieceName);
+			Clients.showNotification("Ingrese las unidades de esta Pieza que contiene el Producto",pieceUnitsByProduct);
 			return;
 		}
     	Integer piece_id = 0;
