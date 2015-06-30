@@ -1,32 +1,59 @@
-<hbox>
-	<bandbox id="bd" buttonVisible = "true" autodrop = "true">
-		<bandpopup>
-			<vbox>
-				<hbox>
-					Search
-					<textbox />
-				</hbox>
-				<listbox width="200px"
-					onSelect="bd.value=self.selectedItem.label; bd.close();">
-					<listhead>
-						<listheader label="Producto"/>
-						<listheader label="Descripcion"/>
-					</listhead>
-					<listitem>
-						<listcell label="Mesa"/>
-						<listcell label="bla bla"/>
-					</listitem>
-					<listitem>
-						<listcell label="Silla"/>
-						<listcell label="Para sentarse"/>
-					</listitem>
-					<listitem>
-						<listcell label="Banco"/>
-						<listcell label="Tbn para sentarse"/>
-					</listitem>
-				</listbox>
-			</vbox>
-		</bandpopup>
-	</bandbox>
-	<button id="addProductBtn" label="Agregar Producto"/>
-</hbox>
+<window apply="ar.edu.utn.sigmaproject.controller.ProductionOrderCreationController" width="95%" style="background:white">
+	<caption label="Crear Orden de Producion"/>
+    <panel title="Orden de Produccion" id="productionOrderCreationBlock" border="rounded">
+        <panelchildren>
+            <vlayout>
+            	<hlayout>
+            	<bandbox id="bd" buttonVisible = "true" autodrop = "true">
+					<bandpopup>
+						<vbox>
+							<hbox>
+								Search
+								<textbox />
+							</hbox>
+							<listbox width="200px"
+								onSelect="bd.value=self.selectedItem.label; bd.close();">
+							<listhead>
+								<listheader label="Producto"/>
+								<listheader label="Descripcion"/>
+							</listhead>
+							<listitem>
+								<listcell label="Mesa"/>
+								<listcell label="bla bla"/>
+							</listitem>
+							<listitem>
+								<listcell label="Silla"/>
+								<listcell label="Para sentarse"/>
+							</listitem>
+							<listitem>
+								<listcell label="Banco"/>
+								<listcell label="Tbn para sentarse"/>
+							</listitem>
+							</listbox>
+						</vbox>
+					</bandpopup>
+				</bandbox>
+				<label value="Cantidad: "/>
+				<textbox width="36px"/>
+				<button id="addProductBtn" label="Agregar Producto"/>
+				</hlayout>
+                <separator/>
+    			<listbox id="productionOrderProductsListbox">
+    				<auxhead>
+						<auxheader label="Productos" colspan="2"/>
+					</auxhead>
+        			<listhead>
+            			<listheader label="Nombre Producto"/>
+            			<listheader label="Unidades"/>
+        			</listhead>
+        			<template name="model">
+            			<listitem>
+                			<listcell label="${each.name}"/>
+                			<listcell label="nro"/>
+            			</listitem>
+        			</template>
+    			</listbox>
+            </vlayout>
+        </panelchildren>
+    </panel>
+</window>

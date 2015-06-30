@@ -245,13 +245,14 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	pieceSize1.setText("");
     	pieceSize2.setText("");
     	pieceUnitsByProduct.setValue(null);
-    	pieceGroup.setChecked(false);;
+    	pieceGroup.setChecked(false);
     	//limpiar procesos (ponerlos en vacio y sin check)
     	for(int i=1; i<processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
     		Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
     		Textbox txtbox = (Textbox)processListbox.getChildren().get(i).getChildren().get(2).getChildren().get(0);
     		chkbox.setChecked(false);
     		txtbox.setText("");
+    		txtbox.setVisible(false);
     	}
     }
 	
