@@ -22,10 +22,17 @@ import ar.edu.utn.sigmaproject.service.impl.ProductListServiceImpl;
 
 
 
+
+
+
 import org.zkoss.zk.ui.select.SelectorComposer;
+import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Executions;
+import org.zkoss.zul.Button;
+import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Paging;
@@ -46,6 +53,8 @@ public class ProductsListController extends SelectorComposer<Component>{
     Listbox pieceListbox;
     @Wire
     Listbox processListbox;
+    @Wire
+	Button newProductButton;
     
     ProductListService productListService = new ProductListServiceImpl();
 	PieceListService pieceListService = new PieceListServiceImpl();
@@ -87,6 +96,13 @@ public class ProductsListController extends SelectorComposer<Component>{
     public void search() {
         //query = searchTextbox.getValue();
         //sortingPagingHelper.resetUnsorted();
+    }
+    
+    @Listen("onClick = #newProductButton")
+    public void goToNewProduct() {
+    	Include include = (Include) Selectors.iterable(productListbox.getPage(), "#mainInclude").iterator().next();
+    	include.setSrc("/product_creation.zul");
+    	//Executions.sendRedirect("/product_creation.zul");
     }
     
     /*

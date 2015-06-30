@@ -135,6 +135,12 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		Clients.showNotification("Producto guardado");
 		
 		//limpiar todo
+		product = null;
+		pieceList = new ArrayList<Piece>();
+		processList = new ArrayList<Process>();
+		productName.setText("");
+		productDetails.setText("");
+		productPiecesListModel.clear();
     }
     
     @Listen("onClick = #createPieceButton")
@@ -241,6 +247,12 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	pieceUnitsByProduct.setValue(null);
     	pieceGroup.setChecked(false);;
     	//limpiar procesos (ponerlos en vacio y sin check)
+    	for(int i=1; i<processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
+    		Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
+    		Textbox txtbox = (Textbox)processListbox.getChildren().get(i).getChildren().get(2).getChildren().get(0);
+    		chkbox.setChecked(false);
+    		txtbox.setText("");
+    	}
     }
 	
     //when user checks on the checkbox of each process on the list
@@ -257,4 +269,10 @@ public class ProductCreationController extends SelectorComposer<Component>{
   		}
   	}
     
+  	private void refreshView() {
+  		if (activePiece == null) {
+  			
+  		}
+  	}
+  	
 }

@@ -11,7 +11,7 @@
                     <rows>
                         <row>
                             <label value="Nombre :"/>
-                            <textbox id="productName" width="50%" placeholder="Nombre del Producto" constraint="no empty" />
+                            <textbox id="productName" width="50%" placeholder="Nombre del Producto"/>
                         </row>
                         <row>
                             <label value="Detalles :"/>
