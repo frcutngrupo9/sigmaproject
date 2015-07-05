@@ -1,3 +1,108 @@
-<vbox vflex="1" hflex="1" align="center" pack="center" spacing="20px">
-	<label value="" sclass="head1" />
-</vbox>
+<window apply="ar.edu.utn.sigmaproject.controller.ProductionPlanCreationController" width="95%" style="background:white">
+    <panel title="Plan de Produccion" id="productionOrderCreationBlock" border="rounded">
+        <panelchildren>
+            <vlayout>
+            	<hlayout>
+            		<label value="Nombre: "/>
+					<textbox width="180px"/>
+            	</hlayout>
+            	<hlayout>
+            		<label value="Fecha: "/>
+					<datebox id="db5" cols="12" format="dd-MM-yyyy" onCreate="self.value = new Date()" />
+            	</hlayout>
+            	<hlayout>
+            	<bandbox id="bd" buttonVisible = "true" autodrop = "true">
+					<bandpopup>
+						<vbox>
+							<hbox>
+								Search
+								<textbox />
+							</hbox>
+							<listbox width="200px"
+								onSelect="bd.value=self.selectedItem.label; bd.close();">
+							<listhead>
+								<listheader label="Producto"/>
+								<listheader label="Descripcion"/>
+							</listhead>
+							<listitem>
+								<listcell label="Mesa"/>
+								<listcell label="bla bla"/>
+							</listitem>
+							<listitem>
+								<listcell label="Silla"/>
+								<listcell label="Para sentarse"/>
+							</listitem>
+							<listitem>
+								<listcell label="Banco"/>
+								<listcell label="Tbn para sentarse"/>
+							</listitem>
+							</listbox>
+						</vbox>
+					</bandpopup>
+				</bandbox>
+				<label value="Cantidad: "/>
+				<textbox width="36px"/>
+				<button id="addProductBtn" label="Agregar Producto"/>
+				</hlayout>
+                <separator/>
+    			<listbox id="productListbox">
+    				<auxhead>
+						<auxheader label="Productos" colspan="2"/>
+					</auxhead>
+        			<listhead>
+            			<listheader label="Nombre Producto"/>
+            			<listheader label="Unidades"/>
+        			</listhead>
+        			<template name="model">
+            			<listitem>
+                			<listcell label="${each.name}"/>
+                			<listcell label="nro"/>
+            			</listitem>
+        			</template>
+    			</listbox>
+    			<listbox id="pieceProcessListbox">
+    				<auxhead>
+						<auxheader label="Procesos" colspan="6"/>
+					</auxhead>
+        			<listhead>
+        				<listheader label="Nombre Producto"/>
+            			<listheader label="Nombre Pieza"/>
+            			<listheader label="Nombre Proceso"/>
+            			<listheader label="Tiempo Proceso"/>
+            			<listheader label="Cantidad Pieza"/>
+            			<listheader label="Tiempo Total"/>
+        			</listhead>
+        			<template name="model">
+            			<listitem>
+                			<listcell label="${each.pieceName}"/>
+                			<listcell label="nro"/>
+                			<listcell label="nro"/>
+                			<listcell label="nro"/>
+                			<listcell label="nro"/>
+                			<listcell label="nro"/>
+            			</listitem>
+        			</template>
+    			</listbox>
+    			<listbox id="supplyListbox">
+    				<auxhead>
+						<auxheader label="Insumos" colspan="3"/>
+					</auxhead>
+        			<listhead>
+        				<listheader label="Nombre Producto"/>
+            			<listheader label="Nombre Insumo"/>
+            			<listheader label="Cantidad"/>
+        			</listhead>
+        			<template name="model">
+            			<listitem>
+                			<listcell label="${each.pieceName}"/>
+                			<listcell label="nro"/>
+                			<listcell label="nro"/>
+                			<listcell label="nro"/>
+                			<listcell label="nro"/>
+            			</listitem>
+        			</template>
+    			</listbox>
+            </vlayout>
+        </panelchildren>
+    </panel>
+</window>

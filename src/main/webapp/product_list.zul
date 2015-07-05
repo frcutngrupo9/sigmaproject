@@ -1,4 +1,4 @@
-<window title="Lista de Productos" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductsListController" sclass="sigma-content">
+<window title="Lista de Productos" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductListController" sclass="sigma-content">
     <hlayout>
         <label>Buscar:</label>
         <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
@@ -27,9 +27,10 @@
     <separator/>
     <listbox id="pieceListbox" mold="paging" pageSize="5">
     	<auxhead>
-			<auxheader label="Piezas" colspan="9"/>
+			<auxheader label="Piezas" colspan="10"/>
 		</auxhead>
         <listhead>
+        	<listheader label="Nombre Producto"/>
             <listheader label="Id"/>
             <listheader label="Id Producto"/>
             <listheader label="Nombre"/>
@@ -42,6 +43,7 @@
         </listhead>
         <template name="model">
             <listitem>
+            	<listcell label=""/>
                 <listcell label="${each.id}"/>
                 <listcell label="${each.idProduct}"/>
                 <listcell label="${each.name}"/>
@@ -57,15 +59,19 @@
     <separator/>
     <listbox id="processListbox" mold="paging" pageSize="5">
     	<auxhead>
-			<auxheader label="Procesos" colspan="3"/>
+			<auxheader label="Procesos" colspan="5"/>
 		</auxhead>
         <listhead>
+        	<listheader label="Nombre Pieza"/>
+            <listheader label="Nombre Tipo Proceso"/>
             <listheader label="Id Pieza"/>
             <listheader label="Id Tipo Proceso"/>
             <listheader label="Tiempo"/>
         </listhead>
         <template name="model">
             <listitem>
+            	<listcell label=""/>
+            	<listcell label=""/>
                 <listcell label="${each.idPiece}"/>
                 <listcell label="${each.idProcessType}"/>
                 <listcell label="${each.time}"/>

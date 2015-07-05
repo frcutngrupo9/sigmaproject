@@ -93,7 +93,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
     @Override
     public void doAfterCompose(Component comp) throws Exception{
         super.doAfterCompose(comp);
-         
+//        System.out.println("-adentro de doAfterCompose-");
         List<ProcessType> processTypeList = processTypeListService.getProcessTypeList();
         processTypeListModel = new ListModelList<ProcessType>(processTypeList);
         processListbox.setModel(processTypeListModel);

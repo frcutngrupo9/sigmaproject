@@ -1,5 +1,4 @@
 <window apply="ar.edu.utn.sigmaproject.controller.ProductionOrderCreationController" width="95%" style="background:white">
-	<caption label="Crear Orden de Producion"/>
     <panel title="Orden de Produccion" id="productionOrderCreationBlock" border="rounded">
         <panelchildren>
             <vlayout>
@@ -38,7 +37,7 @@
 				<button id="addProductBtn" label="Agregar Producto"/>
 				</hlayout>
                 <separator/>
-    			<listbox id="productionOrderProductsListbox">
+    			<listbox id="productionOrderProductListbox">
     				<auxhead>
 						<auxheader label="Productos" colspan="2"/>
 					</auxhead>

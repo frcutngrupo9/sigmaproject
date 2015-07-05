@@ -4,14 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.Piece;
+import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.service.PieceListService;
+import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
 public class PieceListServiceImpl implements PieceListService {
 	
 	static List<Piece> pieceList = new ArrayList<Piece>();
+	private SerializationService serializator = new SerializationService("piece");
 	
-	static{
-		pieceList.add(new Piece(1, 1, "pata delantera", 5L, 5L, 5L, 5L, 5L, true, 1));
+	public PieceListServiceImpl() {
+		List<Piece> aux = serializator.obtenerLista();
+		if(aux != null) {
+			pieceList = aux;
+		} else {
+			serializator.grabarLista(pieceList);
+		}
 	}
 	
 	public synchronized List<Piece> getPieceList() {
@@ -36,6 +44,7 @@ public class PieceListServiceImpl implements PieceListService {
 	public synchronized Piece savePiece(Piece piece) {
 		piece = Piece.clone(piece);
 		pieceList.add(piece);
+		serializator.grabarLista(pieceList);
 		return piece;
 	}
 	
@@ -49,6 +58,7 @@ public class PieceListServiceImpl implements PieceListService {
 				Piece t = pieceList.get(i);
 				if(t.getId().equals(piece.getId())){
 					pieceList.set(i, piece);
+					serializator.grabarLista(pieceList);
 					return piece;
 				}
 			}
@@ -63,6 +73,7 @@ public class PieceListServiceImpl implements PieceListService {
 				Piece t = pieceList.get(i);
 				if(t.getId().equals(piece.getId())){
 					pieceList.remove(i);
+					serializator.grabarLista(pieceList);
 					return;
 				}
 			}

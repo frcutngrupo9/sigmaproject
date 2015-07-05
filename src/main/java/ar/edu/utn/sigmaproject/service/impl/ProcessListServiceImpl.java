@@ -4,14 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.Process;
+import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.service.ProcessListService;
+import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
 public class ProcessListServiceImpl implements ProcessListService {
 
 	static List<Process> processList = new ArrayList<Process>();
+	private SerializationService serializator = new SerializationService("process");
 	
-	static{
-		processList.add(new Process(1, 1, 5L));
+	public ProcessListServiceImpl() {
+		List<Process> aux = serializator.obtenerLista();
+		if(aux != null) {
+			processList = aux;
+		} else {
+			serializator.grabarLista(processList);
+		}
 	}
 	
 	//synchronized para prevenir acceso concurrente al servicio de lista
@@ -37,6 +45,7 @@ public class ProcessListServiceImpl implements ProcessListService {
 	public synchronized Process saveProcess(Process process) {
 		process = Process.clone(process);
 		processList.add(process);
+		serializator.grabarLista(processList);
 		return process;
 	}
 	
@@ -50,6 +59,7 @@ public class ProcessListServiceImpl implements ProcessListService {
 				Process t = processList.get(i);
 				if(t.getIdPiece().equals(process.getIdPiece()) && t.getIdProcessType().equals(process.getIdProcessType())){
 					processList.set(i, process);
+					serializator.grabarLista(processList);
 					return process;
 				}
 			}
@@ -64,6 +74,7 @@ public class ProcessListServiceImpl implements ProcessListService {
 				Process t = processList.get(i);
 				if(t.getIdPiece().equals(process.getIdPiece()) && t.getIdProcessType().equals(process.getIdProcessType())){
 					processList.remove(i);
+					serializator.grabarLista(processList);
 					return;
 				}
 			}

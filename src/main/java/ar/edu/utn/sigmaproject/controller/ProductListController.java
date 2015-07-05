@@ -25,6 +25,9 @@ import ar.edu.utn.sigmaproject.service.impl.ProductListServiceImpl;
 
 
 
+
+
+
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -40,7 +43,7 @@ import org.zkoss.zul.Textbox;
 
 import java.util.List;
 
-public class ProductsListController extends SelectorComposer<Component>{
+public class ProductListController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
 	
 	@Wire
@@ -73,6 +76,7 @@ public class ProductsListController extends SelectorComposer<Component>{
         //sortProperties.put("firstName", Boolean.TRUE);
         //sortProperties.put("lastName", Boolean.TRUE);
         //sortingPagingHelper = new SortingPagingHelper<Product>(clientListbox, pager, sortProperties, this, 1);
+        //        System.out.println("-adentro de doAfterCompose-");
         List<Product> productList = productListService.getProductList();
         productListModel = new ListModelList<Product>(productList);
         productListbox.setModel(productListModel);
