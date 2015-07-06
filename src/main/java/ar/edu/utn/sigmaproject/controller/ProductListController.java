@@ -67,16 +67,10 @@ public class ProductListController extends SelectorComposer<Component>{
     ListModelList<Piece> pieceListModel;
     ListModelList<Process> processListModel;
 	//private String query;
-    //private SortingPagingHelper<Product> sortingPagingHelper;
 
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
-        //LinkedHashMap<String, Boolean> sortProperties = new LinkedHashMap<String, Boolean>();
-        //sortProperties.put("firstName", Boolean.TRUE);
-        //sortProperties.put("lastName", Boolean.TRUE);
-        //sortingPagingHelper = new SortingPagingHelper<Product>(clientListbox, pager, sortProperties, this, 1);
-        //        System.out.println("-adentro de doAfterCompose-");
         List<Product> productList = productListService.getProductList();
         productListModel = new ListModelList<Product>(productList);
         productListbox.setModel(productListModel);
@@ -91,7 +85,7 @@ public class ProductListController extends SelectorComposer<Component>{
     }
     
     @Listen("onSelect = #productListbox")
-    public void onClientSelect() {
+    public void onProductSelect() {
         //EventQueues.lookup(SELECT_CLIENT_QUEUE_NAME).publish(new Event(SELECT_CLIENT_EVENT_NAME, null, clientListbox.getSelectedItem().getValue()));
         getSelf().detach();
     }
@@ -109,16 +103,4 @@ public class ProductListController extends SelectorComposer<Component>{
     	//Executions.sendRedirect("/product_creation.zul");
     }
     
-    /*
-    @Override
-    public Page<Product> getPageForPageRequest(PageRequest pageRequest) {
-        Page<Product> results;
-        if (query != null && !query.isEmpty()) {
-            results = clientService.getClients(query, pageRequest);
-        } else {
-            results = clientService.getClients(pageRequest);
-        }
-        return results;
-    }
-	*/
 }

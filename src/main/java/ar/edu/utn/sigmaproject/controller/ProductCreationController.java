@@ -75,13 +75,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	Listbox processListbox;
 	@Wire
 	Listbox productPiecesListbox;
-	
-	private Product product;
-	private Piece activePiece;
-	private List<Piece> pieceList;
-	private List<Process> processList;
      
-    //services
+    // services
 	ProcessTypeListService processTypeListService = new ProcessTypeListServiceImpl();
 	ProcessListService processListService = new ProcessListServiceImpl();
 	PieceListService pieceListService = new PieceListServiceImpl();
@@ -89,6 +84,12 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	
     ListModelList<ProcessType> processTypeListModel;
     ListModelList<Piece> productPiecesListModel;
+    
+    // atributes
+    private Product product;
+	private Piece activePiece;
+	private List<Piece> pieceList;
+	private List<Process> processList;
      
     @Override
     public void doAfterCompose(Component comp) throws Exception{
@@ -275,5 +276,17 @@ public class ProductCreationController extends SelectorComposer<Component>{
   			
   		}
   	}
+  	
+  	public String quantityOfProcess(int idPiece) {
+  		int quantity = 0;
+  		if(processList != null && processList.isEmpty() == false) {
+    		for(int i=0; i<processList.size(); i++) {
+    			if(processList.get(i).getIdPiece() == idPiece) {
+    				quantity++;
+    			}
+    		}
+    	}
+    	return "" + quantity;
+    }
   	
 }
