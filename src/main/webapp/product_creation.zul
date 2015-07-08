@@ -62,19 +62,19 @@
                             <textbox id="pieceHeight" value="" width="150px"/>
                         </row>
                         <row>
-                            <label value="Espesor (pulgadas) :"/>
+                            <label value="Espesor (cm) :"/>
                             <textbox id="pieceDepth" value="" width="150px"/>
                         </row>
                         <row>
-                            <label value="Ancho (pulgadas) :"/>
+                            <label value="Ancho (cm) :"/>
                             <textbox id="pieceWidth" value="" width="150px"/>
                         </row>
                         <row>
-                            <label value="Medida 1 (cm) :"/>
+                            <label value="Medida 1 (pul) :"/>
                             <textbox id="pieceSize1" value="" width="150px"/>
                         </row>
                         <row>
-                            <label value="Medida 2 (cm) :"/>
+                            <label value="Medida 2 (pul) :"/>
                             <textbox id="pieceSize2" value="" width="150px"/>
                         </row>
                         <row>
