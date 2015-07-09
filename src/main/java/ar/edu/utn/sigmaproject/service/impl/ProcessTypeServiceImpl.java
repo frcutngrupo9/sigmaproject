@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.ProcessType;
-import ar.edu.utn.sigmaproject.service.ProcessTypeListService;
+import ar.edu.utn.sigmaproject.service.ProcessTypeService;
 
-public class ProcessTypeListServiceImpl implements ProcessTypeListService {
+public class ProcessTypeServiceImpl implements ProcessTypeService {
 
 	static int processTypeId = 1;
 	static List<ProcessType> processTypeList = new ArrayList<ProcessType>();  

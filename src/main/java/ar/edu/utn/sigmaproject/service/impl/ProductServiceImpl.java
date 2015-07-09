@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.Product;
-import ar.edu.utn.sigmaproject.service.ProductListService;
+import ar.edu.utn.sigmaproject.service.ProductService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
-public class ProductListServiceImpl implements ProductListService {
+public class ProductServiceImpl implements ProductService {
 	
 	static List<Product> productList = new ArrayList<Product>();
 	private SerializationService serializator = new SerializationService("product");
 	
-	public ProductListServiceImpl() {
+	public ProductServiceImpl() {
 		List<Product> aux = serializator.obtenerLista();
 		if(aux != null) {
 			productList = aux;

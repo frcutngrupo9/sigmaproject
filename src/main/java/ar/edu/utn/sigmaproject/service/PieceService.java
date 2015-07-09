@@ -4,7 +4,7 @@ import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.Piece;
 
-public interface PieceListService {
+public interface PieceService {
 	
 	List<Piece> getPieceList();
 	

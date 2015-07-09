@@ -4,16 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.Process;
-import ar.edu.utn.sigmaproject.domain.Product;
-import ar.edu.utn.sigmaproject.service.ProcessListService;
+import ar.edu.utn.sigmaproject.service.ProcessService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
-public class ProcessListServiceImpl implements ProcessListService {
+public class ProcessServiceImpl implements ProcessService {
 
 	static List<Process> processList = new ArrayList<Process>();
 	private SerializationService serializator = new SerializationService("process");
 	
-	public ProcessListServiceImpl() {
+	public ProcessServiceImpl() {
 		List<Process> aux = serializator.obtenerLista();
 		if(aux != null) {
 			processList = aux;

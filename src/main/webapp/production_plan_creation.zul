@@ -18,24 +18,18 @@
 								Search
 								<textbox />
 							</hbox>
-							<listbox width="200px"
+							<listbox id="productPopupListbox" width="200px"
 								onSelect="bd.value=self.selectedItem.label; bd.close();">
 							<listhead>
 								<listheader label="Producto"/>
 								<listheader label="Descripcion"/>
 							</listhead>
-							<listitem>
-								<listcell label="Mesa"/>
-								<listcell label="bla bla"/>
-							</listitem>
-							<listitem>
-								<listcell label="Silla"/>
-								<listcell label="Para sentarse"/>
-							</listitem>
-							<listitem>
-								<listcell label="Banco"/>
-								<listcell label="Tbn para sentarse"/>
-							</listitem>
+							<template name="model">
+								<listitem>
+									<listcell label="each.name"/>
+									<listcell label="each.details"/>
+								</listitem>
+							</template>
 							</listbox>
 						</vbox>
 					</bandpopup>

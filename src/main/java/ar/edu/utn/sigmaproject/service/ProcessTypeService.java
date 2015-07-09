@@ -3,7 +3,7 @@ package ar.edu.utn.sigmaproject.service;
 import java.util.List;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 
-public interface ProcessTypeListService {
+public interface ProcessTypeService {
 	
 	/** get ProcessType list **/
 	List<ProcessType> getProcessTypeList();

@@ -19,14 +19,14 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.ListModelList;
 
-import ar.edu.utn.sigmaproject.service.PieceListService;
-import ar.edu.utn.sigmaproject.service.ProcessListService;
-import ar.edu.utn.sigmaproject.service.ProcessTypeListService;
-import ar.edu.utn.sigmaproject.service.ProductListService;
-import ar.edu.utn.sigmaproject.service.impl.PieceListServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProcessListServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProcessTypeListServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProductListServiceImpl;
+import ar.edu.utn.sigmaproject.service.PieceService;
+import ar.edu.utn.sigmaproject.service.ProcessService;
+import ar.edu.utn.sigmaproject.service.ProcessTypeService;
+import ar.edu.utn.sigmaproject.service.ProductService;
+import ar.edu.utn.sigmaproject.service.impl.PieceServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.ProcessServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.ProcessTypeServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
@@ -77,10 +77,10 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	Listbox productPiecesListbox;
      
     // services
-	ProcessTypeListService processTypeListService = new ProcessTypeListServiceImpl();
-	ProcessListService processListService = new ProcessListServiceImpl();
-	PieceListService pieceListService = new PieceListServiceImpl();
-	ProductListService productListService = new ProductListServiceImpl();
+	ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
+	ProcessService processService = new ProcessServiceImpl();
+	PieceService pieceService = new PieceServiceImpl();
+	ProductService productService = new ProductServiceImpl();
 	
     ListModelList<ProcessType> processTypeListModel;
     ListModelList<Piece> productPiecesListModel;
@@ -95,7 +95,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
     public void doAfterCompose(Component comp) throws Exception{
         super.doAfterCompose(comp);
 //        System.out.println("-adentro de doAfterCompose-");
-        List<ProcessType> processTypeList = processTypeListService.getProcessTypeList();
+        List<ProcessType> processTypeList = processTypeService.getProcessTypeList();
         processTypeListModel = new ListModelList<ProcessType>(processTypeList);
         processListbox.setModel(processTypeListModel);
         
@@ -113,22 +113,22 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			Clients.showNotification("Ingresar Nombre Producto",productName);
 			return;
 		}
-    	Integer product_id = productListService.getNewId();
+    	Integer product_id = productService.getNewId();
     	String product_name = productName.getText();
     	String product_details = productDetails.getText();
     	product = new Product(product_id, product_name, product_details);
     	
     	//save
-    	product = productListService.updateProduct(product);
+    	product = productService.updateProduct(product);
     	if(pieceList != null && pieceList.isEmpty() == false) {
     		for(int i=0; i<pieceList.size(); i++) {
     			pieceList.get(i).setIdProduct(product.getId());
-    			pieceListService.savePiece(pieceList.get(i));
+    			pieceService.savePiece(pieceList.get(i));
     		}
     	}
     	if(processList != null && processList.isEmpty() == false) {
     		for(int i=0; i<processList.size(); i++) {
-    			processListService.saveProcess(processList.get(i));
+    			processService.saveProcess(processList.get(i));
     		}
     	}
     	
@@ -166,7 +166,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		}
     	Integer piece_id = 0;
     	if(pieceList.isEmpty() == true) {
-    		piece_id = pieceListService.getNewId();
+    		piece_id = pieceService.getNewId();
     	} else {
     		//navegar pieceList y buscar el ultimo id y agregarle 1
     		piece_id = pieceList.get(pieceList.size()-1).getId() + 1;
@@ -215,7 +215,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
     		//System.out.print("Proceso " + lbl.getValue());
     		//System.out.print(",texto " + txtbox.getText());
     		//System.out.println(",checkbox " + chkbox.isChecked());
-    		List<ProcessType> processTypeList = processTypeListService.getProcessTypeList();
+    		List<ProcessType> processTypeList = processTypeService.getProcessTypeList();
     		//System.out.println("id proceso " + processTypeList.get(i - 1).getId());
     		if(chkbox.isChecked() && Strings.isBlank(txtbox.getText())){
     			Clients.showNotification("Ingrese el Tiempo para el Proceso",txtbox);
@@ -224,7 +224,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
     		Process process = null;
     		if(chkbox.isChecked() && !Strings.isBlank(txtbox.getText())){
     			int idPiece = activePiece.getId();
-    			int idProcessType = processTypeListService.getProcessTypeList().get(i - 1).getId();
+    			int idProcessType = processTypeService.getProcessTypeList().get(i - 1).getId();
     			Long time = Long.parseLong(txtbox.getText());
     			process = new Process(idPiece, idProcessType, time);
     		}

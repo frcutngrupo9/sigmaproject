@@ -5,15 +5,15 @@ import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Product;
-import ar.edu.utn.sigmaproject.service.PieceListService;
+import ar.edu.utn.sigmaproject.service.PieceService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
-public class PieceListServiceImpl implements PieceListService {
+public class PieceServiceImpl implements PieceService {
 	
 	static List<Piece> pieceList = new ArrayList<Piece>();
 	private SerializationService serializator = new SerializationService("piece");
 	
-	public PieceListServiceImpl() {
+	public PieceServiceImpl() {
 		List<Piece> aux = serializator.obtenerLista();
 		if(aux != null) {
 			pieceList = aux;

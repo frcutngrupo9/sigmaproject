@@ -3,14 +3,14 @@ package ar.edu.utn.sigmaproject.controller;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.Product;
-import ar.edu.utn.sigmaproject.service.PieceListService;
-import ar.edu.utn.sigmaproject.service.ProcessListService;
-import ar.edu.utn.sigmaproject.service.ProcessTypeListService;
-import ar.edu.utn.sigmaproject.service.ProductListService;
-import ar.edu.utn.sigmaproject.service.impl.PieceListServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProcessListServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProductListServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProcessTypeListServiceImpl;
+import ar.edu.utn.sigmaproject.service.PieceService;
+import ar.edu.utn.sigmaproject.service.ProcessService;
+import ar.edu.utn.sigmaproject.service.ProcessTypeService;
+import ar.edu.utn.sigmaproject.service.ProductService;
+import ar.edu.utn.sigmaproject.service.impl.PieceServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.ProcessServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.ProcessTypeServiceImpl;
 
 //import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 //import java.util.LinkedHashMap;
@@ -55,10 +55,10 @@ public class ProductListController extends SelectorComposer<Component>{
     @Wire
 	Button newProductButton;
     
-    ProductListService productListService = new ProductListServiceImpl();
-	PieceListService pieceListService = new PieceListServiceImpl();
-	ProcessListService processListService = new ProcessListServiceImpl();
-	ProcessTypeListService processTypeListService = new ProcessTypeListServiceImpl();
+    ProductService productListService = new ProductServiceImpl();
+	PieceService pieceListService = new PieceServiceImpl();
+	ProcessService processListService = new ProcessServiceImpl();
+	ProcessTypeService processTypeListService = new ProcessTypeServiceImpl();
 	
     ListModelList<Product> productListModel;
     ListModelList<Piece> pieceListModel;
