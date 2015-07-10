@@ -1,4 +1,4 @@
-<window apply="ar.edu.utn.sigmaproject.controller.ProductionPlanCreationController" width="95%" style="background:white">
+<window id="win_production_plan_creation" apply="ar.edu.utn.sigmaproject.controller.ProductionPlanCreationController" width="95%" style="background:white">
     <panel title="Plan de Produccion" id="productionOrderCreationBlock" border="rounded">
         <panelchildren>
             <vlayout>
@@ -11,23 +11,22 @@
 					<datebox id="db5" cols="12" format="dd-MM-yyyy" onCreate="self.value = new Date()" />
             	</hlayout>
             	<hlayout>
-            	<bandbox id="bd" buttonVisible = "true" autodrop = "true">
+            	<bandbox id="productBandbox" buttonVisible = "true" autodrop = "true">
 					<bandpopup>
 						<vbox>
 							<hbox>
-								Search
+								Buscar
 								<textbox />
 							</hbox>
-							<listbox id="productPopupListbox" width="200px"
-								onSelect="bd.value=self.selectedItem.label; bd.close();">
+							<listbox id="productPopupListbox" width="200px">
 							<listhead>
 								<listheader label="Producto"/>
 								<listheader label="Descripcion"/>
 							</listhead>
 							<template name="model">
 								<listitem>
-									<listcell label="each.name"/>
-									<listcell label="each.details"/>
+									<listcell label="${each.name}"/>
+									<listcell label="${each.details}"/>
 								</listitem>
 							</template>
 							</listbox>
@@ -35,11 +34,11 @@
 					</bandpopup>
 				</bandbox>
 				<label value="Cantidad: "/>
-				<textbox width="36px"/>
-				<button id="addProductBtn" label="Agregar Producto"/>
+				<intbox id="productUnits" width="36px"/>
+				<button id="addProductButton" label="Agregar Producto"/>
 				</hlayout>
                 <separator/>
-    			<listbox id="productListbox">
+    			<listbox id="productionPlanProductListbox">
     				<auxhead>
 						<auxheader label="Productos" colspan="2"/>
 					</auxhead>
@@ -49,8 +48,8 @@
         			</listhead>
         			<template name="model">
             			<listitem>
-                			<listcell label="${each.name}"/>
-                			<listcell label="nro"/>
+                			<listcell label="${win_production_plan_creation$composer.getNameOfProduct(each.idProduct)}"/>
+                			<listcell label="${each.units}"/>
             			</listitem>
         			</template>
     			</listbox>
