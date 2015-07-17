@@ -1,0 +1,70 @@
+<window id="win_raw_material" title="Materias Primas" closable="false" apply="ar.edu.utn.sigmaproject.controller.RawMaterialController" sclass="sigma-content">
+    <hlayout>
+        <label>Buscar:</label>
+        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
+        <button id="searchButton" label="Buscar"/>
+    </hlayout>
+    <separator/>
+    <listbox id="rawMaterialListbox"  mold="paging" pageSize="7">
+        <listhead>
+            <listheader label="Nombre"/>
+            <listheader label="Unidad de Medida"/>
+            <listheader label="Largo (L)"/>
+            <listheader label="Grueso (G)"/>
+            <listheader label="Ancho (A)"/>
+        </listhead>
+        <template name="model">
+            <listitem>
+                <listcell label="${each.name}"/>
+                <listcell label="${win_raw_material$composer.getMeasureUnitName(each.idMeasureUnit)}"/>
+                <listcell label="${each.length}"/>
+                <listcell label="${each.depth}"/>
+                <listcell label="${each.height}"/>
+            </listitem>
+        </template>
+    </listbox>
+    <vlayout>
+        <separator/>
+        <hbox>
+            <button id="newButton" label="Nuevo"/>
+        </hbox>
+        <separator/>
+        <grid id="rawMaterialGrid" width="400px" sclass="sigma-form" visible="false">
+            <columns>
+                <column hflex="min" align="right"/>
+                <column />
+            </columns>
+            <rows>
+                <row>	
+                    <label>Nombre:</label>
+                    <textbox id="nameTextBox" value="" hflex="1"/>
+                </row>
+                <row>	
+                    <label>Unidad de Medida:</label>
+                    <selectbox id="measureUnit">
+                        <template name="model">
+                            <label value="${each}" />
+                        </template>
+                    </selectbox>
+                </row>
+                <row>	
+                    <label>Largo:</label>
+                    <doublebox id="lengthTextBox" value="0.0" format="#.###"/>
+                </row>
+                <row>	
+                    <label>Grueso:</label>
+                    <doublebox id="depthTextBox" value="0.0" format="#.###"/>
+                </row>
+                <row>	
+                    <label>Ancho:</label>
+                    <doublebox id="heightTextBox" value="0.0" format="#.###"/>
+                </row>
+                <row>
+                    <button id="saveButton" label="Guardar"/>
+                    <button id="cancelButton" label="Cancelar"/>
+                    <button id="resetButton" label="Reset"/>
+                </row>
+            </rows>
+        </grid>
+    </vlayout>	
+</window>

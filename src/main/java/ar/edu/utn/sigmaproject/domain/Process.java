@@ -7,11 +7,13 @@ public class Process implements Serializable, Cloneable {
 	
 	Integer idPiece;
 	Integer idProcessType;
+	String details;
 	Long time;
 	
-	public Process(Integer idPiece, Integer idProcessType, Long time) {
+	public Process(Integer idPiece, Integer idProcessType, String details, Long time) {
 		this.idPiece = idPiece;
 		this.idProcessType = idProcessType;
+		this.details = details;
 		this.time = time;
 	}
 
@@ -29,6 +31,14 @@ public class Process implements Serializable, Cloneable {
 
 	public void setIdProcessType(Integer idProcessType) {
 		this.idProcessType = idProcessType;
+	}
+	
+	public String getDetails() {
+		return details;
+	}
+
+	public void setDetails(String details) {
+		this.details = details;
 	}
 	
 	public Long getTime() {

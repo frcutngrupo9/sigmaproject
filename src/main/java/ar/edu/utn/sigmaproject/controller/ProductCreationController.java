@@ -225,8 +225,10 @@ public class ProductCreationController extends SelectorComposer<Component>{
     		if(chkbox.isChecked() && !Strings.isBlank(txtbox.getText())){
     			int idPiece = activePiece.getId();
     			int idProcessType = processTypeService.getProcessTypeList().get(i - 1).getId();
+    			//!! Recordar hacer entrada del detail
+    			String details = "";
     			Long time = Long.parseLong(txtbox.getText());
-    			process = new Process(idPiece, idProcessType, time);
+    			process = new Process(idPiece, idProcessType, details, time);
     		}
     		if(process != null) {
     			processList.add(process);

@@ -81,7 +81,14 @@ public class PieceServiceImpl implements PieceService {
 	}
 	
 	public synchronized Integer getNewId() {
-		return pieceList.size() + 1;
+		Integer lastId = 0;
+		for(int i=0;i<pieceList.size();i++){
+			Piece aux = pieceList.get(i);
+			if(lastId < aux.getId()){
+				lastId = aux.getId();
+			}
+		}
+		return lastId + 1;
 	}
 
 }

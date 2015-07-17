@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.domain.RawMaterial;
 import ar.edu.utn.sigmaproject.service.ProductService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
@@ -86,7 +87,14 @@ public class ProductServiceImpl implements ProductService {
 	}
 	
 	public synchronized Integer getNewId() {
-		return productList.size() + 1;
+		Integer lastId = 0;
+		for(int i=0;i<productList.size();i++){
+			Product aux = productList.get(i);
+			if(lastId < aux.getId()){
+				lastId = aux.getId();
+			}
+		}
+		return lastId + 1;
 	}
 
 }
