@@ -75,19 +75,19 @@ public class SidebarController extends SelectorComposer<Component> {
 		TreeNode<MenuTreeRow> rootNode = new DefaultTreeNode<MenuTreeRow>(null, Arrays.asList(
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Productos"), Arrays.asList(
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Search.png", "Lista de Productos", "/product_list.zul")),
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Write.png", "Crear Producto", "/product_creation.zul"))
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Stationery.png", "Crear Producto", "/product_creation.zul"))
             )),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Produccion"), Arrays.asList(
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Paste.png", "Planes de Produccion", "/production_plan_list.zul")),
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Calender.png", "Planes de Produccion", "/production_plan_list.zul")),
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Write.png", "Crear Plan de Produccion", "/production_plan_creation.zul")),
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Paste.png", "Ordenes de Produccion", "/production_order_list.zul")),
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Write.png", "Crear Orden de Produccion", "/production_order_creation.zul"))
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Clock.png", "Crear Orden de Produccion", "/production_order_creation.zul"))
             )),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Stock"), Arrays.asList(
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Template.png", "Stock de Productos Terminados", "/finished_product_list.zul")),
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Template.png", "Stock de Materia Prima", "/raw_material_stock.zul"))
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Box.png", "Stock de Productos", "/product_stock.zul")),
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Box.png", "Stock de Materia Prima", "/raw_material_stock.zul"))
             )),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Materia Prima", "/raw_material.zul")),
+            new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Insumos", "/supply.zul")),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Reportes"))
         ));
         tree.setModel(new DefaultTreeModel<MenuTreeRow>(rootNode));
