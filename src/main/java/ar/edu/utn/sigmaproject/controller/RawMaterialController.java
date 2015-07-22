@@ -72,7 +72,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
         selectedRawMaterial = null;
         updateUI();
     }
-    
+    //prueba de commit
     @Listen("onClick = #searchButton")
     public void search() {
     }
