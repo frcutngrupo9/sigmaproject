@@ -8,6 +8,8 @@ public interface PieceService {
 	
 	List<Piece> getPieceList();
 	
+	List<Piece> getPieceList(Integer idProduct);
+	
 	Piece getPiece(Integer idPiece);
 
 	Piece savePiece(Piece piece);

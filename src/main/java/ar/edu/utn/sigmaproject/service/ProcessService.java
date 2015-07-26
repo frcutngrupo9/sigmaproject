@@ -7,6 +7,8 @@ public interface ProcessService {
 	
 	List<Process> getProcessList();
 	
+	List<Process> getProcessList(Integer idPiece);
+	
 	Process getProcess(Integer idPiece, Integer idProcessType);
 
 	Process saveProcess(Process process);

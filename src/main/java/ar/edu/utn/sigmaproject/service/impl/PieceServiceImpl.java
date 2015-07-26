@@ -30,6 +30,16 @@ public class PieceServiceImpl implements PieceService {
 		return list;
 	}
 	
+	public synchronized List<Piece> getPieceList(Integer idProduct) {
+		List<Piece> list = new ArrayList<Piece>();
+		for(Piece piece:pieceList){
+			if(piece.getIdProduct().compareTo(idProduct) == 0) {
+				list.add(Piece.clone(piece));
+			}
+		}
+		return list;
+	}
+	
 	public synchronized Piece getPiece(Integer id) {
 		int size = pieceList.size();
 		for(int i=0;i<size;i++){

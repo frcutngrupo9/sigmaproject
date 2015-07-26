@@ -48,12 +48,12 @@
         			</listhead>
         			<template name="model">
             			<listitem>
-                			<listcell label="${win_production_plan_creation$composer.getNameOfProduct(each.idProduct)}"/>
+                			<listcell label="${win_production_plan_creation$composer.getProductName(each.idProduct)}"/>
                 			<listcell label="${each.units}"/>
             			</listitem>
         			</template>
     			</listbox>
-    			<listbox id="pieceProcessListbox">
+    			<listbox id="processListbox" mold="paging" pageSize="8">
     				<auxhead>
 						<auxheader label="Procesos" colspan="6"/>
 					</auxhead>
@@ -61,18 +61,20 @@
         				<listheader label="Nombre Producto"/>
             			<listheader label="Nombre Pieza"/>
             			<listheader label="Nombre Proceso"/>
-            			<listheader label="Tiempo Proceso"/>
-            			<listheader label="Cantidad Pieza"/>
-            			<listheader label="Tiempo Total"/>
+            			<listheader label="Cantidad Pieza por Producto"/>
+            			<listheader label="Cantidad Total Pieza"/>
+            			<listheader label="Tiempo Proceso por Pieza"/>
+            			<listheader label="Tiempo Total Proceso"/>
         			</listhead>
         			<template name="model">
             			<listitem>
-                			<listcell label="${each.pieceName}"/>
-                			<listcell label="nro"/>
-                			<listcell label="nro"/>
-                			<listcell label="nro"/>
-                			<listcell label="nro"/>
-                			<listcell label="nro"/>
+                			<listcell label="${win_production_plan_creation$composer.getProductNameByPieceId(each.idPiece)}"/>
+                			<listcell label="${win_production_plan_creation$composer.getPieceName(each.idPiece)}"/>
+                			<listcell label="${win_production_plan_creation$composer.getProcessName(each.idProcessType)}"/>
+                			<listcell label="${win_production_plan_creation$composer.getPieceUnits(each.idPiece)}"/>
+                			<listcell label="${win_production_plan_creation$composer.getPieceTotalUnits(each.idPiece)}"/>
+                			<listcell label="${each.time}"/>
+                			<listcell label="${win_production_plan_creation$composer.getTotalTime(each.idPiece, each.idProcessType)}"/>
             			</listitem>
         			</template>
     			</listbox>
@@ -87,10 +89,8 @@
         			</listhead>
         			<template name="model">
             			<listitem>
-                			<listcell label="${each.pieceName}"/>
-                			<listcell label="nro"/>
-                			<listcell label="nro"/>
-                			<listcell label="nro"/>
+                			<listcell label="${win_production_plan_creation$composer.getNameOfProduct(each.idProduct)}"/>
+                			<listcell label="${each.name}"/>
                 			<listcell label="nro"/>
             			</listitem>
         			</template>

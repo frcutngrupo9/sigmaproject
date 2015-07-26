@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
+import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.service.MeasureUnitService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
@@ -11,6 +12,12 @@ public class MeasureUnitServiceImpl implements MeasureUnitService {
 	
 	static List<MeasureUnit> measureUnitList = new ArrayList<MeasureUnit>();
 	private SerializationService serializator = new SerializationService("measure_unit");
+	static int measureUnitId = 1;
+	static{
+		measureUnitList.add(new MeasureUnit(measureUnitId++,"centimetros"));
+		measureUnitList.add(new MeasureUnit(measureUnitId++,"metros"));
+		measureUnitList.add(new MeasureUnit(measureUnitId++,"pulgadas"));
+	}
 	
 	public MeasureUnitServiceImpl() {
 		List<MeasureUnit> aux = serializator.obtenerLista();

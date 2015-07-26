@@ -30,6 +30,16 @@ public class ProcessServiceImpl implements ProcessService {
 		return list;
 	}
 	
+	public synchronized List<Process> getProcessList(Integer idPiece) {
+		List<Process> list = new ArrayList<Process>();
+		for(Process process:processList){
+			if(process.getIdPiece().compareTo(idPiece) == 0) {
+				list.add(Process.clone(process));
+			}
+		}
+		return list;
+	}
+	
 	public synchronized Process getProcess(Integer idPiece, Integer idProcessType) {
 		int size = processList.size();
 		for(int i=0;i<size;i++){
