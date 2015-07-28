@@ -1,3 +1,22 @@
-<vbox vflex="1" hflex="1" align="center" pack="center" spacing="20px">
-	<label value="" sclass="head1" />
-</vbox>
+<window id="win_production_plan_list" title="Planes de Produccion" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductionPlanListController" sclass="sigma-content">
+    <hlayout>
+        <label>Buscar:</label>
+        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
+        <button id="searchButton" label="Buscar"/>
+    </hlayout>
+    <separator/>
+    <listbox id="productionPlanListbox"  mold="paging" pageSize="7">
+        <listhead>
+            <listheader label="Nombre"/>
+            <listheader label="Fecha"/>
+        </listhead>
+        <template name="model">
+            <listitem>
+                <listcell label="${each.name}"/>
+                <listcell label="${win_raw_material$composer.getMeasureUnitName(each.idMeasureUnit)}"/>
+            </listitem>
+        </template>
+    </listbox>
+    <separator/>
+    <button id="newButton" label="Nuevo"/>
+</window>

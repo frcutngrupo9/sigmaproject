@@ -37,10 +37,8 @@ public class MeasureUnitServiceImpl implements MeasureUnitService {
 	}
 	
 	public synchronized MeasureUnit getMeasureUnit(Integer id) {
-		int size = measureUnitList.size();
-		for(int i=0;i<size;i++){
-			MeasureUnit aux = measureUnitList.get(i);
-			if(aux.getId().equals(id)){
+		for(MeasureUnit aux:measureUnitList) {
+			if(aux.getId().compareTo(id) == 0) {
 				return MeasureUnit.clone(aux);
 			}
 		}

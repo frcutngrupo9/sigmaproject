@@ -2,6 +2,8 @@ package ar.edu.utn.sigmaproject.controller;
 
 import java.util.List;
 
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zul.ListModelList;
 
 import ar.edu.utn.sigmaproject.domain.Product;
@@ -14,7 +16,8 @@ import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductionPlanDetailServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductionPlanServiceImpl;
 
-public class ProductionPlanListController {
+public class ProductionPlanListController  extends SelectorComposer<Component>{
+	private static final long serialVersionUID = 1L;
 	
 	// services
 	ProductService productListService = new ProductServiceImpl();

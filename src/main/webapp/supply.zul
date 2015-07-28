@@ -1,58 +1,59 @@
-<window id="win_supply" title="Insumos" closable="false" apply="ar.edu.utn.sigmaproject.controller.SupplyController" sclass="sigma-content" border="normal" hflex="1" vflex="1" contentStyle="overflow:auto">
-	<borderlayout>
-		<center autoscroll="true" border="none">
-			<vlayout hflex="1" vflex="1">
-				<hbox align="center" hflex="1">
-					<button id="newButton" label="Nuevo"/>
-				</hbox>		
-				<listbox id="supplyListbox" vflex="1">
-					<listhead>
-						<listheader label="Nombre"/>
-            			<listheader label="Unidad de Medida"/>
-            			<listheader label="Detalles"/>
-					</listhead>
-					<template name="model">
-						<listitem>
-							<listcell label="${each.name}"/>
-							<listcell label="${win_raw_material$composer.getMeasureUnitName(each.idMeasureUnit)}"/>
-							<listcell label="${each.details}"/>
-						</listitem>
-					</template>
-				</listbox>
-			</vlayout>
-		</center>
-		<east id="selectedSupplyBlock" visible="true" width="300px" border="none" collapsible="false" splittable="true" minsize="300" autoscroll="true">
-			<vlayout >
-				<grid hflex="1">
-					<columns>
-						<column align="right" hflex="min"/>
-						<column/>
-					</columns>
-					<rows>
-						<row>
-							<label>Nombre:</label>
-							<textbox id="nameTextBox" value="" hflex="1"/>
-						</row>
-						<row>
-							<label>Unidad de Medida:</label>
-							<selectbox id="measureUnit">
-                        		<template name="model">
-                            	<label value="${each}" />
-                        		</template>
-                    		</selectbox>
-						</row>
-						<row>
-							<label>Detalles:</label>
-							<textbox id="detailsTextBox" value="" hflex="1"/>
-						</row>
-					</rows>
-				</grid>
-				<hlayout>
-					<button id="saveButton" label="Guardar"/>
-					<button id="cancelButton" label="Cancelar"/>
-					<button id="resetButton" label="Reset"/>
-				</hlayout>
-			</vlayout>
-		</east>
-	</borderlayout>
+<vbox id="supply_page" apply="ar.edu.utn.sigmaproject.controller.SupplyController">
+<window title="Insumos" closable="false" sclass="sigma-content" contentStyle="overflow:auto">
+    <vlayout>
+        <listbox id="supplyListbox" hflex="1">
+            <listhead>
+                <listheader label="Nombre"/>
+                <listheader label="Unidad de Medida"/>
+                <listheader label="Detalles"/>
+            </listhead>
+            <template name="model">
+                <listitem>
+                    <listcell label="${each.name}"/>
+                    <listcell label="${supply_page$composer.getMeasureUnitName(each.idMeasureUnit)}"/>
+                    <listcell label="${each.details}"/>
+                </listitem>
+            </template>
+        </listbox>
+        <separator/>
+        <hlayout>
+            <button id="newButton" label="Nuevo"/>
+        </hlayout>
+    </vlayout>
 </window>
+<window id="win_supply" title="Insumo" border="normal" width="400px"  mode="overlapped" position="center" visible="true">
+	<grid>
+        <columns>
+            <column align="right" hflex="min"/>
+            <column/>
+        </columns>
+        <rows>
+            <row>
+                <label>Nombre:</label>
+                <textbox id="nameTextBox" value="" hflex="1"/>
+            </row>
+            <row>
+                <label>Unidad de Medida:</label>
+                <selectbox id="measureUnit">
+                    <template name="model">
+                        <label value="${each}" />
+                    </template>
+                </selectbox>
+            </row>
+            <row>
+                <label>Detalles:</label>
+                <textbox id="detailsTextBox" value="" hflex="1"/>
+            </row>
+            <row>
+                <cell colspan="2" style="text-align:center">
+                    <hlayout>
+                        <button id="saveButton" label="Guardar"/>
+                        <button id="cancelButton" label="Cancelar"/>
+                        <button id="resetButton" label="Reset"/>
+                    </hlayout>
+                </cell>
+            </row>
+        </rows>
+    </grid>
+</window>
+</vbox>

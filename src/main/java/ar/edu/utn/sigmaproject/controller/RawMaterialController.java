@@ -16,8 +16,11 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Selectbox;
 import org.zkoss.zul.Textbox;
 
+import ar.edu.utn.sigmaproject.domain.MeasureUnit;
 import ar.edu.utn.sigmaproject.domain.RawMaterial;
+import ar.edu.utn.sigmaproject.service.MeasureUnitService;
 import ar.edu.utn.sigmaproject.service.RawMaterialService;
+import ar.edu.utn.sigmaproject.service.impl.MeasureUnitServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.RawMaterialServiceImpl;
 
 public class RawMaterialController extends SelectorComposer<Component>{
@@ -62,6 +65,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
     private RawMaterial selectedRawMaterial;
     private RawMaterialService rawMaterialService = new RawMaterialServiceImpl();
     private ListModelList<RawMaterial> rawMaterialListModel;
+    private MeasureUnitService measureUnitService = new MeasureUnitServiceImpl();
     
     @Override
     public void doAfterCompose(Component comp) throws Exception{
@@ -70,11 +74,18 @@ public class RawMaterialController extends SelectorComposer<Component>{
         rawMaterialListModel = new ListModelList<RawMaterial>(rawMaterialList);
         rawMaterialListbox.setModel(rawMaterialListModel);
         selectedRawMaterial = null;
+        
+        List<MeasureUnit> measureUnitlList = measureUnitService.getMeasureUnitList();
+        
+        ListModelList<MeasureUnit> measureUnitlListModel = new ListModelList<MeasureUnit>(measureUnitlList);
+        measureUnitSelectBox.setModel(measureUnitlListModel);
+        
         updateUI();
     }
     //prueba de commit
     @Listen("onClick = #searchButton")
     public void search() {
+    	//System.out.println("indice del measure elegido" + measureUnitSelectBox.getSelectedIndex());
     }
     
     @Listen("onClick = #newButton")
@@ -93,7 +104,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
         selectedRawMaterial.setLength(Long.parseLong(lengthTextBox.getText()));
         selectedRawMaterial.setDepth(Long.parseLong(depthTextBox.getText()));
         selectedRawMaterial.setHeight(Long.parseLong(heightTextBox.getText()));
-        selectedRawMaterial.setIdMeasureUnit(measureUnitSelectBox.getSelectedIndex());
+        selectedRawMaterial.setIdMeasureUnit(measureUnitSelectBox.getSelectedIndex()+1);
         //selectedRawMaterial.setIdMeasureUnit(null);
     	if(selectedRawMaterial.getId() == null)	{
     		selectedRawMaterial.setId(rawMaterialService.getNewId());
@@ -132,8 +143,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
 	}
     
     public String getMeasureUnitName(int idMeasureUnit) {
-    	//return measureUnitService.getMeasureUnit(idMeasureUnit).getName();
-    	return "name_measure_unit_" + idMeasureUnit;
+    	return measureUnitService.getMeasureUnit(idMeasureUnit).getName();
     }
     
     private void updateUI() {  
@@ -144,7 +154,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
         	lengthTextBox.setValue(null);
         	depthTextBox.setValue(null);
         	heightTextBox.setValue(null);
-        	//measureUnitSelectBox.setSelectedIndex(0);
+        	//measureUnitSelectBox.setSelectedIndex(1);
         	
 			saveButton.setDisabled(true);
 			cancelButton.setDisabled(true);

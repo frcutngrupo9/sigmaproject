@@ -38,7 +38,7 @@
 				<button id="addProductButton" label="Agregar Producto"/>
 				</hlayout>
                 <separator/>
-    			<listbox id="productionPlanProductListbox">
+    			<listbox id="productionPlanProductListbox" mold="paging" pageSize="7">
     				<auxhead>
 						<auxheader label="Productos" colspan="2"/>
 					</auxhead>
@@ -53,7 +53,7 @@
             			</listitem>
         			</template>
     			</listbox>
-    			<listbox id="processListbox" mold="paging" pageSize="8">
+    			<listbox id="processListbox" mold="paging" pageSize="7">
     				<auxhead>
 						<auxheader label="Procesos" colspan="6"/>
 					</auxhead>
@@ -78,7 +78,7 @@
             			</listitem>
         			</template>
     			</listbox>
-    			<listbox id="supplyListbox">
+    			<listbox id="supplyListbox" mold="paging" pageSize="7">
     				<auxhead>
 						<auxheader label="Insumos" colspan="3"/>
 					</auxhead>

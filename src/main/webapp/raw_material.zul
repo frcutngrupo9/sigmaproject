@@ -41,9 +41,9 @@
                 </row>
                 <row>	
                     <label>Unidad de Medida:</label>
-                    <selectbox id="measureUnit">
+                    <selectbox id="measureUnitSelectBox">
                         <template name="model">
-                            <label value="${each}" />
+                            <label value="${each.name}" />
                         </template>
                     </selectbox>
                 </row>
@@ -60,9 +60,13 @@
                     <doublebox id="heightTextBox" value="0.0" format="#.###"/>
                 </row>
                 <row>
-                    <button id="saveButton" label="Guardar"/>
-                    <button id="cancelButton" label="Cancelar"/>
-                    <button id="resetButton" label="Reset"/>
+                    <cell colspan="2" style="text-align:center">
+                    <hlayout>
+                        <button id="saveButton" label="Guardar"/>
+                        <button id="cancelButton" label="Cancelar"/>
+                        <button id="resetButton" label="Reset"/>
+                    </hlayout>
+                </cell>
                 </row>
             </rows>
         </grid>
