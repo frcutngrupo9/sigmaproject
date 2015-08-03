@@ -55,7 +55,7 @@
     			</listbox>
     			<listbox id="processListbox" mold="paging" pageSize="7">
     				<auxhead>
-						<auxheader label="Procesos" colspan="6"/>
+						<auxheader label="Procesos" colspan="7"/>
 					</auxhead>
         			<listhead>
         				<listheader label="Nombre Producto"/>
