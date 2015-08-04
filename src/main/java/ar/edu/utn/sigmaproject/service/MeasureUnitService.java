@@ -16,6 +16,4 @@ public interface MeasureUnitService {
 
 	void deleteMeasureUnit(MeasureUnit measureUnit);
 
-	Integer getNewId();
-
 }

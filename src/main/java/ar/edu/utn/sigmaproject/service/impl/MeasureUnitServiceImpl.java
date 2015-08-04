@@ -14,9 +14,15 @@ public class MeasureUnitServiceImpl implements MeasureUnitService {
 	private SerializationService serializator = new SerializationService("measure_unit");
 	static int measureUnitId = 1;
 	static{
-		measureUnitList.add(new MeasureUnit(measureUnitId++,"centimetros"));
-		measureUnitList.add(new MeasureUnit(measureUnitId++,"metros"));
-		measureUnitList.add(new MeasureUnit(measureUnitId++,"pulgadas"));
+		measureUnitList.add(new MeasureUnit(measureUnitId++,"Metros", "M"));
+		measureUnitList.add(new MeasureUnit(measureUnitId++,"Centimetros", "Cm"));
+		measureUnitList.add(new MeasureUnit(measureUnitId++,"Milimetros", "Mm"));
+		measureUnitList.add(new MeasureUnit(measureUnitId++,"Pulgadas", "Pl"));
+		measureUnitList.add(new MeasureUnit(measureUnitId++,"Kilogramos", "Kg"));
+		measureUnitList.add(new MeasureUnit(measureUnitId++,"Gramos", "Gr"));
+		measureUnitList.add(new MeasureUnit(measureUnitId++,"Litros", "L"));
+		measureUnitList.add(new MeasureUnit(measureUnitId++,"Mililitros", "Ml"));
+		measureUnitList.add(new MeasureUnit(measureUnitId++,"Unidad", "Unid"));
 	}
 	
 	public MeasureUnitServiceImpl() {

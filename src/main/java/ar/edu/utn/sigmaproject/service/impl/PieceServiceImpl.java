@@ -100,5 +100,16 @@ public class PieceServiceImpl implements PieceService {
 		}
 		return lastId + 1;
 	}
-
+	
+	private boolean existsId(Integer id) {
+		boolean value = false;
+		for(int i=0; i<pieceList.size(); i++) {
+			Piece aux = pieceList.get(i);
+			if(id.compareTo(aux.getId()) == 0) {
+				value = true;
+				i = pieceList.size();
+			}
+		}
+		return value;
+	}
 }

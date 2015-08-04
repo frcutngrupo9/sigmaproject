@@ -7,10 +7,12 @@ public class MeasureUnit implements Serializable, Cloneable {
 	
 	Integer id;
 	String name;
+	String shortName;
 	
-	public MeasureUnit(Integer id, String name) {
+	public MeasureUnit(Integer id, String name, String shortName) {
 		this.id = id;
 		this.name = name;
+		this.shortName = shortName;
 	}
 
 	public Integer getId() {
@@ -23,6 +25,14 @@ public class MeasureUnit implements Serializable, Cloneable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public String getShortName() {
+		return shortName;
+	}
+
+	public void setShortName(String shortName) {
+		this.shortName = shortName;
 	}
 
 	@Override
