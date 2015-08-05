@@ -1,0 +1,64 @@
+<window id="win_client" title="Clientes" closable="false" apply="ar.edu.utn.sigmaproject.controller.ClientController" sclass="sigma-content">
+    <hlayout>
+        <label>Buscar:</label>
+        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
+        <button id="searchButton" label="Buscar"/>
+    </hlayout>
+    <separator/>
+    <listbox id="clientListbox"  mold="paging" pageSize="7">
+        <listhead>
+            <listheader label="Nombre"/>
+            <listheader label="Telefono"/>
+            <listheader label="Direccion"/>
+            <listheader label="Detalles"/>
+        </listhead>
+        <template name="model">
+            <listitem>
+                <listcell label="${each.name}"/>
+                <listcell label="${each.phone}"/>
+                <listcell label="${each.address}"/>
+                <listcell label="${each.details}"/>
+            </listitem>
+        </template>
+    </listbox>
+    <vlayout>
+        <separator/>
+        <hbox>
+            <button id="newButton" label="Nuevo"/>
+        </hbox>
+        <separator/>
+        <grid id="clientGrid" width="400px" sclass="sigma-form" visible="false">
+            <columns>
+                <column hflex="min" align="right"/>
+                <column />
+            </columns>
+            <rows>
+                <row>	
+                    <label>Nombre:</label>
+                    <textbox id="nameTextBox" value="" hflex="1"/>
+                </row>
+                <row>	
+                    <label>Telefono:</label>
+                    <textbox id="phoneTextBox" value="" hflex="1"/>
+                </row>
+                <row>	
+                    <label>Direccion:</label>
+                    <textbox id="addressTextBox" value="" hflex="1"/>
+                </row>
+                <row>   
+                    <label>Detalles:</label>
+                    <textbox id="detailsTextBox" value="" hflex="1"/>
+                </row>
+                <row>
+                    <cell colspan="2" style="text-align:center">
+                    <hlayout>
+                        <button id="saveButton" label="Guardar"/>
+                        <button id="cancelButton" label="Cancelar"/>
+                        <button id="resetButton" label="Reset"/>
+                    </hlayout>
+                </cell>
+                </row>
+            </rows>
+        </grid>
+    </vlayout>	
+</window>

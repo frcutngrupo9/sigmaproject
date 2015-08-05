@@ -10,10 +10,10 @@ public interface ProductionPlanDetailService {
 	
 	ProductionPlanDetail getProductionPlanDetail(Integer idProductionPlan, Integer idProduct);
 
-	ProductionPlanDetail saveProductionPlanDetail(ProductionPlanDetail process);
+	ProductionPlanDetail saveProductionPlanDetail(ProductionPlanDetail productionPlanDetail);
 
-	ProductionPlanDetail updateProductionPlanDetail(ProductionPlanDetail process);
+	ProductionPlanDetail updateProductionPlanDetail(ProductionPlanDetail productionPlanDetail);
 
-	void deleteProductionPlanDetail(ProductionPlanDetail process);
+	void deleteProductionPlanDetail(ProductionPlanDetail productionPlanDetail);
 
 }

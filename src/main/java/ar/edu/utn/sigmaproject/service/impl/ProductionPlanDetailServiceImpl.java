@@ -50,7 +50,7 @@ public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailServ
 	
 	public synchronized ProductionPlanDetail updateProductionPlanDetail(ProductionPlanDetail productionPlanDetail) {
 		if(productionPlanDetail.getIdProductionPlan()==null && productionPlanDetail.getIdProduct()==null){
-			throw new IllegalArgumentException("can't update a null-id process, save it first");
+			throw new IllegalArgumentException("can't update a null-id productionPlanDetail, save it first");
 		}else{
 			productionPlanDetail = ProductionPlanDetail.clone(productionPlanDetail);
 			int size = productionPlanDetailList.size();
@@ -62,7 +62,7 @@ public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailServ
 					return productionPlanDetail;
 				}
 			}
-			throw new RuntimeException("Process not found "+productionPlanDetail.getIdProductionPlan()+" "+productionPlanDetail.getIdProduct());
+			throw new RuntimeException("ProductionPlanDetail not found "+productionPlanDetail.getIdProductionPlan()+" "+productionPlanDetail.getIdProduct());
 		}
 	}
 	

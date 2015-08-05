@@ -88,6 +88,7 @@ public class SidebarController extends SelectorComposer<Component> {
             )),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Materia Prima", "/raw_material.zul")),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Insumos", "/supply.zul")),
+            new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Clientes", "/client.zul")),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Reportes"))
         ));
         tree.setModel(new DefaultTreeModel<MenuTreeRow>(rootNode));

@@ -55,7 +55,7 @@ public class ProductionPlanDetail implements Serializable, Cloneable {
 		ProductionPlanDetail other = (ProductionPlanDetail) obj;
 		if (idProductionPlan != null && idProduct != null) {
 			if (other.idProductionPlan != null && other.idProduct != null) {
-				if (other.idProductionPlan == idProductionPlan && other.idProduct == idProduct)
+				if (other.idProductionPlan.compareTo(idProductionPlan) ==  0 && other.idProduct.compareTo(idProduct) == 0)
 					return true;
 			}
 		}

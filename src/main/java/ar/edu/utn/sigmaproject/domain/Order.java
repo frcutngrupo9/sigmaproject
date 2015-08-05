@@ -1,22 +1,21 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
+import java.util.Date;
 
-public class Client implements Serializable, Cloneable {
+public class Order implements Serializable, Cloneable {
     private static final long serialVersionUID = 1L;
     
     Integer id;
+    Integer idClient;
     String name;
-    String phone;
-    String address;
-    String details;
+    Date date;
 
-    public Client(Integer id, String name, String phone, String address, String details) {
+    public Order(Integer id, Integer idClient, String name, Date date) {
         this.id = id;
+        this.idClient = idClient;
         this.name = name;
-        this.phone = phone;
-        this.address = address;
-        this.details = details;
+        this.date = date;
     }
 
     public Integer getId() {
@@ -26,6 +25,14 @@ public class Client implements Serializable, Cloneable {
     public void setId(Integer id) {
         this.id = id;
     }
+    
+    public Integer getIdClient() {
+        return idClient;
+    }
+    
+    public void setIdClient(Integer idClient) {
+        this.idClient = idClient;
+    }
 
     public String getName() {
         return name;
@@ -34,29 +41,13 @@ public class Client implements Serializable, Cloneable {
     public void setName(String name) {
         this.name = name;
     }
-    
-    public String getPhone() {
-        return phone;
-    }
-    
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-    
-    public String getAddress() {
-        return address;
-    }
-    
-    public void setAddress(String address) {
-        this.address = address;
-    }
 
-    public String getDetails() {
-        return details;
+    public Date getDate() {
+        return date;
     }
     
-    public void setDetails(String details) {
-        this.details = details;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     @Override
@@ -75,7 +66,7 @@ public class Client implements Serializable, Cloneable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Client other = (Client) obj;
+        Order other = (Order) obj;
         if (id == null) {
             if (other.id != null)
                 return false;
@@ -84,9 +75,9 @@ public class Client implements Serializable, Cloneable {
         return true;
     }
     
-    public static Client clone(Client client){
+    public static Order clone(Order order){
         try {
-            return (Client)client.clone();
+            return (Order)order.clone();
         } catch (CloneNotSupportedException e) {
             //not possible
         }
