@@ -2,56 +2,79 @@
     <panel title="Pedido" id="OrderCreationBlock" border="rounded">
         <panelchildren>
             <vlayout>
-            	<hlayout>
-            	<bandbox id="bd" buttonVisible = "true" autodrop = "true">
-					<bandpopup>
-						<vbox>
-							<hbox>
-								Search
-								<textbox />
-							</hbox>
-							<listbox width="200px"
-								onSelect="bd.value=self.selectedItem.label; bd.close();">
-							<listhead>
-								<listheader label="Producto"/>
-								<listheader label="Descripcion"/>
-							</listhead>
-							<listitem>
-								<listcell label="Mesa"/>
-								<listcell label="bla bla"/>
-							</listitem>
-							<listitem>
-								<listcell label="Silla"/>
-								<listcell label="Para sentarse"/>
-							</listitem>
-							<listitem>
-								<listcell label="Banco"/>
-								<listcell label="Tbn para sentarse"/>
-							</listitem>
-							</listbox>
-						</vbox>
-					</bandpopup>
-				</bandbox>
-				<label value="Cantidad: "/>
-				<textbox width="36px"/>
-				<button id="addProductBtn" label="Agregar Producto"/>
-				</hlayout>
+                <hlayout>
+                    <label value="Cliente: "/>
+                    <bandbox id="clientBandbox" buttonVisible = "true" autodrop = "true">
+                        <bandpopup>
+                            <vbox>
+                                <hbox>
+                                    Buscar
+                                    <textbox />
+                                </hbox>
+                                <listbox id="clientPopupListbox" width="200px">
+                                <listhead>
+                                    <listheader label="Cliente"/>
+                                    <listheader label="Email"/>
+                                </listhead>
+                                <template name="model">
+                                    <listitem>
+                                        <listcell label="${each.name}"/>
+                                        <listcell label="${each.email}"/>
+                                    </listitem>
+                                </template>
+                                </listbox>
+                            </vbox>
+                        </bandpopup>
+                    </bandbox>
+                </hlayout>
+                <hlayout>
+                    <label value="Fecha: "/>
+                    <datebox id="db5" cols="12" format="dd-MM-yyyy" onCreate="self.value = new Date()" />
+                </hlayout>
+                <hlayout>
+                    <label value="Producto: "/>
+                    <bandbox id="productBandbox" buttonVisible = "true" autodrop = "true">
+                        <bandpopup>
+                            <vbox>
+                                <hbox>
+                                    Buscar
+                                    <textbox />
+                                </hbox>
+                                <listbox id="productPopupListbox" width="200px">
+                                <listhead>
+                                    <listheader label="Producto"/>
+                                    <listheader label="Descripcion"/>
+                                </listhead>
+                                <template name="model">
+                                    <listitem>
+                                        <listcell label="${each.name}"/>
+                                        <listcell label="${each.details}"/>
+                                    </listitem>
+                                </template>
+                                </listbox>
+                            </vbox>
+                        </bandpopup>
+                    </bandbox>
+                    <label value="Cantidad: "/>
+                    <intbox id="productUnits" width="36px"/>
+                    <button id="addProductButton" label="Agregar Producto"/>
+                </hlayout>
                 <separator/>
-    			<listbox id="productionOrderProductListbox">
-    				<auxhead>
-						<auxheader label="Productos" colspan="2"/>
-					</auxhead>
-        			<listhead>
-            			<listheader label="Nombre Producto"/>
-            			<listheader label="Unidades"/>
-        			</listhead>
-        			<template name="model">
-            			<listitem>
-                			<listcell label="${each.name}"/>
-                			<listcell label="nro"/>
-            			</listitem>
-        			</template>
-    			</listbox>
+                <listbox id="productListbox" mold="paging" pageSize="7">
+                    <auxhead>
+                        <auxheader label="Productos" colspan="2"/>
+                    </auxhead>
+                    <listhead>
+                        <listheader label="Nombre Producto"/>
+                        <listheader label="Unidades"/>
+                    </listhead>
+                    <template name="model">
+                        <listitem>
+                            <listcell label="${win_production_plan_creation$composer.getProductName(each.idProduct)}"/>
+                            <listcell label="${each.units}"/>
+                        </listitem>
+                    </template>
+                </listbox>
             </vlayout>
         </panelchildren>
     </panel>

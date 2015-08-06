@@ -11,31 +11,32 @@
 					<datebox id="db5" cols="12" format="dd-MM-yyyy" onCreate="self.value = new Date()" />
             	</hlayout>
             	<hlayout>
-            	<bandbox id="productBandbox" buttonVisible = "true" autodrop = "true">
-					<bandpopup>
-						<vbox>
-							<hbox>
-								Buscar
-								<textbox />
-							</hbox>
-							<listbox id="productPopupListbox" width="200px">
-							<listhead>
-								<listheader label="Producto"/>
-								<listheader label="Descripcion"/>
-							</listhead>
-							<template name="model">
-								<listitem>
-									<listcell label="${each.name}"/>
-									<listcell label="${each.details}"/>
-								</listitem>
-							</template>
-							</listbox>
-						</vbox>
-					</bandpopup>
-				</bandbox>
-				<label value="Cantidad: "/>
-				<intbox id="productUnits" width="36px"/>
-				<button id="addProductButton" label="Agregar Producto"/>
+            	   <label value="Producto: "/>
+                	<bandbox id="productBandbox" buttonVisible = "true" autodrop = "true">
+    					<bandpopup>
+    						<vbox>
+    							<hbox>
+    								Buscar
+    								<textbox />
+    							</hbox>
+    							<listbox id="productPopupListbox" width="200px">
+    							<listhead>
+    								<listheader label="Producto"/>
+    								<listheader label="Descripcion"/>
+    							</listhead>
+    							<template name="model">
+    								<listitem>
+    									<listcell label="${each.name}"/>
+    									<listcell label="${each.details}"/>
+    								</listitem>
+    							</template>
+    							</listbox>
+    						</vbox>
+    					</bandpopup>
+    				</bandbox>
+    				<label value="Cantidad: "/>
+    				<intbox id="productUnits" width="36px"/>
+    				<button id="addProductButton" label="Agregar Producto"/>
 				</hlayout>
                 <separator/>
     			<listbox id="productionPlanProductListbox" mold="paging" pageSize="7">

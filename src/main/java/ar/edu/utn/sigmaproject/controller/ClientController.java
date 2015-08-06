@@ -37,6 +37,9 @@ public class ClientController extends SelectorComposer<Component>{
     private Button resetButton;
     
     @Wire
+    private Button deleteButton;
+    
+    @Wire
     private Button newButton;
     
     @Wire
@@ -44,7 +47,10 @@ public class ClientController extends SelectorComposer<Component>{
 
     @Wire
     private Textbox phoneTextBox;
-
+    
+    @Wire
+    private Textbox emailTextBox;
+    
     @Wire
     private Textbox addressTextBox;
 
@@ -76,7 +82,7 @@ public class ClientController extends SelectorComposer<Component>{
     
     @Listen("onClick = #newButton")
     public void newButtonClick() {
-        selectedClient = new Client(null, "", "", "", "");
+        selectedClient = new Client(null, "", "", "", "", "");
         updateUI();
     }
     
@@ -88,6 +94,7 @@ public class ClientController extends SelectorComposer<Component>{
         }
         selectedClient.setName(nameTextBox.getText());
         selectedClient.setPhone(phoneTextBox.getText());
+        selectedClient.setEmail(emailTextBox.getText());
         selectedClient.setAddress(addressTextBox.getText());
         selectedClient.setDetails(detailsTextBox.getText());
         if(selectedClient.getId() == null) {
@@ -114,12 +121,21 @@ public class ClientController extends SelectorComposer<Component>{
         updateUI();
     }
     
+    @Listen("onClick = #deleteButton")
+    public void deleteButtonClick() {
+        clientService.deleteClient(selectedClient);
+        clientListModel.remove(selectedClient);
+        clientListbox.setModel(clientListModel);
+        selectedClient = null;
+        updateUI();
+    }
+    
     @Listen("onSelect = #clientListbox")
     public void doListBoxSelect() {
-        if(clientListModel.isSelectionEmpty()){
+        if(clientListModel.isSelectionEmpty()) {
             //just in case for the no selection
             selectedClient = null;
-        }else{
+        } else {
             selectedClient = clientListModel.getSelection().iterator().next();
         }
         updateUI();
@@ -136,18 +152,25 @@ public class ClientController extends SelectorComposer<Component>{
             saveButton.setDisabled(true);
             cancelButton.setDisabled(true);
             resetButton.setDisabled(true);
+            deleteButton.setDisabled(true);
             newButton.setDisabled(false);
             clientListbox.clearSelection();
-        }else {
+        } else {
             clientGrid.setVisible(true);
             nameTextBox.setValue(selectedClient.getName());
             phoneTextBox.setValue(selectedClient.getPhone());
+            emailTextBox.setValue(selectedClient.getEmail());
             addressTextBox.setValue(selectedClient.getAddress());
             detailsTextBox.setValue(selectedClient.getDetails());
             
             saveButton.setDisabled(false);
             cancelButton.setDisabled(false);
             resetButton.setDisabled(false);
+            if(selectedClient.getId() == null) {
+                deleteButton.setDisabled(true);
+            } else {
+                deleteButton.setDisabled(false);
+            }
             newButton.setDisabled(true);
         }
     }

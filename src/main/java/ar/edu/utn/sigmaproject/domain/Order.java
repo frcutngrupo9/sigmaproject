@@ -8,13 +8,11 @@ public class Order implements Serializable, Cloneable {
     
     Integer id;
     Integer idClient;
-    String name;
     Date date;
 
     public Order(Integer id, Integer idClient, String name, Date date) {
         this.id = id;
         this.idClient = idClient;
-        this.name = name;
         this.date = date;
     }
 
@@ -32,14 +30,6 @@ public class Order implements Serializable, Cloneable {
     
     public void setIdClient(Integer idClient) {
         this.idClient = idClient;
-    }
-
-    public String getName() {
-        return name;
-    }
-    
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Date getDate() {

@@ -9,6 +9,7 @@
         <listhead>
             <listheader label="Nombre"/>
             <listheader label="Telefono"/>
+            <listheader label="Email"/>
             <listheader label="Direccion"/>
             <listheader label="Detalles"/>
         </listhead>
@@ -16,6 +17,7 @@
             <listitem>
                 <listcell label="${each.name}"/>
                 <listcell label="${each.phone}"/>
+                <listcell label="${each.email}"/>
                 <listcell label="${each.address}"/>
                 <listcell label="${each.details}"/>
             </listitem>
@@ -41,6 +43,10 @@
                     <label>Telefono:</label>
                     <textbox id="phoneTextBox" value="" hflex="1"/>
                 </row>
+                <row>   
+                    <label>Email:</label>
+                    <textbox id="emailTextBox" value="" hflex="1"/>
+                </row>
                 <row>	
                     <label>Direccion:</label>
                     <textbox id="addressTextBox" value="" hflex="1"/>
@@ -55,6 +61,7 @@
                         <button id="saveButton" label="Guardar"/>
                         <button id="cancelButton" label="Cancelar"/>
                         <button id="resetButton" label="Reset"/>
+                        <button id="deleteButton" label="Eliminar"/>
                     </hlayout>
                 </cell>
                 </row>
