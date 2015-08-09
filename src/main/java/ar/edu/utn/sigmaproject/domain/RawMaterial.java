@@ -1,6 +1,7 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 public class RawMaterial implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
@@ -8,11 +9,11 @@ public class RawMaterial implements Serializable, Cloneable {
 	Integer id;
 	Integer idMeasureUnit;
 	String name;
-	Long length;
-	Long depth;
-	Long height;
+	BigDecimal length;
+	BigDecimal depth;
+	BigDecimal height;
 
-	public RawMaterial(Integer id, Integer idMeasureUnit, String name, Long length, Long depth, Long height) {
+	public RawMaterial(Integer id, Integer idMeasureUnit, String name, BigDecimal length, BigDecimal depth, BigDecimal height) {
 		this.id = id;
 		this.idMeasureUnit = idMeasureUnit;
 		this.name = name;
@@ -45,27 +46,27 @@ public class RawMaterial implements Serializable, Cloneable {
 		this.name = name;
 	}
 
-	public Long getHeight() {
+	public BigDecimal getHeight() {
 		return height;
 	}
 
-	public void setHeight(Long height) {
+	public void setHeight(BigDecimal height) {
 		this.height = height;
 	}
 
-	public Long getLength() {
+	public BigDecimal getLength() {
 		return length;
 	}
 
-	public void setLength(Long length) {
+	public void setLength(BigDecimal length) {
 		this.length = length;
 	}
 
-	public Long getDepth() {
+	public BigDecimal getDepth() {
 		return depth;
 	}
 
-	public void setDepth(Long depth) {
+	public void setDepth(BigDecimal depth) {
 		this.depth = depth;
 	}
 

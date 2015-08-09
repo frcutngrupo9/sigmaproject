@@ -42,6 +42,9 @@ public class ProductServiceImpl implements ProductService {
 	}
 	
 	public synchronized Product saveProduct(Product product) {
+		if(existId(product.getId())){
+			throw new IllegalArgumentException("can't save product, id already used");
+		}
 		product = Product.clone(product);
 		productList.add(product);
 		serializator.grabarLista(productList);
@@ -55,7 +58,7 @@ public class ProductServiceImpl implements ProductService {
 			return product;
 		}
 		else {
-			if(product.getId()==null){
+			if(product.getId() == null){
 				throw new IllegalArgumentException("can't update a null-id product, save it first");
 			}else{
 				product = Product.clone(product);
@@ -95,6 +98,17 @@ public class ProductServiceImpl implements ProductService {
 			}
 		}
 		return lastId + 1;
+	}
+	
+	private boolean existId(Integer id) {
+		boolean value = false;
+		for(int i=0;i<productList.size();i++){
+			Product aux = productList.get(i);
+			if(aux.getId().equals(id)){
+				value = true;
+			}
+		}
+		return value;
 	}
 
 }
