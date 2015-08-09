@@ -1,6 +1,7 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 public class Piece implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
@@ -8,18 +9,20 @@ public class Piece implements Serializable, Cloneable {
 	Integer id;
 	Integer idProduct;
 	String name;
-	Long height;
-	Long width;
-	Long depth;
-	Long size1;
-	Long size2;
+	Integer idMeasureUnit;
+	BigDecimal height;
+	BigDecimal width;
+	BigDecimal depth;
+	BigDecimal size1;
+	BigDecimal size2;
 	boolean isGroup;
 	Integer units;
 
-	public Piece(Integer id, Integer idProduct, String name, Long height, Long width, Long depth, Long size1, Long size2, boolean isGroup, Integer units) {
+	public Piece(Integer id, Integer idProduct, String name, Integer idMeasureUnit, BigDecimal height, BigDecimal width, BigDecimal depth, BigDecimal size1, BigDecimal size2, boolean isGroup, Integer units) {
 		this.id = id;
 		this.idProduct = idProduct;
 		this.name = name;
+		this.idMeasureUnit = idMeasureUnit;
 		this.height = height;
 		this.width = width;
 		this.depth = depth;
@@ -31,10 +34,6 @@ public class Piece implements Serializable, Cloneable {
 
 	public Integer getId() {
 		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
 	}
 	
 	public Integer getIdProduct() {
@@ -52,44 +51,52 @@ public class Piece implements Serializable, Cloneable {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	public Integer getIdMeasureUnit() {
+		return idMeasureUnit;
+	}
 
-	public Long getHeight() {
+	public void setIdMeasureUnit(Integer idMeasureUnit) {
+		this.idMeasureUnit = idMeasureUnit;
+	}
+
+	public BigDecimal getHeight() {
 		return height;
 	}
 
-	public void setHeight(Long height) {
+	public void setHeight(BigDecimal height) {
 		this.height = height;
 	}
 
-	public Long getWidth() {
+	public BigDecimal getWidth() {
 		return width;
 	}
 
-	public void setWidth(Long width) {
+	public void setWidth(BigDecimal width) {
 		this.width = width;
 	}
 
-	public Long getDepth() {
+	public BigDecimal getDepth() {
 		return depth;
 	}
 
-	public void setDepth(Long depth) {
+	public void setDepth(BigDecimal depth) {
 		this.depth = depth;
 	}
 
-	public Long getSize1() {
+	public BigDecimal getSize1() {
 		return size1;
 	}
 
-	public void setSize1(Long size1) {
+	public void setSize1(BigDecimal size1) {
 		this.size1 = size1;
 	}
 
-	public Long getSize2() {
+	public BigDecimal getSize2() {
 		return size2;
 	}
 
-	public void setSize2(Long size2) {
+	public void setSize2(BigDecimal size2) {
 		this.size2 = size2;
 	}
 

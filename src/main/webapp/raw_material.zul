@@ -49,15 +49,15 @@
                 </row>
                 <row>	
                     <label>Largo:</label>
-                    <doublebox id="lengthTextBox" value="0.0" format="#.###"/>
+                    <doublebox id="lengthTextBox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
                 </row>
                 <row>	
                     <label>Grueso:</label>
-                    <doublebox id="depthTextBox" value="0.0" format="#.###"/>
+                    <doublebox id="depthTextBox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
                 </row>
                 <row>	
                     <label>Ancho:</label>
-                    <doublebox id="heightTextBox" value="0.0" format="#.###"/>
+                    <doublebox id="heightTextBox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
                 </row>
                 <row>
                     <cell colspan="2" style="text-align:center">

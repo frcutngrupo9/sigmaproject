@@ -2,15 +2,17 @@ package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
 
+import javax.xml.datatype.Duration;
+
 public class Process implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 	
 	Integer idPiece;
 	Integer idProcessType;
 	String details;
-	Long time;
+	Duration time;
 	
-	public Process(Integer idPiece, Integer idProcessType, String details, Long time) {
+	public Process(Integer idPiece, Integer idProcessType, String details, Duration time) {
 		this.idPiece = idPiece;
 		this.idProcessType = idProcessType;
 		this.details = details;
@@ -41,11 +43,11 @@ public class Process implements Serializable, Cloneable {
 		this.details = details;
 	}
 	
-	public Long getTime() {
+	public Duration getTime() {
 		return time;
 	}
 
-	public void setTime(Long time) {
+	public void setTime(Duration time) {
 		this.time = time;
 	}
 
