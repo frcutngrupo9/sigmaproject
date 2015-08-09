@@ -23,7 +23,6 @@ import ar.edu.utn.sigmaproject.service.impl.ProcessTypeServiceImpl;
 
 
 
-
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -39,8 +38,6 @@ import org.zkoss.zul.Paging;
 import org.zkoss.zul.Textbox;
 
 import java.util.List;
-
-import javax.xml.datatype.Duration;
 
 public class ProductListController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
@@ -113,10 +110,6 @@ public class ProductListController extends SelectorComposer<Component>{
     
     public String getProcessTypeName(int idProduct) {
     	return processTypeListService.getProcessType(idProduct).getName();
-    }
-    
-    public String getFormatedTime(Duration time) {
-    	return String.format("Dias: %d Horas: %d Minutos: %d", time.getDays(), time.getHours(), time.getMinutes());
     }
     
 }

@@ -185,7 +185,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			}
 		}
 		if(units > 0) {
-			total = auxProcess.getTime().getMinutes() * units;
+			total = auxProcess.getTime() * units;
 		}
 		return total + "";
     }

@@ -1,13 +1,7 @@
 package ar.edu.utn.sigmaproject.controller;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.Duration;
 
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.ForwardEvent;
@@ -20,24 +14,19 @@ import org.zkoss.zul.Intbox;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
-import org.zkoss.zul.Row;
-import org.zkoss.zul.Selectbox;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.ListModelList;
 
-import ar.edu.utn.sigmaproject.service.MeasureUnitService;
 import ar.edu.utn.sigmaproject.service.PieceService;
 import ar.edu.utn.sigmaproject.service.ProcessService;
 import ar.edu.utn.sigmaproject.service.ProcessTypeService;
 import ar.edu.utn.sigmaproject.service.ProductService;
-import ar.edu.utn.sigmaproject.service.impl.MeasureUnitServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.PieceServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProcessServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProcessTypeServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
-import ar.edu.utn.sigmaproject.domain.MeasureUnit;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
@@ -79,8 +68,6 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	Button createProcessButton;
 	@Wire
 	Button cancelPieceButton;
-	@Wire
-    Selectbox measureUnitSelectBox;
 	
 	@Wire
 	Component processCreationBlock;
@@ -94,11 +81,9 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	ProcessService processService = new ProcessServiceImpl();
 	PieceService pieceService = new PieceServiceImpl();
 	ProductService productService = new ProductServiceImpl();
-	MeasureUnitService measureUnitService = new MeasureUnitServiceImpl();
 	
     ListModelList<ProcessType> processTypeListModel;
     ListModelList<Piece> productPiecesListModel;
-    ListModelList<MeasureUnit> measureUnitListModel;
     
     // atributes
     private Product product;
@@ -120,12 +105,6 @@ public class ProductCreationController extends SelectorComposer<Component>{
         productPiecesListbox.setModel(productPiecesListModel);
         
         processList = new ArrayList<Process>();
-        
-        List<MeasureUnit> measureUnitlList = measureUnitService.getMeasureUnitList();
-        measureUnitListModel = new ListModelList<MeasureUnit>(measureUnitlList);
-        measureUnitSelectBox.setModel(measureUnitListModel);
-        
-        activePiece = null;
     }
     
     @Listen("onClick = #saveProductButton")
@@ -195,30 +174,29 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	}
     	
     	String piece_name = pieceName.getText();
-    	Integer idMeasureUnit = measureUnitListModel.getElementAt(measureUnitSelectBox.getSelectedIndex()).getId();
-    	BigDecimal piece_height = BigDecimal.ZERO;
-    	BigDecimal piece_width = BigDecimal.ZERO;
-    	BigDecimal piece_depth = BigDecimal.ZERO;
-    	BigDecimal piece_size1 = BigDecimal.ZERO;
-    	BigDecimal piece_size2 = BigDecimal.ZERO;
+    	Long piece_height = 0L;
+    	Long piece_width = 0L;
+    	Long piece_depth = 0L;
+    	Long piece_size1 = 0L;
+    	Long piece_size2 = 0L;
     	if(pieceHeight.getText().compareTo("")!=0) {
-    		piece_height = new BigDecimal(Double.parseDouble(pieceHeight.getText()));
+    		piece_height = Long.parseLong(pieceHeight.getText());
     	}
     	if(pieceWidth.getText().compareTo("")!=0) {
-    		piece_width = new BigDecimal(Double.parseDouble(pieceWidth.getText()));
+    		piece_width = Long.parseLong(pieceWidth.getText());
     	}
     	if(pieceDepth.getText().compareTo("")!=0) {
-    		piece_depth = new BigDecimal(Double.parseDouble(pieceDepth.getText()));
+    		piece_depth = Long.parseLong(pieceDepth.getText());
     	}
     	if(pieceSize1.getText().compareTo("")!=0) {
-    		piece_size1 = new BigDecimal(Double.parseDouble(pieceSize1.getText()));
+    		piece_size1 = Long.parseLong(pieceSize1.getText());
     	}
     	if(pieceSize2.getText().compareTo("")!=0) {
-    		piece_size2 = new BigDecimal(Double.parseDouble(pieceSize2.getText()));
+    		piece_size2 = Long.parseLong(pieceSize2.getText());
     	}
     	Integer piece_units = pieceUnitsByProduct.getValue();
     	boolean piece_isGroup = pieceGroup.isChecked();
-    	activePiece = new Piece(piece_id, null, piece_name, idMeasureUnit, piece_height, piece_width, piece_depth, piece_size1, piece_size2, piece_isGroup, piece_units);
+    	activePiece = new Piece(piece_id, null, piece_name, piece_height, piece_width, piece_depth, piece_size1, piece_size2, piece_isGroup, piece_units);
     	processCreationBlock.setVisible(true);
     	pieceCreationBlock.setVisible(false);
     }
@@ -249,14 +227,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
     			int idProcessType = processTypeService.getProcessTypeList().get(i - 1).getId();
     			//!! Recordar hacer entrada del detail
     			String details = "";
-    			Integer minutes = Integer.parseInt(txtbox.getText());
-    			Duration duration = null;
-				try {
-					duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, 0, 0, minutes, 0);
-				} catch (DatatypeConfigurationException e) {
-					System.out.println("Error en grabar duracion del proceso: " + e.toString());
-				}
-    			process = new Process(idPiece, idProcessType, details, duration);
+    			Long time = Long.parseLong(txtbox.getText());
+    			process = new Process(idPiece, idProcessType, details, time);
     		}
     		if(process != null) {
     			processList.add(process);
@@ -266,7 +238,25 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	pieceList.add(activePiece);
     	productPiecesListModel.add(activePiece);
     	activePiece = null;
-    	refreshView();
+    	pieceCreationBlock.setVisible(false);
+    	processCreationBlock.setVisible(false);
+    	//limpiar form pieza
+    	pieceName.setText("");
+    	pieceHeight.setText("");
+    	pieceWidth.setText("");
+    	pieceDepth.setText("");
+    	pieceSize1.setText("");
+    	pieceSize2.setText("");
+    	pieceUnitsByProduct.setValue(null);
+    	pieceGroup.setChecked(false);
+    	//limpiar procesos (ponerlos en vacio y sin check)
+    	for(int i=1; i<processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
+    		Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
+    		Textbox txtbox = (Textbox)processListbox.getChildren().get(i).getChildren().get(2).getChildren().get(0);
+    		chkbox.setChecked(false);
+    		txtbox.setText("");
+    		txtbox.setVisible(false);
+    	}
     }
 	
     //when user checks on the checkbox of each process on the list
@@ -282,55 +272,9 @@ public class ProductCreationController extends SelectorComposer<Component>{
   			tbox.setVisible(false);
   		}
   	}
-  	
-  	@Listen("onCheck = #pieceGroup")
-  	public void doPieceGroupCheck() {
-  		Row measureUnitRow = (Row)(measureUnitSelectBox.getParent());
-  		Row pieceHeightRow = (Row)(pieceHeight.getParent());
-  		Row pieceWidthRow = (Row)(pieceWidth.getParent());
-  		Row pieceDepthRow = (Row)(pieceDepth.getParent());
-  		Row pieceSize1Row = (Row)(pieceSize1.getParent());
-  		Row pieceSize2Row = (Row)(pieceSize2.getParent());
-  		if(pieceGroup.isChecked()) {
-  			measureUnitRow.setVisible(false);
-  			pieceHeightRow.setVisible(false);
-  	    	pieceWidthRow.setVisible(false);
-  	    	pieceDepthRow.setVisible(false);
-  	    	pieceSize1Row.setVisible(false);
-  	    	pieceSize2Row.setVisible(false);
-  		} else {
-  			measureUnitRow.setVisible(true);
-  			pieceHeightRow.setVisible(true);
-  	    	pieceWidthRow.setVisible(true);
-  	    	pieceDepthRow.setVisible(true);
-  	    	pieceSize1Row.setVisible(true);
-  	    	pieceSize2Row.setVisible(true);
-  		}
-  	}
     
   	private void refreshView() {
   		if (activePiece == null) {
-  			pieceCreationBlock.setVisible(false);
-  	    	processCreationBlock.setVisible(false);
-  	    	//limpiar form pieza
-  	    	pieceName.setText("");
-  	    	pieceGroup.setChecked(false);
-  	    	measureUnitSelectBox.setSelectedIndex(-1);
-  	    	pieceHeight.setText("");
-  	    	pieceWidth.setText("");
-  	    	pieceDepth.setText("");
-  	    	pieceSize1.setText("");
-  	    	pieceSize2.setText("");
-  	    	pieceUnitsByProduct.setValue(null);
-  	    	//limpiar procesos (ponerlos en vacio y sin check)
-  	    	for(int i=1; i<processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
-  	    		Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
-  	    		Textbox txtbox = (Textbox)processListbox.getChildren().get(i).getChildren().get(2).getChildren().get(0);
-  	    		chkbox.setChecked(false);
-  	    		txtbox.setText("");
-  	    		txtbox.setVisible(false);
-  	    	}
-  		} else {
   			
   		}
   	}

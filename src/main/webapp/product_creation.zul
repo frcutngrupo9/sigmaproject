@@ -58,40 +58,32 @@
                             <textbox id="pieceName" value=""  width="50%" placeholder="Nombre de la Pieza"/>
                         </row>
                         <row>
-                            <label value="La pieza es conjunto de otras? :"/>
-                            <checkbox id="pieceGroup" checked="false"/>
-                        </row>
-                        <row>	
-		                    <label>Unidad de Medida:</label>
-		                    <selectbox id="measureUnitSelectBox">
-		                        <template name="model">
-		                            <label value="${each.name}" />
-		                        </template>
-		                    </selectbox>
-		                </row>
-                        <row>
-                            <label value="Longitud:"/>
+                            <label value="Longitud (cm) :"/>
                             <textbox id="pieceHeight" value="" width="150px"/>
                         </row>
                         <row>
-                            <label value="Espesor:"/>
+                            <label value="Espesor (cm) :"/>
                             <textbox id="pieceDepth" value="" width="150px"/>
                         </row>
                         <row>
-                            <label value="Ancho:"/>
+                            <label value="Ancho (cm) :"/>
                             <textbox id="pieceWidth" value="" width="150px"/>
                         </row>
                         <row>
-                            <label value="Medida 1:"/>
+                            <label value="Medida 1 (pul) :"/>
                             <textbox id="pieceSize1" value="" width="150px"/>
                         </row>
                         <row>
-                            <label value="Medida 2:"/>
+                            <label value="Medida 2 (pul) :"/>
                             <textbox id="pieceSize2" value="" width="150px"/>
                         </row>
                         <row>
-                            <label value="Unidades por Producto:"/>
+                            <label value="Unidades por Producto :"/>
                             <intbox id="pieceUnitsByProduct" width="150px"/>
+                        </row>
+                        <row>
+                            <label value="Pieza Conjunto? :"/>
+                            <checkbox id="pieceGroup" checked="false"/>
                         </row>
                     </rows>
                 </grid>

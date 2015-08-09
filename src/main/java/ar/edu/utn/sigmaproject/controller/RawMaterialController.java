@@ -1,6 +1,5 @@
 package ar.edu.utn.sigmaproject.controller;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.zkoss.lang.Strings;
@@ -67,7 +66,6 @@ public class RawMaterialController extends SelectorComposer<Component>{
     private RawMaterialService rawMaterialService = new RawMaterialServiceImpl();
     private ListModelList<RawMaterial> rawMaterialListModel;
     private MeasureUnitService measureUnitService = new MeasureUnitServiceImpl();
-    private ListModelList<MeasureUnit> measureUnitListModel;
     
     @Override
     public void doAfterCompose(Component comp) throws Exception{
@@ -79,8 +77,8 @@ public class RawMaterialController extends SelectorComposer<Component>{
         
         List<MeasureUnit> measureUnitlList = measureUnitService.getMeasureUnitList();
         
-        measureUnitListModel = new ListModelList<MeasureUnit>(measureUnitlList);
-        measureUnitSelectBox.setModel(measureUnitListModel);
+        ListModelList<MeasureUnit> measureUnitlListModel = new ListModelList<MeasureUnit>(measureUnitlList);
+        measureUnitSelectBox.setModel(measureUnitlListModel);
         
         updateUI();
     }
@@ -92,7 +90,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
     
     @Listen("onClick = #newButton")
     public void newRawMaterial() {
-        selectedRawMaterial = new RawMaterial(null, null, "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+        selectedRawMaterial = new RawMaterial(null, null, "", 0L, 0L, 0L);
         updateUI();
     }
     
@@ -103,10 +101,11 @@ public class RawMaterialController extends SelectorComposer<Component>{
 			return;
 		}
     	selectedRawMaterial.setName(nameTextBox.getText());
-        selectedRawMaterial.setLength(new BigDecimal(Double.parseDouble(lengthTextBox.getText())));
-        selectedRawMaterial.setDepth(new BigDecimal(Double.parseDouble(depthTextBox.getText())));
-        selectedRawMaterial.setHeight(new BigDecimal(Double.parseDouble(heightTextBox.getText())));
-        selectedRawMaterial.setIdMeasureUnit(measureUnitListModel.getElementAt(measureUnitSelectBox.getSelectedIndex()).getId());
+        selectedRawMaterial.setLength(Long.parseLong(lengthTextBox.getText()));
+        selectedRawMaterial.setDepth(Long.parseLong(depthTextBox.getText()));
+        selectedRawMaterial.setHeight(Long.parseLong(heightTextBox.getText()));
+        selectedRawMaterial.setIdMeasureUnit(measureUnitSelectBox.getSelectedIndex()+1);
+        //selectedRawMaterial.setIdMeasureUnit(null);
     	if(selectedRawMaterial.getId() == null)	{
     		selectedRawMaterial.setId(rawMaterialService.getNewId());
             selectedRawMaterial = rawMaterialService.saveRawMaterial(selectedRawMaterial);
@@ -155,8 +154,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
         	lengthTextBox.setValue(null);
         	depthTextBox.setValue(null);
         	heightTextBox.setValue(null);
-        	// Para que empieze con centimetros seleccionado
-        	measureUnitSelectBox.setSelectedIndex(1);
+        	//measureUnitSelectBox.setSelectedIndex(1);
         	
 			saveButton.setDisabled(true);
 			cancelButton.setDisabled(true);
@@ -166,9 +164,9 @@ public class RawMaterialController extends SelectorComposer<Component>{
 		}else{
 			rawMaterialGrid.setVisible(true);
 			nameTextBox.setValue(selectedRawMaterial.getName());
-        	lengthTextBox.setValue(selectedRawMaterial.getLength().doubleValue());
-        	depthTextBox.setValue(selectedRawMaterial.getDepth().doubleValue());
-        	heightTextBox.setValue(selectedRawMaterial.getHeight().doubleValue());
+        	lengthTextBox.setValue(selectedRawMaterial.getLength());
+        	depthTextBox.setValue(selectedRawMaterial.getDepth());
+        	heightTextBox.setValue(selectedRawMaterial.getHeight());
         	//measureUnitSelectBox.setSelectedIndex(measureUnit.get(selectedRawMaterial.getIdMeasureUnit()).getName();
         	
 			saveButton.setDisabled(false);
