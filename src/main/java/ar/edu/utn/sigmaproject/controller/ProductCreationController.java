@@ -234,9 +234,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
     		Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
     		Label lbl = (Label)processListbox.getChildren().get(i).getChildren().get(1).getChildren().get(0);
     		Textbox txtbox = (Textbox)processListbox.getChildren().get(i).getChildren().get(2).getChildren().get(0);
-    		//System.out.print("Proceso " + lbl.getValue());
-    		//System.out.print(",texto " + txtbox.getText());
-    		//System.out.println(",checkbox " + chkbox.isChecked());
+    		//System.out.print("Proceso " + lbl.getValue());//System.out.print(",texto " + txtbox.getText());//System.out.println(",checkbox " + chkbox.isChecked());
     		List<ProcessType> processTypeList = processTypeService.getProcessTypeList();
     		//System.out.println("id proceso " + processTypeList.get(i - 1).getId());
     		if(chkbox.isChecked() && Strings.isBlank(txtbox.getText())){

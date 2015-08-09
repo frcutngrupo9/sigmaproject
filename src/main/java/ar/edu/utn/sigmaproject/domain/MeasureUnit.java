@@ -8,11 +8,13 @@ public class MeasureUnit implements Serializable, Cloneable {
 	Integer id;
 	String name;
 	String shortName;
+	Integer idMeasureUnitType;
 	
-	public MeasureUnit(Integer id, String name, String shortName) {
+	public MeasureUnit(Integer id, String name, String shortName, Integer idMeasureUnitType) {
 		this.id = id;
 		this.name = name;
 		this.shortName = shortName;
+		this.idMeasureUnitType = idMeasureUnitType;
 	}
 
 	public Integer getId() {
@@ -34,6 +36,14 @@ public class MeasureUnit implements Serializable, Cloneable {
 	public void setShortName(String shortName) {
 		this.shortName = shortName;
 	}
+	
+	public Integer getIdMeasureUnitType() {
+        return idMeasureUnitType;
+    }
+
+    public void setIdMeasureUnitType(Integer idMeasureUnitType) {
+        this.idMeasureUnitType = idMeasureUnitType;
+    }
 
 	@Override
 	public int hashCode() {

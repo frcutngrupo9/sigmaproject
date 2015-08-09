@@ -97,7 +97,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
     }
     
     @Listen("onClick = #saveButton")
-    public void saveRawMaterial() {
+    public void saveButtonClick() {
     	if(Strings.isBlank(nameTextBox.getText())){
 			Clients.showNotification("Debe ingresar un nombre", nameTextBox);
 			return;
@@ -122,18 +122,18 @@ public class RawMaterialController extends SelectorComposer<Component>{
     }
     
     @Listen("onClick = #cancelButton")
-    public void cancelRawMaterial() {
+    public void cancelButtonClick() {
     	selectedRawMaterial = null;
         updateUI();
     }
     
     @Listen("onClick = #resetButton")
-    public void resetRawMaterial() {
+    public void resetButtonClick() {
         updateUI();
     }
     
     @Listen("onSelect = #rawMaterialListbox")
-	public void doTodoSelect() {
+	public void doListBoxSelect() {
 		if(rawMaterialListModel.isSelectionEmpty()){
 			//just in case for the no selection
 			selectedRawMaterial = null;
@@ -163,7 +163,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
 			resetButton.setDisabled(true);
 			newButton.setDisabled(false);
 			rawMaterialListbox.clearSelection();
-		}else{
+		}else {
 			rawMaterialGrid.setVisible(true);
 			nameTextBox.setValue(selectedRawMaterial.getName());
         	lengthTextBox.setValue(selectedRawMaterial.getLength().doubleValue());

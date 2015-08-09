@@ -8,6 +8,8 @@ public interface MeasureUnitService {
 	
 	List<MeasureUnit> getMeasureUnitList();
 	
+	List<MeasureUnit> getMeasureUnitList(Integer idMeasureUnitType);
+	
 	MeasureUnit getMeasureUnit(Integer idMeasureUnit);
 
 	MeasureUnit saveMeasureUnit(MeasureUnit measureUnit);
