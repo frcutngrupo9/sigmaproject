@@ -71,23 +71,23 @@
 		                </row>
                         <row>
                             <label value="Longitud:"/>
-                            <textbox id="pieceHeight" value="" width="150px"/>
+                            <doublebox id="pieceHeight" value="" width="150px" format="#.###" constraint="no negative: No puede ser valor negativo."/>
                         </row>
                         <row>
                             <label value="Espesor:"/>
-                            <textbox id="pieceDepth" value="" width="150px"/>
+                            <doublebox id="pieceDepth" value="" width="150px" format="#.###" constraint="no negative: No puede ser valor negativo."/>
                         </row>
                         <row>
                             <label value="Ancho:"/>
-                            <textbox id="pieceWidth" value="" width="150px"/>
+                            <doublebox id="pieceWidth" value="" width="150px" format="#.###" constraint="no negative: No puede ser valor negativo."/>
                         </row>
                         <row>
                             <label value="Medida 1:"/>
-                            <textbox id="pieceSize1" value="" width="150px"/>
+                            <doublebox id="pieceSize1" value="" width="150px" format="#.###" constraint="no negative: No puede ser valor negativo."/>
                         </row>
                         <row>
                             <label value="Medida 2:"/>
-                            <textbox id="pieceSize2" value="" width="150px"/>
+                            <doublebox id="pieceSize2" value="" width="150px" format="#.###" constraint="no negative: No puede ser valor negativo."/>
                         </row>
                         <row>
                             <label value="Unidades por Producto:"/>

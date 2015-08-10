@@ -15,6 +15,7 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.util.Clients;
+import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Listbox;
@@ -63,15 +64,15 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	@Wire
 	Textbox pieceName;
 	@Wire
-	Textbox pieceHeight;
+	Doublebox pieceHeight;
 	@Wire
-	Textbox pieceDepth;
+	Doublebox pieceDepth;
 	@Wire
-	Textbox pieceWidth;
+	Doublebox pieceWidth;
 	@Wire
-	Textbox pieceSize1;
+	Doublebox pieceSize1;
 	@Wire
-	Textbox pieceSize2;
+	Doublebox pieceSize2;
 	@Wire
 	Checkbox pieceGroup;
 	@Wire
@@ -205,19 +206,19 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	BigDecimal piece_size1 = BigDecimal.ZERO;
     	BigDecimal piece_size2 = BigDecimal.ZERO;
     	if(pieceHeight.getText().compareTo("")!=0) {
-    		piece_height = new BigDecimal(Double.parseDouble(pieceHeight.getText()));
+    		piece_height = new BigDecimal(pieceHeight.doubleValue());
     	}
     	if(pieceWidth.getText().compareTo("")!=0) {
-    		piece_width = new BigDecimal(Double.parseDouble(pieceWidth.getText()));
+    		piece_width = new BigDecimal(pieceWidth.doubleValue());
     	}
     	if(pieceDepth.getText().compareTo("")!=0) {
-    		piece_depth = new BigDecimal(Double.parseDouble(pieceDepth.getText()));
+    		piece_depth = new BigDecimal(pieceDepth.doubleValue());
     	}
     	if(pieceSize1.getText().compareTo("")!=0) {
-    		piece_size1 = new BigDecimal(Double.parseDouble(pieceSize1.getText()));
+    		piece_size1 = new BigDecimal(pieceSize1.doubleValue());
     	}
     	if(pieceSize2.getText().compareTo("")!=0) {
-    		piece_size2 = new BigDecimal(Double.parseDouble(pieceSize2.getText()));
+    		piece_size2 = new BigDecimal(pieceSize2.doubleValue());
     	}
     	Integer piece_units = pieceUnitsByProduct.getValue();
     	boolean piece_isGroup = pieceGroup.isChecked();
