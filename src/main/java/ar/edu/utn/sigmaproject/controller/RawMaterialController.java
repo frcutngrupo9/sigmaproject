@@ -18,10 +18,13 @@ import org.zkoss.zul.Selectbox;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
+import ar.edu.utn.sigmaproject.domain.MeasureUnitType;
 import ar.edu.utn.sigmaproject.domain.RawMaterial;
 import ar.edu.utn.sigmaproject.service.MeasureUnitService;
+import ar.edu.utn.sigmaproject.service.MeasureUnitTypeService;
 import ar.edu.utn.sigmaproject.service.RawMaterialService;
 import ar.edu.utn.sigmaproject.service.impl.MeasureUnitServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.MeasureUnitTypeServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.RawMaterialServiceImpl;
 
 public class RawMaterialController extends SelectorComposer<Component>{
@@ -65,8 +68,9 @@ public class RawMaterialController extends SelectorComposer<Component>{
     
     private RawMaterial selectedRawMaterial;
     private RawMaterialService rawMaterialService = new RawMaterialServiceImpl();
-    private ListModelList<RawMaterial> rawMaterialListModel;
     private MeasureUnitService measureUnitService = new MeasureUnitServiceImpl();
+    private MeasureUnitTypeService measureUnitTypeService = new MeasureUnitTypeServiceImpl();
+    private ListModelList<RawMaterial> rawMaterialListModel;
     private ListModelList<MeasureUnit> measureUnitListModel;
     
     @Override
@@ -77,7 +81,8 @@ public class RawMaterialController extends SelectorComposer<Component>{
         rawMaterialListbox.setModel(rawMaterialListModel);
         selectedRawMaterial = null;
         
-        List<MeasureUnit> measureUnitlList = measureUnitService.getMeasureUnitList();
+        Integer idMeasureUnitType = measureUnitTypeService.getMeasureUnitType("Longitud").getId();
+        List<MeasureUnit> measureUnitlList = measureUnitService.getMeasureUnitList(idMeasureUnitType);
         
         measureUnitListModel = new ListModelList<MeasureUnit>(measureUnitlList);
         measureUnitSelectBox.setModel(measureUnitListModel);
@@ -155,8 +160,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
         	lengthTextBox.setValue(null);
         	depthTextBox.setValue(null);
         	heightTextBox.setValue(null);
-        	// Para que empieze con centimetros seleccionado
-        	measureUnitSelectBox.setSelectedIndex(1);
+        	measureUnitSelectBox.setSelectedIndex(-1);
         	
 			saveButton.setDisabled(true);
 			cancelButton.setDisabled(true);
@@ -169,8 +173,12 @@ public class RawMaterialController extends SelectorComposer<Component>{
         	lengthTextBox.setValue(selectedRawMaterial.getLength().doubleValue());
         	depthTextBox.setValue(selectedRawMaterial.getDepth().doubleValue());
         	heightTextBox.setValue(selectedRawMaterial.getHeight().doubleValue());
-        	//measureUnitSelectBox.setSelectedIndex(measureUnit.get(selectedRawMaterial.getIdMeasureUnit()).getName();
-        	
+        	if(selectedRawMaterial.getIdMeasureUnit() != null) {
+        		MeasureUnitType aux = measureUnitTypeService.getMeasureUnitType(selectedRawMaterial.getIdMeasureUnit());
+        		measureUnitSelectBox.setSelectedIndex(aux.getId()-1);
+        	} else {
+        		measureUnitSelectBox.setSelectedIndex(-1);
+        	}
 			saveButton.setDisabled(false);
 			cancelButton.setDisabled(false);
 			resetButton.setDisabled(false);

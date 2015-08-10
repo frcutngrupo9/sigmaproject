@@ -45,6 +45,15 @@ public class MeasureUnitTypeServiceImpl implements MeasureUnitTypeService {
         return null;
     }
     
+    public synchronized MeasureUnitType getMeasureUnitType(String name) {
+        for(MeasureUnitType aux:measureUnitTypeList) {
+            if(aux.getName().compareToIgnoreCase(name) == 0) {
+                return MeasureUnitType.clone(aux);
+            }
+        }
+        return null;
+    }
+    
     public synchronized MeasureUnitType saveMeasureUnitType(MeasureUnitType aux) {
         aux = MeasureUnitType.clone(aux);
         measureUnitTypeList.add(aux);

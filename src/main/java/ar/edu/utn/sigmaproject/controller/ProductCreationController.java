@@ -1,7 +1,6 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,11 +27,13 @@ import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.ListModelList;
 
 import ar.edu.utn.sigmaproject.service.MeasureUnitService;
+import ar.edu.utn.sigmaproject.service.MeasureUnitTypeService;
 import ar.edu.utn.sigmaproject.service.PieceService;
 import ar.edu.utn.sigmaproject.service.ProcessService;
 import ar.edu.utn.sigmaproject.service.ProcessTypeService;
 import ar.edu.utn.sigmaproject.service.ProductService;
 import ar.edu.utn.sigmaproject.service.impl.MeasureUnitServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.MeasureUnitTypeServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.PieceServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProcessServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProcessTypeServiceImpl;
@@ -95,6 +96,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	PieceService pieceService = new PieceServiceImpl();
 	ProductService productService = new ProductServiceImpl();
 	MeasureUnitService measureUnitService = new MeasureUnitServiceImpl();
+	MeasureUnitTypeService measureUnitTypeService = new MeasureUnitTypeServiceImpl();
 	
     ListModelList<ProcessType> processTypeListModel;
     ListModelList<Piece> productPiecesListModel;
@@ -121,7 +123,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
         
         processList = new ArrayList<Process>();
         
-        List<MeasureUnit> measureUnitlList = measureUnitService.getMeasureUnitList();
+        Integer idMeasureUnitType = measureUnitTypeService.getMeasureUnitType("Longitud").getId();
+        List<MeasureUnit> measureUnitlList = measureUnitService.getMeasureUnitList(idMeasureUnitType);
         measureUnitListModel = new ListModelList<MeasureUnit>(measureUnitlList);
         measureUnitSelectBox.setModel(measureUnitListModel);
         
