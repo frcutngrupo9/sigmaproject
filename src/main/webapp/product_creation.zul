@@ -25,7 +25,7 @@
                     <button id="saveProductButton" label="Guardar"/>
                 </hlayout>
                 <separator/>
-    			<listbox id="productPiecesListbox">
+    			<listbox id="pieceListbox">
     				<auxhead>
 						<auxheader label="Piezas" colspan="2"/>
 					</auxhead>
@@ -71,32 +71,32 @@
 		                </row>
                         <row>
                             <label value="Longitud:"/>
-                            <textbox id="pieceHeight" value="" width="150px"/>
+                            <doublebox id="pieceHeight" width="150px" format="#.###"/>
                         </row>
                         <row>
                             <label value="Espesor:"/>
-                            <textbox id="pieceDepth" value="" width="150px"/>
+                            <doublebox id="pieceDepth" width="150px" format="#.###"/>
                         </row>
                         <row>
                             <label value="Ancho:"/>
-                            <textbox id="pieceWidth" value="" width="150px"/>
+                            <doublebox id="pieceWidth" width="150px" format="#.###"/>
                         </row>
                         <row>
                             <label value="Medida 1:"/>
-                            <textbox id="pieceSize1" value="" width="150px"/>
+                            <doublebox id="pieceSize1" width="150px" format="#.###"/>
                         </row>
                         <row>
                             <label value="Medida 2:"/>
-                            <textbox id="pieceSize2" value="" width="150px"/>
+                            <doublebox id="pieceSize2" width="150px" format="#.###"/>
                         </row>
                         <row>
                             <label value="Unidades por Producto:"/>
-                            <intbox id="pieceUnitsByProduct" width="150px"/>
+                            <intbox id="pieceUnitsByProduct" value="0" width="150px"/>
                         </row>
                     </rows>
                 </grid>
                 <hlayout>
-                    <button id="createProcessButton" label="Agregar Procesos"/>
+                    <button id="createProcessButton" label="Continuar a Procesos"/>
                     <button id="cancelPieceButton" label="Cancelar"/>
                 </hlayout>
             </vlayout>
@@ -110,7 +110,10 @@
                 	<listhead>
             			<listheader width="30px"/>
             			<listheader label="Proceso"/>
-            			<listheader label="Tiempo (seg)" width="100px"/>
+            			<listheader label="Detalles" width="450px"/>
+            			<listheader label="Dias" width="80px"/>
+            			<listheader label="Horas" width="80px"/>
+            			<listheader label="Minutos" width="80px"/>
         			</listhead>
 					<template name="model">
 					            <listitem>
@@ -121,14 +124,23 @@
 					                    <label value="${each.name}"/>
 					                </listcell>
 					                <listcell>
-					                    <textbox visible="false" width="36px"/>
+					                    <textbox visible="false" width="400px"/>
+					                </listcell>
+					                <listcell>
+					                    <intbox visible="false" width="36px"/>
+					                </listcell>
+					                <listcell>
+					                    <intbox visible="false" width="36px"/>
+					                </listcell>
+					                <listcell>
+					                    <intbox visible="false" width="36px"/>
 					                </listcell>
 					            </listitem>
 					</template>
                 </listbox>
                 <hlayout>
                     <button id="finishProcessButton" label="Finalizar Pieza"/>
-                    <button id="cancelProcessButton" label="Cancelar"/>
+                    <button id="cancelProcessButton" label="Volver"/>
                 </hlayout>
             </vlayout>
         </panelchildren>

@@ -42,9 +42,9 @@ public class PieceServiceImpl implements PieceService {
 	
 	public synchronized Piece getPiece(Integer id) {
 		int size = pieceList.size();
-		for(int i=0;i<size;i++){
+		for(int i = 0; i < size; i++) {
 			Piece t = pieceList.get(i);
-			if(t.getId().equals(id)){
+			if(t.getId().equals(id)) {
 				return Piece.clone(t);
 			}
 		}

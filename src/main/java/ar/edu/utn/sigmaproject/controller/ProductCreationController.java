@@ -15,6 +15,7 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.util.Clients;
+import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Listbox;
@@ -63,15 +64,15 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	@Wire
 	Textbox pieceName;
 	@Wire
-	Textbox pieceHeight;
+	Doublebox pieceHeight;
 	@Wire
-	Textbox pieceDepth;
+	Doublebox pieceDepth;
 	@Wire
-	Textbox pieceWidth;
+	Doublebox pieceWidth;
 	@Wire
-	Textbox pieceSize1;
+	Doublebox pieceSize1;
 	@Wire
-	Textbox pieceSize2;
+	Doublebox pieceSize2;
 	@Wire
 	Checkbox pieceGroup;
 	@Wire
@@ -88,7 +89,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	@Wire
 	Listbox processListbox;
 	@Wire
-	Listbox productPiecesListbox;
+	Listbox pieceListbox;
      
     // services
 	ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
@@ -99,27 +100,28 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	MeasureUnitTypeService measureUnitTypeService = new MeasureUnitTypeServiceImpl();
 	
     ListModelList<ProcessType> processTypeListModel;
-    ListModelList<Piece> productPiecesListModel;
+    ListModelList<Piece> pieceListModel;
     ListModelList<MeasureUnit> measureUnitListModel;
     
     // atributes
     private Product product;
-	private Piece activePiece;
+	private Piece currentPiece;
 	private List<Piece> pieceList;
 	private List<Process> processList;
+	private List<ProcessType> processTypeList;
      
     @Override
     public void doAfterCompose(Component comp) throws Exception{
         super.doAfterCompose(comp);
 //        System.out.println("-adentro de doAfterCompose-");
-        List<ProcessType> processTypeList = processTypeService.getProcessTypeList();
+        processTypeList = processTypeService.getProcessTypeList();
         processTypeListModel = new ListModelList<ProcessType>(processTypeList);
         processListbox.setModel(processTypeListModel);
         
         pieceList = new ArrayList<Piece>();
         List<Piece> productPiecesList = pieceList;
-        productPiecesListModel = new ListModelList<Piece>(productPiecesList);
-        productPiecesListbox.setModel(productPiecesListModel);
+        pieceListModel = new ListModelList<Piece>(productPiecesList);
+        pieceListbox.setModel(pieceListModel);
         
         processList = new ArrayList<Process>();
         
@@ -128,7 +130,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
         measureUnitListModel = new ListModelList<MeasureUnit>(measureUnitlList);
         measureUnitSelectBox.setModel(measureUnitListModel);
         
-        activePiece = null;
+        product = null;
+        currentPiece = null;
     }
     
     @Listen("onClick = #saveProductButton")
@@ -156,16 +159,16 @@ public class ProductCreationController extends SelectorComposer<Component>{
     		}
     	}
     	
-		//show message for user
+		// mostrar mensaje al user
 		Clients.showNotification("Producto guardado");
 		
-		//limpiar todo
+		// limpiar todo
 		product = null;
 		pieceList = new ArrayList<Piece>();
 		processList = new ArrayList<Process>();
 		productName.setText("");
 		productDetails.setText("");
-		productPiecesListModel.clear();
+		pieceListModel.clear();
     }
     
     @Listen("onClick = #createPieceButton")
@@ -176,97 +179,91 @@ public class ProductCreationController extends SelectorComposer<Component>{
     @Listen("onClick = #cancelPieceButton")
     public void cancelPiece() {
     	pieceCreationBlock.setVisible(false);
+    	processCreationBlock.setVisible(false);
     }
     
     @Listen("onClick = #createProcessButton")
     public void createNewProcess() {
     	if(Strings.isBlank(pieceName.getValue())){
-			Clients.showNotification("Ingrese el Nombre de la Pieza",pieceName);
+			Clients.showNotification("Ingrese el Nombre de la Pieza", pieceName);
 			return;
 		}
     	if(pieceUnitsByProduct.getValue() == null || pieceUnitsByProduct.getValue() <= 0){
-			Clients.showNotification("Ingrese las unidades de esta Pieza que contiene el Producto",pieceUnitsByProduct);
+			Clients.showNotification("La cantidad debe ser mayor a 0.", pieceUnitsByProduct);
 			return;
 		}
     	Integer piece_id = 0;
     	if(pieceList.isEmpty() == true) {
     		piece_id = pieceService.getNewId();
     	} else {
-    		//navegar pieceList y buscar el ultimo id y agregarle 1
+    		//buscamos el ultimo id y sumamos 1
     		piece_id = pieceList.get(pieceList.size()-1).getId() + 1;
     		//si se esta editando un producto habria que buscar un nuevo id del servicio
+    		// porque si las piezas que se estan editando no son las ultimas, 
+    		// entonces el nuevo id va a ser duplicado con otras piezas guardadas antes
     	}
     	
     	String piece_name = pieceName.getText();
-    	Integer idMeasureUnit = measureUnitListModel.getElementAt(measureUnitSelectBox.getSelectedIndex()).getId();
-    	BigDecimal piece_height = BigDecimal.ZERO;
-    	BigDecimal piece_width = BigDecimal.ZERO;
-    	BigDecimal piece_depth = BigDecimal.ZERO;
-    	BigDecimal piece_size1 = BigDecimal.ZERO;
-    	BigDecimal piece_size2 = BigDecimal.ZERO;
-    	if(pieceHeight.getText().compareTo("")!=0) {
-    		piece_height = new BigDecimal(Double.parseDouble(pieceHeight.getText()));
+    	Integer idMeasureUnit = null;
+    	if(measureUnitSelectBox.getSelectedIndex() != -1) {
+    		idMeasureUnit = measureUnitListModel.getElementAt(measureUnitSelectBox.getSelectedIndex()).getId();
     	}
-    	if(pieceWidth.getText().compareTo("")!=0) {
-    		piece_width = new BigDecimal(Double.parseDouble(pieceWidth.getText()));
-    	}
-    	if(pieceDepth.getText().compareTo("")!=0) {
-    		piece_depth = new BigDecimal(Double.parseDouble(pieceDepth.getText()));
-    	}
-    	if(pieceSize1.getText().compareTo("")!=0) {
-    		piece_size1 = new BigDecimal(Double.parseDouble(pieceSize1.getText()));
-    	}
-    	if(pieceSize2.getText().compareTo("")!=0) {
-    		piece_size2 = new BigDecimal(Double.parseDouble(pieceSize2.getText()));
-    	}
+    	BigDecimal piece_height = new BigDecimal(pieceHeight.doubleValue());
+    	BigDecimal piece_width = new BigDecimal(pieceWidth.doubleValue());
+    	BigDecimal piece_depth = new BigDecimal(pieceDepth.doubleValue());
+    	BigDecimal piece_size1 = new BigDecimal(pieceSize1.doubleValue());
+    	BigDecimal piece_size2 = new BigDecimal(pieceSize2.doubleValue());
+
     	Integer piece_units = pieceUnitsByProduct.getValue();
     	boolean piece_isGroup = pieceGroup.isChecked();
-    	activePiece = new Piece(piece_id, null, piece_name, idMeasureUnit, piece_height, piece_width, piece_depth, piece_size1, piece_size2, piece_isGroup, piece_units);
+    	currentPiece = new Piece(piece_id, null, piece_name, idMeasureUnit, piece_height, piece_width, piece_depth, piece_size1, piece_size2, piece_isGroup, piece_units);
     	processCreationBlock.setVisible(true);
     	pieceCreationBlock.setVisible(false);
     }
     
     @Listen("onClick = #cancelProcessButton")
     public void cancelProcess() {
+    	pieceCreationBlock.setVisible(true);
     	processCreationBlock.setVisible(false);
     }
     
     @Listen("onClick = #finishProcessButton")
     public void finishPiece() {
-    	for(int i=1; i<processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
+    	for(int i = 1; i < processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
     		Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
     		Label lbl = (Label)processListbox.getChildren().get(i).getChildren().get(1).getChildren().get(0);
-    		Textbox txtbox = (Textbox)processListbox.getChildren().get(i).getChildren().get(2).getChildren().get(0);
-    		//System.out.print("Proceso " + lbl.getValue());//System.out.print(",texto " + txtbox.getText());//System.out.println(",checkbox " + chkbox.isChecked());
-    		List<ProcessType> processTypeList = processTypeService.getProcessTypeList();
-    		//System.out.println("id proceso " + processTypeList.get(i - 1).getId());
-    		if(chkbox.isChecked() && Strings.isBlank(txtbox.getText())){
-    			Clients.showNotification("Ingrese el Tiempo para el Proceso",txtbox);
+    		Textbox txtboxDetails = (Textbox)processListbox.getChildren().get(i).getChildren().get(2).getChildren().get(0);
+    		Intbox intboxDays = (Intbox)processListbox.getChildren().get(i).getChildren().get(3).getChildren().get(0);
+      		Intbox intboxHours = (Intbox)processListbox.getChildren().get(i).getChildren().get(4).getChildren().get(0);
+      		Intbox intboxMinutes = (Intbox)processListbox.getChildren().get(i).getChildren().get(5).getChildren().get(0);
+    		if(chkbox.isChecked() && intboxDays.intValue() == 0 && intboxHours.intValue() == 0 && intboxMinutes.intValue() == 0){
+    			Clients.showNotification("Ingrese el Tiempo para el Proceso", intboxMinutes, true);
     			return;
     		}
-    		Process process = null;
-    		if(chkbox.isChecked() && !Strings.isBlank(txtbox.getText())){
-    			int idPiece = activePiece.getId();
+    		Process currentProcess = null;
+    		if(chkbox.isChecked() && (intboxDays.intValue() != 0 || intboxHours.intValue() != 0 || intboxMinutes.intValue() != 0)){
+    			int idPiece = currentPiece.getId();
     			int idProcessType = processTypeService.getProcessTypeList().get(i - 1).getId();
-    			//!! Recordar hacer entrada del detail
-    			String details = "";
-    			Integer minutes = Integer.parseInt(txtbox.getText());
+    			String details = txtboxDetails.getText();
+    			Integer days = intboxDays.intValue();
+    			Integer hours = intboxHours.intValue();
+    			Integer minutes = intboxMinutes.intValue();
     			Duration duration = null;
 				try {
-					duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, 0, 0, minutes, 0);
+					duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, days, hours, minutes, 0);
 				} catch (DatatypeConfigurationException e) {
 					System.out.println("Error en grabar duracion del proceso: " + e.toString());
 				}
-    			process = new Process(idPiece, idProcessType, details, duration);
+    			currentProcess = new Process(idPiece, idProcessType, details, duration);
     		}
-    		if(process != null) {
-    			processList.add(process);
+    		if(currentProcess != null) {
+    			processList.add(currentProcess);
     		}
     	}
     	//agregamos la pieza a la lista y actualizamos el view
-    	pieceList.add(activePiece);
-    	productPiecesListModel.add(activePiece);
-    	activePiece = null;
+    	pieceList.add(currentPiece);
+    	pieceListModel.add(currentPiece);
+    	currentPiece = null;
     	refreshView();
     }
 	
@@ -276,14 +273,24 @@ public class ProductCreationController extends SelectorComposer<Component>{
   		//get data from event
   		Checkbox cbox = (Checkbox)evt.getOrigin().getTarget();
   		Listitem litem = (Listitem)cbox.getParent().getParent();
-  		Textbox tbox = (Textbox)litem.getChildren().get(2).getFirstChild();
+  		Textbox txtboxDetails = (Textbox)litem.getChildren().get(2).getFirstChild();
+  		Intbox intboxDays = (Intbox)litem.getChildren().get(3).getFirstChild();
+  		Intbox intboxHours = (Intbox)litem.getChildren().get(4).getFirstChild();
+  		Intbox intboxMinutes = (Intbox)litem.getChildren().get(5).getFirstChild();
   		if(cbox.isChecked()) {
-  			tbox.setVisible(true);
+  			txtboxDetails.setVisible(true);
+  			intboxDays.setVisible(true);
+  			intboxHours.setVisible(true);
+  			intboxMinutes.setVisible(true);
   		} else {
-  			tbox.setVisible(false);
+  			txtboxDetails.setVisible(false);
+  			intboxDays.setVisible(false);
+  			intboxHours.setVisible(false);
+  			intboxMinutes.setVisible(false);
   		}
   	}
   	
+  	/*
   	@Listen("onCheck = #pieceGroup")
   	public void doPieceGroupCheck() {
   		Row measureUnitRow = (Row)(measureUnitSelectBox.getParent());
@@ -292,47 +299,106 @@ public class ProductCreationController extends SelectorComposer<Component>{
   		Row pieceDepthRow = (Row)(pieceDepth.getParent());
   		Row pieceSize1Row = (Row)(pieceSize1.getParent());
   		Row pieceSize2Row = (Row)(pieceSize2.getParent());
-  		if(pieceGroup.isChecked()) {
-  			measureUnitRow.setVisible(false);
-  			pieceHeightRow.setVisible(false);
-  	    	pieceWidthRow.setVisible(false);
-  	    	pieceDepthRow.setVisible(false);
+  		if(pieceGroup.isChecked()) { // se muestran solo las medidas principales si es grupo
+  			//pieceHeightRow.setVisible(false);
+  			//pieceWidthRow.setVisible(false);
+  			//pieceDepthRow.setVisible(false);
   	    	pieceSize1Row.setVisible(false);
   	    	pieceSize2Row.setVisible(false);
   		} else {
-  			measureUnitRow.setVisible(true);
-  			pieceHeightRow.setVisible(true);
-  	    	pieceWidthRow.setVisible(true);
-  	    	pieceDepthRow.setVisible(true);
+  			//pieceHeightRow.setVisible(true);
+  			//pieceWidthRow.setVisible(true);
+  			//pieceDepthRow.setVisible(true);
   	    	pieceSize1Row.setVisible(true);
   	    	pieceSize2Row.setVisible(true);
   		}
   	}
+  	*/
     
   	private void refreshView() {
-  		if (activePiece == null) {
+  		if (currentPiece == null) {
   			pieceCreationBlock.setVisible(false);
   	    	processCreationBlock.setVisible(false);
-  	    	//limpiar form pieza
+  	    	// limpiar form pieza
   	    	pieceName.setText("");
   	    	pieceGroup.setChecked(false);
   	    	measureUnitSelectBox.setSelectedIndex(-1);
-  	    	pieceHeight.setText("");
-  	    	pieceWidth.setText("");
-  	    	pieceDepth.setText("");
-  	    	pieceSize1.setText("");
-  	    	pieceSize2.setText("");
-  	    	pieceUnitsByProduct.setValue(null);
-  	    	//limpiar procesos (ponerlos en vacio y sin check)
+  	    	pieceHeight.setValue(0);
+  	    	pieceWidth.setValue(0);
+  	    	pieceDepth.setValue(0);
+  	    	pieceSize1.setValue(0);
+  	    	pieceSize2.setValue(0);
+  	    	pieceUnitsByProduct.setValue(0);
+  	    	// limpiar procesos (ponerlos en vacio y sin check)
   	    	for(int i=1; i<processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
   	    		Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
-  	    		Textbox txtbox = (Textbox)processListbox.getChildren().get(i).getChildren().get(2).getChildren().get(0);
+  	    		Textbox txtboxDetails = (Textbox)processListbox.getChildren().get(i).getChildren().get(2).getChildren().get(0);
+  	    		Intbox intboxDays = (Intbox)processListbox.getChildren().get(i).getChildren().get(3).getChildren().get(0);
+  	    		Intbox intboxHours = (Intbox)processListbox.getChildren().get(i).getChildren().get(4).getChildren().get(0);
+  	    		Intbox intboxMinutes = (Intbox)processListbox.getChildren().get(i).getChildren().get(5).getChildren().get(0);
+  	    		
   	    		chkbox.setChecked(false);
-  	    		txtbox.setText("");
-  	    		txtbox.setVisible(false);
+  	    		txtboxDetails.setVisible(false);
+  	    		intboxDays.setVisible(false);
+  	    		intboxHours.setVisible(false);
+  	    		intboxMinutes.setVisible(false);
+  	    		txtboxDetails.setText("");
+  	    		intboxDays.setValue(0);
+  	    		intboxHours.setValue(0);
+  	    		intboxMinutes.setValue(0);
   	    	}
   		} else {
-  			
+  			pieceCreationBlock.setVisible(true);
+  	    	processCreationBlock.setVisible(true);
+  	    	// cargar form pieza
+  	    	pieceName.setText(currentPiece.getName());
+  	    	pieceGroup.setChecked(currentPiece.isGroup());
+  	    	measureUnitSelectBox.setSelectedIndex(measureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getIdMeasureUnit())));
+  	    	pieceHeight.setValue(currentPiece.getHeight().doubleValue());
+  	    	pieceWidth.setValue(currentPiece.getWidth().doubleValue());
+  	    	pieceDepth.setValue(currentPiece.getDepth().doubleValue());
+  	    	pieceSize1.setValue(currentPiece.getSize1().doubleValue());
+  	    	pieceSize2.setValue(currentPiece.getSize2().doubleValue());
+  	    	pieceUnitsByProduct.setValue(currentPiece.getUnits());
+  	    	// cargar procesos (cargar detalles, tiempos y checks)
+  	    	processTypeList = processTypeService.getProcessTypeList();
+  	    	// recorremos los elementos del DOM
+  	    	for(int i = 1; i < processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
+  	    		// obtenemos las referencias a los elementos
+  	    		Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
+  	    		Textbox txtboxDetails = (Textbox)processListbox.getChildren().get(i).getChildren().get(2).getChildren().get(0);
+  	    		Intbox intboxDays = (Intbox)processListbox.getChildren().get(i).getChildren().get(3).getChildren().get(0);
+  	    		Intbox intboxHours = (Intbox)processListbox.getChildren().get(i).getChildren().get(4).getChildren().get(0);
+  	    		Intbox intboxMinutes = (Intbox)processListbox.getChildren().get(i).getChildren().get(5).getChildren().get(0);
+  	    		// cargamos los valores, de los procesos a los elementos
+  	    		Process currentProcess = null;
+  	    		for(int j = 0; j < processList.size(); j++) {
+  	    			if(processList.get(j).getIdPiece().equals(currentPiece.getId()) && processList.get(j).getIdProcessType().equals(processTypeList.get(i - 1).getId())) { // el tipo de proceso i -1 es para empezar desde el indice 0
+  	    				currentProcess = processList.get(j);
+  	    			}
+  	    		}
+  	    		if(currentProcess == null) { //si no se encontro el proceso esta en null
+  	    			chkbox.setChecked(false);
+  	    			txtboxDetails.setVisible(false);
+  	  	    		intboxDays.setVisible(false);
+  	  	    		intboxHours.setVisible(false);
+  	  	    		intboxMinutes.setVisible(false);
+  	    			txtboxDetails.setText("");
+  	    			intboxDays.setValue(0);
+  	  	    		intboxHours.setValue(0);
+  	  	    		intboxMinutes.setValue(0);
+  	    		} else {
+  	    			chkbox.setChecked(true);
+  	    			txtboxDetails.setVisible(true);
+  	    			intboxDays.setVisible(true);
+  	  	    		intboxHours.setVisible(true);
+  	  	    		intboxMinutes.setVisible(true);
+  	    			txtboxDetails.setText(currentProcess.getDetails());
+  	    			intboxDays.setValue(currentProcess.getTime().getDays());
+  	  	    		intboxHours.setValue(currentProcess.getTime().getHours());
+  	  	    		intboxMinutes.setValue(currentProcess.getTime().getMinutes());
+  	    		}
+  	    	}
   		}
   	}
   	
@@ -348,4 +414,14 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	return "" + quantity;
     }
   	
+  	@Listen("onSelect = #pieceListbox")
+	public void doListBoxSelect() {
+		if(pieceListModel.isSelectionEmpty()){
+			//just in case for the no selection
+			currentPiece = null;
+		}else {
+			currentPiece = pieceListModel.getSelection().iterator().next();
+		}
+		refreshView();
+	}
 }

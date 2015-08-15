@@ -7,7 +7,7 @@ import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.service.OrderDetailService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
-public class OrderDetailServiceImpl implements OrderDetailService{
+public class OrderDetailServiceImpl implements OrderDetailService {
     
     static List<OrderDetail> orderDetailList = new ArrayList<OrderDetail>();
     private SerializationService serializator = new SerializationService("order_detail");
@@ -32,7 +32,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
     
     public synchronized OrderDetail getOrderDetail(Integer idOrder, Integer idProduct) {
         int size = orderDetailList.size();
-        for(int i=0;i<size;i++){
+        for(int i = 0; i < size; i++){
             OrderDetail aux = orderDetailList.get(i);
             if(aux.getIdOrder().equals(idOrder) && aux.getIdProduct().equals(idProduct)){
                 return OrderDetail.clone(aux);

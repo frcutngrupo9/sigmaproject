@@ -33,7 +33,7 @@ public class ProcessServiceImpl implements ProcessService {
 	public synchronized List<Process> getProcessList(Integer idPiece) {
 		List<Process> list = new ArrayList<Process>();
 		for(Process process:processList){
-			if(process.getIdPiece().compareTo(idPiece) == 0) {
+			if(process.getIdPiece().equals(idPiece)) {
 				list.add(Process.clone(process));
 			}
 		}
@@ -59,12 +59,12 @@ public class ProcessServiceImpl implements ProcessService {
 	}
 	
 	public synchronized Process updateProcess(Process process) {
-		if(process.getIdPiece()==null && process.getIdProcessType()==null){
+		if(process.getIdPiece() == null && process.getIdProcessType() == null) {
 			throw new IllegalArgumentException("can't update a null-id process, save it first");
-		}else{
+		}else {
 			process = Process.clone(process);
 			int size = processList.size();
-			for(int i=0;i<size;i++){
+			for(int i = 0; i < size; i++) {
 				Process t = processList.get(i);
 				if(t.getIdPiece().equals(process.getIdPiece()) && t.getIdProcessType().equals(process.getIdProcessType())){
 					processList.set(i, process);
@@ -72,16 +72,16 @@ public class ProcessServiceImpl implements ProcessService {
 					return process;
 				}
 			}
-			throw new RuntimeException("Process not found "+process.getIdPiece()+" "+process.getIdProcessType());
+			throw new RuntimeException("Process not found " + process.getIdPiece()+" "+process.getIdProcessType());
 		}
 	}
 	
 	public synchronized void deleteProcess(Process process) {
 		if(process.getIdPiece()!=null && process.getIdProcessType()!=null){
 			int size = processList.size();
-			for(int i=0;i<size;i++){
+			for(int i = 0; i < size; i++) {
 				Process t = processList.get(i);
-				if(t.getIdPiece().equals(process.getIdPiece()) && t.getIdProcessType().equals(process.getIdProcessType())){
+				if(t.getIdPiece().equals(process.getIdPiece()) && t.getIdProcessType().equals(process.getIdProcessType())) {
 					processList.remove(i);
 					serializator.grabarLista(processList);
 					return;

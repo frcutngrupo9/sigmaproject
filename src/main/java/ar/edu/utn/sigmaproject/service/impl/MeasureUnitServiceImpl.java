@@ -48,7 +48,7 @@ public class MeasureUnitServiceImpl implements MeasureUnitService {
 	public List<MeasureUnit> getMeasureUnitList(Integer idMeasureUnitType) {
 	    List<MeasureUnit> list = new ArrayList<MeasureUnit>();
         for(MeasureUnit aux:measureUnitList) {
-            if(aux.getIdMeasureUnitType().compareTo(idMeasureUnitType) == 0) {
+            if(aux.getIdMeasureUnitType().equals(idMeasureUnitType)) {
                 list.add(MeasureUnit.clone(aux));
             }
         }
@@ -57,7 +57,7 @@ public class MeasureUnitServiceImpl implements MeasureUnitService {
 	
 	public synchronized MeasureUnit getMeasureUnit(Integer id) {
 		for(MeasureUnit aux:measureUnitList) {
-			if(aux.getId().compareTo(id) == 0) {
+			if(aux.getId().equals(id)) {
 				return MeasureUnit.clone(aux);
 			}
 		}
@@ -72,32 +72,32 @@ public class MeasureUnitServiceImpl implements MeasureUnitService {
 	}
 	
 	public synchronized MeasureUnit updateMeasureUnit(MeasureUnit aux) {
-		if(aux.getId()!=null && aux.getId()==getNewId()) {
+		if(aux.getId() != null && aux.getId().equals(getNewId())) {
 			aux = saveMeasureUnit(aux);
 			return aux;
 		}
 		else {
-			if(aux.getId()==null) {
+			if(aux.getId() == null) {
 				throw new IllegalArgumentException("can't update a null-id MeasureUnit, save it first");
 			}else {
 				aux = MeasureUnit.clone(aux);
 				int size = measureUnitList.size();
-				for(int i=0;i<size;i++){
+				for(int i = 0; i < size; i++){
 					MeasureUnit t = measureUnitList.get(i);
 					if(t.getId().equals(aux.getId())) {
 						measureUnitList.set(i, aux);
 						return aux;
 					}
 				}
-				throw new RuntimeException("Product not found "+aux.getId());
+				throw new RuntimeException("Product not found " + aux.getId());
 			}
 		}
 	}
 	
 	public synchronized void deleteMeasureUnit(MeasureUnit aux) {
-		if(aux.getId()!=null) {
+		if(aux.getId() != null) {
 			int size = measureUnitList.size();
-			for(int i=0;i<size;i++) {
+			for(int i = 0; i < size; i++) {
 				MeasureUnit t = measureUnitList.get(i);
 				if(t.getId().equals(aux.getId())) {
 					measureUnitList.remove(i);

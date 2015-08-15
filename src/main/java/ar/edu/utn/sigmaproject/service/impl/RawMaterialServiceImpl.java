@@ -32,9 +32,9 @@ public class RawMaterialServiceImpl implements RawMaterialService {
 	
 	public synchronized RawMaterial getRawMaterial(Integer id) {
 		int size = rawMaterialList.size();
-		for(int i=0;i<size;i++){
+		for(int i = 0; i < size; i++) {
 			RawMaterial t = rawMaterialList.get(i);
-			if(t.getId().equals(id)){
+			if(t.getId().equals(id)) {
 				return RawMaterial.clone(t);
 			}
 		}
@@ -49,20 +49,18 @@ public class RawMaterialServiceImpl implements RawMaterialService {
 	}
 	
 	public synchronized RawMaterial updateRawMaterial(RawMaterial rawMaterial) {
-		if(rawMaterial.getId()!=null && rawMaterial.getId()==getNewId())
-		{
+		if(rawMaterial.getId()!=null && rawMaterial.getId()==getNewId()) {
 			rawMaterial = saveRawMaterial(rawMaterial);
 			return rawMaterial;
-		}
-		else {
-			if(rawMaterial.getId()==null){
+		}else {
+			if(rawMaterial.getId()==null) {
 				throw new IllegalArgumentException("can't update a null-id product, save it first");
-			}else{
+			}else {
 				rawMaterial = RawMaterial.clone(rawMaterial);
 				int size = rawMaterialList.size();
 				for(int i=0;i<size;i++){
 					RawMaterial t = rawMaterialList.get(i);
-					if(t.getId().equals(rawMaterial.getId())){
+					if(t.getId().equals(rawMaterial.getId())) {
 						rawMaterialList.set(i, rawMaterial);
 						return rawMaterial;
 					}
@@ -73,11 +71,11 @@ public class RawMaterialServiceImpl implements RawMaterialService {
 	}
 	
 	public synchronized void deleteRawMaterial(RawMaterial rawMaterial) {
-		if(rawMaterial.getId()!=null){
+		if(rawMaterial.getId() != null) {
 			int size = rawMaterialList.size();
-			for(int i=0;i<size;i++){
+			for(int i = 0; i < size; i++) {
 				RawMaterial t = rawMaterialList.get(i);
-				if(t.getId().equals(rawMaterial.getId())){
+				if(t.getId().equals(rawMaterial.getId())) {
 					rawMaterialList.remove(i);
 					serializator.grabarLista(rawMaterialList);
 					return;

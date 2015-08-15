@@ -38,7 +38,7 @@ public class MeasureUnitTypeServiceImpl implements MeasureUnitTypeService {
     
     public synchronized MeasureUnitType getMeasureUnitType(Integer id) {
         for(MeasureUnitType aux:measureUnitTypeList) {
-            if(aux.getId().compareTo(id) == 0) {
+            if(aux.getId().equals(id)) {
                 return MeasureUnitType.clone(aux);
             }
         }
@@ -62,24 +62,24 @@ public class MeasureUnitTypeServiceImpl implements MeasureUnitTypeService {
     }
     
     public synchronized MeasureUnitType updateMeasureUnitType(MeasureUnitType aux) {
-        if(aux.getId()!=null && aux.getId()==getNewId()) {
+        if(aux.getId() != null && aux.getId().equals(getNewId())) {
             aux = saveMeasureUnitType(aux);
             return aux;
         }
         else {
-            if(aux.getId()==null) {
+            if(aux.getId() == null) {
                 throw new IllegalArgumentException("can't update a null-id MeasureUnit, save it first");
             }else {
                 aux = MeasureUnitType.clone(aux);
                 int size = measureUnitTypeList.size();
-                for(int i=0;i<size;i++) {
+                for(int i = 0; i < size; i++) {
                     MeasureUnitType t = measureUnitTypeList.get(i);
                     if(t.getId().equals(aux.getId())) {
                         measureUnitTypeList.set(i, aux);
                         return aux;
                     }
                 }
-                throw new RuntimeException("Product not found "+aux.getId());
+                throw new RuntimeException("Product not found " + aux.getId());
             }
         }
     }

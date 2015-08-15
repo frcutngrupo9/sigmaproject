@@ -52,25 +52,22 @@ public class ProductServiceImpl implements ProductService {
 	}
 	
 	public synchronized Product updateProduct(Product product) {
-		if(product.getId()!=null && product.getId()==getNewId())
-		{
+		if(product.getId()!=null && product.getId().equals(getNewId())) {
 			product = saveProduct(product);
 			return product;
-		}
-		else {
+		} else {
 			if(product.getId() == null){
 				throw new IllegalArgumentException("can't update a null-id product, save it first");
-			}else{
+			}else {
 				product = Product.clone(product);
 				int size = productList.size();
 				for(int i=0;i<size;i++){
 					Product t = productList.get(i);
-					if(t.getId().equals(product.getId())){
+					if(t.getId().equals(product.getId())) {
 						productList.set(i, product);
 						return product;
 					}
-				}
-				throw new RuntimeException("Product not found "+product.getId());
+				} throw new RuntimeException("Product not found "+product.getId());
 			}
 		}
 	}
@@ -102,7 +99,7 @@ public class ProductServiceImpl implements ProductService {
 	
 	private boolean existId(Integer id) {
 		boolean value = false;
-		for(int i=0;i<productList.size();i++){
+		for(int i =0; i < productList.size(); i++){
 			Product aux = productList.get(i);
 			if(aux.getId().equals(id)){
 				value = true;
