@@ -204,10 +204,12 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	}
     	
     	String piece_name = pieceName.getText();
+    	
     	Integer idMeasureUnit = null;
     	if(measureUnitSelectBox.getSelectedIndex() != -1) {
     		idMeasureUnit = measureUnitListModel.getElementAt(measureUnitSelectBox.getSelectedIndex()).getId();
     	}
+
     	BigDecimal piece_height = new BigDecimal(pieceHeight.doubleValue());
     	BigDecimal piece_width = new BigDecimal(pieceWidth.doubleValue());
     	BigDecimal piece_depth = new BigDecimal(pieceDepth.doubleValue());
