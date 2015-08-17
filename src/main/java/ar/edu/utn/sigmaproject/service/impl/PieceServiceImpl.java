@@ -61,10 +61,10 @@ public class PieceServiceImpl implements PieceService {
 	public synchronized Piece updatePiece(Piece piece) {
 		if(piece.getId()==null){
 			throw new IllegalArgumentException("can't update a null-id piece, save it first");
-		}else{
+		}else {
 			piece = Piece.clone(piece);
 			int size = pieceList.size();
-			for(int i=0;i<size;i++){
+			for(int i = 0; i < size; i++) {
 				Piece t = pieceList.get(i);
 				if(t.getId().equals(piece.getId())){
 					pieceList.set(i, piece);

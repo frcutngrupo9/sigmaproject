@@ -22,7 +22,9 @@
                 <separator/>
                 <hlayout>
                     <button id="createPieceButton" label="Agregar Nueva Pieza"/>
-                    <button id="saveProductButton" label="Guardar"/>
+                    <button id="saveProductButton" label="Guardar Producto"/>
+                    <button id="resetProductButton" label="Reset Producto"/>
+                    <button id="deleteProductButton" label="Eliminar Producto"/>
                 </hlayout>
                 <separator/>
     			<listbox id="pieceListbox">
@@ -96,7 +98,7 @@
                     </rows>
                 </grid>
                 <hlayout>
-                    <button id="createProcessButton" label="Continuar a Procesos"/>
+                    <button id="createProcessButton" label="Continuar"/>
                     <button id="cancelPieceButton" label="Cancelar"/>
                 </hlayout>
             </vlayout>
@@ -118,7 +120,7 @@
 					<template name="model">
 					            <listitem>
 					                <listcell>
-					                    <checkbox forward="onCheck=processListbox.onProcessCheck"	checked="false"/>
+					                    <checkbox forward="onCheck=processListbox.onProcessCheck"/>
 					                </listcell>
 					                <listcell>
 					                    <label value="${each.name}"/>
@@ -139,8 +141,10 @@
 					</template>
                 </listbox>
                 <hlayout>
-                    <button id="finishProcessButton" label="Finalizar Pieza"/>
                     <button id="cancelProcessButton" label="Volver"/>
+                    <button id="finishProcessButton" label="Guardar Pieza"/>
+                    <button id="resetPieceButton" label="Reset Pieza"/>
+                    <button id="deletePieceButton" label="Eliminar Pieza"/>
                 </hlayout>
             </vlayout>
         </panelchildren>

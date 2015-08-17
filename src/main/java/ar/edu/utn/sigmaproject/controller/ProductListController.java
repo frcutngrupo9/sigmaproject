@@ -24,6 +24,7 @@ import ar.edu.utn.sigmaproject.service.impl.ProcessTypeServiceImpl;
 
 
 
+
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -38,6 +39,7 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Paging;
 import org.zkoss.zul.Textbox;
 
+import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.datatype.Duration;
@@ -86,9 +88,11 @@ public class ProductListController extends SelectorComposer<Component>{
     
     @Listen("onSelect = #productListbox")
     public void onProductSelect() {
-    	Clients.showNotification("Usted hizo click en el Producto: " + ((Product) productListbox.getSelectedItem().getValue()).getName());
-    	productListbox.clearSelection();
-    	//getSelf().detach();
+    	//Clients.showNotification("Usted hizo click en el Producto: " + ((Product) productListbox.getSelectedItem().getValue()).getName());
+        Executions.getCurrent().setAttribute("selected_product", ((Product) productListbox.getSelectedItem().getValue()));
+        //productListbox.clearSelection();
+        Include include = (Include) Selectors.iterable(productListbox.getPage(), "#mainInclude").iterator().next();
+    	include.setSrc("/product_creation.zul");
     }
     
     @Listen("onClick = #searchButton")
@@ -98,6 +102,7 @@ public class ProductListController extends SelectorComposer<Component>{
     
     @Listen("onClick = #newProductButton")
     public void goToNewProduct() {
+    	Executions.getCurrent().setAttribute("selected_product", null);
     	Include include = (Include) Selectors.iterable(productListbox.getPage(), "#mainInclude").iterator().next();
     	include.setSrc("/product_creation.zul");
     	//Executions.sendRedirect("/product_creation.zul");
@@ -108,7 +113,13 @@ public class ProductListController extends SelectorComposer<Component>{
     }
     
     public String getPieceName(int idPiece) {
-    	return pieceListService.getPiece(idPiece).getName();
+    	Piece aux = pieceListService.getPiece(idPiece);
+    	if(aux != null) {
+    		return aux.getName();
+    	} else {
+    		return null;
+    	}
+    	
     }
     
     public String getProcessTypeName(int idProduct) {
