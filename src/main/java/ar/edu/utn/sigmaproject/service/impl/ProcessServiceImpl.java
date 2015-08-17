@@ -42,13 +42,13 @@ public class ProcessServiceImpl implements ProcessService {
 	
 	public synchronized Process getProcess(Integer idPiece, Integer idProcessType) {
 		int size = processList.size();
-		for(int i=0;i<size;i++){
-			Process t = processList.get(i);
-			if(t.getIdPiece().equals(idPiece) && t.getIdProcessType().equals(idProcessType)){
-				return Process.clone(t);
-			}
-		}
-		return null;
+  		for(int i = 0; i < size; i++) {
+  			Process t = processList.get(i);
+  			if(t.getIdPiece().equals(idPiece) && t.getIdProcessType().equals(idProcessType)) {
+  				return Process.clone(t);
+  			}
+  		}
+  		return null;
 	}
 	
 	public synchronized Process saveProcess(Process process) {

@@ -192,33 +192,6 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			Clients.showNotification("La cantidad debe ser mayor a 0.", pieceUnitsByProduct);
 			return;
 		}
-    	Integer piece_id = 0;
-    	if(pieceList.isEmpty() == true) {
-    		piece_id = pieceService.getNewId();
-    	} else {
-    		//buscamos el ultimo id y sumamos 1
-    		piece_id = pieceList.get(pieceList.size()-1).getId() + 1;
-    		//si se esta editando un producto habria que buscar un nuevo id del servicio
-    		// porque si las piezas que se estan editando no son las ultimas, 
-    		// entonces el nuevo id va a ser duplicado con otras piezas guardadas antes
-    	}
-    	
-    	String piece_name = pieceName.getText();
-    	
-    	Integer idMeasureUnit = null;
-    	if(measureUnitSelectBox.getSelectedIndex() != -1) {
-    		idMeasureUnit = measureUnitListModel.getElementAt(measureUnitSelectBox.getSelectedIndex()).getId();
-    	}
-
-    	BigDecimal piece_height = new BigDecimal(pieceHeight.doubleValue());
-    	BigDecimal piece_width = new BigDecimal(pieceWidth.doubleValue());
-    	BigDecimal piece_depth = new BigDecimal(pieceDepth.doubleValue());
-    	BigDecimal piece_size1 = new BigDecimal(pieceSize1.doubleValue());
-    	BigDecimal piece_size2 = new BigDecimal(pieceSize2.doubleValue());
-
-    	Integer piece_units = pieceUnitsByProduct.getValue();
-    	boolean piece_isGroup = pieceGroup.isChecked();
-    	currentPiece = new Piece(piece_id, null, piece_name, idMeasureUnit, piece_height, piece_width, piece_depth, piece_size1, piece_size2, piece_isGroup, piece_units);
     	processCreationBlock.setVisible(true);
     	pieceCreationBlock.setVisible(false);
     }
@@ -230,7 +203,46 @@ public class ProductCreationController extends SelectorComposer<Component>{
     }
     
     @Listen("onClick = #finishProcessButton")
-    public void finishPiece() {
+    public void finishPiece() { //actualizamos la lista de piezas y procesos
+    	Integer piece_id = 0;
+    	String piece_name = pieceName.getText();
+    	Integer idMeasureUnit = null;
+    	if(measureUnitSelectBox.getSelectedIndex() != -1) {
+    		idMeasureUnit = measureUnitListModel.getElementAt(measureUnitSelectBox.getSelectedIndex()).getId();
+    	}
+    	BigDecimal piece_height = new BigDecimal(pieceHeight.doubleValue());
+    	BigDecimal piece_width = new BigDecimal(pieceWidth.doubleValue());
+    	BigDecimal piece_depth = new BigDecimal(pieceDepth.doubleValue());
+    	BigDecimal piece_size1 = new BigDecimal(pieceSize1.doubleValue());
+    	BigDecimal piece_size2 = new BigDecimal(pieceSize2.doubleValue());
+    	Integer piece_units = pieceUnitsByProduct.getValue();
+    	boolean piece_isGroup = pieceGroup.isChecked();
+    	
+    	if(currentPiece == null) { // no se esta editando una pieza
+    		Integer serviceNewPieceId = pieceService.getNewId();
+    		if(pieceList.isEmpty() == true) {
+        		piece_id = serviceNewPieceId;
+        	} else {
+        		piece_id = getLastPieceId() + 1;// buscamos el ultimo id y sumamos 1
+        		if(piece_id < serviceNewPieceId) { // si el ultimo id es menor que uno nuevo del servicio quiere decir que las piezas en la lista son viejas y hay que agarra el id mas grande osea el que viene del servicio
+        			piece_id = serviceNewPieceId;
+        		}
+        	}
+    		currentPiece = new Piece(piece_id, null, piece_name, idMeasureUnit, piece_height, piece_width, piece_depth, piece_size1, piece_size2, piece_isGroup, piece_units);
+    		pieceList.add(currentPiece);// lo agregamos a la lista
+        	pieceListModel.add(currentPiece);// y al modelo para que aparezca en la pantalla
+    	} else { // se esta editando una pieza
+    		currentPiece.setHeight(piece_height);
+    		currentPiece.setWidth(piece_width);
+    		currentPiece.setDepth(piece_depth);
+    		currentPiece.setSize1(piece_size1);
+    		currentPiece.setSize2(piece_size2);
+    		currentPiece.setUnits(piece_units);
+    		currentPiece.setGroup(piece_isGroup);
+    		updatePiece(currentPiece);
+    	}
+    	
+    	// segundo actualizamos la lista de procesos
     	for(int i = 1; i < processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
     		Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
     		Label lbl = (Label)processListbox.getChildren().get(i).getChildren().get(1).getChildren().get(0);
@@ -242,10 +254,10 @@ public class ProductCreationController extends SelectorComposer<Component>{
     			Clients.showNotification("Ingrese el Tiempo para el Proceso", intboxMinutes, true);
     			return;
     		}
-    		Process currentProcess = null;
-    		if(chkbox.isChecked() && (intboxDays.intValue() != 0 || intboxHours.intValue() != 0 || intboxMinutes.intValue() != 0)){
-    			int idPiece = currentPiece.getId();
-    			int idProcessType = processTypeService.getProcessTypeList().get(i - 1).getId();
+    		Integer idPiece = currentPiece.getId();
+			Integer idProcessType = processTypeList.get(i - 1).getId(); // restamos 1 para empezar del indice 0
+    		Process currentProcess = searchProcess(idPiece, idProcessType); // buscamos si ya esta creado
+    		if(chkbox.isChecked()) {
     			String details = txtboxDetails.getText();
     			Integer days = intboxDays.intValue();
     			Integer hours = intboxHours.intValue();
@@ -254,17 +266,23 @@ public class ProductCreationController extends SelectorComposer<Component>{
 				try {
 					duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, days, hours, minutes, 0);
 				} catch (DatatypeConfigurationException e) {
-					System.out.println("Error en grabar duracion del proceso: " + e.toString());
+					System.out.println("Error en finalizar pieza, en convertir a duracion: " + e.toString());
 				}
-    			currentProcess = new Process(idPiece, idProcessType, details, duration);
-    		}
-    		if(currentProcess != null) {
-    			processList.add(currentProcess);
+    			if(currentProcess == null) { // no esta creado
+	    			currentProcess = new Process(idPiece, idProcessType, details, duration);
+	    			processList.add(currentProcess);
+    			} else { // esta creado
+    				currentProcess.setDetails(details);
+    				currentProcess.setTime(duration);
+    				currentProcess = updateProcess(currentProcess);
+    			}
+    		} else {
+    			if(currentProcess != null) { // esta creado pero el check en false, hay que eliminarlo
+	    			deleteProcess(currentProcess);
+    			}
     		}
     	}
-    	//agregamos la pieza a la lista y actualizamos el view
-    	pieceList.add(currentPiece);
-    	pieceListModel.add(currentPiece);
+    	// actualizamos el view
     	currentPiece = null;
     	refreshView();
     }
@@ -403,6 +421,89 @@ public class ProductCreationController extends SelectorComposer<Component>{
   	    	}
   		}
   	}
+  	
+  	private int getLastPieceId() {
+  		int piece_id = 0;
+  		int size = pieceList.size();
+  		for(int i = 0; i < size; i++) {
+  			Piece t = pieceList.get(i);
+  			if(piece_id < t.getId()) { // asignamos el mas alto a la variable piece id
+  				piece_id = t.getId(); 
+  			}
+  		}
+  		return piece_id;
+    }
+  	
+  	private  Piece updatePiece(Piece piece) {
+		if(piece.getId() == null) {
+			throw new IllegalArgumentException("can't update a null-id piece");
+		}else {
+			piece = Piece.clone(piece);
+			int size = pieceList.size();
+			for(int i = 0; i < size; i++) {
+				Piece t = pieceList.get(i);
+				if(t.getId().equals(piece.getId())) {
+					pieceList.set(i, piece);
+					return piece;
+				}
+			}
+			throw new RuntimeException("Piece not found " + piece.getId());
+		}
+	}
+  	
+  	private void deletePiece(Piece piece) {
+		if(piece.getId() != null) {
+			int size = pieceList.size();
+			for(int i = 0; i < size; i++) {
+				Piece t = pieceList.get(i);
+				if(t.getId().equals(piece.getId())) {
+					pieceList.remove(i);
+					return;
+				}
+			}
+		}
+	}
+  	
+  	private Process searchProcess(Integer idPiece, Integer idProcessType) {
+  		int size = processList.size();
+  		for(int i = 0; i < size; i++) {
+  			Process t = processList.get(i);
+  			if(t.getIdPiece().equals(idPiece) && t.getIdProcessType().equals(idProcessType)) {
+  				return Process.clone(t);
+  			}
+  		}
+  		return null;
+    }
+  	
+  	private  Process updateProcess(Process process) {
+		if(process.getIdPiece() == null && process.getIdProcessType() == null) {
+			throw new IllegalArgumentException("can't update a null-id process");
+		}else {
+			process = Process.clone(process);
+			int size = processList.size();
+			for(int i = 0; i < size; i++) {
+				Process t = processList.get(i);
+				if(t.getIdPiece().equals(process.getIdPiece()) && t.getIdProcessType().equals(process.getIdProcessType())){
+					processList.set(i, process);
+					return process;
+				}
+			}
+			throw new RuntimeException("Process not found " + process.getIdPiece()+" "+process.getIdProcessType());
+		}
+	}
+  	
+  	private void deleteProcess(Process process) {
+		if(process.getIdPiece()!=null && process.getIdProcessType()!=null){
+			int size = processList.size();
+			for(int i = 0; i < size; i++) {
+				Process t = processList.get(i);
+				if(t.getIdPiece().equals(process.getIdPiece()) && t.getIdProcessType().equals(process.getIdProcessType())) {
+					processList.remove(i);
+					return;
+				}
+			}
+		}
+	}
   	
   	public String quantityOfProcess(int idPiece) {
   		int quantity = 0;
