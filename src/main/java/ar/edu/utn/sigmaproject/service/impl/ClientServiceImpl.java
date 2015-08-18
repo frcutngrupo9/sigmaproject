@@ -51,26 +51,20 @@ public class ClientServiceImpl implements ClientService {
     }
     
     public synchronized Client updateClient(Client client) {
-        if(client.getId()!=null && client.getId()==getNewId())
-        {
-            client = saveClient(client);
-            return client;
-        }
-        else {
-            if(client.getId()==null){
-                throw new IllegalArgumentException("can't update a null-id client, save it first");
-            }else{
-                client = Client.clone(client);
-                int size = clientList.size();
-                for(int i=0;i<size;i++){
-                    Client t = clientList.get(i);
-                    if(t.getId().equals(client.getId())){
-                        clientList.set(i, client);
-                        return client;
-                    }
+        if(client.getId()==null){
+            throw new IllegalArgumentException("can't update a null-id client, save it first");
+        }else{
+            client = Client.clone(client);
+            int size = clientList.size();
+            for(int i=0;i<size;i++){
+                Client t = clientList.get(i);
+                if(t.getId().equals(client.getId())){
+                    clientList.set(i, client);
+                    serializator.grabarLista(clientList);
+                    return client;
                 }
-                throw new RuntimeException("Client not found "+client.getId());
             }
+            throw new RuntimeException("Client not found "+client.getId());
         }
     }
     

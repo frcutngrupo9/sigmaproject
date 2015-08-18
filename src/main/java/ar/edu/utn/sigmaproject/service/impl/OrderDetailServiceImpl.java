@@ -49,14 +49,14 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     }
     
     public synchronized OrderDetail updateOrderDetail(OrderDetail orderDetail) {
-        if(orderDetail.getIdOrder()==null && orderDetail.getIdProduct()==null){
+        if(orderDetail.getIdOrder()==null && orderDetail.getIdProduct()==null) {
             throw new IllegalArgumentException("can't update a null-id orderDetail, save it first");
-        }else{
+        }else {
             orderDetail = OrderDetail.clone(orderDetail);
             int size = orderDetailList.size();
-            for(int i=0;i<size;i++){
+            for(int i=0;i<size;i++) {
                 OrderDetail aux = orderDetailList.get(i);
-                if(aux.getIdOrder().equals(orderDetail.getIdOrder()) && aux.getIdProduct().equals(orderDetail.getIdProduct())){
+                if(aux.getIdOrder().equals(orderDetail.getIdOrder()) && aux.getIdProduct().equals(orderDetail.getIdProduct())) {
                     orderDetailList.set(i, orderDetail);
                     serializator.grabarLista(orderDetailList);
                     return orderDetail;

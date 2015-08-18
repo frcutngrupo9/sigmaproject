@@ -23,7 +23,7 @@ public class ProductionPlanServiceImpl  implements ProductionPlanService {
 	
 	public synchronized List<ProductionPlan> getProductionPlanList() {
 		List<ProductionPlan> list = new ArrayList<ProductionPlan>();
-		for(ProductionPlan productionPlan:productionPlanList){
+		for(ProductionPlan productionPlan:productionPlanList) {
 			list.add(ProductionPlan.clone(productionPlan));
 		}
 		return list;
@@ -31,9 +31,9 @@ public class ProductionPlanServiceImpl  implements ProductionPlanService {
 	
 	public synchronized ProductionPlan getProductionPlan(Integer id) {
 		int size = productionPlanList.size();
-		for(int i=0;i<size;i++){
+		for(int i = 0; i < size; i++) {
 			ProductionPlan t = productionPlanList.get(i);
-			if(t.getId().equals(id)){
+			if(t.getId().equals(id)) {
 				return ProductionPlan.clone(t);
 			}
 		}
@@ -48,35 +48,29 @@ public class ProductionPlanServiceImpl  implements ProductionPlanService {
 	}
 	
 	public synchronized ProductionPlan updateProductionPlan(ProductionPlan productionPlan) {
-		if(productionPlan.getId()!=null && productionPlan.getId()==getNewId())
-		{
-			productionPlan = saveProductionPlan(productionPlan);
-			return productionPlan;
-		}
-		else {
-			if(productionPlan.getId()==null){
-				throw new IllegalArgumentException("can't update a null-id production plan, save it first");
-			}else{
-				productionPlan = ProductionPlan.clone(productionPlan);
-				int size = productionPlanList.size();
-				for(int i=0;i<size;i++){
-					ProductionPlan aux = productionPlanList.get(i);
-					if(aux.getId().equals(productionPlan.getId())){
-						productionPlanList.set(i, productionPlan);
-						return productionPlan;
-					}
-				}
-				throw new RuntimeException("Product Plan not found "+productionPlan.getId());
-			}
-		}
+	    if(productionPlan.getId() == null) {
+	        throw new IllegalArgumentException("can't update a null-id production plan, save it first");
+	    } else {
+	        productionPlan = ProductionPlan.clone(productionPlan);
+	        int size = productionPlanList.size();
+	        for(int i = 0; i < size; i++) {
+	            ProductionPlan aux = productionPlanList.get(i);
+	            if(aux.getId().equals(productionPlan.getId())) {
+	                productionPlanList.set(i, productionPlan);
+	                serializator.grabarLista(productionPlanList);
+	                return productionPlan;
+	            }
+	        }
+	        throw new RuntimeException("Product Plan not found "+productionPlan.getId());
+	    }
 	}
 	
 	public synchronized void deleteProductionPlan(ProductionPlan productionPlan) {
-		if(productionPlan.getId()!=null){
+		if(productionPlan.getId() != null) {
 			int size = productionPlanList.size();
-			for(int i=0;i<size;i++){
+			for(int i = 0; i < size; i++) {
 				ProductionPlan t = productionPlanList.get(i);
-				if(t.getId().equals(productionPlan.getId())){
+				if(t.getId().equals(productionPlan.getId())) {
 					productionPlanList.remove(i);
 					serializator.grabarLista(productionPlanList);
 					return;
@@ -87,9 +81,9 @@ public class ProductionPlanServiceImpl  implements ProductionPlanService {
 	
 	public synchronized Integer getNewId() {
 		Integer lastId = 0;
-		for(int i=0;i<productionPlanList.size();i++){
+		for(int i = 0; i < productionPlanList.size(); i++) {
 			ProductionPlan aux = productionPlanList.get(i);
-			if(lastId < aux.getId()){
+			if(lastId < aux.getId()) {
 				lastId = aux.getId();
 			}
 		}

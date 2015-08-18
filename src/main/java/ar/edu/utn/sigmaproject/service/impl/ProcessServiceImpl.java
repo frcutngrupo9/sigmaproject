@@ -24,7 +24,7 @@ public class ProcessServiceImpl implements ProcessService {
 	//synchronized para prevenir acceso concurrente al servicio de lista
 	public synchronized List<Process> getProcessList() {
 		List<Process> list = new ArrayList<Process>();
-		for(Process process:processList){
+		for(Process process:processList) {
 			list.add(Process.clone(process));
 		}
 		return list;
@@ -32,7 +32,7 @@ public class ProcessServiceImpl implements ProcessService {
 	
 	public synchronized List<Process> getProcessList(Integer idPiece) {
 		List<Process> list = new ArrayList<Process>();
-		for(Process process:processList){
+		for(Process process:processList) {
 			if(process.getIdPiece().equals(idPiece)) {
 				list.add(Process.clone(process));
 			}
@@ -66,7 +66,7 @@ public class ProcessServiceImpl implements ProcessService {
 			int size = processList.size();
 			for(int i = 0; i < size; i++) {
 				Process t = processList.get(i);
-				if(t.getIdPiece().equals(process.getIdPiece()) && t.getIdProcessType().equals(process.getIdProcessType())){
+				if(t.getIdPiece().equals(process.getIdPiece()) && t.getIdProcessType().equals(process.getIdProcessType())) {
 					processList.set(i, process);
 					serializator.grabarLista(processList);
 					return process;
@@ -77,7 +77,7 @@ public class ProcessServiceImpl implements ProcessService {
 	}
 	
 	public synchronized void deleteProcess(Process process) {
-		if(process.getIdPiece()!=null && process.getIdProcessType()!=null){
+		if(process.getIdPiece()!=null && process.getIdProcessType()!=null) {
 			int size = processList.size();
 			for(int i = 0; i < size; i++) {
 				Process t = processList.get(i);

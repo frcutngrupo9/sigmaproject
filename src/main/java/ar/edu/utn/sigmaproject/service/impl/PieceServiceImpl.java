@@ -24,7 +24,7 @@ public class PieceServiceImpl implements PieceService {
 	
 	public synchronized List<Piece> getPieceList() {
 		List<Piece> list = new ArrayList<Piece>();
-		for(Piece piece:pieceList){
+		for(Piece piece:pieceList) {
 			list.add(Piece.clone(piece));
 		}
 		return list;
@@ -32,8 +32,8 @@ public class PieceServiceImpl implements PieceService {
 	
 	public synchronized List<Piece> getPieceList(Integer idProduct) {
 		List<Piece> list = new ArrayList<Piece>();
-		for(Piece piece:pieceList){
-			if(piece.getIdProduct().compareTo(idProduct) == 0) {
+		for(Piece piece:pieceList) {
+			if(piece.getIdProduct().equals(idProduct)) {
 				list.add(Piece.clone(piece));
 			}
 		}
@@ -59,14 +59,14 @@ public class PieceServiceImpl implements PieceService {
 	}
 	
 	public synchronized Piece updatePiece(Piece piece) {
-		if(piece.getId()==null){
+		if(piece.getId() == null) {
 			throw new IllegalArgumentException("can't update a null-id piece, save it first");
 		}else {
 			piece = Piece.clone(piece);
 			int size = pieceList.size();
 			for(int i = 0; i < size; i++) {
 				Piece t = pieceList.get(i);
-				if(t.getId().equals(piece.getId())){
+				if(t.getId().equals(piece.getId())) {
 					pieceList.set(i, piece);
 					serializator.grabarLista(pieceList);
 					return piece;
@@ -77,11 +77,11 @@ public class PieceServiceImpl implements PieceService {
 	}
 	
 	public synchronized void deletePiece(Piece piece) {
-		if(piece.getId()!=null){
+		if(piece.getId() != null) {
 			int size = pieceList.size();
-			for(int i=0;i<size;i++){
+			for(int i = 0; i < size; i++) {
 				Piece t = pieceList.get(i);
-				if(t.getId().equals(piece.getId())){
+				if(t.getId().equals(piece.getId())) {
 					pieceList.remove(i);
 					serializator.grabarLista(pieceList);
 					return;
@@ -92,9 +92,9 @@ public class PieceServiceImpl implements PieceService {
 	
 	public synchronized Integer getNewId() {
 		Integer lastId = 0;
-		for(int i=0;i<pieceList.size();i++){
+		for(int i = 0; i < pieceList.size(); i++) {
 			Piece aux = pieceList.get(i);
-			if(lastId < aux.getId()){
+			if(lastId < aux.getId()) {
 				lastId = aux.getId();
 			}
 		}

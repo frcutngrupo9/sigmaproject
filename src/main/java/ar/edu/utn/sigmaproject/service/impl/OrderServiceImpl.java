@@ -23,7 +23,7 @@ public class OrderServiceImpl implements OrderService {
     
     public synchronized List<Order> getOrderList() {
         List<Order> list = new ArrayList<Order>();
-        for(Order order:orderList){
+        for(Order order : orderList) {
             list.add(Order.clone(order));
         }
         return list;
@@ -31,9 +31,9 @@ public class OrderServiceImpl implements OrderService {
     
     public synchronized Order getOrder(Integer id) {
         int size = orderList.size();
-        for(int i=0;i<size;i++){
+        for(int i = 0; i < size; i++){
             Order t = orderList.get(i);
-            if(t.getId().equals(id)){
+            if(t.getId().equals(id)) {
                 return Order.clone(t);
             }
         }
@@ -51,35 +51,29 @@ public class OrderServiceImpl implements OrderService {
     }
     
     public synchronized Order updateOrder(Order order) {
-        if(order.getId() != null && order.getId().compareTo(getNewId()) == 0)
-        {
-            order = saveOrder(order);
-            return order;
-        }
-        else {
-            if(order.getId()==null){
-                throw new IllegalArgumentException("can't update a null-id order, save it first");
-            }else{
-                order = Order.clone(order);
-                int size = orderList.size();
-                for(int i=0;i<size;i++){
-                    Order t = orderList.get(i);
-                    if(t.getId().equals(order.getId())){
-                        orderList.set(i, order);
-                        return order;
-                    }
+        if(order.getId() == null) {
+            throw new IllegalArgumentException("can't update a null-id order, save it first");
+        } else {
+            order = Order.clone(order);
+            int size = orderList.size();
+            for(int i = 0; i < size; i++) {
+                Order t = orderList.get(i);
+                if(t.getId().equals(order.getId())) {
+                    orderList.set(i, order);
+                    serializator.grabarLista(orderList);
+                    return order;
                 }
-                throw new RuntimeException("Order not found "+order.getId());
             }
+            throw new RuntimeException("Order not found "+order.getId());
         }
     }
     
     public synchronized void deleteOrder(Order order) {
-        if(order.getId()!=null){
+        if(order.getId() != null) {
             int size = orderList.size();
-            for(int i=0;i<size;i++){
+            for(int i = 0; i < size; i++) {
                 Order t = orderList.get(i);
-                if(t.getId().equals(order.getId())){
+                if(t.getId().equals(order.getId())) {
                     orderList.remove(i);
                     serializator.grabarLista(orderList);
                     return;
@@ -90,9 +84,9 @@ public class OrderServiceImpl implements OrderService {
     
     public synchronized Integer getNewId() {
         Integer lastId = 0;
-        for(int i=0;i<orderList.size();i++){
+        for(int i = 0; i < orderList.size(); i++) {
             Order aux = orderList.get(i);
-            if(lastId < aux.getId()){
+            if(lastId < aux.getId()) {
                 lastId = aux.getId();
             }
         }

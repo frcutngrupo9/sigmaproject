@@ -7,7 +7,7 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 import ar.edu.utn.sigmaproject.service.ProductionPlanDetailService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
-public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailService{
+public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailService {
 	
 	static List<ProductionPlanDetail> productionPlanDetailList = new ArrayList<ProductionPlanDetail>();
 	private SerializationService serializator = new SerializationService("production_plan_detail");
@@ -24,7 +24,7 @@ public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailServ
 	//synchronized para prevenir acceso concurrente al servicio de lista
 	public synchronized List<ProductionPlanDetail> getProductionPlanDetailList() {
 		List<ProductionPlanDetail> list = new ArrayList<ProductionPlanDetail>();
-		for(ProductionPlanDetail productionPlanDetail:productionPlanDetailList){
+		for(ProductionPlanDetail productionPlanDetail:productionPlanDetailList) {
 			list.add(ProductionPlanDetail.clone(productionPlanDetail));
 		}
 		return list;
@@ -32,9 +32,9 @@ public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailServ
 	
 	public synchronized ProductionPlanDetail getProductionPlanDetail(Integer idProductionPlan, Integer idProduct) {
 		int size = productionPlanDetailList.size();
-		for(int i=0;i<size;i++){
+		for(int i = 0; i < size; i++) {
 			ProductionPlanDetail aux = productionPlanDetailList.get(i);
-			if(aux.getIdProductionPlan().equals(idProductionPlan) && aux.getIdProduct().equals(idProduct)){
+			if(aux.getIdProductionPlan().equals(idProductionPlan) && aux.getIdProduct().equals(idProduct)) {
 				return ProductionPlanDetail.clone(aux);
 			}
 		}
@@ -49,14 +49,14 @@ public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailServ
 	}
 	
 	public synchronized ProductionPlanDetail updateProductionPlanDetail(ProductionPlanDetail productionPlanDetail) {
-		if(productionPlanDetail.getIdProductionPlan()==null && productionPlanDetail.getIdProduct()==null){
+		if(productionPlanDetail.getIdProductionPlan()==null && productionPlanDetail.getIdProduct()==null) {
 			throw new IllegalArgumentException("can't update a null-id productionPlanDetail, save it first");
-		}else{
+		} else {
 			productionPlanDetail = ProductionPlanDetail.clone(productionPlanDetail);
 			int size = productionPlanDetailList.size();
-			for(int i=0;i<size;i++){
+			for(int i = 0; i < size; i++) {
 				ProductionPlanDetail aux = productionPlanDetailList.get(i);
-				if(aux.getIdProductionPlan().equals(productionPlanDetail.getIdProductionPlan()) && aux.getIdProduct().equals(productionPlanDetail.getIdProduct())){
+				if(aux.getIdProductionPlan().equals(productionPlanDetail.getIdProductionPlan()) && aux.getIdProduct().equals(productionPlanDetail.getIdProduct())) {
 					productionPlanDetailList.set(i, productionPlanDetail);
 					serializator.grabarLista(productionPlanDetailList);
 					return productionPlanDetail;
@@ -69,9 +69,9 @@ public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailServ
 	public synchronized void deleteProductionPlanDetail(ProductionPlanDetail productionPlanDetail) {
 		if(productionPlanDetail.getIdProductionPlan()!=null && productionPlanDetail.getIdProduct()!=null){
 			int size = productionPlanDetailList.size();
-			for(int i=0;i<size;i++){
+			for(int i = 0; i < size; i++) {
 				ProductionPlanDetail aux = productionPlanDetailList.get(i);
-				if(aux.getIdProductionPlan().equals(productionPlanDetail.getIdProductionPlan()) && aux.getIdProduct().equals(productionPlanDetail.getIdProduct())){
+				if(aux.getIdProductionPlan().equals(productionPlanDetail.getIdProductionPlan()) && aux.getIdProduct().equals(productionPlanDetail.getIdProduct())) {
 					productionPlanDetailList.remove(i);
 					serializator.grabarLista(productionPlanDetailList);
 					return;

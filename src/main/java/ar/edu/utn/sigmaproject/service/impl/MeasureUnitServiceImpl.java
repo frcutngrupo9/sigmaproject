@@ -72,26 +72,21 @@ public class MeasureUnitServiceImpl implements MeasureUnitService {
 	}
 	
 	public synchronized MeasureUnit updateMeasureUnit(MeasureUnit aux) {
-		if(aux.getId() != null && aux.getId().equals(getNewId())) {
-			aux = saveMeasureUnit(aux);
-			return aux;
-		}
-		else {
-			if(aux.getId() == null) {
-				throw new IllegalArgumentException("can't update a null-id MeasureUnit, save it first");
-			}else {
-				aux = MeasureUnit.clone(aux);
-				int size = measureUnitList.size();
-				for(int i = 0; i < size; i++){
-					MeasureUnit t = measureUnitList.get(i);
-					if(t.getId().equals(aux.getId())) {
-						measureUnitList.set(i, aux);
-						return aux;
-					}
-				}
-				throw new RuntimeException("Product not found " + aux.getId());
-			}
-		}
+	    if(aux.getId() == null) {
+	        throw new IllegalArgumentException("can't update a null-id MeasureUnit, save it first");
+	    }else {
+	        aux = MeasureUnit.clone(aux);
+	        int size = measureUnitList.size();
+	        for(int i = 0; i < size; i++) {
+	            MeasureUnit t = measureUnitList.get(i);
+	            if(t.getId().equals(aux.getId())) {
+	                measureUnitList.set(i, aux);
+	                serializator.grabarLista(measureUnitList);
+	                return aux;
+	            }
+	        }
+	        throw new RuntimeException("Product not found " + aux.getId());
+	    }
 	}
 	
 	public synchronized void deleteMeasureUnit(MeasureUnit aux) {

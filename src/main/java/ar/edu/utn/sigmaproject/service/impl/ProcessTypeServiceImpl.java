@@ -29,17 +29,17 @@ public class ProcessTypeServiceImpl implements ProcessTypeService {
 	
 	public List<ProcessType> getProcessTypeList() {
 		List<ProcessType> list = new ArrayList<ProcessType>();
-		for(ProcessType processType:processTypeList){
+		for(ProcessType processType:processTypeList) {
 			list.add(ProcessType.clone(processType));
 		}
 		return list;
 	}
 	
-	public synchronized ProcessType getProcessType(Integer id){
+	public synchronized ProcessType getProcessType(Integer id) {
 		int size = processTypeList.size();
-		for(int i=0;i<size;i++){
+		for(int i = 0; i < size; i++){
 			ProcessType t = processTypeList.get(i);
-			if(t.getId().equals(id)){
+			if(t.getId().equals(id)) {
 				return ProcessType.clone(t);
 			}
 		}

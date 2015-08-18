@@ -170,7 +170,6 @@ public class ProductCreationController extends SelectorComposer<Component>{
         		}
         	}
     	} else {// se esta editando un producto
-    		System.out.println("-adentro de editando un producto-"); //no se esta actualizando las modificaciones a los detalles del producto
     		currentProduct.setName(product_name);
     		currentProduct.setDetails(product_details);
     		currentProduct = productService.updateProduct(currentProduct);
@@ -181,7 +180,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
     				Piece current = auxPieceList.get(i);
     				Piece aux = searchPiece(current.getId());
 					if(aux == null) {// si la pieza no esta en la lista se debe eliminar del service
-						// se deben eliminar los procesos relacionados a la pieza
+						// se deben eliminar del servicio los procesos relacionados a la pieza
 						List<Process> deleteProcessList = processService.getProcessList(current.getId());
 						if(deleteProcessList != null) {
 							for(int j = 0; j < deleteProcessList.size(); j++) {

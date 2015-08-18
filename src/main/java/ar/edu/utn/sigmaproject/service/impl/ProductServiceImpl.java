@@ -57,10 +57,11 @@ public class ProductServiceImpl implements ProductService {
 		}else {
 			product = Product.clone(product);
 			int size = productList.size();
-			for(int i=0;i<size;i++){
+			for(int i = 0; i < size; i++){
 				Product t = productList.get(i);
 				if(t.getId().equals(product.getId())) {
 					productList.set(i, product);
+					serializator.grabarLista(productList);
 					return product;
 				}
 			} throw new RuntimeException("Product not found "+product.getId());
