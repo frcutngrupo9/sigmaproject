@@ -202,7 +202,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
         			}
         		}
         	}
-    		if(processList != null && processList.isEmpty() == false) {// se actualizan todos los procesos
+    		if(processList != null) {// se actualizan todos los procesos
     			// primero eliminamos los procesos que estan en el service, pero que no existen mas en el producto
     			for(int i = 0; i < pieceList.size(); i++) {
     				List<Process> auxProcessList = processService.getProcessList(pieceList.get(i).getId());
@@ -300,7 +300,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	
     	if(currentPiece == null) { // no se esta editando una pieza
     		Integer serviceNewPieceId = pieceService.getNewId();
-    		if(pieceList.isEmpty() == true) {
+    		if(pieceList.isEmpty() == true) {// buscamos un id para la pieza nueva
         		piece_id = serviceNewPieceId;
         	} else {
         		piece_id = getLastPieceId() + 1;// buscamos el ultimo id y sumamos 1

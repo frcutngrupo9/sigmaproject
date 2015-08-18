@@ -24,8 +24,8 @@ public class RawMaterialServiceImpl implements RawMaterialService {
 	
 	public synchronized List<RawMaterial> getRawMaterialList() {
 		List<RawMaterial> list = new ArrayList<RawMaterial>();
-		for(RawMaterial rawMateria:rawMaterialList){
-			list.add(RawMaterial.clone(rawMateria));
+		for(RawMaterial rawMaterial:rawMaterialList) {
+			list.add(RawMaterial.clone(rawMaterial));
 		}
 		return list;
 	}
@@ -49,25 +49,21 @@ public class RawMaterialServiceImpl implements RawMaterialService {
 	}
 	
 	public synchronized RawMaterial updateRawMaterial(RawMaterial rawMaterial) {
-		if(rawMaterial.getId()!=null && rawMaterial.getId()==getNewId()) {
-			rawMaterial = saveRawMaterial(rawMaterial);
-			return rawMaterial;
-		}else {
-			if(rawMaterial.getId()==null) {
-				throw new IllegalArgumentException("can't update a null-id product, save it first");
-			}else {
-				rawMaterial = RawMaterial.clone(rawMaterial);
-				int size = rawMaterialList.size();
-				for(int i=0;i<size;i++){
-					RawMaterial t = rawMaterialList.get(i);
-					if(t.getId().equals(rawMaterial.getId())) {
-						rawMaterialList.set(i, rawMaterial);
-						return rawMaterial;
-					}
-				}
-				throw new RuntimeException("RawMaterial not found "+rawMaterial.getId());
-			}
-		}
+	    if(rawMaterial.getId() == null) {
+	        throw new IllegalArgumentException("can't update a null-id product, save it first");
+	    } else {
+	        rawMaterial = RawMaterial.clone(rawMaterial);
+	        int size = rawMaterialList.size();
+	        for(int i = 0; i < size; i++) {
+	            RawMaterial t = rawMaterialList.get(i);
+	            if(t.getId().equals(rawMaterial.getId())) {
+	                rawMaterialList.set(i, rawMaterial);
+	                serializator.grabarLista(rawMaterialList);
+	                return rawMaterial;
+	            }
+	        }
+	        throw new RuntimeException("RawMaterial not found "+rawMaterial.getId());
+	    }
 	}
 	
 	public synchronized void deleteRawMaterial(RawMaterial rawMaterial) {
@@ -86,9 +82,9 @@ public class RawMaterialServiceImpl implements RawMaterialService {
 	
 	public synchronized Integer getNewId() {
 		Integer lastId = 0;
-		for(int i=0;i<rawMaterialList.size();i++){
+		for(int i = 0; i < rawMaterialList.size(); i++) {
 			RawMaterial aux = rawMaterialList.get(i);
-			if(lastId < aux.getId()){
+			if(lastId < aux.getId()) {
 				lastId = aux.getId();
 			}
 		}

@@ -18,11 +18,11 @@ public class UserInfoServiceImpl implements UserInfoService,Serializable{
 	}
 	
 	/** synchronized is just because we use static userList to prevent concurrent access **/
-	public synchronized User findUser(String account){
+	public synchronized User findUser(String account) {
 		int s = userList.size();
-		for(int i=0;i<s;i++){
+		for(int i = 0; i < s; i++) {
 			User u = userList.get(i);
-			if(account.equals(u.getAccount())){
+			if(account.equals(u.getAccount())) {
 				return User.clone(u);
 			}
 		}
@@ -30,11 +30,11 @@ public class UserInfoServiceImpl implements UserInfoService,Serializable{
 	}
 	
 	/** synchronized is just because we use static userList to prevent concurrent access **/
-	public synchronized User updateUser(User user){
+	public synchronized User updateUser(User user) {
 		int s = userList.size();
-		for(int i=0;i<s;i++){
+		for(int i = 0; i < s; i++){
 			User u = userList.get(i);
-			if(user.getAccount().equals(u.getAccount())){
+			if(user.getAccount().equals(u.getAccount())) {
 				userList.set(i,u = User.clone(user));
 				return u;
 			}

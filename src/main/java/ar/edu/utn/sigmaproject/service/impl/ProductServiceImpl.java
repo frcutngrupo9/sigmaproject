@@ -31,11 +31,9 @@ public class ProductServiceImpl implements ProductService {
 	}
 	
 	public synchronized Product getProduct(Integer id) {
-		int size = productList.size();
-		for(int i=0;i<size;i++){
-			Product t = productList.get(i);
-			if(t.getId().equals(id)){
-				return Product.clone(t);
+		for(Product product:productList) {
+			if(product.getId().equals(id)) {
+				return Product.clone(product);
 			}
 		}
 		return null;
@@ -57,7 +55,7 @@ public class ProductServiceImpl implements ProductService {
 		}else {
 			product = Product.clone(product);
 			int size = productList.size();
-			for(int i = 0; i < size; i++){
+			for(int i = 0; i < size; i++) {
 				Product t = productList.get(i);
 				if(t.getId().equals(product.getId())) {
 					productList.set(i, product);
@@ -69,11 +67,11 @@ public class ProductServiceImpl implements ProductService {
 	}
 	
 	public synchronized void deleteProduct(Product product) {
-		if(product.getId()!=null){
+		if(product.getId() != null) {
 			int size = productList.size();
-			for(int i=0;i<size;i++){
+			for(int i=0;i<size;i++) {
 				Product t = productList.get(i);
-				if(t.getId().equals(product.getId())){
+				if(t.getId().equals(product.getId())) {
 					productList.remove(i);
 					serializator.grabarLista(productList);
 					return;
@@ -84,9 +82,9 @@ public class ProductServiceImpl implements ProductService {
 	
 	public synchronized Integer getNewId() {
 		Integer lastId = 0;
-		for(int i=0;i<productList.size();i++){
+		for(int i = 0; i < productList.size(); i++) {
 			Product aux = productList.get(i);
-			if(lastId < aux.getId()){
+			if(lastId < aux.getId()) {
 				lastId = aux.getId();
 			}
 		}
@@ -95,9 +93,9 @@ public class ProductServiceImpl implements ProductService {
 	
 	private boolean existId(Integer id) {
 		boolean value = false;
-		for(int i =0; i < productList.size(); i++){
+		for(int i =0; i < productList.size(); i++) {
 			Product aux = productList.get(i);
-			if(aux.getId().equals(id)){
+			if(aux.getId().equals(id)) {
 				value = true;
 			}
 		}
