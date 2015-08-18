@@ -67,6 +67,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 	
 	public synchronized void deleteProduct(Product product) {
+	    // se debe eliminar tambien todas las piezas relacionadas al producto, asi como los procesos relacionados a las piezas
 		if(product.getId() != null) {
 			int size = productList.size();
 			for(int i=0;i<size;i++) {

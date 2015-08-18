@@ -651,7 +651,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
   	@Listen("onClick = #deleteProductButton")
     public void deleteProduct() {
   		if(currentProduct != null) {
-  			Messagebox.show("Esta seguro que quiere eliminar el producto?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+  			Messagebox.show("Esta seguro que quiere eliminar el producto? Se eliminaran las piezas y procesos relacionados tambien", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
   			    public void onEvent(Event evt) throws InterruptedException {
   			        if (evt.getName().equals("onOK")) {
   			        	// eliminamos las piezas y procesos relacionados al producto
