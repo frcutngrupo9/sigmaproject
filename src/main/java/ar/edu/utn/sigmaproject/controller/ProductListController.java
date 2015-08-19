@@ -114,12 +114,7 @@ public class ProductListController extends SelectorComposer<Component>{
     
     public String getPieceName(int idPiece) {
     	Piece aux = pieceListService.getPiece(idPiece);
-    	if(aux != null) {
-    		return aux.getName();
-    	} else {
-    		return null;
-    	}
-    	
+    	return aux.getName();
     }
     
     public String getProcessTypeName(int idProduct) {

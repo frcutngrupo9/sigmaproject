@@ -176,23 +176,14 @@ public class ProductCreationController extends SelectorComposer<Component>{
     		if(pieceList != null) {// se actualizan todas las piezas
     			// primero eliminamos las piezas que estan en el service, pero que no existen mas en el producto
     			List<Piece> auxPieceList = pieceService.getPieceList(currentProduct.getId());// obtenemos las piezas del producto que estan en el servicio
-    			for(int i = 0; i < auxPieceList.size(); i++) {// recorremos todas las piezas obtenidas
-    				Piece current = auxPieceList.get(i);
-    				Piece aux = searchPiece(current.getId());
+    			for(Piece auxPiece:auxPieceList) {// recorremos todas las piezas obtenidas
+    				Piece aux = searchPiece(auxPiece.getId());
 					if(aux == null) {// si la pieza no esta en la lista se debe eliminar del service
-						// se deben eliminar del servicio los procesos relacionados a la pieza
-						List<Process> deleteProcessList = processService.getProcessList(current.getId());
-						if(deleteProcessList != null) {
-							for(int j = 0; j < deleteProcessList.size(); j++) {
-								processService.deleteProcess(deleteProcessList.get(j));// eliminamos todos los procesos
-							}
-						}
-						pieceService.deletePiece(current);// eliminamos la pieza
+						pieceService.deletePiece(auxPiece);// eliminamos la pieza, el servicio se encarga de eliminar los procesos relacionados a esa pieza
 					}
     			}
     			// ahora recorremos la lista para actualizar las piezas que ya existen o agregar las que no
-        		for(int i = 0; i < pieceList.size(); i++) {
-        			Piece current = pieceList.get(i);
+        		for(Piece current:pieceList) {
         			Piece auxPiece = pieceService.getPiece(current.getId());// se busca a ver si existe la pieza
         			if(auxPiece == null) {// es una nueva pieza, se graba
         				current.setIdProduct(currentProduct.getId());// se le asigna el id del producto
@@ -204,16 +195,20 @@ public class ProductCreationController extends SelectorComposer<Component>{
         	}
     		if(processList != null) {// se actualizan todos los procesos
     			// primero eliminamos los procesos que estan en el service, pero que no existen mas en el producto
-    			for(int i = 0; i < pieceList.size(); i++) {
-    				List<Process> auxProcessList = processService.getProcessList(pieceList.get(i).getId());
-    				for(int j = 0; j < auxProcessList.size(); j++) {// recorremos todos los procesos de todas las piezas del producto
-    					Process current = auxProcessList.get(j);
-    					Process aux = searchProcess(current.getIdPiece(), current.getIdProcessType());
-    					if(aux == null) {// si el proceso no esta en la lista se debe eliminar del service
-    						processService.deleteProcess(current);
-    					}
-    				}
-    			}
+    		    List<Process> completeProcessList = new ArrayList<Process>();
+    		    List<Piece> auxPieceList = pieceService.getPieceList(currentProduct.getId());// obtenemos las piezas del producto que estan en el servicio
+                for(Piece auxPiece:auxPieceList) {// recorremos todas las piezas del producto
+                    List<Process> auxProcessList = processService.getProcessList(auxPiece.getId());// por cada pieza buscamos sus procesos
+                    for(Process auxProcess:auxProcessList) {
+                        completeProcessList.add(auxProcess);// agregamos los procesos a la lista completa
+                    }
+                }
+                for(Process auxProcess:completeProcessList) {// recorremos la lista completa de procesos que estan en el servicio
+                    Process aux = searchProcess(auxProcess.getIdPiece(), auxProcess.getIdProcessType());
+                    if(aux == null) {// si el proceso no esta en la lista se debe eliminar del service
+                        processService.deleteProcess(auxProcess);
+                    }
+                }
     			// ahora recorremos la lista para actualizar los procesos que ya existen o agregar los que no
     			for(int i = 0; i < processList.size(); i++) {
     				Integer pieceId = processList.get(i).getIdPiece();
@@ -313,6 +308,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
         	pieceListModel.add(currentPiece);
         	pieceListbox.setModel(pieceListModel);// y al modelo para que aparezca en la pantalla
     	} else { // se esta editando una pieza
+    	    currentPiece.setName(piece_name);
     		currentPiece.setIdMeasureUnit(idMeasureUnit);
     		currentPiece.setHeight(piece_height);
     		currentPiece.setWidth(piece_width);
@@ -390,7 +386,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
   		}
   	}
   	
-  	/*
+  	/* este metodo era para hacer invisible el ingreso de valores si la pieza es grupo
   	@Listen("onCheck = #pieceGroup")
   	public void doPieceGroupCheck() {
   		Row measureUnitRow = (Row)(measureUnitSelectBox.getParent());
@@ -416,6 +412,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
   	*/
   	private void refreshViewProduct() {
   		if (currentProduct == null) {
+  		    deleteProductButton.setDisabled(true);
   			productName.setText("");
   			productDetails.setText("");
   			processList = new ArrayList<Process>();
@@ -423,6 +420,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
   			pieceListModel = new ListModelList<Piece>(pieceList);
   	        pieceListbox.setModel(pieceListModel);
   		} else {
+  		    deleteProductButton.setDisabled(false);
   			productName.setText(currentProduct.getName());
   			productDetails.setText(currentProduct.getDetails());
   			processList = getProcessList(currentProduct.getId());
@@ -436,6 +434,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
   		if (currentPiece == null) {// no se esta editando ninguna pieza
   			pieceCreationBlock.setVisible(false);
   			processCreationBlock.setVisible(false);
+  			deletePieceButton.setDisabled(true);
   	    	// limpiar form pieza
   	    	pieceName.setText("");
   	    	pieceGroup.setChecked(false);
@@ -467,6 +466,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
   		} else { // se esta editando una pieza
   			pieceCreationBlock.setVisible(true);
   	    	processCreationBlock.setVisible(true);
+  	    	deletePieceButton.setDisabled(false);
   	    	// cargar form pieza
   	    	pieceName.setText(currentPiece.getName());
   	    	pieceGroup.setChecked(currentPiece.isGroup());
@@ -561,14 +561,25 @@ public class ProductCreationController extends SelectorComposer<Component>{
   	
   	private void deletePiece(Piece piece) {
 		if(piece.getId() != null) {
-			int size = pieceList.size();
-			for(int i = 0; i < size; i++) {
-				Piece t = pieceList.get(i);
-				if(t.getId().equals(piece.getId())) {
-					pieceList.remove(i);
-					return;
+		    //eliminamos los procesos vinculados a esta pieza
+		    List<Process> deleteProcessList = new ArrayList<Process>();
+            for(Process auxProcess:processList) {
+                if(auxProcess.getIdPiece().equals(piece.getId())) {
+                    deleteProcessList.add(auxProcess);// no podemos eliminar directamte mientras se recorre la lista porque se la modifica
+                }
+            }
+            for(Process auxProcess:deleteProcessList) {
+                processList.remove(auxProcess);// eliminamos los procesos de la pieza
+            }
+            Piece deletePiece = null;
+			for(Piece auxPiece:pieceList) {
+				if(auxPiece.getId().equals(piece.getId())) {
+				    deletePiece = auxPiece;
 				}
 			}
+			if(deletePiece != null) {
+			    pieceList.remove(deletePiece);// eliminamos la pieza
+            }
 		}
 	}
   	
@@ -613,15 +624,17 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	}
   	
   	private void deleteProcess(Process process) {
-		if(process.getIdPiece()!=null && process.getIdProcessType()!=null){
-			int size = processList.size();
-			for(int i = 0; i < size; i++) {
-				Process t = processList.get(i);
-				if(t.getIdPiece().equals(process.getIdPiece()) && t.getIdProcessType().equals(process.getIdProcessType())) {
-					processList.remove(i);
-					return;
-				}
-			}
+		if(process.getIdPiece()!=null && process.getIdProcessType()!=null) {
+		    Process deleteProcess = null;
+            for(Process auxProcess:processList) {
+                if(auxProcess.getIdPiece().equals(process.getIdPiece()) && auxProcess.getIdProcessType().equals(process.getIdProcessType())) {
+                    deleteProcess = auxProcess;// no podemos eliminar directamte mientras se recorre la lista porque se la modifica
+                }
+            }
+            if(deleteProcess != null) {
+                processList.remove(deleteProcess);
+                return;
+            }
 		}
 	}
   	
@@ -651,19 +664,10 @@ public class ProductCreationController extends SelectorComposer<Component>{
   	@Listen("onClick = #deleteProductButton")
     public void deleteProduct() {
   		if(currentProduct != null) {
-  			Messagebox.show("Esta seguro que quiere eliminar el producto? Se eliminaran las piezas y procesos relacionados tambien", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+  			Messagebox.show("Esta seguro que quiere eliminar el producto? Se eliminaran las piezas y procesos relacionados", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
   			    public void onEvent(Event evt) throws InterruptedException {
   			        if (evt.getName().equals("onOK")) {
-  			        	// eliminamos las piezas y procesos relacionados al producto
-  			        	List<Piece> deletePieceList = pieceService.getPieceList(currentProduct.getId());// obtenemos todas las piezas del producto
-  		    			for(int i = 0; i < deletePieceList.size(); i++) {// recorremos todas las piezas obtenidas
-  		    				Piece current = deletePieceList.get(i);
-  		    				List<Process> deleteProcessList = processService.getProcessList(current.getId());// buscamos los procesos de la pieza
-  		    				for(int j = 0; j < deleteProcessList.size(); j++) {
-  		    					processService.deleteProcess(deleteProcessList.get(j));// eliminamos todos los procesos
-  		    				}
-  		    				pieceService.deletePiece(current);// eliminamos la pieza
-  		    			}
+  			            // la eliminacion de las piezas y procesos relacionados al producto se realizan en el servicio
   		    			productService.deleteProduct(currentProduct);
   		    			currentProduct = null;
   		    			currentPiece = null;
@@ -679,17 +683,11 @@ public class ProductCreationController extends SelectorComposer<Component>{
   	@Listen("onClick = #deletePieceButton")
     public void deletePiece() {
   		if(currentPiece != null) {
-  			Messagebox.show("Esta seguro que quiere eliminar la pieza?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+  			Messagebox.show("Esta seguro que desea eliminar la pieza " + currentPiece.getName() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
   			    public void onEvent(Event evt) throws InterruptedException {
   			        if (evt.getName().equals("onOK")) {
-  			        	//eliminamos los procesos vinculados a esta pieza
-  			        	for(int i = 0; i < processList.size(); i++) {
-  			        		if(processList.get(i).getIdPiece().equals(currentPiece.getId())) {
-  			        			processList.remove(i);// eliminamos los procesos de esa pieza
-  			        		}
-  			        	}
-  			        	//eliminamos la pieza
-  			        	pieceList.remove(currentPiece);
+  			        	//eliminamos la pieza, los procesos tambien se eliminan en el metodo
+  			        	deletePiece(currentPiece);
   			        	pieceListModel.remove(currentPiece);
   			        	pieceListbox.setModel(pieceListModel);
   			        	currentPiece = null;

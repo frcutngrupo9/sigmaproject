@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.Piece;
+import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.service.PieceService;
+import ar.edu.utn.sigmaproject.service.ProcessService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
 public class PieceServiceImpl implements PieceService {
@@ -78,6 +80,12 @@ public class PieceServiceImpl implements PieceService {
 	
 	public synchronized void deletePiece(Piece piece) {
 		if(piece.getId() != null) {
+		    // se realiza una eliminacion en cascada de los procesos relacionadas a la pieza
+	        ProcessService processService = new ProcessServiceImpl();
+	        List<Process> deleteProcessList = processService.getProcessList(piece.getId());// buscamos los procesos de la pieza
+	        for(Process currentProcess:deleteProcessList) {
+	            processService.deleteProcess(currentProcess);// eliminamos todos los procesos
+	        }
 			int size = pieceList.size();
 			for(int i = 0; i < size; i++) {
 				Piece t = pieceList.get(i);

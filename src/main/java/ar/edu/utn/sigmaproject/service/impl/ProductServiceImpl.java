@@ -3,8 +3,12 @@ package ar.edu.utn.sigmaproject.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import ar.edu.utn.sigmaproject.domain.Piece;
+import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.RawMaterial;
+import ar.edu.utn.sigmaproject.service.PieceService;
+import ar.edu.utn.sigmaproject.service.ProcessService;
 import ar.edu.utn.sigmaproject.service.ProductService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
@@ -67,10 +71,15 @@ public class ProductServiceImpl implements ProductService {
 	}
 	
 	public synchronized void deleteProduct(Product product) {
-	    // se debe eliminar tambien todas las piezas relacionadas al producto, asi como los procesos relacionados a las piezas
 		if(product.getId() != null) {
+		    // se realiza una eliminacion en cascada de las piezas relacionadas al producto, los procesos se eliminan en el servicio de la pieza
+	        PieceService pieceService = new PieceServiceImpl();
+	        List<Piece> deletePieceList = pieceService.getPieceList(product.getId());// obtenemos todas las piezas del producto
+	        for(Piece currentPiece:deletePieceList) {// recorremos todas las piezas obtenidas
+	            pieceService.deletePiece(currentPiece);// eliminamos la pieza
+	        }
 			int size = productList.size();
-			for(int i=0;i<size;i++) {
+			for(int i = 0; i < size; i++) {
 				Product t = productList.get(i);
 				if(t.getId().equals(product.getId())) {
 					productList.remove(i);
