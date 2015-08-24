@@ -71,7 +71,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 	
 	public synchronized void deleteProduct(Product product) {
-		if(product.getId() != null) {
+		if(product.getId() != null) {// hay que agregar un checkeo para no eliminar el producto si esta siendo referenciado por otros objetos u enviar alguna confirmacion
 		    // se realiza una eliminacion en cascada de las piezas relacionadas al producto, los procesos se eliminan en el servicio de la pieza
 	        PieceService pieceService = new PieceServiceImpl();
 	        List<Piece> deletePieceList = pieceService.getPieceList(product.getId());// obtenemos todas las piezas del producto

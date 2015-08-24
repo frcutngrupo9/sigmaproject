@@ -177,7 +177,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
     			// primero eliminamos las piezas que estan en el service, pero que no existen mas en el producto
     			List<Piece> auxPieceList = pieceService.getPieceList(currentProduct.getId());// obtenemos las piezas del producto que estan en el servicio
     			for(Piece auxPiece:auxPieceList) {// recorremos todas las piezas obtenidas
-    				Piece aux = searchPiece(auxPiece.getId());
+    				Piece aux = searchPiece(auxPiece.getId());// buscamos en la lista para ver si esta tambien ahi
 					if(aux == null) {// si la pieza no esta en la lista se debe eliminar del service
 						pieceService.deletePiece(auxPiece);// eliminamos la pieza, el servicio se encarga de eliminar los procesos relacionados a esa pieza
 					}
