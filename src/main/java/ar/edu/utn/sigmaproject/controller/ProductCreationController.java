@@ -146,7 +146,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
     }
     
     @Listen("onClick = #saveProductButton")
-    public void SaveProduct() {
+    public void saveProduct() {
     	if(Strings.isBlank(productName.getValue())){
 			Clients.showNotification("Ingresar Nombre Producto", productName);
 			return;
