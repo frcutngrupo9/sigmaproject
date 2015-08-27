@@ -12,6 +12,7 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
@@ -45,6 +46,8 @@ public class OrderCreationController extends SelectorComposer<Component>{
     Bandbox clientBandbox;
     @Wire
     Listbox clientPopupListbox;
+    @Wire
+    Datebox orderDateBox;
     @Wire
     Intbox productUnits;
     @Wire
@@ -175,11 +178,13 @@ public class OrderCreationController extends SelectorComposer<Component>{
   		if (currentOrder == null) {
   			clientBandbox.setValue("");
   	        clientBandbox.close();
+  	        orderDateBox.setValue(null);
   	        productBandbox.setValue("");
   	        productBandbox.close();
   		} else {
   			clientBandbox.setValue(getClientName(currentOrder.getIdClient()));
   	        clientBandbox.close();
+  	        orderDateBox.setValue(currentOrder.getDate());
   	        productBandbox.setValue("");
   	        productBandbox.close();
   		}

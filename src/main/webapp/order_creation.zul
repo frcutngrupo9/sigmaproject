@@ -29,7 +29,7 @@
                 </hlayout>
                 <hlayout>
                     <label value="Fecha: "/>
-                    <datebox id="db5" cols="12" constraint="no past" format="dd-MM-yyyy" onCreate="self.value = new Date()" />
+                    <datebox id="orderDateBox" cols="12" constraint="no past" format="dd-MM-yyyy" onCreate="self.value = new Date()" />
                 </hlayout>
                 <hlayout>
                     <label value="Producto: "/>
