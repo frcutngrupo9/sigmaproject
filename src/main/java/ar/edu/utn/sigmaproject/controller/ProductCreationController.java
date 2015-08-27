@@ -317,7 +317,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
     		currentPiece.setSize2(piece_size2);
     		currentPiece.setUnits(piece_units);
     		currentPiece.setGroup(piece_isGroup);
-    		updatePiece(currentPiece);// actualizamos la lista
+    		updatePieceList(currentPiece);// actualizamos la lista
     		pieceListModel = new ListModelList<Piece>(pieceList); 
     		pieceListbox.setModel(pieceListModel);// actualizamos el modelo para que aparezca en la pantalla
     	}
@@ -350,7 +350,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
     			} else { // esta creado
     				currentProcess.setDetails(details);
     				currentProcess.setTime(duration);
-    				currentProcess = updateProcess(currentProcess);
+    				currentProcess = updateProcessList(currentProcess);
     			}
     		} else {
     			if(currentProcess != null) { // esta creado pero el check en false, hay que eliminarlo
@@ -542,10 +542,10 @@ public class ProductCreationController extends SelectorComposer<Component>{
   		return null;
     }
   	
-  	private  Piece updatePiece(Piece piece) {
+  	private  Piece updatePieceList(Piece piece) {
 		if(piece.getId() == null) {
 			throw new IllegalArgumentException("can't update a null-id piece");
-		}else {
+		} else {
 			piece = Piece.clone(piece);
 			int size = pieceList.size();
 			for(int i = 0; i < size; i++) {
@@ -606,7 +606,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		return list;
 	}
   	
-  	private  Process updateProcess(Process process) {
+  	private  Process updateProcessList(Process process) {
 		if(process.getIdPiece() == null && process.getIdProcessType() == null) {
 			throw new IllegalArgumentException("can't update a null-id process");
 		}else {
@@ -651,7 +651,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
     }
   	
   	@Listen("onSelect = #pieceListbox")
-	public void doListBoxSelect() {
+	public void selectPiece() {
 		if(pieceListModel.isSelectionEmpty()){
 			//just in case for the no selection
 			currentPiece = null;

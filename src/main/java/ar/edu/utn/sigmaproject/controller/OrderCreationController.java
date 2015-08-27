@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
@@ -14,6 +15,7 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Messagebox;
 
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
@@ -92,7 +94,8 @@ public class OrderCreationController extends SelectorComposer<Component>{
         currentOrderDetail = null;
         currentProduct = null;
         currentClient = null;
-        refreshView();
+        refreshViewOrder();
+        refreshViewOrderDetail();
     }
     
     @Listen("onSelect = #productPopupListbox")
@@ -112,36 +115,63 @@ public class OrderCreationController extends SelectorComposer<Component>{
     @Listen("onClick = #saveOrderDetailButton")
     public void saveOrderDetail() {
 		if(productUnits.getValue()==null || productUnits.getValue().intValue()<=0){
-			Clients.showNotification("Ingresar Cantidad del Producto",productUnits);
+			Clients.showNotification("Ingresar Cantidad del Producto", productUnits);
 			return;
 		}
-		productPopupListModel.remove(currentProduct);// quitamos el producto de la lista del popup
-		productPopupListbox.setModel(productPopupListModel);
-		currentOrderDetail = new OrderDetail(null,currentProduct.getId(),productUnits.getValue());
-		orderDetailList.add(currentOrderDetail);
-		orderDetailListModel.add(currentOrderDetail);
-		orderDetailListbox.setModel(orderDetailListModel);// actualizamos la vista con el nuevo order detail
+		if(currentProduct == null){
+			Clients.showNotification("Debe seleccionar un Producto", productBandbox);
+			return;
+		}
+		removeProductPopup();
+		if(currentOrderDetail == null) { // es un detalle de pedido nuevo
+			currentOrderDetail = new OrderDetail(null,currentProduct.getId(), productUnits.getValue());
+			orderDetailList.add(currentOrderDetail);
+		} else { // se edita el detalle de pedido
+			currentOrderDetail.setIdProduct(currentProduct.getId());
+			currentOrderDetail.setUnits(productUnits.getValue());
+			updateOrderDetailList(currentOrderDetail);// actualizamos la lista
+		}
+		currentOrderDetail = null;
 		refreshViewOrderDetail();
     }
     
-    private void refreshViewOrderDetail() {
+    private void removeProductPopup() {
+    	productPopupList.remove(currentProduct);// quitamos el producto de la lista del popup
+    	productPopupListModel = new ListModelList<Product>(productPopupList);
+		productPopupListbox.setModel(productPopupListModel);
+	}
+    
+    private void addProductPopup(Product product) {
+    	productPopupList.add(product);// agregamos el producto de la lista del popup
+    	productPopupListModel = new ListModelList<Product>(productPopupList);
+		productPopupListbox.setModel(productPopupListModel);
+	}
+
+	private void refreshViewOrderDetail() {
   		if (currentOrderDetail == null) {
   			// borramos el text del producto  seleccionado
   			// deseleccionamos la tabla y borramos la cantidad
+  			productBandbox.setDisabled(false);
   			productBandbox.setValue("");
   			productPopupListbox.clearSelection();
   			productUnits.setText(null);
   			currentProduct = null;
+  			deleteOrderDetailButton.setDisabled(true);
+  			resetOrderDetailButton.setDisabled(true);
   		} else {
-  			// lo contrario
+  			currentProduct = productService.getProduct(currentOrderDetail.getIdProduct());
+  			productBandbox.setDisabled(true);// no se permite modificar el producto solo las unidades
   			productBandbox.setValue(getProductName(currentOrderDetail.getIdProduct()));
   			productPopupListbox.clearSelection();
-  			productUnits.setText(null);
-  			currentProduct = null;
+  			productUnits.setText(currentOrderDetail.getUnits() + "");
+  			deleteOrderDetailButton.setDisabled(false);
+  			resetOrderDetailButton.setDisabled(false);
   		}
+  		orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
+		orderDetailListbox.setModel(orderDetailListModel);// actualizamos la vista del order detail
   	}
     
-    private void refreshView() {
+    private void refreshViewOrder() {
   		if (currentOrder == null) {
   			clientBandbox.setValue("");
   	        clientBandbox.close();
@@ -153,7 +183,6 @@ public class OrderCreationController extends SelectorComposer<Component>{
   	        productBandbox.setValue("");
   	        productBandbox.close();
   		}
-  		currentOrderDetail = null;// se empieza sin OrderDetail seleccionado
   	}
     
     public String getProductName(int idProduct) {
@@ -165,5 +194,57 @@ public class OrderCreationController extends SelectorComposer<Component>{
     	Client aux = clientService.getClient(idClient);
 		return aux.getName();
     }
+    
+    private  OrderDetail updateOrderDetailList(OrderDetail orderDetail) {
+		if(orderDetail.getIdProduct() == null) {
+			throw new IllegalArgumentException("can't update a null-id orderDetail");
+		} else {
+			orderDetail = OrderDetail.clone(orderDetail);
+			int size = orderDetailList.size();
+			for(int i = 0; i < size; i++) {
+				OrderDetail t = orderDetailList.get(i);
+				if(t.getIdProduct().equals(orderDetail.getIdProduct())) {
+					orderDetailList.set(i, orderDetail);
+					return orderDetail;
+				}
+			}
+			throw new RuntimeException("OrderDetail not found " + orderDetail.getIdProduct());
+		}
+	}
+    
+    @Listen("onSelect = #orderDetailListbox")
+	public void selectOrderDetail() { // se selecciona un detalle de pedido
+		if(orderDetailListModel.isSelectionEmpty()){
+			//just in case for the no selection
+			currentOrderDetail = null;
+		}else {
+			currentOrderDetail = orderDetailListModel.getSelection().iterator().next();
+			currentProduct = productService.getProduct(currentOrderDetail.getIdProduct());
+			refreshViewOrderDetail();
+		}
+	}
+    
+    @Listen("onClick = #resetOrderDetailButton")
+    public void resetOrderDetail() {
+  		refreshViewOrderDetail();
+  	}
+    
+    @Listen("onClick = #deleteOrderDetailButton")
+    public void deleteOrderDetail() {
+  		if(currentOrderDetail != null) {
+  			Messagebox.show("Esta seguro que desea eliminar " + getProductName(currentOrderDetail.getIdProduct()) + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+  			    public void onEvent(Event evt) throws InterruptedException {
+  			        if (evt.getName().equals("onOK")) {
+  			        	//eliminamos el detalle de pedido
+  			        	addProductPopup(currentProduct);// agregamos el producto al popup
+  						orderDetailList.remove(currentOrderDetail);// quitamos el detalle de pedido de la lista
+  			        	currentOrderDetail = null;
+  			        	refreshViewOrderDetail();
+  			            alert("Detalle de pedido eliminado.");
+  			        }
+  			    }
+  			});
+  		} 
+  	}
     
 }

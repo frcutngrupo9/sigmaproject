@@ -57,9 +57,9 @@
                     </bandbox>
                     <label value="Cantidad: "/>
                     <intbox id="productUnits" width="36px"/>
-                    <button id="saveOrderDetailButton" label="Agregar"/>
-                    <button id="deleteOrderDetailButton" label="Eliminar"/>
-                    <button id="resetOrderDetailButton" label="Reset"/>
+                    <button id="saveOrderDetailButton" label="Grabar Detalle"/>
+                    <button id="deleteOrderDetailButton" label="Eliminar Detalle"/>
+                    <button id="resetOrderDetailButton" label="Reset Detalle"/>
                 </hlayout>
                 <separator/>
                 <listbox id="orderDetailListbox" mold="paging" pageSize="7">
