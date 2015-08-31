@@ -29,7 +29,7 @@
                 </hlayout>
                 <hlayout>
                     <label value="Fecha: "/>
-                    <datebox id="orderDateBox" cols="12" constraint="no past" format="dd-MM-yyyy" onCreate="self.value = new Date()" />
+                    <datebox id="orderDateBox" cols="12" constraint="no past" format="dd-MM-yyyy"/>
                 </hlayout>
                 <hlayout>
                     <label value="Producto: "/>
@@ -58,8 +58,8 @@
                     <label value="Cantidad: "/>
                     <intbox id="productUnits" width="36px"/>
                     <button id="saveOrderDetailButton" label="Grabar Detalle"/>
-                    <button id="deleteOrderDetailButton" label="Eliminar Detalle"/>
                     <button id="resetOrderDetailButton" label="Reset Detalle"/>
+                    <button id="deleteOrderDetailButton" label="Eliminar Detalle"/>
                 </hlayout>
                 <separator/>
                 <listbox id="orderDetailListbox" mold="paging" pageSize="7">
@@ -77,6 +77,11 @@
                         </listitem>
                     </template>
                 </listbox>
+                <hlayout>
+                    <button id="saveOrderButton" label="Guardar Pedido"/>
+                    <button id="resetOrderButton" label="Reset Pedido"/>
+                    <button id="deleteOrderButton" label="Eliminar Pedido"/>
+                </hlayout>
             </vlayout>
         </panelchildren>
     </panel>

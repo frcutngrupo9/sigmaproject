@@ -60,10 +60,10 @@ public class ProductListController extends SelectorComposer<Component>{
     @Wire
 	Button newProductButton;
     
-    ProductService productListService = new ProductServiceImpl();
-	PieceService pieceListService = new PieceServiceImpl();
-	ProcessService processListService = new ProcessServiceImpl();
-	ProcessTypeService processTypeListService = new ProcessTypeServiceImpl();
+    ProductService productService = new ProductServiceImpl();
+	PieceService pieceService = new PieceServiceImpl();
+	ProcessService processService = new ProcessServiceImpl();
+	ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
 	
     ListModelList<Product> productListModel;
     ListModelList<Piece> pieceListModel;
@@ -73,15 +73,15 @@ public class ProductListController extends SelectorComposer<Component>{
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
-        List<Product> productList = productListService.getProductList();
+        List<Product> productList = productService.getProductList();
         productListModel = new ListModelList<Product>(productList);
         productListbox.setModel(productListModel);
         
-        List<Piece> pieceList = pieceListService.getPieceList();
+        List<Piece> pieceList = pieceService.getPieceList();
         pieceListModel = new ListModelList<Piece>(pieceList);
         pieceListbox.setModel(pieceListModel);
         
-        List<Process> processList = processListService.getProcessList();
+        List<Process> processList = processService.getProcessList();
         processListModel = new ListModelList<Process>(processList);
         processListbox.setModel(processListModel);
     }
@@ -109,16 +109,16 @@ public class ProductListController extends SelectorComposer<Component>{
     }
     
     public String getProductName(int idProduct) {
-    	return productListService.getProduct(idProduct).getName();
+    	return productService.getProduct(idProduct).getName();
     }
     
     public String getPieceName(int idPiece) {
-    	Piece aux = pieceListService.getPiece(idPiece);
+    	Piece aux = pieceService.getPiece(idPiece);
     	return aux.getName();
     }
     
     public String getProcessTypeName(int idProduct) {
-    	return processTypeListService.getProcessType(idProduct).getName();
+    	return processTypeService.getProcessType(idProduct).getName();
     }
     
     public String getFormatedTime(Duration time) {

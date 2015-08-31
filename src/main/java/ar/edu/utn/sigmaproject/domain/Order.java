@@ -10,7 +10,7 @@ public class Order implements Serializable, Cloneable {
     Integer idClient;
     Date date;
 
-    public Order(Integer id, Integer idClient, String name, Date date) {
+    public Order(Integer id, Integer idClient, Date date) {
         this.id = id;
         this.idClient = idClient;
         this.date = date;

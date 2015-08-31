@@ -82,6 +82,10 @@ public class SidebarController extends SelectorComposer<Component> {
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Write.png", "Crear Plan de Produccion", "/production_plan_creation.zul")),
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Clock.png", "Crear Orden de Produccion", "/production_order_creation.zul"))
             )),
+            new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Pedidos"), Arrays.asList(
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Pedido", "/order_creation.zul")),
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Lista de Pedidos", "/order_list.zul"))
+            )),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Stock"), Arrays.asList(
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Box.png", "Stock de Productos", "/product_stock.zul")),
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Box.png", "Stock de Materia Prima", "/raw_material_stock.zul"))
@@ -89,7 +93,6 @@ public class SidebarController extends SelectorComposer<Component> {
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Materia Prima", "/raw_material.zul")),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Insumos", "/supply.zul")),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Clientes", "/client.zul")),
-            new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Pedido", "/order_creation.zul")),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Reportes"))
         ));
         tree.setModel(new DefaultTreeModel<MenuTreeRow>(rootNode));

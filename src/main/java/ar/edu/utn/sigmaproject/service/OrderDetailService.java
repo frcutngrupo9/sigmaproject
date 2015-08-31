@@ -16,4 +16,6 @@ public interface OrderDetailService  {
 
     void deleteOrderDetail(OrderDetail orderDetail);
 
+	List<OrderDetail> getOrderDetailList(Integer idOrder);
+
 }

@@ -30,6 +30,17 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         return list;
     }
     
+	public List<OrderDetail> getOrderDetailList(Integer idOrder) {
+		List<OrderDetail> list = new ArrayList<OrderDetail>();
+        for(OrderDetail orderDetail:orderDetailList) {
+        	if(orderDetail.getIdOrder().equals(idOrder)) {
+        		list.add(OrderDetail.clone(orderDetail));
+        	}
+            
+        }
+        return list;
+	}
+    
     public synchronized OrderDetail getOrderDetail(Integer idOrder, Integer idProduct) {
         int size = orderDetailList.size();
         for(int i = 0; i < size; i++){

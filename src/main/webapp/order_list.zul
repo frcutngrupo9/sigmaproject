@@ -1,0 +1,29 @@
+<window id="win_order_list" title="Lista de Pedidos" closable="false" apply="ar.edu.utn.sigmaproject.controller.OrderListController" sclass="sigma-content">
+    <hlayout>
+        <label>Buscar:</label>
+        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
+        <button id="searchButton" label="Buscar"/>
+    </hlayout>
+    <separator/>
+    <listbox id="orderListbox" mold="paging" pageSize="7">
+    	<auxhead>
+			<auxheader label="Pedidos" colspan="4"/>
+		</auxhead>
+        <listhead>
+            <listheader label="Id"/>
+            <listheader label="Cliente"/>
+            <listheader label="Fecha"/>
+            <listheader label="Cantidad Productos"/>
+        </listhead>
+        <template name="model">
+            <listitem>
+                <listcell label="${each.id}"/>
+                <listcell label="${win_order_list$composer.getClientName(each.idClient)}"/>
+                <listcell label="${each.date}"/>
+                <listcell label="${win_order_list$composer.quantityOfDetail(each.id)}"/>
+            </listitem>
+        </template>
+    </listbox>
+    <separator/>
+    <button id="newOrderButton" label="Nuevo Pedido"/>
+</window>
