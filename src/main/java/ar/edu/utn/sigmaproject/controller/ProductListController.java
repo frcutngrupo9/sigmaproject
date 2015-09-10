@@ -112,6 +112,11 @@ public class ProductListController extends SelectorComposer<Component>{
     	return productService.getProduct(idProduct).getName();
     }
     
+    public String getProductNameByPieceId(int idPiece) {
+        Piece aux = pieceService.getPiece(idPiece);
+        return productService.getProduct(aux.getIdProduct()).getName();
+    }
+    
     public String getPieceName(int idPiece) {
     	Piece aux = pieceService.getPiece(idPiece);
     	return aux.getName();

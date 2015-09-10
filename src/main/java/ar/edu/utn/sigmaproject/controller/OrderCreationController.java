@@ -233,11 +233,15 @@ public class OrderCreationController extends SelectorComposer<Component>{
   	        productPopupList = productService.getProductList();
   	        refreshProductPopup();
   	        deleteOrderButton.setDisabled(true);
-  		} else {
+  		} else {// editar pedido
   			clientBandbox.setValue(getClientName(currentOrder.getIdClient()));
   	        clientBandbox.close();
   	        orderDateBox.setValue(currentOrder.getDate());
   	        orderDetailList = orderDetailService.getOrderDetailList(currentOrder.getId());
+  	        for(OrderDetail orderDetail : orderDetailList) {
+  	            Product aux
+  	            removeProductPopup(currentProduct);// sacamos el todos los productos del popup
+  	        }
   	        deleteOrderButton.setDisabled(false);
   		}
   		refreshViewOrderDetail();

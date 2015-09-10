@@ -30,8 +30,8 @@
 			<auxheader label="Piezas" colspan="10"/>
 		</auxhead>
         <listhead>
-        	<listheader label="Nombre Producto"/>
-        	<listheader label="Nombre Pieza"/>
+        	<listheader label="Producto"/>
+        	<listheader label="Pieza"/>
             <listheader label="Id"/>
             <listheader label="Id Producto"/>
             <listheader label="Longitud"/>
@@ -59,17 +59,19 @@
     <separator/>
     <listbox id="processListbox" mold="paging" pageSize="5">
     	<auxhead>
-			<auxheader label="Procesos" colspan="5"/>
+			<auxheader label="Procesos" colspan="6"/>
 		</auxhead>
         <listhead>
-        	<listheader label="Nombre Pieza"/>
-            <listheader label="Nombre Tipo Proceso"/>
+            <listheader label="Producto"/>
+        	<listheader label="Pieza"/>
+            <listheader label="Tipo Proceso"/>
             <listheader label="Id Pieza"/>
             <listheader label="Id Tipo Proceso"/>
             <listheader label="Tiempo"/>
         </listhead>
         <template name="model">
             <listitem>
+                <listcell label="${win_product_list$composer.getProductNameByPieceId(each.idPiece)}"/>
             	<listcell label="${win_product_list$composer.getPieceName(each.idPiece)}"/>
             	<listcell label="${win_product_list$composer.getProcessTypeName(each.idProcessType)}"/>
                 <listcell label="${each.idPiece}"/>
