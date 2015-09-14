@@ -30,7 +30,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         return list;
     }
     
-	public List<OrderDetail> getOrderDetailList(Integer idOrder) {
+	public synchronized List<OrderDetail> getOrderDetailList(Integer idOrder) {
 		List<OrderDetail> list = new ArrayList<OrderDetail>();
         for(OrderDetail orderDetail:orderDetailList) {
         	if(orderDetail.getIdOrder().equals(idOrder)) {
@@ -65,7 +65,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         }else {
             orderDetail = OrderDetail.clone(orderDetail);
             int size = orderDetailList.size();
-            for(int i=0;i<size;i++) {
+            for(int i = 0; i < size; i++) {
                 OrderDetail aux = orderDetailList.get(i);
                 if(aux.getIdOrder().equals(orderDetail.getIdOrder()) && aux.getIdProduct().equals(orderDetail.getIdProduct())) {
                     orderDetailList.set(i, orderDetail);
@@ -78,11 +78,11 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     }
     
     public synchronized void deleteOrderDetail(OrderDetail orderDetail) {
-        if(orderDetail.getIdOrder()!=null && orderDetail.getIdProduct()!=null){
+        if(orderDetail.getIdOrder()!=null && orderDetail.getIdProduct()!=null) {
             int size = orderDetailList.size();
-            for(int i=0;i<size;i++){
+            for(int i = 0; i < size; i++) {
                 OrderDetail aux = orderDetailList.get(i);
-                if(aux.getIdOrder().equals(orderDetail.getIdOrder()) && aux.getIdProduct().equals(orderDetail.getIdProduct())){
+                if(aux.getIdOrder().equals(orderDetail.getIdOrder()) && aux.getIdProduct().equals(orderDetail.getIdProduct())) {
                     orderDetailList.remove(i);
                     serializator.grabarLista(orderDetailList);
                     return;

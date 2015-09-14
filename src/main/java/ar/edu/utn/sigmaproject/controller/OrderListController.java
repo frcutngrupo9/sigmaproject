@@ -24,9 +24,11 @@ import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.service.ClientService;
 import ar.edu.utn.sigmaproject.service.OrderDetailService;
 import ar.edu.utn.sigmaproject.service.OrderService;
+import ar.edu.utn.sigmaproject.service.ProductService;
 import ar.edu.utn.sigmaproject.service.impl.ClientServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.OrderDetailServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.OrderServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
 
 public class OrderListController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
@@ -37,24 +39,32 @@ public class OrderListController extends SelectorComposer<Component>{
     Listbox orderListbox;
     @Wire
 	Button newOrderButton;
+    @Wire
+    Listbox orderDetailListbox;
     
     // services
     private OrderService orderService = new OrderServiceImpl();
     private OrderDetailService orderDetailService = new OrderDetailServiceImpl();
     private ClientService clientService = new ClientServiceImpl();
+    private ProductService productService = new ProductServiceImpl();
     
     // list
     private List<Order> orderList;
+    private List<OrderDetail> orderDetailList;
     
     // list models
     private ListModelList<Order> orderListModel;
+    private ListModelList<OrderDetail> orderDetailListModel;
     
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
-        List<Order> orderList = orderService.getOrderList();
+        orderList = orderService.getOrderList();
         orderListModel = new ListModelList<Order>(orderList);
         orderListbox.setModel(orderListModel);
+        orderDetailList = orderDetailService.getOrderDetailList();
+        orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
+        orderDetailListbox.setModel(orderDetailListModel);
     }
     
     @Listen("onSelect = #orderListbox")
@@ -73,6 +83,10 @@ public class OrderListController extends SelectorComposer<Component>{
     
     public String getClientName(int idClient) {
     	return clientService.getClient(idClient).getName();
+    }
+    
+    public String getProductName(int idProduct) {
+    	return productService.getProduct(idProduct).getName();
     }
     
     public String quantityOfDetail(int idOrder) {

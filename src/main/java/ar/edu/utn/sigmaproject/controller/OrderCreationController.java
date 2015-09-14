@@ -77,6 +77,7 @@ public class OrderCreationController extends SelectorComposer<Component>{
     private List<Client> clientPopupList;
     private List<Product> productPopupList;
     private List<OrderDetail> orderDetailList;
+    private List<OrderDetail> lateDeleteOrderDetailList;
     
     // list models
     private ListModelList<Product> productPopupListModel;
@@ -87,10 +88,6 @@ public class OrderCreationController extends SelectorComposer<Component>{
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
         
-        productPopupList = productService.getProductList();
-        productPopupListModel = new ListModelList<Product>(productPopupList);
-        productPopupListbox.setModel(productPopupListModel);
-        
         clientPopupList = clientService.getClientList();
         clientPopupListModel = new ListModelList<Client>(clientPopupList);
         clientPopupListbox.setModel(clientPopupListModel);
@@ -98,6 +95,8 @@ public class OrderCreationController extends SelectorComposer<Component>{
         orderDetailList = new ArrayList<OrderDetail>();
         orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
         orderDetailListbox.setModel(orderDetailListModel);
+        
+        lateDeleteOrderDetailList = new ArrayList<OrderDetail>();
         
         currentOrder = (Order) Executions.getCurrent().getAttribute("selected_order");
         currentOrderDetail = null;
@@ -135,20 +134,25 @@ public class OrderCreationController extends SelectorComposer<Component>{
 			// creamos el nuevo pedido
 			currentOrder = new Order(null, currentClient.getId(), orderDateBox.getValue());
 			currentOrder = orderService.saveOrder(currentOrder); // se obtiene una orden con id agregado
-			for(OrderDetail orderDetail : orderDetailList) {
-				orderDetail.setIdOrder(currentOrder.getId());// agregamos el id del pedido a todos los detalles y los guardamos
+			for(OrderDetail orderDetail : orderDetailList) {// agregamos el id del pedido a todos los detalles y los guardamos
+				orderDetail.setIdOrder(currentOrder.getId());
 				orderDetailService.saveOrderDetail(orderDetail);
 			}
 		} else { // se edita un pedido
+			currentOrder.setDate(orderDateBox.getValue());
+			currentOrder.setIdClient(currentClient.getId());
 			currentOrder = orderService.updateOrder(currentOrder);
-			for(OrderDetail orderDetail : orderDetailList) {
-				// hay que actualizar las que existen y agregar las que no
+			for(OrderDetail orderDetail : orderDetailList) {// hay que actualizar los detalles que existen y agregar las que no
 				OrderDetail aux = orderDetailService.getOrderDetail(orderDetail.getIdOrder(), orderDetail.getIdProduct());
-				if(aux == null) {// no existe
+				if(aux == null) {// no existe se agrega
+					orderDetail.setIdOrder(currentOrder.getId());// agregamos el id del pedido
 					orderDetailService.saveOrderDetail(orderDetail);
 				} else {// existe, se actualiza
 					orderDetailService.updateOrderDetail(orderDetail);
 				}
+			}
+			for(OrderDetail lateDeleteOrderDetail : lateDeleteOrderDetailList) {// y eliminar los detalles que se eliminaron
+				orderDetailService.deleteOrderDetail(lateDeleteOrderDetail);
 			}
 		}
 		currentOrder = null;
@@ -168,11 +172,22 @@ public class OrderCreationController extends SelectorComposer<Component>{
 			Clients.showNotification("Ingresar Cantidad del Producto", productUnits);
 			return;
 		}
-		if(currentProduct == null){
+		if(currentProduct == null) {
 			Clients.showNotification("Debe seleccionar un Producto", productBandbox);
 			return;
 		}
+		// buscamos si el producto no esta en un detalle eliminado
+		OrderDetail aux = null;
+		for(OrderDetail lateDeleteOrderDetail : lateDeleteOrderDetailList) {
+			if(currentProduct.getId().equals(lateDeleteOrderDetail.getIdProduct())) {
+				aux = lateDeleteOrderDetail;
+			}
+		}
+		if(aux != null) {
+			lateDeleteOrderDetailList.remove(aux);// lo eliminamos de la lista de eliminacion tardia porque el producto sera agregado de nuevo
+		}
 		if(currentOrderDetail == null) { // es un detalle nuevo
+			// se crea un detalle sin id de pedido porque recien se le asignara uno al momento de grabarse definitivamente
 			currentOrderDetail = new OrderDetail(null,currentProduct.getId(), productUnits.getValue());
 			orderDetailList.add(currentOrderDetail);
 		} else { // se edita un detalle
@@ -180,33 +195,53 @@ public class OrderCreationController extends SelectorComposer<Component>{
 			currentOrderDetail.setUnits(productUnits.getValue());
 			updateOrderDetailList(currentOrderDetail);// actualizamos la lista
 		}
-		removeProductPopup(currentProduct);// sacamos el producto del popup
+		refreshProductPopup();// actualizamos el popup
 		currentOrderDetail = null;
 		refreshViewOrderDetail();
     }
     
-    private void removeProductPopup(Product product) {
-    	productPopupList.remove(product);// quitamos el producto de la lista del popup
-    	refreshProductPopup();
-	}
-    
-    private void addProductPopup(Product product) {
-    	productPopupList.add(product);// agregamos el producto de la lista del popup
-    	refreshProductPopup();
-	}
-    
-    private void refreshProductPopup() {
+    private void refreshProductPopup() {// el popup se actualiza en base a los detalles del pedido
+    	productPopupList = productService.getProductList();
+    	for(OrderDetail orderDetail : orderDetailList) {
+    		Product aux = productService.getProduct(orderDetail.getIdProduct());
+    		productPopupList.remove(aux);// sacamos todos los productos del popup
+    	}
     	productPopupListModel = new ListModelList<Product>(productPopupList);
 		productPopupListbox.setModel(productPopupListModel);
 	}
+    
+    private void refreshOrderDetailListbox() {
+    	orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
+		orderDetailListbox.setModel(orderDetailListModel);// actualizamos la vista del order detail
+	}
 
+    private void refreshViewOrder() {
+  		if (currentOrder == null) {// nuevo pedido
+  			currentClient = null;
+  			clientBandbox.setValue("");
+  	        clientBandbox.close();
+  	        orderDateBox.setValue(null);
+  	        orderDetailList = new ArrayList<OrderDetail>();
+  	        deleteOrderButton.setDisabled(true);
+  		} else {// editar pedido
+  			currentClient = clientService.getClient(currentOrder.getIdClient());
+  			clientBandbox.setValue(currentClient.getName());
+  	        clientBandbox.close();
+  	        orderDateBox.setValue(currentOrder.getDate());
+  	        orderDetailList = orderDetailService.getOrderDetailList(currentOrder.getId());
+  	        deleteOrderButton.setDisabled(false);
+  		}
+  		currentOrderDetail = null;
+  		refreshProductPopup();
+  		refreshViewOrderDetail();
+  	}
+    
 	private void refreshViewOrderDetail() {
   		if (currentOrderDetail == null) {
   			// borramos el text del producto  seleccionado
   			// deseleccionamos la tabla y borramos la cantidad
   			productBandbox.setDisabled(false);
   			productBandbox.setValue("");
-  			productPopupListbox.clearSelection();
   			productUnits.setText(null);
   			currentProduct = null;
   			deleteOrderDetailButton.setDisabled(true);
@@ -214,37 +249,11 @@ public class OrderCreationController extends SelectorComposer<Component>{
   			currentProduct = productService.getProduct(currentOrderDetail.getIdProduct());
   			productBandbox.setDisabled(true);// no se permite modificar el producto solo las unidades
   			productBandbox.setValue(getProductName(currentOrderDetail.getIdProduct()));
-  			productPopupListbox.clearSelection();
   			productUnits.setText(currentOrderDetail.getUnits() + "");
   			deleteOrderDetailButton.setDisabled(false);
   		}
-  		orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
-		orderDetailListbox.setModel(orderDetailListModel);// actualizamos la vista del order detail
-  	}
-    
-    private void refreshViewOrder() {
-  		if (currentOrder == null) {// nuevo pedido
-  			currentClient = null;
-  			currentOrderDetail = null;
-  			clientBandbox.setValue("");
-  	        clientBandbox.close();
-  	        orderDateBox.setValue(null);
-  	        orderDetailList = new ArrayList<OrderDetail>();
-  	        productPopupList = productService.getProductList();
-  	        refreshProductPopup();
-  	        deleteOrderButton.setDisabled(true);
-  		} else {// editar pedido
-  			clientBandbox.setValue(getClientName(currentOrder.getIdClient()));
-  	        clientBandbox.close();
-  	        orderDateBox.setValue(currentOrder.getDate());
-  	        orderDetailList = orderDetailService.getOrderDetailList(currentOrder.getId());
-  	        for(OrderDetail orderDetail : orderDetailList) {
-  	            Product aux
-  	            removeProductPopup(currentProduct);// sacamos el todos los productos del popup
-  	        }
-  	        deleteOrderButton.setDisabled(false);
-  		}
-  		refreshViewOrderDetail();
+  		productPopupListbox.clearSelection();
+  		refreshOrderDetailListbox();
   	}
     
     public String getProductName(int idProduct) {
@@ -297,9 +306,10 @@ public class OrderCreationController extends SelectorComposer<Component>{
   			Messagebox.show("Esta seguro que desea eliminar " + getProductName(currentOrderDetail.getIdProduct()) + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
   			    public void onEvent(Event evt) throws InterruptedException {
   			        if (evt.getName().equals("onOK")) {
-  			        	addProductPopup(currentProduct);// agregamos el producto al popup
+  			        	lateDeleteOrderDetailList.add(currentOrderDetail);// agregamos el detalle a la lista de eliminacion tardia que se realiza al grabar definitivamente
   						orderDetailList.remove(currentOrderDetail);// quitamos el detalle de la lista
   			        	currentOrderDetail = null;// eliminamos el detalle
+  			        	refreshProductPopup();// actualizamos el popup para que aparezca el producto eliminado del detalle
   			        	refreshViewOrderDetail();
   			            alert("Detalle eliminado.");
   			        }

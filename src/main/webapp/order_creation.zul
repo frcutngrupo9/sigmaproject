@@ -29,7 +29,7 @@
                 </hlayout>
                 <hlayout>
                     <label value="Fecha: "/>
-                    <datebox id="orderDateBox" cols="12" constraint="no past" format="dd-MM-yyyy"/>
+                    <datebox id="orderDateBox" cols="12" format="dd-MM-yyyy"/>
                 </hlayout>
                 <hlayout>
                     <label value="Producto: "/>
