@@ -306,7 +306,9 @@ public class OrderCreationController extends SelectorComposer<Component>{
   			Messagebox.show("Esta seguro que desea eliminar " + getProductName(currentOrderDetail.getIdProduct()) + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
   			    public void onEvent(Event evt) throws InterruptedException {
   			        if (evt.getName().equals("onOK")) {
-  			        	lateDeleteOrderDetailList.add(currentOrderDetail);// agregamos el detalle a la lista de eliminacion tardia que se realiza al grabar definitivamente
+  			        	if(currentOrderDetail.getIdOrder() != null) {// si el detalle existe en un pedido
+  			        		lateDeleteOrderDetailList.add(currentOrderDetail);// agregamos el detalle a la lista de eliminacion tardia que se realiza al grabar definitivamente
+  			        	}
   						orderDetailList.remove(currentOrderDetail);// quitamos el detalle de la lista
   			        	currentOrderDetail = null;// eliminamos el detalle
   			        	refreshProductPopup();// actualizamos el popup para que aparezca el producto eliminado del detalle
