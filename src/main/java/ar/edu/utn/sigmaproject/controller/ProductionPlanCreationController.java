@@ -15,18 +15,21 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Button;
 
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
+import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
+import ar.edu.utn.sigmaproject.service.OrderDetailService;
 import ar.edu.utn.sigmaproject.service.PieceService;
 import ar.edu.utn.sigmaproject.service.ProcessService;
 import ar.edu.utn.sigmaproject.service.ProcessTypeService;
 import ar.edu.utn.sigmaproject.service.ProductService;
 import ar.edu.utn.sigmaproject.service.ProductionPlanService;
 import ar.edu.utn.sigmaproject.service.ProductionPlanDetailService;
+import ar.edu.utn.sigmaproject.service.impl.OrderDetailServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.PieceServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProcessServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProcessTypeServiceImpl;
@@ -53,6 +56,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
     Listbox supplyListbox;
 	
 	// services
+	OrderDetailService orderDetailService = new OrderDetailServiceImpl();
 	ProductService productService = new ProductServiceImpl();
 	ProductionPlanService productionPlanService = new ProductionPlanServiceImpl();
 	ProductionPlanDetailService productionPlanDetailService = new ProductionPlanDetailServiceImpl();
@@ -66,19 +70,23 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	ListModelList<Process> processListModel;
 	//ListModelList<Product> supplyListModel;
     ListModelList<ProductionPlanDetail> productionPlanDetailListModel;
+    ListModelList<OrderDetail> orderDetailListModel;
     
     // atributes
     private Product selectedProduct;
     private List<Product> productList;
     private List<Process> processList;
 	private List<ProductionPlanDetail> productionPlanDetailList;
+	private List<OrderDetail> orderDetailList;
 	
 	@Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
-        productList = productService.getProductList();
-        productListModel = new ListModelList<Product>(productList);
-        productPopupListbox.setModel(productListModel);
+        //productList = productService.getProductList();
+        //productListModel = new ListModelList<Product>(productList);
+        orderDetailList = orderDetailService.getOrderDetailList();
+        orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
+        productPopupListbox.setModel(orderDetailListModel);
         
         selectedProduct = null;
         productionPlanDetailList = new ArrayList<ProductionPlanDetail>();

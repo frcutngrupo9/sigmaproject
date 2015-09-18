@@ -21,13 +21,15 @@
     							</hbox>
     							<listbox id="productPopupListbox" width="200px">
     							<listhead>
+    								<listheader label="Pedido"/>
     								<listheader label="Producto"/>
-    								<listheader label="Descripcion"/>
+    								<listheader label="Cantidad"/>
     							</listhead>
     							<template name="model">
     								<listitem>
-    									<listcell label="${each.name}"/>
-    									<listcell label="${each.details}"/>
+    									<listcell label="${each.idOrder}"/>
+    									<listcell label="${win_production_plan_creation$composer.getProductName(each.idProduct)}"/>
+    									<listcell label="${each.units}"/>
     								</listitem>
     							</template>
     							</listbox>

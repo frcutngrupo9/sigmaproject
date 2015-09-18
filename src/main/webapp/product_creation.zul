@@ -9,6 +9,10 @@
                         <column align="left"/>
                     </columns>
                     <rows>
+                    	<row>
+                            <label value="Codigo :"/>
+                            <textbox id="productCode" width="50%" placeholder="Codigo del Producto"/>
+                        </row>
                         <row>
                             <label value="Nombre :"/>
                             <textbox id="productName" width="50%" placeholder="Nombre del Producto"/>

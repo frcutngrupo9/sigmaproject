@@ -80,7 +80,7 @@ public class SidebarController extends SelectorComposer<Component> {
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Produccion"), Arrays.asList(
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Calender.png", "Planes de Produccion", "/production_plan_list.zul")),
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Write.png", "Crear Plan de Produccion", "/production_plan_creation.zul")),
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Clock.png", "Crear Orden de Produccion", "/production_order_creation.zul"))
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Orden de Produccion", "/production_order_creation.zul"))
             )),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Pedidos"), Arrays.asList(
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Pedido", "/order_creation.zul")),
