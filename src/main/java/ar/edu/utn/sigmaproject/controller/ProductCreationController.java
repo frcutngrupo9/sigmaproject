@@ -75,6 +75,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	@Wire
 	Textbox pieceName;
 	@Wire
+        Textbox productCode;
+        @Wire
 	Doublebox pieceHeight;
 	@Wire
 	Doublebox pieceDepth;
@@ -153,10 +155,11 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		}
     	String product_name = productName.getText();
     	String product_details = productDetails.getText();
+        String product_code = productCode.getText();
     	
     	if(currentProduct == null) {// se esta creando un nuevo producto
     		Integer product_id = productService.getNewId();
-    		currentProduct = new Product(product_id, product_name, product_details);
+    		currentProduct = new Product(product_id,product_code, product_name, product_details);
     		productService.saveProduct(currentProduct);
     		if(pieceList != null && pieceList.isEmpty() == false) {// se guardan todas las piezas
         		for(int i = 0; i < pieceList.size(); i++) {
@@ -172,6 +175,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	} else {// se esta editando un producto
     		currentProduct.setName(product_name);
     		currentProduct.setDetails(product_details);
+                currentProduct.setCode(product_code);
     		currentProduct = productService.updateProduct(currentProduct);
     		if(pieceList != null) {// se actualizan todas las piezas
     			// primero eliminamos las piezas que estan en el service, pero que no existen mas en el producto
@@ -415,6 +419,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
   		    deleteProductButton.setDisabled(true);
   			productName.setText("");
   			productDetails.setText("");
+                        productCode.setText("");
   			processList = new ArrayList<Process>();
   			pieceList = new ArrayList<Piece>();
   			pieceListModel = new ListModelList<Piece>(pieceList);
@@ -423,6 +428,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
   		    deleteProductButton.setDisabled(false);
   			productName.setText(currentProduct.getName());
   			productDetails.setText(currentProduct.getDetails());
+                        productCode.setText(currentProduct.getCode());
   			processList = getProcessList(currentProduct.getId());
   			pieceList = pieceService.getPieceList(currentProduct.getId());
   	        pieceListModel = new ListModelList<Piece>(pieceList);

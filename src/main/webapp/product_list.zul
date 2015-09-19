@@ -7,16 +7,18 @@
     <separator/>
     <listbox id="productListbox" mold="paging" pageSize="7">
     	<auxhead>
-			<auxheader label="Productos" colspan="3"/>
+			<auxheader label="Productos" colspan="4"/>
 		</auxhead>
         <listhead>
             <listheader label="Id"/>
+            <listheader label="Codigo"/>
             <listheader label="Nombre"/>
             <listheader label="Detalles"/>
         </listhead>
         <template name="model">
             <listitem>
                 <listcell label="${each.id}"/>
+                <listcell label="${each.code}"/>
                 <listcell label="${each.name}"/>
                 <listcell label="${each.details}"/>
             </listitem>

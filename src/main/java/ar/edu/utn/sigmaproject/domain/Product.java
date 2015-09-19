@@ -8,11 +8,13 @@ public class Product implements Serializable, Cloneable {
 	Integer id;
 	String name;
 	String details;
+        String code;
 
-	public Product(Integer id, String name, String details) {
+	public Product(Integer id,String code ,String name, String details) {
 		this.id = id;
 		this.name = name;
 		this.details = details;
+                this.code = code;
 	}
 
 	public Integer getId() {
@@ -33,6 +35,13 @@ public class Product implements Serializable, Cloneable {
 	
 	public void setDetails(String details) {
 		this.details = details;
+	}
+        public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	@Override
