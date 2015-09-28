@@ -2,10 +2,11 @@
     <panel title="Plan de Produccion" id="productionOrderCreationBlock" border="rounded">
         <panelchildren>
             <vlayout>
-            	<hlayout>
+            	<!-- <hlayout>
             		<label value="Nombre: "/>
 					<textbox width="180px"/>
-            	</hlayout>
+            	</hlayout> -->
+            	<separator/>
             	<hlayout>
             		<label value="Fecha: "/>
 					<datebox id="db5" cols="12" format="dd-MM-yyyy" onCreate="self.value = new Date()" />
@@ -22,12 +23,14 @@
     							<listbox id="productPopupListbox" width="200px">
     							<listhead>
     								<listheader label="Pedido"/>
+    								<listheader label="Cliente"/>
     								<listheader label="Producto"/>
     								<listheader label="Cantidad"/>
     							</listhead>
     							<template name="model">
     								<listitem>
     									<listcell label="${each.idOrder}"/>
+    									<listcell label="${win_production_plan_creation$composer.getClientNameByOrderId(each.idOrder)}"/>
     									<listcell label="${win_production_plan_creation$composer.getProductName(each.idProduct)}"/>
     									<listcell label="${each.units}"/>
     								</listitem>
@@ -56,7 +59,7 @@
             			</listitem>
         			</template>
     			</listbox>
-    			<listbox id="processListbox" mold="paging" pageSize="7">
+    			<listbox id="processListbox" mold="paging" pageSize="7" visible="false">
     				<auxhead>
 						<auxheader label="Procesos" colspan="7"/>
 					</auxhead>
@@ -81,7 +84,7 @@
             			</listitem>
         			</template>
     			</listbox>
-    			<listbox id="supplyListbox" mold="paging" pageSize="7">
+    			<listbox id="supplyListbox" mold="paging" pageSize="7" visible="false">
     				<auxhead>
 						<auxheader label="Insumos" colspan="3"/>
 					</auxhead>

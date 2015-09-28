@@ -14,7 +14,9 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Button;
 
+import ar.edu.utn.sigmaproject.domain.Client;
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
+import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
@@ -22,14 +24,18 @@ import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
+import ar.edu.utn.sigmaproject.service.ClientService;
 import ar.edu.utn.sigmaproject.service.OrderDetailService;
+import ar.edu.utn.sigmaproject.service.OrderService;
 import ar.edu.utn.sigmaproject.service.PieceService;
 import ar.edu.utn.sigmaproject.service.ProcessService;
 import ar.edu.utn.sigmaproject.service.ProcessTypeService;
 import ar.edu.utn.sigmaproject.service.ProductService;
 import ar.edu.utn.sigmaproject.service.ProductionPlanService;
 import ar.edu.utn.sigmaproject.service.ProductionPlanDetailService;
+import ar.edu.utn.sigmaproject.service.impl.ClientServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.OrderDetailServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.OrderServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.PieceServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProcessServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProcessTypeServiceImpl;
@@ -56,6 +62,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
     Listbox supplyListbox;
 	
 	// services
+	OrderService orderService = new OrderServiceImpl();
 	OrderDetailService orderDetailService = new OrderDetailServiceImpl();
 	ProductService productService = new ProductServiceImpl();
 	ProductionPlanService productionPlanService = new ProductionPlanServiceImpl();
@@ -63,6 +70,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	PieceService pieceService = new PieceServiceImpl();
 	ProcessService processService = new ProcessServiceImpl();
 	ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
+	ClientService clientService = new ClientServiceImpl();
 	//SupplyService supplyListService = new SupplyServiceImpl();
 	
 	// list models
@@ -74,6 +82,9 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
     
     // atributes
     private Product selectedProduct;
+    private Client selectedClient;
+    private Order selectedOrder;
+    private OrderDetail selectedOrderDetail;
     private List<Product> productList;
     private List<Process> processList;
 	private List<ProductionPlanDetail> productionPlanDetailList;
@@ -100,9 +111,13 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	
 	@Listen("onSelect = #productPopupListbox")
     public void selectionProductPopupListbox() {
-		selectedProduct = (Product) productPopupListbox.getSelectedItem().getValue();
+		selectedOrderDetail = (OrderDetail) productPopupListbox.getSelectedItem().getValue();
+		selectedOrder = orderService.getOrder(selectedOrderDetail.getIdOrder());
+		selectedProduct = productService.getProduct(selectedOrderDetail.getIdProduct());
+		selectedClient = clientService.getClient(selectedOrder.getIdClient());
 		productBandbox.setValue(selectedProduct.getName());
 		productBandbox.close();
+		productUnits.setValue(selectedOrderDetail.getUnits());
     }
 	
 	@Listen("onClick = #addProductButton")
@@ -113,7 +128,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		}
 		productListModel.remove(selectedProduct);
 		productPopupListbox.setModel(productListModel);
-		ProductionPlanDetail aux = new ProductionPlanDetail(null,selectedProduct.getId(),productUnits.getValue());
+		ProductionPlanDetail aux = new ProductionPlanDetail(null, selectedProduct.getId(), selectedOrder.getId(), productUnits.getValue());
 		productionPlanDetailList.add(aux);
 		productionPlanDetailListModel.add(aux);
 		productionPlanProductListbox.setModel(productionPlanDetailListModel);
@@ -141,6 +156,17 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		processListModel = new ListModelList<Process>(processList);
         processListbox.setModel(processListModel);
 	}
+	
+	public String getClientName(int idClient) {
+		Client aux = clientService.getClient(idClient);
+		return aux.getName();
+    }
+	
+	public String getClientNameByOrderId(int idOrder) {
+		Order auxOrder = orderService.getOrder(idOrder);
+		Client auxClient = clientService.getClient(auxOrder.getIdClient());
+		return auxClient.getName();
+    }
 	
 	public String getProductName(int idProduct) {
 		Product aux = productService.getProduct(idProduct);

@@ -6,13 +6,11 @@ public class ProductionPlanDetail implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 	
 	Integer idProductionPlan;
-	Integer idProduct;
-	Integer units;
+	Integer idOrder;
 
-	public ProductionPlanDetail(Integer idProductionPlan, Integer idProduct, Integer units) {
+	public ProductionPlanDetail(Integer idProductionPlan, Integer idOrder) {
 		this.idProductionPlan = idProductionPlan;
-		this.idProduct = idProduct;
-		this.units = units;
+		this.idOrder = idOrder;
 	}
 	
 	public Integer getIdProductionPlan() {
@@ -24,24 +22,13 @@ public class ProductionPlanDetail implements Serializable, Cloneable {
 		this.idProductionPlan = idProductionPlan;
 	}
 
-
-	public Integer getIdProduct() {
-		return idProduct;
+	public Integer getIdOrder() {
+		return idOrder;
 	}
 
 
-	public void setIdProduct(Integer idProduct) {
-		this.idProduct = idProduct;
-	}
-
-
-	public Integer getUnits() {
-		return units;
-	}
-
-
-	public void setUnits(Integer units) {
-		this.units = units;
+	public void setIdOrder(Integer idOrder) {
+		this.idOrder = idOrder;
 	}
 
 	@Override
@@ -53,9 +40,9 @@ public class ProductionPlanDetail implements Serializable, Cloneable {
 		if (getClass() != obj.getClass())
 			return false;
 		ProductionPlanDetail other = (ProductionPlanDetail) obj;
-		if (idProductionPlan != null && idProduct != null) {
-			if (other.idProductionPlan != null && other.idProduct != null) {
-				if (other.idProductionPlan.compareTo(idProductionPlan) ==  0 && other.idProduct.compareTo(idProduct) == 0)
+		if (idProductionPlan != null && idOrder != null) {
+			if (other.idProductionPlan != null  && other.idOrder != null) {
+				if (other.idProductionPlan.equals(idProductionPlan) && other.idOrder.equals(idOrder))
 					return true;
 			}
 		}
