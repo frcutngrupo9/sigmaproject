@@ -128,7 +128,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		}
 		productListModel.remove(selectedProduct);
 		productPopupListbox.setModel(productListModel);
-		ProductionPlanDetail aux = new ProductionPlanDetail(null, selectedProduct.getId(), selectedOrder.getId(), productUnits.getValue());
+		ProductionPlanDetail aux = new ProductionPlanDetail(null, selectedOrder.getId());
 		productionPlanDetailList.add(aux);
 		productionPlanDetailListModel.add(aux);
 		productionPlanProductListbox.setModel(productionPlanDetailListModel);
@@ -144,12 +144,16 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	private void refreshProcessListBox() {
 		processList = new ArrayList<Process>();
 		for(ProductionPlanDetail auxProductionPlanDetail : productionPlanDetailList) {
-			Product auxProduct = productService.getProduct(auxProductionPlanDetail.getIdProduct());
-			List<Piece> auxPieceList = pieceService.getPieceList(auxProduct.getId());
-			for(Piece auxPiece : auxPieceList) {
-				List<Process> auxProcessList = processService.getProcessList(auxPiece.getId());
-				for(Process auxProcess : auxProcessList) {
-					processList.add(auxProcess);
+			Order auxOrder = orderService.getOrder(auxProductionPlanDetail.getIdOrder());
+			List<OrderDetail> auxOrderDetailList = orderDetailService.getOrderDetailList(auxOrder.getId());
+			for(OrderDetail auxOrderDetail : auxOrderDetailList) {
+				Product auxProduct = productService.getProduct(auxOrderDetail.getIdProduct());
+				List<Piece> auxPieceList = pieceService.getPieceList(auxProduct.getId());
+				for(Piece auxPiece : auxPieceList) {
+					List<Process> auxProcessList = processService.getProcessList(auxPiece.getId());
+					for(Process auxProcess : auxProcessList) {
+						processList.add(auxProcess);
+					}
 				}
 			}
 		}
@@ -198,8 +202,12 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		Piece auxPiece = pieceService.getPiece(idPiece);
 		int units = 0;
 		for(ProductionPlanDetail auxProductionPlanDetail : productionPlanDetailList) {
-			if(auxProductionPlanDetail.getIdProduct().compareTo(auxPiece.getIdProduct()) == 0) {
-				units = auxProductionPlanDetail.getUnits();
+			Order auxOrder = orderService.getOrder(auxProductionPlanDetail.getIdOrder());
+			List<OrderDetail> auxOrderDetailList = orderDetailService.getOrderDetailList(auxOrder.getId());
+			for(OrderDetail auxOrderDetail : auxOrderDetailList) {
+				if(auxOrderDetail.getIdProduct().equals(auxPiece.getIdProduct())) {
+					units = auxOrderDetail.getUnits();
+				}
 			}
 		}
 		if(units > 0) {
@@ -214,8 +222,12 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		long total = 0;
 		int units = 0;
 		for(ProductionPlanDetail auxProductionPlanDetail : productionPlanDetailList) {
-			if(auxProductionPlanDetail.getIdProduct().compareTo(auxPiece.getIdProduct()) == 0) {
-				units = auxProductionPlanDetail.getUnits();
+			Order auxOrder = orderService.getOrder(auxProductionPlanDetail.getIdOrder());
+			List<OrderDetail> auxOrderDetailList = orderDetailService.getOrderDetailList(auxOrder.getId());
+			for(OrderDetail auxOrderDetail : auxOrderDetailList) {
+				if(auxOrderDetail.getIdProduct().equals(auxPiece.getIdProduct())) {
+					units = auxOrderDetail.getUnits();
+				}
 			}
 		}
 		if(units > 0) {

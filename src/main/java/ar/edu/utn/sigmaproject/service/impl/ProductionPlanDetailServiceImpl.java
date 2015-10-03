@@ -34,7 +34,7 @@ public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailServ
 		int size = productionPlanDetailList.size();
 		for(int i = 0; i < size; i++) {
 			ProductionPlanDetail aux = productionPlanDetailList.get(i);
-			if(aux.getIdProductionPlan().equals(idProductionPlan) && aux.getIdProduct().equals(idProduct)) {
+			if(aux.getIdProductionPlan().equals(idProductionPlan) && aux.getIdOrder().equals(idProduct)) {
 				return ProductionPlanDetail.clone(aux);
 			}
 		}
@@ -49,29 +49,29 @@ public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailServ
 	}
 	
 	public synchronized ProductionPlanDetail updateProductionPlanDetail(ProductionPlanDetail productionPlanDetail) {
-		if(productionPlanDetail.getIdProductionPlan()==null && productionPlanDetail.getIdProduct()==null) {
+		if(productionPlanDetail.getIdProductionPlan()==null && productionPlanDetail.getIdOrder()==null) {
 			throw new IllegalArgumentException("can't update a null-id productionPlanDetail, save it first");
 		} else {
 			productionPlanDetail = ProductionPlanDetail.clone(productionPlanDetail);
 			int size = productionPlanDetailList.size();
 			for(int i = 0; i < size; i++) {
 				ProductionPlanDetail aux = productionPlanDetailList.get(i);
-				if(aux.getIdProductionPlan().equals(productionPlanDetail.getIdProductionPlan()) && aux.getIdProduct().equals(productionPlanDetail.getIdProduct())) {
+				if(aux.getIdProductionPlan().equals(productionPlanDetail.getIdProductionPlan()) && aux.getIdOrder().equals(productionPlanDetail.getIdOrder())) {
 					productionPlanDetailList.set(i, productionPlanDetail);
 					serializator.grabarLista(productionPlanDetailList);
 					return productionPlanDetail;
 				}
 			}
-			throw new RuntimeException("ProductionPlanDetail not found "+productionPlanDetail.getIdProductionPlan()+" "+productionPlanDetail.getIdProduct());
+			throw new RuntimeException("ProductionPlanDetail not found "+productionPlanDetail.getIdProductionPlan()+" "+productionPlanDetail.getIdOrder());
 		}
 	}
 	
 	public synchronized void deleteProductionPlanDetail(ProductionPlanDetail productionPlanDetail) {
-		if(productionPlanDetail.getIdProductionPlan()!=null && productionPlanDetail.getIdProduct()!=null){
+		if(productionPlanDetail.getIdProductionPlan()!=null && productionPlanDetail.getIdOrder()!=null) {
 			int size = productionPlanDetailList.size();
 			for(int i = 0; i < size; i++) {
 				ProductionPlanDetail aux = productionPlanDetailList.get(i);
-				if(aux.getIdProductionPlan().equals(productionPlanDetail.getIdProductionPlan()) && aux.getIdProduct().equals(productionPlanDetail.getIdProduct())) {
+				if(aux.getIdProductionPlan().equals(productionPlanDetail.getIdProductionPlan()) && aux.getIdOrder().equals(productionPlanDetail.getIdOrder())) {
 					productionPlanDetailList.remove(i);
 					serializator.grabarLista(productionPlanDetailList);
 					return;
