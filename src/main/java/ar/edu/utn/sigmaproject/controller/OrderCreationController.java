@@ -49,15 +49,15 @@ public class OrderCreationController extends SelectorComposer<Component>{
     @Wire
     Intbox productUnits;
     @Wire
-    Button saveOrderDetailButton;
-    @Wire
-    Button deleteOrderDetailButton;
-    @Wire
     Button resetOrderButton;
     @Wire
     Button saveOrderButton;
     @Wire
     Button deleteOrderButton;
+    @Wire
+    Button saveOrderDetailButton;
+    @Wire
+    Button deleteOrderDetailButton;
     @Wire
     Button resetOrderDetailButton;
 

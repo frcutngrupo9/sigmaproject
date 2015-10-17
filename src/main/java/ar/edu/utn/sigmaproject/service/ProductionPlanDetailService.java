@@ -8,6 +8,8 @@ public interface ProductionPlanDetailService {
 	
 	List<ProductionPlanDetail> getProductionPlanDetailList();
 	
+	List<ProductionPlanDetail> getProductionPlanDetailList(Integer idProductionPlan);
+	
 	ProductionPlanDetail getProductionPlanDetail(Integer idProductionPlan, Integer idProduct);
 
 	ProductionPlanDetail saveProductionPlanDetail(ProductionPlanDetail productionPlanDetail);

@@ -9,6 +9,8 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Bandbox;
+import org.zkoss.zul.Datebox;
+import org.zkoss.zul.Grid;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
@@ -47,99 +49,134 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	private static final long serialVersionUID = 1L;
 	
 	@Wire
-    Listbox productPopupListbox;
+    Listbox orderPopupListbox;
 	@Wire
-    Listbox productionPlanProductListbox;
+	Grid productionPlanDetailListGrid;
 	@Wire
-	Bandbox productBandbox;
+	Bandbox orderBandbox;
 	@Wire
-	Intbox productUnits;
+    Datebox productionPlanDateBox;
 	@Wire
-	Button addProductButton;
+	Button addOrderButton;
 	@Wire
     Listbox processListbox;
 	@Wire
     Listbox supplyListbox;
+	@Wire
+    Button resetProductionPlanButton;
+    @Wire
+    Button saveProductionPlanButton;
+    @Wire
+    Button deleteProductionPlanButton;
 	
 	// services
-	OrderService orderService = new OrderServiceImpl();
-	OrderDetailService orderDetailService = new OrderDetailServiceImpl();
-	ProductService productService = new ProductServiceImpl();
-	ProductionPlanService productionPlanService = new ProductionPlanServiceImpl();
-	ProductionPlanDetailService productionPlanDetailService = new ProductionPlanDetailServiceImpl();
-	PieceService pieceService = new PieceServiceImpl();
-	ProcessService processService = new ProcessServiceImpl();
-	ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
-	ClientService clientService = new ClientServiceImpl();
-	//SupplyService supplyListService = new SupplyServiceImpl();
+	private OrderService orderService = new OrderServiceImpl();
+	private OrderDetailService orderDetailService = new OrderDetailServiceImpl();
+	private ProductService productService = new ProductServiceImpl();
+	private ProductionPlanService productionPlanService = new ProductionPlanServiceImpl();
+	private ProductionPlanDetailService productionPlanDetailService = new ProductionPlanDetailServiceImpl();
+	private PieceService pieceService = new PieceServiceImpl();
+	private ProcessService processService = new ProcessServiceImpl();
+	private ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
+	private ClientService clientService = new ClientServiceImpl();
+	
+	// list
+	private List<Order> orderPopupList;
+	private List<Product> productList;
+    private List<Process> processList;
+    private List<ProductionPlanDetail> productionPlanDetailList;
+	private List<ProductionPlanDetail> lateDeleteProductionPlanDetailList;
 	
 	// list models
-	ListModelList<Product> productListModel;
-	ListModelList<Process> processListModel;
-	//ListModelList<Product> supplyListModel;
-    ListModelList<ProductionPlanDetail> productionPlanDetailListModel;
-    ListModelList<OrderDetail> orderDetailListModel;
+	private ListModelList<Order> orderPopupListModel;
+	private ListModelList<Process> processListModel;
+	private ListModelList<ProductionPlanDetail> productionPlanDetailListModel;
     
     // atributes
-    private Product selectedProduct;
-    private Client selectedClient;
-    private Order selectedOrder;
-    private OrderDetail selectedOrderDetail;
-    private List<Product> productList;
-    private List<Process> processList;
-	private List<ProductionPlanDetail> productionPlanDetailList;
-	private List<OrderDetail> orderDetailList;
-	
+    private Order currentOrder;
+    private ProductionPlan currentProductionPlan;
+    
 	@Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
-        //productList = productService.getProductList();
-        //productListModel = new ListModelList<Product>(productList);
-        orderDetailList = orderDetailService.getOrderDetailList();
-        orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
-        productPopupListbox.setModel(orderDetailListModel);
         
-        selectedProduct = null;
         productionPlanDetailList = new ArrayList<ProductionPlanDetail>();
         productionPlanDetailListModel = new ListModelList<ProductionPlanDetail>(productionPlanDetailList);
-        productionPlanProductListbox.setModel(productionPlanDetailListModel);
+        productionPlanDetailListGrid.setModel(productionPlanDetailListModel);
         
         processList = new ArrayList<Process>();
         processListModel = new ListModelList<Process>(processList);
         processListbox.setModel(processListModel);
     }
 	
-	@Listen("onSelect = #productPopupListbox")
-    public void selectionProductPopupListbox() {
-		selectedOrderDetail = (OrderDetail) productPopupListbox.getSelectedItem().getValue();
-		selectedOrder = orderService.getOrder(selectedOrderDetail.getIdOrder());
-		selectedProduct = productService.getProduct(selectedOrderDetail.getIdProduct());
-		selectedClient = clientService.getClient(selectedOrder.getIdClient());
-		productBandbox.setValue(selectedProduct.getName());
-		productBandbox.close();
-		productUnits.setValue(selectedOrderDetail.getUnits());
+	@Listen("onSelect = #orderPopupListbox")
+    public void selectionOrderPopupListbox() {
+		currentOrder = (Order) orderPopupListbox.getSelectedItem().getValue();
+		orderBandbox.setValue("Pedido nro " + currentOrder.getId());
+		orderBandbox.close();
     }
 	
-	@Listen("onClick = #addProductButton")
-    public void addProductToProdPlan() {
-		if(productUnits.getValue()==null || productUnits.getValue().intValue()<=0){
-			Clients.showNotification("Ingresar Cantidad del Producto",productUnits);
+	@Listen("onClick = #resetProductionPlanButton")
+    public void resetProductionPlan() {
+		refreshViewProductionPlan();
+    }
+	
+	@Listen("onClick = #addOrderButton")
+    public void addOrder() {
+		if(currentOrder == null){
+			Clients.showNotification("Debe seleccionar un pedido", orderBandbox);
 			return;
 		}
-		productListModel.remove(selectedProduct);
-		productPopupListbox.setModel(productListModel);
-		ProductionPlanDetail aux = new ProductionPlanDetail(null, selectedOrder.getId());
-		productionPlanDetailList.add(aux);
-		productionPlanDetailListModel.add(aux);
-		productionPlanProductListbox.setModel(productionPlanDetailListModel);
+		// buscamos si el pedido no esta en un detalle eliminado
+		ProductionPlanDetail aux = null;
+		for(ProductionPlanDetail lateDeleteProductionPlanDetail : lateDeleteProductionPlanDetailList) {
+			if(currentOrder.getId().equals(lateDeleteProductionPlanDetail.getIdOrder())) {
+				aux = lateDeleteProductionPlanDetail;
+			}
+		}
+		if(aux != null) {
+			lateDeleteProductionPlanDetailList.remove(aux);// lo eliminamos de la lista de eliminacion tardia porque el pedido sera agregado de nuevo
+		}
+		productionPlanDetailList.add(new ProductionPlanDetail(null, currentOrder.getId()));
+		refreshProductionPlanDetailListGrid();
 		
 		// luego de actualizar la tabla borramos el text del producto  seleccionado
 		// deseleccionamos la tabla y borramos la cantidad
-		productBandbox.setValue("");
-		productPopupListbox.clearSelection();
-		productUnits.setText(null);
+		orderBandbox.setValue("");
+		orderPopupListbox.clearSelection();
 		refreshProcessListBox();
+		refreshOrderPopup();
+		
     }
+	
+	private void refreshOrderPopup() {// el popup se actualiza en base a los detalles
+		orderPopupList = orderService.getOrderList();
+    	for(ProductionPlanDetail productionPlanDetail : productionPlanDetailList) {
+    		Order aux = orderService.getOrder(productionPlanDetail.getIdOrder());
+    		orderPopupList.remove(aux);// sacamos todos los pedidos del popup
+    	}
+    	orderPopupListModel = new ListModelList<Order>(orderPopupList);
+        orderPopupListbox.setModel(orderPopupListModel);
+	}
+	
+	private void refreshProductionPlanDetailListGrid() {
+		productionPlanDetailListModel = new ListModelList<ProductionPlanDetail>(productionPlanDetailList);
+        productionPlanDetailListGrid.setModel(productionPlanDetailListModel);
+	}
+	
+	private void refreshViewProductionPlan() {
+  		if (currentProductionPlan == null) {// nuevo plan de produccion
+  			productionPlanDateBox.setValue(null);
+  	        productionPlanDetailList = new ArrayList<ProductionPlanDetail>();
+  	        deleteProductionPlanButton.setDisabled(true);
+  		} else {// editar plan de produccion
+  			productionPlanDateBox.setValue(currentProductionPlan.getDate());
+  			productionPlanDetailList = productionPlanDetailService.getProductionPlanDetailList(currentProductionPlan.getId());
+  			deleteProductionPlanButton.setDisabled(false);
+  		}
+  		refreshOrderPopup();
+  	}
+    
 	
 	private void refreshProcessListBox() {
 		processList = new ArrayList<Process>();
@@ -234,5 +271,9 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			total = auxProcess.getTime().getMinutes() * units;
 		}
 		return total + "";
+    }
+	
+	public String quantityOfDetail(int idOrder) {
+    	return orderDetailService.getOrderDetailList(idOrder).size() + "";
     }
 }

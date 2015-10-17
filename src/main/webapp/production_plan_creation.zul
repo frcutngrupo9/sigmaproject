@@ -1,5 +1,5 @@
 <window id="win_production_plan_creation" apply="ar.edu.utn.sigmaproject.controller.ProductionPlanCreationController" width="95%" style="background:white">
-    <panel title="Plan de Produccion" id="productionOrderCreationBlock" border="rounded">
+    <panel title="Plan de Produccion" id="productionPlanCreationBlock" border="rounded">
         <panelchildren>
             <vlayout>
             	<!-- <hlayout>
@@ -9,23 +9,23 @@
             	<separator/>
             	<hlayout>
             		<label value="Fecha: "/>
-					<datebox id="db5" cols="12" format="dd-MM-yyyy" onCreate="self.value = new Date()" />
+					<datebox id="productionPlanDateBox" cols="12" format="dd-MM-yyyy" onCreate="self.value = new Date()" />
             	</hlayout>
             	<hlayout>
-            	   <label value="Producto: "/>
-                	<bandbox id="productBandbox" buttonVisible = "true" autodrop = "true">
+            	   <label value="Pedido: "/>
+                	<bandbox id="orderBandbox" buttonVisible = "true" autodrop = "true">
     					<bandpopup>
     						<vbox>
     							<hbox>
     								Buscar
     								<textbox />
     							</hbox>
-    							<listbox id="productPopupListbox" width="200px">
+    							<listbox id="orderPopupListbox" width="200px">
     							<listhead>
     								<listheader label="Pedido"/>
     								<listheader label="Cliente"/>
-    								<listheader label="Producto"/>
-    								<listheader label="Cantidad"/>
+    								<listheader label="Fecha"/>
+    								<listheader label="Cantidad de Productos"/>
     							</listhead>
     							<template name="model">
     								<listitem>
@@ -39,26 +39,33 @@
     						</vbox>
     					</bandpopup>
     				</bandbox>
-    				<label value="Cantidad: "/>
-    				<intbox id="productUnits" width="36px"/>
-    				<button id="addProductButton" label="Agregar Producto"/>
+    				<button id="addOrderButton" label="Agregar Pedido"/>
 				</hlayout>
                 <separator/>
-    			<listbox id="productionPlanProductListbox" mold="paging" pageSize="7">
+    			<grid id="productionPlanDetailGrid" mold="paging" pageSize="7">
     				<auxhead>
-						<auxheader label="Productos" colspan="2"/>
+						<auxheader label="Pedidos" colspan="2"/>
 					</auxhead>
-        			<listhead>
-            			<listheader label="Nombre Producto"/>
-            			<listheader label="Unidades"/>
-        			</listhead>
+        			<columns>
+            			<column label="Id"/>
+            			<column label="Cliente"/>
+            			<column label="Fecha"/>
+           			 	<column label="Cantidad Productos"/>
+        			</columns>
         			<template name="model">
-            			<listitem>
-                			<listcell label="${win_production_plan_creation$composer.getProductName(each.idProduct)}"/>
-                			<listcell label="${each.units}"/>
-            			</listitem>
+            			<row>
+                			<label value="${each.id}"/>
+                			<label value="${win_production_plan_creation$composer.getClientName(each.idClient)}"/>
+                			<label value="${each.date}"/>
+                			<label value="${win_production_plan_creation$composer.quantityOfDetail(each.id)}"/>
+            			</row>
         			</template>
-    			</listbox>
+    			</grid>
+    			<hlayout>
+                    <button id="saveProductionPlanButton" label="Guardar Plan de Produccion"/>
+                    <button id="resetProductionPlanButton" label="Reset Plan de Produccion"/>
+                    <button id="deleteProductionPlanButton" label="Eliminar Plan de Produccion"/>
+                </hlayout>
     			<listbox id="processListbox" mold="paging" pageSize="7" visible="false">
     				<auxhead>
 						<auxheader label="Procesos" colspan="7"/>

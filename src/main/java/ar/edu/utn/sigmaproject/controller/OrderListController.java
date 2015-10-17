@@ -9,7 +9,9 @@ import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
+import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Paging;
@@ -36,7 +38,7 @@ public class OrderListController extends SelectorComposer<Component>{
 	@Wire
     Textbox searchTextbox;
     @Wire
-    Listbox orderListbox;
+    Grid orderGrid;
     @Wire
 	Button newOrderButton;
     @Wire
@@ -61,23 +63,23 @@ public class OrderListController extends SelectorComposer<Component>{
         super.doAfterCompose(comp);
         orderList = orderService.getOrderList();
         orderListModel = new ListModelList<Order>(orderList);
-        orderListbox.setModel(orderListModel);
+        orderGrid.setModel(orderListModel);
         orderDetailList = orderDetailService.getOrderDetailList();
         orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
         orderDetailListbox.setModel(orderDetailListModel);
     }
-    
-    @Listen("onSelect = #orderListbox")
+    /*
+    @Listen("onSelect = #orderGrid")
     public void onOrderSelect() {
     	Executions.getCurrent().setAttribute("selected_order", ((Order) orderListbox.getSelectedItem().getValue()));
         Include include = (Include) Selectors.iterable(orderListbox.getPage(), "#mainInclude").iterator().next();
     	include.setSrc("/order_creation.zul");
-    }
+    }*/
     
     @Listen("onClick = #newOrderButton")
     public void goToOrderCreation() {
     	Executions.getCurrent().setAttribute("selected_order", null);
-    	Include include = (Include) Selectors.iterable(orderListbox.getPage(), "#mainInclude").iterator().next();
+    	Include include = (Include) Selectors.iterable(orderGrid.getPage(), "#mainInclude").iterator().next();
     	include.setSrc("/order_creation.zul");
     }
     
@@ -91,5 +93,9 @@ public class OrderListController extends SelectorComposer<Component>{
     
     public String quantityOfDetail(int idOrder) {
     	return orderDetailService.getOrderDetailList(idOrder).size() + "";
+    }
+    
+    public ListModel<OrderDetail> getOrderDetails(int idOrder) {
+    	return new ListModelList<OrderDetail>(orderDetailService.getOrderDetailList(idOrder));
     }
 }

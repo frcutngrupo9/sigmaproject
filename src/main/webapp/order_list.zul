@@ -5,28 +5,36 @@
         <button id="searchButton" label="Buscar"/>
     </hlayout>
     <separator/>
-    <listbox id="orderListbox" mold="paging" pageSize="7">
+    <grid id="orderGrid" mold="paging" pageSize="7">
     	<auxhead>
-			<auxheader label="Pedidos" colspan="4"/>
+			<auxheader label="Pedidos" colspan="5"/>
 		</auxhead>
-        <listhead>
-            <listheader label="Id"/>
-            <listheader label="Cliente"/>
-            <listheader label="Fecha"/>
-            <listheader label="Cantidad Productos"/>
-        </listhead>
+        <columns>
+        	<column width="40px" />
+            <column label="Id"/>
+            <column label="Cliente"/>
+            <column label="Fecha"/>
+            <column label="Cantidad Productos"/>
+        </columns>
         <template name="model">
-            <listitem>
-                <listcell label="${each.id}"/>
-                <listcell label="${win_order_list$composer.getClientName(each.idClient)}"/>
-                <listcell label="${each.date}"/>
-                <listcell label="${win_order_list$composer.quantityOfDetail(each.id)}"/>
-            </listitem>
+            <row>
+            	<!-- se usa custom-attributes para guardar los productos en la fila, 
+				 		para que se puedan acceder cuando se usa onOpen del detail -->
+            	<custom-attributes products="${win_order_list$composer.getOrderDetails(each.id)}"/>
+            	<detail open="false" fulfill="onOpen">
+            		<include src="/order_products.zul" products="${products}"/>
+            	</detail>
+                <label value="${each.id}"/>
+                <label value="${win_order_list$composer.getClientName(each.idClient)}"/>
+                <label value="${each.date}"/>
+                <label value="${win_order_list$composer.quantityOfDetail(each.id)}"/>
+            </row>
         </template>
-    </listbox>
+    </grid>
     <separator/>
     <button id="newOrderButton" label="Nuevo Pedido"/>
     <separator/>
+    <!--
     <listbox id="orderDetailListbox" mold="paging" pageSize="7">
     	<auxhead>
 			<auxheader label="Detalles" colspan="4"/>
@@ -46,4 +54,5 @@
             </listitem>
         </template>
     </listbox>
+    -->
 </window>

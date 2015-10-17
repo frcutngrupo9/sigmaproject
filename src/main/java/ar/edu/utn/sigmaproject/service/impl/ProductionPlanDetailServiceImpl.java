@@ -30,6 +30,16 @@ public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailServ
 		return list;
 	}
 	
+	public synchronized List<ProductionPlanDetail> getProductionPlanDetailList(Integer idProductionPlan) {
+		List<ProductionPlanDetail> list = new ArrayList<ProductionPlanDetail>();
+		for(ProductionPlanDetail productionPlanDetail:productionPlanDetailList) {
+			if(productionPlanDetail.getIdProductionPlan().equals(idProductionPlan)) {
+				list.add(ProductionPlanDetail.clone(productionPlanDetail));
+			}
+		}
+		return list;
+	}
+	
 	public synchronized ProductionPlanDetail getProductionPlanDetail(Integer idProductionPlan, Integer idProduct) {
 		int size = productionPlanDetailList.size();
 		for(int i = 0; i < size; i++) {
