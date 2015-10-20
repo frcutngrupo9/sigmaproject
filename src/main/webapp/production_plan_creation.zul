@@ -9,7 +9,7 @@
             	<separator/>
             	<hlayout>
             		<label value="Fecha: "/>
-					<datebox id="productionPlanDateBox" cols="12" format="dd-MM-yyyy" onCreate="self.value = new Date()" />
+					<datebox id="productionPlanDateBox" cols="12" format="dd-MM-yyyy"/>
             	</hlayout>
             	<hlayout>
             	   <label value="Pedido: "/>
@@ -29,10 +29,10 @@
     							</listhead>
     							<template name="model">
     								<listitem>
-    									<listcell label="${each.idOrder}"/>
-    									<listcell label="${win_production_plan_creation$composer.getClientNameByOrderId(each.idOrder)}"/>
-    									<listcell label="${win_production_plan_creation$composer.getProductName(each.idProduct)}"/>
-    									<listcell label="${each.units}"/>
+    									<listcell label="${each.id}"/>
+    									<listcell label="${win_production_plan_creation$composer.getClientNameByOrderId(each.id)}"/>
+    									<listcell label="${each.date}"/>
+    									<listcell label="${win_production_plan_creation$composer.quantityOfDetail(each.id)}"/>
     								</listitem>
     							</template>
     							</listbox>
@@ -44,20 +44,18 @@
                 <separator/>
     			<grid id="productionPlanDetailGrid" mold="paging" pageSize="7">
     				<auxhead>
-						<auxheader label="Pedidos" colspan="2"/>
+						<auxheader label="Pedidos" colspan="4"/>
 					</auxhead>
         			<columns>
-            			<column label="Id"/>
+            			<column label="Id Pedido"/>
             			<column label="Cliente"/>
-            			<column label="Fecha"/>
            			 	<column label="Cantidad Productos"/>
         			</columns>
         			<template name="model">
             			<row>
-                			<label value="${each.id}"/>
-                			<label value="${win_production_plan_creation$composer.getClientName(each.idClient)}"/>
-                			<label value="${each.date}"/>
-                			<label value="${win_production_plan_creation$composer.quantityOfDetail(each.id)}"/>
+                			<label value="${each.idOrder}"/>
+                			<label value="${win_production_plan_creation$composer.getClientNameByOrderId(each.idOrder)}"/>
+                			<label value="${win_production_plan_creation$composer.quantityOfDetail(each.idOrder)}"/>
             			</row>
         			</template>
     			</grid>

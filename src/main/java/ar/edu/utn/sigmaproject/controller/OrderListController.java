@@ -52,11 +52,9 @@ public class OrderListController extends SelectorComposer<Component>{
     
     // list
     private List<Order> orderList;
-    private List<OrderDetail> orderDetailList;
     
     // list models
     private ListModelList<Order> orderListModel;
-    private ListModelList<OrderDetail> orderDetailListModel;
     
     @Override
     public void doAfterCompose(Component comp) throws Exception {
@@ -64,9 +62,11 @@ public class OrderListController extends SelectorComposer<Component>{
         orderList = orderService.getOrderList();
         orderListModel = new ListModelList<Order>(orderList);
         orderGrid.setModel(orderListModel);
-        orderDetailList = orderDetailService.getOrderDetailList();
-        orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
+        if(orderDetailListbox != null) {// por si esta comentada la listBox
+        List<OrderDetail> orderDetailList = orderDetailService.getOrderDetailList();
+        ListModelList<OrderDetail> orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
         orderDetailListbox.setModel(orderDetailListModel);
+        }
     }
     /*
     @Listen("onSelect = #orderGrid")
