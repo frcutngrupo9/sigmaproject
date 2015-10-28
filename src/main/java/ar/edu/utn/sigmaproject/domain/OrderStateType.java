@@ -2,49 +2,43 @@ package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
 
-public class Product implements Serializable, Cloneable {
+public class OrderStateType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 	
 	Integer id;
 	String name;
 	String details;
-    String code;
-
-	public Product(Integer id,String code ,String name, String details) {
+	
+	public OrderStateType(Integer id, String name, String details) {
 		this.id = id;
 		this.name = name;
 		this.details = details;
-        this.code = code;
 	}
 
 	public Integer getId() {
 		return id;
 	}
 
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	
 	public String getName() {
 		return name;
-	}
-
-	public String getDetails() {
-		return details;
 	}
 
 	public void setName(String name) {
 		this.name = name;
 	}
 	
+	public String getDetails() {
+		return details;
+	}
+
 	public void setDetails(String details) {
 		this.details = details;
 	}
 	
-    public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -61,7 +55,7 @@ public class Product implements Serializable, Cloneable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Product other = (Product) obj;
+		ProcessType other = (ProcessType) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -69,12 +63,12 @@ public class Product implements Serializable, Cloneable {
 			return false;
 		return true;
 	}
-	
-	public static Product clone(Product product){
+
+	public static OrderStateType clone(OrderStateType orderStateType) {
 		try {
-			return (Product)product.clone();
+			return (OrderStateType) orderStateType.clone();
 		} catch (CloneNotSupportedException e) {
-			//not possible
+			// not possible
 		}
 		return null;
 	}
