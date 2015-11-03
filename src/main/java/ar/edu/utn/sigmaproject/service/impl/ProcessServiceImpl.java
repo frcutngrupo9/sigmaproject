@@ -59,7 +59,7 @@ public class ProcessServiceImpl implements ProcessService {
 	}
 	
 	public synchronized Process updateProcess(Process process) {
-		if(process.getIdPiece() == null && process.getIdProcessType() == null) {
+		if(process.getIdPiece() == null || process.getIdProcessType() == null) {
 			throw new IllegalArgumentException("can't update a null-id process, save it first");
 		}else {
 			process = Process.clone(process);

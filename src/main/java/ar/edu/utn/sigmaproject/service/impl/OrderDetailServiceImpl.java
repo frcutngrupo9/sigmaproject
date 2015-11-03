@@ -60,7 +60,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     }
     
     public synchronized OrderDetail updateOrderDetail(OrderDetail orderDetail) {
-        if(orderDetail.getIdOrder()==null && orderDetail.getIdProduct()==null) {
+        if(orderDetail.getIdOrder()==null || orderDetail.getIdProduct()==null) {
             throw new IllegalArgumentException("can't update a null-id orderDetail, save it first");
         }else {
             orderDetail = OrderDetail.clone(orderDetail);

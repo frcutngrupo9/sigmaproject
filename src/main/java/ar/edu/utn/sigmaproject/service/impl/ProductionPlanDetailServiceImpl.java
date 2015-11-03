@@ -59,7 +59,7 @@ public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailServ
 	}
 	
 	public synchronized ProductionPlanDetail updateProductionPlanDetail(ProductionPlanDetail productionPlanDetail) {
-		if(productionPlanDetail.getIdProductionPlan()==null && productionPlanDetail.getIdOrder()==null) {
+		if(productionPlanDetail.getIdProductionPlan()==null || productionPlanDetail.getIdOrder()==null) {
 			throw new IllegalArgumentException("can't update a null-id productionPlanDetail, save it first");
 		} else {
 			productionPlanDetail = ProductionPlanDetail.clone(productionPlanDetail);
