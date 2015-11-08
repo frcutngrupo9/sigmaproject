@@ -9,11 +9,13 @@ public class Order implements Serializable, Cloneable {
     Integer id;
     Integer idClient;
     Date date;
+    Date needDate;
 
-    public Order(Integer id, Integer idClient, Date date) {
+    public Order(Integer id, Integer idClient, Date date, Date needDate) {
         this.id = id;
         this.idClient = idClient;
         this.date = date;
+        this.needDate = needDate;
     }
 
     public Integer getId() {
@@ -38,6 +40,14 @@ public class Order implements Serializable, Cloneable {
     
     public void setDate(Date date) {
         this.date = date;
+    }
+    
+    public Date getNeedDate() {
+        return needDate;
+    }
+    
+    public void setNeedDate(Date needDate) {
+        this.needDate = needDate;
     }
 
     @Override

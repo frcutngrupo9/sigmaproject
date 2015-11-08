@@ -1,6 +1,7 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
@@ -46,6 +47,8 @@ public class OrderCreationController extends SelectorComposer<Component>{
     Listbox clientPopupListbox;
     @Wire
     Datebox orderDateBox;
+    @Wire
+    Datebox orderNeedDateBox;
     @Wire
     Intbox productUnits;
     @Wire
@@ -126,23 +129,24 @@ public class OrderCreationController extends SelectorComposer<Component>{
 			Clients.showNotification("Seleccionar Cliente", clientBandbox);
 			return;
 		}
-		if(orderDateBox.getValue() == null){
-			Clients.showNotification("Debe seleccionar una fecha", orderDateBox);
+		/*
+		if(orderNeedDateBox.getValue() == null){
+			Clients.showNotification("Debe seleccionar una fecha de  necesidad", orderNeedDateBox);
 			return;
-		}
+		}*/
 		if(currentOrder == null) { // es un pedido nuevo
 			// creamos el nuevo pedido
-			currentOrder = new Order(null, currentClient.getId(), orderDateBox.getValue());
+			currentOrder = new Order(null, currentClient.getId(), orderDateBox.getValue(), orderNeedDateBox.getValue());
 			currentOrder = orderService.saveOrder(currentOrder); // se obtiene una orden con id agregado
 			for(OrderDetail orderDetail : orderDetailList) {// agregamos el id del pedido a todos los detalles y los guardamos
 				orderDetail.setIdOrder(currentOrder.getId());
 				orderDetailService.saveOrderDetail(orderDetail);
 			}
 		} else { // se edita un pedido
-			currentOrder.setDate(orderDateBox.getValue());
+			currentOrder.setNeedDate(orderNeedDateBox.getValue());
 			currentOrder.setIdClient(currentClient.getId());
 			currentOrder = orderService.updateOrder(currentOrder);
-			for(OrderDetail orderDetail : orderDetailList) {// hay que actualizar los detalles que existen y agregar las que no
+			for(OrderDetail orderDetail : orderDetailList) {// hay que actualizar los detalles que existen y agregar los que no
 				OrderDetail aux = orderDetailService.getOrderDetail(orderDetail.getIdOrder(), orderDetail.getIdProduct());
 				if(aux == null) {// no existe se agrega
 					orderDetail.setIdOrder(currentOrder.getId());// agregamos el id del pedido
@@ -220,7 +224,8 @@ public class OrderCreationController extends SelectorComposer<Component>{
   			currentClient = null;
   			clientBandbox.setValue("");
   	        clientBandbox.close();
-  	        orderDateBox.setValue(null);
+  	        orderDateBox.setValue(new Date());
+  	        orderNeedDateBox.setValue(null);
   	        orderDetailList = new ArrayList<OrderDetail>();
   	        deleteOrderButton.setDisabled(true);
   		} else {// editar pedido
@@ -228,9 +233,11 @@ public class OrderCreationController extends SelectorComposer<Component>{
   			clientBandbox.setValue(currentClient.getName());
   	        clientBandbox.close();
   	        orderDateBox.setValue(currentOrder.getDate());
+  	        orderNeedDateBox.setValue(currentOrder.getNeedDate());
   	        orderDetailList = orderDetailService.getOrderDetailList(currentOrder.getId());
   	        deleteOrderButton.setDisabled(false);
   		}
+  		orderDateBox.setDisabled(true);// nunca se debe poder modificar la fecha de creacion del pedido
   		currentOrderDetail = null;
   		refreshProductPopup();
   		refreshViewOrderDetail();

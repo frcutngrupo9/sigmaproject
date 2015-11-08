@@ -32,6 +32,10 @@
                     <datebox id="orderDateBox" cols="12" format="dd-MM-yyyy"/>
                 </hlayout>
                 <hlayout>
+                    <label value="Fecha de necesidad: "/>
+                    <datebox id="orderNeedDateBox" cols="12" format="dd-MM-yyyy"/>
+                </hlayout>
+                <hlayout>
                     <label value="Producto: "/>
                     <bandbox id="productBandbox" buttonVisible = "true" autodrop = "true">
                         <bandpopup>
