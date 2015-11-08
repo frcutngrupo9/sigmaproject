@@ -2,6 +2,14 @@
     <panel title="Pedido" id="OrderCreationBlock" border="rounded">
         <panelchildren>
             <vlayout>
+            	<hlayout>
+            		<label value="Estado: "/>
+                    <selectbox id="orderStateTypeSelectBox">
+                        <template name="model">
+                            <label value="${each.name}" />
+                        </template>
+                    </selectbox>
+                </hlayout>
                 <hlayout>
                     <label value="Cliente: "/>
                     <bandbox id="clientBandbox" buttonVisible = "true" autodrop = "true">

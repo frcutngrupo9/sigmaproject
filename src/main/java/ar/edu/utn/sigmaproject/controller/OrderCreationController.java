@@ -18,15 +18,24 @@ import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Selectbox;
 
+import ar.edu.utn.sigmaproject.domain.MeasureUnit;
+import ar.edu.utn.sigmaproject.domain.MeasureUnitType;
+import ar.edu.utn.sigmaproject.domain.OrderState;
+import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.Client;
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
+import ar.edu.utn.sigmaproject.service.OrderStateService;
+import ar.edu.utn.sigmaproject.service.OrderStateTypeService;
 import ar.edu.utn.sigmaproject.service.ProductService;
 import ar.edu.utn.sigmaproject.service.ClientService;
 import ar.edu.utn.sigmaproject.service.OrderService;
 import ar.edu.utn.sigmaproject.service.OrderDetailService;
+import ar.edu.utn.sigmaproject.service.impl.OrderStateServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.OrderStateTypeServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ClientServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.OrderServiceImpl;
@@ -63,22 +72,28 @@ public class OrderCreationController extends SelectorComposer<Component>{
     Button deleteOrderDetailButton;
     @Wire
     Button resetOrderDetailButton;
+    @Wire
+    Selectbox orderStateTypeSelectBox;
 
     // services
     private ProductService productService = new ProductServiceImpl();
     private ClientService clientService = new ClientServiceImpl();
     private OrderService orderService = new OrderServiceImpl();
     private OrderDetailService orderDetailService = new OrderDetailServiceImpl();
+    private OrderStateService orderStateService = new OrderStateServiceImpl();
+    private OrderStateTypeService orderStateTypeService = new OrderStateTypeServiceImpl();
     
     // atributes
     private Order currentOrder;
     private OrderDetail currentOrderDetail;
+    private OrderState currentOrderState;
     private Product currentProduct;
     private Client currentClient;
     
     // list
     private List<Client> clientPopupList;
     private List<Product> productPopupList;
+    private List<OrderStateType> orderStateTypeList;
     private List<OrderDetail> orderDetailList;
     private List<OrderDetail> lateDeleteOrderDetailList;
     
@@ -86,6 +101,7 @@ public class OrderCreationController extends SelectorComposer<Component>{
     private ListModelList<Product> productPopupListModel;
     private ListModelList<Client> clientPopupListModel;
     private ListModelList<OrderDetail> orderDetailListModel;
+    private ListModelList<OrderStateType> orderStateTypeListModel;
     
     @Override
     public void doAfterCompose(Component comp) throws Exception {
@@ -101,8 +117,13 @@ public class OrderCreationController extends SelectorComposer<Component>{
         
         lateDeleteOrderDetailList = new ArrayList<OrderDetail>();
         
+        orderStateTypeList = orderStateTypeService.getOrderStateTypeList();
+        orderStateTypeListModel = new ListModelList<OrderStateType>(orderStateTypeList);
+        orderStateTypeSelectBox.setModel(orderStateTypeListModel);
+        
         currentOrder = (Order) Executions.getCurrent().getAttribute("selected_order");
         currentOrderDetail = null;
+        currentOrderState = null;
         currentProduct = null;
         currentClient = null;
         refreshViewOrder();
@@ -220,7 +241,9 @@ public class OrderCreationController extends SelectorComposer<Component>{
 	}
 
     private void refreshViewOrder() {
-  		if (currentOrder == null) {// nuevo pedido
+  		if (currentOrder == null) {// nuevo pedido);
+  			orderStateTypeListModel.addToSelection(orderStateTypeService.getOrderStateType("iniciado"));
+  			orderStateTypeSelectBox.setModel(orderStateTypeListModel);
   			currentClient = null;
   			clientBandbox.setValue("");
   	        clientBandbox.close();
@@ -228,7 +251,15 @@ public class OrderCreationController extends SelectorComposer<Component>{
   	        orderNeedDateBox.setValue(null);
   	        orderDetailList = new ArrayList<OrderDetail>();
   	        deleteOrderButton.setDisabled(true);
+  	        orderStateTypeSelectBox.setDisabled(true);
   		} else {// editar pedido
+  			currentOrderState = orderStateService.getLastOrderState(currentOrder.getId());
+  			if(currentOrderState != null) {
+  				orderStateTypeListModel.addToSelection(orderStateTypeService.getOrderStateType(currentOrderState.getIdOrderStateType()));
+  				orderStateTypeSelectBox.setModel(orderStateTypeListModel);
+        	} else {
+        		orderStateTypeSelectBox.setSelectedIndex(-1);
+        	}
   			currentClient = clientService.getClient(currentOrder.getIdClient());
   			clientBandbox.setValue(currentClient.getName());
   	        clientBandbox.close();
@@ -236,6 +267,7 @@ public class OrderCreationController extends SelectorComposer<Component>{
   	        orderNeedDateBox.setValue(currentOrder.getNeedDate());
   	        orderDetailList = orderDetailService.getOrderDetailList(currentOrder.getId());
   	        deleteOrderButton.setDisabled(false);
+  	        orderStateTypeSelectBox.setDisabled(false);
   		}
   		orderDateBox.setDisabled(true);// nunca se debe poder modificar la fecha de creacion del pedido
   		currentOrderDetail = null;

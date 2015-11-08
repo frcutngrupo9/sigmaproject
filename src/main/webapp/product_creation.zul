@@ -60,12 +60,16 @@
                     </columns>
                     <rows>
                         <row>
-                            <label value="Nombre :"/>
+                            <label value="Nombre:"/>
                             <textbox id="pieceName" value=""  width="50%" placeholder="Nombre de la Pieza"/>
                         </row>
                         <row>
-                            <label value="La pieza es conjunto de otras? :"/>
+                            <label value="La pieza es conjunto de otras?:"/>
                             <checkbox id="pieceGroup" checked="false"/>
+                        </row>
+                        <row>
+                            <label value="Prefijadas :"/>
+                            <combobox id="comboMeasurePreset" autodrop="true"/>
                         </row>
                         <row>	
 		                    <label>Unidad de Medida:</label>

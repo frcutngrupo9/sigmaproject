@@ -8,5 +8,7 @@ public interface OrderStateTypeService {
 	List<OrderStateType> getOrderStateTypeList();
 	
 	OrderStateType getOrderStateType(Integer id);
+	
+	OrderStateType getOrderStateType(String name);
 
 }

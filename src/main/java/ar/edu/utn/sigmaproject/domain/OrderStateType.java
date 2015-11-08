@@ -55,7 +55,7 @@ public class OrderStateType implements Serializable, Cloneable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ProcessType other = (ProcessType) obj;
+		OrderStateType other = (OrderStateType) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;

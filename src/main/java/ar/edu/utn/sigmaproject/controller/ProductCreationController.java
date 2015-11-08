@@ -17,14 +17,17 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.util.Clients;
+import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.Label;
+import org.zkoss.zul.ListModel;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Row;
 import org.zkoss.zul.Selectbox;
+import org.zkoss.zul.SimpleListModel;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
@@ -75,8 +78,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	@Wire
 	Textbox pieceName;
 	@Wire
-        Textbox productCode;
-        @Wire
+    Textbox productCode;
+    @Wire
 	Doublebox pieceHeight;
 	@Wire
 	Doublebox pieceDepth;
@@ -96,6 +99,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	Button cancelPieceButton;
 	@Wire
     Selectbox measureUnitSelectBox;
+	@Wire
+    Combobox comboMeasurePreset;
 	
 	@Wire
 	Component processCreationBlock;
@@ -141,6 +146,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
         List<MeasureUnit> measureUnitlList = measureUnitService.getMeasureUnitList(idMeasureUnitType);
         measureUnitListModel = new ListModelList<MeasureUnit>(measureUnitlList);
         measureUnitSelectBox.setModel(measureUnitListModel);
+        
+        fillComboMeasurePreset();
         
         currentProduct = (Product) Executions.getCurrent().getAttribute("selected_product");
         currentPiece = null;
@@ -654,6 +661,14 @@ public class ProductCreationController extends SelectorComposer<Component>{
     		}
     	}
     	return "" + quantity;
+    }
+  	
+  	private void fillComboMeasurePreset() {
+  		String[] _presets = { 
+			"3x2x40", "2x2x20", "3x2x45", "1x2x15", "2x2x50", "2x2x60", "4x2x45",
+		};
+		ListModel presetsModel= new SimpleListModel(_presets);
+		comboMeasurePreset.setModel(presetsModel);
     }
   	
   	@Listen("onSelect = #pieceListbox")

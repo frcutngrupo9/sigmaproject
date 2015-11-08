@@ -49,11 +49,11 @@
             	<listcell label="${each.name}"/>
                 <listcell label="${each.id}"/>
                 <listcell label="${each.idProduct}"/>
-                <listcell label="${each.height}"/>
-                <listcell label="${each.width}"/>
-                <listcell label="${each.depth}"/>
-                <listcell label="${each.size1}"/>
-                <listcell label="${each.size2}"/>
+                <listcell label="${each.height.doubleValue()}"/>
+                <listcell label="${each.width.doubleValue()}"/>
+                <listcell label="${each.depth.doubleValue()}"/>
+                <listcell label="${each.size1.doubleValue()}"/>
+                <listcell label="${each.size2.doubleValue()}"/>
                 <listcell label="${each.units}"/>
             </listitem>
         </template>

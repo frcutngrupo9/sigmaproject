@@ -66,7 +66,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
     @Wire
     private Grid rawMaterialGrid;
     
-    private RawMaterial selectedRawMaterial;
+    private RawMaterial currentRawMaterial;
     private RawMaterialService rawMaterialService = new RawMaterialServiceImpl();
     private MeasureUnitService measureUnitService = new MeasureUnitServiceImpl();
     private MeasureUnitTypeService measureUnitTypeService = new MeasureUnitTypeServiceImpl();
@@ -79,7 +79,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
         List<RawMaterial> rawMaterialList = rawMaterialService.getRawMaterialList();
         rawMaterialListModel = new ListModelList<RawMaterial>(rawMaterialList);
         rawMaterialListbox.setModel(rawMaterialListModel);
-        selectedRawMaterial = null;
+        currentRawMaterial = null;
         
         Integer idMeasureUnitType = measureUnitTypeService.getMeasureUnitType("Longitud").getId();
         List<MeasureUnit> measureUnitlList = measureUnitService.getMeasureUnitList(idMeasureUnitType);
@@ -97,7 +97,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
     
     @Listen("onClick = #newButton")
     public void newRawMaterial() {
-        selectedRawMaterial = new RawMaterial(null, null, "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+        currentRawMaterial = new RawMaterial(null, null, "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
         updateUI();
     }
     
@@ -107,28 +107,28 @@ public class RawMaterialController extends SelectorComposer<Component>{
 			Clients.showNotification("Debe ingresar un nombre", nameTextBox);
 			return;
 		}
-    	selectedRawMaterial.setName(nameTextBox.getText());
-        selectedRawMaterial.setLength(new BigDecimal(Double.parseDouble(lengthTextBox.getText())));
-        selectedRawMaterial.setDepth(new BigDecimal(Double.parseDouble(depthTextBox.getText())));
-        selectedRawMaterial.setHeight(new BigDecimal(Double.parseDouble(heightTextBox.getText())));
-        selectedRawMaterial.setIdMeasureUnit(measureUnitListModel.getElementAt(measureUnitSelectBox.getSelectedIndex()).getId());
-    	if(selectedRawMaterial.getId() == null)	{
-    		selectedRawMaterial.setId(rawMaterialService.getNewId());
-            selectedRawMaterial = rawMaterialService.saveRawMaterial(selectedRawMaterial);
+    	currentRawMaterial.setName(nameTextBox.getText());
+        currentRawMaterial.setLength(new BigDecimal(Double.parseDouble(lengthTextBox.getText())));
+        currentRawMaterial.setDepth(new BigDecimal(Double.parseDouble(depthTextBox.getText())));
+        currentRawMaterial.setHeight(new BigDecimal(Double.parseDouble(heightTextBox.getText())));
+        currentRawMaterial.setIdMeasureUnit(measureUnitListModel.getElementAt(measureUnitSelectBox.getSelectedIndex()).getId());
+    	if(currentRawMaterial.getId() == null)	{// si es nuevo
+    		currentRawMaterial.setId(rawMaterialService.getNewId());
+            currentRawMaterial = rawMaterialService.saveRawMaterial(currentRawMaterial);
     	} else {
-    		//si es una actualizacion
-    		selectedRawMaterial = rawMaterialService.updateRawMaterial(selectedRawMaterial);
+    		// si es una edicion
+    		currentRawMaterial = rawMaterialService.updateRawMaterial(currentRawMaterial);
     	}
     	List<RawMaterial> rawMaterialList = rawMaterialService.getRawMaterialList();
         rawMaterialListModel = new ListModelList<RawMaterial>(rawMaterialList);
         rawMaterialListbox.setModel(rawMaterialListModel);
-		selectedRawMaterial = null;
+		currentRawMaterial = null;
         updateUI();
     }
     
     @Listen("onClick = #cancelButton")
     public void cancelButtonClick() {
-    	selectedRawMaterial = null;
+    	currentRawMaterial = null;
         updateUI();
     }
     
@@ -141,9 +141,9 @@ public class RawMaterialController extends SelectorComposer<Component>{
 	public void doListBoxSelect() {
 		if(rawMaterialListModel.isSelectionEmpty()){
 			//just in case for the no selection
-			selectedRawMaterial = null;
+			currentRawMaterial = null;
 		}else{
-			selectedRawMaterial = rawMaterialListModel.getSelection().iterator().next();
+			currentRawMaterial = rawMaterialListModel.getSelection().iterator().next();
 		}
 		updateUI();
 	}
@@ -153,7 +153,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
     }
     
     private void updateUI() {  
-        if(selectedRawMaterial == null) {
+        if(currentRawMaterial == null) {
 			//limpiar
         	rawMaterialGrid.setVisible(false);
         	nameTextBox.setValue(null);
@@ -169,12 +169,12 @@ public class RawMaterialController extends SelectorComposer<Component>{
 			rawMaterialListbox.clearSelection();
 		}else {
 			rawMaterialGrid.setVisible(true);
-			nameTextBox.setValue(selectedRawMaterial.getName());
-        	lengthTextBox.setValue(selectedRawMaterial.getLength().doubleValue());
-        	depthTextBox.setValue(selectedRawMaterial.getDepth().doubleValue());
-        	heightTextBox.setValue(selectedRawMaterial.getHeight().doubleValue());
-        	if(selectedRawMaterial.getIdMeasureUnit() != null) {
-        		MeasureUnitType aux = measureUnitTypeService.getMeasureUnitType(selectedRawMaterial.getIdMeasureUnit());
+			nameTextBox.setValue(currentRawMaterial.getName());
+        	lengthTextBox.setValue(currentRawMaterial.getLength().doubleValue());
+        	depthTextBox.setValue(currentRawMaterial.getDepth().doubleValue());
+        	heightTextBox.setValue(currentRawMaterial.getHeight().doubleValue());
+        	if(currentRawMaterial.getIdMeasureUnit() != null) {
+        		MeasureUnitType aux = measureUnitTypeService.getMeasureUnitType(currentRawMaterial.getIdMeasureUnit());
         		measureUnitSelectBox.setSelectedIndex(aux.getId()-1);
         	} else {
         		measureUnitSelectBox.setSelectedIndex(-1);

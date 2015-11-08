@@ -11,11 +11,11 @@ public class OrderStateTypeServiceImpl  implements OrderStateTypeService {
 	static int orderStateTypeId = 1;
 	static List<OrderStateType> orderStateTypeList = new ArrayList<OrderStateType>();  
 	static{
-		orderStateTypeList.add(new OrderStateType(orderStateTypeId++,"creado", ""));
+		orderStateTypeList.add(new OrderStateType(orderStateTypeId++,"iniciado", ""));
 		orderStateTypeList.add(new OrderStateType(orderStateTypeId++,"cancelado", ""));
 		orderStateTypeList.add(new OrderStateType(orderStateTypeId++,"planificado", ""));
 		orderStateTypeList.add(new OrderStateType(orderStateTypeId++,"en produccion", ""));
-		orderStateTypeList.add(new OrderStateType(orderStateTypeId++,"finalizado", ""));
+		orderStateTypeList.add(new OrderStateType(orderStateTypeId++,"realizado", ""));
 	}
 	
 	public List<OrderStateType> getOrderStateTypeList() {
@@ -31,6 +31,17 @@ public class OrderStateTypeServiceImpl  implements OrderStateTypeService {
 		for(int i = 0; i < size; i++){
 			OrderStateType t = orderStateTypeList.get(i);
 			if(t.getId().equals(id)) {
+				return OrderStateType.clone(t);
+			}
+		}
+		return null;
+	}
+	
+	public synchronized OrderStateType getOrderStateType(String name) {
+		int size = orderStateTypeList.size();
+		for(int i = 0; i < size; i++){
+			OrderStateType t = orderStateTypeList.get(i);
+			if(t.getName().equalsIgnoreCase(name)) {
 				return OrderStateType.clone(t);
 			}
 		}
