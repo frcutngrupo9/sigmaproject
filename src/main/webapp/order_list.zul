@@ -7,14 +7,18 @@
     <separator/>
     <grid id="orderGrid" mold="paging" pageSize="7">
     	<auxhead>
-			<auxheader label="Pedidos" colspan="5"/>
+			<auxheader label="Pedidos" colspan="9"/>
 		</auxhead>
         <columns>
         	<column width="40px" />
-            <column label="Id"/>
+            <column label="Id" width="40px" />
             <column label="Cliente"/>
             <column label="Fecha"/>
             <column label="Cantidad Productos"/>
+            <column label="Estado"/>
+            <column label="Monto Total"/>
+            <column label="Editar" width="120px" />
+            <column label="Cancelar" width="120px" />
         </columns>
         <template name="model">
             <row>
@@ -28,6 +32,10 @@
                 <label value="${win_order_list$composer.getClientName(each.idClient)}"/>
                 <label value="${each.date}"/>
                 <label value="${win_order_list$composer.quantityOfDetail(each.id)}"/>
+                <label value="${win_order_list$composer.getStateName(each.id)}"/>
+                <label value="${win_order_list$composer.totalPrice(each.id)}"/>
+                <button forward="onClick=orderGrid.onEditOrder(${each.id})"  image="/img/edit16x16.png"/>
+                <button forward="onClick=orderGrid.onCancelOrder(${each.id})"  image="/img/delete16x16.png"/>
             </row>
         </template>
     </grid>

@@ -163,6 +163,8 @@ public class OrderCreationController extends SelectorComposer<Component>{
 				orderDetail.setIdOrder(currentOrder.getId());
 				orderDetailService.saveOrderDetail(orderDetail);
 			}
+			currentOrderState = new OrderState(currentOrder.getId(), orderStateTypeListModel.getElementAt(orderStateTypeSelectBox.getSelectedIndex()).getId(), new Date());
+			orderStateService.saveOrderState(currentOrderState);// grabamos el estado del pedido
 		} else { // se edita un pedido
 			currentOrder.setNeedDate(orderNeedDateBox.getValue());
 			currentOrder.setIdClient(currentClient.getId());
@@ -179,9 +181,25 @@ public class OrderCreationController extends SelectorComposer<Component>{
 			for(OrderDetail lateDeleteOrderDetail : lateDeleteOrderDetailList) {// y eliminar los detalles que se eliminaron
 				orderDetailService.deleteOrderDetail(lateDeleteOrderDetail);
 			}
+			int selectedStateTypeId = -1; 
+			if(orderStateTypeSelectBox.getSelectedIndex() != -1) {
+				selectedStateTypeId = orderStateTypeListModel.getElementAt(orderStateTypeSelectBox.getSelectedIndex()).getId();
+			}
+			if(currentOrderState != null) {
+				if(selectedStateTypeId != -1 && selectedStateTypeId != currentOrderState.getIdOrderStateType()) {// si hay seleccionado un estado y es diferente al guardado
+					currentOrderState = new OrderState(currentOrder.getId(), selectedStateTypeId, new Date());
+					orderStateService.saveOrderState(currentOrderState);
+				}
+			} else {
+				if(selectedStateTypeId != -1) {// si hay seleccionado un estado
+					currentOrderState = new OrderState(currentOrder.getId(), selectedStateTypeId, new Date());
+					orderStateService.saveOrderState(currentOrderState);
+				}
+			}
 		}
 		currentOrder = null;
 		currentOrderDetail = null;
+		currentOrderState = null;
 		refreshViewOrder();
 		alert("Pedido guardado.");
     }
