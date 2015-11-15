@@ -1,9 +1,12 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
@@ -18,6 +21,7 @@ import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
+import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Paging;
 import org.zkoss.zul.Textbox;
 
@@ -96,9 +100,26 @@ public class OrderListController extends SelectorComposer<Component>{
     }
     
     @Listen("onCancelOrder = #orderGrid")
-  	public void doCancelOrder(ForwardEvent evt) {
-    	int idOrder = (Integer) evt.getData();
-  		alert("Se selecciono cancelar pedido " + idOrder +". [implement pend]");
+  	public void doCancelOrder(final ForwardEvent ForwEvt) {
+		Messagebox.show("Esta seguro que quiere cancelar el pedido?", "Confirmar Cancelacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+		    public void onEvent(Event evt) throws InterruptedException {
+		        if (evt.getName().equals("onOK")) {
+		        	int idOrder = (Integer) ForwEvt.getData();
+		        	if(isStateCancel(idOrder)) {
+		        		alert("No se puede cancelar un Pedido ya cancelado.");
+		        	} else {
+		        		OrderStateTypeService orderStateTypeService = new OrderStateTypeServiceImpl();
+			        	OrderStateType order_state_type = orderStateTypeService.getOrderStateType("cancelado");
+			        	OrderState aux = new OrderState(idOrder, order_state_type.getId(), new Date());
+			    		OrderStateService orderStateService = new OrderStateServiceImpl();
+			    		orderStateService.saveOrderState(aux);// grabamos el estado del pedido
+			    		refreshList();
+			            alert("Pedido cancelado.");
+		        	}
+		        }
+		    }
+		});
+  		
   	}
     
     @Listen("onEditOrder = #orderGrid")
@@ -108,6 +129,12 @@ public class OrderListController extends SelectorComposer<Component>{
         Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
     	include.setSrc("/order_creation.zul");
     }
+    
+    private void refreshList() {
+    	orderList = orderService.getOrderList();
+        orderListModel = new ListModelList<Order>(orderList);
+        orderGrid.setModel(orderListModel);
+	}
     
     public String getClientName(int idClient) {
     	return clientService.getClient(idClient).getName();
@@ -135,7 +162,24 @@ public class OrderListController extends SelectorComposer<Component>{
     	}
     }
     
-    public String totalPrice(int idOrder) {
-    	return "[implement pend]";
+    public double totalPrice(int idOrder) {
+    	List<OrderDetail> order_detail_list = orderDetailService.getOrderDetailList(idOrder);
+    	BigDecimal total_price = new BigDecimal("0");
+    	for(OrderDetail order_detail : order_detail_list) {
+    		if(order_detail.getPrice() != null) {
+    			total_price = total_price.add(order_detail.getPrice());
+    		}
+    	}
+    	return total_price.doubleValue();
+    }
+    
+    public boolean isStateCancel(int idOrder) {
+    	OrderState last_order_state = orderStateService.getLastOrderState(idOrder);
+    	OrderStateType cancel_state_type = orderStateTypeService.getOrderStateType("cancelado");
+    	if(last_order_state.getIdOrderStateType() == cancel_state_type.getId()) {
+    		return true;
+    	} else {
+    		return false;
+    	}
     }
 }

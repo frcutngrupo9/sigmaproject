@@ -7,11 +7,12 @@
     <separator/>
     <grid id="orderGrid" mold="paging" pageSize="7">
     	<auxhead>
-			<auxheader label="Pedidos" colspan="9"/>
+			<auxheader label="Pedidos" colspan="10"/>
 		</auxhead>
         <columns>
         	<column width="40px" />
             <column label="Id" width="40px" />
+            <column label="Numero"/>
             <column label="Cliente"/>
             <column label="Fecha"/>
             <column label="Cantidad Productos"/>
@@ -29,13 +30,14 @@
             		<include src="/order_products.zul" products="${products}"/>
             	</detail>
                 <label value="${each.id}"/>
+                <label value="${each.number}"/>
                 <label value="${win_order_list$composer.getClientName(each.idClient)}"/>
                 <label value="${each.date}"/>
                 <label value="${win_order_list$composer.quantityOfDetail(each.id)}"/>
                 <label value="${win_order_list$composer.getStateName(each.id)}"/>
                 <label value="${win_order_list$composer.totalPrice(each.id)}"/>
                 <button forward="onClick=orderGrid.onEditOrder(${each.id})"  image="/img/edit16x16.png"/>
-                <button forward="onClick=orderGrid.onCancelOrder(${each.id})"  image="/img/delete16x16.png"/>
+                <button disabled="${win_order_list$composer.isStateCancel(each.id)}" forward="onClick=orderGrid.onCancelOrder(${each.id})"  image="/img/delete16x16.png"/>
             </row>
         </template>
     </grid>

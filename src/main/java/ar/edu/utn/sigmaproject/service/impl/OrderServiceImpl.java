@@ -1,10 +1,16 @@
 package ar.edu.utn.sigmaproject.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.Order;
+import ar.edu.utn.sigmaproject.domain.OrderDetail;
+import ar.edu.utn.sigmaproject.domain.OrderState;
+import ar.edu.utn.sigmaproject.service.OrderDetailService;
 import ar.edu.utn.sigmaproject.service.OrderService;
+import ar.edu.utn.sigmaproject.service.OrderStateService;
+import ar.edu.utn.sigmaproject.service.OrderStateTypeService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
 public class OrderServiceImpl implements OrderService {
@@ -92,5 +98,44 @@ public class OrderServiceImpl implements OrderService {
         }
         return lastId + 1;
     }
+
+	public Order saveOrder(Order order, Integer idOrderStateType, List<OrderDetail> orderDetailList) {
+		order = saveOrder(order);// se obtiene un pedido con id agregado
+		OrderDetailService orderDetailService = new OrderDetailServiceImpl();
+		for(OrderDetail orderDetail : orderDetailList) {// agregamos el id del pedido a todos los detalles y los guardamos
+			orderDetail.setIdOrder(order.getId());
+			orderDetailService.saveOrderDetail(orderDetail);
+		}
+		OrderState aux = new OrderState(order.getId(), idOrderStateType, new Date());
+		OrderStateService orderStateService = new OrderStateServiceImpl();
+		orderStateService.saveOrderState(aux);// grabamos el estado del pedido
+		return order;
+	}
+
+	public Order updateOrder(Order order, Integer idOrderStateType, List<OrderDetail> orderDetailList, List<OrderDetail> lateDeleteOrderDetailList) {
+		order = updateOrder(order);
+		OrderDetailService orderDetailService = new OrderDetailServiceImpl();
+		for(OrderDetail orderDetail : orderDetailList) {// hay que actualizar los detalles que existen y agregar los que no
+			OrderDetail aux = orderDetailService.getOrderDetail(orderDetail.getIdOrder(), orderDetail.getIdProduct());
+			if(aux == null) {// no existe se agrega
+				orderDetail.setIdOrder(order.getId());// agregamos el id del pedido
+				orderDetailService.saveOrderDetail(orderDetail);
+			} else {// existe, se actualiza
+				orderDetailService.updateOrderDetail(orderDetail);
+			}
+		}
+		for(OrderDetail lateDeleteOrderDetail : lateDeleteOrderDetailList) {// y eliminar los detalles que se eliminaron
+			orderDetailService.deleteOrderDetail(lateDeleteOrderDetail);
+		}
+		OrderStateService orderStateService = new OrderStateServiceImpl();
+		if(idOrderStateType != null) {
+			int order_id = order.getId();
+			if(idOrderStateType != orderStateService.getLastOrderState(order_id).getIdOrderStateType()) {// si el estado seleccionado es diferente al ultimo guardado
+				OrderState aux = new OrderState(order_id, idOrderStateType, new Date());
+				orderStateService.saveOrderState(aux);
+			}
+		}
+		return order;
+	}
     
 }

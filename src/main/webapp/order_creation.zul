@@ -11,6 +11,10 @@
                     </selectbox>
                 </hlayout>
                 <hlayout>
+                    <label value="Numero: "/>
+                    <intbox id="orderNumber" constraint="no negative"/>
+                </hlayout>
+                <hlayout>
                     <label value="Cliente: "/>
                     <bandbox id="clientBandbox" buttonVisible = "true" autodrop = "true">
                         <bandpopup>
@@ -68,9 +72,9 @@
                         </bandpopup>
                     </bandbox>
                     <label value="Cantidad: "/>
-                    <intbox id="productUnits" width="36px"/>
-                    <label id="productPrice" value="Precio Unitario: "/>
-                    <doublebox constraint="no negative" format=",###.##" locale="es" width="80px"/>
+                    <intbox id="productUnits" constraint="no negative" width="36px"/>
+                    <label value="Precio Unitario: "/>
+                    <doublebox id="productPrice" constraint="no negative" format=",###.##" width="77px"/>
                     <button id="saveOrderDetailButton" label="Grabar Detalle"/>
                     <button id="resetOrderDetailButton" label="Reset Detalle"/>
                     <button id="deleteOrderDetailButton" label="Eliminar Detalle"/>
@@ -78,16 +82,18 @@
                 <separator/>
                 <listbox id="orderDetailListbox" mold="paging" pageSize="7">
                     <auxhead>
-                        <auxheader label="Productos" colspan="2"/>
+                        <auxheader label="Productos" colspan="3"/>
                     </auxhead>
                     <listhead>
                         <listheader label="Nombre Producto"/>
                         <listheader label="Unidades"/>
+                        <listheader label="Precio Unitario"/>
                     </listhead>
                     <template name="model">
                         <listitem>
                             <listcell label="${win_order_creation$composer.getProductName(each.idProduct)}"/>
                             <listcell label="${each.units}"/>
+                            <listcell label="${each.price.doubleValue()}"/>
                         </listitem>
                     </template>
                 </listbox>

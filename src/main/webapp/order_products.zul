@@ -4,14 +4,14 @@
             <column label="Id Producto" align="center"/>
             <column label="Producto" align="center"/>
             <column label="Unidades" align="center"/>
-            <column label="Monto" align="center"/>
+            <column label="Subtotal" align="center"/>
         </columns>
         <template name="model">
             <row>
                 <label value="${each.idProduct}" />
                 <label value="${win_order_list$composer.getProductName(each.idProduct)}" />
                 <label value="${each.units}" />
-                <label value="[implement pend]" />
+                <label value="${each.price.doubleValue()}" />
             </row>
         </template>
     </grid>

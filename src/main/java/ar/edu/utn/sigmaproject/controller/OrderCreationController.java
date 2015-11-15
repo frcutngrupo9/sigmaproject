@@ -1,5 +1,6 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,6 +56,8 @@ public class OrderCreationController extends SelectorComposer<Component>{
     Bandbox clientBandbox;
     @Wire
     Listbox clientPopupListbox;
+    @Wire
+    Intbox orderNumber;
     @Wire
     Datebox orderDateBox;
     @Wire
@@ -158,47 +161,20 @@ public class OrderCreationController extends SelectorComposer<Component>{
 			Clients.showNotification("Debe seleccionar una fecha de  necesidad", orderNeedDateBox);
 			return;
 		}*/
+		int client_id = currentClient.getId();
+		int order_number = orderNumber.intValue();
+		Date order_date = orderDateBox.getValue();
+		Date order_need_date = orderNeedDateBox.getValue();
+		int order_state_type_id = orderStateTypeListModel.getElementAt(orderStateTypeSelectBox.getSelectedIndex()).getId();
 		if(currentOrder == null) { // es un pedido nuevo
 			// creamos el nuevo pedido
-			currentOrder = new Order(null, currentClient.getId(), orderDateBox.getValue(), orderNeedDateBox.getValue());
-			currentOrder = orderService.saveOrder(currentOrder); // se obtiene una orden con id agregado
-			for(OrderDetail orderDetail : orderDetailList) {// agregamos el id del pedido a todos los detalles y los guardamos
-				orderDetail.setIdOrder(currentOrder.getId());
-				orderDetailService.saveOrderDetail(orderDetail);
-			}
-			currentOrderState = new OrderState(currentOrder.getId(), orderStateTypeListModel.getElementAt(orderStateTypeSelectBox.getSelectedIndex()).getId(), new Date());
-			orderStateService.saveOrderState(currentOrderState);// grabamos el estado del pedido
+			currentOrder = new Order(null, client_id, order_number, order_date, order_need_date);
+			currentOrder = orderService.saveOrder(currentOrder, order_state_type_id, orderDetailList);
 		} else { // se edita un pedido
-			currentOrder.setNeedDate(orderNeedDateBox.getValue());
-			currentOrder.setIdClient(currentClient.getId());
-			currentOrder = orderService.updateOrder(currentOrder);
-			for(OrderDetail orderDetail : orderDetailList) {// hay que actualizar los detalles que existen y agregar los que no
-				OrderDetail aux = orderDetailService.getOrderDetail(orderDetail.getIdOrder(), orderDetail.getIdProduct());
-				if(aux == null) {// no existe se agrega
-					orderDetail.setIdOrder(currentOrder.getId());// agregamos el id del pedido
-					orderDetailService.saveOrderDetail(orderDetail);
-				} else {// existe, se actualiza
-					orderDetailService.updateOrderDetail(orderDetail);
-				}
-			}
-			for(OrderDetail lateDeleteOrderDetail : lateDeleteOrderDetailList) {// y eliminar los detalles que se eliminaron
-				orderDetailService.deleteOrderDetail(lateDeleteOrderDetail);
-			}
-			int selectedStateTypeId = -1; 
-			if(orderStateTypeSelectBox.getSelectedIndex() != -1) {
-				selectedStateTypeId = orderStateTypeListModel.getElementAt(orderStateTypeSelectBox.getSelectedIndex()).getId();
-			}
-			if(currentOrderState != null) {
-				if(selectedStateTypeId != -1 && selectedStateTypeId != currentOrderState.getIdOrderStateType()) {// si hay seleccionado un estado y es diferente al guardado
-					currentOrderState = new OrderState(currentOrder.getId(), selectedStateTypeId, new Date());
-					orderStateService.saveOrderState(currentOrderState);
-				}
-			} else {
-				if(selectedStateTypeId != -1) {// si hay seleccionado un estado
-					currentOrderState = new OrderState(currentOrder.getId(), selectedStateTypeId, new Date());
-					orderStateService.saveOrderState(currentOrderState);
-				}
-			}
+			currentOrder.setIdClient(client_id);
+			currentOrder.setNeedDate(order_need_date);
+			currentOrder.setNumber(order_number);
+			currentOrder = orderService.updateOrder(currentOrder, order_state_type_id, orderDetailList, lateDeleteOrderDetailList);
 		}
 		currentOrder = null;
 		currentOrderDetail = null;
@@ -232,13 +208,17 @@ public class OrderCreationController extends SelectorComposer<Component>{
 		if(aux != null) {
 			lateDeleteOrderDetailList.remove(aux);// lo eliminamos de la lista de eliminacion tardia porque el producto sera agregado de nuevo
 		}
+		int product_id = currentProduct.getId();
+		int product_units = productUnits.getValue();
+		BigDecimal product_price = new BigDecimal(productPrice.getValue().doubleValue());
 		if(currentOrderDetail == null) { // es un detalle nuevo
 			// se crea un detalle sin id de pedido porque recien se le asignara uno al momento de grabarse definitivamente
-			currentOrderDetail = new OrderDetail(null,currentProduct.getId(), productUnits.getValue());
+			currentOrderDetail = new OrderDetail(null, product_id, product_units, product_price);
 			orderDetailList.add(currentOrderDetail);
 		} else { // se edita un detalle
-			currentOrderDetail.setIdProduct(currentProduct.getId());
-			currentOrderDetail.setUnits(productUnits.getValue());
+			currentOrderDetail.setIdProduct(product_id);
+			currentOrderDetail.setUnits(product_units);
+			currentOrderDetail.setPrice(product_price);
 			updateOrderDetailList(currentOrderDetail);// actualizamos la lista
 		}
 		refreshProductPopup();// actualizamos el popup
@@ -262,12 +242,13 @@ public class OrderCreationController extends SelectorComposer<Component>{
 	}
 
     private void refreshViewOrder() {
-  		if (currentOrder == null) {// nuevo pedido);
+  		if (currentOrder == null) {// nuevo pedido;
   			orderStateTypeListModel.addToSelection(orderStateTypeService.getOrderStateType("iniciado"));
   			orderStateTypeSelectBox.setModel(orderStateTypeListModel);
   			currentClient = null;
   			clientBandbox.setValue("");
   	        clientBandbox.close();
+  	        orderNumber.setValue(null);
   	        orderDateBox.setValue(new Date());
   	        orderNeedDateBox.setValue(null);
   	        orderDetailList = new ArrayList<OrderDetail>();
@@ -284,6 +265,7 @@ public class OrderCreationController extends SelectorComposer<Component>{
   			currentClient = clientService.getClient(currentOrder.getIdClient());
   			clientBandbox.setValue(currentClient.getName());
   	        clientBandbox.close();
+  	        orderNumber.setValue(currentOrder.getNumber());
   	        orderDateBox.setValue(currentOrder.getDate());
   	        orderNeedDateBox.setValue(currentOrder.getNeedDate());
   	        orderDetailList = orderDetailService.getOrderDetailList(currentOrder.getId());
@@ -302,14 +284,20 @@ public class OrderCreationController extends SelectorComposer<Component>{
   			// deseleccionamos la tabla y borramos la cantidad
   			productBandbox.setDisabled(false);
   			productBandbox.setValue("");
-  			productUnits.setText(null);
+  			productUnits.setValue(null);
+  			productPrice.setValue(null);
   			currentProduct = null;
   			deleteOrderDetailButton.setDisabled(true);
   		} else {
   			currentProduct = productService.getProduct(currentOrderDetail.getIdProduct());
   			productBandbox.setDisabled(true);// no se permite modificar el producto solo las unidades
   			productBandbox.setValue(getProductName(currentOrderDetail.getIdProduct()));
-  			productUnits.setText(currentOrderDetail.getUnits() + "");
+  			productUnits.setValue(currentOrderDetail.getUnits());
+  			if(currentOrderDetail.getPrice() != null) {
+  				productPrice.setValue(currentOrderDetail.getPrice().doubleValue());
+  			} else {
+  				productPrice.setValue(null);
+  			}
   			deleteOrderDetailButton.setDisabled(false);
   		}
   		productPopupListbox.clearSelection();

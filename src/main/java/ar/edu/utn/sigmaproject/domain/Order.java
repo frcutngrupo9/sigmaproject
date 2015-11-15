@@ -8,12 +8,14 @@ public class Order implements Serializable, Cloneable {
     
     Integer id;
     Integer idClient;
+    Integer number;
     Date date;
     Date needDate;
 
-    public Order(Integer id, Integer idClient, Date date, Date needDate) {
+    public Order(Integer id, Integer idClient, Integer number, Date date, Date needDate) {
         this.id = id;
         this.idClient = idClient;
+        this.number = number;
         this.date = date;
         this.needDate = needDate;
     }
@@ -32,6 +34,14 @@ public class Order implements Serializable, Cloneable {
     
     public void setIdClient(Integer idClient) {
         this.idClient = idClient;
+    }
+    
+    public Integer getNumber() {
+        return number;
+    }
+    
+    public void setNumber(Integer number) {
+        this.number = number;
     }
 
     public Date getDate() {
