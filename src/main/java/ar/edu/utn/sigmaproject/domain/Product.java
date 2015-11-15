@@ -1,6 +1,7 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 public class Product implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
@@ -9,12 +10,14 @@ public class Product implements Serializable, Cloneable {
 	String name;
 	String details;
     String code;
+    BigDecimal price;
 
-	public Product(Integer id,String code ,String name, String details) {
+	public Product(Integer id, String code , String name, String details, BigDecimal price) {
 		this.id = id;
 		this.name = name;
 		this.details = details;
         this.code = code;
+        this.price = price;
 	}
 
 	public Integer getId() {
@@ -43,6 +46,14 @@ public class Product implements Serializable, Cloneable {
 
 	public void setCode(String code) {
 		this.code = code;
+	}
+	
+	public BigDecimal getPrice() {
+		return price;
+	}
+
+	public void setPrice(BigDecimal price) {
+		this.price = price;
 	}
 
 	@Override

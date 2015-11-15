@@ -69,6 +69,8 @@
                     </bandbox>
                     <label value="Cantidad: "/>
                     <intbox id="productUnits" width="36px"/>
+                    <label id="productPrice" value="Precio Unitario: "/>
+                    <doublebox constraint="no negative" format=",###.##" locale="es" width="80px"/>
                     <button id="saveOrderDetailButton" label="Grabar Detalle"/>
                     <button id="resetOrderDetailButton" label="Reset Detalle"/>
                     <button id="deleteOrderDetailButton" label="Eliminar Detalle"/>

@@ -61,6 +61,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	@Wire
 	Textbox productDetails;
 	@Wire
+	Doublebox productPrice;
+	@Wire
 	Button createPieceButton;
 	@Wire
 	Button resetPieceButton;
@@ -101,7 +103,6 @@ public class ProductCreationController extends SelectorComposer<Component>{
     Selectbox measureUnitSelectBox;
 	@Wire
     Combobox comboMeasurePreset;
-	
 	@Wire
 	Component processCreationBlock;
 	@Wire
@@ -163,74 +164,18 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	String product_name = productName.getText();
     	String product_details = productDetails.getText();
         String product_code = productCode.getText();
+        BigDecimal product_price = new BigDecimal(productPrice.doubleValue());
     	
     	if(currentProduct == null) {// se esta creando un nuevo producto
     		Integer product_id = productService.getNewId();
-    		currentProduct = new Product(product_id,product_code, product_name, product_details);
-    		productService.saveProduct(currentProduct);
-    		if(pieceList != null && pieceList.isEmpty() == false) {// se guardan todas las piezas
-        		for(int i = 0; i < pieceList.size(); i++) {
-        			pieceList.get(i).setIdProduct(currentProduct.getId());// se le asigna el id del producto
-        			pieceService.savePiece(pieceList.get(i));
-        		}
-        	}
-        	if(processList != null && processList.isEmpty() == false) {// se guardan todos los procesos
-        		for(int i = 0; i < processList.size(); i++) {
-        			processService.saveProcess(processList.get(i));
-        		}
-        	}
+    		currentProduct = new Product(product_id, product_code, product_name, product_details, product_price);
+    		productService.saveProduct(currentProduct, pieceList, processList);
     	} else {// se esta editando un producto
     		currentProduct.setName(product_name);
     		currentProduct.setDetails(product_details);
-                currentProduct.setCode(product_code);
-    		currentProduct = productService.updateProduct(currentProduct);
-    		if(pieceList != null) {// se actualizan todas las piezas
-    			// primero eliminamos las piezas que estan en el service, pero que no existen mas en el producto
-    			List<Piece> auxPieceList = pieceService.getPieceList(currentProduct.getId());// obtenemos las piezas del producto que estan en el servicio
-    			for(Piece auxPiece:auxPieceList) {// recorremos todas las piezas obtenidas
-    				Piece aux = searchPiece(auxPiece.getId());// buscamos en la lista para ver si esta tambien ahi
-					if(aux == null) {// si la pieza no esta en la lista se debe eliminar del service
-						pieceService.deletePiece(auxPiece);// eliminamos la pieza, el servicio se encarga de eliminar los procesos relacionados a esa pieza
-					}
-    			}
-    			// ahora recorremos la lista para actualizar las piezas que ya existen o agregar las que no
-        		for(Piece current:pieceList) {
-        			Piece auxPiece = pieceService.getPiece(current.getId());// se busca a ver si existe la pieza
-        			if(auxPiece == null) {// es una nueva pieza, se graba
-        				current.setIdProduct(currentProduct.getId());// se le asigna el id del producto
-        				pieceService.savePiece(current);
-        			} else {// esta pieza existe, se actualiza
-        				pieceService.updatePiece(current);
-        			}
-        		}
-        	}
-    		if(processList != null) {// se actualizan todos los procesos
-    			// primero eliminamos los procesos que estan en el service, pero que no existen mas en el producto
-    		    List<Process> completeProcessList = new ArrayList<Process>();
-    		    List<Piece> auxPieceList = pieceService.getPieceList(currentProduct.getId());// obtenemos las piezas del producto que estan en el servicio
-                for(Piece auxPiece:auxPieceList) {// recorremos todas las piezas del producto
-                    List<Process> auxProcessList = processService.getProcessList(auxPiece.getId());// por cada pieza buscamos sus procesos
-                    for(Process auxProcess:auxProcessList) {
-                        completeProcessList.add(auxProcess);// agregamos los procesos a la lista completa
-                    }
-                }
-                for(Process auxProcess:completeProcessList) {// recorremos la lista completa de procesos que estan en el servicio
-                    Process aux = searchProcess(auxProcess.getIdPiece(), auxProcess.getIdProcessType());
-                    if(aux == null) {// si el proceso no esta en la lista se debe eliminar del service
-                        processService.deleteProcess(auxProcess);
-                    }
-                }
-    			// ahora recorremos la lista para actualizar los procesos que ya existen o agregar los que no
-    			for(int i = 0; i < processList.size(); i++) {
-    				Integer pieceId = processList.get(i).getIdPiece();
-    				Integer processTypeId = processList.get(i).getIdProcessType();
-    				if(processService.getProcess(pieceId, processTypeId) == null) {// no existe, se guarda
-    					processService.saveProcess(processList.get(i));
-    				} else {// existe, se actualiza
-    					processService.updateProcess(processList.get(i));
-    				}
-        		}
-        	}
+            currentProduct.setCode(product_code);
+            currentProduct.setPrice(product_price);;
+    		currentProduct = productService.updateProduct(currentProduct, pieceList, processList);
     	}
 		// mostrar mensaje al user
 		Clients.showNotification("Producto guardado");
@@ -426,7 +371,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
   		    deleteProductButton.setDisabled(true);
   			productName.setText("");
   			productDetails.setText("");
-                        productCode.setText("");
+  			productCode.setText("");
+  			productPrice.setText("");
   			processList = new ArrayList<Process>();
   			pieceList = new ArrayList<Piece>();
   			pieceListModel = new ListModelList<Piece>(pieceList);
@@ -435,7 +381,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
   		    deleteProductButton.setDisabled(false);
   			productName.setText(currentProduct.getName());
   			productDetails.setText(currentProduct.getDetails());
-                        productCode.setText(currentProduct.getCode());
+  			productCode.setText(currentProduct.getCode());
+  			productPrice.setValue(currentProduct.getPrice().doubleValue());
   			processList = getProcessList(currentProduct.getId());
   			pieceList = pieceService.getPieceList(currentProduct.getId());
   	        pieceListModel = new ListModelList<Piece>(pieceList);
@@ -544,17 +491,6 @@ public class ProductCreationController extends SelectorComposer<Component>{
   		return piece_id;
     }
   	
-  	private Piece searchPiece(Integer idPiece) {
-  		int size = pieceList.size();
-  		for(int i = 0; i < size; i++) {
-  			Piece t = pieceList.get(i);
-  			if(t.getId().equals(idPiece)) {
-  				return Piece.clone(t);
-  			}
-  		}
-  		return null;
-    }
-  	
   	private  Piece updatePieceList(Piece piece) {
 		if(piece.getId() == null) {
 			throw new IllegalArgumentException("can't update a null-id piece");
@@ -595,17 +531,6 @@ public class ProductCreationController extends SelectorComposer<Component>{
             }
 		}
 	}
-  	
-  	private Process searchProcess(Integer idPiece, Integer idProcessType) {
-  		int size = processList.size();
-  		for(int i = 0; i < size; i++) {
-  			Process t = processList.get(i);
-  			if(t.getIdPiece().equals(idPiece) && t.getIdProcessType().equals(idProcessType)) {
-  				return Process.clone(t);
-  			}
-  		}
-  		return null;
-    }
   	
   	private List<Process> getProcessList(Integer idProduct) {// buscar todos los procesos de ese producto
   		List<Process> list = new ArrayList<Process>();
@@ -732,4 +657,15 @@ public class ProductCreationController extends SelectorComposer<Component>{
   		refreshViewPiece();
   		pieceCreationBlock.setVisible(true);
   	}
+  	
+  	private Process searchProcess(Integer idPiece, Integer idProcessType) {
+  		int size = processList.size();
+  		for(int i = 0; i < size; i++) {
+  			Process t = processList.get(i);
+  			if(t.getIdPiece().equals(idPiece) && t.getIdProcessType().equals(idProcessType)) {
+  				return Process.clone(t);
+  			}
+  		}
+  		return null;
+    }
 }

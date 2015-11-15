@@ -112,4 +112,98 @@ public class ProductServiceImpl implements ProductService {
 		return value;
 	}
 
+	public Product saveProduct(Product product, List<Piece> pieceList, List<Process> processList) {
+		product = saveProduct(product);
+		PieceService pieceService = new PieceServiceImpl();
+		if(pieceList != null && pieceList.isEmpty() == false) {// se guardan todas las piezas
+    		for(int i = 0; i < pieceList.size(); i++) {
+    			pieceList.get(i).setIdProduct(product.getId());// se le asigna el id del producto
+    			pieceService.savePiece(pieceList.get(i));
+    		}
+    	}
+		ProcessService processService = new ProcessServiceImpl();
+    	if(processList != null && processList.isEmpty() == false) {// se guardan todos los procesos
+    		for(int i = 0; i < processList.size(); i++) {
+    			processService.saveProcess(processList.get(i));
+    		}
+    	}
+		return product;
+	}
+
+	public Product updateProduct(Product product, List<Piece> pieceList, List<Process> processList) {
+		product = updateProduct(product);
+		PieceService pieceService = new PieceServiceImpl();
+		ProcessService processService = new ProcessServiceImpl();
+		if(pieceList != null) {// se actualizan todas las piezas
+			// primero eliminamos las piezas que estan en el service, pero que no existen mas en el producto
+			List<Piece> auxPieceList = pieceService.getPieceList(product.getId());// obtenemos las piezas del producto que estan en el servicio
+			for(Piece auxPiece:auxPieceList) {// recorremos todas las piezas obtenidas
+				Piece aux = searchPiece(auxPiece.getId(), pieceList);// buscamos en la lista para ver si esta tambien ahi
+				if(aux == null) {// si la pieza no esta en la lista se debe eliminar del service
+					pieceService.deletePiece(auxPiece);// eliminamos la pieza, el servicio se encarga de eliminar los procesos relacionados a esa pieza
+				}
+			}
+			// ahora recorremos la lista para actualizar las piezas que ya existen o agregar las que no
+    		for(Piece current:pieceList) {
+    			Piece auxPiece = pieceService.getPiece(current.getId());// se busca a ver si existe la pieza
+    			if(auxPiece == null) {// es una nueva pieza, se graba
+    				current.setIdProduct(product.getId());// se le asigna el id del producto
+    				pieceService.savePiece(current);
+    			} else {// esta pieza existe, se actualiza
+    				pieceService.updatePiece(current);
+    			}
+    		}
+    	}
+		if(processList != null) {// se actualizan todos los procesos
+			// primero eliminamos los procesos que estan en el service, pero que no existen mas en el producto
+		    List<Process> completeProcessList = new ArrayList<Process>();
+		    List<Piece> auxPieceList = pieceService.getPieceList(product.getId());// obtenemos las piezas del producto que estan en el servicio
+            for(Piece auxPiece:auxPieceList) {// recorremos todas las piezas del producto
+                List<Process> auxProcessList = processService.getProcessList(auxPiece.getId());// por cada pieza buscamos sus procesos
+                for(Process auxProcess:auxProcessList) {
+                    completeProcessList.add(auxProcess);// agregamos los procesos a la lista completa
+                }
+            }
+            for(Process auxProcess:completeProcessList) {// recorremos la lista completa de procesos que estan en el servicio
+                Process aux = searchProcess(auxProcess.getIdPiece(), auxProcess.getIdProcessType(), processList);
+                if(aux == null) {// si el proceso no esta en la lista se debe eliminar del service
+                    processService.deleteProcess(auxProcess);
+                }
+            }
+			// ahora recorremos la lista para actualizar los procesos que ya existen o agregar los que no
+			for(int i = 0; i < processList.size(); i++) {
+				Integer pieceId = processList.get(i).getIdPiece();
+				Integer processTypeId = processList.get(i).getIdProcessType();
+				if(processService.getProcess(pieceId, processTypeId) == null) {// no existe, se guarda
+					processService.saveProcess(processList.get(i));
+				} else {// existe, se actualiza
+					processService.updateProcess(processList.get(i));
+				}
+    		}
+    	}
+		return null;
+	}
+	
+	private Piece searchPiece(Integer idPiece, List<Piece> pieceList) {
+  		int size = pieceList.size();
+  		for(int i = 0; i < size; i++) {
+  			Piece t = pieceList.get(i);
+  			if(t.getId().equals(idPiece)) {
+  				return Piece.clone(t);
+  			}
+  		}
+  		return null;
+    }
+	
+	private Process searchProcess(Integer idPiece, Integer idProcessType, List<Process> processList) {
+  		int size = processList.size();
+  		for(int i = 0; i < size; i++) {
+  			Process t = processList.get(i);
+  			if(t.getIdPiece().equals(idPiece) && t.getIdProcessType().equals(idProcessType)) {
+  				return Process.clone(t);
+  			}
+  		}
+  		return null;
+    }
+
 }

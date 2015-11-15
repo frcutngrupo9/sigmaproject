@@ -14,6 +14,7 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Datebox;
+import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
@@ -60,6 +61,8 @@ public class OrderCreationController extends SelectorComposer<Component>{
     Datebox orderNeedDateBox;
     @Wire
     Intbox productUnits;
+    @Wire
+    Doublebox productPrice;
     @Wire
     Button resetOrderButton;
     @Wire

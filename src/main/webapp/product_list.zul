@@ -7,13 +7,14 @@
     <separator/>
     <listbox id="productListbox" mold="paging" pageSize="7">
     	<auxhead>
-			<auxheader label="Productos" colspan="4"/>
+			<auxheader label="Productos" colspan="5"/>
 		</auxhead>
         <listhead>
             <listheader label="Id"/>
             <listheader label="Codigo"/>
             <listheader label="Nombre"/>
             <listheader label="Detalles"/>
+            <listheader label="Precio"/>
         </listhead>
         <template name="model">
             <listitem>
@@ -21,6 +22,7 @@
                 <listcell label="${each.code}"/>
                 <listcell label="${each.name}"/>
                 <listcell label="${each.details}"/>
+                <listcell label="${each.price.doubleValue()}"/>
             </listitem>
         </template>
     </listbox>
