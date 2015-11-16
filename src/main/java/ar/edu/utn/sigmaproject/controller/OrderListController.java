@@ -167,7 +167,7 @@ public class OrderListController extends SelectorComposer<Component>{
     	BigDecimal total_price = new BigDecimal("0");
     	for(OrderDetail order_detail : order_detail_list) {
     		if(order_detail.getPrice() != null) {
-    			total_price = total_price.add(order_detail.getPrice());
+    			total_price = total_price.add(getSubTotal(order_detail.getUnits(), order_detail.getPrice()));
     		}
     	}
     	return total_price.doubleValue();
@@ -176,10 +176,14 @@ public class OrderListController extends SelectorComposer<Component>{
     public boolean isStateCancel(int idOrder) {
     	OrderState last_order_state = orderStateService.getLastOrderState(idOrder);
     	OrderStateType cancel_state_type = orderStateTypeService.getOrderStateType("cancelado");
-    	if(last_order_state.getIdOrderStateType() == cancel_state_type.getId()) {
+    	if(last_order_state.getIdOrderStateType().equals(cancel_state_type.getId())) {// si el ultimo tiene estado cancelado
     		return true;
     	} else {
     		return false;
     	}
+    }
+    
+    public BigDecimal getSubTotal(int units, BigDecimal price) {
+    	return price.multiply(new BigDecimal(units));
     }
 }

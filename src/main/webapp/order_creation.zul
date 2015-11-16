@@ -82,20 +82,25 @@
                 <separator/>
                 <listbox id="orderDetailListbox" mold="paging" pageSize="7">
                     <auxhead>
-                        <auxheader label="Productos" colspan="3"/>
+                        <auxheader label="Productos" colspan="4"/>
                     </auxhead>
                     <listhead>
                         <listheader label="Nombre Producto"/>
                         <listheader label="Unidades"/>
-                        <listheader label="Precio Unitario"/>
+                        <listheader label="Monto Unitario"/>
+                        <listheader label="Subtotal"/>
                     </listhead>
                     <template name="model">
                         <listitem>
                             <listcell label="${win_order_creation$composer.getProductName(each.idProduct)}"/>
                             <listcell label="${each.units}"/>
                             <listcell label="${each.price.doubleValue()}"/>
+                            <listcell label="${win_order_creation$composer.getSubTotal(each.units, each.price).doubleValue()}"/>
                         </listitem>
                     </template>
+                    <listfoot>
+			            <listfooter><label id="orderTotalPriceLabel"/></listfooter>
+			        </listfoot>
                 </listbox>
                 <hlayout>
                     <button id="saveOrderButton" label="Guardar Pedido"/>

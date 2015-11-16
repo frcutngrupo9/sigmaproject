@@ -17,6 +17,7 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Intbox;
+import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
@@ -80,6 +81,8 @@ public class OrderCreationController extends SelectorComposer<Component>{
     Button resetOrderDetailButton;
     @Wire
     Selectbox orderStateTypeSelectBox;
+    @Wire
+    Label orderTotalPriceLabel;
 
     // services
     private ProductService productService = new ProductServiceImpl();
@@ -140,6 +143,10 @@ public class OrderCreationController extends SelectorComposer<Component>{
         currentProduct = (Product) productPopupListbox.getSelectedItem().getValue();
         productBandbox.setValue(currentProduct.getName());
         productBandbox.close();
+        BigDecimal product_price = currentProduct.getPrice();
+        if(product_price != null) {
+        	productPrice.setValue(currentProduct.getPrice().doubleValue());
+        }
     }
     
     @Listen("onSelect = #clientPopupListbox")
@@ -239,6 +246,7 @@ public class OrderCreationController extends SelectorComposer<Component>{
     private void refreshOrderDetailListbox() {
     	orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
 		orderDetailListbox.setModel(orderDetailListModel);// actualizamos la vista del order detail
+		orderTotalPriceLabel.setValue("Monto Total: " + getTotalPrice().doubleValue());
 	}
 
     private void refreshViewOrder() {
@@ -307,6 +315,22 @@ public class OrderCreationController extends SelectorComposer<Component>{
     public String getProductName(int idProduct) {
 		Product aux = productService.getProduct(idProduct);
 		return aux.getName();
+    }
+    
+    public BigDecimal getSubTotal(int units, BigDecimal price) {
+    	return price.multiply(new BigDecimal(units));
+    }
+    
+    public BigDecimal getTotalPrice() {
+    	BigDecimal total_price = new BigDecimal("0");
+    	if(orderDetailList != null) {
+    		for(OrderDetail order_detail : orderDetailList) {
+        		if(order_detail.getPrice() != null) {
+        			total_price = total_price.add(getSubTotal(order_detail.getUnits(), order_detail.getPrice()));
+        		}
+        	}
+    	}
+    	return total_price;
     }
     
     public String getClientName(int idClient) {
