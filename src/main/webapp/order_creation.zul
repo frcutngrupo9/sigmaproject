@@ -1,4 +1,5 @@
 <window id="win_order_creation" apply="ar.edu.utn.sigmaproject.controller.OrderCreationController" width="95%" style="background:white">
+    <caption id="orderCaption" label="Creacion/Edicion de Pedido"/>
     <panel title="Pedido" id="OrderCreationBlock" border="rounded">
         <panelchildren>
             <vlayout>

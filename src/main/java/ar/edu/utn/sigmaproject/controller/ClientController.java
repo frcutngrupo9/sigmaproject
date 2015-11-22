@@ -22,58 +22,53 @@ public class ClientController extends SelectorComposer<Component>{
     private static final long serialVersionUID = 1L;
     
     @Wire
-    private Textbox searchTextbox;
-    
+    Textbox searchTextbox;
     @Wire
-    private Listbox clientListbox;
-    
+    Listbox clientListbox;
     @Wire
-    private Button saveButton;
-    
+    Button newButton;
     @Wire
-    private Button cancelButton;
-    
+    Grid clientGrid;
     @Wire
-    private Button resetButton;
-    
+    Button saveButton;
     @Wire
-    private Button deleteButton;
-    
+    Button cancelButton;
     @Wire
-    private Button newButton;
-    
+    Button resetButton;
     @Wire
-    private Textbox nameTextBox;
-
+    Button deleteButton;
     @Wire
-    private Textbox phoneTextBox;
-    
+    Textbox nameTextBox;
     @Wire
-    private Textbox emailTextBox;
-    
+    Textbox phoneTextBox;
     @Wire
-    private Textbox addressTextBox;
-
+    Textbox emailTextBox;
     @Wire
-    private Textbox detailsTextBox;
+    Textbox addressTextBox;
+    @Wire
+    Textbox detailsTextBox;
     
     
-    @Wire
-    private Grid clientGrid;
-    
-    private Client selectedClient;
+    // services
     private ClientService clientService = new ClientServiceImpl();
+    
+    // atributes
+    private Client currentClient;
+    
+    // list
+    private List<Client> clientList;
+    
+    // list models
     private ListModelList<Client> clientListModel;
     
     @Override
-    public void doAfterCompose(Component comp) throws Exception{
+    public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
-        List<Client> clientList = clientService.getClientList();
+        clientList = clientService.getClientList();
         clientListModel = new ListModelList<Client>(clientList);
         clientListbox.setModel(clientListModel);
-        selectedClient = null;
-        
-        updateUI();
+        currentClient = null;
+        refreshView();
     }
     
     @Listen("onClick = #searchButton")
@@ -82,8 +77,8 @@ public class ClientController extends SelectorComposer<Component>{
     
     @Listen("onClick = #newButton")
     public void newButtonClick() {
-        selectedClient = new Client(null, "", "", "", "", "");
-        updateUI();
+        currentClient = new Client(null, "", "", "", "", "");
+        refreshView();
     }
     
     @Listen("onClick = #saveButton")
@@ -92,57 +87,59 @@ public class ClientController extends SelectorComposer<Component>{
             Clients.showNotification("Debe ingresar un nombre", nameTextBox);
             return;
         }
-        selectedClient.setName(nameTextBox.getText());
-        selectedClient.setPhone(phoneTextBox.getText());
-        selectedClient.setEmail(emailTextBox.getText());
-        selectedClient.setAddress(addressTextBox.getText());
-        selectedClient.setDetails(detailsTextBox.getText());
-        if(selectedClient.getId() == null) {
-            selectedClient = clientService.saveClient(selectedClient);
+        currentClient.setName(nameTextBox.getText());
+        currentClient.setPhone(phoneTextBox.getText());
+        currentClient.setEmail(emailTextBox.getText());
+        currentClient.setAddress(addressTextBox.getText());
+        currentClient.setDetails(detailsTextBox.getText());
+        if(currentClient.getId() == null) {// nuevo cliente
+            currentClient = clientService.saveClient(currentClient);
         } else {
-            //si es una actualizacion
-            selectedClient = clientService.updateClient(selectedClient);
+            // si es una actualizacion
+            currentClient = clientService.updateClient(currentClient);
         }
-        List<Client> clientList = clientService.getClientList();
+        clientList = clientService.getClientList();
         clientListModel = new ListModelList<Client>(clientList);
-        clientListbox.setModel(clientListModel);
-        selectedClient = null;
-        updateUI();
+        currentClient = null;
+        refreshView();
     }
     
     @Listen("onClick = #cancelButton")
     public void cancelButtonClick() {
-        selectedClient = null;
-        updateUI();
+        currentClient = null;
+        refreshView();
     }
     
     @Listen("onClick = #resetButton")
     public void resetButtonClick() {
-        updateUI();
+        refreshView();
     }
     
     @Listen("onClick = #deleteButton")
     public void deleteButtonClick() {
-        clientService.deleteClient(selectedClient);
-        clientListModel.remove(selectedClient);
-        clientListbox.setModel(clientListModel);
-        selectedClient = null;
-        updateUI();
+        clientService.deleteClient(currentClient);
+        clientListModel.remove(currentClient);
+        currentClient = null;
+        refreshView();
     }
     
     @Listen("onSelect = #clientListbox")
     public void doListBoxSelect() {
         if(clientListModel.isSelectionEmpty()) {
             //just in case for the no selection
-            selectedClient = null;
+            currentClient = null;
         } else {
-            selectedClient = clientListModel.getSelection().iterator().next();
+        	if(currentClient == null) {// si no hay nada editandose
+        		currentClient = clientListModel.getSelection().iterator().next();
+        	}
         }
-        updateUI();
+        refreshView();
     }
     
-    private void updateUI() {  
-        if(selectedClient == null) {
+    private void refreshView() {
+    	clientListModel.clearSelection();
+    	clientListbox.setModel(clientListModel);// se actualiza la lista
+        if(currentClient == null) {// no se esta editando ni creando
             clientGrid.setVisible(false);
             nameTextBox.setValue(null);
             phoneTextBox.setValue(null);
@@ -154,19 +151,18 @@ public class ClientController extends SelectorComposer<Component>{
             resetButton.setDisabled(true);
             deleteButton.setDisabled(true);
             newButton.setDisabled(false);
-            clientListbox.clearSelection();
-        } else {
+        } else {// editando o creando
             clientGrid.setVisible(true);
-            nameTextBox.setValue(selectedClient.getName());
-            phoneTextBox.setValue(selectedClient.getPhone());
-            emailTextBox.setValue(selectedClient.getEmail());
-            addressTextBox.setValue(selectedClient.getAddress());
-            detailsTextBox.setValue(selectedClient.getDetails());
+            nameTextBox.setValue(currentClient.getName());
+            phoneTextBox.setValue(currentClient.getPhone());
+            emailTextBox.setValue(currentClient.getEmail());
+            addressTextBox.setValue(currentClient.getAddress());
+            detailsTextBox.setValue(currentClient.getDetails());
             
             saveButton.setDisabled(false);
             cancelButton.setDisabled(false);
             resetButton.setDisabled(false);
-            if(selectedClient.getId() == null) {
+            if(currentClient.getId() == null) {
                 deleteButton.setDisabled(true);
             } else {
                 deleteButton.setDisabled(false);

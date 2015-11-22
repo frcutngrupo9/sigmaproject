@@ -17,6 +17,7 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.util.Clients;
+import org.zkoss.zul.Caption;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Intbox;
@@ -109,6 +110,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	Listbox processListbox;
 	@Wire
 	Listbox pieceListbox;
+	@Wire
+	Caption productCaption;
      
     // services
 	ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
@@ -368,6 +371,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
   	*/
   	private void refreshViewProduct() {
   		if (currentProduct == null) {
+  			productCaption.setLabel("Creacion de Producto");
   		    deleteProductButton.setDisabled(true);
   			productName.setText("");
   			productDetails.setText("");
@@ -378,11 +382,17 @@ public class ProductCreationController extends SelectorComposer<Component>{
   			pieceListModel = new ListModelList<Piece>(pieceList);
   	        pieceListbox.setModel(pieceListModel);
   		} else {
+  			productCaption.setLabel("Edicion de Producto");
   		    deleteProductButton.setDisabled(false);
   			productName.setText(currentProduct.getName());
   			productDetails.setText(currentProduct.getDetails());
   			productCode.setText(currentProduct.getCode());
-  			productPrice.setValue(currentProduct.getPrice().doubleValue());
+  			BigDecimal product_price = currentProduct.getPrice();
+  			if(product_price != null) {
+  				productPrice.setValue(product_price.doubleValue());
+  			}else {
+  				productPrice.setValue(null);
+  			}
   			processList = getProcessList(currentProduct.getId());
   			pieceList = pieceService.getPieceList(currentProduct.getId());
   	        pieceListModel = new ListModelList<Piece>(pieceList);

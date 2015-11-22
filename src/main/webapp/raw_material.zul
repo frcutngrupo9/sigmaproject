@@ -17,9 +17,9 @@
             <listitem>
                 <listcell label="${each.name}"/>
                 <listcell label="${win_raw_material$composer.getMeasureUnitName(each.idMeasureUnit)}"/>
-                <listcell label="${each.length}"/>
-                <listcell label="${each.depth}"/>
-                <listcell label="${each.height}"/>
+                <listcell label="${each.length.doubleValue()}"/>
+                <listcell label="${each.depth.doubleValue()}"/>
+                <listcell label="${each.height.doubleValue()}"/>
             </listitem>
         </template>
     </listbox>
@@ -37,11 +37,11 @@
             <rows>
                 <row>	
                     <label>Nombre:</label>
-                    <textbox id="nameTextBox" value="" hflex="1"/>
+                    <textbox id="nameTextbox" value="" hflex="1"/>
                 </row>
                 <row>	
                     <label>Unidad de Medida:</label>
-                    <selectbox id="measureUnitSelectBox">
+                    <selectbox id="measureUnitSelectbox">
                         <template name="model">
                             <label value="${each.name}" />
                         </template>
@@ -49,24 +49,25 @@
                 </row>
                 <row>	
                     <label>Largo:</label>
-                    <doublebox id="lengthTextBox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
+                    <doublebox id="lengthDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
                 </row>
                 <row>	
                     <label>Grueso:</label>
-                    <doublebox id="depthTextBox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
+                    <doublebox id="depthDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
                 </row>
                 <row>	
                     <label>Ancho:</label>
-                    <doublebox id="heightTextBox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
+                    <doublebox id="heightDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
                 </row>
                 <row>
                     <cell colspan="2" style="text-align:center">
-                    <hlayout>
-                        <button id="saveButton" label="Guardar"/>
-                        <button id="cancelButton" label="Cancelar"/>
-                        <button id="resetButton" label="Reset"/>
-                    </hlayout>
-                </cell>
+	                    <hlayout>
+	                        <button id="saveButton" label="Guardar"/>
+	                        <button id="cancelButton" label="Cancelar"/>
+	                        <button id="resetButton" label="Reset"/>
+	                        <button id="deleteButton" label="Eliminar"/>
+	                    </hlayout>
+	                </cell>
                 </row>
             </rows>
         </grid>

@@ -16,24 +16,24 @@ public class ClientServiceImpl implements ClientService {
         List<Client> aux = serializator.obtenerLista();
         if(aux != null) {
             clientList = aux;
-        } else {
+        }else {
             serializator.grabarLista(clientList);
         }
     }
     
     public synchronized List<Client> getClientList() {
         List<Client> list = new ArrayList<Client>();
-        for(Client product:clientList){
-            list.add(Client.clone(product));
+        for(Client client: clientList) {
+            list.add(Client.clone(client));
         }
         return list;
     }
     
     public synchronized Client getClient(Integer id) {
         int size = clientList.size();
-        for(int i=0;i<size;i++){
+        for(int i=0; i<size; i++) {
             Client t = clientList.get(i);
-            if(t.getId().equals(id)){
+            if(t.getId().equals(id)) {
                 return Client.clone(t);
             }
         }
@@ -51,14 +51,14 @@ public class ClientServiceImpl implements ClientService {
     }
     
     public synchronized Client updateClient(Client client) {
-        if(client.getId()==null){
+        if(client.getId() == null) {
             throw new IllegalArgumentException("can't update a null-id client, save it first");
-        }else{
+        }else {
             client = Client.clone(client);
             int size = clientList.size();
-            for(int i=0;i<size;i++){
+            for(int i=0;i<size;i++) {
                 Client t = clientList.get(i);
-                if(t.getId().equals(client.getId())){
+                if(t.getId().equals(client.getId())) {
                     clientList.set(i, client);
                     serializator.grabarLista(clientList);
                     return client;
@@ -69,11 +69,11 @@ public class ClientServiceImpl implements ClientService {
     }
     
     public synchronized void deleteClient(Client client) {
-        if(client.getId()!=null){
+        if(client.getId() != null) {
             int size = clientList.size();
-            for(int i=0;i<size;i++){
+            for(int i=0; i<size; i++){
                 Client t = clientList.get(i);
-                if(t.getId().equals(client.getId())){
+                if(t.getId().equals(client.getId())) {
                     clientList.remove(i);
                     serializator.grabarLista(clientList);
                     return;
@@ -82,7 +82,7 @@ public class ClientServiceImpl implements ClientService {
         }
     }
     
-    public synchronized Integer getNewId() {
+    private synchronized Integer getNewId() {
         Integer lastId = 0;
         for(int i=0;i<clientList.size();i++){
             Client aux = clientList.get(i);

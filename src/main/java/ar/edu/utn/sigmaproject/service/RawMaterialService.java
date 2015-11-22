@@ -15,7 +15,4 @@ public interface RawMaterialService {
 	RawMaterial updateRawMaterial(RawMaterial rawMaterial);
 
 	void deleteRawMaterial(RawMaterial rawMaterial);
-
-	Integer getNewId();
-
 }

@@ -14,6 +14,7 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Caption;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Intbox;
@@ -83,6 +84,8 @@ public class OrderCreationController extends SelectorComposer<Component>{
     Selectbox orderStateTypeSelectBox;
     @Wire
     Label orderTotalPriceLabel;
+    @Wire
+	Caption orderCaption;
 
     // services
     private ProductService productService = new ProductServiceImpl();
@@ -250,7 +253,8 @@ public class OrderCreationController extends SelectorComposer<Component>{
 	}
 
     private void refreshViewOrder() {
-  		if (currentOrder == null) {// nuevo pedido;
+  		if (currentOrder == null) {// nuevo pedido
+  			orderCaption.setLabel("Creacion de Pedido");
   			orderStateTypeListModel.addToSelection(orderStateTypeService.getOrderStateType("iniciado"));
   			orderStateTypeSelectBox.setModel(orderStateTypeListModel);
   			currentClient = null;
@@ -263,6 +267,7 @@ public class OrderCreationController extends SelectorComposer<Component>{
   	        deleteOrderButton.setDisabled(true);
   	        orderStateTypeSelectBox.setDisabled(true);
   		} else {// editar pedido
+  			orderCaption.setLabel("Edicion de Pedido");
   			currentOrderState = orderStateService.getLastOrderState(currentOrder.getId());
   			if(currentOrderState != null) {
   				orderStateTypeListModel.addToSelection(orderStateTypeService.getOrderStateType(currentOrderState.getIdOrderStateType()));

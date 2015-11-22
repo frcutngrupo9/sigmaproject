@@ -56,16 +56,16 @@
                     <textbox id="detailsTextBox" value="" hflex="1"/>
                 </row>
                 <row>
-                    <cell colspan="2" style="text-align:center">
-                    <hlayout>
-                        <button id="saveButton" label="Guardar"/>
-                        <button id="cancelButton" label="Cancelar"/>
-                        <button id="resetButton" label="Reset"/>
-                        <button id="deleteButton" label="Eliminar"/>
-                    </hlayout>
-                </cell>
+					<cell colspan="2" style="text-align:center">
+	                    <hlayout>
+	                        <button id="saveButton" label="Guardar"/>
+	                        <button id="cancelButton" label="Cancelar"/>
+	                        <button id="resetButton" label="Reset"/>
+	                        <button id="deleteButton" label="Eliminar"/>
+	                    </hlayout>
+	                </cell>
                 </row>
             </rows>
         </grid>
-    </vlayout>	
+    </vlayout>
 </window>

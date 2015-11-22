@@ -42,6 +42,9 @@ public class RawMaterialServiceImpl implements RawMaterialService {
 	}
 	
 	public synchronized RawMaterial saveRawMaterial(RawMaterial rawMaterial) {
+		if(rawMaterial.getId() == null) {
+			rawMaterial.setId(getNewId());
+        }
 		rawMaterial = RawMaterial.clone(rawMaterial);
 		rawMaterialList.add(rawMaterial);
 		serializator.grabarLista(rawMaterialList);
@@ -80,7 +83,7 @@ public class RawMaterialServiceImpl implements RawMaterialService {
 		}
 	}
 	
-	public synchronized Integer getNewId() {
+	private synchronized Integer getNewId() {
 		Integer lastId = 0;
 		for(int i = 0; i < rawMaterialList.size(); i++) {
 			RawMaterial aux = rawMaterialList.get(i);

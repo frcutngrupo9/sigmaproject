@@ -1,5 +1,5 @@
 <window id="win_product_creation" apply="ar.edu.utn.sigmaproject.controller.ProductCreationController" width="95%" style="background:white">
-	<caption label="Crear Producto"/>
+	<caption id="productCaption" label="Creacion/Edicion Producto"/>
     <panel title="Producto" id="productCreationBlock" border="rounded">
         <panelchildren>
             <vlayout>

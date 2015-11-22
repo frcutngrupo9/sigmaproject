@@ -4,7 +4,7 @@ import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.Client;
 
-public interface ClientService  {
+public interface ClientService {
     
     List<Client> getClientList();
     
@@ -15,7 +15,4 @@ public interface ClientService  {
     Client updateClient(Client client);
 
     void deleteClient(Client client);
-
-    Integer getNewId();
-
 }
