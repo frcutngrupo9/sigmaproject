@@ -614,6 +614,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		}else {
 			currentPiece = pieceListModel.getSelection().iterator().next();
 		}
+		pieceListModel.clearSelection();
 		refreshViewPiece();
 	}
   	
