@@ -235,6 +235,14 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		return aux.getName();
     }
 	
+	public String getProductUnits(int idProduct) {
+		return "[Impl Pend]";
+    }
+	
+	public String getProductTotalPrice(int idProduct) {
+		return "[Impl Pend]";
+    }
+	
 	public String getProductNameByPieceId(int idPiece) {
 		Piece aux = pieceService.getPiece(idPiece);
 		Product aux2 = productService.getProduct(aux.getIdProduct());

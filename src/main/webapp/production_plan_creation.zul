@@ -44,7 +44,7 @@
                 <separator/>
     			<grid id="productionPlanDetailGrid" mold="paging" pageSize="7">
     				<auxhead>
-						<auxheader label="Pedidos" colspan="4"/>
+						<auxheader label="Pedidos" colspan="3"/>
 					</auxhead>
         			<columns>
             			<column label="Id Pedido"/>
@@ -59,6 +59,26 @@
             			</row>
         			</template>
     			</grid>
+    			<separator/>
+    			<listbox id="productListbox" mold="paging" pageSize="7" visible="false">
+    				<auxhead>
+						<auxheader label="Productos" colspan="3"/>
+					</auxhead>
+        			<listhead>
+        				<listheader label="Nombre Producto"/>
+            			<listheader label="Cantidad de Producto"/>
+            			<listheader label="Monto Unitario"/>
+            			<listheader label="Monto Total"/>
+        			</listhead>
+        			<template name="model">
+            			<listitem>
+                			<listcell label="${win_production_plan_creation$composer.getProductName(each.id)}"/>
+                			<listcell label="${win_production_plan_creation$composer.getProductUnits(each.id)}"/>
+                			<listcell label="${each.price.doubleValue()}"/>
+                			<listcell label="${win_production_plan_creation$composer.getProductTotalPrice(each.id)}"/>
+            			</listitem>
+        			</template>
+    			</listbox>
     			<hlayout>
                     <button id="saveProductionPlanButton" label="Guardar Plan de Produccion"/>
                     <button id="resetProductionPlanButton" label="Reset Plan de Produccion"/>
