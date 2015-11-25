@@ -35,6 +35,19 @@ public class OrderServiceImpl implements OrderService {
         return list;
     }
     
+    public synchronized List<Order> getOrderList(Integer idOrderStateType) {
+        List<Order> list = new ArrayList<Order>();
+        OrderStateService orderStateService = new OrderStateServiceImpl();
+        for(Order order : orderList) {
+        	Integer order_id = order.getId();
+        	OrderState order_state = orderStateService.getLastOrderState(order_id);
+        	if(order_state.getIdOrderStateType().equals(idOrderStateType)) {
+        		list.add(Order.clone(order));
+        	}
+        }
+        return list;
+    }
+    
     public synchronized Order getOrder(Integer id) {
         int size = orderList.size();
         for(int i = 0; i < size; i++){
@@ -99,7 +112,7 @@ public class OrderServiceImpl implements OrderService {
         return lastId + 1;
     }
 
-	public Order saveOrder(Order order, Integer idOrderStateType, List<OrderDetail> orderDetailList) {
+	public synchronized Order saveOrder(Order order, Integer idOrderStateType, List<OrderDetail> orderDetailList) {
 		order = saveOrder(order);// se obtiene un pedido con id agregado
 		OrderDetailService orderDetailService = new OrderDetailServiceImpl();
 		for(OrderDetail orderDetail : orderDetailList) {// agregamos el id del pedido a todos los detalles y los guardamos
@@ -112,7 +125,7 @@ public class OrderServiceImpl implements OrderService {
 		return order;
 	}
 
-	public Order updateOrder(Order order, Integer idOrderStateType, List<OrderDetail> orderDetailList, List<OrderDetail> lateDeleteOrderDetailList) {
+	public synchronized Order updateOrder(Order order, Integer idOrderStateType, List<OrderDetail> orderDetailList, List<OrderDetail> lateDeleteOrderDetailList) {
 		order = updateOrder(order);
 		OrderDetailService orderDetailService = new OrderDetailServiceImpl();
 		for(OrderDetail orderDetail : orderDetailList) {// hay que actualizar los detalles que existen y agregar los que no

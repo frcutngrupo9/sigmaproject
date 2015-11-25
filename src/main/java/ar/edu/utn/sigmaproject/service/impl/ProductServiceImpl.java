@@ -112,7 +112,7 @@ public class ProductServiceImpl implements ProductService {
 		return value;
 	}
 
-	public Product saveProduct(Product product, List<Piece> pieceList, List<Process> processList) {
+	public synchronized Product saveProduct(Product product, List<Piece> pieceList, List<Process> processList) {
 		product = saveProduct(product);
 		PieceService pieceService = new PieceServiceImpl();
 		if(pieceList != null && pieceList.isEmpty() == false) {// se guardan todas las piezas
@@ -130,7 +130,7 @@ public class ProductServiceImpl implements ProductService {
 		return product;
 	}
 
-	public Product updateProduct(Product product, List<Piece> pieceList, List<Process> processList) {
+	public synchronized Product updateProduct(Product product, List<Piece> pieceList, List<Process> processList) {
 		product = updateProduct(product);
 		PieceService pieceService = new PieceServiceImpl();
 		ProcessService processService = new ProcessServiceImpl();
@@ -184,7 +184,7 @@ public class ProductServiceImpl implements ProductService {
 		return null;
 	}
 	
-	private Piece searchPiece(Integer idPiece, List<Piece> pieceList) {
+	private synchronized Piece searchPiece(Integer idPiece, List<Piece> pieceList) {
   		int size = pieceList.size();
   		for(int i = 0; i < size; i++) {
   			Piece t = pieceList.get(i);
@@ -195,7 +195,7 @@ public class ProductServiceImpl implements ProductService {
   		return null;
     }
 	
-	private Process searchProcess(Integer idPiece, Integer idProcessType, List<Process> processList) {
+	private synchronized Process searchProcess(Integer idPiece, Integer idProcessType, List<Process> processList) {
   		int size = processList.size();
   		for(int i = 0; i < size; i++) {
   			Process t = processList.get(i);

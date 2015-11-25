@@ -9,6 +9,8 @@ public interface OrderService {
     
     List<Order> getOrderList();
     
+    List<Order> getOrderList(Integer idOrderStateType);
+    
     Order getOrder(Integer idOrder);
     
     Order saveOrder(Order order);

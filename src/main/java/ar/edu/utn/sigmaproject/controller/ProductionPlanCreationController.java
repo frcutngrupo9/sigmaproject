@@ -29,6 +29,8 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 import ar.edu.utn.sigmaproject.service.ClientService;
 import ar.edu.utn.sigmaproject.service.OrderDetailService;
 import ar.edu.utn.sigmaproject.service.OrderService;
+import ar.edu.utn.sigmaproject.service.OrderStateService;
+import ar.edu.utn.sigmaproject.service.OrderStateTypeService;
 import ar.edu.utn.sigmaproject.service.PieceService;
 import ar.edu.utn.sigmaproject.service.ProcessService;
 import ar.edu.utn.sigmaproject.service.ProcessTypeService;
@@ -38,6 +40,8 @@ import ar.edu.utn.sigmaproject.service.ProductionPlanDetailService;
 import ar.edu.utn.sigmaproject.service.impl.ClientServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.OrderDetailServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.OrderServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.OrderStateServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.OrderStateTypeServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.PieceServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProcessServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProcessTypeServiceImpl;
@@ -72,6 +76,8 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	// services
 	private OrderService orderService = new OrderServiceImpl();
 	private OrderDetailService orderDetailService = new OrderDetailServiceImpl();
+	private OrderStateService orderStateService = new OrderStateServiceImpl();
+	private OrderStateTypeService orderStateTypeService = new OrderStateTypeServiceImpl();
 	private ProductService productService = new ProductServiceImpl();
 	private ProductionPlanService productionPlanService = new ProductionPlanServiceImpl();
 	private ProductionPlanDetailService productionPlanDetailService = new ProductionPlanDetailServiceImpl();
@@ -126,8 +132,9 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
     }
 	
 	private void refreshOrderPopupList() {// el popup se actualiza en base a los detalles
-		orderPopupList = orderService.getOrderList();// debe contener todos los pedidos que no estan en los detalles
-    	for(ProductionPlanDetail productionPlanDetail : productionPlanDetailList) {
+		Integer order_state_type_id = orderStateTypeService.getOrderStateType("iniciado").getId();// se busca el id del estado de pedido iniciado
+		orderPopupList = orderService.getOrderList(order_state_type_id);// se buscan los pedidos que no estan asignados a un plan y no estan cancelados (estan en estado iniciado)
+    	for(ProductionPlanDetail productionPlanDetail : productionPlanDetailList) {// no debe contener los pedidos que ya estan en el detalle
     		Order aux = orderService.getOrder(productionPlanDetail.getIdOrder());
     		orderPopupList.remove(aux);// sacamos todos los pedidos del popup
     	}
