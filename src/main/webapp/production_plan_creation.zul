@@ -60,22 +60,34 @@
         			</template>
     			</grid>
     			<separator/>
-    			<listbox id="productListbox" mold="paging" pageSize="7" visible="false">
+    			<listbox id="productTotalListbox" mold="paging" pageSize="7" visible="true">
     				<auxhead>
-						<auxheader label="Productos" colspan="3"/>
+						<auxheader label="Productos" colspan="5"/>
 					</auxhead>
         			<listhead>
-        				<listheader label="Nombre Producto"/>
+        				<listheader label="Id"/>
+        				<listheader label="Codigo"/>
+            			<listheader label="Nombre Producto"/>
+            			<listheader label="Detalles"/>
             			<listheader label="Cantidad de Producto"/>
-            			<listheader label="Monto Unitario"/>
-            			<listheader label="Monto Total"/>
+            			<!-- plan de produccion no deberia mostrar nada relacionado a los precios
+            			porque los precios pueden variar para un mismo producto de un pedido a otro
+            			y por lo tanto el precio unitario podria tener mas de 1 valor
+            			<listheader label="Precio Unitario"/>
+            			<listheader label="Precio Total"/>
+            			-->
         			</listhead>
         			<template name="model">
             			<listitem>
-                			<listcell label="${win_production_plan_creation$composer.getProductName(each.id)}"/>
-                			<listcell label="${win_production_plan_creation$composer.getProductUnits(each.id)}"/>
+            				<listcell label="${each.id}"/>
+                			<listcell label="${each.code}"/>
+                			<listcell label="${each.name}"/>
+                			<listcell label="${each.details}"/>
+                			<listcell label="${win_production_plan_creation$composer.getProductTotalUnits(each.id)}"/>
+                			<!-- no se muestran precios en plan de produccion (importan solo las cantidades para producir)
                 			<listcell label="${each.price.doubleValue()}"/>
-                			<listcell label="${win_production_plan_creation$composer.getProductTotalPrice(each.id)}"/>
+                			<listcell label="${win_production_plan_creation$composer.getProductTotalPrice(each.id).doubleValue()}"/>
+                			-->
             			</listitem>
         			</template>
     			</listbox>

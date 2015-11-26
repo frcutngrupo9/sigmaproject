@@ -1,5 +1,6 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,7 +50,7 @@ import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductionPlanServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductionPlanDetailServiceImpl;
 
-public class ProductionPlanCreationController extends SelectorComposer<Component>{
+public class ProductionPlanCreationController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 	
 	@Wire
@@ -72,6 +73,8 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
     Button saveProductionPlanButton;
     @Wire
     Button deleteProductionPlanButton;
+    @Wire
+    Listbox productTotalListbox;
 	
 	// services
 	private OrderService orderService = new OrderServiceImpl();
@@ -90,6 +93,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	private List<Order> orderPopupList;
     private List<ProductionPlanDetail> productionPlanDetailList;
 	private List<ProductionPlanDetail> lateDeleteProductionPlanDetailList;
+	private List<ProductTotal> productTotalList;
 	
 	// list models
 	private ListModelList<Order> orderPopupListModel;
@@ -104,8 +108,8 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
         
+        productTotalList = new ArrayList<ProductTotal>();
         productionPlanDetailList = new ArrayList<ProductionPlanDetail>();
-        refreshProductionPlanDetailListGrid();
         
         currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
         refreshViewProductionPlan();
@@ -113,6 +117,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
         lateDeleteProductionPlanDetailList = new ArrayList<ProductionPlanDetail>();
         
         refreshProcessListBox();
+        refreshProductTotalListbox();
     }
 	
 	@Listen("onSelect = #orderPopupListbox")
@@ -175,11 +180,18 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		refreshOrderPopupList();
 		refreshOrder();
 		refreshProcessListBox();
+		refreshProductTotalListbox();
     }
 	
 	private void refreshProductionPlanDetailListGrid() {
 		productionPlanDetailListModel = new ListModelList<ProductionPlanDetail>(productionPlanDetailList);
         productionPlanDetailGrid.setModel(productionPlanDetailListModel);
+	}
+	
+	private void refreshProductTotalListbox() {
+		refreshProductTotalList();
+		ListModelList<ProductTotal> productTotalListModel = new ListModelList<ProductTotal>(productTotalList);
+		productTotalListbox.setModel(productTotalListModel);
 	}
 	
 	private void refreshViewProductionPlan() {
@@ -198,7 +210,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
   		refreshProductionPlanDetailListGrid();
   	}
     
-	
 	private void refreshProcessListBox() {
 		List<Process> processList = new ArrayList<Process>();
 		for(ProductionPlanDetail auxProductionPlanDetail : productionPlanDetailList) {
@@ -219,6 +230,35 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
         processListbox.setModel(processListModel);
 	}
 	
+	private void refreshProductTotalList() {
+		productTotalList = new ArrayList<ProductTotal>();// se empieza con una lista vacia
+		for(ProductionPlanDetail auxProductionPlanDetail : productionPlanDetailList) {
+			Order auxOrder = orderService.getOrder(auxProductionPlanDetail.getIdOrder());// buscamos el pedido referente al detalle del plan de produccion
+			List<OrderDetail> orderDetailList =  orderDetailService.getOrderDetailList(auxOrder.getId());// buscamos todos sus detalles
+			for(OrderDetail auxOrderDetail : orderDetailList) {// por cada detalle del pedido, observamos si el producto ya esta en la lista, si lo esta sumamos su cantidad y, si no esta lo agregamos
+				Boolean is_in_list = false;
+				Integer id_product = auxOrderDetail.getIdProduct();
+				Integer order_detail_units = auxOrderDetail.getUnits();
+				for(ProductTotal productTotal : productTotalList) {
+					if(productTotal.getId().equals(id_product)) {// si esta
+						is_in_list = true;
+						productTotal.setTotalUnits(productTotal.getTotalUnits() + order_detail_units);// sumamos su cantidad con la existente
+						break;
+						//(!) no muy seguro si las modificaciones de los objetos en este for afectan a los que estan adentro de la lista(!)
+					}
+				}
+				if(is_in_list == false) {// no esta, por lo tanto agregamos el producto a la lista total
+					ProductTotal productTotal = new ProductTotal(productService.getProduct(id_product));
+					productTotal.setTotalUnits(order_detail_units);// el primer valor son el total de unidades del detalle de pedido
+					productTotalList.add(productTotal);
+				}
+			}
+			// si es el primer loop del productionPlanDetailList entonces la lista productTotalList deberia estar llena solo con los productos
+			// del primer pedido, en el siguiente loop se sumaran los que ya estan y agregaran los nuevos
+		}
+		// aqui deberia llegar con el productTotalList lleno con todos los productos sin repetir y con el total, que conforman el plan de produccion
+	}
+	
 	public String getClientName(int idClient) {
 		Client aux = clientService.getClient(idClient);
 		return aux.getName();
@@ -230,17 +270,26 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		return auxClient.getName();
     }
 	
-	public String getProductName(int idProduct) {
-		Product aux = productService.getProduct(idProduct);
-		return aux.getName();
+	public int getProductTotalUnits(int idProduct) {
+		int product_total_units = 0;
+		for(ProductTotal productTotal : productTotalList) {// buscamos el total de unidades
+			if(productTotal.getId().equals(idProduct)) {
+				product_total_units = productTotal.getTotalUnits();
+			}
+		}
+		return product_total_units;
     }
 	
-	public String getProductUnits(int idProduct) {
-		return "[Impl Pend]";
+	public BigDecimal getProductTotalPrice(int idProduct) {
+		int product_total_units = getProductTotalUnits(idProduct);
+    	return getTotalPrice(product_total_units, productService.getProduct(idProduct).getPrice());// esta funcion es incorrecta pq agarra el valor actual del producto cuando deberia ser el valor en el pedido
     }
 	
-	public String getProductTotalPrice(int idProduct) {
-		return "[Impl Pend]";
+	private BigDecimal getTotalPrice(int units, BigDecimal price) {
+		if(price == null) {
+			price = new BigDecimal("0");
+		}
+    	return price.multiply(new BigDecimal(units));
     }
 	
 	public String getProductNameByPieceId(int idPiece) {
@@ -305,5 +354,24 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	public String quantityOfDetail(int idOrder) {
     	return orderDetailService.getOrderDetailList(idOrder).size() + "";
     }
+	
+	class ProductTotal extends Product {
+		
+		private static final long serialVersionUID = 1L;
+		Integer totalUnits;
+		
+		public ProductTotal(Product product) {
+			super(product.getId(), product.getCode(), product.getName(), product.getDetails(), product.getPrice());
+		}
+		
+		public Integer getTotalUnits() {
+			return totalUnits;
+		}
+
+		public void setTotalUnits(Integer totalUnits) {
+			this.totalUnits = totalUnits;
+		}
+		
+	}
 	
 }
