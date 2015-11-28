@@ -3,7 +3,7 @@ package ar.edu.utn.sigmaproject.domain;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class RawMaterial implements Serializable, Cloneable {
+public class RawMaterialType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 	
 	Integer id;
@@ -13,7 +13,7 @@ public class RawMaterial implements Serializable, Cloneable {
 	BigDecimal depth;
 	BigDecimal height;
 
-	public RawMaterial(Integer id, Integer idMeasureUnit, String name, BigDecimal length, BigDecimal depth, BigDecimal height) {
+	public RawMaterialType(Integer id, Integer idMeasureUnit, String name, BigDecimal length, BigDecimal depth, BigDecimal height) {
 		this.id = id;
 		this.idMeasureUnit = idMeasureUnit;
 		this.name = name;
@@ -87,7 +87,7 @@ public class RawMaterial implements Serializable, Cloneable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		RawMaterial other = (RawMaterial) obj;
+		RawMaterialType other = (RawMaterialType) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -96,9 +96,9 @@ public class RawMaterial implements Serializable, Cloneable {
 		return true;
 	}
 	
-	public static RawMaterial clone(RawMaterial rawMaterial){
+	public static RawMaterialType clone(RawMaterialType rawMaterial){
 		try {
-			return (RawMaterial)rawMaterial.clone();
+			return (RawMaterialType)rawMaterial.clone();
 		} catch (CloneNotSupportedException e) {
 			//not possible
 		}

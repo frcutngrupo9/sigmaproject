@@ -25,7 +25,7 @@ import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Product;
-import ar.edu.utn.sigmaproject.domain.RawMaterial;
+import ar.edu.utn.sigmaproject.domain.RawMaterialType;
 import ar.edu.utn.sigmaproject.service.ClientService;
 import ar.edu.utn.sigmaproject.service.MeasureUnitService;
 import ar.edu.utn.sigmaproject.service.MeasureUnitTypeService;
@@ -34,7 +34,7 @@ import ar.edu.utn.sigmaproject.service.OrderService;
 import ar.edu.utn.sigmaproject.service.OrderStateService;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeService;
 import ar.edu.utn.sigmaproject.service.ProductService;
-import ar.edu.utn.sigmaproject.service.RawMaterialService;
+import ar.edu.utn.sigmaproject.service.RawMaterialTypeService;
 import ar.edu.utn.sigmaproject.service.impl.ClientServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.MeasureUnitServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.MeasureUnitTypeServiceImpl;
@@ -43,7 +43,7 @@ import ar.edu.utn.sigmaproject.service.impl.OrderServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.OrderStateServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.OrderStateTypeServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.RawMaterialServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.RawMaterialTypeServiceImpl;
 
 public class RawMaterialController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
@@ -76,28 +76,28 @@ public class RawMaterialController extends SelectorComposer<Component>{
     Grid rawMaterialGrid;
     
     // services
-    private RawMaterialService rawMaterialService = new RawMaterialServiceImpl();
+    private RawMaterialTypeService rawMaterialTypeService = new RawMaterialTypeServiceImpl();
     private MeasureUnitService measureUnitService = new MeasureUnitServiceImpl();
     private MeasureUnitTypeService measureUnitTypeService = new MeasureUnitTypeServiceImpl();
     
     // atributes
-    private RawMaterial currentRawMaterial;
+    private RawMaterialType currentRawMaterialType;
     
     // list
-    private List<RawMaterial> rawMaterialList;
+    private List<RawMaterialType> rawMaterialTypeList;
     private List<MeasureUnit> measureUnitlList;
     
     // list models
-    private ListModelList<RawMaterial> rawMaterialListModel;
+    private ListModelList<RawMaterialType> rawMaterialTypeListModel;
     private ListModelList<MeasureUnit> measureUnitListModel;
     
     @Override
     public void doAfterCompose(Component comp) throws Exception{
         super.doAfterCompose(comp);
-        rawMaterialList = rawMaterialService.getRawMaterialList();
-        rawMaterialListModel = new ListModelList<RawMaterial>(rawMaterialList);
-        rawMaterialListbox.setModel(rawMaterialListModel);
-        currentRawMaterial = null;
+        rawMaterialTypeList = rawMaterialTypeService.getRawMaterialTypeList();
+        rawMaterialTypeListModel = new ListModelList<RawMaterialType>(rawMaterialTypeList);
+        rawMaterialListbox.setModel(rawMaterialTypeListModel);
+        currentRawMaterialType = null;
         
         Integer idMeasureUnitType = measureUnitTypeService.getMeasureUnitType("Longitud").getId();
         measureUnitlList = measureUnitService.getMeasureUnitList(idMeasureUnitType);
@@ -113,7 +113,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
     
     @Listen("onClick = #newButton")
     public void newRawMaterial() {
-        currentRawMaterial = new RawMaterial(null, null, "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+        currentRawMaterialType = new RawMaterialType(null, null, "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
         refreshView();
     }
     
@@ -128,26 +128,26 @@ public class RawMaterialController extends SelectorComposer<Component>{
         	Clients.showNotification("Debe seleccionar una unidad de medida", measureUnitSelectbox);
 			return;
         }
-    	currentRawMaterial.setName(nameTextbox.getText());
-        currentRawMaterial.setLength(new BigDecimal(lengthDoublebox.doubleValue()));
-        currentRawMaterial.setDepth(new BigDecimal(depthDoublebox.doubleValue()));
-        currentRawMaterial.setHeight(new BigDecimal(heightDoublebox.doubleValue()));
-        currentRawMaterial.setIdMeasureUnit(measureUnitListModel.getElementAt(selected_index).getId());
-    	if(currentRawMaterial.getId() == null)	{// si es nuevo
-            currentRawMaterial = rawMaterialService.saveRawMaterial(currentRawMaterial);
+    	currentRawMaterialType.setName(nameTextbox.getText());
+        currentRawMaterialType.setLength(new BigDecimal(lengthDoublebox.doubleValue()));
+        currentRawMaterialType.setDepth(new BigDecimal(depthDoublebox.doubleValue()));
+        currentRawMaterialType.setHeight(new BigDecimal(heightDoublebox.doubleValue()));
+        currentRawMaterialType.setIdMeasureUnit(measureUnitListModel.getElementAt(selected_index).getId());
+    	if(currentRawMaterialType.getId() == null)	{// si es nuevo
+            currentRawMaterialType = rawMaterialTypeService.saveRawMaterialType(currentRawMaterialType);
     	} else {
     		// si es una edicion
-    		currentRawMaterial = rawMaterialService.updateRawMaterial(currentRawMaterial);
+    		currentRawMaterialType = rawMaterialTypeService.updateRawMaterialType(currentRawMaterialType);
     	}
-    	rawMaterialList = rawMaterialService.getRawMaterialList();
-        rawMaterialListModel = new ListModelList<RawMaterial>(rawMaterialList);
-		currentRawMaterial = null;
+    	rawMaterialTypeList = rawMaterialTypeService.getRawMaterialTypeList();
+        rawMaterialTypeListModel = new ListModelList<RawMaterialType>(rawMaterialTypeList);
+		currentRawMaterialType = null;
         refreshView();
     }
     
     @Listen("onClick = #cancelButton")
     public void cancelButtonClick() {
-    	currentRawMaterial = null;
+    	currentRawMaterialType = null;
         refreshView();
     }
     
@@ -158,20 +158,20 @@ public class RawMaterialController extends SelectorComposer<Component>{
     
     @Listen("onClick = #deleteButton")
     public void deleteButtonClick() {
-    	rawMaterialService.deleteRawMaterial(currentRawMaterial);
-        rawMaterialListModel.remove(currentRawMaterial);
-        currentRawMaterial = null;
+    	rawMaterialTypeService.deleteRawMaterialType(currentRawMaterialType);
+        rawMaterialTypeListModel.remove(currentRawMaterialType);
+        currentRawMaterialType = null;
         refreshView();
     }
     
     @Listen("onSelect = #rawMaterialListbox")
 	public void doListBoxSelect() {
-		if(rawMaterialListModel.isSelectionEmpty()) {
+		if(rawMaterialTypeListModel.isSelectionEmpty()) {
 			//just in case for the no selection
-			currentRawMaterial = null;
+			currentRawMaterialType = null;
 		}else {
-			if(currentRawMaterial == null) {
-				currentRawMaterial = rawMaterialListModel.getSelection().iterator().next();
+			if(currentRawMaterialType == null) {
+				currentRawMaterialType = rawMaterialTypeListModel.getSelection().iterator().next();
 			}
 		}
 		refreshView();
@@ -182,9 +182,9 @@ public class RawMaterialController extends SelectorComposer<Component>{
     }
     
     private void refreshView() {
-    	rawMaterialListModel.clearSelection();
-    	rawMaterialListbox.setModel(rawMaterialListModel);
-        if(currentRawMaterial == null) {
+    	rawMaterialTypeListModel.clearSelection();
+    	rawMaterialListbox.setModel(rawMaterialTypeListModel);
+        if(currentRawMaterialType == null) {
 			//limpiar
         	rawMaterialGrid.setVisible(false);
         	nameTextbox.setValue(null);
@@ -201,12 +201,12 @@ public class RawMaterialController extends SelectorComposer<Component>{
 			rawMaterialListbox.clearSelection();
 		}else {
 			rawMaterialGrid.setVisible(true);
-			nameTextbox.setValue(currentRawMaterial.getName());
-        	lengthDoublebox.setValue(currentRawMaterial.getLength().doubleValue());
-        	depthDoublebox.setValue(currentRawMaterial.getDepth().doubleValue());
-        	heightDoublebox.setValue(currentRawMaterial.getHeight().doubleValue());
-        	if(currentRawMaterial.getIdMeasureUnit() != null) {
-        		MeasureUnitType aux = measureUnitTypeService.getMeasureUnitType(currentRawMaterial.getIdMeasureUnit());
+			nameTextbox.setValue(currentRawMaterialType.getName());
+        	lengthDoublebox.setValue(currentRawMaterialType.getLength().doubleValue());
+        	depthDoublebox.setValue(currentRawMaterialType.getDepth().doubleValue());
+        	heightDoublebox.setValue(currentRawMaterialType.getHeight().doubleValue());
+        	if(currentRawMaterialType.getIdMeasureUnit() != null) {
+        		MeasureUnitType aux = measureUnitTypeService.getMeasureUnitType(currentRawMaterialType.getIdMeasureUnit());
         		measureUnitSelectbox.setSelectedIndex(aux.getId()-1);
         	}else {
         		measureUnitSelectbox.setSelectedIndex(-1);
@@ -214,7 +214,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
 			saveButton.setDisabled(false);
 			cancelButton.setDisabled(false);
 			resetButton.setDisabled(false);
-			if(currentRawMaterial.getId() == null) {
+			if(currentRawMaterialType.getId() == null) {
                 deleteButton.setDisabled(true);
             } else {
                 deleteButton.setDisabled(false);

@@ -19,11 +19,11 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.Client;
-import ar.edu.utn.sigmaproject.domain.RawMaterial;
+import ar.edu.utn.sigmaproject.domain.RawMaterialType;
 import ar.edu.utn.sigmaproject.domain.Supply;
-import ar.edu.utn.sigmaproject.service.RawMaterialService;
+import ar.edu.utn.sigmaproject.service.RawMaterialTypeService;
 import ar.edu.utn.sigmaproject.service.SupplyService;
-import ar.edu.utn.sigmaproject.service.impl.RawMaterialServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.RawMaterialTypeServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.SupplyServiceImpl;
 
 public class SupplyController extends SelectorComposer<Component>{
