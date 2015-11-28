@@ -4,7 +4,7 @@ import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
 
-public interface OrderDetailService  {
+public interface OrderDetailService {
     
     List<OrderDetail> getOrderDetailList();
     
