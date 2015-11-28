@@ -7,7 +7,7 @@ import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.service.OrderStateService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
-public class OrderStateServiceImpl  implements OrderStateService {
+public class OrderStateServiceImpl implements OrderStateService {
 
 	static List<OrderState> orderStateList = new ArrayList<OrderState>();
 	private SerializationService serializator = new SerializationService("order_state");

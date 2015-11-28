@@ -6,7 +6,7 @@ import java.util.List;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeService;
 
-public class OrderStateTypeServiceImpl  implements OrderStateTypeService {
+public class OrderStateTypeServiceImpl implements OrderStateTypeService {
 
 	static int orderStateTypeId = 1;
 	static List<OrderStateType> orderStateTypeList = new ArrayList<OrderStateType>();  
