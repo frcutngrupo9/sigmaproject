@@ -96,9 +96,9 @@ public class RawMaterialType implements Serializable, Cloneable {
 		return true;
 	}
 	
-	public static RawMaterialType clone(RawMaterialType rawMaterial){
+	public static RawMaterialType clone(RawMaterialType rawMaterialType){
 		try {
-			return (RawMaterialType)rawMaterial.clone();
+			return (RawMaterialType)rawMaterialType.clone();
 		} catch (CloneNotSupportedException e) {
 			//not possible
 		}

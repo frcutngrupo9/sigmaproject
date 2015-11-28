@@ -3,14 +3,14 @@ package ar.edu.utn.sigmaproject.domain;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class Supply implements Serializable, Cloneable {
+public class SupplyType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 	
 	Integer id;
 	String name;
 	String details;
 	
-	public Supply(Integer id, String name, String details) {
+	public SupplyType(Integer id, String name, String details) {
 		this.id = id;
 		this.name = name;
 		this.details = details;
@@ -56,7 +56,7 @@ public class Supply implements Serializable, Cloneable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Supply other = (Supply) obj;
+        SupplyType other = (SupplyType) obj;
         if (id == null) {
             if (other.id != null)
                 return false;
@@ -65,9 +65,9 @@ public class Supply implements Serializable, Cloneable {
         return true;
     }
     
-    public static Supply clone(Supply supply){
+    public static SupplyType clone(SupplyType supplyType){
         try {
-            return (Supply)supply.clone();
+            return (SupplyType)supplyType.clone();
         } catch (CloneNotSupportedException e) {
             //not possible
         }

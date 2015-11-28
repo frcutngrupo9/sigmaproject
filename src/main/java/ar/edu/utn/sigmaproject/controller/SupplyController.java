@@ -20,11 +20,11 @@ import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.Client;
 import ar.edu.utn.sigmaproject.domain.RawMaterialType;
-import ar.edu.utn.sigmaproject.domain.Supply;
+import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.service.RawMaterialTypeService;
-import ar.edu.utn.sigmaproject.service.SupplyService;
+import ar.edu.utn.sigmaproject.service.SupplyTypeService;
 import ar.edu.utn.sigmaproject.service.impl.RawMaterialTypeServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.SupplyServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.SupplyTypeServiceImpl;
 
 public class SupplyController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
@@ -51,25 +51,25 @@ public class SupplyController extends SelectorComposer<Component>{
     Button deleteButton;
 	
     // services
-    private SupplyService supplyService = new SupplyServiceImpl();
+    private SupplyTypeService supplyTypeService = new SupplyTypeServiceImpl();
     
     // atributes
-    private Supply currentSupply;
+    private SupplyType currentSupplyType;
     
     // list
-    private List<Supply> supplyList;
+    private List<SupplyType> supplyTypeList;
     
     // list models
-    private ListModelList<Supply> supplyListModel;
+    private ListModelList<SupplyType> supplyTypeListModel;
 	
 	@Override
     public void doAfterCompose(Component comp) throws Exception{
         super.doAfterCompose(comp);
         //SupplyCreationController supplyCreationController = (SupplyCreationController) supplyCreationWindow.getAttribute("supplyCreationWindow$composer"); (codigo que quedo cuando se manejaba una ventana para crear el insumo)
-        supplyList = supplyService.getSupplyList();
-        supplyListModel = new ListModelList<Supply>(supplyList);
-        supplyListbox.setModel(supplyListModel);
-        currentSupply = null;
+        supplyTypeList = supplyTypeService.getSupplyTypeList();
+        supplyTypeListModel = new ListModelList<SupplyType>(supplyTypeList);
+        supplyListbox.setModel(supplyTypeListModel);
+        currentSupplyType = null;
         refreshView();
     }
 	
@@ -79,7 +79,7 @@ public class SupplyController extends SelectorComposer<Component>{
     
     @Listen("onClick = #newButton")
     public void newButtonClick() {
-        currentSupply = new Supply(null, "", "");
+        currentSupplyType = new SupplyType(null, "", "");
         refreshView();
     }
     
@@ -89,24 +89,24 @@ public class SupplyController extends SelectorComposer<Component>{
             Clients.showNotification("Debe ingresar un nombre", nameTextBox);
             return;
         }
-        currentSupply.setName(nameTextBox.getText());
-        currentSupply.setDetails(detailsTextBox.getText());
-        if(currentSupply.getId() == null) {
+        currentSupplyType.setName(nameTextBox.getText());
+        currentSupplyType.setDetails(detailsTextBox.getText());
+        if(currentSupplyType.getId() == null) {
         	// es un nuevo insumo
-        	currentSupply = supplyService.saveSupply(currentSupply);
+        	currentSupplyType = supplyTypeService.saveSupplyType(currentSupplyType);
         } else {
             // es una edicion
-        	currentSupply = supplyService.updateSupply(currentSupply);
+        	currentSupplyType = supplyTypeService.updateSupplyType(currentSupplyType);
         }
-        supplyList = supplyService.getSupplyList();
-        supplyListModel = new ListModelList<Supply>(supplyList);
-        currentSupply = null;
+        supplyTypeList = supplyTypeService.getSupplyTypeList();
+        supplyTypeListModel = new ListModelList<SupplyType>(supplyTypeList);
+        currentSupplyType = null;
         refreshView();
     }
     
     @Listen("onClick = #cancelButton")
     public void cancelButtonClick() {
-    	currentSupply = null;
+    	currentSupplyType = null;
         refreshView();
     }
     
@@ -117,29 +117,29 @@ public class SupplyController extends SelectorComposer<Component>{
     
     @Listen("onClick = #deleteButton")
     public void deleteButtonClick() {
-    	supplyService.deleteSupply(currentSupply);
-    	supplyListModel.remove(currentSupply);
-    	currentSupply = null;
+    	supplyTypeService.deleteSupplyType(currentSupplyType);
+    	supplyTypeListModel.remove(currentSupplyType);
+    	currentSupplyType = null;
         refreshView();
     }
     
     @Listen("onSelect = #supplyListbox")
     public void doListBoxSelect() {
-        if(supplyListModel.isSelectionEmpty()) {
+        if(supplyTypeListModel.isSelectionEmpty()) {
             //just in case for the no selection
-        	currentSupply = null;
+        	currentSupplyType = null;
         } else {
-        	if(currentSupply == null) {// si no hay nada editandose
-        		currentSupply = supplyListModel.getSelection().iterator().next();
+        	if(currentSupplyType == null) {// si no hay nada editandose
+        		currentSupplyType = supplyTypeListModel.getSelection().iterator().next();
         	}
         }
         refreshView();
     }
 	
 	private void refreshView() {
-		supplyListModel.clearSelection();
-		supplyListbox.setModel(supplyListModel);// se actualiza la lista
-        if(currentSupply == null) {// no editando ni creando
+		supplyTypeListModel.clearSelection();
+		supplyListbox.setModel(supplyTypeListModel);// se actualiza la lista
+        if(currentSupplyType == null) {// no editando ni creando
         	supplyGrid.setVisible(false);
         	nameTextBox.setValue(null);
         	detailsTextBox.setValue(null);
@@ -150,12 +150,12 @@ public class SupplyController extends SelectorComposer<Component>{
 			newButton.setDisabled(false);
 		}else {// editando o creando
 			supplyGrid.setVisible(true);
-			nameTextBox.setValue(currentSupply.getName());
-			detailsTextBox.setValue(currentSupply.getDetails());
+			nameTextBox.setValue(currentSupplyType.getName());
+			detailsTextBox.setValue(currentSupplyType.getDetails());
 			saveButton.setDisabled(false);
 			cancelButton.setDisabled(false);
 			resetButton.setDisabled(false);
-			if(currentSupply.getId() == null) {
+			if(currentSupplyType.getId() == null) {
                 deleteButton.setDisabled(true);
             } else {
                 deleteButton.setDisabled(false);
