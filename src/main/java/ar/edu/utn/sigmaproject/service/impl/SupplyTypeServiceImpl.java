@@ -7,7 +7,7 @@ import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.service.SupplyTypeService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
-public class SupplyTypeServiceImpl  implements SupplyTypeService {
+public class SupplyTypeServiceImpl implements SupplyTypeService {
     
     static List<SupplyType> supplyTypeList = new ArrayList<SupplyType>();
     private SerializationService serializator = new SerializationService("supply_type");
