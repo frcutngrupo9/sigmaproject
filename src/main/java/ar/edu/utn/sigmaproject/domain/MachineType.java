@@ -2,17 +2,21 @@ package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
 
+import javax.xml.datatype.Duration;
+
 public class MachineType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 	
 	Integer id;
 	String name;
 	String details;
+	Duration deteriorationTime;
 	
-	public MachineType(Integer id, String name, String details) {
+	public MachineType(Integer id, String name, String details, Duration deteriorationTime) {
 		this.id = id;
 		this.name = name;
 		this.details = details;
+		this.deteriorationTime = deteriorationTime;
 	}
 
 	public Integer getId() {
@@ -39,6 +43,14 @@ public class MachineType implements Serializable, Cloneable {
 		this.details = details;
 	}
 	
+	public Duration getDeteriorationTime() {
+		return deteriorationTime;
+	}
+
+	public void setDeteriorationTime(Duration deteriorationTime) {
+		this.deteriorationTime = deteriorationTime;
+	}
+
 	@Override
     public int hashCode() {
         final int prime = 31;
