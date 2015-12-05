@@ -144,6 +144,10 @@ public class OrderListController extends SelectorComposer<Component>{
     	return productService.getProduct(idProduct).getName();
     }
     
+    public String getProductCode(int idProduct) {
+    	return productService.getProduct(idProduct).getCode();
+    }
+    
     public String quantityOfDetail(int idOrder) {
     	return orderDetailService.getOrderDetailList(idOrder).size() + "";
     }

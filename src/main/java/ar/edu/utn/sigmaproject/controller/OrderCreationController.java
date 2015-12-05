@@ -75,6 +75,8 @@ public class OrderCreationController extends SelectorComposer<Component>{
     @Wire
     Button deleteOrderButton;
     @Wire
+    Button cancelOrderDetailButton;
+    @Wire
     Button saveOrderDetailButton;
     @Wire
     Button deleteOrderDetailButton;
@@ -198,6 +200,12 @@ public class OrderCreationController extends SelectorComposer<Component>{
 		refreshViewOrder();
     }
     
+    @Listen("onClick = #cancelOrderDetailButton")
+    public void cancelOrderDetail() {
+    	currentOrderDetail = null;
+    	refreshViewOrderDetail();
+    }
+    
     @Listen("onClick = #saveOrderDetailButton")
     public void saveOrderDetail() {
 		if(productUnits.getValue()==null || productUnits.getValue().intValue()<=0){
@@ -301,6 +309,7 @@ public class OrderCreationController extends SelectorComposer<Component>{
   			productPrice.setValue(null);
   			currentProduct = null;
   			deleteOrderDetailButton.setDisabled(true);
+  			cancelOrderDetailButton.setDisabled(true);
   		} else {
   			currentProduct = productService.getProduct(currentOrderDetail.getIdProduct());
   			productBandbox.setDisabled(true);// no se permite modificar el producto solo las unidades
@@ -312,6 +321,7 @@ public class OrderCreationController extends SelectorComposer<Component>{
   				productPrice.setValue(null);
   			}
   			deleteOrderDetailButton.setDisabled(false);
+  			cancelOrderDetailButton.setDisabled(false);
   		}
   		productPopupListbox.clearSelection();
   		refreshOrderDetailListbox();

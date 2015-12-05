@@ -2,6 +2,7 @@
     <grid model="${arg.products}">
         <columns>
             <column label="Id Producto" align="center"/>
+            <column label="Codigo" align="center"/>
             <column label="Producto" align="center"/>
             <column label="Unidades" align="center"/>
             <column label="Monto Unitario" align="center"/>
@@ -10,6 +11,7 @@
         <template name="model">
             <row>
                 <label value="${each.idProduct}" />
+                <label value="${win_order_list$composer.getProductCode(each.idProduct)}" />
                 <label value="${win_order_list$composer.getProductName(each.idProduct)}" />
                 <label value="${each.units}" />
                 <label value="${each.price.doubleValue()}" />

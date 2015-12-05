@@ -79,6 +79,7 @@
                     <button id="saveOrderDetailButton" label="Grabar Detalle"/>
                     <button id="resetOrderDetailButton" label="Reset Detalle"/>
                     <button id="deleteOrderDetailButton" label="Eliminar Detalle"/>
+                    <button id="cancelOrderDetailButton" label="Cancelar Edicion"/>
                 </hlayout>
                 <separator/>
                 <listbox id="orderDetailListbox" mold="paging" pageSize="7">
