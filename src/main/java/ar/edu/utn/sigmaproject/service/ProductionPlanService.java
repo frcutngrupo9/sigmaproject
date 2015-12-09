@@ -3,6 +3,7 @@ package ar.edu.utn.sigmaproject.service;
 import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
+import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 
 public interface ProductionPlanService  {
 	
@@ -17,5 +18,9 @@ public interface ProductionPlanService  {
 	void deleteProductionPlan(ProductionPlan productionPlan);
 
 	Integer getNewId();
+
+	ProductionPlan saveProductionPlan(ProductionPlan productionPlan, Integer productionPlanStateTypeId,	List<ProductionPlanDetail> productionPlanDetailList);
+
+	ProductionPlan updateProductionPlan(ProductionPlan productionPlan, Integer productionPlanStateTypeId, List<ProductionPlanDetail> productionPlanDetailList);
 
 }

@@ -5,18 +5,31 @@
         <button id="searchButton" label="Buscar"/>
     </hlayout>
     <separator/>
-    <listbox id="productionPlanListbox"  mold="paging" pageSize="7">
-        <listhead>
-            <listheader label="Nombre"/>
-            <listheader label="Fecha"/>
-        </listhead>
+    <grid id="productionPlanGrid" mold="paging" pageSize="7">
+    	<auxhead>
+			<auxheader label="Planes de Produccion" colspan="7"/>
+		</auxhead>
+        <columns>
+        	<column label="Id"/>
+            <column label="Nombre"/>
+            <column label="Fecha Creacion"/>
+            <column label="Cantidad Pedidos"/>
+            <column label="Cantidad Productos"/>
+            <column label="Estado"/>
+            <column label="Editar" width="120px" />
+        </columns>
         <template name="model">
-            <listitem>
-                <listcell label="${each.name}"/>
-                <listcell label="${win_raw_material$composer.getMeasureUnitName(each.idMeasureUnit)}"/>
-            </listitem>
+            <row>
+            	<label value="${each.id}"/>
+                <label value="${each.name}"/>
+                <label value="${each.date}"/>
+                <label value="${win_production_plan_list$composer.getQuantityOfOrder(each.id)}"/>
+                <label value="${win_production_plan_list$composer.getQuantityOfProduct(each.id)}"/>
+                <label value="${win_production_plan_list$composer.getProductionPlanStateName(each.id)}"/>
+                <button forward="onClick=productionPlanGrid.onEditProductionPlan(${each.id})"  image="/img/edit16x16.png"/>
+            </row>
         </template>
-    </listbox>
+    </grid>
     <separator/>
     <button id="newButton" label="Nuevo"/>
 </window>

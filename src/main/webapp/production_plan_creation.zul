@@ -1,12 +1,20 @@
 <window id="win_production_plan_creation" apply="ar.edu.utn.sigmaproject.controller.ProductionPlanCreationController" width="95%" style="background:white">
+    <caption id="productionPlanCaption" label="Creacion/Edicion de Plan"/>
     <panel title="Plan de Produccion" id="productionPlanCreationBlock" border="rounded">
         <panelchildren>
             <vlayout>
-            	<!-- <hlayout>
+            	<hlayout>
+            		<label value="Estado: "/>
+                    <selectbox id="productionPlanStateTypeSelectBox">
+                        <template name="model">
+                            <label value="${each.name}" />
+                        </template>
+                    </selectbox>
+                </hlayout>
+            	<hlayout>
             		<label value="Nombre: "/>
-					<textbox width="180px"/>
-            	</hlayout> -->
-            	<separator/>
+					<textbox id="productionPlanNameTextbox" width="180px"/>
+				</hlayout>
             	<hlayout>
             		<label value="Fecha: "/>
 					<datebox id="productionPlanDateBox" cols="12" format="dd-MM-yyyy"/>
@@ -44,18 +52,22 @@
                 <separator/>
     			<grid id="productionPlanDetailGrid" mold="paging" pageSize="7">
     				<auxhead>
-						<auxheader label="Pedidos" colspan="3"/>
+						<auxheader label="Pedidos" colspan="5"/>
 					</auxhead>
         			<columns>
-            			<column label="Id Pedido"/>
+            			<column label="Id"/>
+            			<column label="Fecha"/>
             			<column label="Cliente"/>
            			 	<column label="Cantidad Productos"/>
+           			 	<column label="Quitar" width="120px" />
         			</columns>
         			<template name="model">
             			<row>
                 			<label value="${each.idOrder}"/>
+                			<label value="${win_production_plan_creation$composer.getOrderDate(each.idOrder)}"/>
                 			<label value="${win_production_plan_creation$composer.getClientNameByOrderId(each.idOrder)}"/>
                 			<label value="${win_production_plan_creation$composer.quantityOfDetail(each.idOrder)}"/>
+                			<button forward="onClick=productionPlanDetailGrid.onRemoveOrder(${each.idOrder})" image="/img/delete16x16.png"/>
             			</row>
         			</template>
     			</grid>
@@ -71,11 +83,10 @@
             			<listheader label="Detalles"/>
             			<listheader label="Cantidad de Producto"/>
             			<!-- plan de produccion no deberia mostrar nada relacionado a los precios
-            			porque los precios pueden variar para un mismo producto de un pedido a otro
-            			y por lo tanto el precio unitario podria tener mas de 1 valor
             			<listheader label="Precio Unitario"/>
             			<listheader label="Precio Total"/>
-            			-->
+            			porque los precios pueden variar para un mismo producto de un pedido a otro
+            			y por lo tanto el precio unitario podria tener mas de 1 valor -->
         			</listhead>
         			<template name="model">
             			<listitem>
@@ -96,6 +107,9 @@
                     <button id="resetProductionPlanButton" label="Reset Plan de Produccion"/>
                     <button id="deleteProductionPlanButton" label="Eliminar Plan de Produccion"/>
                 </hlayout>
+                
+                <!-- Lo que sigue es p Debug -->
+                
     			<listbox id="processListbox" mold="paging" pageSize="7" visible="false">
     				<auxhead>
 						<auxheader label="Procesos" colspan="7"/>

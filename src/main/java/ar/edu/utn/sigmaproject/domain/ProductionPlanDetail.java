@@ -17,7 +17,6 @@ public class ProductionPlanDetail implements Serializable, Cloneable {
 		return idProductionPlan;
 	}
 
-
 	public void setIdProductionPlan(Integer idProductionPlan) {
 		this.idProductionPlan = idProductionPlan;
 	}
@@ -25,7 +24,6 @@ public class ProductionPlanDetail implements Serializable, Cloneable {
 	public Integer getIdOrder() {
 		return idOrder;
 	}
-
 
 	public void setIdOrder(Integer idOrder) {
 		this.idOrder = idOrder;

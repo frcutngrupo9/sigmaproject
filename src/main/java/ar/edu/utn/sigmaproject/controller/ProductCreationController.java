@@ -58,11 +58,11 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	@Wire
 	Component productCreationBlock;
 	@Wire
-	Textbox productName;
+	Textbox productNameTextbox;
 	@Wire
-	Textbox productDetails;
+	Textbox productDetailsTextbox;
 	@Wire
-	Doublebox productPrice;
+	Doublebox productPriceDoublebox;
 	@Wire
 	Button createPieceButton;
 	@Wire
@@ -79,23 +79,23 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	@Wire
 	Component pieceCreationBlock;
 	@Wire
-	Textbox pieceName;
+	Textbox pieceNameTextbox;
 	@Wire
-    Textbox productCode;
+    Textbox productCodeTextbox;
     @Wire
-	Doublebox pieceHeight;
+	Doublebox pieceHeightDoublebox;
 	@Wire
-	Doublebox pieceDepth;
+	Doublebox pieceDepthDoublebox;
 	@Wire
-	Doublebox pieceWidth;
+	Doublebox pieceWidthDoublebox;
 	@Wire
-	Doublebox pieceSize1;
+	Doublebox pieceSize1Doublebox;
 	@Wire
-	Doublebox pieceSize2;
+	Doublebox pieceSize2Doublebox;
 	@Wire
-	Checkbox pieceGroup;
+	Checkbox pieceGroupCheckbox;
 	@Wire
-	Intbox pieceUnitsByProduct;
+	Intbox pieceUnitsByProductIntbox;
 	@Wire
 	Button createProcessButton;
 	@Wire
@@ -103,7 +103,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	@Wire
     Selectbox measureUnitSelectBox;
 	@Wire
-    Combobox comboMeasurePreset;
+    Combobox measurePresetCombobox;
 	@Wire
 	Component processCreationBlock;
 	@Wire
@@ -160,14 +160,14 @@ public class ProductCreationController extends SelectorComposer<Component>{
     
     @Listen("onClick = #saveProductButton")
     public void saveProduct() {
-    	if(Strings.isBlank(productName.getValue())){
-			Clients.showNotification("Ingresar Nombre Producto", productName);
+    	if(Strings.isBlank(productNameTextbox.getValue())){
+			Clients.showNotification("Ingresar Nombre Producto", productNameTextbox);
 			return;
 		}
-    	String product_name = productName.getText();
-    	String product_details = productDetails.getText();
-        String product_code = productCode.getText();
-        BigDecimal product_price = new BigDecimal(productPrice.doubleValue());
+    	String product_name = productNameTextbox.getText();
+    	String product_details = productDetailsTextbox.getText();
+        String product_code = productCodeTextbox.getText();
+        BigDecimal product_price = new BigDecimal(productPriceDoublebox.doubleValue());
     	
     	if(currentProduct == null) {// se esta creando un nuevo producto
     		Integer product_id = productService.getNewId();
@@ -206,12 +206,12 @@ public class ProductCreationController extends SelectorComposer<Component>{
     
     @Listen("onClick = #createProcessButton")
     public void createNewProcess() {
-    	if(Strings.isBlank(pieceName.getValue())){
-			Clients.showNotification("Ingrese el Nombre de la Pieza", pieceName);
+    	if(Strings.isBlank(pieceNameTextbox.getValue())){
+			Clients.showNotification("Ingrese el Nombre de la Pieza", pieceNameTextbox);
 			return;
 		}
-    	if(pieceUnitsByProduct.getValue() == null || pieceUnitsByProduct.getValue() <= 0){
-			Clients.showNotification("La cantidad debe ser mayor a 0.", pieceUnitsByProduct);
+    	if(pieceUnitsByProductIntbox.getValue() == null || pieceUnitsByProductIntbox.getValue() <= 0){
+			Clients.showNotification("La cantidad debe ser mayor a 0.", pieceUnitsByProductIntbox);
 			return;
 		}
     	processCreationBlock.setVisible(true);
@@ -239,18 +239,18 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	}
     	// actualizamos la lista de piezas
     	Integer piece_id = 0;
-    	String piece_name = pieceName.getText();
+    	String piece_name = pieceNameTextbox.getText();
     	Integer idMeasureUnit = null;
     	if(measureUnitSelectBox.getSelectedIndex() != -1) {
     		idMeasureUnit = measureUnitListModel.getElementAt(measureUnitSelectBox.getSelectedIndex()).getId();
     	}
-    	BigDecimal piece_height = new BigDecimal(pieceHeight.doubleValue());
-    	BigDecimal piece_width = new BigDecimal(pieceWidth.doubleValue());
-    	BigDecimal piece_depth = new BigDecimal(pieceDepth.doubleValue());
-    	BigDecimal piece_size1 = new BigDecimal(pieceSize1.doubleValue());
-    	BigDecimal piece_size2 = new BigDecimal(pieceSize2.doubleValue());
-    	Integer piece_units = pieceUnitsByProduct.getValue();
-    	boolean piece_isGroup = pieceGroup.isChecked();
+    	BigDecimal piece_height = new BigDecimal(pieceHeightDoublebox.doubleValue());
+    	BigDecimal piece_width = new BigDecimal(pieceWidthDoublebox.doubleValue());
+    	BigDecimal piece_depth = new BigDecimal(pieceDepthDoublebox.doubleValue());
+    	BigDecimal piece_size1 = new BigDecimal(pieceSize1Doublebox.doubleValue());
+    	BigDecimal piece_size2 = new BigDecimal(pieceSize2Doublebox.doubleValue());
+    	Integer piece_units = pieceUnitsByProductIntbox.getValue();
+    	boolean piece_isGroup = pieceGroupCheckbox.isChecked();
     	
     	if(currentPiece == null) { // no se esta editando una pieza
     		Integer serviceNewPieceId = pieceService.getNewId();
@@ -373,10 +373,10 @@ public class ProductCreationController extends SelectorComposer<Component>{
   		if (currentProduct == null) {
   			productCaption.setLabel("Creacion de Producto");
   		    deleteProductButton.setDisabled(true);
-  			productName.setText("");
-  			productDetails.setText("");
-  			productCode.setText("");
-  			productPrice.setText("");
+  			productNameTextbox.setText("");
+  			productDetailsTextbox.setText("");
+  			productCodeTextbox.setText("");
+  			productPriceDoublebox.setText("");
   			processList = new ArrayList<Process>();
   			pieceList = new ArrayList<Piece>();
   			pieceListModel = new ListModelList<Piece>(pieceList);
@@ -384,14 +384,14 @@ public class ProductCreationController extends SelectorComposer<Component>{
   		} else {
   			productCaption.setLabel("Edicion de Producto");
   		    deleteProductButton.setDisabled(false);
-  			productName.setText(currentProduct.getName());
-  			productDetails.setText(currentProduct.getDetails());
-  			productCode.setText(currentProduct.getCode());
+  			productNameTextbox.setText(currentProduct.getName());
+  			productDetailsTextbox.setText(currentProduct.getDetails());
+  			productCodeTextbox.setText(currentProduct.getCode());
   			BigDecimal product_price = currentProduct.getPrice();
   			if(product_price != null) {
-  				productPrice.setValue(product_price.doubleValue());
+  				productPriceDoublebox.setValue(product_price.doubleValue());
   			}else {
-  				productPrice.setValue(null);
+  				productPriceDoublebox.setValue(null);
   			}
   			processList = getProcessList(currentProduct.getId());
   			pieceList = pieceService.getPieceList(currentProduct.getId());
@@ -406,15 +406,15 @@ public class ProductCreationController extends SelectorComposer<Component>{
   			processCreationBlock.setVisible(false);
   			deletePieceButton.setDisabled(true);
   	    	// limpiar form pieza
-  	    	pieceName.setText("");
-  	    	pieceGroup.setChecked(false);
+  	    	pieceNameTextbox.setText("");
+  	    	pieceGroupCheckbox.setChecked(false);
   	    	measureUnitSelectBox.setSelectedIndex(-1);
-  	    	pieceHeight.setValue(0);
-  	    	pieceWidth.setValue(0);
-  	    	pieceDepth.setValue(0);
-  	    	pieceSize1.setValue(0);
-  	    	pieceSize2.setValue(0);
-  	    	pieceUnitsByProduct.setValue(0);
+  	    	pieceHeightDoublebox.setValue(0);
+  	    	pieceWidthDoublebox.setValue(0);
+  	    	pieceDepthDoublebox.setValue(0);
+  	    	pieceSize1Doublebox.setValue(0);
+  	    	pieceSize2Doublebox.setValue(0);
+  	    	pieceUnitsByProductIntbox.setValue(0);
   	    	// limpiar procesos (ponerlos en vacio y sin check)
   	    	for(int i=1; i<processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
   	    		Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
@@ -438,15 +438,15 @@ public class ProductCreationController extends SelectorComposer<Component>{
   	    	processCreationBlock.setVisible(true);
   	    	deletePieceButton.setDisabled(false);
   	    	// cargar form pieza
-  	    	pieceName.setText(currentPiece.getName());
-  	    	pieceGroup.setChecked(currentPiece.isGroup());
+  	    	pieceNameTextbox.setText(currentPiece.getName());
+  	    	pieceGroupCheckbox.setChecked(currentPiece.isGroup());
   	    	measureUnitSelectBox.setSelectedIndex(measureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getIdMeasureUnit())));
-  	    	pieceHeight.setValue(currentPiece.getHeight().doubleValue());
-  	    	pieceWidth.setValue(currentPiece.getWidth().doubleValue());
-  	    	pieceDepth.setValue(currentPiece.getDepth().doubleValue());
-  	    	pieceSize1.setValue(currentPiece.getSize1().doubleValue());
-  	    	pieceSize2.setValue(currentPiece.getSize2().doubleValue());
-  	    	pieceUnitsByProduct.setValue(currentPiece.getUnits());
+  	    	pieceHeightDoublebox.setValue(currentPiece.getHeight().doubleValue());
+  	    	pieceWidthDoublebox.setValue(currentPiece.getWidth().doubleValue());
+  	    	pieceDepthDoublebox.setValue(currentPiece.getDepth().doubleValue());
+  	    	pieceSize1Doublebox.setValue(currentPiece.getSize1().doubleValue());
+  	    	pieceSize2Doublebox.setValue(currentPiece.getSize2().doubleValue());
+  	    	pieceUnitsByProductIntbox.setValue(currentPiece.getUnits());
   	    	// cargar procesos (cargar detalles, tiempos y checks)
   	    	processTypeList = processTypeService.getProcessTypeList();
   	    	// recorremos los elementos del DOM
@@ -603,7 +603,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			"3x2x40", "2x2x20", "3x2x45", "1x2x15", "2x2x50", "2x2x60", "4x2x45",
 		};
 		ListModel presetsModel= new SimpleListModel(_presets);
-		comboMeasurePreset.setModel(presetsModel);
+		measurePresetCombobox.setModel(presetsModel);
     }
   	
   	@Listen("onSelect = #pieceListbox")

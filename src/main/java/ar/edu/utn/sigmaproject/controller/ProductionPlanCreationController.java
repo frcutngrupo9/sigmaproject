@@ -7,26 +7,38 @@ import java.util.List;
 
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
+import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Bandbox;
+import org.zkoss.zul.Caption;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Grid;
+import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Selectbox;
+import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Client;
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
+import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.domain.ProductTotal;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
+import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
+import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.service.ClientService;
 import ar.edu.utn.sigmaproject.service.OrderDetailService;
 import ar.edu.utn.sigmaproject.service.OrderService;
@@ -38,6 +50,8 @@ import ar.edu.utn.sigmaproject.service.ProcessTypeService;
 import ar.edu.utn.sigmaproject.service.ProductService;
 import ar.edu.utn.sigmaproject.service.ProductionPlanService;
 import ar.edu.utn.sigmaproject.service.ProductionPlanDetailService;
+import ar.edu.utn.sigmaproject.service.ProductionPlanStateService;
+import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeService;
 import ar.edu.utn.sigmaproject.service.impl.ClientServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.OrderDetailServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.OrderServiceImpl;
@@ -49,6 +63,8 @@ import ar.edu.utn.sigmaproject.service.impl.ProcessTypeServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductionPlanServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductionPlanDetailServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.ProductionPlanStateServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.ProductionPlanStateTypeServiceImpl;
 
 public class ProductionPlanCreationController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
@@ -59,6 +75,8 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	Grid productionPlanDetailGrid;
 	@Wire
 	Bandbox orderBandbox;
+	@Wire
+	Textbox productionPlanNameTextbox;
 	@Wire
     Datebox productionPlanDateBox;
 	@Wire
@@ -75,6 +93,10 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
     Button deleteProductionPlanButton;
     @Wire
     Listbox productTotalListbox;
+    @Wire
+    Selectbox productionPlanStateTypeSelectBox;
+    @Wire
+	Caption productionPlanCaption;
 	
 	// services
 	private OrderService orderService = new OrderServiceImpl();
@@ -88,34 +110,39 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	private ProcessService processService = new ProcessServiceImpl();
 	private ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
 	private ClientService clientService = new ClientServiceImpl();
+	private ProductionPlanStateService productionPlanStateService = new ProductionPlanStateServiceImpl();
+	private ProductionPlanStateTypeService productionPlanStateTypeService = new ProductionPlanStateTypeServiceImpl();;
 	
 	// list
 	private List<Order> orderPopupList;
-    private List<ProductionPlanDetail> productionPlanDetailList;
-	private List<ProductionPlanDetail> lateDeleteProductionPlanDetailList;
+    private List<ProductionPlanDetail> currentProductionPlanDetailList;
 	private List<ProductTotal> productTotalList;
+	private List<ProductionPlanStateType> productionPlanStateTypeList;
 	
 	// list models
 	private ListModelList<Order> orderPopupListModel;
 	private ListModelList<Process> processListModel;
 	private ListModelList<ProductionPlanDetail> productionPlanDetailListModel;
+	private ListModelList<ProductionPlanStateType> productionPlanStateTypeListModel;
     
     // atributes
     private Order currentOrder;
     private ProductionPlan currentProductionPlan;
+    private ProductionPlanState currentProductionPlanState;
     
 	@Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
         
         productTotalList = new ArrayList<ProductTotal>();
-        productionPlanDetailList = new ArrayList<ProductionPlanDetail>();
-        
+        currentProductionPlanDetailList = new ArrayList<ProductionPlanDetail>();
         currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
+        
+        productionPlanStateTypeList = productionPlanStateTypeService.getProductionPlanStateTypeList();
+        productionPlanStateTypeListModel = new ListModelList<ProductionPlanStateType>(productionPlanStateTypeList);
+        productionPlanStateTypeSelectBox.setModel(productionPlanStateTypeListModel);
+        
         refreshViewProductionPlan();
-        
-        lateDeleteProductionPlanDetailList = new ArrayList<ProductionPlanDetail>();
-        
         refreshProcessListBox();
         refreshProductTotalListbox();
     }
@@ -128,7 +155,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	
 	private void refreshOrder() {
 		if(currentOrder != null) { 
-			orderBandbox.setValue("Pedido nro " + currentOrder.getId());
+			orderBandbox.setValue("Pedido " + currentOrder.getId());
 			orderBandbox.close();
 		}else {
 			orderBandbox.setValue("");// borramos el text del producto  seleccionado
@@ -139,7 +166,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	private void refreshOrderPopupList() {// el popup se actualiza en base a los detalles
 		Integer order_state_type_id = orderStateTypeService.getOrderStateType("iniciado").getId();// se busca el id del estado de pedido iniciado
 		orderPopupList = orderService.getOrderList(order_state_type_id);// se buscan los pedidos que no estan asignados a un plan y no estan cancelados (estan en estado iniciado)
-    	for(ProductionPlanDetail productionPlanDetail : productionPlanDetailList) {// no debe contener los pedidos que ya estan en el detalle
+    	for(ProductionPlanDetail productionPlanDetail : currentProductionPlanDetailList) {// no debe contener los pedidos que ya estan en el detalle
     		Order aux = orderService.getOrder(productionPlanDetail.getIdOrder());
     		orderPopupList.remove(aux);// sacamos todos los pedidos del popup
     	}
@@ -152,39 +179,72 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		refreshViewProductionPlan();
     }
 	
-	@Listen("onClick = #addOrderButton")
-    public void addOrder() {
-		if(currentOrder == null) {
-			Clients.showNotification("Debe seleccionar un pedido", orderBandbox);
+	@Listen("onClick = #deleteProductionPlanButton")
+    public void deleteProductionPlan() {
+		if(currentProductionPlan != null) {
+			productionPlanService.deleteProductionPlan(currentProductionPlan);
+			currentProductionPlan = null;
+			refreshViewProductionPlan();
+		}
+    }
+	
+	@Listen("onClick = #saveProductionPlanButton")
+    public void saveProductionPlan() {
+		if(currentProductionPlanDetailList.size() == 0) {
+			Clients.showNotification("Ingresar al menos 1 pedido", addOrderButton);
 			return;
 		}
-		// buscamos si el pedido no esta en un detalle eliminado
-		ProductionPlanDetail aux = null;
-		for(ProductionPlanDetail lateDeleteProductionPlanDetail : lateDeleteProductionPlanDetailList) {
-			if(currentOrder.getId().equals(lateDeleteProductionPlanDetail.getIdOrder())) {
-				aux = lateDeleteProductionPlanDetail;
-			}
+		String production_plan_name = productionPlanNameTextbox.getText();
+		Date production_plan_date = productionPlanDateBox.getValue();
+		int production_plan_state_type_id = productionPlanStateTypeListModel.getElementAt(productionPlanStateTypeSelectBox.getSelectedIndex()).getId();
+		if(currentProductionPlan == null) { // es un plan nuevo
+			// creamos el nuevo plan
+			currentProductionPlan = new ProductionPlan(null, production_plan_name, null, production_plan_date);
+			currentProductionPlan = productionPlanService.saveProductionPlan(currentProductionPlan, production_plan_state_type_id, currentProductionPlanDetailList);
+		} else { // se edita un plan
+			currentProductionPlan.setName(production_plan_name);
+			currentProductionPlan.setDate(production_plan_date);
+			currentProductionPlan = productionPlanService.updateProductionPlan(currentProductionPlan, production_plan_state_type_id, currentProductionPlanDetailList);
 		}
-		if(aux != null) {
-			lateDeleteProductionPlanDetailList.remove(aux);// lo eliminamos de la lista de eliminacion tardia (porque el pedido sera agregado de nuevo, y no se eliminara tardiamente)
-		}
+		currentProductionPlan = null;
+		currentProductionPlanState = null;
+		refreshViewProductionPlan();
+		alert("Plan guardado.");
+	}
+	
+	@Listen("onClick = #addOrderButton")
+    public void addOrder() {
 		if(currentProductionPlan == null) {// es un plan de produccion nuevo
-			productionPlanDetailList.add(new ProductionPlanDetail(null, currentOrder.getId()));
+			currentProductionPlanDetailList.add(new ProductionPlanDetail(null, currentOrder.getId()));
 		} else {
-			productionPlanDetailList.add(new ProductionPlanDetail(currentProductionPlan.getId(), currentOrder.getId()));
+			currentProductionPlanDetailList.add(new ProductionPlanDetail(currentProductionPlan.getId(), currentOrder.getId()));
 		}
 		
 		refreshProductionPlanDetailListGrid();
 		currentOrder = null;
-		
 		refreshOrderPopupList();
 		refreshOrder();
 		refreshProcessListBox();
 		refreshProductTotalListbox();
     }
 	
+	@Listen("onRemoveOrder = #productionPlanDetailGrid")
+    public void doRemoveOrder(ForwardEvent evt) {
+		int idOrder = (Integer) evt.getData();
+    	// eliminamos el detalle de la lista
+    	for(ProductionPlanDetail auxProductionPlanDetail : currentProductionPlanDetailList) {
+    		if(auxProductionPlanDetail.getIdOrder().equals(idOrder)) {
+    			currentProductionPlanDetailList.remove(auxProductionPlanDetail);
+    			break;
+    		}
+    	}
+    	refreshProductionPlanDetailListGrid();
+    	refreshProductTotalListbox();
+    	refreshOrderPopupList();
+    }
+	
 	private void refreshProductionPlanDetailListGrid() {
-		productionPlanDetailListModel = new ListModelList<ProductionPlanDetail>(productionPlanDetailList);
+		productionPlanDetailListModel = new ListModelList<ProductionPlanDetail>(currentProductionPlanDetailList);
         productionPlanDetailGrid.setModel(productionPlanDetailListModel);
 	}
 	
@@ -198,21 +258,42 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		currentOrder = null;// deseleccionamos el pedido
 		refreshOrder();
   		if (currentProductionPlan == null) {// nuevo plan de produccion
+  			productionPlanCaption.setLabel("Creacion de Plan de Produccion");
+  			productionPlanStateTypeListModel.addToSelection(productionPlanStateTypeService.getProductionPlanStateType("iniciado"));
+  			productionPlanStateTypeSelectBox.setModel(productionPlanStateTypeListModel);
+  			productionPlanNameTextbox.setText("");
   			productionPlanDateBox.setValue(new Date());
-  	        productionPlanDetailList = new ArrayList<ProductionPlanDetail>();
+  	        currentProductionPlanDetailList = new ArrayList<ProductionPlanDetail>();
   	        deleteProductionPlanButton.setDisabled(true);
+  	        productionPlanStateTypeSelectBox.setDisabled(true);
   		} else {// se edita plan de produccion
+  			productionPlanCaption.setLabel("Edicion de Plan de Produccion");
+  			currentProductionPlanState = productionPlanStateService.getLastProductionPlanState(currentProductionPlan.getId());
+  			if(currentProductionPlanState != null) {
+  				productionPlanStateTypeListModel.addToSelection(productionPlanStateTypeService.getProductionPlanStateType(currentProductionPlanState.getIdProductionPlanStateType()));
+  				productionPlanStateTypeSelectBox.setModel(productionPlanStateTypeListModel);
+        	} else {
+        		productionPlanStateTypeSelectBox.setSelectedIndex(-1);
+        	}
+  			if(currentProductionPlan.getName() != null) {
+  				productionPlanNameTextbox.setText(currentProductionPlan.getName());
+  			} else {
+  				productionPlanNameTextbox.setText("");
+  			}
   			productionPlanDateBox.setValue(currentProductionPlan.getDate());
-  			productionPlanDetailList = productionPlanDetailService.getProductionPlanDetailList(currentProductionPlan.getId());
+  			currentProductionPlanDetailList = productionPlanDetailService.getProductionPlanDetailList(currentProductionPlan.getId());
   			deleteProductionPlanButton.setDisabled(false);
+  			productionPlanStateTypeSelectBox.setDisabled(false);
   		}
+  		productionPlanDateBox.setDisabled(true);// nunca se debe poder modificar
   		refreshOrderPopupList();
   		refreshProductionPlanDetailListGrid();
+  		refreshProductTotalListbox();
   	}
     
 	private void refreshProcessListBox() {
 		List<Process> processList = new ArrayList<Process>();
-		for(ProductionPlanDetail auxProductionPlanDetail : productionPlanDetailList) {
+		for(ProductionPlanDetail auxProductionPlanDetail : currentProductionPlanDetailList) {
 			Order auxOrder = orderService.getOrder(auxProductionPlanDetail.getIdOrder());
 			List<OrderDetail> auxOrderDetailList = orderDetailService.getOrderDetailList(auxOrder.getId());
 			for(OrderDetail auxOrderDetail : auxOrderDetailList) {
@@ -232,7 +313,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	
 	private void refreshProductTotalList() {
 		productTotalList = new ArrayList<ProductTotal>();// se empieza con una lista vacia
-		for(ProductionPlanDetail auxProductionPlanDetail : productionPlanDetailList) {
+		for(ProductionPlanDetail auxProductionPlanDetail : currentProductionPlanDetailList) {
 			Order auxOrder = orderService.getOrder(auxProductionPlanDetail.getIdOrder());// buscamos el pedido referente al detalle del plan de produccion
 			List<OrderDetail> orderDetailList =  orderDetailService.getOrderDetailList(auxOrder.getId());// buscamos todos sus detalles
 			for(OrderDetail auxOrderDetail : orderDetailList) {// por cada detalle del pedido, observamos si el producto ya esta en la lista, si lo esta sumamos su cantidad y, si no esta lo agregamos
@@ -244,7 +325,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 						is_in_list = true;
 						productTotal.setTotalUnits(productTotal.getTotalUnits() + order_detail_units);// sumamos su cantidad con la existente
 						break;
-						//(!) no muy seguro si las modificaciones de los objetos en este for afectan a los que estan adentro de la lista(!)
 					}
 				}
 				if(is_in_list == false) {// no esta, por lo tanto agregamos el producto a la lista total
@@ -308,6 +388,11 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		return aux.getName();
     }
 	
+	public Date getOrderDate(int idOrder) {
+		Order aux = orderService.getOrder(idOrder);
+		return aux.getDate();
+    }
+	
 	public String getPieceUnits(int idPiece) {
 		Piece aux = pieceService.getPiece(idPiece);
 		return aux.getUnits() + "";
@@ -316,7 +401,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	public String getPieceTotalUnits(int idPiece) {
 		Piece auxPiece = pieceService.getPiece(idPiece);
 		int units = 0;
-		for(ProductionPlanDetail auxProductionPlanDetail : productionPlanDetailList) {
+		for(ProductionPlanDetail auxProductionPlanDetail : currentProductionPlanDetailList) {
 			Order auxOrder = orderService.getOrder(auxProductionPlanDetail.getIdOrder());
 			List<OrderDetail> auxOrderDetailList = orderDetailService.getOrderDetailList(auxOrder.getId());
 			for(OrderDetail auxOrderDetail : auxOrderDetailList) {
@@ -336,7 +421,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		Piece auxPiece = pieceService.getPiece(idPiece);
 		long total = 0;
 		int units = 0;
-		for(ProductionPlanDetail auxProductionPlanDetail : productionPlanDetailList) {
+		for(ProductionPlanDetail auxProductionPlanDetail : currentProductionPlanDetailList) {
 			Order auxOrder = orderService.getOrder(auxProductionPlanDetail.getIdOrder());
 			List<OrderDetail> auxOrderDetailList = orderDetailService.getOrderDetailList(auxOrder.getId());
 			for(OrderDetail auxOrderDetail : auxOrderDetailList) {
@@ -354,24 +439,5 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	public String quantityOfDetail(int idOrder) {
     	return orderDetailService.getOrderDetailList(idOrder).size() + "";
     }
-	
-	class ProductTotal extends Product {
-		
-		private static final long serialVersionUID = 1L;
-		Integer totalUnits;
-		
-		public ProductTotal(Product product) {
-			super(product.getId(), product.getCode(), product.getName(), product.getDetails(), product.getPrice());
-		}
-		
-		public Integer getTotalUnits() {
-			return totalUnits;
-		}
-
-		public void setTotalUnits(Integer totalUnits) {
-			this.totalUnits = totalUnits;
-		}
-		
-	}
 	
 }

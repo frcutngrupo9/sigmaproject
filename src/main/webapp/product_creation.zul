@@ -11,19 +11,19 @@
                     <rows>
                     	<row>
                             <label value="Codigo :"/>
-                            <textbox id="productCode" width="50%" placeholder="Codigo del Producto"/>
+                            <textbox id="productCodeTextbox" width="50%" placeholder="Codigo del Producto"/>
                         </row>
                         <row>
                             <label value="Nombre :"/>
-                            <textbox id="productName" width="50%" placeholder="Nombre del Producto"/>
+                            <textbox id="productNameTextbox" width="50%" placeholder="Nombre del Producto"/>
                         </row>
                         <row>
                             <label value="Detalles :"/>
-                            <textbox id="productDetails" width="50%" rows="3" height="100px" />
+                            <textbox id="productDetailsTextbox" width="50%" rows="3" height="100px" />
                         </row>
                         <row>
                             <label value="Precio :"/>
-                            <doublebox id="productPrice" width="50%" placeholder="Precio del Producto"/>
+                            <doublebox id="productPriceDoublebox" width="50%" placeholder="Precio del Producto"/>
                         </row>
                     </rows>
                 </grid>
@@ -65,19 +65,19 @@
                     <rows>
                         <row>
                             <label value="Nombre:"/>
-                            <textbox id="pieceName" value=""  width="50%" placeholder="Nombre de la Pieza"/>
+                            <textbox id="pieceNameTextbox" value=""  width="50%" placeholder="Nombre de la Pieza"/>
                         </row>
                         <row>
                             <label value="Unidades por Producto:"/>
-                            <intbox id="pieceUnitsByProduct" value="0" width="150px"/>
+                            <intbox id="pieceUnitsByProductIntbox" value="0" width="150px"/>
                         </row>
                         <row>
                             <label value="La pieza es conjunto de otras?:"/>
-                            <checkbox id="pieceGroup" checked="false"/>
+                            <checkbox id="pieceGroupCheckbox" checked="false"/>
                         </row>
                         <row>
                             <label value="Dimensiones Prefijadas :"/>
-                            <combobox id="comboMeasurePreset" autodrop="true"/>
+                            <combobox id="measurePresetCombobox" autodrop="true"/>
                         </row>
                         <row>	
 		                    <label>Unidad de Medida:</label>
@@ -89,23 +89,23 @@
 		                </row>
                         <row>
                             <label value="Longitud:"/>
-                            <doublebox id="pieceHeight" width="150px" format="#.###"/>
+                            <doublebox id="pieceHeightDoublebox" width="150px" format="#.###"/>
                         </row>
                         <row>
                             <label value="Espesor:"/>
-                            <doublebox id="pieceDepth" width="150px" format="#.###"/>
+                            <doublebox id="pieceDepthDoublebox" width="150px" format="#.###"/>
                         </row>
                         <row>
                             <label value="Ancho:"/>
-                            <doublebox id="pieceWidth" width="150px" format="#.###"/>
+                            <doublebox id="pieceWidthDoublebox" width="150px" format="#.###"/>
                         </row>
                         <row>
                             <label value="Medida 1:"/>
-                            <doublebox id="pieceSize1" width="150px" format="#.###"/>
+                            <doublebox id="pieceSize1Doublebox" width="150px" format="#.###"/>
                         </row>
                         <row>
                             <label value="Medida 2:"/>
-                            <doublebox id="pieceSize2" width="150px" format="#.###"/>
+                            <doublebox id="pieceSize2Doublebox" width="150px" format="#.###"/>
                         </row>
                     </rows>
                 </grid>
