@@ -3,6 +3,7 @@ package ar.edu.utn.sigmaproject.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
@@ -101,6 +102,13 @@ public class ProductionPlanStateServiceImpl implements ProductionPlanStateServic
 					return;
 				}
 			}
+		}
+	}
+
+	public synchronized void deleteAllProductionPlanState(Integer idProductionPlan) {
+		List<ProductionPlanState> listDelete = getProductionPlanStateList(idProductionPlan);
+		for(ProductionPlanState delete:listDelete) {
+			deleteProductionPlanState(delete);
 		}
 	}
 }

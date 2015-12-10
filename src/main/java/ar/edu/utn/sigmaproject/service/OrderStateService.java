@@ -20,4 +20,6 @@ public interface OrderStateService {
 
 	void deleteOrderState(OrderState orderState);
 
+	void deleteAllOrderState(Integer idOrder);
+
 }

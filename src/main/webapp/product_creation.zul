@@ -29,12 +29,12 @@
                 </grid>
                 <separator/>
                 <hlayout>
-                    <button id="createPieceButton" label="Agregar Nueva Pieza"/>
                     <button id="saveProductButton" label="Guardar Producto"/>
                     <button id="resetProductButton" label="Reset Producto"/>
                     <button id="deleteProductButton" label="Eliminar Producto"/>
                 </hlayout>
                 <separator/>
+                <button id="createPieceButton" label="Agregar Nueva Pieza"/>
     			<listbox id="pieceListbox">
     				<auxhead>
 						<auxheader label="Piezas" colspan="2"/>

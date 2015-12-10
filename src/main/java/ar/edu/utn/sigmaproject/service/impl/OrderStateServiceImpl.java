@@ -104,4 +104,11 @@ public class OrderStateServiceImpl implements OrderStateService {
 			}
 		}
 	}
+
+	public synchronized void deleteAllOrderState(Integer idOrder) {
+		List<OrderState> listDelete = getOrderStateList(idOrder);
+		for(OrderState delete:listDelete) {
+			deleteOrderState(delete);
+		}
+	}
 }

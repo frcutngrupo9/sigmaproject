@@ -166,10 +166,12 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	private void refreshOrderPopupList() {// el popup se actualiza en base a los detalles
 		Integer order_state_type_id = orderStateTypeService.getOrderStateType("iniciado").getId();// se busca el id del estado de pedido iniciado
 		orderPopupList = orderService.getOrderList(order_state_type_id);// se buscan los pedidos que no estan asignados a un plan y no estan cancelados (estan en estado iniciado)
-    	for(ProductionPlanDetail productionPlanDetail : currentProductionPlanDetailList) {// no debe contener los pedidos que ya estan en el detalle
+		for(ProductionPlanDetail productionPlanDetail : currentProductionPlanDetailList) {// no debe contener los pedidos que ya estan en el detalle
     		Order aux = orderService.getOrder(productionPlanDetail.getIdOrder());
-    		orderPopupList.remove(aux);// sacamos todos los pedidos del popup
+    		orderPopupList.remove(aux);// sacamos los pedidos que estan en la currentProductionPlanDetailList del popup
     	}
+		// agregamos el pedido que se eliminó y al ser de un plan que se esta editando, no aparece en la lista
+		// [aca deberia agregarse a la lista los pedidos que esten en el ProductionPlanDetailList serializado pero no esten en el currentProductionPlanDetailList (solo si se esta editando un plan)]
     	orderPopupListModel = new ListModelList<Order>(orderPopupList);
         orderPopupListbox.setModel(orderPopupListModel);
 	}
@@ -214,12 +216,8 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	
 	@Listen("onClick = #addOrderButton")
     public void addOrder() {
-		if(currentProductionPlan == null) {// es un plan de produccion nuevo
-			currentProductionPlanDetailList.add(new ProductionPlanDetail(null, currentOrder.getId()));
-		} else {
-			currentProductionPlanDetailList.add(new ProductionPlanDetail(currentProductionPlan.getId(), currentOrder.getId()));
-		}
-		
+		// el detalle debe tener id de plan nulo ya que se lo agrega al guardar o actualizar el plan
+		currentProductionPlanDetailList.add(new ProductionPlanDetail(null, currentOrder.getId()));
 		refreshProductionPlanDetailListGrid();
 		currentOrder = null;
 		refreshOrderPopupList();

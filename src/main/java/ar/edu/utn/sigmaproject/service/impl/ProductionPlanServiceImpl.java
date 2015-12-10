@@ -92,11 +92,14 @@ public class ProductionPlanServiceImpl  implements ProductionPlanService {
 			for(int i = 0; i < size; i++) {
 				ProductionPlan t = productionPlanList.get(i);
 				if(t.getId().equals(productionPlan.getId())) {
-					productionPlanList.remove(i);
+					productionPlanList.remove(i);// eliminamos el plan
 					serializator.grabarLista(productionPlanList);
 					return;
 				}
 			}
+			ProductionPlanStateService productionPlanStateService = new ProductionPlanStateServiceImpl();
+			// eliminamos todos los estados del plan
+			productionPlanStateService.deleteAllProductionPlanState(productionPlan.getId());
 		}
 	}
 	
@@ -137,30 +140,32 @@ public class ProductionPlanServiceImpl  implements ProductionPlanService {
 			List<ProductionPlanDetail> productionPlanDetailList) {
 		productionPlan = updateProductionPlan(productionPlan);
 		ProductionPlanDetailService productionPlanDetailService = new ProductionPlanDetailServiceImpl();
+		List<ProductionPlanDetail> serializedProductionPlanDetailList = productionPlanDetailService.getProductionPlanDetailList(productionPlan.getId());// buscamos todos los detalles del plan de produccion
+		
 		for(ProductionPlanDetail productionPlanDetail : productionPlanDetailList) {// hay que actualizar los detalles que existen y agregar los que no
+			if(productionPlanDetail.getIdProductionPlan() == null) {
+				productionPlanDetail.setIdProductionPlan(productionPlan.getId());// agregamos el id del plan a los detalles en caso de que se haya agregado un detalle
+			}
 			ProductionPlanDetail aux = productionPlanDetailService.getProductionPlanDetail(productionPlanDetail.getIdProductionPlan(), productionPlanDetail.getIdOrder());
 			if(aux == null) {// no existe se agrega
-				productionPlanDetail.setIdOrder(productionPlan.getId());// agregamos el id del plan
 				productionPlanDetailService.saveProductionPlanDetail(productionPlanDetail);
-				// debemos cambiar el estado a "planificado"
+				// debemos cambiar el estado del pedido a "planificado"
 	        	setNewOrderState("planificado", productionPlanDetail.getIdOrder());// grabamos el estado del pedido
-			} else {// existe, se actualiza
+			} else {// existe, se actualiza (es irrelevante actualizarlo mientras no posea mas atributos que los dos id de referencia al plan y al pedido
 				productionPlanDetailService.updateProductionPlanDetail(productionPlanDetail);
 			}
 		}
-		List<ProductionPlanDetail> serializedProductionPlanDetailList = productionPlanDetailService.getProductionPlanDetailList(productionPlan.getId());// buscamos todos los detalles serializados de ese plan de produccion
+		// eliminamos los detalles que ya no estan en la lista
 		for(ProductionPlanDetail serializedProductionPlanDetail:serializedProductionPlanDetailList) {
 			Boolean is_in_list = false;
 			for(ProductionPlanDetail productionPlanDetail:productionPlanDetailList) {
-				if(serializedProductionPlanDetail.getIdProductionPlan().equals(productionPlanDetail.getIdProductionPlan())) {// si esta en la lista
+				if(serializedProductionPlanDetail.getIdOrder().equals(productionPlanDetail.getIdOrder())) {// si esta en la lista
 					is_in_list = true;
 					break;
 				}
 			}
-			System.out.println("LLego aca");
 			if(is_in_list == false) {// no esta en la lista que sera grabada, por lo tanto se debe eliminar
 				// debemos volver el estado de los pedidos a "iniciado"
-				System.out.println("a punto de eliminar detalle");
 				setNewOrderState("iniciado", serializedProductionPlanDetail.getIdOrder());// grabamos el estado del pedido
 	    		// eliminamos el detalle
 	    		productionPlanDetailService.deleteProductionPlanDetail(serializedProductionPlanDetail);

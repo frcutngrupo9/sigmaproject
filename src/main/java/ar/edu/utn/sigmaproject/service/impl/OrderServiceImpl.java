@@ -95,6 +95,9 @@ public class OrderServiceImpl implements OrderService {
                 if(t.getId().equals(order.getId())) {
                     orderList.remove(i);
                     serializator.grabarLista(orderList);
+                    // debemos eliminar todos los estados que hagan referencia a este pedido
+                    OrderStateService orderStateService = new OrderStateServiceImpl();
+                    orderStateService.deleteAllOrderState(order.getId());
                     return;
                 }
             }

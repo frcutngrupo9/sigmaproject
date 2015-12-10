@@ -74,17 +74,18 @@ public class SidebarController extends SelectorComposer<Component> {
         @SuppressWarnings("unchecked")
 		TreeNode<MenuTreeRow> rootNode = new DefaultTreeNode<MenuTreeRow>(null, Arrays.asList(
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Productos"), Arrays.asList(
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Search.png", "Lista de Productos", "/product_list.zul")),
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Paste.png", "Lista de Productos", "/product_list.zul")),
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Stationery.png", "Crear Producto", "/product_creation.zul"))
             )),
+            new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Pedidos"), Arrays.asList(
+            		new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Lista de Pedidos", "/order_list.zul")),
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Pedido", "/order_creation.zul"))
+                    
+            )),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Produccion"), Arrays.asList(
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Planes de Produccion", "/production_plan_list.zul")),
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Lista de Planes de Produccion", "/production_plan_list.zul")),
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Plan de Produccion", "/production_plan_creation.zul")),
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Orden de Produccion", "/production_order_creation.zul"))
-            )),
-            new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Pedidos"), Arrays.asList(
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Pedido", "/order_creation.zul")),
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Lista de Pedidos", "/order_list.zul"))
             )),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Stock"), Arrays.asList(
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Box.png", "Stock de Productos", "/product_stock.zul")),
