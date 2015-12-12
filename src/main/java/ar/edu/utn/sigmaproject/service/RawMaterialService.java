@@ -17,5 +17,7 @@ public interface RawMaterialService {
 	RawMaterial updateRawMaterial(RawMaterial rawMaterial);
 
 	void deleteRawMaterial(RawMaterial rawMaterial);
+	
+	void deleteAll(Integer idProduct);
 
 }

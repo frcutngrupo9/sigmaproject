@@ -89,15 +89,18 @@ public class OrderServiceImpl implements OrderService {
     
     public synchronized void deleteOrder(Order order) {
         if(order.getId() != null) {
+        	OrderDetailService orderDetailService = new OrderDetailServiceImpl();
+        	OrderStateService orderStateService = new OrderStateServiceImpl();
             int size = orderList.size();
             for(int i = 0; i < size; i++) {
                 Order t = orderList.get(i);
                 if(t.getId().equals(order.getId())) {
                     orderList.remove(i);
                     serializator.grabarLista(orderList);
+                    // se deben eliminar todos los detalles del pedido tbn
+                    orderDetailService.deleteAll(order.getId());
                     // debemos eliminar todos los estados que hagan referencia a este pedido
-                    OrderStateService orderStateService = new OrderStateServiceImpl();
-                    orderStateService.deleteAllOrderState(order.getId());
+                    orderStateService.deleteAll(order.getId());
                     return;
                 }
             }

@@ -3,6 +3,7 @@ package ar.edu.utn.sigmaproject.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.RawMaterial;
 import ar.edu.utn.sigmaproject.service.RawMaterialService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
@@ -85,6 +86,13 @@ public class RawMaterialServiceImpl implements RawMaterialService {
 					return;
 				}
 			}
+		}
+	}
+	
+	public synchronized void deleteAll(Integer idProduct) {
+		List<RawMaterial> listDelete = getRawMaterialList(idProduct);
+		for(RawMaterial delete:listDelete) {
+			deleteRawMaterial(delete);
 		}
 	}
 }

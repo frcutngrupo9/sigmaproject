@@ -1,6 +1,7 @@
 package ar.edu.utn.sigmaproject.service;
 
 import java.util.List;
+
 import ar.edu.utn.sigmaproject.domain.Process;
 
 public interface ProcessService {
@@ -16,6 +17,8 @@ public interface ProcessService {
 	Process updateProcess(Process process);
 
 	void deleteProcess(Process process);
+
+	void deleteAll(Integer idPiece);
 
 }
 

@@ -74,31 +74,33 @@ public class SidebarController extends SelectorComposer<Component> {
         @SuppressWarnings("unchecked")
 		TreeNode<MenuTreeRow> rootNode = new DefaultTreeNode<MenuTreeRow>(null, Arrays.asList(
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Productos"), Arrays.asList(
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Paste.png", "Lista de Productos", "/product_list.zul")),
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Paste.png", "Listado Productos", "/product_list.zul")),
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Stationery.png", "Crear Producto", "/product_creation.zul"))
             )),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Pedidos"), Arrays.asList(
-            		new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Lista de Pedidos", "/order_list.zul")),
+            		new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Pedidos", "/order_list.zul")),
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Pedido", "/order_creation.zul"))
                     
             )),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Produccion"), Arrays.asList(
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Lista de Planes de Produccion", "/production_plan_list.zul")),
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Planes de Produccion", "/production_plan_list.zul")),
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Plan de Produccion", "/production_plan_creation.zul")),
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Orden de Produccion", "/production_order_creation.zul"))
             )),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Stock"), Arrays.asList(
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Box.png", "Stock de Productos", "/product_stock.zul")),
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Box.png", "Stock de Materia Prima", "/raw_material_stock.zul"))
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Stock Productos", "/product_stock.zul")),
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Stock Materia Prima", "/raw_material_stock.zul")),
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Stock Insumos", "/supply_stock.zul")),
+                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Maquinas", "/machine_stock.zul"))
             )),
-            new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Materia Prima", "/raw_material.zul")),
-            new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Insumos", "/supply.zul")),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Clientes", "/client.zul")),
+            new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Materias Primas", "/raw_material.zul")),
+            new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Insumos", "/supply.zul")),
+            new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Maquinas", "/machine.zul")),
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Reportes"))
         ));
         tree.setModel(new DefaultTreeModel<MenuTreeRow>(rootNode));
         tree.addEventListener(Events.ON_CLICK, new EventListener<MouseEvent>() {
-
             public void onEvent(MouseEvent event) throws Exception {
                 Treeitem treeitem = tree.getSelectedItem();
                 DefaultTreeNode<MenuTreeRow> treeNode = treeitem.<DefaultTreeNode<MenuTreeRow>>getValue();

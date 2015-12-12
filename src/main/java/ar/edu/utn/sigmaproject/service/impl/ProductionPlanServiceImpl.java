@@ -81,13 +81,8 @@ public class ProductionPlanServiceImpl  implements ProductionPlanService {
 		if(productionPlan.getId() != null) {
 			// primero eliminamos los detalles y cambiamos los estados
 			ProductionPlanDetailService productionPlanDetailService = new ProductionPlanDetailServiceImpl();
-			List<ProductionPlanDetail> productionPlanDetailList = productionPlanDetailService.getProductionPlanDetailList();
-			for(ProductionPlanDetail productionPlanDetail : productionPlanDetailList) {
-				// debemos volver el estado de los pedidos a "iniciado"
-				setNewOrderState("iniciado", productionPlanDetail.getIdOrder());// grabamos el estado del pedido
-	    		// eliminamos el detalle
-	    		productionPlanDetailService.deleteProductionPlanDetail(productionPlanDetail);
-			}
+			productionPlanDetailService.deleteAll(productionPlan.getId());
+			
 			int size = productionPlanList.size();
 			for(int i = 0; i < size; i++) {
 				ProductionPlan t = productionPlanList.get(i);
@@ -99,7 +94,7 @@ public class ProductionPlanServiceImpl  implements ProductionPlanService {
 			}
 			ProductionPlanStateService productionPlanStateService = new ProductionPlanStateServiceImpl();
 			// eliminamos todos los estados del plan
-			productionPlanStateService.deleteAllProductionPlanState(productionPlan.getId());
+			productionPlanStateService.deleteAll(productionPlan.getId());
 		}
 	}
 	
@@ -125,9 +120,7 @@ public class ProductionPlanServiceImpl  implements ProductionPlanService {
 			productionPlanDetail.setIdProductionPlan(productionPlan.getId());
 			productionPlanDetail = productionPlanDetailService.saveProductionPlanDetail(productionPlanDetail);
 			// debemos cambiar el estado de todos los pedidos a "planificado"
-        	OrderStateType order_state_type = orderStateTypeService.getOrderStateType("planificado");
-        	OrderState aux = new OrderState(productionPlanDetail.getIdOrder(), order_state_type.getId(), new Date());
-    		orderStateService.saveOrderState(aux);// grabamos el estado del pedido
+    		orderStateService.setNewOrderState("planificado", productionPlanDetail.getIdOrder());
 		}
 		ProductionPlanState aux = new ProductionPlanState(productionPlan.getId(), productionPlanStateTypeId, new Date());
 		ProductionPlanStateService productionPlanStateService = new ProductionPlanStateServiceImpl();
@@ -140,8 +133,8 @@ public class ProductionPlanServiceImpl  implements ProductionPlanService {
 			List<ProductionPlanDetail> productionPlanDetailList) {
 		productionPlan = updateProductionPlan(productionPlan);
 		ProductionPlanDetailService productionPlanDetailService = new ProductionPlanDetailServiceImpl();
+		OrderStateService orderStateService = new OrderStateServiceImpl();
 		List<ProductionPlanDetail> serializedProductionPlanDetailList = productionPlanDetailService.getProductionPlanDetailList(productionPlan.getId());// buscamos todos los detalles del plan de produccion
-		
 		for(ProductionPlanDetail productionPlanDetail : productionPlanDetailList) {// hay que actualizar los detalles que existen y agregar los que no
 			if(productionPlanDetail.getIdProductionPlan() == null) {
 				productionPlanDetail.setIdProductionPlan(productionPlan.getId());// agregamos el id del plan a los detalles en caso de que se haya agregado un detalle
@@ -150,7 +143,7 @@ public class ProductionPlanServiceImpl  implements ProductionPlanService {
 			if(aux == null) {// no existe se agrega
 				productionPlanDetailService.saveProductionPlanDetail(productionPlanDetail);
 				// debemos cambiar el estado del pedido a "planificado"
-	        	setNewOrderState("planificado", productionPlanDetail.getIdOrder());// grabamos el estado del pedido
+				orderStateService.setNewOrderState("planificado", productionPlanDetail.getIdOrder());// grabamos el estado del pedido
 			} else {// existe, se actualiza (es irrelevante actualizarlo mientras no posea mas atributos que los dos id de referencia al plan y al pedido
 				productionPlanDetailService.updateProductionPlanDetail(productionPlanDetail);
 			}
@@ -166,7 +159,7 @@ public class ProductionPlanServiceImpl  implements ProductionPlanService {
 			}
 			if(is_in_list == false) {// no esta en la lista que sera grabada, por lo tanto se debe eliminar
 				// debemos volver el estado de los pedidos a "iniciado"
-				setNewOrderState("iniciado", serializedProductionPlanDetail.getIdOrder());// grabamos el estado del pedido
+				orderStateService.setNewOrderState("iniciado", serializedProductionPlanDetail.getIdOrder());// grabamos el estado del pedido
 	    		// eliminamos el detalle
 	    		productionPlanDetailService.deleteProductionPlanDetail(serializedProductionPlanDetail);
 			}
@@ -180,14 +173,6 @@ public class ProductionPlanServiceImpl  implements ProductionPlanService {
 			}
 		}
 		return productionPlan;
-	}
-	
-	private void setNewOrderState(String stateName, Integer idOrder) {
-		OrderStateTypeService orderStateTypeService = new OrderStateTypeServiceImpl();
-		OrderStateService orderStateService = new OrderStateServiceImpl();
-		OrderStateType order_state_type = orderStateTypeService.getOrderStateType(stateName);
-    	OrderState aux = new OrderState(idOrder, order_state_type.getId(), new Date());
-		orderStateService.saveOrderState(aux);// grabamos el estado del pedido
 	}
 
 }

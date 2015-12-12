@@ -1,11 +1,16 @@
 package ar.edu.utn.sigmaproject.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.OrderState;
+import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
+import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
+import ar.edu.utn.sigmaproject.service.OrderStateTypeService;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateService;
+import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
 public class ProductionPlanStateServiceImpl implements ProductionPlanStateService {
@@ -105,10 +110,17 @@ public class ProductionPlanStateServiceImpl implements ProductionPlanStateServic
 		}
 	}
 
-	public synchronized void deleteAllProductionPlanState(Integer idProductionPlan) {
+	public synchronized void deleteAll(Integer idProductionPlan) {
 		List<ProductionPlanState> listDelete = getProductionPlanStateList(idProductionPlan);
 		for(ProductionPlanState delete:listDelete) {
 			deleteProductionPlanState(delete);
 		}
+	}
+	
+	public void setNewProductionPlanState(String stateName, Integer idProductionPlan) {// crea un nuevo estado en base al nombre pasado por parametro
+		ProductionPlanStateTypeService productionPlanStateTypeService = new ProductionPlanStateTypeServiceImpl();
+		ProductionPlanStateType production_plan_state_type = productionPlanStateTypeService.getProductionPlanStateType(stateName);
+		ProductionPlanState aux = new ProductionPlanState(idProductionPlan, production_plan_state_type.getId(), new Date());
+		saveProductionPlanState(aux);
 	}
 }

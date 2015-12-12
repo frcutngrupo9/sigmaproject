@@ -9,6 +9,7 @@ import ar.edu.utn.sigmaproject.domain.ProductTotal;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 import ar.edu.utn.sigmaproject.service.OrderDetailService;
 import ar.edu.utn.sigmaproject.service.OrderService;
+import ar.edu.utn.sigmaproject.service.OrderStateService;
 import ar.edu.utn.sigmaproject.service.ProductService;
 import ar.edu.utn.sigmaproject.service.ProductionPlanDetailService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
@@ -126,5 +127,16 @@ public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailServ
 			// del primer pedido, en el siguiente loop se sumaran los que ya estan y agregaran los nuevos
 		}
 		return productTotalList;// devuelve el productTotalList lleno con todos los productos sin repetir y con el total, que conforman el plan de produccion
+	}
+
+	public void deleteAll(Integer idProductionPlan) {
+		OrderStateService orderStateService = new OrderStateServiceImpl();
+		List<ProductionPlanDetail> deleteList = getProductionPlanDetailList(idProductionPlan);
+		for(ProductionPlanDetail delete : deleteList) {
+			// debemos volver el estado de los pedidos a "iniciado"
+			orderStateService.setNewOrderState("iniciado", delete.getIdOrder());
+    		// eliminamos el detalle
+    		deleteProductionPlanDetail(delete);
+		}
 	}
 }

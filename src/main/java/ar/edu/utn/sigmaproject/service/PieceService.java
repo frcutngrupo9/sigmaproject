@@ -20,4 +20,6 @@ public interface PieceService {
 
 	Integer getNewId();
 
+	void deleteAll(Integer idProduct);
+
 }

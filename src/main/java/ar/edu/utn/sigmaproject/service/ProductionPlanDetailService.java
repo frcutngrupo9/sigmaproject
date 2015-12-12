@@ -22,4 +22,6 @@ public interface ProductionPlanDetailService {
 
 	void deleteProductionPlanDetail(ProductionPlanDetail productionPlanDetail);
 
+	void deleteAll(Integer idProductionPlan);
+
 }

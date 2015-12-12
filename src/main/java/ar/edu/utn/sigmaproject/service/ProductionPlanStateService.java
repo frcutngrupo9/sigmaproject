@@ -20,6 +20,6 @@ public interface ProductionPlanStateService {
 
 	void deleteProductionPlanState(ProductionPlanState productionPlanState);
 
-	void deleteAllProductionPlanState(Integer idProductionPlan);
+	void deleteAll(Integer idProductionPlan);
 
 }

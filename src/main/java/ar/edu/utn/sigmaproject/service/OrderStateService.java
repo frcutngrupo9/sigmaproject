@@ -20,6 +20,8 @@ public interface OrderStateService {
 
 	void deleteOrderState(OrderState orderState);
 
-	void deleteAllOrderState(Integer idOrder);
+	void deleteAll(Integer idOrder);
+
+	void setNewOrderState(String stateName, Integer idOrder);
 
 }

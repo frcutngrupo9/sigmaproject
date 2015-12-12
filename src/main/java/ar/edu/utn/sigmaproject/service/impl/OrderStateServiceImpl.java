@@ -1,10 +1,13 @@
 package ar.edu.utn.sigmaproject.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.OrderState;
+import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.service.OrderStateService;
+import ar.edu.utn.sigmaproject.service.OrderStateTypeService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
 public class OrderStateServiceImpl implements OrderStateService {
@@ -105,10 +108,17 @@ public class OrderStateServiceImpl implements OrderStateService {
 		}
 	}
 
-	public synchronized void deleteAllOrderState(Integer idOrder) {
+	public synchronized void deleteAll(Integer idOrder) {
 		List<OrderState> listDelete = getOrderStateList(idOrder);
 		for(OrderState delete:listDelete) {
 			deleteOrderState(delete);
 		}
+	}
+
+	public void setNewOrderState(String stateName, Integer idOrder) {// crea un nuevo estado en base al nombre pasado por parametro
+		OrderStateTypeService orderStateTypeService = new OrderStateTypeServiceImpl();
+		OrderStateType order_state_type = orderStateTypeService.getOrderStateType(stateName);
+    	OrderState aux = new OrderState(idOrder, order_state_type.getId(), new Date());
+		saveOrderState(aux);
 	}
 }

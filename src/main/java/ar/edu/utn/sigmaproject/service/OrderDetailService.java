@@ -18,4 +18,6 @@ public interface OrderDetailService {
 
 	List<OrderDetail> getOrderDetailList(Integer idOrder);
 
+	void deleteAll(Integer idOrder);
+
 }

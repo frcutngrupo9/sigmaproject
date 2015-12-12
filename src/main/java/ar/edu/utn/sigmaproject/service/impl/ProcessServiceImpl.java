@@ -3,6 +3,7 @@ package ar.edu.utn.sigmaproject.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.service.ProcessService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
@@ -87,6 +88,13 @@ public class ProcessServiceImpl implements ProcessService {
 					return;
 				}
 			}
+		}
+	}
+
+	public synchronized void deleteAll(Integer idPiece) {
+		List<Process> listDelete = getProcessList(idPiece);
+		for(Process delete:listDelete) {
+			deleteProcess(delete);
 		}
 	}
 }
