@@ -75,7 +75,7 @@ public class MeasureUnitTypeServiceImpl implements MeasureUnitTypeService {
                     return aux;
                 }
             }
-            throw new RuntimeException("Product not found " + aux.getId());
+            throw new RuntimeException("MeasureUnitType not found " + aux.getId());
         }
     }
     
