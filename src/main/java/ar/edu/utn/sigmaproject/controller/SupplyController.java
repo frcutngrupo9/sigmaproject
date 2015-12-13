@@ -19,10 +19,15 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.Client;
+import ar.edu.utn.sigmaproject.domain.MeasureUnit;
 import ar.edu.utn.sigmaproject.domain.RawMaterialType;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
+import ar.edu.utn.sigmaproject.service.MeasureUnitService;
+import ar.edu.utn.sigmaproject.service.MeasureUnitTypeService;
 import ar.edu.utn.sigmaproject.service.RawMaterialTypeService;
 import ar.edu.utn.sigmaproject.service.SupplyTypeService;
+import ar.edu.utn.sigmaproject.service.impl.MeasureUnitServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.MeasureUnitTypeServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.RawMaterialTypeServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.SupplyTypeServiceImpl;
 
@@ -38,9 +43,17 @@ public class SupplyController extends SelectorComposer<Component>{
 	@Wire
     Grid supplyGrid;
 	@Wire
-	Textbox nameTextBox;
+	Textbox codeTextBox;
+	@Wire
+	Textbox descriptionTextBox;
 	@Wire
 	Textbox detailsTextBox;
+	@Wire
+	Textbox brandTextBox;
+	@Wire
+	Textbox presentationTextBox;
+	@Wire
+	Textbox measureTextBox;
 	@Wire
     Button saveButton;
 	@Wire
@@ -49,6 +62,7 @@ public class SupplyController extends SelectorComposer<Component>{
     Button resetButton;
     @Wire
     Button deleteButton;
+    
 	
     // services
     private SupplyTypeService supplyTypeService = new SupplyTypeServiceImpl();
@@ -70,6 +84,7 @@ public class SupplyController extends SelectorComposer<Component>{
         supplyTypeListModel = new ListModelList<SupplyType>(supplyTypeList);
         supplyListbox.setModel(supplyTypeListModel);
         currentSupplyType = null;
+        
         refreshView();
     }
 	
@@ -79,18 +94,22 @@ public class SupplyController extends SelectorComposer<Component>{
     
     @Listen("onClick = #newButton")
     public void newButtonClick() {
-        currentSupplyType = new SupplyType(null, "", "");
+        currentSupplyType = new SupplyType(null, "", "", "", "", "", "");
         refreshView();
     }
     
     @Listen("onClick = #saveButton")
     public void saveButtonClick() {
-        if(Strings.isBlank(nameTextBox.getText())){
-            Clients.showNotification("Debe ingresar un nombre", nameTextBox);
+        if(Strings.isBlank(descriptionTextBox.getText())){
+            Clients.showNotification("Debe ingresar una descripcion", descriptionTextBox);
             return;
         }
-        currentSupplyType.setName(nameTextBox.getText());
+        currentSupplyType.setCode(codeTextBox.getText());
+        currentSupplyType.setDescription(descriptionTextBox.getText());
         currentSupplyType.setDetails(detailsTextBox.getText());
+        currentSupplyType.setBrand(brandTextBox.getText());
+        currentSupplyType.setPresentation(presentationTextBox.getText());
+        currentSupplyType.setMeasure(measureTextBox.getText());
         if(currentSupplyType.getId() == null) {
         	// es un nuevo insumo
         	currentSupplyType = supplyTypeService.saveSupplyType(currentSupplyType);
@@ -141,8 +160,12 @@ public class SupplyController extends SelectorComposer<Component>{
 		supplyListbox.setModel(supplyTypeListModel);// se actualiza la lista
         if(currentSupplyType == null) {// no editando ni creando
         	supplyGrid.setVisible(false);
-        	nameTextBox.setValue(null);
+        	codeTextBox.setValue(null);
+        	descriptionTextBox.setValue(null);
         	detailsTextBox.setValue(null);
+        	brandTextBox.setValue(null);
+        	presentationTextBox.setValue(null);
+        	measureTextBox.setValue(null);
 			saveButton.setDisabled(true);
 			cancelButton.setDisabled(true);
 			resetButton.setDisabled(true);
@@ -150,8 +173,12 @@ public class SupplyController extends SelectorComposer<Component>{
 			newButton.setDisabled(false);
 		}else {// editando o creando
 			supplyGrid.setVisible(true);
-			nameTextBox.setValue(currentSupplyType.getName());
-			detailsTextBox.setValue(currentSupplyType.getDetails());
+			codeTextBox.setValue(currentSupplyType.getCode());
+        	descriptionTextBox.setValue(currentSupplyType.getDescription());
+        	detailsTextBox.setValue(currentSupplyType.getDetails());
+        	brandTextBox.setValue(currentSupplyType.getBrand());
+        	presentationTextBox.setValue(currentSupplyType.getPresentation());
+        	measureTextBox.setValue(currentSupplyType.getMeasure());
 			saveButton.setDisabled(false);
 			cancelButton.setDisabled(false);
 			resetButton.setDisabled(false);

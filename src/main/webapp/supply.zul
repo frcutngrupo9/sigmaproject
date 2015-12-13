@@ -7,13 +7,21 @@
     <separator/>
     <listbox id="supplyListbox" mold="paging" pageSize="7">
         <listhead>
-            <listheader label="Nombre"/>
+            <listheader label="Codigo"/>
+            <listheader label="Descripcion"/>
             <listheader label="Detalles"/>
+            <listheader label="Marca"/>
+            <listheader label="Presentacion"/>
+            <listheader label="Medida"/>
         </listhead>
         <template name="model">
             <listitem>
-                <listcell label="${each.name}"/>
+                <listcell label="${each.code}"/>
+                <listcell label="${each.description}"/>
                 <listcell label="${each.details}"/>
+                <listcell label="${each.brand}"/>
+                <listcell label="${each.presentation}"/>
+                <listcell label="${each.measure}"/>
             </listitem>
         </template>
     </listbox>
@@ -30,12 +38,28 @@
             </columns>
 	        <rows>
 	            <row>
-	                <label>Nombre:</label>
-	                <textbox id="nameTextBox" value="" hflex="1"/>
+	                <label>Codigo:</label>
+	                <textbox id="codeTextBox" value="" hflex="1"/>
+	            </row>
+	            <row>
+	                <label>Descripcion:</label>
+	                <textbox id="descriptionTextBox" value="" hflex="1"/>
 	            </row>
 	            <row>
 	                <label>Detalles:</label>
 	                <textbox id="detailsTextBox" value="" hflex="1"/>
+	            </row>
+	            <row>
+	                <label>Marca:</label>
+	                <textbox id="brandTextBox" value="" hflex="1"/>
+	            </row>
+	            <row>
+	                <label>Presentacion:</label>
+	                <textbox id="presentationTextBox" value="" hflex="1"/>
+	            </row>
+	            <row>
+	                <label>Medida:</label>
+	                <textbox id="measureTextBox" value="" hflex="1"/>
 	            </row>
 	            <row>
 	                <cell colspan="2" style="text-align:center">

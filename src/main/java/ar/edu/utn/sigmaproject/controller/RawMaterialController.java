@@ -85,7 +85,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
     
     // list
     private List<RawMaterialType> rawMaterialTypeList;
-    private List<MeasureUnit> measureUnitlList;
+    private List<MeasureUnit> measureUnitList;
     
     // list models
     private ListModelList<RawMaterialType> rawMaterialTypeListModel;
@@ -100,8 +100,8 @@ public class RawMaterialController extends SelectorComposer<Component>{
         currentRawMaterialType = null;
         
         Integer idMeasureUnitType = measureUnitTypeService.getMeasureUnitType("Longitud").getId();
-        measureUnitlList = measureUnitService.getMeasureUnitList(idMeasureUnitType);
-        measureUnitListModel = new ListModelList<MeasureUnit>(measureUnitlList);
+        measureUnitList = measureUnitService.getMeasureUnitList(idMeasureUnitType);
+        measureUnitListModel = new ListModelList<MeasureUnit>(measureUnitList);
         measureUnitSelectbox.setModel(measureUnitListModel);
         refreshView();
     }
