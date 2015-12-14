@@ -6,11 +6,11 @@ public class ProductExistence implements Serializable, Cloneable {
     private static final long serialVersionUID = 1L;
     
     Integer idProduct;
-    Double stock;
-    Double stockMin;
-    Double stockRepo;
+    Integer stock;
+    Integer stockMin;
+    Integer stockRepo;
     
-    public ProductExistence(Integer idProduct, Double stock, Double stockMin, Double stockRepo) {
+    public ProductExistence(Integer idProduct, Integer stock, Integer stockMin, Integer stockRepo) {
     	this.idProduct = idProduct;
         this.stock = stock;
         this.stockMin = stockMin;
@@ -25,27 +25,27 @@ public class ProductExistence implements Serializable, Cloneable {
 		this.idProduct = idProduct;
 	}
 
-	public Double getStock() {
+	public Integer getStock() {
 		return stock;
 	}
 
-	public void setStock(Double stock) {
+	public void setStock(Integer stock) {
 		this.stock = stock;
 	}
 
-	public Double getStockMin() {
+	public Integer getStockMin() {
 		return stockMin;
 	}
 
-	public void setStockMin(Double stockMin) {
+	public void setStockMin(Integer stockMin) {
 		this.stockMin = stockMin;
 	}
 
-	public Double getStockRepo() {
+	public Integer getStockRepo() {
 		return stockRepo;
 	}
 
-	public void setStockRepo(Double stockRepo) {
+	public void setStockRepo(Integer stockRepo) {
 		this.stockRepo = stockRepo;
 	}
 

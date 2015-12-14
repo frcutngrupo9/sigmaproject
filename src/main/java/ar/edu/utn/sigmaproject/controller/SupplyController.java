@@ -62,7 +62,6 @@ public class SupplyController extends SelectorComposer<Component>{
     Button resetButton;
     @Wire
     Button deleteButton;
-    
 	
     // services
     private SupplyTypeService supplyTypeService = new SupplyTypeServiceImpl();

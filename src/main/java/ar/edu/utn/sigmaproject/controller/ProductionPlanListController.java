@@ -13,10 +13,14 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
+import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
 
+import ar.edu.utn.sigmaproject.domain.Order;
+import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductTotal;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
+import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.service.ProductionPlanDetailService;
@@ -94,5 +98,10 @@ public class ProductionPlanListController  extends SelectorComposer<Component>{
     	Executions.getCurrent().setAttribute("selected_production_plan", null);
     	Include include = (Include) Selectors.iterable(productionPlanGrid.getPage(), "#mainInclude").iterator().next();
     	include.setSrc("/production_plan_creation.zul");
+    }
+	
+	public ListModel<ProductTotal> getProductionPlanProducts(int idProductionPlan) {
+		ArrayList<ProductTotal> productTotalList = productionPlanDetailService.getProductTotalList(idProductionPlan);
+		return new ListModelList<ProductTotal>(productTotalList);
     }
 }

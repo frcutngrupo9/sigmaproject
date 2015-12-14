@@ -142,18 +142,6 @@ public class OrderCreationController extends SelectorComposer<Component>{
         currentClient = null;
         refreshViewOrder();
     }
-    
-    @Listen("onSelect = #productPopupListbox")
-    public void selectionProductPopupListbox() {
-        currentProduct = (Product) productPopupListbox.getSelectedItem().getValue();
-        productBandbox.setValue(currentProduct.getName());
-        productBandbox.close();
-        BigDecimal product_price = currentProduct.getPrice();
-        if(product_price != null) {
-        	productPrice.setValue(currentProduct.getPrice().doubleValue());
-        }
-    }
-    
     @Listen("onSelect = #clientPopupListbox")
     public void selectionClientPopupListbox() {
     	currentClient = (Client) clientPopupListbox.getSelectedItem().getValue();
@@ -206,6 +194,17 @@ public class OrderCreationController extends SelectorComposer<Component>{
     	refreshViewOrderDetail();
     }
     
+    @Listen("onSelect = #productPopupListbox")
+    public void selectionProductPopupListbox() {
+        currentProduct = (Product) productPopupListbox.getSelectedItem().getValue();
+        productBandbox.setValue(currentProduct.getName());
+        productBandbox.close();
+        BigDecimal product_price = currentProduct.getPrice();
+        if(product_price != null) {
+        	productPrice.setValue(currentProduct.getPrice().doubleValue());
+        }
+    }
+    
     @Listen("onClick = #saveOrderDetailButton")
     public void saveOrderDetail() {
 		if(productUnits.getValue()==null || productUnits.getValue().intValue()<=0){
@@ -230,9 +229,15 @@ public class OrderCreationController extends SelectorComposer<Component>{
 		int product_units = productUnits.getValue();
 		BigDecimal product_price = new BigDecimal(productPrice.getValue().doubleValue());
 		if(currentOrderDetail == null) { // es un detalle nuevo
-			// se crea un detalle sin id de pedido porque recien se le asignara uno al momento de grabarse definitivamente
-			currentOrderDetail = new OrderDetail(null, product_id, product_units, product_price);
-			orderDetailList.add(currentOrderDetail);
+			if(aux != null) {// si el producto seleccionado ya estaba en un detalle
+				aux.setUnits(product_units);
+				aux.setPrice(product_price);
+				orderDetailList.add(aux);
+			} else {
+				// se crea un detalle sin id de pedido porque recien se le asignara uno al momento de grabarse definitivamente
+				currentOrderDetail = new OrderDetail(null, product_id, product_units, product_price);
+				orderDetailList.add(currentOrderDetail);
+			}
 		} else { // se edita un detalle
 			currentOrderDetail.setIdProduct(product_id);
 			currentOrderDetail.setUnits(product_units);

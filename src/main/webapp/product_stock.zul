@@ -1,3 +1,101 @@
-<vbox vflex="1" hflex="1" align="center" pack="center" spacing="20px">
-	<label value="" sclass="head1" />
-</vbox>
+<window id="win_product_stock" title="Stock de Productos" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductStockController" sclass="sigma-content">
+    <hlayout>
+        <label>Buscar:</label>
+        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
+        <button id="searchButton" label="Buscar"/>
+    </hlayout>
+    <separator/>
+    <listbox id="productListbox" mold="paging" pageSize="7">
+    	<auxhead>
+			<auxheader label="Productos" colspan="5"/>
+		</auxhead>
+        <listhead>
+            <listheader label="Codigo"/>
+            <listheader label="Descripcion"/>
+            <listheader label="Stock Actual"/>
+            <listheader label="Stock Minimo"/>
+            <listheader label="Stock Reposicion"/>
+        </listhead>
+        <template name="model">
+            <listitem>
+                <listcell label="${each.id}"/>
+                <listcell label="${each.name}"/>
+                <listcell label="${win_product_stock$composer.getProductStock(each.id)}"/>
+                <listcell label="${win_product_stock$composer.getProductStockMin(each.id)}"/>
+                <listcell label="${win_product_stock$composer.getProductStockRepo(each.id)}"/>
+            </listitem>
+        </template>
+    </listbox>
+    <vlayout>
+        <separator/>
+        <hbox>
+            <button id="newButton" label="Nuevo Pedido Para Productos con bajo stock"/>
+        </hbox>
+        <separator/>
+		<grid id="productExistenceGrid" width="400px" sclass="sigma-form" visible="false">
+	        <columns>
+                <column hflex="min" align="right"/>
+                <column />
+            </columns>
+	        <rows>
+	            <row>
+	                <label>Codigo:</label>
+	                <textbox id="codeTextBox" value="" hflex="1"/>
+	            </row>
+	            <row>
+	                <label>Descripcion:</label>
+	                <textbox id="nameTextBox" value="" hflex="1"/>
+	            </row>
+	            <row>
+	                <label>Stock Actual:</label>
+	                <intbox id="stockIntbox" value="0" width="150px" hflex="1"/>
+	            </row>
+	            <row>
+	                <label>Stock Minimo:</label>
+	                <intbox id="stockMinIntbox" value="0" width="150px" hflex="1"/>
+	            </row>
+	            <row>
+	                <label>Stock Reposicion:</label>
+	                <intbox id="stockRepoIntbox" value="0" width="150px" hflex="1"/>
+	            </row>
+	            <row>
+	                <cell colspan="2" style="text-align:center">
+	                    <hlayout>
+	                        <button id="saveButton" label="Guardar"/>
+	                        <button id="cancelButton" label="Cancelar"/>
+	                        <button id="resetButton" label="Reset"/>
+	                    </hlayout>
+	                </cell>
+	            </row>
+	        </rows>
+    	</grid>
+    	<panel title="Pedido" id="orderCreationBlock" collapsible="true" visible="false" closable="false" border="rounded">
+        	<panelchildren>
+		    	<grid id="orderDetailGrid" mold="paging" pageSize="7">
+		            <auxhead>
+		                <auxheader label="Productos" colspan="4"/>
+		            </auxhead>
+		            <columns>
+		                <column label="Nombre Producto"/>
+		                <column label="Unidades"/>
+		                <column label="Monto Unitario"/>
+		                <column label="Subtotal"/>
+		            </columns>
+		            <template name="model">
+		                <row>
+		                    <label value="${win_product_stock$composer.getProductName(each.idProduct)}"/>
+		                    <label value="${each.units}" inplace="true"/>
+		                    <label value="${each.price.doubleValue()}"/>
+		                    <label value="${win_product_stock$composer.getSubTotal(each.units, each.price).doubleValue()}"/>
+		                </row>
+		            </template>
+		        </grid>
+		        <hlayout>
+		            <button id="saveOrderButton" label="Guardar Pedido"/>
+		            <button id="resetOrderButton" label="Reset Pedido"/>
+		            <button id="cancelOrderButton" label="Cancelar Pedido"/>
+		        </hlayout>
+	        </panelchildren>
+	    </panel>
+    </vlayout>
+</window>

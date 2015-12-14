@@ -7,9 +7,10 @@
     <separator/>
     <grid id="productionPlanGrid" mold="paging" pageSize="7">
     	<auxhead>
-			<auxheader label="Planes de Produccion" colspan="7"/>
+			<auxheader label="Planes de Produccion" colspan="8"/>
 		</auxhead>
         <columns>
+        	<column width="40px" />
         	<column label="Id"/>
             <column label="Nombre"/>
             <column label="Fecha Creacion"/>
@@ -20,6 +21,12 @@
         </columns>
         <template name="model">
             <row>
+            	<!-- se usa custom-attributes para guardar los productos en la fila, 
+				 		para que se puedan acceder cuando se usa onOpen del detail -->
+            	<custom-attributes products="${win_production_plan_list$composer.getProductionPlanProducts(each.id)}"/>
+            	<detail open="false" fulfill="onOpen">
+            		<include src="/production_plan_products.zul" products="${products}"/>
+            	</detail>
             	<label value="${each.id}"/>
                 <label value="${each.name}"/>
                 <label value="${each.date}"/>
