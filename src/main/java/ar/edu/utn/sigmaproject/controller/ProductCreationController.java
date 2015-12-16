@@ -170,8 +170,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
         BigDecimal product_price = new BigDecimal(productPriceDoublebox.doubleValue());
     	
     	if(currentProduct == null) {// se esta creando un nuevo producto
-    		Integer product_id = productService.getNewId();
-    		currentProduct = new Product(product_id, product_code, product_name, product_details, product_price);
+    		currentProduct = new Product(null, product_code, product_name, product_details, product_price);
     		productService.saveProduct(currentProduct, pieceList, processList);
     	} else {// se esta editando un producto
     		currentProduct.setName(product_name);

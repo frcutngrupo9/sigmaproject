@@ -44,6 +44,11 @@ public class ProductServiceImpl implements ProductService {
 	}
 	
 	public synchronized Product saveProduct(Product product) {
+		if(product.getId() == null) {
+			Integer new_id = getNewId();
+			product.setId(new_id);
+		}
+		
 		if(existId(product.getId())){
 			throw new IllegalArgumentException("can't save product, id already used");
 		}
@@ -109,7 +114,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	public synchronized Product saveProduct(Product product, List<Piece> pieceList, List<Process> processList) {
-		product = saveProduct(product);
+		product = saveProduct(product);// vuelve con id agregado
 		PieceService pieceService = new PieceServiceImpl();
 		if(pieceList != null && pieceList.isEmpty() == false) {// se guardan todas las piezas
     		for(int i = 0; i < pieceList.size(); i++) {
