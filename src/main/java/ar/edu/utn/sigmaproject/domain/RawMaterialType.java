@@ -7,19 +7,23 @@ public class RawMaterialType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 	
 	Integer id;
-	Integer idMeasureUnit;
 	String name;
 	BigDecimal length;
+	Integer lengthIdMeasureUnit;
 	BigDecimal depth;
+	Integer depthIdMeasureUnit;
 	BigDecimal height;
+	Integer heightIdMeasureUnit;
 
-	public RawMaterialType(Integer id, Integer idMeasureUnit, String name, BigDecimal length, BigDecimal depth, BigDecimal height) {
+	public RawMaterialType(Integer id, String name, BigDecimal length, Integer lengthIdMeasureUnit, BigDecimal depth, Integer depthIdMeasureUnit, BigDecimal height, Integer heightIdMeasureUnit) {
 		this.id = id;
-		this.idMeasureUnit = idMeasureUnit;
 		this.name = name;
 		this.length = length;
+		this.lengthIdMeasureUnit = lengthIdMeasureUnit;
 		this.depth = depth;
+		this.depthIdMeasureUnit = depthIdMeasureUnit;
 		this.height = height;
+		this.heightIdMeasureUnit = heightIdMeasureUnit;
 	}
 
 	public Integer getId() {
@@ -28,14 +32,6 @@ public class RawMaterialType implements Serializable, Cloneable {
 
 	public void setId(Integer id) {
 		this.id = id;
-	}
-	
-	public Integer getIdMeasureUnit() {
-		return idMeasureUnit;
-	}
-
-	public void setIdMeasureUnit(Integer idMeasureUnit) {
-		this.idMeasureUnit = idMeasureUnit;
 	}
 	
 	public String getName() {
@@ -70,6 +66,29 @@ public class RawMaterialType implements Serializable, Cloneable {
 		this.depth = depth;
 	}
 
+	public Integer getLengthIdMeasureUnit() {
+		return lengthIdMeasureUnit;
+	}
+
+	public void setLengthIdMeasureUnit(Integer lengthIdMeasureUnit) {
+		this.lengthIdMeasureUnit = lengthIdMeasureUnit;
+	}
+
+	public Integer getDepthIdMeasureUnit() {
+		return depthIdMeasureUnit;
+	}
+
+	public void setDepthIdMeasureUnit(Integer depthIdMeasureUnit) {
+		this.depthIdMeasureUnit = depthIdMeasureUnit;
+	}
+
+	public Integer getHeightIdMeasureUnit() {
+		return heightIdMeasureUnit;
+	}
+
+	public void setHeightIdMeasureUnit(Integer heightIdMeasureUnit) {
+		this.heightIdMeasureUnit = heightIdMeasureUnit;
+	}
 
 	@Override
 	public int hashCode() {

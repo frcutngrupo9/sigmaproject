@@ -96,8 +96,8 @@
                         <listitem>
                             <listcell label="${win_order_creation$composer.getProductName(each.idProduct)}"/>
                             <listcell label="${each.units}"/>
-                            <listcell label="${each.price.doubleValue()}"/>
-                            <listcell label="${win_order_creation$composer.getSubTotal(each.units, each.price).doubleValue()}"/>
+                            <listcell label="${each.price.doubleValue()} $"/>
+                            <listcell label="${win_order_creation$composer.getSubTotal(each.units, each.price).doubleValue()} $"/>
                         </listitem>
                     </template>
                     <listfoot>

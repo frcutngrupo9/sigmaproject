@@ -35,7 +35,7 @@
                 <label value="${each.date}"/>
                 <label value="${win_order_list$composer.quantityOfDetail(each.id)}"/>
                 <label value="${win_order_list$composer.getStateName(each.id)}"/>
-                <label value="${win_order_list$composer.totalPrice(each.id)}"/>
+                <label value="${win_order_list$composer.totalPrice(each.id)} $"/>
                 <button forward="onClick=orderGrid.onEditOrder(${each.id})"  image="/img/edit16x16.png"/>
                 <button disabled="${win_order_list$composer.isStateCancel(each.id)}" forward="onClick=orderGrid.onCancelOrder(${each.id})"  image="/img/delete16x16.png"/>
             </row>

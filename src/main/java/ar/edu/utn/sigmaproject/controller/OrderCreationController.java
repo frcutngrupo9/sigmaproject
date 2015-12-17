@@ -262,7 +262,7 @@ public class OrderCreationController extends SelectorComposer<Component>{
     private void refreshOrderDetailListbox() {
     	orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
 		orderDetailListbox.setModel(orderDetailListModel);// actualizamos la vista del order detail
-		orderTotalPriceLabel.setValue("Monto Total: " + getTotalPrice().doubleValue());
+		orderTotalPriceLabel.setValue("Monto Total: " + getTotalPrice().doubleValue() + " $");
 	}
 
     private void refreshViewOrder() {

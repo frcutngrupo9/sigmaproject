@@ -8,18 +8,16 @@
     <listbox id="rawMaterialListbox"  mold="paging" pageSize="7">
         <listhead>
             <listheader label="Nombre"/>
-            <listheader label="Unidad de Medida"/>
             <listheader label="Largo (L)"/>
-            <listheader label="Grueso (G)"/>
+            <listheader label="Espesor (E)"/>
             <listheader label="Ancho (A)"/>
         </listhead>
         <template name="model">
             <listitem>
                 <listcell label="${each.name}"/>
-                <listcell label="${win_raw_material$composer.getMeasureUnitName(each.idMeasureUnit)}"/>
-                <listcell label="${each.length.doubleValue()}"/>
-                <listcell label="${each.depth.doubleValue()}"/>
-                <listcell label="${each.height.doubleValue()}"/>
+                <listcell label="${each.length.doubleValue()} ${win_raw_material$composer.getMeasureUnitName(each.lengthIdMeasureUnit)}"/>
+                <listcell label="${each.depth.doubleValue()} ${win_raw_material$composer.getMeasureUnitName(each.depthIdMeasureUnit)}"/>
+                <listcell label="${each.height.doubleValue()} ${win_raw_material$composer.getMeasureUnitName(each.heightIdMeasureUnit)}"/>
             </listitem>
         </template>
     </listbox>
@@ -40,24 +38,31 @@
                     <textbox id="nameTextbox" value="" hflex="1"/>
                 </row>
                 <row>	
-                    <label>Unidad de Medida:</label>
-                    <selectbox id="measureUnitSelectbox">
+                    <label>Largo:</label>
+                    <doublebox id="lengthDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
+                	<selectbox id="lengthMeasureUnitSelectbox">
                         <template name="model">
                             <label value="${each.name}" />
                         </template>
                     </selectbox>
                 </row>
                 <row>	
-                    <label>Largo:</label>
-                    <doublebox id="lengthDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
-                </row>
-                <row>	
-                    <label>Grueso:</label>
+                    <label>Espesor:</label>
                     <doublebox id="depthDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
+                	<selectbox id="depthMeasureUnitSelectbox">
+                        <template name="model">
+                            <label value="${each.name}" />
+                        </template>
+                    </selectbox>
                 </row>
                 <row>	
                     <label>Ancho:</label>
                     <doublebox id="heightDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
+                	<selectbox id="heightMeasureUnitSelectbox">
+                        <template name="model">
+                            <label value="${each.name}" />
+                        </template>
+                    </selectbox>
                 </row>
                 <row>
                     <cell colspan="2" style="text-align:center">

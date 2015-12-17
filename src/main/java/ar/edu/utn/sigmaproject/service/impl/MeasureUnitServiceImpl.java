@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
+import ar.edu.utn.sigmaproject.domain.MeasureUnitType;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.service.MeasureUnitService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
@@ -62,6 +63,15 @@ public class MeasureUnitServiceImpl implements MeasureUnitService {
 			}
 		}
 		return null;
+	}
+	
+	public synchronized MeasureUnit getMeasureUnit(String name) {
+		for(MeasureUnit aux:measureUnitList) {
+            if(aux.getName().compareToIgnoreCase(name) == 0) {
+                return MeasureUnit.clone(aux);
+            }
+        }
+        return null;
 	}
 	
 	public synchronized MeasureUnit saveMeasureUnit(MeasureUnit aux) {

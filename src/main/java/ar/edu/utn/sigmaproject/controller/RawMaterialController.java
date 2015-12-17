@@ -71,7 +71,11 @@ public class RawMaterialController extends SelectorComposer<Component>{
     @Wire
     Doublebox heightDoublebox;
     @Wire
-    Selectbox measureUnitSelectbox;
+    Selectbox lengthMeasureUnitSelectbox;
+    @Wire
+    Selectbox depthMeasureUnitSelectbox;
+    @Wire
+    Selectbox heightMeasureUnitSelectbox;
     @Wire
     Grid rawMaterialGrid;
     
@@ -89,7 +93,9 @@ public class RawMaterialController extends SelectorComposer<Component>{
     
     // list models
     private ListModelList<RawMaterialType> rawMaterialTypeListModel;
-    private ListModelList<MeasureUnit> measureUnitListModel;
+    private ListModelList<MeasureUnit> lengthMeasureUnitListModel;
+    private ListModelList<MeasureUnit> depthMeasureUnitListModel;
+    private ListModelList<MeasureUnit> heightMeasureUnitListModel;
     
     @Override
     public void doAfterCompose(Component comp) throws Exception{
@@ -101,11 +107,15 @@ public class RawMaterialController extends SelectorComposer<Component>{
         
         Integer idMeasureUnitType = measureUnitTypeService.getMeasureUnitType("Longitud").getId();
         measureUnitList = measureUnitService.getMeasureUnitList(idMeasureUnitType);
-        measureUnitListModel = new ListModelList<MeasureUnit>(measureUnitList);
-        measureUnitSelectbox.setModel(measureUnitListModel);
+        lengthMeasureUnitListModel = new ListModelList<MeasureUnit>(measureUnitList);
+        depthMeasureUnitListModel = new ListModelList<MeasureUnit>(measureUnitList);
+        heightMeasureUnitListModel = new ListModelList<MeasureUnit>(measureUnitList);
+        lengthMeasureUnitSelectbox.setModel(lengthMeasureUnitListModel);
+        depthMeasureUnitSelectbox.setModel(depthMeasureUnitListModel);
+        heightMeasureUnitSelectbox.setModel(heightMeasureUnitListModel);
         refreshView();
     }
-    //prueba de commit
+
     @Listen("onClick = #searchButton")
     public void search() {
     	//System.out.println("indice del measure elegido" + measureUnitSelectBox.getSelectedIndex());
@@ -113,7 +123,11 @@ public class RawMaterialController extends SelectorComposer<Component>{
     
     @Listen("onClick = #newButton")
     public void newRawMaterial() {
-        currentRawMaterialType = new RawMaterialType(null, null, "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+    	// arrancamos con seleccion de metros x pulgada x pulgada
+    	Integer length_id_measure_unit = measureUnitService.getMeasureUnit("Metros").getId();
+    	Integer depth_id_measure_unit = measureUnitService.getMeasureUnit("Pulgadas").getId();
+    	Integer height_id_measure_unit = measureUnitService.getMeasureUnit("Pulgadas").getId();
+        currentRawMaterialType = new RawMaterialType(null, "", BigDecimal.ZERO, length_id_measure_unit, BigDecimal.ZERO, depth_id_measure_unit, BigDecimal.ZERO, height_id_measure_unit);
         refreshView();
     }
     
@@ -123,16 +137,28 @@ public class RawMaterialController extends SelectorComposer<Component>{
 			Clients.showNotification("Debe ingresar un nombre", nameTextbox);
 			return;
 		}
-    	int selected_index = measureUnitSelectbox.getSelectedIndex();
-        if(selected_index == -1) {// no hay una unidad de medida seleccionada
-        	Clients.showNotification("Debe seleccionar una unidad de medida", measureUnitSelectbox);
+    	int selected_index_length = lengthMeasureUnitSelectbox.getSelectedIndex();
+        if(selected_index_length == -1) {// no hay una unidad de medida seleccionada
+        	Clients.showNotification("Debe seleccionar una unidad de medida", lengthMeasureUnitSelectbox);
+			return;
+        }
+        int selected_index_depth = depthMeasureUnitSelectbox.getSelectedIndex();
+        if(selected_index_depth == -1) {// no hay una unidad de medida seleccionada
+        	Clients.showNotification("Debe seleccionar una unidad de medida", depthMeasureUnitSelectbox);
+			return;
+        }
+        int selected_index_height = heightMeasureUnitSelectbox.getSelectedIndex();
+        if(selected_index_height == -1) {// no hay una unidad de medida seleccionada
+        	Clients.showNotification("Debe seleccionar una unidad de medida", heightMeasureUnitSelectbox);
 			return;
         }
     	currentRawMaterialType.setName(nameTextbox.getText());
         currentRawMaterialType.setLength(new BigDecimal(lengthDoublebox.doubleValue()));
         currentRawMaterialType.setDepth(new BigDecimal(depthDoublebox.doubleValue()));
         currentRawMaterialType.setHeight(new BigDecimal(heightDoublebox.doubleValue()));
-        currentRawMaterialType.setIdMeasureUnit(measureUnitListModel.getElementAt(selected_index).getId());
+        currentRawMaterialType.setLengthIdMeasureUnit(lengthMeasureUnitListModel.getElementAt(selected_index_length).getId());
+        currentRawMaterialType.setDepthIdMeasureUnit(depthMeasureUnitListModel.getElementAt(selected_index_depth).getId());
+        currentRawMaterialType.setHeightIdMeasureUnit(heightMeasureUnitListModel.getElementAt(selected_index_height).getId());
     	if(currentRawMaterialType.getId() == null)	{// si es nuevo
             currentRawMaterialType = rawMaterialTypeService.saveRawMaterialType(currentRawMaterialType);
     	} else {
@@ -191,7 +217,9 @@ public class RawMaterialController extends SelectorComposer<Component>{
         	lengthDoublebox.setValue(null);
         	depthDoublebox.setValue(null);
         	heightDoublebox.setValue(null);
-        	measureUnitSelectbox.setSelectedIndex(-1);
+            lengthMeasureUnitSelectbox.setSelectedIndex(-1);
+            depthMeasureUnitSelectbox.setSelectedIndex(-1);
+            heightMeasureUnitSelectbox.setSelectedIndex(-1);
         	
 			saveButton.setDisabled(true);
 			cancelButton.setDisabled(true);
@@ -205,11 +233,27 @@ public class RawMaterialController extends SelectorComposer<Component>{
         	lengthDoublebox.setValue(currentRawMaterialType.getLength().doubleValue());
         	depthDoublebox.setValue(currentRawMaterialType.getDepth().doubleValue());
         	heightDoublebox.setValue(currentRawMaterialType.getHeight().doubleValue());
-        	if(currentRawMaterialType.getIdMeasureUnit() != null) {
-        		MeasureUnitType aux = measureUnitTypeService.getMeasureUnitType(currentRawMaterialType.getIdMeasureUnit());
-        		measureUnitSelectbox.setSelectedIndex(aux.getId()-1);
-        	}else {
-        		measureUnitSelectbox.setSelectedIndex(-1);
+        	
+        	Integer length_id_measure_unit = currentRawMaterialType.getLengthIdMeasureUnit();
+        	if(length_id_measure_unit != null) {
+        		MeasureUnit aux = measureUnitService.getMeasureUnit(length_id_measure_unit);
+        		lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(aux));
+        	} else {
+        		lengthMeasureUnitSelectbox.setSelectedIndex(-1);
+        	}
+        	Integer depth_id_measure_unit = currentRawMaterialType.getDepthIdMeasureUnit();
+        	if(depth_id_measure_unit != null) {
+        		MeasureUnit aux = measureUnitService.getMeasureUnit(depth_id_measure_unit);
+        		depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(aux));
+        	} else {
+        		depthMeasureUnitSelectbox.setSelectedIndex(-1);
+        	}
+        	Integer height_id_measure_unit = currentRawMaterialType.getHeightIdMeasureUnit();
+        	if(height_id_measure_unit != null) {
+        		MeasureUnit aux = measureUnitService.getMeasureUnit(height_id_measure_unit);
+        		heightMeasureUnitSelectbox.setSelectedIndex(heightMeasureUnitListModel.indexOf(aux));
+        	} else {
+        		heightMeasureUnitSelectbox.setSelectedIndex(-1);
         	}
 			saveButton.setDisabled(false);
 			cancelButton.setDisabled(false);

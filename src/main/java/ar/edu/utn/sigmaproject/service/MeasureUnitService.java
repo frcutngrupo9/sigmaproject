@@ -11,6 +11,8 @@ public interface MeasureUnitService {
 	List<MeasureUnit> getMeasureUnitList(Integer idMeasureUnitType);
 	
 	MeasureUnit getMeasureUnit(Integer idMeasureUnit);
+	
+	MeasureUnit getMeasureUnit(String nameMeasureUnit);
 
 	MeasureUnit saveMeasureUnit(MeasureUnit measureUnit);
 

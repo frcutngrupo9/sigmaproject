@@ -14,8 +14,8 @@
                 <label value="${win_order_list$composer.getProductCode(each.idProduct)}" />
                 <label value="${win_order_list$composer.getProductName(each.idProduct)}" />
                 <label value="${each.units}" />
-                <label value="${each.price.doubleValue()}" />
-                <label value="${win_order_list$composer.getSubTotal(each.units, each.price).doubleValue()}" />
+                <label value="${each.price.doubleValue()} $" />
+                <label value="${win_order_list$composer.getSubTotal(each.units, each.price).doubleValue()} $" />
             </row>
         </template>
     </grid>

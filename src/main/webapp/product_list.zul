@@ -22,7 +22,7 @@
                 <listcell label="${each.code}"/>
                 <listcell label="${each.name}"/>
                 <listcell label="${each.details}"/>
-                <listcell label="${each.price.doubleValue()}"/>
+                <listcell label="${each.price.doubleValue()} $"/>
             </listitem>
         </template>
     </listbox>
