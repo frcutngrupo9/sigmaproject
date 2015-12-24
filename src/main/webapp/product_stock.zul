@@ -29,7 +29,7 @@
     <vlayout>
         <separator/>
         <hbox>
-            <button id="newButton" label="Nuevo Pedido Para Productos con bajo stock"/>
+            <button id="newProvisionOrderButton" label="Nuevo Pedido Para Productos con bajo stock"/>
         </hbox>
         <separator/>
 		<grid id="productExistenceGrid" width="400px" sclass="sigma-form" visible="false">
@@ -69,32 +69,50 @@
 	            </row>
 	        </rows>
     	</grid>
-    	<panel title="Pedido" id="orderCreationBlock" collapsible="true" visible="false" closable="false" border="rounded">
+    	<panel title="Pedido de Autoabastecimiento" id="orderCreationBlock" collapsible="true" visible="true" closable="false" border="rounded">
         	<panelchildren>
-		    	<grid id="orderDetailGrid" mold="paging" pageSize="7">
-		            <auxhead>
-		                <auxheader label="Productos" colspan="4"/>
-		            </auxhead>
-		            <columns>
-		                <column label="Nombre Producto"/>
-		                <column label="Unidades"/>
-		                <column label="Monto Unitario"/>
-		                <column label="Subtotal"/>
-		            </columns>
-		            <template name="model">
-		                <row>
-		                    <label value="${win_product_stock$composer.getProductName(each.idProduct)}"/>
-		                    <label value="${each.units}" inplace="true"/>
-		                    <label value="${each.price.doubleValue()}"/>
-		                    <label value="${win_product_stock$composer.getSubTotal(each.units, each.price).doubleValue()}"/>
-		                </row>
-		            </template>
-		        </grid>
-		        <hlayout>
-		            <button id="saveOrderButton" label="Guardar Pedido"/>
-		            <button id="resetOrderButton" label="Reset Pedido"/>
-		            <button id="cancelOrderButton" label="Cancelar Pedido"/>
+        		<separator/>
+        		<hlayout>
+        			<separator/>
+                    <label value="Numero: "/>
+                    <intbox id="orderNumber" constraint="no negative"/>
+                    <separator/>
+                    <separator/>
+                    <label value="Fecha de necesidad: "/>
+                    <datebox id="orderNeedDateBox" cols="12" format="dd-MM-yyyy"/>
+                </hlayout>
+                <separator/>
+                <hlayout>
+        			<separator/>
+			    	<grid id="orderDetailGrid" mold="paging" pageSize="7">
+			            <auxhead>
+			                <auxheader label="Productos" colspan="3"/>
+			            </auxhead>
+			            <columns>
+			            	<column label="Codigo Producto"/>
+			                <column label="Nombre Producto"/>
+			                <column label="Unidades"/>
+			            </columns>
+			            <template name="model">
+			                <row>
+			                	<label value="${win_product_stock$composer.getProductCode(each.idProduct)}"/>
+			                    <label value="${win_product_stock$composer.getProductName(each.idProduct)}"/>
+			                    <div class='text-center'>
+	                        		<spinner inplace="true" value="${each.units}" width="98%"/>
+	                    		</div>
+							</row>
+			            </template>
+			        </grid>
+			        <separator/>
 		        </hlayout>
+		        <separator/>
+		        <hlayout>
+		        	<separator/>
+		            <button id="saveOrderButton" label="Guardar"/>
+		            <button id="resetOrderButton" label="Reset"/>
+		            <button id="cancelOrderButton" label="Cancelar"/>
+		        </hlayout>
+		        <separator/>
 	        </panelchildren>
 	    </panel>
     </vlayout>
