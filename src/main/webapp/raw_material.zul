@@ -65,7 +65,7 @@
                     </selectbox>
                 </row>
                 <row>
-                    <cell colspan="2" style="text-align:center">
+                    <cell colspan="3" style="text-align:center">
 	                    <hlayout>
 	                        <button id="saveButton" label="Guardar"/>
 	                        <button id="cancelButton" label="Cancelar"/>

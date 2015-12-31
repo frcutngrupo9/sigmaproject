@@ -198,9 +198,9 @@ public class RawMaterialController extends SelectorComposer<Component>{
 		}else {
 			if(currentRawMaterialType == null) {
 				currentRawMaterialType = rawMaterialTypeListModel.getSelection().iterator().next();
+				refreshView();
 			}
 		}
-		refreshView();
 	}
     
     public String getMeasureUnitName(int idMeasureUnit) {

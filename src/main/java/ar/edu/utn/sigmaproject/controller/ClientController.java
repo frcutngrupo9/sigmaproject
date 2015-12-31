@@ -131,9 +131,9 @@ public class ClientController extends SelectorComposer<Component>{
         } else {
         	if(currentClient == null) {// si no hay nada editandose
         		currentClient = clientListModel.getSelection().iterator().next();
+        		refreshView();
         	}
         }
-        refreshView();
     }
     
     private void refreshView() {

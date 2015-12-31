@@ -15,7 +15,7 @@ public class OrderStateTypeServiceImpl implements OrderStateTypeService {
 		orderStateTypeList.add(new OrderStateType(orderStateTypeId++,"cancelado", ""));
 		orderStateTypeList.add(new OrderStateType(orderStateTypeId++,"planificado", ""));
 		orderStateTypeList.add(new OrderStateType(orderStateTypeId++,"en produccion", ""));
-		orderStateTypeList.add(new OrderStateType(orderStateTypeId++,"realizado", ""));
+		orderStateTypeList.add(new OrderStateType(orderStateTypeId++,"finalizado", ""));
 	}
 	
 	public List<OrderStateType> getOrderStateTypeList() {

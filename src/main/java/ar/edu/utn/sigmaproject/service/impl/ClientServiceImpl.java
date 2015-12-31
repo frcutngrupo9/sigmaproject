@@ -93,4 +93,15 @@ public class ClientServiceImpl implements ClientService {
         return lastId + 1;
     }
 
+	public synchronized Client getClient(String name) {
+		int size = clientList.size();
+        for(int i=0; i<size; i++) {
+            Client t = clientList.get(i);
+            if(t.getName().equalsIgnoreCase(name)) {
+                return Client.clone(t);
+            }
+        }
+        return null;
+	}
+
 }

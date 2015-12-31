@@ -11,6 +11,8 @@ public interface OrderService {
     
     List<Order> getOrderList(Integer idOrderStateType);
     
+    List<Order> getOrderListByClientId(Integer idClient);
+    
     Order getOrder(Integer idOrder);
     
     Order saveOrder(Order order);

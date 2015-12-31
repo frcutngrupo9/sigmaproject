@@ -14,6 +14,7 @@ public class ProductionPlanStateTypeServiceImpl implements ProductionPlanStateTy
 		productionPlanStateTypeList.add(new ProductionPlanStateType(productionPlanStateTypeId++,"iniciado", ""));
 		productionPlanStateTypeList.add(new ProductionPlanStateType(productionPlanStateTypeId++,"cancelado", ""));
 		productionPlanStateTypeList.add(new ProductionPlanStateType(productionPlanStateTypeId++,"abastecido", ""));
+		productionPlanStateTypeList.add(new ProductionPlanStateType(productionPlanStateTypeId++,"lanzado", ""));
 		productionPlanStateTypeList.add(new ProductionPlanStateType(productionPlanStateTypeId++,"en produccion", ""));
 		productionPlanStateTypeList.add(new ProductionPlanStateType(productionPlanStateTypeId++,"finalizado", ""));
 	}

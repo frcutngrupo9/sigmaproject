@@ -75,7 +75,7 @@
         		<hlayout>
         			<separator/>
                     <label value="Numero: "/>
-                    <intbox id="orderNumber" constraint="no negative"/>
+                    <intbox id="orderNumberIntbox" constraint="no negative"/>
                     <separator/>
                     <separator/>
                     <label value="Fecha de necesidad: "/>
@@ -84,25 +84,25 @@
                 <separator/>
                 <hlayout>
         			<separator/>
-			    	<grid id="orderDetailGrid" mold="paging" pageSize="7">
+			    	<listbox id="orderDetailListbox" mold="paging" pageSize="7">
 			            <auxhead>
 			                <auxheader label="Productos" colspan="3"/>
 			            </auxhead>
-			            <columns>
-			            	<column label="Codigo Producto"/>
-			                <column label="Nombre Producto"/>
-			                <column label="Unidades"/>
-			            </columns>
+			            <listhead>
+			            	<listheader label="Codigo Producto"/>
+			                <listheader label="Nombre Producto"/>
+			                <listheader label="Unidades"/>
+			            </listhead>
 			            <template name="model">
-			                <row>
-			                	<label value="${win_product_stock$composer.getProductCode(each.idProduct)}"/>
-			                    <label value="${win_product_stock$composer.getProductName(each.idProduct)}"/>
-			                    <div class='text-center'>
-	                        		<spinner inplace="true" value="${each.units}" width="98%"/>
-	                    		</div>
-							</row>
+			                <listitem>
+			                	<listcell label="${win_product_stock$composer.getProductCode(each.idProduct)}"/>
+			                    <listcell label="${win_product_stock$composer.getProductName(each.idProduct)}"/>
+			                    <listcell>
+		                        	<spinner inplace="true" value="${each.units}" forward="onChange=orderDetailListbox.onEditOrderDetailUnits(${each})" constraint="no negative: No puede ser valor negativo." width="98%"/>
+	                    		</listcell>
+							</listitem>
 			            </template>
-			        </grid>
+			        </listbox>
 			        <separator/>
 		        </hlayout>
 		        <separator/>

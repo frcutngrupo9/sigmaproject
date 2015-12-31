@@ -149,9 +149,9 @@ public class SupplyController extends SelectorComposer<Component>{
         } else {
         	if(currentSupplyType == null) {// si no hay nada editandose
         		currentSupplyType = supplyTypeListModel.getSelection().iterator().next();
+        		refreshView();
         	}
         }
-        refreshView();
     }
 	
 	private void refreshView() {

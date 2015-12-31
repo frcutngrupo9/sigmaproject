@@ -122,8 +122,10 @@ public class OrderServiceImpl implements OrderService {
 		order = saveOrder(order);// se obtiene un pedido con id agregado
 		OrderDetailService orderDetailService = new OrderDetailServiceImpl();
 		for(OrderDetail orderDetail : orderDetailList) {// agregamos el id del pedido a todos los detalles y los guardamos
-			orderDetail.setIdOrder(order.getId());
-			orderDetailService.saveOrderDetail(orderDetail);
+			if(orderDetail.getUnits() != null && orderDetail.getUnits() > 0) {// solo guardamos los detalles que tengan mas de 0 unidades
+				orderDetail.setIdOrder(order.getId());
+				orderDetailService.saveOrderDetail(orderDetail);
+			}
 		}
 		OrderState aux = new OrderState(order.getId(), idOrderStateType, new Date());
 		OrderStateService orderStateService = new OrderStateServiceImpl();
@@ -155,6 +157,16 @@ public class OrderServiceImpl implements OrderService {
 			}
 		}
 		return order;
+	}
+
+	public synchronized List<Order> getOrderListByClientId(Integer idClient) {
+		List<Order> list = new ArrayList<Order>();
+        for(Order order : orderList) {
+        	if(order.getIdClient().equals(idClient)) {
+        		list.add(Order.clone(order));
+        	}
+        }
+        return list;
 	}
     
 }

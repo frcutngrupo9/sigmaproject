@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
@@ -15,16 +16,26 @@ import org.zkoss.zul.Grid;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Spinner;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
+import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductExistence;
 import ar.edu.utn.sigmaproject.service.ClientService;
+import ar.edu.utn.sigmaproject.service.OrderDetailService;
+import ar.edu.utn.sigmaproject.service.OrderService;
+import ar.edu.utn.sigmaproject.service.OrderStateService;
+import ar.edu.utn.sigmaproject.service.OrderStateTypeService;
 import ar.edu.utn.sigmaproject.service.ProductExistenceService;
 import ar.edu.utn.sigmaproject.service.ProductService;
 import ar.edu.utn.sigmaproject.service.impl.ClientServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.OrderDetailServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.OrderServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.OrderStateServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.OrderStateTypeServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductExistenceServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
 
@@ -58,9 +69,9 @@ public class ProductStockController extends SelectorComposer<Component>{
     @Wire
 	Component orderCreationBlock;
     @Wire
-    Grid orderDetailGrid;
+    Listbox orderDetailListbox;
     @Wire
-    Intbox orderNumber;
+    Intbox orderNumberIntbox;
     @Wire
     Datebox orderNeedDateBox;
     
@@ -68,6 +79,10 @@ public class ProductStockController extends SelectorComposer<Component>{
     private ProductExistenceService productExistenceService = new ProductExistenceServiceImpl();
     private ProductService productService = new ProductServiceImpl();
     private ClientService clientService = new ClientServiceImpl();
+    private OrderService orderService = new OrderServiceImpl();
+    private OrderDetailService orderDetailService = new OrderDetailServiceImpl();
+    private OrderStateService orderStateService = new OrderStateServiceImpl();
+    private OrderStateTypeService orderStateTypeService = new OrderStateTypeServiceImpl();
     
     // atributes
     private ProductExistence currentProductExistence;
@@ -117,11 +132,11 @@ public class ProductStockController extends SelectorComposer<Component>{
             //just in case for the no selection
         	currentProduct = null;
         } else {
-        	if(currentProduct == null) {// si no hay nada editandose
+        	if(currentProduct == null && currentOrder == null) {// si no hay nada editandose
         		currentProduct = productListModel.getSelection().iterator().next();
+        		refreshView();
         	}
         }
-        refreshView();
     }
 	
 	private void refreshView() {
@@ -215,7 +230,7 @@ public class ProductStockController extends SelectorComposer<Component>{
 	// creacion de pedido de auto abastecimiento
 	@Listen("onClick = #newProvisionOrderButton")
     public void newProvisionOrder() {
-		Integer order_client_id = null;// deberia ser el id del cliente auto abastecimiento
+		Integer order_client_id = clientService.getClient("Auto Abastecimiento").getId();// deberia ser el id del cliente auto abastecimiento
 		Integer order_number = null;
 		Date order_date = new Date();
 		Date order_need_date = null;
@@ -237,9 +252,14 @@ public class ProductStockController extends SelectorComposer<Component>{
 	
 	@Listen("onClick = #saveOrderButton")
     public void saveOrder() {
+		int order_number = orderNumberIntbox.intValue();
+		Date order_need_date = orderNeedDateBox.getValue();
+		int order_state_type_id = orderStateTypeService.getOrderStateType("iniciado").getId();
+		currentOrder.setNumber(order_number);
+		currentOrder.setNeedDate(order_need_date);
+		currentOrder = orderService.saveOrder(currentOrder, order_state_type_id, orderDetailList);
 		for(OrderDetail each:orderDetailList) {
 			System.out.println("prod: " + each.getIdProduct() + ", units: " + each.getUnits());
-			// por lo visto no se modifican los elementos de la lista
 		}
     }
 	
@@ -247,21 +267,60 @@ public class ProductStockController extends SelectorComposer<Component>{
 		if(currentOrder == null) {
 			orderCreationBlock.setVisible(false);
 			orderDetailList = null;
+			newProvisionOrderButton.setDisabled(false);
 		} else {
 			orderCreationBlock.setVisible(true);
-			orderNumber.setValue(currentOrder.getNumber());
+			orderNumberIntbox.setValue(currentOrder.getNumber());
 			orderNeedDateBox.setValue(null);
 			
+			int id_order_state_type_finished = orderStateTypeService.getOrderStateType("finalizado").getId();
+			int id_order_state_type_canceleded = orderStateTypeService.getOrderStateType("cancelado").getId();
+			List<Order> provisionOrderList = orderService.getOrderListByClientId(clientService.getClient("Auto Abastecimiento").getId());// obtenemos la lista de los pedidos de autoabastecimiento
+			// creamos una lista donde guardaremos todos los detalles de los pedidos de autoabastecimiento sumando su cantidad si el producto se repite
+			List<OrderDetail> completeProvisionOrderDetailList = new ArrayList<OrderDetail>();
+			for(Order eachProvisionOrder:provisionOrderList) {
+				// por cada pedido debemos verificar que no este en estado finalizado o cancelado
+				int id_last_order_state_type = orderStateService.getLastOrderState(eachProvisionOrder.getId()).getIdOrderStateType();
+				if(id_last_order_state_type != id_order_state_type_finished && id_last_order_state_type != id_order_state_type_canceleded) {
+					List<OrderDetail> provisionOrderDetailList = orderDetailService.getOrderDetailList(eachProvisionOrder.getId());
+					for(OrderDetail eachProvisionOrderDetail:provisionOrderDetailList) {
+						boolean is_in_list = false;
+						for(OrderDetail eachCompleteProvisionOrderDetail:completeProvisionOrderDetailList) {
+							if(eachCompleteProvisionOrderDetail.getIdProduct().equals(eachProvisionOrderDetail.getIdProduct())) {
+								// si el mismo producto aparece en varios pedidos de reposicion hay que sumar sus cantidades y guardarlas en la lista completa de detalles de pedido de autoabasteciemiento
+								eachCompleteProvisionOrderDetail.setUnits(eachCompleteProvisionOrderDetail.getUnits() + eachProvisionOrderDetail.getUnits());
+								is_in_list = true;
+							}
+						}
+						if(is_in_list == false) {
+							// si el producto no esta en la lista completa se lo agrega
+							completeProvisionOrderDetailList.add(eachProvisionOrderDetail);
+						}
+					}
+				}
+			}
+			// usamos la lista completa para asegurarnos que no se agreguen productos que ya tengan un pedido de autoabastecimiento activo o para que su cantidad sea la necesaria para llegar al stock
 			orderDetailList = new ArrayList<OrderDetail>();
 			List<ProductExistence> list_product_existence_complete = productExistenceService.getProductExistenceList();
-			for(ProductExistence each:list_product_existence_complete) {
-				int units_to_repo = each.getStockRepo() - each.getStock();// si esta resta da un valor positivo quiere decir que el valor de reposicion esta por arriba del stock, por lo tanto ese valor es el necesario
+			for(ProductExistence eachProductExistence:list_product_existence_complete) {
+				int units_to_repo = eachProductExistence.getStockRepo() - eachProductExistence.getStock();// si esta resta da un valor positivo quiere decir que el valor de reposicion esta por arriba del stock, por lo tanto ese valor es el necesario
 				if(units_to_repo > 0) {
-					orderDetailList.add(new OrderDetail(null, each.getIdProduct(), units_to_repo, new BigDecimal("0")));
+					// debemos recorrer los productos de los pedidos de autoabastecimiento para verificar si alguno es igual al producto que esta con bajo stock
+					int units_needed = 0;
+					for(OrderDetail eachCompleteProvisionOrderDetail:completeProvisionOrderDetailList) {// debemos buscar si este producto no tiene actualmente un pedido de auto abastecimiento sin finalizar
+						if(eachCompleteProvisionOrderDetail.getIdProduct().equals(eachProductExistence.getIdProduct())) {
+							// debemos revisar si la cantidad pedida en este detalle es mayor o igual a la necesitada en stock, en caso de ser asi, este producto no debe ser agregado al pedido de auto abastecimiento, caso contrario, se debe agregar el producto y la cantidad sera la diferencia entre lo que se necesita y lo que hay ya pedido
+							units_needed = units_to_repo - eachCompleteProvisionOrderDetail.getUnits();
+						}
+					}
+					if(units_needed > 0) {
+						orderDetailList.add(new OrderDetail(null, eachProductExistence.getIdProduct(), units_needed, new BigDecimal("0")));
+					}
 				}
 			}
 	        orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
-	        orderDetailGrid.setModel(orderDetailListModel);
+	        orderDetailListbox.setModel(orderDetailListModel);
+	        newProvisionOrderButton.setDisabled(true);
 		}
 		
 	}
@@ -274,6 +333,13 @@ public class ProductStockController extends SelectorComposer<Component>{
 	public String getProductCode(int idProduct) {
 		Product aux = productService.getProduct(idProduct);
 		return aux.getCode();
+    }
+	
+	@Listen("onEditOrderDetailUnits = #orderDetailListbox")
+	public void doEditOrderDetailUnits(ForwardEvent evt) {
+		OrderDetail orderDetail = (OrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
+		Spinner spinner = (Spinner) evt.getOrigin().getTarget();// obtenemos el elemento web
+		orderDetail.setUnits(spinner.getValue());// cargamos al objeto el valor actualizado del elemento web
     }
 	
 }

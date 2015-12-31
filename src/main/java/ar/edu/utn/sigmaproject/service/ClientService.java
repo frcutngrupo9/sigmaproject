@@ -9,6 +9,8 @@ public interface ClientService {
     List<Client> getClientList();
     
     Client getClient(Integer idClient);
+    
+    Client getClient(String name);
 
     Client saveClient(Client client);
 
