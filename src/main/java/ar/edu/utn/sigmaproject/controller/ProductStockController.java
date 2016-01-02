@@ -10,6 +10,7 @@ import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Grid;
@@ -258,9 +259,9 @@ public class ProductStockController extends SelectorComposer<Component>{
 		currentOrder.setNumber(order_number);
 		currentOrder.setNeedDate(order_need_date);
 		currentOrder = orderService.saveOrder(currentOrder, order_state_type_id, orderDetailList);
-		for(OrderDetail each:orderDetailList) {
-			System.out.println("prod: " + each.getIdProduct() + ", units: " + each.getUnits());
-		}
+		Clients.showNotification("Pedido guardado");
+		currentOrder = null;
+		refreshViewOrder();
     }
 	
 	private void refreshViewOrder() {
@@ -269,10 +270,6 @@ public class ProductStockController extends SelectorComposer<Component>{
 			orderDetailList = null;
 			newProvisionOrderButton.setDisabled(false);
 		} else {
-			orderCreationBlock.setVisible(true);
-			orderNumberIntbox.setValue(currentOrder.getNumber());
-			orderNeedDateBox.setValue(null);
-			
 			int id_order_state_type_finished = orderStateTypeService.getOrderStateType("finalizado").getId();
 			int id_order_state_type_canceleded = orderStateTypeService.getOrderStateType("cancelado").getId();
 			List<Order> provisionOrderList = orderService.getOrderListByClientId(clientService.getClient("Auto Abastecimiento").getId());// obtenemos la lista de los pedidos de autoabastecimiento
@@ -306,21 +303,34 @@ public class ProductStockController extends SelectorComposer<Component>{
 				int units_to_repo = eachProductExistence.getStockRepo() - eachProductExistence.getStock();// si esta resta da un valor positivo quiere decir que el valor de reposicion esta por arriba del stock, por lo tanto ese valor es el necesario
 				if(units_to_repo > 0) {
 					// debemos recorrer los productos de los pedidos de autoabastecimiento para verificar si alguno es igual al producto que esta con bajo stock
-					int units_needed = 0;
+					int units_existing = 0;
 					for(OrderDetail eachCompleteProvisionOrderDetail:completeProvisionOrderDetailList) {// debemos buscar si este producto no tiene actualmente un pedido de auto abastecimiento sin finalizar
 						if(eachCompleteProvisionOrderDetail.getIdProduct().equals(eachProductExistence.getIdProduct())) {
-							// debemos revisar si la cantidad pedida en este detalle es mayor o igual a la necesitada en stock, en caso de ser asi, este producto no debe ser agregado al pedido de auto abastecimiento, caso contrario, se debe agregar el producto y la cantidad sera la diferencia entre lo que se necesita y lo que hay ya pedido
-							units_needed = units_to_repo - eachCompleteProvisionOrderDetail.getUnits();
+							units_existing = eachCompleteProvisionOrderDetail.getUnits();
 						}
 					}
-					if(units_needed > 0) {
-						orderDetailList.add(new OrderDetail(null, eachProductExistence.getIdProduct(), units_needed, new BigDecimal("0")));
+					// debemos revisar si la cantidad pedida en este detalle es mayor o igual a la necesitada en stock, en caso de ser asi, este producto no debe ser agregado al pedido de auto abastecimiento, caso contrario, se debe agregar el producto y la cantidad sera la diferencia entre lo que se necesita y lo que hay ya pedido
+					units_to_repo = units_to_repo - units_existing;
+					if(units_to_repo > 0) {
+						orderDetailList.add(new OrderDetail(null, eachProductExistence.getIdProduct(), units_to_repo, new BigDecimal("0")));
 					}
 				}
 			}
-	        orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
-	        orderDetailListbox.setModel(orderDetailListModel);
-	        newProvisionOrderButton.setDisabled(true);
+			// si la orderDetailList esta vacia quiere decir que no hay productos que necesiten un pedido de autoasbastecimiento, por lo tanto se informa y se cancela la creacion
+			if(orderDetailList.isEmpty()) {
+				Clients.showNotification("No existen productos con stock bajo que necesiten un pedido");
+				orderCreationBlock.setVisible(false);
+				orderDetailList = null;
+				newProvisionOrderButton.setDisabled(false);
+			} else {
+				orderCreationBlock.setVisible(true);
+				orderNumberIntbox.setValue(currentOrder.getNumber());
+				orderNeedDateBox.setValue(null);
+				orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
+		        orderDetailListbox.setModel(orderDetailListModel);
+		        newProvisionOrderButton.setDisabled(true);
+			}
+	        
 		}
 		
 	}
