@@ -3,54 +3,37 @@
         <panelchildren>
             <vlayout>
             	<hlayout>
-            	<bandbox id="bd" buttonVisible = "true" autodrop = "true">
-					<bandpopup>
-						<vbox>
-							<hbox>
-								Search
-								<textbox />
-							</hbox>
-							<listbox width="200px"
-								onSelect="bd.value=self.selectedItem.label; bd.close();">
-							<listhead>
-								<listheader label="Producto"/>
-								<listheader label="Descripcion"/>
-							</listhead>
-							<listitem>
-								<listcell label="Mesa"/>
-								<listcell label="bla bla"/>
-							</listitem>
-							<listitem>
-								<listcell label="Silla"/>
-								<listcell label="Para sentarse"/>
-							</listitem>
-							<listitem>
-								<listcell label="Banco"/>
-								<listcell label="Tbn para sentarse"/>
-							</listitem>
-							</listbox>
-						</vbox>
-					</bandpopup>
-				</bandbox>
-				<label value="Cantidad: "/>
-				<textbox width="36px"/>
-				<button id="addProductBtn" label="Agregar Producto"/>
+            		<label value="Nombre Plan de Produccion: "/>
+					<textbox id="productionPlanNameTextbox" width="180px"/>
 				</hlayout>
+            	<hlayout>
+            		<label value="Fecha Plan de Produccion: "/>
+					<datebox id="productionPlanDateBox" cols="12" format="dd-MM-yyyy"/>
+            	</hlayout>
                 <separator/>
-    			<listbox id="productionOrderProductListbox">
+    			<listbox id="productionOrderListbox">
     				<auxhead>
 						<auxheader label="Productos" colspan="2"/>
 					</auxhead>
         			<listhead>
-            			<listheader label="Nombre Producto"/>
-            			<listheader label="Unidades"/>
-        			</listhead>
-        			<template name="model">
-            			<listitem>
-                			<listcell label="${each.name}"/>
-                			<listcell label="nro"/>
-            			</listitem>
-        			</template>
+        				<listheader label="Id Orden Produccion"/>
+        				<listheader label="Numero Orden Produccion"/>
+		            	<listheader label="Codigo Producto"/>
+		                <listheader label="Nombre Producto"/>
+		                <listheader label="Unidades"/>
+		                <listheader label="Empleado"/>
+		                <listheader label="Fecha"/>
+		                <listheader label="Fecha Finalizado"/>
+		            </listhead>
+		            <template name="model">
+		                <listitem>
+		                	<listcell label="${win_product_stock$composer.getProductCode(each.idProduct)}"/>
+		                    <listcell label="${win_product_stock$composer.getProductName(each.idProduct)}"/>
+		                    <listcell>
+	                        	<spinner inplace="true" value="${each.units}" forward="onChange=orderDetailListbox.onEditOrderDetailUnits(${each})" constraint="no negative: No puede ser valor negativo." width="98%"/>
+                    		</listcell>
+						</listitem>
+		            </template>
     			</listbox>
             </vlayout>
         </panelchildren>
