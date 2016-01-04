@@ -156,6 +156,11 @@ public class OrderCreationController extends SelectorComposer<Component>{
 			Clients.showNotification("Seleccionar Cliente", clientBandbox);
 			return;
 		}
+		
+		if(orderDetailList.isEmpty()){
+			Clients.showNotification("Debe agregar como minimo 1 producto al pedido", productBandbox);
+			return;
+		}
 		/*
 		if(orderNeedDateBox.getValue() == null){
 			Clients.showNotification("Debe seleccionar una fecha de  necesidad", orderNeedDateBox);
