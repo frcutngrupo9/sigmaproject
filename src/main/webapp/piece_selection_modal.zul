@@ -1,0 +1,35 @@
+<window id="modalDialog" title="Seleccion de Pieza" border="normal" width="900px"
+    apply="ar.edu.utn.sigmaproject.controller.PieceSelectionModalController"
+    position="center,center" closable="true"
+    action="show: slideDown;hide: slideUp">
+    <vlayout>
+        <separator/>
+	    <listbox id="pieceListbox" mold="paging" pageSize="10" sizedByContent="true" span="true">
+	    	<auxhead>
+				<auxheader label="Piezas" colspan="8"/>
+			</auxhead>
+	        <listhead>
+	        	<listheader label="Producto"/>
+	        	<listheader label="Pieza"/>
+	            <listheader label="Longitud"/>
+	            <listheader label="Espesor"/>
+	            <listheader label="Ancho"/>
+	            <listheader label="Otras Medidas"/>
+	            <listheader label="Unidades"/>
+	        </listhead>
+	        <template name="model">
+	            <listitem>
+	            	<listcell label="${modalDialog$composer.getProductName(each.idProduct)}"/>
+	            	<listcell label="${each.name}"/>
+	                <listcell label="${each.length.doubleValue()} ${modalDialog$composer.getMeasureUnitName(each.idMeasureUnit)}"/>
+	                <listcell label="${each.width.doubleValue()} ${modalDialog$composer.getMeasureUnitName(each.idMeasureUnit)}"/>
+	                <listcell label="${each.depth.doubleValue()} ${modalDialog$composer.getMeasureUnitName(each.idMeasureUnit)}"/>
+	                <listcell label="${each.size}"/>
+	                <listcell label="${each.units}"/>
+	            </listitem>
+	        </template>
+	    </listbox>
+	    <separator/>
+        <button id="closeButton" hflex="1" label="Cerrar"/>
+    </vlayout>
+</window>

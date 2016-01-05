@@ -66,7 +66,7 @@ public class SupplyController extends SelectorComposer<Component>{
     // services
     private SupplyTypeService supplyTypeService = new SupplyTypeServiceImpl();
     
-    // atributes
+    // attributes
     private SupplyType currentSupplyType;
     
     // list
@@ -78,7 +78,6 @@ public class SupplyController extends SelectorComposer<Component>{
 	@Override
     public void doAfterCompose(Component comp) throws Exception{
         super.doAfterCompose(comp);
-        //SupplyCreationController supplyCreationController = (SupplyCreationController) supplyCreationWindow.getAttribute("supplyCreationWindow$composer"); (codigo que quedo cuando se manejaba una ventana para crear el insumo)
         supplyTypeList = supplyTypeService.getSupplyTypeList();
         supplyTypeListModel = new ListModelList<SupplyType>(supplyTypeList);
         supplyListbox.setModel(supplyTypeListModel);

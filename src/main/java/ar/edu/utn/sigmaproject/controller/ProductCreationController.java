@@ -11,6 +11,9 @@ import javax.xml.datatype.Duration;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.EventQueue;
+import org.zkoss.zk.ui.event.EventQueues;
 import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Wire;
@@ -33,6 +36,7 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.ListModelList;
+import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.service.MeasureUnitService;
 import ar.edu.utn.sigmaproject.service.MeasureUnitTypeService;
@@ -83,15 +87,13 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	@Wire
     Textbox productCodeTextbox;
     @Wire
-	Doublebox pieceHeightDoublebox;
+	Doublebox pieceLengthDoublebox;
 	@Wire
 	Doublebox pieceDepthDoublebox;
 	@Wire
 	Doublebox pieceWidthDoublebox;
 	@Wire
-	Doublebox pieceSize1Doublebox;
-	@Wire
-	Doublebox pieceSize2Doublebox;
+	Textbox pieceSizeTextbox;
 	@Wire
 	Checkbox pieceGroupCheckbox;
 	@Wire
@@ -112,30 +114,35 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	Listbox pieceListbox;
 	@Wire
 	Caption productCaption;
+	@Wire
+	Button pieceCopyButton;
      
     // services
-	ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
-	ProcessService processService = new ProcessServiceImpl();
-	PieceService pieceService = new PieceServiceImpl();
-	ProductService productService = new ProductServiceImpl();
-	MeasureUnitService measureUnitService = new MeasureUnitServiceImpl();
-	MeasureUnitTypeService measureUnitTypeService = new MeasureUnitTypeServiceImpl();
+	private ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
+	private ProcessService processService = new ProcessServiceImpl();
+	private PieceService pieceService = new PieceServiceImpl();
+	private ProductService productService = new ProductServiceImpl();
+	private MeasureUnitService measureUnitService = new MeasureUnitServiceImpl();
+	private MeasureUnitTypeService measureUnitTypeService = new MeasureUnitTypeServiceImpl();
 	
-    ListModelList<ProcessType> processTypeListModel;
-    ListModelList<Piece> pieceListModel;
-    ListModelList<MeasureUnit> measureUnitListModel;
-    
-    // atributes
+    // attributes
     private Product currentProduct;
 	private Piece currentPiece;
+	private EventQueue eq;
+	
+	// list
 	private List<Piece> pieceList;
 	private List<Process> processList;
 	private List<ProcessType> processTypeList;
+	
+	// list models
+	private ListModelList<ProcessType> processTypeListModel;
+	private ListModelList<Piece> pieceListModel;
+	private ListModelList<MeasureUnit> measureUnitListModel;
      
     @Override
     public void doAfterCompose(Component comp) throws Exception{
         super.doAfterCompose(comp);
-//        System.out.println("-adentro de doAfterCompose-");
         processTypeList = processTypeService.getProcessTypeList();
         processTypeListModel = new ListModelList<ProcessType>(processTypeList);
         processListbox.setModel(processTypeListModel);
@@ -151,11 +158,18 @@ public class ProductCreationController extends SelectorComposer<Component>{
         measureUnitListModel = new ListModelList<MeasureUnit>(measureUnitlList);
         measureUnitSelectBox.setModel(measureUnitListModel);
         
-        fillComboMeasurePreset();
-        
         currentProduct = (Product) Executions.getCurrent().getAttribute("selected_product");
         currentPiece = null;
         refreshViewProduct();
+        
+        // agregamos un listener para cuando se seleccione una pieza en el modal de copia de otra pieza
+        eq = EventQueues.lookup("Piece Selection Queue", EventQueues.DESKTOP, true);
+        eq.subscribe(new EventListener() {
+            public void onEvent(Event event) throws Exception {
+            	Piece value = (Piece)event.getData();
+            	fillPieceCopy(value);
+            }
+        });
     }
     
     @Listen("onClick = #saveProductButton")
@@ -243,11 +257,10 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	if(measureUnitSelectBox.getSelectedIndex() != -1) {
     		idMeasureUnit = measureUnitListModel.getElementAt(measureUnitSelectBox.getSelectedIndex()).getId();
     	}
-    	BigDecimal piece_height = new BigDecimal(pieceHeightDoublebox.doubleValue());
+    	BigDecimal piece_length = new BigDecimal(pieceLengthDoublebox.doubleValue());
     	BigDecimal piece_width = new BigDecimal(pieceWidthDoublebox.doubleValue());
     	BigDecimal piece_depth = new BigDecimal(pieceDepthDoublebox.doubleValue());
-    	BigDecimal piece_size1 = new BigDecimal(pieceSize1Doublebox.doubleValue());
-    	BigDecimal piece_size2 = new BigDecimal(pieceSize2Doublebox.doubleValue());
+    	String piece_size = pieceSizeTextbox.getText();
     	Integer piece_units = pieceUnitsByProductIntbox.getValue();
     	boolean piece_isGroup = pieceGroupCheckbox.isChecked();
     	
@@ -261,18 +274,17 @@ public class ProductCreationController extends SelectorComposer<Component>{
         			piece_id = serviceNewPieceId;
         		}
         	}
-    		currentPiece = new Piece(piece_id, null, piece_name, idMeasureUnit, piece_height, piece_width, piece_depth, piece_size1, piece_size2, piece_isGroup, piece_units);
+    		currentPiece = new Piece(piece_id, null, piece_name, idMeasureUnit, piece_length, piece_width, piece_depth, piece_size, piece_isGroup, piece_units);
     		pieceList.add(currentPiece);// lo agregamos a la lista
         	pieceListModel.add(currentPiece);
         	pieceListbox.setModel(pieceListModel);// y al modelo para que aparezca en la pantalla
     	} else { // se esta editando una pieza
     	    currentPiece.setName(piece_name);
     		currentPiece.setIdMeasureUnit(idMeasureUnit);
-    		currentPiece.setHeight(piece_height);
+    		currentPiece.setLength(piece_length);
     		currentPiece.setWidth(piece_width);
     		currentPiece.setDepth(piece_depth);
-    		currentPiece.setSize1(piece_size1);
-    		currentPiece.setSize2(piece_size2);
+    		currentPiece.setSize(piece_size);
     		currentPiece.setUnits(piece_units);
     		currentPiece.setGroup(piece_isGroup);
     		updatePieceList(currentPiece);// actualizamos la lista
@@ -408,11 +420,10 @@ public class ProductCreationController extends SelectorComposer<Component>{
   	    	pieceNameTextbox.setText("");
   	    	pieceGroupCheckbox.setChecked(false);
   	    	measureUnitSelectBox.setSelectedIndex(-1);
-  	    	pieceHeightDoublebox.setValue(0);
+  	    	pieceLengthDoublebox.setValue(0);
   	    	pieceWidthDoublebox.setValue(0);
   	    	pieceDepthDoublebox.setValue(0);
-  	    	pieceSize1Doublebox.setValue(0);
-  	    	pieceSize2Doublebox.setValue(0);
+  	    	pieceSizeTextbox.setText("");
   	    	pieceUnitsByProductIntbox.setValue(0);
   	    	// limpiar procesos (ponerlos en vacio y sin check)
   	    	for(int i=1; i<processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
@@ -440,11 +451,25 @@ public class ProductCreationController extends SelectorComposer<Component>{
   	    	pieceNameTextbox.setText(currentPiece.getName());
   	    	pieceGroupCheckbox.setChecked(currentPiece.isGroup());
   	    	measureUnitSelectBox.setSelectedIndex(measureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getIdMeasureUnit())));
-  	    	pieceHeightDoublebox.setValue(currentPiece.getHeight().doubleValue());
-  	    	pieceWidthDoublebox.setValue(currentPiece.getWidth().doubleValue());
-  	    	pieceDepthDoublebox.setValue(currentPiece.getDepth().doubleValue());
-  	    	pieceSize1Doublebox.setValue(currentPiece.getSize1().doubleValue());
-  	    	pieceSize2Doublebox.setValue(currentPiece.getSize2().doubleValue());
+  	    	BigDecimal lenght = currentPiece.getLength();
+  			if(lenght != null) {
+  				pieceLengthDoublebox.setValue(lenght.doubleValue());
+  			} else {
+  				pieceLengthDoublebox.setValue(0);
+  			}
+  			BigDecimal depth = currentPiece.getDepth();
+  			if(depth != null) {
+  				pieceDepthDoublebox.setValue(depth.doubleValue());
+  			} else {
+  				pieceDepthDoublebox.setValue(0);
+  			}
+  			BigDecimal width = currentPiece.getWidth();
+  			if(width != null) {
+  				pieceWidthDoublebox.setValue(width.doubleValue());
+  			} else {
+  				pieceWidthDoublebox.setValue(0);
+  			}
+  	    	pieceSizeTextbox.setValue(currentPiece.getSize());
   	    	pieceUnitsByProductIntbox.setValue(currentPiece.getUnits());
   	    	// cargar procesos (cargar detalles, tiempos y checks)
   	    	processTypeList = processTypeService.getProcessTypeList();
@@ -597,14 +622,6 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	return "" + quantity;
     }
   	
-  	private void fillComboMeasurePreset() {
-  		String[] _presets = { 
-			"3x2x40", "2x2x20", "3x2x45", "1x2x15", "2x2x50", "2x2x60", "4x2x45",
-		};
-		ListModel presetsModel= new SimpleListModel(_presets);
-		measurePresetCombobox.setModel(presetsModel);
-    }
-  	
   	@Listen("onSelect = #pieceListbox")
 	public void selectPiece() {
 		if(pieceListModel.isSelectionEmpty()){
@@ -678,4 +695,40 @@ public class ProductCreationController extends SelectorComposer<Component>{
   		}
   		return null;
     }
+  	
+  	@Listen("onClick = #pieceCopyButton")
+    public void doPieceCopyButtonClick() {
+  		createNewPiece();
+  		// mostramos el modal para seleccionar la pieza
+        Window window = (Window)Executions.createComponents(
+                "/piece_selection_modal.zul", null, null);
+        window.doModal();
+    }
+  	
+  	private void fillPieceCopy(Piece piece) {
+  		pieceNameTextbox.setText(piece.getName());
+    	pieceGroupCheckbox.setChecked(piece.isGroup());
+    	measureUnitSelectBox.setSelectedIndex(measureUnitListModel.indexOf(measureUnitService.getMeasureUnit(piece.getIdMeasureUnit())));
+    	BigDecimal lenght = piece.getLength();
+		if(lenght != null) {
+			pieceLengthDoublebox.setValue(lenght.doubleValue());
+		} else {
+			pieceLengthDoublebox.setValue(0);
+		}
+		BigDecimal depth = piece.getDepth();
+		if(depth != null) {
+			pieceDepthDoublebox.setValue(depth.doubleValue());
+		} else {
+			pieceDepthDoublebox.setValue(0);
+		}
+		BigDecimal width = piece.getWidth();
+		if(width != null) {
+			pieceWidthDoublebox.setValue(width.doubleValue());
+		} else {
+			pieceWidthDoublebox.setValue(0);
+		}
+    	pieceSizeTextbox.setValue(piece.getSize());
+    	pieceUnitsByProductIntbox.setValue(piece.getUnits());
+  	}
+  	
 }

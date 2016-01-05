@@ -34,7 +34,10 @@
                     <button id="deleteProductButton" label="Eliminar Producto"/>
                 </hlayout>
                 <separator/>
-                <button id="createPieceButton" label="Agregar Nueva Pieza"/>
+                <hlayout>
+	                <button id="createPieceButton" label="Agregar Nueva Pieza"/>
+	                <button id="pieceCopyButton" label="Copiar Otra Pieza"/>
+                </hlayout>
     			<listbox id="pieceListbox">
     				<auxhead>
 						<auxheader label="Piezas" colspan="2"/>
@@ -75,10 +78,6 @@
                             <label value="La pieza es conjunto de otras?:"/>
                             <checkbox id="pieceGroupCheckbox" checked="false"/>
                         </row>
-                        <row>
-                            <label value="Dimensiones Prefijadas :"/>
-                            <combobox id="measurePresetCombobox" autodrop="true"/>
-                        </row>
                         <row>	
 		                    <label>Unidad de Medida:</label>
 		                    <selectbox id="measureUnitSelectBox">
@@ -89,7 +88,7 @@
 		                </row>
                         <row>
                             <label value="Longitud:"/>
-                            <doublebox id="pieceHeightDoublebox" width="150px" format="#.###"/>
+                            <doublebox id="pieceLengthDoublebox" width="150px" format="#.###"/>
                         </row>
                         <row>
                             <label value="Espesor:"/>
@@ -100,12 +99,8 @@
                             <doublebox id="pieceWidthDoublebox" width="150px" format="#.###"/>
                         </row>
                         <row>
-                            <label value="Medida 1:"/>
-                            <doublebox id="pieceSize1Doublebox" width="150px" format="#.###"/>
-                        </row>
-                        <row>
-                            <label value="Medida 2:"/>
-                            <doublebox id="pieceSize2Doublebox" width="150px" format="#.###"/>
+                            <label value="Otras Medidas:"/>
+                            <textbox id="pieceSizeTextbox" width="150px"/>
                         </row>
                     </rows>
                 </grid>

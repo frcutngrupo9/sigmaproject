@@ -85,7 +85,7 @@ public class ProductStockController extends SelectorComposer<Component>{
     private OrderStateService orderStateService = new OrderStateServiceImpl();
     private OrderStateTypeService orderStateTypeService = new OrderStateTypeServiceImpl();
     
-    // atributes
+    // attributes
     private ProductExistence currentProductExistence;
     private Product currentProduct;
     private Order currentOrder;
@@ -101,7 +101,6 @@ public class ProductStockController extends SelectorComposer<Component>{
 	@Override
     public void doAfterCompose(Component comp) throws Exception{
         super.doAfterCompose(comp);
-        //SupplyCreationController supplyCreationController = (SupplyCreationController) supplyCreationWindow.getAttribute("supplyCreationWindow$composer"); (codigo que quedo cuando se manejaba una ventana para crear el insumo)
         productList = productService.getProductList();
         productListModel = new ListModelList<Product>(productList);
         productListbox.setModel(productListModel);

@@ -1,5 +1,5 @@
 <zk>
-    <grid model="${arg.products}">
+    <grid model="${arg.products}" sizedByContent="true" span="true">
         <columns>
             <column label="Id Producto" align="center"/>
             <column label="Codigo" align="center"/>

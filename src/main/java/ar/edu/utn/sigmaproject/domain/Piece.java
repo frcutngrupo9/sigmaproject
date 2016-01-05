@@ -10,24 +10,22 @@ public class Piece implements Serializable, Cloneable {
 	Integer idProduct;
 	String name;
 	Integer idMeasureUnit;
-	BigDecimal height;
+	BigDecimal length;
 	BigDecimal width;
 	BigDecimal depth;
-	BigDecimal size1;
-	BigDecimal size2;
+	String size;
 	boolean isGroup;
 	Integer units;
 
-	public Piece(Integer id, Integer idProduct, String name, Integer idMeasureUnit, BigDecimal height, BigDecimal width, BigDecimal depth, BigDecimal size1, BigDecimal size2, boolean isGroup, Integer units) {
+	public Piece(Integer id, Integer idProduct, String name, Integer idMeasureUnit, BigDecimal length, BigDecimal width, BigDecimal depth, String size, boolean isGroup, Integer units) {
 		this.id = id;
 		this.idProduct = idProduct;
 		this.name = name;
 		this.idMeasureUnit = idMeasureUnit;
-		this.height = height;
+		this.length = length;
 		this.width = width;
 		this.depth = depth;
-		this.size1 = size1;
-		this.size2 = size2;
+		this.size = size;
 		this.isGroup = isGroup;
 		this.units = units;
 	}
@@ -60,12 +58,12 @@ public class Piece implements Serializable, Cloneable {
 		this.idMeasureUnit = idMeasureUnit;
 	}
 
-	public BigDecimal getHeight() {
-		return height;
+	public BigDecimal getLength() {
+		return length;
 	}
 
-	public void setHeight(BigDecimal height) {
-		this.height = height;
+	public void setLength(BigDecimal length) {
+		this.length = length;
 	}
 
 	public BigDecimal getWidth() {
@@ -84,20 +82,12 @@ public class Piece implements Serializable, Cloneable {
 		this.depth = depth;
 	}
 
-	public BigDecimal getSize1() {
-		return size1;
+	public String getSize() {
+		return size;
 	}
 
-	public void setSize1(BigDecimal size1) {
-		this.size1 = size1;
-	}
-
-	public BigDecimal getSize2() {
-		return size2;
-	}
-
-	public void setSize2(BigDecimal size2) {
-		this.size2 = size2;
+	public void setSize(String size) {
+		this.size = size;
 	}
 
 	public boolean isGroup() {

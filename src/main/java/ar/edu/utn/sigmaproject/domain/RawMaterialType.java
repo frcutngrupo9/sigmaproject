@@ -12,18 +12,18 @@ public class RawMaterialType implements Serializable, Cloneable {
 	Integer lengthIdMeasureUnit;
 	BigDecimal depth;
 	Integer depthIdMeasureUnit;
-	BigDecimal height;
-	Integer heightIdMeasureUnit;
+	BigDecimal width;
+	Integer widthIdMeasureUnit;
 
-	public RawMaterialType(Integer id, String name, BigDecimal length, Integer lengthIdMeasureUnit, BigDecimal depth, Integer depthIdMeasureUnit, BigDecimal height, Integer heightIdMeasureUnit) {
+	public RawMaterialType(Integer id, String name, BigDecimal length, Integer lengthIdMeasureUnit, BigDecimal depth, Integer depthIdMeasureUnit, BigDecimal width, Integer widthIdMeasureUnit) {
 		this.id = id;
 		this.name = name;
 		this.length = length;
 		this.lengthIdMeasureUnit = lengthIdMeasureUnit;
 		this.depth = depth;
 		this.depthIdMeasureUnit = depthIdMeasureUnit;
-		this.height = height;
-		this.heightIdMeasureUnit = heightIdMeasureUnit;
+		this.width = width;
+		this.widthIdMeasureUnit = widthIdMeasureUnit;
 	}
 
 	public Integer getId() {
@@ -42,12 +42,12 @@ public class RawMaterialType implements Serializable, Cloneable {
 		this.name = name;
 	}
 
-	public BigDecimal getHeight() {
-		return height;
+	public BigDecimal getWidth() {
+		return width;
 	}
 
-	public void setHeight(BigDecimal height) {
-		this.height = height;
+	public void setWidth(BigDecimal width) {
+		this.width = width;
 	}
 
 	public BigDecimal getLength() {
@@ -82,12 +82,12 @@ public class RawMaterialType implements Serializable, Cloneable {
 		this.depthIdMeasureUnit = depthIdMeasureUnit;
 	}
 
-	public Integer getHeightIdMeasureUnit() {
-		return heightIdMeasureUnit;
+	public Integer getWidthIdMeasureUnit() {
+		return widthIdMeasureUnit;
 	}
 
-	public void setHeightIdMeasureUnit(Integer heightIdMeasureUnit) {
-		this.heightIdMeasureUnit = heightIdMeasureUnit;
+	public void setWidthIdMeasureUnit(Integer widthIdMeasureUnit) {
+		this.widthIdMeasureUnit = widthIdMeasureUnit;
 	}
 
 	@Override

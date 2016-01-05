@@ -17,7 +17,7 @@
                 <listcell label="${each.name}"/>
                 <listcell label="${each.length.doubleValue()} ${win_raw_material$composer.getMeasureUnitName(each.lengthIdMeasureUnit)}"/>
                 <listcell label="${each.depth.doubleValue()} ${win_raw_material$composer.getMeasureUnitName(each.depthIdMeasureUnit)}"/>
-                <listcell label="${each.height.doubleValue()} ${win_raw_material$composer.getMeasureUnitName(each.heightIdMeasureUnit)}"/>
+                <listcell label="${each.width.doubleValue()} ${win_raw_material$composer.getMeasureUnitName(each.widthIdMeasureUnit)}"/>
             </listitem>
         </template>
     </listbox>
@@ -57,8 +57,8 @@
                 </row>
                 <row>	
                     <label>Ancho:</label>
-                    <doublebox id="heightDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
-                	<selectbox id="heightMeasureUnitSelectbox">
+                    <doublebox id="widthDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
+                	<selectbox id="widthMeasureUnitSelectbox">
                         <template name="model">
                             <label value="${each.name}" />
                         </template>

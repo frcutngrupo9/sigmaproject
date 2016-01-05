@@ -5,7 +5,7 @@
         <button id="searchButton" label="Buscar"/>
     </hlayout>
     <separator/>
-    <listbox id="productListbox" mold="paging" pageSize="7">
+    <listbox id="productListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
     	<auxhead>
 			<auxheader label="Productos" colspan="5"/>
 		</auxhead>
@@ -29,7 +29,7 @@
     <separator/>
     <button id="newProductButton" label="Crear Producto Nuevo"/>
     <separator/>
-    <listbox id="pieceListbox" mold="paging" pageSize="5">
+    <listbox id="pieceListbox" mold="paging" pageSize="5" sizedByContent="true" span="true">
     	<auxhead>
 			<auxheader label="Piezas" colspan="10"/>
 		</auxhead>
@@ -38,11 +38,10 @@
         	<listheader label="Pieza"/>
             <listheader label="Id"/>
             <listheader label="Id Producto"/>
-            <listheader label="Longitud"/>
+            <listheader label="Largo"/>
             <listheader label="Espesor"/>
             <listheader label="Ancho"/>
-            <listheader label="Medida 1"/>
-            <listheader label="Medida 2"/>
+            <listheader label="Otras Medidas"/>
             <listheader label="Unidades"/>
         </listhead>
         <template name="model">
@@ -51,17 +50,16 @@
             	<listcell label="${each.name}"/>
                 <listcell label="${each.id}"/>
                 <listcell label="${each.idProduct}"/>
-                <listcell label="${each.height.doubleValue()}"/>
-                <listcell label="${each.width.doubleValue()}"/>
-                <listcell label="${each.depth.doubleValue()}"/>
-                <listcell label="${each.size1.doubleValue()}"/>
-                <listcell label="${each.size2.doubleValue()}"/>
+                <listcell label="${each.length.doubleValue()} ${win_product_list$composer.getMeasureUnitName(each.idMeasureUnit)}"/>
+                <listcell label="${each.width.doubleValue()} ${win_product_list$composer.getMeasureUnitName(each.idMeasureUnit)}"/>
+                <listcell label="${each.depth.doubleValue()} ${win_product_list$composer.getMeasureUnitName(each.idMeasureUnit)}"/>
+                <listcell label="${each.size}"/>
                 <listcell label="${each.units}"/>
             </listitem>
         </template>
     </listbox>
     <separator/>
-    <listbox id="processListbox" mold="paging" pageSize="5">
+    <listbox id="processListbox" mold="paging" pageSize="5" sizedByContent="true" span="true">
     	<auxhead>
 			<auxheader label="Procesos" colspan="6"/>
 		</auxhead>
