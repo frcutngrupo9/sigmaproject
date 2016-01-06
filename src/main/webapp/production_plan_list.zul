@@ -7,7 +7,7 @@
     <separator/>
     <grid id="productionPlanGrid" mold="paging" pageSize="7">
     	<auxhead>
-			<auxheader label="Planes de Produccion" colspan="8"/>
+			<auxheader label="Planes de Produccion" colspan="9"/>
 		</auxhead>
         <columns>
         	<column width="40px" />
@@ -18,6 +18,7 @@
             <column label="Cantidad Productos"/>
             <column label="Estado"/>
             <column label="Editar" width="120px" />
+            <column width="120px" />
         </columns>
         <template name="model">
             <row>
@@ -34,6 +35,7 @@
                 <label value="${win_production_plan_list$composer.getQuantityOfProduct(each.id)}"/>
                 <label value="${win_production_plan_list$composer.getProductionPlanStateName(each.id)}"/>
                 <button forward="onClick=productionPlanGrid.onEditProductionPlan(${each.id})"  image="/img/edit16x16.png"/>
+                <button forward="onClick=productionPlanGrid.onGenerateProductionOrder(${each.id})" label="Ordenes" />
             </row>
         </template>
     </grid>

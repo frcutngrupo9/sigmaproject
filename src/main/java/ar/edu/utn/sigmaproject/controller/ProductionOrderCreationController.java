@@ -13,31 +13,18 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Order;
-import ar.edu.utn.sigmaproject.domain.OrderDetail;
-import ar.edu.utn.sigmaproject.domain.Process;
-import ar.edu.utn.sigmaproject.domain.Product;
-import ar.edu.utn.sigmaproject.domain.ProductExistence;
 import ar.edu.utn.sigmaproject.domain.ProductTotal;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
-import ar.edu.utn.sigmaproject.service.ClientService;
-import ar.edu.utn.sigmaproject.service.OrderDetailService;
-import ar.edu.utn.sigmaproject.service.OrderService;
-import ar.edu.utn.sigmaproject.service.OrderStateService;
-import ar.edu.utn.sigmaproject.service.OrderStateTypeService;
-import ar.edu.utn.sigmaproject.service.ProductExistenceService;
+import ar.edu.utn.sigmaproject.domain.Worker;
 import ar.edu.utn.sigmaproject.service.ProductService;
 import ar.edu.utn.sigmaproject.service.ProductionOrderService;
 import ar.edu.utn.sigmaproject.service.ProductionPlanDetailService;
-import ar.edu.utn.sigmaproject.service.impl.ClientServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.OrderDetailServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.OrderServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.OrderStateServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.OrderStateTypeServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProductExistenceServiceImpl;
+import ar.edu.utn.sigmaproject.service.WorkerService;
 import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductionOrderServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductionPlanDetailServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.WorkerServiceImpl;
 
 public class ProductionOrderCreationController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
@@ -52,19 +39,15 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	// services
     private ProductionOrderService productionOrderService = new ProductionOrderServiceImpl();
     private ProductService productService = new ProductServiceImpl();
-    private ClientService clientService = new ClientServiceImpl();
-    private OrderService orderService = new OrderServiceImpl();
-    private OrderDetailService orderDetailService = new OrderDetailServiceImpl();
-    private OrderStateService orderStateService = new OrderStateServiceImpl();
-    private OrderStateTypeService orderStateTypeService = new OrderStateTypeServiceImpl();
     private ProductionPlanDetailService productionPlanDetailService = new ProductionPlanDetailServiceImpl();
+    private WorkerService workerService = new WorkerServiceImpl();
     
     // atributes
     private ProductionPlan currentProductionPlan;
-    private Order currentOrder;
     
     // list
     private List<ProductionOrder> productionOrderList;
+    private List<ProductTotal> productTotalList;
     
     // list models
     private ListModelList<ProductionOrder> productionOrderListModel;
@@ -83,8 +66,9 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
         		ArrayList<ProductTotal> productTotalList = productionPlanDetailService.getProductTotalList(id_production_plan);
         		for(ProductTotal productTotal : productTotalList) {
         			Integer id_product = productTotal.getId();
-        			
-        			productionOrderList.add(new ProductionOrder(null, id_production_plan, null, null, null, null, null));
+        			Integer product_units = productTotal.getTotalUnits();
+        			Integer id_worker = null;
+        			productionOrderList.add(new ProductionOrder(null, id_production_plan, id_product, id_worker, null, product_units, null, null));
         		}
         	}
         	
@@ -98,8 +82,40 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
     }
 
 	private void refreshView() {
-		// TODO Auto-generated method stub
+		productionPlanNameTextbox.setDisabled(true);
+		productionPlanDateBox.setDisabled(true);
+		if(currentProductionPlan != null) {
+			productionPlanNameTextbox.setText(currentProductionPlan.getName());
+			productionPlanDateBox.setValue(currentProductionPlan.getDate());
+		}
 		
 	}
+	
+	public String getProductName(int idProduct) {
+    	return productService.getProduct(idProduct).getName();
+    }
+    
+    public String getProductCode(int idProduct) {
+    	return productService.getProduct(idProduct).getCode();
+    }
+    
+    public String getProductUnits(int idProduct) {
+    	int product_units = 0;
+    	for(ProductTotal productTotal : productTotalList) {
+    		if(productTotal.getId().equals(idProduct)) {
+    			product_units = productTotal.getTotalUnits();
+    		}
+    	}
+    	return "" + product_units;
+    }
+    
+    public String getWorkerName(int idWorker) {
+    	Worker aux = workerService.getWorker(idWorker);
+    	if(aux != null) {
+    		return aux.getName();
+    	} else {
+    		return "[sin empleado]";
+    	}
+    }
 	
 }

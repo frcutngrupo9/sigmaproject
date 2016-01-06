@@ -1,7 +1,8 @@
-<window apply="ar.edu.utn.sigmaproject.controller.ProductionOrderCreationController" width="95%" style="background:white">
+<window id="win_production_order_creation" apply="ar.edu.utn.sigmaproject.controller.ProductionOrderCreationController" width="95%" style="background:white">
     <panel title="Ordenes de Produccion" id="productionOrderCreationBlock" border="rounded">
         <panelchildren>
             <vlayout>
+            	<separator/>
             	<hlayout>
             		<label value="Nombre Plan de Produccion: "/>
 					<textbox id="productionPlanNameTextbox" width="180px"/>
@@ -11,7 +12,7 @@
 					<datebox id="productionPlanDateBox" cols="12" format="dd-MM-yyyy"/>
             	</hlayout>
                 <separator/>
-    			<listbox id="productionOrderListbox">
+    			<listbox id="productionOrderListbox" sizedByContent="true" span="true">
     				<auxhead>
 						<auxheader label="Orden de Produccion" colspan="8"/>
 					</auxhead>
@@ -21,7 +22,7 @@
 		            	<listheader label="Codigo Producto"/>
 		                <listheader label="Nombre Producto"/>
 		                <listheader label="Unidades"/>
-		                <listheader label="Empleado"/>
+		                <listheader label="Empleado Asignado"/>
 		                <listheader label="Fecha"/>
 		                <listheader label="Fecha Finalizado"/>
 		            </listhead>
@@ -29,12 +30,14 @@
 		                <listitem>
 		                	<listcell label="${each.id}"/>
 		                	<listcell label="${each.number}"/>
-		                	<listcell label="${win_product_stock$composer.getProductCode(each.idProduct)}"/>
-		                    <listcell label="${win_product_stock$composer.getProductName(each.idProduct)}"/>
-		                    <listcell label="${win_product_stock$composer.getProductUnits(each.idProduct)}"/>
-		                    <listcell label="${win_product_stock$composer.getWorkerName(each.idWorker)}"/>
+		                	<listcell label="${win_production_order_creation$composer.getProductCode(each.idProduct)}"/>
+		                    <listcell label="${win_production_order_creation$composer.getProductName(each.idProduct)}"/>
+		                    <listcell label="${each.units}"/>
+		                    <listcell label="${win_production_order_creation$composer.getWorkerName(each.idWorker)}"/>
 		                    <listcell label="${each.date}"/>
-		                    <listcell label="${each.dateFinished}"/>
+		                    <listcell>
+	                        	<datebox inplace="true" value="${each.date}" forward="onChange=productionOrderListbox.onEditProductionOrderDate(${each})" cols="12" format="dd-MM-yyyy"/>
+                    		</listcell>
 						</listitem>
 		            </template>
     			</listbox>

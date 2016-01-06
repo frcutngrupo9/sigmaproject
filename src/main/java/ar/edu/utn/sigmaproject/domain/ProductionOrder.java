@@ -8,18 +8,20 @@ public class ProductionOrder implements Serializable, Cloneable {
     
     Integer id;
     Integer idProductionPlan;
-    Integer idWorker;
     Integer idProduct;
+    Integer idWorker;
     Integer number;
+    Integer units;
     Date date;
     Date dateFinished;
 
-    public ProductionOrder(Integer id, Integer idProductionPlan, Integer idWorker, Integer idProduct, Integer number, Date date, Date dateFinished) {
+    public ProductionOrder(Integer id, Integer idProductionPlan, Integer idProduct, Integer idWorker, Integer number, Integer units, Date date, Date dateFinished) {
         this.id = id;
         this.idProductionPlan = idProductionPlan;
-        this.idWorker = idWorker;
         this.idProduct = idProduct;
+        this.idWorker = idWorker;
         this.number = number;
+        this.units = units;
         this.date = date;
         this.dateFinished = dateFinished;
     }
@@ -40,14 +42,6 @@ public class ProductionOrder implements Serializable, Cloneable {
 		this.idProductionPlan = idProductionPlan;
 	}
 
-	public Integer getIdWorker() {
-		return idWorker;
-	}
-
-	public void setIdWorker(Integer idWorker) {
-		this.idWorker = idWorker;
-	}
-
 	public Integer getIdProduct() {
 		return idProduct;
 	}
@@ -56,12 +50,28 @@ public class ProductionOrder implements Serializable, Cloneable {
 		this.idProduct = idProduct;
 	}
 
+	public Integer getIdWorker() {
+		return idWorker;
+	}
+
+	public void setIdWorker(Integer idWorker) {
+		this.idWorker = idWorker;
+	}
+
 	public Integer getNumber() {
 		return number;
 	}
 
 	public void setNumber(Integer number) {
 		this.number = number;
+	}
+
+	public Integer getUnits() {
+		return units;
+	}
+
+	public void setUnits(Integer units) {
+		this.units = units;
 	}
 
 	public Date getDate() {

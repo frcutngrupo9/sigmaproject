@@ -16,11 +16,8 @@ import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
 
-import ar.edu.utn.sigmaproject.domain.Order;
-import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductTotal;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
-import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.service.ProductionPlanDetailService;
@@ -103,5 +100,13 @@ public class ProductionPlanListController  extends SelectorComposer<Component>{
 	public ListModel<ProductTotal> getProductionPlanProducts(int idProductionPlan) {
 		ArrayList<ProductTotal> productTotalList = productionPlanDetailService.getProductTotalList(idProductionPlan);
 		return new ListModelList<ProductTotal>(productTotalList);
+    }
+	
+	@Listen("onGenerateProductionOrder = #productionPlanGrid")
+    public void goToProductionOrderCreation(ForwardEvent evt) {
+    	int idProductionPlan = (Integer) evt.getData();
+    	Executions.getCurrent().setAttribute("selected_production_plan", productionPlanService.getProductionPlan(idProductionPlan));
+        Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
+    	include.setSrc("/production_order_creation.zul");
     }
 }
