@@ -52,9 +52,10 @@
                 <separator/>
     			<grid id="productionPlanDetailGrid" mold="paging" pageSize="7">
     				<auxhead>
-						<auxheader label="Pedidos" colspan="5"/>
+						<auxheader label="Pedidos" colspan="6"/>
 					</auxhead>
         			<columns>
+        				<column width="40px" />
             			<column label="Id"/>
             			<column label="Fecha"/>
             			<column label="Cliente"/>
@@ -63,6 +64,12 @@
         			</columns>
         			<template name="model">
             			<row>
+	            			<!-- se usa custom-attributes para guardar los productos en la fila, 
+					 		para que se puedan acceder cuando se usa onOpen del detail -->
+			            	<custom-attributes details="${win_production_plan_creation$composer.getOrderDetailList(each.idOrder)}"/>
+			            	<detail open="false" fulfill="onOpen">
+			            		<include src="/production_plan_order_details.zul" details="${details}"/>
+			            	</detail>
                 			<label value="${each.idOrder}"/>
                 			<label value="${win_production_plan_creation$composer.getOrderDate(each.idOrder)}"/>
                 			<label value="${win_production_plan_creation$composer.getClientNameByOrderId(each.idOrder)}"/>

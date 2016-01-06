@@ -1,5 +1,5 @@
 <window apply="ar.edu.utn.sigmaproject.controller.ProductionOrderCreationController" width="95%" style="background:white">
-    <panel title="Orden de Produccion" id="productionOrderCreationBlock" border="rounded">
+    <panel title="Ordenes de Produccion" id="productionOrderCreationBlock" border="rounded">
         <panelchildren>
             <vlayout>
             	<hlayout>
@@ -13,7 +13,7 @@
                 <separator/>
     			<listbox id="productionOrderListbox">
     				<auxhead>
-						<auxheader label="Productos" colspan="2"/>
+						<auxheader label="Orden de Produccion" colspan="8"/>
 					</auxhead>
         			<listhead>
         				<listheader label="Id Orden Produccion"/>
@@ -27,11 +27,14 @@
 		            </listhead>
 		            <template name="model">
 		                <listitem>
+		                	<listcell label="${each.id}"/>
+		                	<listcell label="${each.number}"/>
 		                	<listcell label="${win_product_stock$composer.getProductCode(each.idProduct)}"/>
 		                    <listcell label="${win_product_stock$composer.getProductName(each.idProduct)}"/>
-		                    <listcell>
-	                        	<spinner inplace="true" value="${each.units}" forward="onChange=orderDetailListbox.onEditOrderDetailUnits(${each})" constraint="no negative: No puede ser valor negativo." width="98%"/>
-                    		</listcell>
+		                    <listcell label="${win_product_stock$composer.getProductUnits(each.idProduct)}"/>
+		                    <listcell label="${win_product_stock$composer.getWorkerName(each.idWorker)}"/>
+		                    <listcell label="${each.date}"/>
+		                    <listcell label="${each.dateFinished}"/>
 						</listitem>
 		            </template>
     			</listbox>
