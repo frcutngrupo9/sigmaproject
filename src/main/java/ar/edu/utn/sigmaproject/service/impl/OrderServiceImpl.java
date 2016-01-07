@@ -10,7 +10,6 @@ import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.service.OrderDetailService;
 import ar.edu.utn.sigmaproject.service.OrderService;
 import ar.edu.utn.sigmaproject.service.OrderStateService;
-import ar.edu.utn.sigmaproject.service.OrderStateTypeService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
 public class OrderServiceImpl implements OrderService {

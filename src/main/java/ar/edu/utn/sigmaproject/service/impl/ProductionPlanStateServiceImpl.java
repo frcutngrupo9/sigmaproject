@@ -4,11 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import ar.edu.utn.sigmaproject.domain.OrderState;
-import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
-import ar.edu.utn.sigmaproject.service.OrderStateTypeService;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateService;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
