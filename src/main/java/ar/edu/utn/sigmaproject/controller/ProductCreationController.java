@@ -90,6 +90,12 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	@Wire
 	Doublebox pieceWidthDoublebox;
 	@Wire
+    Selectbox lengthMeasureUnitSelectbox;
+    @Wire
+    Selectbox depthMeasureUnitSelectbox;
+    @Wire
+    Selectbox widthMeasureUnitSelectbox;
+	@Wire
 	Textbox pieceSizeTextbox;
 	@Wire
 	Checkbox pieceGroupCheckbox;
@@ -99,10 +105,6 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	Button createProcessButton;
 	@Wire
 	Button cancelPieceButton;
-	@Wire
-    Selectbox measureUnitSelectBox;
-	@Wire
-    Combobox measurePresetCombobox;
 	@Wire
 	Component processCreationBlock;
 	@Wire
@@ -135,7 +137,9 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	// list models
 	private ListModelList<ProcessType> processTypeListModel;
 	private ListModelList<Piece> pieceListModel;
-	private ListModelList<MeasureUnit> measureUnitListModel;
+	private ListModelList<MeasureUnit> lengthMeasureUnitListModel;
+    private ListModelList<MeasureUnit> depthMeasureUnitListModel;
+    private ListModelList<MeasureUnit> widthMeasureUnitListModel;
      
     @Override
     public void doAfterCompose(Component comp) throws Exception{
@@ -151,9 +155,13 @@ public class ProductCreationController extends SelectorComposer<Component>{
         processList = new ArrayList<Process>();
         
         Integer idMeasureUnitType = measureUnitTypeService.getMeasureUnitType("Longitud").getId();
-        List<MeasureUnit> measureUnitlList = measureUnitService.getMeasureUnitList(idMeasureUnitType);
-        measureUnitListModel = new ListModelList<MeasureUnit>(measureUnitlList);
-        measureUnitSelectBox.setModel(measureUnitListModel);
+        List<MeasureUnit> measureUnitList = measureUnitService.getMeasureUnitList(idMeasureUnitType);
+        lengthMeasureUnitListModel = new ListModelList<MeasureUnit>(measureUnitList);
+        depthMeasureUnitListModel = new ListModelList<MeasureUnit>(measureUnitList);
+        widthMeasureUnitListModel = new ListModelList<MeasureUnit>(measureUnitList);
+        lengthMeasureUnitSelectbox.setModel(lengthMeasureUnitListModel);
+        depthMeasureUnitSelectbox.setModel(depthMeasureUnitListModel);
+        widthMeasureUnitSelectbox.setModel(widthMeasureUnitListModel);
         
         currentProduct = (Product) Executions.getCurrent().getAttribute("selected_product");
         currentPiece = null;
@@ -250,13 +258,21 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	// actualizamos la lista de piezas
     	Integer piece_id = 0;
     	String piece_name = pieceNameTextbox.getText();
-    	Integer idMeasureUnit = null;
-    	if(measureUnitSelectBox.getSelectedIndex() != -1) {
-    		idMeasureUnit = measureUnitListModel.getElementAt(measureUnitSelectBox.getSelectedIndex()).getId();
+    	Integer length_id_measure_unit = null;
+    	Integer depth_id_measure_unit = null;
+    	Integer width_id_measure_unit = null;
+    	if(lengthMeasureUnitSelectbox.getSelectedIndex() != -1) {
+    		length_id_measure_unit = lengthMeasureUnitListModel.getElementAt(lengthMeasureUnitSelectbox.getSelectedIndex()).getId();
+    	}
+    	if(depthMeasureUnitSelectbox.getSelectedIndex() != -1) {
+    		depth_id_measure_unit = depthMeasureUnitListModel.getElementAt(depthMeasureUnitSelectbox.getSelectedIndex()).getId();
+    	}
+    	if(widthMeasureUnitSelectbox.getSelectedIndex() != -1) {
+    		width_id_measure_unit = widthMeasureUnitListModel.getElementAt(widthMeasureUnitSelectbox.getSelectedIndex()).getId();
     	}
     	BigDecimal piece_length = new BigDecimal(pieceLengthDoublebox.doubleValue());
-    	BigDecimal piece_width = new BigDecimal(pieceWidthDoublebox.doubleValue());
     	BigDecimal piece_depth = new BigDecimal(pieceDepthDoublebox.doubleValue());
+    	BigDecimal piece_width = new BigDecimal(pieceWidthDoublebox.doubleValue());
     	String piece_size = pieceSizeTextbox.getText();
     	Integer piece_units = pieceUnitsByProductIntbox.getValue();
     	boolean piece_isGroup = pieceGroupCheckbox.isChecked();
@@ -271,16 +287,18 @@ public class ProductCreationController extends SelectorComposer<Component>{
         			piece_id = serviceNewPieceId;
         		}
         	}
-    		currentPiece = new Piece(piece_id, null, piece_name, idMeasureUnit, piece_length, piece_width, piece_depth, piece_size, piece_isGroup, piece_units);
+    		currentPiece = new Piece(piece_id, null, piece_name, piece_length, length_id_measure_unit, piece_depth, depth_id_measure_unit, piece_width, width_id_measure_unit, piece_size, piece_isGroup, piece_units);
     		pieceList.add(currentPiece);// lo agregamos a la lista
         	pieceListModel.add(currentPiece);
         	pieceListbox.setModel(pieceListModel);// y al modelo para que aparezca en la pantalla
     	} else { // se esta editando una pieza
     	    currentPiece.setName(piece_name);
-    		currentPiece.setIdMeasureUnit(idMeasureUnit);
     		currentPiece.setLength(piece_length);
-    		currentPiece.setWidth(piece_width);
+    		currentPiece.setLengthIdMeasureUnit(length_id_measure_unit);
     		currentPiece.setDepth(piece_depth);
+    		currentPiece.setDepthIdMeasureUnit(depth_id_measure_unit);
+    		currentPiece.setWidth(piece_width);
+    		currentPiece.setWidthIdMeasureUnit(width_id_measure_unit);
     		currentPiece.setSize(piece_size);
     		currentPiece.setUnits(piece_units);
     		currentPiece.setGroup(piece_isGroup);
@@ -416,7 +434,14 @@ public class ProductCreationController extends SelectorComposer<Component>{
   	    	// limpiar form pieza
   	    	pieceNameTextbox.setText("");
   	    	pieceGroupCheckbox.setChecked(false);
-  	    	measureUnitSelectBox.setSelectedIndex(-1);
+  	    	// seleccionamos metros y pulgadas como valores predeterminados de las dimensiones de las piezas
+  	    	Integer id_measure_unit_meters = measureUnitService.getMeasureUnit("Metros").getId();
+  	    	MeasureUnit meters = measureUnitService.getMeasureUnit(id_measure_unit_meters);
+  	    	Integer id_measure_unit_inch = measureUnitService.getMeasureUnit("Pulgadas").getId();
+  	    	MeasureUnit inch = measureUnitService.getMeasureUnit(id_measure_unit_inch);
+    		lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(meters));
+  	        depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(inch));
+  	        widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(inch));
   	    	pieceLengthDoublebox.setValue(0);
   	    	pieceWidthDoublebox.setValue(0);
   	    	pieceDepthDoublebox.setValue(0);
@@ -447,7 +472,9 @@ public class ProductCreationController extends SelectorComposer<Component>{
   	    	// cargar form pieza
   	    	pieceNameTextbox.setText(currentPiece.getName());
   	    	pieceGroupCheckbox.setChecked(currentPiece.isGroup());
-  	    	measureUnitSelectBox.setSelectedIndex(measureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getIdMeasureUnit())));
+  	    	lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getLengthIdMeasureUnit())));
+  	    	depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getDepthIdMeasureUnit())));
+  	    	widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getWidthIdMeasureUnit())));
   	    	BigDecimal lenght = currentPiece.getLength();
   			if(lenght != null) {
   				pieceLengthDoublebox.setValue(lenght.doubleValue());
@@ -705,7 +732,9 @@ public class ProductCreationController extends SelectorComposer<Component>{
   	private void fillPieceCopy(Piece piece) {
   		pieceNameTextbox.setText(piece.getName());
     	pieceGroupCheckbox.setChecked(piece.isGroup());
-    	measureUnitSelectBox.setSelectedIndex(measureUnitListModel.indexOf(measureUnitService.getMeasureUnit(piece.getIdMeasureUnit())));
+    	lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getLengthIdMeasureUnit())));
+    	depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getDepthIdMeasureUnit())));
+    	widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getWidthIdMeasureUnit())));
     	BigDecimal lenght = piece.getLength();
 		if(lenght != null) {
 			pieceLengthDoublebox.setValue(lenght.doubleValue());

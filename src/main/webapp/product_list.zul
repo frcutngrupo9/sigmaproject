@@ -50,9 +50,9 @@
             	<listcell label="${each.name}"/>
                 <listcell label="${each.id}"/>
                 <listcell label="${each.idProduct}"/>
-                <listcell label="${each.length.doubleValue()} ${win_product_list$composer.getMeasureUnitName(each.idMeasureUnit)}"/>
-                <listcell label="${each.width.doubleValue()} ${win_product_list$composer.getMeasureUnitName(each.idMeasureUnit)}"/>
-                <listcell label="${each.depth.doubleValue()} ${win_product_list$composer.getMeasureUnitName(each.idMeasureUnit)}"/>
+                <listcell label="${each.length.doubleValue()} ${win_product_list$composer.getMeasureUnitName(each.lengthIdMeasureUnit)}"/>
+                <listcell label="${each.depth.doubleValue()} ${win_product_list$composer.getMeasureUnitName(each.depthIdMeasureUnit)}"/>
+                <listcell label="${each.width.doubleValue()} ${win_product_list$composer.getMeasureUnitName(each.widthIdMeasureUnit)}"/>
                 <listcell label="${each.size}"/>
                 <listcell label="${each.units}"/>
             </listitem>

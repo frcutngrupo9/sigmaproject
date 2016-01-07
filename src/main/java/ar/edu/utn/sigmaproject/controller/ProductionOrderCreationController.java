@@ -5,13 +5,17 @@ import java.util.List;
 
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
+import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Spinner;
 import org.zkoss.zul.Textbox;
 
+import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductTotal;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
@@ -115,6 +119,20 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
     	} else {
     		return "[sin empleado]";
     	}
+    }
+    
+    @Listen("onEditProductionOrderNumber = #productionOrderListbox")
+	public void doEditProductionOrderNumber(ForwardEvent evt) {
+    	ProductionOrder data = (ProductionOrder) evt.getData();// obtenemos el objeto pasado por parametro
+    	Spinner element = (Spinner) evt.getOrigin().getTarget();// obtenemos el elemento web
+    	data.setNumber(element.getValue());// cargamos al objeto el valor actualizado del elemento web
+    }
+    
+    @Listen("onEditProductionOrderDate = #productionOrderListbox")
+	public void doEditProductionOrderDate(ForwardEvent evt) {
+    	ProductionOrder data = (ProductionOrder) evt.getData();// obtenemos el objeto pasado por parametro
+    	Datebox element = (Datebox) evt.getOrigin().getTarget();// obtenemos el elemento web
+    	data.setDate(element.getValue());// cargamos al objeto el valor actualizado del elemento web
     }
 	
 }

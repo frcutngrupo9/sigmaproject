@@ -384,9 +384,11 @@ public class OrderCreationController extends SelectorComposer<Component>{
 			//just in case for the no selection
 			currentOrderDetail = null;
 		} else {
-			currentOrderDetail = orderDetailListModel.getSelection().iterator().next();
-			currentProduct = productService.getProduct(currentOrderDetail.getIdProduct());
-			refreshViewOrderDetail();
+			if(currentOrderDetail == null) {// permite la seleccion si no existe nada seleccionado
+				currentOrderDetail = orderDetailListModel.getSelection().iterator().next();
+				currentProduct = productService.getProduct(currentOrderDetail.getIdProduct());
+				refreshViewOrderDetail();
+			}
 		}
 	}
     

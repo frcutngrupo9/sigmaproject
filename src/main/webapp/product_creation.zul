@@ -78,29 +78,42 @@
                             <label value="La pieza es conjunto de otras?:"/>
                             <checkbox id="pieceGroupCheckbox" checked="false"/>
                         </row>
-                        <row>	
-		                    <label>Unidad de Medida:</label>
-		                    <selectbox id="measureUnitSelectBox">
-		                        <template name="model">
-		                            <label value="${each.name}" />
-		                        </template>
-		                    </selectbox>
-		                </row>
                         <row>
                             <label value="Longitud:"/>
-                            <doublebox id="pieceLengthDoublebox" width="150px" format="#.###"/>
+                            <hbox>
+	                            <doublebox id="pieceLengthDoublebox" width="150px" format="#.###"/>
+	                            <selectbox id="lengthMeasureUnitSelectbox">
+			                        <template name="model">
+			                            <label value="${each.name}" />
+			                        </template>
+			                    </selectbox>
+		                    </hbox>
                         </row>
                         <row>
                             <label value="Espesor:"/>
-                            <doublebox id="pieceDepthDoublebox" width="150px" format="#.###"/>
+                            <hbox>
+	                            <doublebox id="pieceDepthDoublebox" width="150px" format="#.###"/>
+	                            <selectbox id="depthMeasureUnitSelectbox">
+			                        <template name="model">
+			                            <label value="${each.name}" />
+			                        </template>
+			                    </selectbox>
+		                    </hbox>
                         </row>
                         <row>
                             <label value="Ancho:"/>
-                            <doublebox id="pieceWidthDoublebox" width="150px" format="#.###"/>
+                            <hbox>
+	                            <doublebox id="pieceWidthDoublebox" width="150px" format="#.###"/>
+	                            <selectbox id="widthMeasureUnitSelectbox">
+			                        <template name="model">
+			                            <label value="${each.name}" />
+			                        </template>
+			                    </selectbox>
+		                    </hbox>
                         </row>
                         <row>
                             <label value="Otras Medidas:"/>
-                            <textbox id="pieceSizeTextbox" width="150px"/>
+                            <textbox id="pieceSizeTextbox" width="50%"/>
                         </row>
                     </rows>
                 </grid>

@@ -9,22 +9,26 @@ public class Piece implements Serializable, Cloneable {
 	Integer id;
 	Integer idProduct;
 	String name;
-	Integer idMeasureUnit;
 	BigDecimal length;
-	BigDecimal width;
+	Integer lengthIdMeasureUnit;
 	BigDecimal depth;
+	Integer depthIdMeasureUnit;
+	BigDecimal width;
+	Integer widthIdMeasureUnit;
 	String size;
 	boolean isGroup;
 	Integer units;
 
-	public Piece(Integer id, Integer idProduct, String name, Integer idMeasureUnit, BigDecimal length, BigDecimal width, BigDecimal depth, String size, boolean isGroup, Integer units) {
+	public Piece(Integer id, Integer idProduct, String name, BigDecimal length, Integer lengthIdMeasureUnit, BigDecimal depth, Integer depthIdMeasureUnit, BigDecimal width, Integer widthIdMeasureUnit, String size, boolean isGroup, Integer units) {
 		this.id = id;
 		this.idProduct = idProduct;
 		this.name = name;
-		this.idMeasureUnit = idMeasureUnit;
 		this.length = length;
-		this.width = width;
+		this.lengthIdMeasureUnit = lengthIdMeasureUnit;
 		this.depth = depth;
+		this.depthIdMeasureUnit = depthIdMeasureUnit;
+		this.width = width;
+		this.widthIdMeasureUnit = widthIdMeasureUnit;
 		this.size = size;
 		this.isGroup = isGroup;
 		this.units = units;
@@ -49,14 +53,6 @@ public class Piece implements Serializable, Cloneable {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	public Integer getIdMeasureUnit() {
-		return idMeasureUnit;
-	}
-
-	public void setIdMeasureUnit(Integer idMeasureUnit) {
-		this.idMeasureUnit = idMeasureUnit;
-	}
 
 	public BigDecimal getLength() {
 		return length;
@@ -64,6 +60,14 @@ public class Piece implements Serializable, Cloneable {
 
 	public void setLength(BigDecimal length) {
 		this.length = length;
+	}
+	
+	public BigDecimal getDepth() {
+		return depth;
+	}
+
+	public void setDepth(BigDecimal depth) {
+		this.depth = depth;
 	}
 
 	public BigDecimal getWidth() {
@@ -74,12 +78,28 @@ public class Piece implements Serializable, Cloneable {
 		this.width = width;
 	}
 
-	public BigDecimal getDepth() {
-		return depth;
+	public Integer getLengthIdMeasureUnit() {
+		return lengthIdMeasureUnit;
 	}
 
-	public void setDepth(BigDecimal depth) {
-		this.depth = depth;
+	public void setLengthIdMeasureUnit(Integer lengthIdMeasureUnit) {
+		this.lengthIdMeasureUnit = lengthIdMeasureUnit;
+	}
+
+	public Integer getDepthIdMeasureUnit() {
+		return depthIdMeasureUnit;
+	}
+
+	public void setDepthIdMeasureUnit(Integer depthIdMeasureUnit) {
+		this.depthIdMeasureUnit = depthIdMeasureUnit;
+	}
+
+	public Integer getWidthIdMeasureUnit() {
+		return widthIdMeasureUnit;
+	}
+
+	public void setWidthIdMeasureUnit(Integer widthIdMeasureUnit) {
+		this.widthIdMeasureUnit = widthIdMeasureUnit;
 	}
 
 	public String getSize() {

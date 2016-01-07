@@ -14,7 +14,7 @@
                 <separator/>
     			<listbox id="productionOrderListbox" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Orden de Produccion" colspan="8"/>
+						<auxheader label="Ordenes de Produccion" colspan="8"/>
 					</auxhead>
         			<listhead>
         				<listheader label="Id Orden Produccion"/>
@@ -29,7 +29,9 @@
 		            <template name="model">
 		                <listitem>
 		                	<listcell label="${each.id}"/>
-		                	<listcell label="${each.number}"/>
+                    		<listcell>
+	                        	<textbox inplace="true" value="${each.number}" forward="onChange=productionOrderListbox.onEditProductionOrderNumber(${each})" width="180px"/>
+                    		</listcell>
 		                	<listcell label="${win_production_order_creation$composer.getProductCode(each.idProduct)}"/>
 		                    <listcell label="${win_production_order_creation$composer.getProductName(each.idProduct)}"/>
 		                    <listcell label="${each.units}"/>
