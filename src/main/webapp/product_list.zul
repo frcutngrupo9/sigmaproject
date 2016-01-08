@@ -5,7 +5,41 @@
         <button id="searchButton" label="Buscar"/>
     </hlayout>
     <separator/>
-    <listbox id="productListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
+    <grid id="productGrid" mold="paging" pageSize="7" span="true">
+    	<auxhead>
+			<auxheader label="Productos" colspan="7"/>
+		</auxhead>
+        <columns>
+        	<column width="40px" />
+            <column label="Id" width="50px" align="center"/>
+            <column label="Codigo" align="center"/>
+            <column label="Nombre" align="center"/>
+            <column label="Detalles" align="center"/>
+            <column label="Precio" align="center"/>
+            <column label="Editar" width="100px" />
+        </columns>
+        <template name="model">
+            <row>
+            	<custom-attributes pieces="${win_product_list$composer.getProductPieces(each.id)}"/>
+            	<detail open="false" fulfill="onOpen">
+            		<include src="/product_pieces.zul" pieces="${pieces}"/>
+            	</detail>
+                <label value="${each.id}"/>
+                <label value="${each.code}"/>
+                <label value="${each.name}"/>
+                <label value="${each.details}"/>
+                <label value="${each.price.doubleValue()} $"/>
+                <button forward="onClick=productGrid.onEditProduct(${each.id})" image="/img/edit16x16.png"/>
+            </row>
+        </template>
+    </grid>
+    <separator/>
+    <button id="newProductButton" label="Crear Producto Nuevo"/>
+    <separator/>
+    
+    <!-- las listbox siguientes estaran  NO VISIBLES ya que no son necesarias -->
+    
+    <listbox id="productListbox" mold="paging" pageSize="7" sizedByContent="true" span="true" visible="false">
     	<auxhead>
 			<auxheader label="Productos" colspan="5"/>
 		</auxhead>
@@ -26,10 +60,7 @@
             </listitem>
         </template>
     </listbox>
-    <separator/>
-    <button id="newProductButton" label="Crear Producto Nuevo"/>
-    <separator/>
-    <listbox id="pieceListbox" mold="paging" pageSize="5" sizedByContent="true" span="true">
+    <listbox id="pieceListbox" mold="paging" pageSize="5" sizedByContent="true" span="true" visible="false">
     	<auxhead>
 			<auxheader label="Piezas" colspan="10"/>
 		</auxhead>
@@ -58,8 +89,7 @@
             </listitem>
         </template>
     </listbox>
-    <separator/>
-    <listbox id="processListbox" mold="paging" pageSize="5" sizedByContent="true" span="true">
+    <listbox id="processListbox" mold="paging" pageSize="5" sizedByContent="true" span="true" visible="false">
     	<auxhead>
 			<auxheader label="Procesos" colspan="6"/>
 		</auxhead>

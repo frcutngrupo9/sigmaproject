@@ -1,0 +1,18 @@
+<zk>
+    <grid model="${arg.processes}" sizedByContent="true" span="true">
+        <columns>
+        	<column label="Id" align="center"/>
+            <column label="Tipo Proceso" align="center"/>
+            <column label="Detalles" align="center"/>
+            <column label="Tiempo" align="center"/>
+        </columns>
+        <template name="model">
+            <row>
+                <label value="${each.idProcessType}"/>
+            	<label value="${win_product_list$composer.getProcessTypeName(each.idProcessType)}"/>
+            	<label value="${each.details}"/>
+            	<label value="${win_product_list$composer.getFormatedTime(each.time)}"/>
+            </row>
+        </template>
+    </grid>
+</zk>

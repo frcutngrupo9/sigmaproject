@@ -1,0 +1,29 @@
+<zk>
+    <grid model="${arg.pieces}" span="true">
+        <columns>
+        	<column width="40px" />
+        	<column label="Id" align="center"/>
+            <column label="Pieza" align="center"/>
+            <column label="Largo" align="center"/>
+            <column label="Espesor" align="center"/>
+            <column label="Ancho" align="center"/>
+            <column label="Otras Medidas" align="center"/>
+            <column label="Unidades" align="center"/>
+        </columns>
+        <template name="model">
+            <row>
+            	<custom-attributes processes="${win_product_list$composer.getPieceProcesses(each.id)}"/>
+            	<detail open="false" fulfill="onOpen">
+            		<include src="/piece_processes.zul" processes="${processes}"/>
+            	</detail>
+                <label value="${each.id}"/>
+            	<label value="${each.name}"/>
+                <label value="${each.length.doubleValue()} ${win_product_list$composer.getMeasureUnitName(each.lengthIdMeasureUnit)}"/>
+                <label value="${each.depth.doubleValue()} ${win_product_list$composer.getMeasureUnitName(each.depthIdMeasureUnit)}"/>
+                <label value="${each.width.doubleValue()} ${win_product_list$composer.getMeasureUnitName(each.widthIdMeasureUnit)}"/>
+                <label value="${each.size}"/>
+                <label value="${each.units}"/>
+            </row>
+        </template>
+    </grid>
+</zk>

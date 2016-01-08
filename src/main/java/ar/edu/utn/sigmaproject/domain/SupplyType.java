@@ -1,7 +1,6 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 public class SupplyType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;

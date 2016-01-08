@@ -6,12 +6,15 @@ import javax.xml.datatype.Duration;
 
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
+import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Paging;
@@ -46,6 +49,8 @@ public class ProductListController extends SelectorComposer<Component>{
     Listbox processListbox;
     @Wire
 	Button newProductButton;
+    @Wire
+    Grid productGrid;
     
     // services
     private ProductService productService = new ProductServiceImpl();
@@ -62,13 +67,14 @@ public class ProductListController extends SelectorComposer<Component>{
 	private ListModelList<Product> productListModel;
 	private ListModelList<Piece> pieceListModel;
 	private ListModelList<Process> processListModel;
-	//private String query;
 
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
         List<Product> productList = productService.getProductList();
         productListModel = new ListModelList<Product>(productList);
+        productGrid.setModel(productListModel);
+        
         productListbox.setModel(productListModel);
         
         List<Piece> pieceList = pieceService.getPieceList();
@@ -84,20 +90,19 @@ public class ProductListController extends SelectorComposer<Component>{
     public void onProductSelect() {
     	//Clients.showNotification("Usted hizo click en el Producto: " + ((Product) productListbox.getSelectedItem().getValue()).getName());
         Executions.getCurrent().setAttribute("selected_product", ((Product) productListbox.getSelectedItem().getValue()));
-        //productListbox.clearSelection();
         Include include = (Include) Selectors.iterable(productListbox.getPage(), "#mainInclude").iterator().next();
     	include.setSrc("/product_creation.zul");
     }
     
     @Listen("onClick = #searchButton")
     public void search() {
-        //query = searchTextbox.getValue();
+        //String query = searchTextbox.getValue();
     }
     
     @Listen("onClick = #newProductButton")
     public void goToNewProduct() {
     	Executions.getCurrent().setAttribute("selected_product", null);
-    	Include include = (Include) Selectors.iterable(productListbox.getPage(), "#mainInclude").iterator().next();
+    	Include include = (Include) Selectors.iterable(productGrid.getPage(), "#mainInclude").iterator().next();
     	include.setSrc("/product_creation.zul");
     }
     
@@ -129,5 +134,21 @@ public class ProductListController extends SelectorComposer<Component>{
     	} else {
     		return "[Sin Unidad de Medida]";
     	}
+    }
+    
+    @Listen("onEditProduct = #productGrid")
+    public void doEditProduct(ForwardEvent evt) {
+    	int idProduct = (Integer) evt.getData();
+    	Executions.getCurrent().setAttribute("selected_product", productService.getProduct(idProduct));
+        Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
+    	include.setSrc("/product_creation.zul");
+    }
+    
+    public ListModel<Piece> getProductPieces(int idProduct) {
+    	return new ListModelList<Piece>(pieceService.getPieceList(idProduct));
+    }
+    
+    public ListModel<Process> getPieceProcesses(int idPiece) {
+    	return new ListModelList<Process>(processService.getProcessList(idPiece));
     }
 }

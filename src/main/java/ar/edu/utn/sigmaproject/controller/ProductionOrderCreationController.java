@@ -15,7 +15,6 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Spinner;
 import org.zkoss.zul.Textbox;
 
-import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductTotal;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
