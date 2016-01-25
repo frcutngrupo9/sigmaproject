@@ -44,25 +44,4 @@
     <separator/>
     <button id="newOrderButton" label="Nuevo Pedido"/>
     <separator/>
-    <!--
-    <listbox id="orderDetailListbox" mold="paging" pageSize="7">
-    	<auxhead>
-			<auxheader label="Detalles" colspan="4"/>
-		</auxhead>
-        <listhead>
-            <listheader label="Id Pedido"/>
-            <listheader label="Id Producto"/>
-            <listheader label="Producto"/>
-            <listheader label="Unidades"/>
-        </listhead>
-        <template name="model">
-            <listitem>
-                <listcell label="${each.idOrder}"/>
-                <listcell label="${each.idProduct}"/>
-                <listcell label="${win_order_list$composer.getProductName(each.idProduct)}"/>
-                <listcell label="${each.units}"/>
-            </listitem>
-        </template>
-    </listbox>
-    -->
 </window>

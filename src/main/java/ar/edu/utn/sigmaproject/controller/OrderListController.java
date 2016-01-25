@@ -17,7 +17,6 @@ import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Textbox;
 
@@ -47,8 +46,6 @@ public class OrderListController extends SelectorComposer<Component>{
     Grid orderGrid;
     @Wire
 	Button newOrderButton;
-    @Wire
-    Listbox orderDetailListbox;
     
     // services
     private OrderService orderService = new OrderServiceImpl();
@@ -70,11 +67,6 @@ public class OrderListController extends SelectorComposer<Component>{
         orderList = orderService.getOrderList();
         orderListModel = new ListModelList<Order>(orderList);
         orderGrid.setModel(orderListModel);
-        if(orderDetailListbox != null) {// por si esta desactivada la listBox
-	        List<OrderDetail> orderDetailList = orderDetailService.getOrderDetailList();
-	        ListModelList<OrderDetail> orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
-	        orderDetailListbox.setModel(orderDetailListModel);
-        }
     }
     /*
     @Listen("onSelect = #orderGrid")
