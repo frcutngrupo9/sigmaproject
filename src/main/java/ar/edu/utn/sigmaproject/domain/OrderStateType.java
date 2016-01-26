@@ -2,24 +2,36 @@ package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
 public class OrderStateType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 	
-	Integer id;
-	String name;
-	String details;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
 	
-	public OrderStateType(Integer id, String name, String details) {
-		this.id = id;
+	String name = "";
+	String details = "";
+	
+	public OrderStateType() {
+		
+	}
+	
+	public OrderStateType(String name, String details) {
 		this.name = name;
 		this.details = details;
 	}
-
-	public Integer getId() {
+	
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	

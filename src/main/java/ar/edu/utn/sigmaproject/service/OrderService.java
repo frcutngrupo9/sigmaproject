@@ -7,11 +7,7 @@ import ar.edu.utn.sigmaproject.domain.OrderDetail;
 
 public interface OrderService {
     
-    List<Order> getOrderList();
-    
-    List<Order> getOrderList(Integer idOrderStateType);
-    
-    Order getOrder(Integer idOrder);
+    List<Order> getOrders();
     
     Order saveOrder(Order order);
 

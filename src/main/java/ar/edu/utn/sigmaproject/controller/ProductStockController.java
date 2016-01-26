@@ -2,12 +2,12 @@ package ar.edu.utn.sigmaproject.controller;
 
 import java.util.List;
 
-import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
-import org.zkoss.zk.ui.util.Clients;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Intbox;
@@ -16,13 +16,9 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Product;
-import ar.edu.utn.sigmaproject.domain.ProductExistence;
-import ar.edu.utn.sigmaproject.domain.SupplyType;
-import ar.edu.utn.sigmaproject.service.ProductExistenceService;
-import ar.edu.utn.sigmaproject.service.ProductService;
-import ar.edu.utn.sigmaproject.service.impl.ProductExistenceServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
+import ar.edu.utn.sigmaproject.service.ProductRepository;
 
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProductStockController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
 	
@@ -52,11 +48,11 @@ public class ProductStockController extends SelectorComposer<Component>{
     Button resetButton;
     
     // services
-    private ProductExistenceService productExistenceService = new ProductExistenceServiceImpl();
-    private ProductService productService = new ProductServiceImpl();
     
-    // atributes
-    private ProductExistence currentProductExistence;
+    @WireVariable
+    private ProductRepository productRepository;
+    
+    // attributes
     private Product currentProduct;
     
     // list
@@ -69,7 +65,7 @@ public class ProductStockController extends SelectorComposer<Component>{
     public void doAfterCompose(Component comp) throws Exception{
         super.doAfterCompose(comp);
         //SupplyCreationController supplyCreationController = (SupplyCreationController) supplyCreationWindow.getAttribute("supplyCreationWindow$composer"); (codigo que quedo cuando se manejaba una ventana para crear el insumo)
-        productList = productService.getProductList();
+        productList = productRepository.findAll();
         productListModel = new ListModelList<Product>(productList);
         productListbox.setModel(productListModel);
         currentProduct = null;
@@ -121,22 +117,13 @@ public class ProductStockController extends SelectorComposer<Component>{
 			cancelButton.setDisabled(true);
 			resetButton.setDisabled(true);
 			newButton.setDisabled(false);
-			currentProductExistence = null;
 		}else {// editando o creando
 			productExistenceGrid.setVisible(true);
 			codeTextBox.setValue(currentProduct.getCode());
 			nameTextBox.setValue(currentProduct.getName());
-			int stock = 0;
-			int stock_min = 0;
-			int stock_repo = 0;
-			currentProductExistence = productExistenceService.getProductExistence(currentProduct.getId());
-			if(currentProductExistence != null) {
-				stock = currentProductExistence.getStock();
-				stock_min = currentProductExistence.getStockMin();
-				stock_repo = currentProductExistence.getStockRepo();
-			} else {
-				currentProductExistence = new ProductExistence(null, 0, 0, 0);// no existe, se crea uno con id nulo para saber que hacer al guardar
-			}
+			int stock = currentProduct.getStock();
+			int stock_min = currentProduct.getStockMin();
+			int stock_repo = currentProduct.getStockRepo();
 			stockIntbox.setValue(stock);
 			stockMinIntbox.setValue(stock_min);
 			stockRepoIntbox.setValue(stock_repo);
@@ -149,47 +136,13 @@ public class ProductStockController extends SelectorComposer<Component>{
 	
 	@Listen("onClick = #saveButton")
     public void saveButtonClick() {
-		currentProductExistence.setStock(stockIntbox.intValue());
-		currentProductExistence.setStockMin(stockMinIntbox.intValue());
-		currentProductExistence.setStockRepo(stockRepoIntbox.intValue());
-        if(currentProductExistence.getIdProduct() == null) {
-        	// es nuevo
-        	currentProductExistence.setIdProduct(currentProduct.getId());
-        	currentProductExistence = productExistenceService.saveProductExistence(currentProductExistence);
-        } else {
-            // es una edicion
-        	currentProductExistence = productExistenceService.updateProductExistence(currentProductExistence);
-        }
-        productList = productService.getProductList();
+		currentProduct.setStock(stockIntbox.intValue());
+		currentProduct.setStockMin(stockMinIntbox.intValue());
+		currentProduct.setStockRepo(stockRepoIntbox.intValue());
+		productRepository.save(currentProduct);
+        productList = productRepository.findAll();
         productListModel = new ListModelList<Product>(productList);
         currentProduct = null;
         refreshView();
-    }
-	
-	public String getProductStock(int idProduct) {
-		Integer value = 0;
-		ProductExistence aux = productExistenceService.getProductExistence(idProduct);
-		if(aux != null) {
-			value = aux.getStock();
-		}
-    	return value + "";
-    }
-	
-	public String getProductStockMin(int idProduct) {
-		Integer value = 0;
-		ProductExistence aux = productExistenceService.getProductExistence(idProduct);
-		if(aux != null) {
-			value = aux.getStockMin();
-		}
-    	return value + "";
-    }
-	
-	public String getProductStockRepo(int idProduct) {
-		Integer value = 0;
-		ProductExistence aux = productExistenceService.getProductExistence(idProduct);
-		if(aux != null) {
-			value = aux.getStockRepo();
-		}
-    	return value + "";
     }
 }

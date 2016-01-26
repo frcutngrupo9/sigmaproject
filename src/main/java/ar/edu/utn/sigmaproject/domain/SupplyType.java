@@ -1,21 +1,32 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
 public class SupplyType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 	
-	Integer id;
-	String code;
-	String description;
-	String details;
-	String brand;
-	String presentation;
-	String measure;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
 	
-	public SupplyType(Integer id, String code, String description, String details, String brand, String presentation, String measure) {
-		this.id = id;
+	String code = "";
+	String description = "";
+	String details = "";
+	String brand = "";
+	String presentation = "";
+	String measure = "";
+	
+	public SupplyType() {
+		
+	}
+	
+	public SupplyType(String code, String description, String details, String brand, String presentation, String measure) {
 		this.code = code;
 		this.description = description;
 		this.details = details;
@@ -24,11 +35,11 @@ public class SupplyType implements Serializable, Cloneable {
 		this.measure = measure;
 	}
 	
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

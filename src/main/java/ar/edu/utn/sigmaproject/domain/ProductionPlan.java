@@ -2,28 +2,76 @@ package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
+
+@Entity
 public class ProductionPlan  implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 	
-	Integer id;
-	String name;
-	String details;
-	Date date;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
+	
+	@OneToMany(mappedBy = "productionPlan", cascade = CascadeType.ALL)
+	@OrderColumn(name = "detail_index")
+	List<ProductionPlanDetail> details;
+	
+	@OneToMany(mappedBy = "productionPlan", cascade = CascadeType.ALL)
+	@OrderColumn(name = "state_index")
+	List<ProductionPlanState> states;
+	
+	@ManyToOne
+	ProductionPlanStateType currentStateType;
+	
+	String name = "";
+	String info = "";
+	Date date = new Date();
 
-	public ProductionPlan(Integer id, String name, String details, Date date) {
-		this.id = id;
+	public ProductionPlan(String name, String details, Date date) {
 		this.name = name;
-		this.details = details;
+		this.info = details;
 		this.date = date;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 	
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public List<ProductionPlanDetail> getDetails() {
+		return details;
+	}
+
+	public void setDetails(List<ProductionPlanDetail> details) {
+		this.details = details;
+	}
+
+	public List<ProductionPlanState> getStates() {
+		return states;
+	}
+
+	public void setStates(List<ProductionPlanState> states) {
+		this.states = states;
+	}
+
+	public ProductionPlanStateType getCurrentStateType() {
+		return currentStateType;
+	}
+
+	public void setCurrentStateType(ProductionPlanStateType currentStateType) {
+		this.currentStateType = currentStateType;
 	}
 
 	public String getName() {
@@ -34,12 +82,12 @@ public class ProductionPlan  implements Serializable, Cloneable {
 		this.name = name;
 	}
 
-	public String getDetails() {
-		return details;
+	public String getInfo() {
+		return info;
 	}
 	
-	public void setDetails(String details) {
-		this.details = details;
+	public void setInfo(String info) {
+		this.info = info;
 	}
 	
 	public Date getDate() {

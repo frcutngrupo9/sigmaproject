@@ -1,42 +1,93 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
+
+@Entity(name = "Orders")
 public class Order implements Serializable, Cloneable {
     private static final long serialVersionUID = 1L;
     
-    Integer id;
-    Integer idClient;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
+    
+    @ManyToOne
+    Client client;
+    
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @OrderColumn(name = "state_index")
+    List<OrderState> states = new ArrayList<OrderState>();
+    
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @OrderColumn(name = "detail_index")
+    List<OrderDetail> details = new ArrayList<OrderDetail>();
+    
+    @ManyToOne(optional = false)
+	OrderStateType currentStateType;
+    
     Integer number;
     Date date;
     Date needDate;
 
-    public Order(Integer id, Integer idClient, Integer number, Date date, Date needDate) {
-        this.id = id;
-        this.idClient = idClient;
+    public Order(Client client, Integer number, Date date, Date needDate) {
+        this.client = client;
         this.number = number;
         this.date = date;
         this.needDate = needDate;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
     
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
     
-    public Integer getIdClient() {
-        return idClient;
-    }
-    
-    public void setIdClient(Integer idClient) {
-        this.idClient = idClient;
-    }
-    
-    public Integer getNumber() {
+    public Client getClient() {
+		return client;
+	}
+
+	public void setClient(Client client) {
+		this.client = client;
+	}
+	
+	public List<OrderState> getStates() {
+		return states;
+	}
+
+	public void setStates(List<OrderState> states) {
+		this.states = states;
+	}
+
+	public List<OrderDetail> getDetails() {
+		return details;
+	}
+
+	public void setDetails(List<OrderDetail> details) {
+		this.details = details;
+	}
+
+	public OrderStateType getCurrentStateType() {
+		return currentStateType;
+	}
+
+	public void setCurrentStateType(OrderStateType currentStateType) {
+		this.currentStateType = currentStateType;
+	}
+
+	public Integer getNumber() {
         return number;
     }
     

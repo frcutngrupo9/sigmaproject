@@ -71,8 +71,7 @@ public class SidebarController extends SelectorComposer<Component> {
         
         Executions.getCurrent().getDesktop().setAttribute(SIDEBAR_CONTROLLER_PAGE_ATTRIBUTE_NAME, getPage());
         
-        @SuppressWarnings("unchecked")
-		TreeNode<MenuTreeRow> rootNode = new DefaultTreeNode<MenuTreeRow>(null, Arrays.asList(
+        TreeNode<MenuTreeRow> rootNode = new DefaultTreeNode<MenuTreeRow>(null, Arrays.asList(
             new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Productos"), Arrays.asList(
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Paste.png", "Listado Productos", "/product_list.zul")),
                     new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Stationery.png", "Crear Producto", "/product_creation.zul"))

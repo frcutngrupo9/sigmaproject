@@ -3,37 +3,77 @@ package ar.edu.utn.sigmaproject.domain;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+
+@Entity
 public class RawMaterialType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 	
-	Integer id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
+	
+	@ManyToOne
+	MeasureUnit lengthMeasureUnit;
+	
+	@ManyToOne
+	MeasureUnit depthMeasureUnit;
+	
+	@ManyToOne
+	MeasureUnit heightMeasureUnit;
+	
 	String name;
-	BigDecimal length;
-	Integer lengthIdMeasureUnit;
-	BigDecimal depth;
-	Integer depthIdMeasureUnit;
-	BigDecimal height;
-	Integer heightIdMeasureUnit;
+	BigDecimal length = BigDecimal.ZERO;
+	BigDecimal depth = BigDecimal.ZERO;
+	BigDecimal height = BigDecimal.ZERO;
+	
 
-	public RawMaterialType(Integer id, String name, BigDecimal length, Integer lengthIdMeasureUnit, BigDecimal depth, Integer depthIdMeasureUnit, BigDecimal height, Integer heightIdMeasureUnit) {
-		this.id = id;
+	public RawMaterialType(String name, BigDecimal length, MeasureUnit lengthMeasureUnit, BigDecimal depth, MeasureUnit depthMeasureUnit, BigDecimal height, MeasureUnit heightMeasureUnit) {
 		this.name = name;
 		this.length = length;
-		this.lengthIdMeasureUnit = lengthIdMeasureUnit;
+		this.lengthMeasureUnit = lengthMeasureUnit;
 		this.depth = depth;
-		this.depthIdMeasureUnit = depthIdMeasureUnit;
+		this.depthMeasureUnit = depthMeasureUnit;
 		this.height = height;
-		this.heightIdMeasureUnit = heightIdMeasureUnit;
+		this.heightMeasureUnit = heightMeasureUnit;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	
+	public MeasureUnit getLengthMeasureUnit() {
+		return lengthMeasureUnit;
+	}
+
+	public void setLengthMeasureUnit(MeasureUnit lengthMeasureUnit) {
+		this.lengthMeasureUnit = lengthMeasureUnit;
+	}
+
+	public MeasureUnit getDepthMeasureUnit() {
+		return depthMeasureUnit;
+	}
+
+	public void setDepthMeasureUnit(MeasureUnit depthMeasureUnit) {
+		this.depthMeasureUnit = depthMeasureUnit;
+	}
+
+	public MeasureUnit getHeightMeasureUnit() {
+		return heightMeasureUnit;
+	}
+
+	public void setHeightMeasureUnit(MeasureUnit heightMeasureUnit) {
+		this.heightMeasureUnit = heightMeasureUnit;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -64,30 +104,6 @@ public class RawMaterialType implements Serializable, Cloneable {
 
 	public void setDepth(BigDecimal depth) {
 		this.depth = depth;
-	}
-
-	public Integer getLengthIdMeasureUnit() {
-		return lengthIdMeasureUnit;
-	}
-
-	public void setLengthIdMeasureUnit(Integer lengthIdMeasureUnit) {
-		this.lengthIdMeasureUnit = lengthIdMeasureUnit;
-	}
-
-	public Integer getDepthIdMeasureUnit() {
-		return depthIdMeasureUnit;
-	}
-
-	public void setDepthIdMeasureUnit(Integer depthIdMeasureUnit) {
-		this.depthIdMeasureUnit = depthIdMeasureUnit;
-	}
-
-	public Integer getHeightIdMeasureUnit() {
-		return heightIdMeasureUnit;
-	}
-
-	public void setHeightIdMeasureUnit(Integer heightIdMeasureUnit) {
-		this.heightIdMeasureUnit = heightIdMeasureUnit;
 	}
 
 	@Override

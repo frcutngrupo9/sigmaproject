@@ -6,31 +6,20 @@ import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
-import org.zkoss.zk.ui.util.Composer;
 import org.zkoss.zul.Button;
-import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Selectbox;
 import org.zkoss.zul.Textbox;
-import org.zkoss.zul.Window;
 
-import ar.edu.utn.sigmaproject.domain.Client;
-import ar.edu.utn.sigmaproject.domain.MeasureUnit;
-import ar.edu.utn.sigmaproject.domain.RawMaterialType;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
-import ar.edu.utn.sigmaproject.service.MeasureUnitService;
-import ar.edu.utn.sigmaproject.service.MeasureUnitTypeService;
-import ar.edu.utn.sigmaproject.service.RawMaterialTypeService;
-import ar.edu.utn.sigmaproject.service.SupplyTypeService;
-import ar.edu.utn.sigmaproject.service.impl.MeasureUnitServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.MeasureUnitTypeServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.RawMaterialTypeServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.SupplyTypeServiceImpl;
+import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SupplyController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
 	
@@ -64,7 +53,8 @@ public class SupplyController extends SelectorComposer<Component>{
     Button deleteButton;
 	
     // services
-    private SupplyTypeService supplyTypeService = new SupplyTypeServiceImpl();
+    @WireVariable
+    private SupplyTypeRepository supplyTypeRepository;
     
     // atributes
     private SupplyType currentSupplyType;
@@ -79,7 +69,7 @@ public class SupplyController extends SelectorComposer<Component>{
     public void doAfterCompose(Component comp) throws Exception{
         super.doAfterCompose(comp);
         //SupplyCreationController supplyCreationController = (SupplyCreationController) supplyCreationWindow.getAttribute("supplyCreationWindow$composer"); (codigo que quedo cuando se manejaba una ventana para crear el insumo)
-        supplyTypeList = supplyTypeService.getSupplyTypeList();
+        supplyTypeList = supplyTypeRepository.findAll();
         supplyTypeListModel = new ListModelList<SupplyType>(supplyTypeList);
         supplyListbox.setModel(supplyTypeListModel);
         currentSupplyType = null;
@@ -93,7 +83,7 @@ public class SupplyController extends SelectorComposer<Component>{
     
     @Listen("onClick = #newButton")
     public void newButtonClick() {
-        currentSupplyType = new SupplyType(null, "", "", "", "", "", "");
+        currentSupplyType = new SupplyType("", "", "", "", "", "");
         refreshView();
     }
     
@@ -109,14 +99,8 @@ public class SupplyController extends SelectorComposer<Component>{
         currentSupplyType.setBrand(brandTextBox.getText());
         currentSupplyType.setPresentation(presentationTextBox.getText());
         currentSupplyType.setMeasure(measureTextBox.getText());
-        if(currentSupplyType.getId() == null) {
-        	// es un nuevo insumo
-        	currentSupplyType = supplyTypeService.saveSupplyType(currentSupplyType);
-        } else {
-            // es una edicion
-        	currentSupplyType = supplyTypeService.updateSupplyType(currentSupplyType);
-        }
-        supplyTypeList = supplyTypeService.getSupplyTypeList();
+        currentSupplyType = supplyTypeRepository.save(currentSupplyType);
+        supplyTypeList = supplyTypeRepository.findAll();
         supplyTypeListModel = new ListModelList<SupplyType>(supplyTypeList);
         currentSupplyType = null;
         refreshView();
@@ -135,7 +119,7 @@ public class SupplyController extends SelectorComposer<Component>{
     
     @Listen("onClick = #deleteButton")
     public void deleteButtonClick() {
-    	supplyTypeService.deleteSupplyType(currentSupplyType);
+    	supplyTypeRepository.delete(currentSupplyType);
     	supplyTypeListModel.remove(currentSupplyType);
     	currentSupplyType = null;
         refreshView();

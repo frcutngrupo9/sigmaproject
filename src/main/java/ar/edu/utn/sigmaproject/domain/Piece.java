@@ -2,27 +2,51 @@ package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+@Entity
 public class Piece implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 	
-	Integer id;
-	Integer idProduct;
-	String name;
-	Integer idMeasureUnit;
-	BigDecimal height;
-	BigDecimal width;
-	BigDecimal depth;
-	BigDecimal size1;
-	BigDecimal size2;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
+	
+	@ManyToOne
+	Product product;
+	
+	@OneToMany(mappedBy = "piece", cascade = CascadeType.ALL)
+	List<Process> processes = new ArrayList<Process>();
+	
+	@ManyToOne
+	MeasureUnit measureUnit;
+	
+	String name = "";
+	BigDecimal height = BigDecimal.ZERO;
+	BigDecimal width = BigDecimal.ZERO;
+	BigDecimal depth = BigDecimal.ZERO;
+	BigDecimal size1 = BigDecimal.ZERO;
+	BigDecimal size2 = BigDecimal.ZERO;
 	boolean isGroup;
-	Integer units;
+	Integer units = 0;
+	
+	public Piece() {
+		
+	}
 
-	public Piece(Integer id, Integer idProduct, String name, Integer idMeasureUnit, BigDecimal height, BigDecimal width, BigDecimal depth, BigDecimal size1, BigDecimal size2, boolean isGroup, Integer units) {
-		this.id = id;
-		this.idProduct = idProduct;
+	public Piece(Product product, String name, MeasureUnit measureUnit, BigDecimal height, BigDecimal width, BigDecimal depth, BigDecimal size1, BigDecimal size2, boolean isGroup, Integer units) {
+		this.product = product;
 		this.name = name;
-		this.idMeasureUnit = idMeasureUnit;
+		this.measureUnit = measureUnit;
 		this.height = height;
 		this.width = width;
 		this.depth = depth;
@@ -32,16 +56,36 @@ public class Piece implements Serializable, Cloneable {
 		this.units = units;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 	
-	public Integer getIdProduct() {
-		return idProduct;
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
+	public List<Process> getProcesses() {
+		return processes;
 	}
 
-	public void setIdProduct(Integer idProduct) {
-		this.idProduct = idProduct;
+	public void setProcesses(List<Process> processes) {
+		this.processes = processes;
+	}
+
+	public Product getProduct() {
+		return product;
+	}
+
+	public void setProduct(Product product) {
+		this.product = product;
+	}
+
+	public MeasureUnit getMeasureUnit() {
+		return measureUnit;
+	}
+
+	public void setMeasureUnit(MeasureUnit measureUnit) {
+		this.measureUnit = measureUnit;
 	}
 	
 	public String getName() {
@@ -50,14 +94,6 @@ public class Piece implements Serializable, Cloneable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-	
-	public Integer getIdMeasureUnit() {
-		return idMeasureUnit;
-	}
-
-	public void setIdMeasureUnit(Integer idMeasureUnit) {
-		this.idMeasureUnit = idMeasureUnit;
 	}
 
 	public BigDecimal getHeight() {
@@ -123,24 +159,29 @@ public class Piece implements Serializable, Cloneable {
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
-
+	
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (!(obj instanceof Piece)) {
 			return false;
+		}
 		Piece other = (Piece) obj;
 		if (id == null) {
-			if (other.id != null)
+			if (other.id != null) {
 				return false;
-		} else if (!id.equals(other.id))
+			}
+		} else if (!id.equals(other.id)) {
 			return false;
+		}
 		return true;
 	}
-	
+
 	public static Piece clone(Piece piece){
 		try {
 			return (Piece)piece.clone();

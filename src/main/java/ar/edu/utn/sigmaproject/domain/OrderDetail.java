@@ -3,45 +3,66 @@ package ar.edu.utn.sigmaproject.domain;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+
+@Entity
 public class OrderDetail  implements Serializable, Cloneable {
     private static final long serialVersionUID = 1L;
     
-    Integer idOrder;
-    Integer idProduct;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
+    
+    @ManyToOne(optional = false)
+    Order order;
+    
+    @ManyToOne
+    Product product;
     Integer units;
     BigDecimal price;
+    
+    public OrderDetail() {
+    	
+    }
 
-    public OrderDetail(Integer idOrder, Integer idProduct, Integer units, BigDecimal price) {
-        this.idOrder = idOrder;
-        this.idProduct = idProduct;
+    public OrderDetail(Order order, Product product, Integer units, BigDecimal price) {
+    	this.order = order;
+    	this.product = product;
         this.units = units;
         this.price = price;
     }
-    
-    public Integer getIdOrder() {
-        return idOrder;
-    }
 
+    public Long getId() {
+		return id;
+	}
 
-    public void setIdOrder(Integer idOrder) {
-        this.idOrder = idOrder;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
+	public Order getOrder() {
+		return order;
+	}
 
-    public Integer getIdProduct() {
-        return idProduct;
-    }
+	public void setOrder(Order order) {
+		this.order = order;
+	}
 
+	public Product getProduct() {
+		return product;
+	}
 
-    public void setIdProduct(Integer idProduct) {
-        this.idProduct = idProduct;
-    }
+	public void setProduct(Product product) {
+		this.product = product;
+	}
 
-
-    public Integer getUnits() {
+	public Integer getUnits() {
         return units;
     }
-
 
     public void setUnits(Integer units) {
         this.units = units;
@@ -64,11 +85,8 @@ public class OrderDetail  implements Serializable, Cloneable {
         if (getClass() != obj.getClass())
             return false;
         OrderDetail other = (OrderDetail) obj;
-        if (idOrder != null && idProduct != null) {
-            if (other.idOrder != null && other.idProduct != null) {
-                if (other.idOrder.compareTo(idOrder) == 0  && other.idProduct.compareTo(idProduct) == 0)
-                    return true;
-            }
+        if (id != null && other.id != null) {
+            return id.equals(other.id);
         }
         return false;
     }

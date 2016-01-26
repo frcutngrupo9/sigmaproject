@@ -46,7 +46,7 @@
         			<template name="model">
             			<listitem>
                 			<listcell label="${each.name}"/>
-                			<listcell label="${win_product_creation$composer.quantityOfProcess(each.id)}"/>
+                			<listcell label="${win_product_creation$composer.each.processes().size()}"/>
             			</listitem>
         			</template>
     			</listbox>

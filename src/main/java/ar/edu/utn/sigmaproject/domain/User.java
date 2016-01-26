@@ -3,19 +3,39 @@ package ar.edu.utn.sigmaproject.domain;
 import java.io.Serializable;
 import java.util.Date;
 
-public class User implements Serializable,Cloneable {
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
+public class User implements Serializable, Cloneable {
+	
 	private static final long serialVersionUID = 1L;
-	String account;
-	String fullName;
-	String password;
-	String email;
-	Date birthday;
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
+	
+	String account = "";
+	String fullName = "";
+	String password = "";
+	String email = "";
+	Date birthday = new Date();
+	
+	public User() {
+		
+	}
 
 	public User(String account, String password, String fullName,String email) {
 		this.account = account;
 		this.password = password;
 		this.fullName = fullName;
 		this.email = email;
+	}
+
+	public Long getId() {
+		return id;
 	}
 
 	public String getAccount() {

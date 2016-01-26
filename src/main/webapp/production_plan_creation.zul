@@ -40,7 +40,7 @@
     									<listcell label="${each.id}"/>
     									<listcell label="${win_production_plan_creation$composer.getClientNameByOrderId(each.id)}"/>
     									<listcell label="${each.date}"/>
-    									<listcell label="${win_production_plan_creation$composer.quantityOfDetail(each.id)}"/>
+    									<listcell label="${each.details.size()}"/>
     								</listitem>
     							</template>
     							</listbox>
@@ -66,7 +66,7 @@
                 			<label value="${each.idOrder}"/>
                 			<label value="${win_production_plan_creation$composer.getOrderDate(each.idOrder)}"/>
                 			<label value="${win_production_plan_creation$composer.getClientNameByOrderId(each.idOrder)}"/>
-                			<label value="${win_production_plan_creation$composer.quantityOfDetail(each.idOrder)}"/>
+                			<label value="${each.details.size()}"/>
                 			<button forward="onClick=productionPlanDetailGrid.onRemoveOrder(${each.idOrder})" image="/img/delete16x16.png"/>
             			</row>
         			</template>
@@ -97,7 +97,7 @@
                 			<listcell label="${win_production_plan_creation$composer.getProductTotalUnits(each.id)}"/>
                 			<!-- no se muestran precios en plan de produccion (importan solo las cantidades para producir)
                 			<listcell label="${each.price.doubleValue()}"/>
-                			<listcell label="${win_production_plan_creation$composer.getProductTotalPrice(each.id).doubleValue()}"/>
+                			<listcell label="${win_production_plan_creation$composer.getProductTotalPrice(each).doubleValue()}"/>
                 			-->
             			</listitem>
         			</template>
@@ -125,9 +125,9 @@
         			</listhead>
         			<template name="model">
             			<listitem>
-                			<listcell label="${win_production_plan_creation$composer.getProductNameByPieceId(each.idPiece)}"/>
-                			<listcell label="${win_production_plan_creation$composer.getPieceName(each.idPiece)}"/>
-                			<listcell label="${win_production_plan_creation$composer.getProcessName(each.idProcessType)}"/>
+                			<listcell label="${each.product.name}"/>
+                			<listcell label="${each.name}"/>
+                			<listcell label="${each.type.name}"/>
                 			<listcell label="${win_production_plan_creation$composer.getPieceUnits(each.idPiece)}"/>
                 			<listcell label="${win_production_plan_creation$composer.getPieceTotalUnits(each.idPiece)}"/>
                 			<listcell label="${each.time}"/>

@@ -1,16 +1,18 @@
 package ar.edu.utn.sigmaproject.controller;
 
-import ar.edu.utn.sigmaproject.service.AuthService;
-import ar.edu.utn.sigmaproject.service.AuthenticationServiceImpl;
+import ar.edu.utn.sigmaproject.service.AuthenticationService;
 import ar.edu.utn.sigmaproject.service.UserCredential;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Textbox;
 
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class LoginController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 	
@@ -23,19 +25,20 @@ public class LoginController extends SelectorComposer<Component> {
 	Label message;
 	
 	//services
-	AuthService authService = new AuthenticationServiceImpl();
-
+	
+	@WireVariable
+	AuthenticationService authenticationService;
 	
 	@Listen("onClick=#login; onOK=#loginWin")
 	public void doLogin(){
 		String nm = account.getValue();
 		String pd = password.getValue();
 		
-		if(!authService.login(nm,pd)){
+		if(!authenticationService.login(nm,pd)){
 			message.setValue("usuario o password incorrecto.");
 			return;
 		}
-		UserCredential cre= authService.getUserCredential();
+		UserCredential cre = authenticationService.getUserCredential();
 		message.setValue("Bienvenido, "+cre.getName());
 		message.setSclass("");
 		

@@ -20,9 +20,9 @@
             <listitem>
                 <listcell label="${each.id}"/>
                 <listcell label="${each.name}"/>
-                <listcell label="${win_product_stock$composer.getProductStock(each.id)}"/>
-                <listcell label="${win_product_stock$composer.getProductStockMin(each.id)}"/>
-                <listcell label="${win_product_stock$composer.getProductStockRepo(each.id)}"/>
+                <listcell label="${each.stock}"/>
+                <listcell label="${each.stockMin}"/>
+                <listcell label="${each.stockRepo}"/>
             </listitem>
         </template>
     </listbox>

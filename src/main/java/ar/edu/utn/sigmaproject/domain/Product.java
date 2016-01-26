@@ -2,30 +2,61 @@ package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
+@Entity
 public class Product implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 	
-	Integer id;
-	String name;
-	String details;
-    String code;
-    BigDecimal price;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
+	
+	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+	List<Piece> pieces;
+	
+	String name = "";
+	String details = "";
+    String code = "";
+    BigDecimal price = BigDecimal.ZERO;
+    
+    Integer stock;
+    Integer stockMin;
+    Integer stockRepo;
+    
+    public Product() {
+    	
+    }
 
-	public Product(Integer id, String code , String name, String details, BigDecimal price) {
-		this.id = id;
+	public Product(List<Piece> pieces, String code , String name, String details, BigDecimal price) {
+		this.pieces = pieces;
 		this.name = name;
 		this.details = details;
         this.code = code;
         this.price = price;
 	}
 	
-	public void setId(Integer id) {
+	public Long getId() {
+		return id;
+	}
+	
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public Integer getId() {
-		return id;
+	public List<Piece> getPieces() {
+		return pieces;
+	}
+
+	public void setPieces(List<Piece> pieces) {
+		this.pieces = pieces;
 	}
 
 	public String getName() {
@@ -60,6 +91,30 @@ public class Product implements Serializable, Cloneable {
 		this.price = price;
 	}
 
+	public Integer getStock() {
+		return stock;
+	}
+
+	public void setStock(Integer stock) {
+		this.stock = stock;
+	}
+
+	public Integer getStockMin() {
+		return stockMin;
+	}
+
+	public void setStockMin(Integer stockMin) {
+		this.stockMin = stockMin;
+	}
+
+	public Integer getStockRepo() {
+		return stockRepo;
+	}
+
+	public void setStockRepo(Integer stockRepo) {
+		this.stockRepo = stockRepo;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -77,12 +132,10 @@ public class Product implements Serializable, Cloneable {
 		if (getClass() != obj.getClass())
 			return false;
 		Product other = (Product) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
+		if (id != null && other.id != null) {
+			return id.equals(other.id);
+		}
+		return false;
 	}
 	
 	public static Product clone(Product product){

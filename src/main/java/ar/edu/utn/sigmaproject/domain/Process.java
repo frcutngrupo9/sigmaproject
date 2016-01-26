@@ -2,39 +2,75 @@ package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Entity
 public class Process implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 	
-	Integer idPiece;
-	Integer idProcessType;
-	String details;
+	@Transient
+	final Logger logger = LoggerFactory.getLogger(Process.class);
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
+	
+	@ManyToOne
+	Piece piece;
+	
+	@ManyToOne
+	ProcessType type;
+	
+	String details = "";
+	
+	@Transient
 	Duration time;
 	
-	public Process(Integer idPiece, Integer idProcessType, String details, Duration time) {
-		this.idPiece = idPiece;
-		this.idProcessType = idProcessType;
+	@Column
+	String timeInternal; 
+	
+	public Process(Piece piece, ProcessType processType, String details, Duration time) {
+		this.piece = piece;
+		this.type = processType;
 		this.details = details;
 		this.time = time;
 	}
-
-	public Integer getIdPiece() {
-		return idPiece;
-	}
-
-	public void setIdPiece(Integer idPiece) {
-		this.idPiece = idPiece;
-	}
 	
-	public Integer getIdProcessType() {
-		return idProcessType;
+	public Long getId() {
+		return id;
 	}
 
-	public void setIdProcessType(Integer idProcessType) {
-		this.idProcessType = idProcessType;
+	public void setId(Long id) {
+		this.id = id;
 	}
-	
+
+	public Piece getPiece() {
+		return piece;
+	}
+
+	public void setPiece(Piece piece) {
+		this.piece = piece;
+	}
+
+	public ProcessType getType() {
+		return type;
+	}
+
+	public void setType(ProcessType type) {
+		this.type = type;
+	}
+
 	public String getDetails() {
 		return details;
 	}
@@ -44,29 +80,24 @@ public class Process implements Serializable, Cloneable {
 	}
 	
 	public Duration getTime() {
+		if (time == null && this.timeInternal != null) {
+			try {
+				this.time = DatatypeFactory.newInstance().newDuration(this.timeInternal);
+			} catch (Exception e) {
+				logger.error("Error while trying to deserialize Duration representation(" + this.timeInternal + "): " + e.toString());
+			}
+		}
 		return time;
 	}
 
 	public void setTime(Duration time) {
 		this.time = time;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Process other = (Process) obj;
-		if (idPiece != null && idProcessType != null) {
-			if (other.idPiece != null && other.idProcessType != null) {
-				if (other.idPiece == idPiece && other.idProcessType == idProcessType)
-					return true;
-			}
+		if (time != null) {
+			this.timeInternal = time.toString();			
+		} else {
+			this.timeInternal = null;
 		}
-		return false;
+		
 	}
 
 	public static Process clone(Process process) {
@@ -76,6 +107,36 @@ public class Process implements Serializable, Cloneable {
 			// not possible
 		}
 		return null;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Process)) {
+			return false;
+		}
+		Process other = (Process) obj;
+		if (id == null) {
+			if (other.id != null) {
+				return false;
+			}
+		} else if (!id.equals(other.id)) {
+			return false;
+		}
+		return true;
 	}
 	
 }

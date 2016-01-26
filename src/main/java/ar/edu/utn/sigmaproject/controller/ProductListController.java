@@ -1,37 +1,15 @@
 package ar.edu.utn.sigmaproject.controller;
 
-import ar.edu.utn.sigmaproject.domain.Piece;
-import ar.edu.utn.sigmaproject.domain.Process;
-import ar.edu.utn.sigmaproject.domain.Product;
-import ar.edu.utn.sigmaproject.service.PieceService;
-import ar.edu.utn.sigmaproject.service.ProcessService;
-import ar.edu.utn.sigmaproject.service.ProcessTypeService;
-import ar.edu.utn.sigmaproject.service.ProductService;
-import ar.edu.utn.sigmaproject.service.impl.PieceServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProcessServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProcessTypeServiceImpl;
+import javax.xml.datatype.Duration;
 
-//import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
-//import java.util.LinkedHashMap;
-//import org.springframework.data.domain.Page;
-//import org.springframework.data.domain.PageRequest;
-//import org.zkoss.zk.ui.select.annotation.WireVariable;
-//import org.zkoss.zk.ui.event.Event;
-//import org.zkoss.zk.ui.event.EventQueues;
-//import org.zkoss.zk.ui.select.annotation.VariableResolver;
-
-
-
-
-
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
-import org.zkoss.zk.ui.util.Clients;
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
@@ -39,11 +17,12 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Paging;
 import org.zkoss.zul.Textbox;
 
-import java.util.HashMap;
-import java.util.List;
+import ar.edu.utn.sigmaproject.domain.Piece;
+import ar.edu.utn.sigmaproject.domain.Process;
+import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.service.ProductRepository;
 
-import javax.xml.datatype.Duration;
-
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProductListController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
 	
@@ -60,10 +39,9 @@ public class ProductListController extends SelectorComposer<Component>{
     @Wire
 	Button newProductButton;
     
-    ProductService productService = new ProductServiceImpl();
-	PieceService pieceService = new PieceServiceImpl();
-	ProcessService processService = new ProcessServiceImpl();
-	ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
+    @WireVariable
+    ProductRepository productService;
+	//ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
 	
     ListModelList<Product> productListModel;
     ListModelList<Piece> pieceListModel;
@@ -73,17 +51,17 @@ public class ProductListController extends SelectorComposer<Component>{
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
-        List<Product> productList = productService.getProductList();
-        productListModel = new ListModelList<Product>(productList);
-        productListbox.setModel(productListModel);
-        
-        List<Piece> pieceList = pieceService.getPieceList();
-        pieceListModel = new ListModelList<Piece>(pieceList);
-        pieceListbox.setModel(pieceListModel);
-        
-        List<Process> processList = processService.getProcessList();
-        processListModel = new ListModelList<Process>(processList);
-        processListbox.setModel(processListModel);
+//        List<Product> productList = productService.getProductList();
+//        productListModel = new ListModelList<Product>(productList);
+//        productListbox.setModel(productListModel);
+//        
+//        List<Piece> pieceList = pieceService.getPieceList();
+//        pieceListModel = new ListModelList<Piece>(pieceList);
+//        pieceListbox.setModel(pieceListModel);
+//        
+//        List<Process> processList = processService.getProcessList();
+//        processListModel = new ListModelList<Process>(processList);
+//        processListbox.setModel(processListModel);
     }
     
     @Listen("onSelect = #productListbox")
@@ -109,21 +87,19 @@ public class ProductListController extends SelectorComposer<Component>{
     }
     
     public String getProductName(int idProduct) {
-    	return productService.getProduct(idProduct).getName();
-    }
-    
-    public String getProductNameByPieceId(int idPiece) {
-        Piece aux = pieceService.getPiece(idPiece);
-        return productService.getProduct(aux.getIdProduct()).getName();
+    	return "";
+    	//return productService.getProduct(idProduct).getName();
     }
     
     public String getPieceName(int idPiece) {
-    	Piece aux = pieceService.getPiece(idPiece);
-    	return aux.getName();
+    	return "";
+    	//Piece aux = pieceService.getPiece(idPiece);
+    	//return aux.getName();
     }
     
     public String getProcessTypeName(int idProduct) {
-    	return processTypeService.getProcessType(idProduct).getName();
+    	return "";
+    	//return processTypeService.getProcessType(idProduct).getName();
     }
     
     public String getFormatedTime(Duration time) {
