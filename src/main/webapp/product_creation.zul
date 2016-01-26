@@ -37,6 +37,8 @@
                 <hlayout>
 	                <button id="createPieceButton" label="Agregar Nueva Pieza"/>
 	                <button id="pieceCopyButton" label="Copiar Otra Pieza"/>
+	                <button id="supplyButton" label="Insumos"/>
+                    <button id="rawMaterialButton" label="Materias Prima"/>
                 </hlayout>
     			<listbox id="pieceListbox">
     				<auxhead>

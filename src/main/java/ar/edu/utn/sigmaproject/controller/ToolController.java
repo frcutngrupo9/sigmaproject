@@ -130,6 +130,7 @@ public class ToolController extends SelectorComposer<Component>{
         		refreshView();
         	}
         }
+        toolTypeListModel.clearSelection();
     }
     
     private void refreshView() {

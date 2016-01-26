@@ -134,6 +134,7 @@ public class ClientController extends SelectorComposer<Component>{
         		refreshView();
         	}
         }
+        clientListModel.clearSelection();
     }
     
     private void refreshView() {

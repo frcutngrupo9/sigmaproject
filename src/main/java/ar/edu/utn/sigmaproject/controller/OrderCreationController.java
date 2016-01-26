@@ -390,6 +390,7 @@ public class OrderCreationController extends SelectorComposer<Component>{
 				refreshViewOrderDetail();
 			}
 		}
+		orderDetailListModel.clearSelection();
 	}
     
     @Listen("onClick = #resetOrderDetailButton")

@@ -136,6 +136,7 @@ public class ProductStockController extends SelectorComposer<Component>{
         		refreshView();
         	}
         }
+        productListModel.clearSelection();
     }
 	
 	private void refreshView() {

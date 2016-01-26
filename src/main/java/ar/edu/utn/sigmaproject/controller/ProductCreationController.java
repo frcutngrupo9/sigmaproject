@@ -114,6 +114,10 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	Caption productCaption;
 	@Wire
 	Button pieceCopyButton;
+	@Wire
+	Button supplyButton;
+	@Wire
+	Button rawMaterialButton;
      
     // services
 	private ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
@@ -651,10 +655,12 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			//just in case for the no selection
 			currentPiece = null;
 		}else {
-			currentPiece = pieceListModel.getSelection().iterator().next();
+			if(currentPiece == null) {// si no hay nada editandose
+				currentPiece = pieceListModel.getSelection().iterator().next();
+				refreshViewPiece();
+			}
 		}
 		pieceListModel.clearSelection();
-		refreshViewPiece();
 	}
   	
   	@Listen("onClick = #deleteProductButton")

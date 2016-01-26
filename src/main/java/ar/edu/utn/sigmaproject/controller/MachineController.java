@@ -151,6 +151,7 @@ public class MachineController extends SelectorComposer<Component>{
         		refreshView();
         	}
         }
+        machineTypeListModel.clearSelection();
     }
     
     private void refreshView() {

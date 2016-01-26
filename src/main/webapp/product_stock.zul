@@ -5,11 +5,12 @@
         <button id="searchButton" label="Buscar"/>
     </hlayout>
     <separator/>
-    <listbox id="productListbox" mold="paging" pageSize="7">
+    <listbox id="productListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
     	<auxhead>
-			<auxheader label="Productos" colspan="5"/>
+			<auxheader label="Productos" colspan="6"/>
 		</auxhead>
         <listhead>
+        	<listheader label="Id"/>
             <listheader label="Codigo"/>
             <listheader label="Descripcion"/>
             <listheader label="Stock Actual"/>
@@ -19,6 +20,7 @@
         <template name="model">
             <listitem>
                 <listcell label="${each.id}"/>
+                <listcell label="${each.code}"/>
                 <listcell label="${each.name}"/>
                 <listcell label="${win_product_stock$composer.getProductStock(each.id)}"/>
                 <listcell label="${win_product_stock$composer.getProductStockMin(each.id)}"/>

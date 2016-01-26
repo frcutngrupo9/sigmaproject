@@ -138,6 +138,7 @@ public class SupplyController extends SelectorComposer<Component>{
         		refreshView();
         	}
         }
+        supplyTypeListModel.clearSelection();
     }
 	
 	private void refreshView() {

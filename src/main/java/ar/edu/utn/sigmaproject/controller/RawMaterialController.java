@@ -182,6 +182,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
 				refreshView();
 			}
 		}
+		rawMaterialTypeListModel.clearSelection();
 	}
     
     public String getMeasureUnitName(int idMeasureUnit) {
