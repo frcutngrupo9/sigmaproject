@@ -81,7 +81,13 @@ public class MachineController extends SelectorComposer<Component>{
     
     @Listen("onClick = #newButton")
     public void newButtonClick() {
-        currentMachineType = new MachineType(null, "", "", null);
+    	Duration duration = null;
+		try {
+			duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, 0, 0, 0, 0);
+		} catch (DatatypeConfigurationException e) {
+			System.out.println("Error en finalizar maquina, en convertir a duracion: " + e.toString());
+		}
+        currentMachineType = new MachineType(null, "", "", duration);
         refreshView();
     }
     
@@ -98,11 +104,11 @@ public class MachineController extends SelectorComposer<Component>{
 		Integer hours = deteriorationTimeIntboxHours.intValue();
 		Duration duration = null;
 		try {
-			duration = DatatypeFactory.newInstance().newDuration(true, 0, years, days, hours, 0, 0);
+			duration = DatatypeFactory.newInstance().newDuration(true, years, 0, days, hours, 0, 0);
 		} catch (DatatypeConfigurationException e) {
 			System.out.println("Error en finalizar maquina, en convertir a duracion: " + e.toString());
 		}
-        currentMachineType.setDeteriorationTime(duration);;
+        currentMachineType.setDeteriorationTime(duration);
         if(currentMachineType.getId() == null) {// nuevo
             currentMachineType = machineTypeService.saveMachineType(currentMachineType);
         } else {
@@ -134,7 +140,7 @@ public class MachineController extends SelectorComposer<Component>{
         refreshView();
     }
     
-    @Listen("onSelect = #clientListbox")
+    @Listen("onSelect = #machineListbox")
     public void doListBoxSelect() {
         if(machineTypeListModel.isSelectionEmpty()) {
             //just in case for the no selection
@@ -152,11 +158,6 @@ public class MachineController extends SelectorComposer<Component>{
     	machineListbox.setModel(machineTypeListModel);// se actualiza la lista
         if(currentMachineType == null) {// no se esta editando ni creando
             machineGrid.setVisible(false);
-            nameTextBox.setValue(null);
-            detailsTextBox.setValue(null);
-            deteriorationTimeIntboxYears.setValue(null);
-            deteriorationTimeIntboxDays.setValue(null);
-    		deteriorationTimeIntboxHours.setValue(null);
             
             saveButton.setDisabled(true);
             cancelButton.setDisabled(true);
@@ -184,6 +185,6 @@ public class MachineController extends SelectorComposer<Component>{
     }
 	
 	public String getFormatedTime(Duration time) {
-    	return String.format("Dias: %d Horas: %d Minutos: %d", time.getDays(), time.getHours(), time.getMinutes());
+    	return String.format("Años: %d Horas: %d Minutos: %d", time.getYears(), time.getHours(), time.getMinutes());
     }
 }

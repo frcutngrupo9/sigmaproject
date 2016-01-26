@@ -33,22 +33,22 @@
             <rows>
                 <row>	
                     <label>Nombre:</label>
-                    <textbox id="nameTextbox" value="" hflex="1"/>
+                    <textbox id="nameTextBox" value="" hflex="1"/>
                 </row>
                 <row>	
                     <label>Detalles:</label>
-                    <textbox id="detailsTextbox" value="" hflex="1"/>
+                    <textbox id="detailsTextBox" value="" hflex="1"/>
                 </row>
                 <row>   
                     <label>Tiempo de Deterioro:</label>
-                    <hlayout>
-                    	<label>Años</label>
-                    	<intbox id="deteriorationTimeIntboxYears" value="" hflex="1"/>
-                    	<label>Dias</label>
-                    	<intbox id="deteriorationTimeIntboxDays" value="" hflex="1"/>
-                    	<label>Horas</label>
-                    	<intbox id="deteriorationTimeIntboxHours" value="" hflex="1"/>
-                    </hlayout>
+                    <hbox>
+                    	<label value="(Anios)"/>
+                    	<intbox id="deteriorationTimeIntboxYears" width="26px"/>
+                    	<label value="(Dias)"/>
+                    	<intbox id="deteriorationTimeIntboxDays" width="26px"/>
+                    	<label value="(Horas)"/>
+                    	<intbox id="deteriorationTimeIntboxHours" width="36px"/>
+                    </hbox>
                 </row>
                 <row>
 					<cell colspan="2" style="text-align:center">
