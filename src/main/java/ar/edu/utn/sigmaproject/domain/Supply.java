@@ -5,17 +5,29 @@ import java.io.Serializable;
 public class Supply implements Serializable, Cloneable {
     private static final long serialVersionUID = 1L;
     
+    Integer id;
     Integer idProduct;
     Integer idSupplyType;
     Double quantity;
+    boolean isClone;
     
-    public Supply(Integer idProduct, Integer idSupplyType, Double quantity) {
+    public Supply(Integer id, Integer idProduct, Integer idSupplyType, Double quantity) {
+    	this.id = id;
     	this.idProduct = idProduct;
         this.idSupplyType = idSupplyType;
         this.quantity = quantity;
+        isClone = false;
     }
     
-    public Integer getIdProduct() {
+    public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Integer getIdProduct() {
 		return idProduct;
 	}
 
@@ -39,6 +51,14 @@ public class Supply implements Serializable, Cloneable {
 		this.quantity = quantity;
 	}
 
+	public boolean isClone() {
+		return isClone;
+	}
+
+	public void setClone(boolean isClone) {
+		this.isClone = isClone;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -48,13 +68,12 @@ public class Supply implements Serializable, Cloneable {
 		if (getClass() != obj.getClass())
 			return false;
 		Supply other = (Supply) obj;
-		if (idProduct != null && idSupplyType != null) {
-			if (other.idProduct != null  && other.idSupplyType != null) {
-				if (other.idProduct.equals(idProduct) && other.idSupplyType.equals(idSupplyType))
-					return true;
-			}
-		}
-		return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
 	}
 
 	public static Supply clone(Supply supply) {

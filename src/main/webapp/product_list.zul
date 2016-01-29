@@ -91,9 +91,10 @@
     </listbox>
     <listbox id="processListbox" mold="paging" pageSize="5" sizedByContent="true" span="true" visible="false">
     	<auxhead>
-			<auxheader label="Procesos" colspan="6"/>
+			<auxheader label="Procesos" colspan="7"/>
 		</auxhead>
         <listhead>
+        	<listheader label="Id Proceso"/>
             <listheader label="Producto"/>
         	<listheader label="Pieza"/>
             <listheader label="Tipo Proceso"/>
@@ -103,6 +104,7 @@
         </listhead>
         <template name="model">
             <listitem>
+            	<listcell label="${each.id}"/>
                 <listcell label="${win_product_list$composer.getProductNameByPieceId(each.idPiece)}"/>
             	<listcell label="${win_product_list$composer.getPieceName(each.idPiece)}"/>
             	<listcell label="${win_product_list$composer.getProcessTypeName(each.idProcessType)}"/>

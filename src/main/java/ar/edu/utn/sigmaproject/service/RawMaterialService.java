@@ -10,6 +10,8 @@ public interface RawMaterialService {
 	
 	List<RawMaterial> getRawMaterialList(Integer idProduct);
 	
+	RawMaterial getRawMaterial(Integer id);
+	
 	RawMaterial getRawMaterial(Integer idProduct, Integer idRawMaterialType);
 
 	RawMaterial saveRawMaterial(RawMaterial rawMaterial);

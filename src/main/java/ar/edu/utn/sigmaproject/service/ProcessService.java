@@ -10,6 +10,8 @@ public interface ProcessService {
 	
 	List<Process> getProcessList(Integer idPiece);
 	
+	Process getProcess(Integer id);
+	
 	Process getProcess(Integer idPiece, Integer idProcessType);
 
 	Process saveProcess(Process process);
@@ -19,6 +21,8 @@ public interface ProcessService {
 	void deleteProcess(Process process);
 
 	void deleteAll(Integer idPiece);
+	
+	Process generateClone(Process process);
 
 }
 

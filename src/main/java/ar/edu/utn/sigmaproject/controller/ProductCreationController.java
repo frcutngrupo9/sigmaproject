@@ -20,6 +20,7 @@ import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.util.Clients;
+import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Caption;
 import org.zkoss.zul.Checkbox;
@@ -115,9 +116,19 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	@Wire
 	Button pieceCopyButton;
 	@Wire
-	Button supplyButton;
+	Button openRawMaterialListButton;
 	@Wire
-	Button rawMaterialButton;
+	Button openSupplyListButton;
+	@Wire
+	Button closeSupplyListButton;
+	@Wire
+	Component supplyCreationBlock;
+	@Wire
+    Bandbox supplyBandbox;
+	@Wire
+    Listbox supplyPopupListbox;
+	@Wire
+    Listbox supplyListbox;
      
     // services
 	private ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
@@ -333,7 +344,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 					System.out.println("Error en finalizar pieza, en convertir a duracion: " + e.toString());
 				}
     			if(currentProcess == null) { // no esta creado
-	    			currentProcess = new Process(idPiece, idProcessType, details, duration);
+	    			currentProcess = new Process(null, idPiece, idProcessType, details, duration);
 	    			processList.add(currentProcess);
     			} else { // esta creado
     				currentProcess.setDetails(details);
@@ -762,4 +773,10 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	pieceUnitsByProductIntbox.setValue(piece.getUnits());
   	}
   	
+  	@Listen("onClick = #supplyButton")
+    public void showSupplyCreationBlock() {
+  		if(currentPiece == null) {// si no hay nada editandose
+			
+		}
+    }
 }

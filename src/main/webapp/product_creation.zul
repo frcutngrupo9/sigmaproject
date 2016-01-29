@@ -37,8 +37,8 @@
                 <hlayout>
 	                <button id="createPieceButton" label="Agregar Nueva Pieza"/>
 	                <button id="pieceCopyButton" label="Copiar Otra Pieza"/>
-	                <button id="supplyButton" label="Insumos"/>
-                    <button id="rawMaterialButton" label="Materias Prima"/>
+	                <button id="openSupplyListButton" label="Insumos"/>
+                    <button id="openRawMaterialListButton" label="Materias Prima"/>
                 </hlayout>
     			<listbox id="pieceListbox">
     				<auxhead>
@@ -167,6 +167,76 @@
                     <button id="finishProcessButton" label="Guardar Pieza"/>
                     <button id="resetPieceButton" label="Reset Pieza"/>
                     <button id="deletePieceButton" label="Eliminar Pieza"/>
+                </hlayout>
+            </vlayout>
+        </panelchildren>
+    </panel>
+    <separator/>
+    <panel title="Insumos" id="supplyCreationBlock" collapsible="true" visible="true" closable="false" border="rounded">
+        <panelchildren>
+            <vlayout>
+                <hlayout>
+                	<separator/>
+                    <label value="Insumo: "/>
+                    <bandbox id="supplyBandbox" buttonVisible = "true" autodrop = "true">
+                        <bandpopup>
+                            <vbox>
+                                <hbox>
+                                    Buscar
+                                    <textbox />
+                                </hbox>
+                                <listbox id="supplyPopupListbox" width="200px">
+	                                <listhead>
+	                                    <listheader label="Insumo"/>
+	                                    <listheader label="Descripcion"/>
+	                                    <listheader label="Detalles"/>
+	                                </listhead>
+	                                <template name="model">
+	                                    <listitem>
+	                                        <listcell label="${each.name}"/>
+	                                        <listcell label="${each.description}"/>
+	                                        <listcell label="${each.details}"/>
+	                                    </listitem>
+	                                </template>
+                                </listbox>
+                            </vbox>
+                        </bandpopup>
+                    </bandbox>
+                    <label value="Cantidad: "/>
+                    <doublebox id="supplyUnits" constraint="no negative" width="36px"/>
+                    <button id="saveSupplyButton" label="Grabar Insumo"/>
+                    <button id="resetSupplyButton" label="Reset Insumo"/>
+                    <button id="deleteSupplyButton" label="Eliminar Insumo"/>
+                    <button id="cancelSupplyButton" label="Cancelar Edicion"/>
+                </hlayout>
+                <separator/>
+                <listbox id="supplyListbox" mold="paging" pageSize="7">
+                    <auxhead>
+                        <auxheader label="Insumos" colspan="7"/>
+                    </auxhead>
+                    <listhead>
+                        <listheader label="Codigo"/>
+			            <listheader label="Descripcion"/>
+			            <listheader label="Detalles"/>
+			            <listheader label="Marca"/>
+			            <listheader label="Presentacion"/>
+			            <listheader label="Medida"/>
+			            <listheader label="Cantidad"/>
+                    </listhead>
+                    <template name="model">
+                        <listitem>
+                            <listcell label="${each.code}"/>
+			                <listcell label="${each.description}"/>
+			                <listcell label="${each.details}"/>
+			                <listcell label="${each.brand}"/>
+			                <listcell label="${each.presentation}"/>
+			                <listcell label="${each.measure}"/>
+			                <listcell label="[impl. pend.]"/>
+                        </listitem>
+                    </template>
+                </listbox>
+                <hlayout>
+                    <button id="closeSupplyButton" label="Cerrar"/>
                 </hlayout>
             </vlayout>
         </panelchildren>

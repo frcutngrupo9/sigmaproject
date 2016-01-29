@@ -5,17 +5,29 @@ import java.io.Serializable;
 public class RawMaterial  implements Serializable, Cloneable {
     private static final long serialVersionUID = 1L;
     
+    Integer id;
     Integer idProduct;
     Integer idRawMaterialType;
     Double quantity;
+    boolean isClone;
     
-    public RawMaterial(Integer idProduct, Integer idRawMaterialType, Double quantity) {
+    public RawMaterial(Integer id, Integer idProduct, Integer idRawMaterialType, Double quantity) {
+    	this.id = id;
     	this.idProduct = idProduct;
         this.idRawMaterialType = idRawMaterialType;
         this.quantity = quantity;
+        isClone = false;
     }
     
-    public Integer getIdProduct() {
+    public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Integer getIdProduct() {
 		return idProduct;
 	}
 
@@ -39,6 +51,14 @@ public class RawMaterial  implements Serializable, Cloneable {
 		this.quantity = quantity;
 	}
 
+	public boolean isClone() {
+		return isClone;
+	}
+
+	public void setClone(boolean isClone) {
+		this.isClone = isClone;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -48,13 +68,12 @@ public class RawMaterial  implements Serializable, Cloneable {
 		if (getClass() != obj.getClass())
 			return false;
 		RawMaterial other = (RawMaterial) obj;
-		if (idProduct != null && idRawMaterialType != null) {
-			if (other.idProduct != null  && other.idRawMaterialType != null) {
-				if (other.idProduct.equals(idProduct) && other.idRawMaterialType.equals(idRawMaterialType))
-					return true;
-			}
-		}
-		return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
 	}
 
 	public static RawMaterial clone(RawMaterial rawMaterial) {

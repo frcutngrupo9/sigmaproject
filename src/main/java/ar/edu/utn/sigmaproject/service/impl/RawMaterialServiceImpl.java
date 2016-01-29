@@ -23,7 +23,9 @@ public class RawMaterialServiceImpl implements RawMaterialService {
 	public synchronized List<RawMaterial> getRawMaterialList() {
 		List<RawMaterial> list = new ArrayList<RawMaterial>();
 		for(RawMaterial rawMaterial:rawMaterialList) {
-			list.add(RawMaterial.clone(rawMaterial));
+			if(rawMaterial.isClone() == false) {
+				list.add(RawMaterial.clone(rawMaterial));
+			}
 		}
 		return list;
 	}
@@ -31,18 +33,29 @@ public class RawMaterialServiceImpl implements RawMaterialService {
 	public synchronized List<RawMaterial> getRawMaterialList(Integer idProduct) {
 		List<RawMaterial> list = new ArrayList<RawMaterial>();
 		for(RawMaterial rawMaterial:rawMaterialList) {
-			if(rawMaterial.getIdProduct().equals(idProduct)) {
+			if(rawMaterial.getIdProduct().equals(idProduct) && rawMaterial.isClone() == false) {
 				list.add(RawMaterial.clone(rawMaterial));
 			}
 		}
 		return list;
 	}
 	
+	public synchronized RawMaterial getRawMaterial(Integer id) {
+		int size = rawMaterialList.size();
+		for(int i = 0; i < size; i++) {
+			RawMaterial aux = rawMaterialList.get(i);
+			if(aux.getId().equals(id)) {
+				return RawMaterial.clone(aux);
+			}
+		}
+		return null;
+	}
+	
 	public synchronized RawMaterial getRawMaterial(Integer idProduct, Integer idRawMaterialType) {
 		int size = rawMaterialList.size();
 		for(int i = 0; i < size; i++) {
 			RawMaterial aux = rawMaterialList.get(i);
-			if(aux.getIdProduct().equals(idProduct) && aux.getIdRawMaterialType().equals(idRawMaterialType)) {
+			if(aux.getIdProduct().equals(idProduct) && aux.getIdRawMaterialType().equals(idRawMaterialType) && aux.isClone() == false) {
 				return RawMaterial.clone(aux);
 			}
 		}
@@ -50,6 +63,10 @@ public class RawMaterialServiceImpl implements RawMaterialService {
 	}
 	
 	public synchronized RawMaterial saveRawMaterial(RawMaterial rawMaterial) {
+		if(rawMaterial.getId() == null) {
+			Integer newId = getNewId();
+			rawMaterial.setId(newId);
+		}
 		rawMaterial = RawMaterial.clone(rawMaterial);
 		rawMaterialList.add(rawMaterial);
 		serializator.grabarLista(rawMaterialList);
@@ -57,29 +74,29 @@ public class RawMaterialServiceImpl implements RawMaterialService {
 	}
 	
 	public synchronized RawMaterial updateRawMaterial(RawMaterial rawMaterial) {
-		if(rawMaterial.getIdProduct()==null || rawMaterial.getIdRawMaterialType()==null) {
+		if(rawMaterial.getId() == null) {
 			throw new IllegalArgumentException("can't update a null-id raw material, save it first");
 		} else {
 			rawMaterial = RawMaterial.clone(rawMaterial);
 			int size = rawMaterialList.size();
 			for(int i = 0; i < size; i++) {
 				RawMaterial aux = rawMaterialList.get(i);
-				if(aux.getIdProduct().equals(rawMaterial.getIdProduct()) && aux.getIdRawMaterialType().equals(rawMaterial.getIdRawMaterialType())) {
+				if(aux.getId().equals(rawMaterial.getId())) {
 					rawMaterialList.set(i, rawMaterial);
 					serializator.grabarLista(rawMaterialList);
 					return rawMaterial;
 				}
 			}
-			throw new RuntimeException("RawMaterial not found "+rawMaterial.getIdProduct()+" "+rawMaterial.getIdRawMaterialType());
+			throw new RuntimeException("RawMaterial not found " + rawMaterial.getId());
 		}
 	}
 	
 	public synchronized void deleteRawMaterial(RawMaterial rawMaterial) {
-		if(rawMaterial.getIdProduct()!=null && rawMaterial.getIdRawMaterialType()!=null) {
+		if(rawMaterial.getId() != null) {
 			int size = rawMaterialList.size();
 			for(int i = 0; i < size; i++) {
 				RawMaterial aux = rawMaterialList.get(i);
-				if(aux.getIdProduct().equals(rawMaterial.getIdProduct()) && aux.getIdRawMaterialType().equals(rawMaterial.getIdRawMaterialType())) {
+				if(aux.getId().equals(rawMaterial.getId())) {
 					rawMaterialList.remove(i);
 					serializator.grabarLista(rawMaterialList);
 					return;
@@ -93,5 +110,16 @@ public class RawMaterialServiceImpl implements RawMaterialService {
 		for(RawMaterial delete:listDelete) {
 			deleteRawMaterial(delete);
 		}
+	}
+	
+	public synchronized Integer getNewId() {
+		Integer lastId = 0;
+		for(int i = 0; i < rawMaterialList.size(); i++) {
+			RawMaterial aux = rawMaterialList.get(i);
+			if(lastId < aux.getId()) {
+				lastId = aux.getId();
+			}
+		}
+		return lastId + 1;
 	}
 }
