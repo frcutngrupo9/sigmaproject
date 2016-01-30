@@ -178,22 +178,22 @@
                 <hlayout>
                 	<separator/>
                     <label value="Insumo: "/>
-                    <bandbox id="supplyBandbox" buttonVisible = "true" autodrop = "true">
+                    <bandbox id="supplyTypeBandbox" buttonVisible = "true" autodrop = "true">
                         <bandpopup>
                             <vbox>
                                 <hbox>
                                     Buscar
                                     <textbox />
                                 </hbox>
-                                <listbox id="supplyPopupListbox" width="200px">
+                                <listbox id="supplyTypePopupListbox" width="200px">
 	                                <listhead>
-	                                    <listheader label="Insumo"/>
+	                                    <listheader label="Id"/>
 	                                    <listheader label="Descripcion"/>
 	                                    <listheader label="Detalles"/>
 	                                </listhead>
 	                                <template name="model">
 	                                    <listitem>
-	                                        <listcell label="${each.name}"/>
+	                                        <listcell label="${each.id}"/>
 	                                        <listcell label="${each.description}"/>
 	                                        <listcell label="${each.details}"/>
 	                                    </listitem>
@@ -203,7 +203,7 @@
                         </bandpopup>
                     </bandbox>
                     <label value="Cantidad: "/>
-                    <doublebox id="supplyUnits" constraint="no negative" width="36px"/>
+                    <doublebox id="supplyQuantityDoublebox" constraint="no negative" width="36px"/>
                     <button id="saveSupplyButton" label="Grabar Insumo"/>
                     <button id="resetSupplyButton" label="Reset Insumo"/>
                     <button id="deleteSupplyButton" label="Eliminar Insumo"/>
@@ -215,7 +215,7 @@
                         <auxheader label="Insumos" colspan="7"/>
                     </auxhead>
                     <listhead>
-                        <listheader label="Codigo"/>
+                        <listheader label="Id"/>
 			            <listheader label="Descripcion"/>
 			            <listheader label="Detalles"/>
 			            <listheader label="Marca"/>
@@ -225,7 +225,7 @@
                     </listhead>
                     <template name="model">
                         <listitem>
-                            <listcell label="${each.code}"/>
+                            <listcell label="${each.id}"/>
 			                <listcell label="${each.description}"/>
 			                <listcell label="${each.details}"/>
 			                <listcell label="${each.brand}"/>
@@ -236,7 +236,7 @@
                     </template>
                 </listbox>
                 <hlayout>
-                    <button id="closeSupplyButton" label="Cerrar"/>
+                    <button id="closeSupplyListButton" label="Cerrar"/>
                 </hlayout>
             </vlayout>
         </panelchildren>

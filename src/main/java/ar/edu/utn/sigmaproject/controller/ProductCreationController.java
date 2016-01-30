@@ -36,22 +36,29 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
+import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.domain.Supply;
+import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.service.MeasureUnitService;
 import ar.edu.utn.sigmaproject.service.MeasureUnitTypeService;
 import ar.edu.utn.sigmaproject.service.PieceService;
 import ar.edu.utn.sigmaproject.service.ProcessService;
 import ar.edu.utn.sigmaproject.service.ProcessTypeService;
 import ar.edu.utn.sigmaproject.service.ProductService;
+import ar.edu.utn.sigmaproject.service.SupplyService;
+import ar.edu.utn.sigmaproject.service.SupplyTypeService;
 import ar.edu.utn.sigmaproject.service.impl.MeasureUnitServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.MeasureUnitTypeServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.PieceServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProcessServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProcessTypeServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.SupplyServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.SupplyTypeServiceImpl;
 
 public class ProductCreationController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
@@ -117,6 +124,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	Button pieceCopyButton;
 	@Wire
 	Button openRawMaterialListButton;
+	
+	// supply
 	@Wire
 	Button openSupplyListButton;
 	@Wire
@@ -124,11 +133,21 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	@Wire
 	Component supplyCreationBlock;
 	@Wire
-    Bandbox supplyBandbox;
+    Bandbox supplyTypeBandbox;
 	@Wire
-    Listbox supplyPopupListbox;
+    Listbox supplyTypePopupListbox;
 	@Wire
     Listbox supplyListbox;
+	@Wire
+	Doublebox supplyQuantityDoublebox;
+	@Wire
+	Button saveSupplyButton;
+	@Wire
+	Button resetSupplyButton;
+	@Wire
+	Button deleteSupplyButton;
+	@Wire
+	Button cancelSupplyButton;
      
     // services
 	private ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
@@ -137,16 +156,23 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	private ProductService productService = new ProductServiceImpl();
 	private MeasureUnitService measureUnitService = new MeasureUnitServiceImpl();
 	private MeasureUnitTypeService measureUnitTypeService = new MeasureUnitTypeServiceImpl();
+	private SupplyTypeService supplyTypeService = new SupplyTypeServiceImpl();
+	private SupplyService supplyService = new SupplyServiceImpl();
 	
     // attributes
     private Product currentProduct;
 	private Piece currentPiece;
 	private EventQueue eq;
+	private Supply currentSupply;
+	private SupplyType currentSupplyType;
 	
 	// list
 	private List<Piece> pieceList;
 	private List<Process> processList;
 	private List<ProcessType> processTypeList;
+	private List<Supply> supplyList;
+    private List<Supply> lateDeleteSupplyList;
+    private List<SupplyType> supplyTypePopupList;
 	
 	// list models
 	private ListModelList<ProcessType> processTypeListModel;
@@ -154,6 +180,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	private ListModelList<MeasureUnit> lengthMeasureUnitListModel;
     private ListModelList<MeasureUnit> depthMeasureUnitListModel;
     private ListModelList<MeasureUnit> widthMeasureUnitListModel;
+    private ListModelList<Supply> supplyListModel;
+    private ListModelList<SupplyType> supplyTypePopupListModel;
      
     @Override
     public void doAfterCompose(Component comp) throws Exception{
@@ -179,7 +207,6 @@ public class ProductCreationController extends SelectorComposer<Component>{
         
         currentProduct = (Product) Executions.getCurrent().getAttribute("selected_product");
         currentPiece = null;
-        refreshViewProduct();
         
         // agregamos un listener para cuando se seleccione una pieza en el modal de copia de otra pieza
         eq = EventQueues.lookup("Piece Selection Queue", EventQueues.DESKTOP, true);
@@ -189,6 +216,15 @@ public class ProductCreationController extends SelectorComposer<Component>{
             	fillPieceCopy(value);
             }
         });
+        
+        lateDeleteSupplyList = new ArrayList<Supply>();
+        supplyList = new ArrayList<Supply>();
+        supplyListModel = new ListModelList<Supply>(supplyList);
+        supplyListbox.setModel(supplyListModel);
+        currentSupply = null;
+        currentSupplyType = null;
+        
+        refreshViewProduct();
     }
     
     @Listen("onClick = #saveProductButton")
@@ -438,6 +474,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
   	        pieceListModel = new ListModelList<Piece>(pieceList);
   	        pieceListbox.setModel(pieceListModel);
   		}
+  		refreshViewSupply();
+  		refreshSupplyTypePopup();
   	}
   	
   	private void refreshViewPiece() {
@@ -773,10 +811,161 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	pieceUnitsByProductIntbox.setValue(piece.getUnits());
   	}
   	
-  	@Listen("onClick = #supplyButton")
+  	@Listen("onClick = #openSupplyListButton")
     public void showSupplyCreationBlock() {
-  		if(currentPiece == null) {// si no hay nada editandose
-			
-		}
+  		supplyCreationBlock.setVisible(true);
     }
+  	
+  	@Listen("onClick = #closeSupplyListButton")
+    public void hideSupplyCreationBlock() {
+  		supplyCreationBlock.setVisible(false);
+    }
+  	
+  	private void refreshViewSupply() {
+  		if (currentSupply == null) {
+  			// borramos el text del insumo
+  			// deseleccionamos la tabla y borramos la cantidad
+  			supplyTypeBandbox.setDisabled(false);
+  			supplyTypeBandbox.setValue("");
+  			supplyQuantityDoublebox.setValue(null);
+  			currentSupplyType = null;
+  			deleteSupplyButton.setDisabled(true);
+  			cancelSupplyButton.setDisabled(true);
+  		} else {
+  			currentSupplyType = supplyTypeService.getSupplyType(currentSupply.getIdSupplyType());
+  			supplyTypeBandbox.setDisabled(true);// no se permite modificar el producto solo las unidades
+  			supplyTypeBandbox.setValue(currentSupplyType.getDescription());
+  			supplyQuantityDoublebox.setValue(currentSupply.getQuantity());
+  			deleteSupplyButton.setDisabled(false);
+  			cancelSupplyButton.setDisabled(false);
+  		}
+  		supplyTypePopupListbox.clearSelection();
+  		refreshSupplyListbox();
+  	}
+  	
+  	private void refreshSupplyListbox() {
+  		supplyListModel = new ListModelList<Supply>(supplyList);
+  		supplyListbox.setModel(supplyListModel);
+  	}
+  	
+  	private void refreshSupplyTypePopup() {// el popup se actualiza en base a la lista
+  		supplyTypePopupList = supplyTypeService.getSupplyTypeList();
+    	for(Supply supply : supplyList) {
+    		SupplyType aux = supplyTypeService.getSupplyType(supply.getIdSupplyType());
+    		supplyTypePopupList.remove(aux);// sacamos del popup
+    	}
+    	supplyTypePopupListModel = new ListModelList<SupplyType>(supplyTypePopupList);
+    	supplyTypePopupListbox.setModel(supplyTypePopupListModel);
+	}
+  	
+  	@Listen("onSelect = #supplyTypePopupListbox")
+    public void selectionSupplyTypePopupListbox() {
+        currentSupplyType = (SupplyType) supplyTypePopupListbox.getSelectedItem().getValue();
+        supplyTypeBandbox.setValue(currentSupplyType.getDescription());
+        supplyTypeBandbox.close();
+    }
+  	
+  	@Listen("onSelect = #supplyListbox")
+	public void selectSupply() {
+		if(supplyListModel.isSelectionEmpty()){
+			//just in case for the no selection
+			currentSupply = null;
+		} else {
+			if(currentSupply == null) {// permite la seleccion solo si no existe nada seleccionado
+				currentSupply = supplyListModel.getSelection().iterator().next();
+				currentSupplyType = supplyTypeService.getSupplyType(currentSupply.getIdSupplyType());
+				refreshViewSupply();
+			}
+		}
+		supplyListModel.clearSelection();
+	}
+  	
+  	@Listen("onClick = #cancelSupplyButton")
+    public void cancelSupply() {
+    	currentSupply = null;
+    	refreshViewSupply();
+    }
+  	
+  	@Listen("onClick = #resetSupplyButton")
+    public void resetSupply() {
+  		refreshViewSupply();
+  	}
+  	
+  	@Listen("onClick = #deleteSupplyButton")
+    public void deleteSupply() {
+  		if(currentSupply != null) {
+  			Messagebox.show("Esta seguro que desea eliminar " + supplyTypeService.getSupplyType(currentSupply.getIdSupplyType()).getDescription() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+  			    public void onEvent(Event evt) throws InterruptedException {
+  			        if (evt.getName().equals("onOK")) {
+  			        	if(currentSupply.getId() != null) {// si el detalle existe en la bd
+  			        		lateDeleteSupplyList.add(currentSupply);// agregamos a la lista de eliminacion tardia que se realiza al grabar definitivamente
+  			        	}
+  			        	supplyList.remove(currentSupply);// quitamos de la lista
+  			        	currentSupply = null;// eliminamos
+  			        	refreshSupplyTypePopup();// actualizamos el popup para que aparezca el insumo eliminado
+  			        	refreshViewSupply();
+  			            alert("Insumo eliminado.");
+  			        }
+  			    }
+  			});
+  		} 
+  	}
+  	
+  	@Listen("onClick = #saveSupplyButton")
+    public void saveSupply() {
+		if(supplyQuantityDoublebox.getValue()==null || supplyQuantityDoublebox.getValue()<=0) {
+			Clients.showNotification("Ingresar Cantidad del Insumo", supplyQuantityDoublebox);
+			return;
+		}
+		if(currentSupplyType == null) {
+			Clients.showNotification("Debe seleccionar un Insumo", supplyTypeBandbox);
+			return;
+		}
+		// buscamos si no esta eliminado
+		Supply aux = null;
+		for(Supply lateDeleteSupply : lateDeleteSupplyList) {
+			if(currentSupplyType.getId().equals(lateDeleteSupply.getIdSupplyType())) {
+				aux = lateDeleteSupply;
+			}
+		}
+		if(aux != null) {
+			lateDeleteSupplyList.remove(aux);// lo eliminamos de la lista de eliminacion tardia porque el sera agregado nuevamente
+		}
+		int supplyTypeId = currentSupplyType.getId();
+		double supplyQuantity = supplyQuantityDoublebox.getValue();
+		if(currentSupply == null) { // es nuevo
+			if(aux != null) {// si ya estaba en un detalle
+				aux.setQuantity(supplyQuantity);;
+				supplyList.add(aux);
+			} else {
+				// se crea un detalle sin id porque recien se le asignara uno al momento de grabarse definitivamente
+				currentSupply = new Supply(null, null, supplyTypeId, supplyQuantity);
+				supplyList.add(currentSupply);
+			}
+		} else { // se edita
+			currentSupply.setIdSupplyType(supplyTypeId);;
+			currentSupply.setQuantity(supplyQuantity);
+			updateSupplyList(currentSupply);// actualizamos la lista
+		}
+		refreshSupplyTypePopup();// actualizamos el popup
+		currentSupply = null;
+		refreshViewSupply();
+    }
+  	
+  	private  Supply updateSupplyList(Supply supply) {
+		if(supply.getId() == null) {
+			throw new IllegalArgumentException("can't update a null-id Supply");
+		} else {
+			supply = Supply.clone(supply);
+			int size = supplyList.size();
+			for(int i = 0; i < size; i++) {
+				Supply t = supplyList.get(i);
+				if(t.getIdSupplyType().equals(supply.getIdSupplyType())) {
+					supplyList.set(i, supply);
+					return supply;
+				}
+			}
+			throw new RuntimeException("Supply not found " + supply.getId());
+		}
+	}
 }
