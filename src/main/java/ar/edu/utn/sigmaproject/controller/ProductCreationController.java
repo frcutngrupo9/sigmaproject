@@ -36,7 +36,6 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
-import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
@@ -240,13 +239,13 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	
     	if(currentProduct == null) {// se esta creando un nuevo producto
     		currentProduct = new Product(null, product_code, product_name, product_details, product_price);
-    		productService.saveProduct(currentProduct, pieceList, processList);
+    		productService.saveProduct(currentProduct, pieceList, processList, supplyList);
     	} else {// se esta editando un producto
     		currentProduct.setName(product_name);
     		currentProduct.setDetails(product_details);
             currentProduct.setCode(product_code);
             currentProduct.setPrice(product_price);;
-    		currentProduct = productService.updateProduct(currentProduct, pieceList, processList);
+    		currentProduct = productService.updateProduct(currentProduct, pieceList, processList, supplyList);
     	}
 		// mostrar mensaje al user
 		Clients.showNotification("Producto guardado");
@@ -457,6 +456,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
   			pieceList = new ArrayList<Piece>();
   			pieceListModel = new ListModelList<Piece>(pieceList);
   	        pieceListbox.setModel(pieceListModel);
+  	        supplyList = new ArrayList<Supply>();
   		} else {
   			productCaption.setLabel("Edicion de Producto");
   		    deleteProductButton.setDisabled(false);
@@ -473,6 +473,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
   			pieceList = pieceService.getPieceList(currentProduct.getId());
   	        pieceListModel = new ListModelList<Piece>(pieceList);
   	        pieceListbox.setModel(pieceListModel);
+  	        supplyList = supplyService.getSupplyList(currentProduct.getId());
   		}
   		refreshViewSupply();
   		refreshSupplyTypePopup();
@@ -904,7 +905,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
   			        	currentSupply = null;// eliminamos
   			        	refreshSupplyTypePopup();// actualizamos el popup para que aparezca el insumo eliminado
   			        	refreshViewSupply();
-  			            alert("Insumo eliminado.");
+  			            //alert("Insumo eliminado.");
   			        }
   			    }
   			});
@@ -968,4 +969,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			throw new RuntimeException("Supply not found " + supply.getId());
 		}
 	}
+  	
+  	public SupplyType getSupplyType(int idSupplyType) {
+    	return supplyTypeService.getSupplyType(idSupplyType);
+    }
 }

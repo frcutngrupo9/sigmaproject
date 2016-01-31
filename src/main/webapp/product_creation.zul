@@ -172,7 +172,7 @@
         </panelchildren>
     </panel>
     <separator/>
-    <panel title="Insumos" id="supplyCreationBlock" collapsible="true" visible="true" closable="false" border="rounded">
+    <panel title="Insumos" id="supplyCreationBlock" collapsible="true" visible="false" closable="false" border="rounded">
         <panelchildren>
             <vlayout>
                 <hlayout>
@@ -185,17 +185,19 @@
                                     Buscar
                                     <textbox />
                                 </hbox>
-                                <listbox id="supplyTypePopupListbox" width="200px">
+                                <listbox id="supplyTypePopupListbox" width="500px">
 	                                <listhead>
 	                                    <listheader label="Id"/>
 	                                    <listheader label="Descripcion"/>
 	                                    <listheader label="Detalles"/>
+	                                    <listheader label="Medida"/>
 	                                </listhead>
 	                                <template name="model">
 	                                    <listitem>
 	                                        <listcell label="${each.id}"/>
 	                                        <listcell label="${each.description}"/>
 	                                        <listcell label="${each.details}"/>
+	                                        <listcell label="${each.measure}"/>
 	                                    </listitem>
 	                                </template>
                                 </listbox>
@@ -226,12 +228,12 @@
                     <template name="model">
                         <listitem>
                             <listcell label="${each.id}"/>
-			                <listcell label="${each.description}"/>
-			                <listcell label="${each.details}"/>
-			                <listcell label="${each.brand}"/>
-			                <listcell label="${each.presentation}"/>
-			                <listcell label="${each.measure}"/>
-			                <listcell label="[impl. pend.]"/>
+			                <listcell label="${win_product_creation$composer.getSupplyType(each.idSupplyType).description}"/>
+			                <listcell label="${win_product_creation$composer.getSupplyType(each.idSupplyType).details}"/>
+			                <listcell label="${win_product_creation$composer.getSupplyType(each.idSupplyType).brand}"/>
+			                <listcell label="${win_product_creation$composer.getSupplyType(each.idSupplyType).presentation}"/>
+			                <listcell label="${win_product_creation$composer.getSupplyType(each.idSupplyType).measure}"/>
+			                <listcell label="${each.quantity}"/>
                         </listitem>
                     </template>
                 </listbox>

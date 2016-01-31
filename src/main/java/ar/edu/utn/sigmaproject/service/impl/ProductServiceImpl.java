@@ -6,9 +6,11 @@ import java.util.List;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.domain.Supply;
 import ar.edu.utn.sigmaproject.service.PieceService;
 import ar.edu.utn.sigmaproject.service.ProcessService;
 import ar.edu.utn.sigmaproject.service.ProductService;
+import ar.edu.utn.sigmaproject.service.SupplyService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
 public class ProductServiceImpl implements ProductService {
@@ -129,6 +131,18 @@ public class ProductServiceImpl implements ProductService {
     	}
 		return product;
 	}
+	
+	public synchronized Product saveProduct(Product product, List<Piece> pieceList, List<Process> processList, List<Supply> supplyList) {
+		product = saveProduct(product, pieceList, processList);
+		SupplyService supplyService = new SupplyServiceImpl();
+		if(supplyList != null && supplyList.isEmpty() == false) {// se guardan los insumos
+    		for(int i = 0; i < supplyList.size(); i++) {
+    			supplyList.get(i).setIdProduct(product.getId());// se le asigna el id del producto
+    			supplyService.saveSupply(supplyList.get(i));
+    		}
+    	}
+		return product;
+	}
 
 	public synchronized Product updateProduct(Product product, List<Piece> pieceList, List<Process> processList) {
 		product = updateProduct(product);
@@ -181,7 +195,32 @@ public class ProductServiceImpl implements ProductService {
 				}
     		}
     	}
-		return null;
+		return product;
+	}
+	
+	public synchronized Product updateProduct(Product product, List<Piece> pieceList, List<Process> processList, List<Supply> supplyList) {
+		product = updateProduct(product, pieceList, processList);
+		if(supplyList != null) {
+			// primero eliminamos los insumos que estan en el service, pero que no existen mas en el producto
+			SupplyService supplyService = new SupplyServiceImpl();
+			List<Supply> completeSupplyList = supplyService.getSupplyList();
+            for(Supply auxSupply:completeSupplyList) {// recorremos la lista completa de insumos que estan en el servicio
+            	Supply aux = searchSupply(auxSupply.getId(), supplyList);
+                if(aux == null) {// si el insumo no esta en la lista se debe eliminar del service
+                	supplyService.deleteSupply(auxSupply);
+                }
+            }
+			// ahora recorremos la lista para actualizar los insumos que ya existen o agregar los que no
+			for(int i = 0; i < supplyList.size(); i++) {
+				if(supplyList.get(i).getId() == null) {// es un nuevo insumo, se guarda
+					supplyList.get(i).setIdProduct(product.getId());// se le asigna el id del producto
+					supplyService.saveSupply(supplyList.get(i));
+				} else {// se actualiza
+					supplyService.updateSupply(supplyList.get(i));
+				}
+    		}
+		}
+		return product;
 	}
 	
 	private synchronized Piece searchPiece(Integer idPiece, List<Piece> pieceList) {
@@ -201,6 +240,17 @@ public class ProductServiceImpl implements ProductService {
   			Process t = processList.get(i);
   			if(t.getIdPiece().equals(idPiece) && t.getIdProcessType().equals(idProcessType)) {
   				return Process.clone(t);
+  			}
+  		}
+  		return null;
+    }
+	
+	private synchronized Supply searchSupply(Integer idSupply, List<Supply> supplyList) {
+  		int size = supplyList.size();
+  		for(int i = 0; i < size; i++) {
+  			Supply t = supplyList.get(i);
+  			if(t.getId().equals(idSupply)) {
+  				return Supply.clone(t);
   			}
   		}
   		return null;
