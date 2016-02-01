@@ -38,7 +38,7 @@
 	                <button id="createPieceButton" label="Agregar Nueva Pieza"/>
 	                <button id="pieceCopyButton" label="Copiar Otra Pieza"/>
 	                <button id="openSupplyListButton" label="Insumos"/>
-                    <button id="openRawMaterialListButton" label="Materias Prima"/>
+                    <button id="openRawMaterialListButton" label="Materias Primas"/>
                 </hlayout>
     			<listbox id="pieceListbox">
     				<auxhead>
@@ -212,7 +212,7 @@
                     <button id="cancelSupplyButton" label="Cancelar Edicion"/>
                 </hlayout>
                 <separator/>
-                <listbox id="supplyListbox" mold="paging" pageSize="7">
+                <listbox id="supplyListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
                     <auxhead>
                         <auxheader label="Insumos" colspan="7"/>
                     </auxhead>
@@ -239,6 +239,78 @@
                 </listbox>
                 <hlayout>
                     <button id="closeSupplyListButton" label="Cerrar"/>
+                </hlayout>
+            </vlayout>
+        </panelchildren>
+    </panel>
+    <separator/>
+    <panel title="Materias Primas" id="rawMaterialCreationBlock" collapsible="true" visible="false" closable="false" border="rounded">
+        <panelchildren>
+            <vlayout>
+                <hlayout>
+                	<separator/>
+                    <label value="Materia Prima: "/>
+                    <bandbox id="rawMaterialTypeBandbox" buttonVisible = "true" autodrop = "true">
+                        <bandpopup>
+                            <vbox>
+                                <hbox>
+                                    Buscar
+                                    <textbox />
+                                </hbox>
+                                <listbox id="rawMaterialTypePopupListbox" width="500px">
+	                                <listhead>
+	                                    <listheader label="Id"/>
+	                                    <listheader label="Nombre"/>
+	                                    <listheader label="Largo (L)"/>
+							            <listheader label="Espesor (E)"/>
+							            <listheader label="Ancho (A)"/>
+	                                </listhead>
+	                                <template name="model">
+	                                    <listitem>
+	                                        <listcell label="${each.id}"/>
+	                                        <listcell label="${each.name}"/>
+	                                        <listcell label="${each.length.doubleValue()} ${win_product_creation$composer.getMeasureUnitName(each.lengthIdMeasureUnit)}"/>
+							                <listcell label="${each.depth.doubleValue()} ${win_product_creation$composer.getMeasureUnitName(each.depthIdMeasureUnit)}"/>
+							                <listcell label="${each.width.doubleValue()} ${win_product_creation$composer.getMeasureUnitName(each.widthIdMeasureUnit)}"/>
+	                                    </listitem>
+	                                </template>
+                                </listbox>
+                            </vbox>
+                        </bandpopup>
+                    </bandbox>
+                    <label value="Cantidad: "/>
+                    <doublebox id="rawMaterialQuantityDoublebox" constraint="no negative" width="36px"/>
+                    <button id="saveRawMaterialButton" label="Grabar Materia Prima"/>
+                    <button id="resetRawMaterialButton" label="Reset Materia Prima"/>
+                    <button id="deleteRawMaterialButton" label="Eliminar Materia Prima"/>
+                    <button id="cancelRawMaterialButton" label="Cancelar Edicion"/>
+                </hlayout>
+                <separator/>
+                <listbox id="rawMaterialListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
+                    <auxhead>
+                        <auxheader label="Materias Prima" colspan="6"/>
+                    </auxhead>
+                    <listhead>
+                        <listheader label="Id"/>
+			            <listheader label="Nombre"/>
+			            <listheader label="Largo (L)"/>
+			            <listheader label="Espesor (E)"/>
+			            <listheader label="Ancho (A)"/>
+			            <listheader label="Cantidad"/>
+                    </listhead>
+                    <template name="model">
+                        <listitem>
+                            <listcell label="${each.id}"/>
+			                <listcell label="${win_product_creation$composer.getRawMaterialType(each.idRawMaterialType).name}"/>
+			                <listcell label="${win_product_creation$composer.getRawMaterialType(each.idRawMaterialType).length.doubleValue()} ${win_product_creation$composer.getMeasureUnitName(win_product_creation$composer.getRawMaterialType(each.idRawMaterialType).lengthIdMeasureUnit)}"/>
+			                <listcell label="${win_product_creation$composer.getRawMaterialType(each.idRawMaterialType).depth.doubleValue()} ${win_product_creation$composer.getMeasureUnitName(win_product_creation$composer.getRawMaterialType(each.idRawMaterialType).depthIdMeasureUnit)}"/>
+			                <listcell label="${win_product_creation$composer.getRawMaterialType(each.idRawMaterialType).width.doubleValue()} ${win_product_creation$composer.getMeasureUnitName(win_product_creation$composer.getRawMaterialType(each.idRawMaterialType).widthIdMeasureUnit)}"/>
+			                <listcell label="${each.quantity}"/>
+                        </listitem>
+                    </template>
+                </listbox>
+                <hlayout>
+                    <button id="closeRawMaterialListButton" label="Cerrar"/>
                 </hlayout>
             </vlayout>
         </panelchildren>

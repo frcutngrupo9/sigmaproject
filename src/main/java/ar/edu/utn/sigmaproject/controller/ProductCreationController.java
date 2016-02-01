@@ -40,6 +40,8 @@ import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.domain.RawMaterial;
+import ar.edu.utn.sigmaproject.domain.RawMaterialType;
 import ar.edu.utn.sigmaproject.domain.Supply;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.service.MeasureUnitService;
@@ -48,6 +50,8 @@ import ar.edu.utn.sigmaproject.service.PieceService;
 import ar.edu.utn.sigmaproject.service.ProcessService;
 import ar.edu.utn.sigmaproject.service.ProcessTypeService;
 import ar.edu.utn.sigmaproject.service.ProductService;
+import ar.edu.utn.sigmaproject.service.RawMaterialService;
+import ar.edu.utn.sigmaproject.service.RawMaterialTypeService;
 import ar.edu.utn.sigmaproject.service.SupplyService;
 import ar.edu.utn.sigmaproject.service.SupplyTypeService;
 import ar.edu.utn.sigmaproject.service.impl.MeasureUnitServiceImpl;
@@ -56,6 +60,8 @@ import ar.edu.utn.sigmaproject.service.impl.PieceServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProcessServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProcessTypeServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.RawMaterialServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.RawMaterialTypeServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.SupplyServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.SupplyTypeServiceImpl;
 
@@ -121,8 +127,6 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	Caption productCaption;
 	@Wire
 	Button pieceCopyButton;
-	@Wire
-	Button openRawMaterialListButton;
 	
 	// supply
 	@Wire
@@ -147,6 +151,30 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	Button deleteSupplyButton;
 	@Wire
 	Button cancelSupplyButton;
+	
+	// raw material
+	@Wire
+	Button openRawMaterialListButton;
+	@Wire
+	Button closeRawMaterialListButton;
+	@Wire
+	Component rawMaterialCreationBlock;
+	@Wire
+    Bandbox rawMaterialTypeBandbox;
+	@Wire
+    Listbox rawMaterialTypePopupListbox;
+	@Wire
+    Listbox rawMaterialListbox;
+	@Wire
+	Doublebox rawMaterialQuantityDoublebox;
+	@Wire
+	Button saveRawMaterialButton;
+	@Wire
+	Button resetRawMaterialButton;
+	@Wire
+	Button deleteRawMaterialButton;
+	@Wire
+	Button cancelRawMaterialButton;
      
     // services
 	private ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
@@ -157,6 +185,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	private MeasureUnitTypeService measureUnitTypeService = new MeasureUnitTypeServiceImpl();
 	private SupplyTypeService supplyTypeService = new SupplyTypeServiceImpl();
 	private SupplyService supplyService = new SupplyServiceImpl();
+	private RawMaterialTypeService rawMaterialTypeService = new RawMaterialTypeServiceImpl();
+	private RawMaterialService rawMaterialService = new RawMaterialServiceImpl();
 	
     // attributes
     private Product currentProduct;
@@ -164,6 +194,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	private EventQueue eq;
 	private Supply currentSupply;
 	private SupplyType currentSupplyType;
+	private RawMaterial currentRawMaterial;
+	private RawMaterialType currentRawMaterialType;
 	
 	// list
 	private List<Piece> pieceList;
@@ -172,6 +204,9 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	private List<Supply> supplyList;
     private List<Supply> lateDeleteSupplyList;
     private List<SupplyType> supplyTypePopupList;
+    private List<RawMaterial> rawMaterialList;
+    private List<RawMaterial> lateDeleteRawMaterialList;
+    private List<RawMaterialType> rawMaterialTypePopupList;
 	
 	// list models
 	private ListModelList<ProcessType> processTypeListModel;
@@ -181,6 +216,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
     private ListModelList<MeasureUnit> widthMeasureUnitListModel;
     private ListModelList<Supply> supplyListModel;
     private ListModelList<SupplyType> supplyTypePopupListModel;
+    private ListModelList<RawMaterial> rawMaterialListModel;
+    private ListModelList<RawMaterialType> rawMaterialTypePopupListModel;
      
     @Override
     public void doAfterCompose(Component comp) throws Exception{
@@ -223,6 +260,13 @@ public class ProductCreationController extends SelectorComposer<Component>{
         currentSupply = null;
         currentSupplyType = null;
         
+        lateDeleteRawMaterialList = new ArrayList<RawMaterial>();
+        rawMaterialList = new ArrayList<RawMaterial>();
+        rawMaterialListModel = new ListModelList<RawMaterial>(rawMaterialList);
+        rawMaterialListbox.setModel(rawMaterialListModel);
+        currentRawMaterial = null;
+        currentRawMaterialType = null;
+        
         refreshViewProduct();
     }
     
@@ -239,13 +283,13 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	
     	if(currentProduct == null) {// se esta creando un nuevo producto
     		currentProduct = new Product(null, product_code, product_name, product_details, product_price);
-    		productService.saveProduct(currentProduct, pieceList, processList, supplyList);
+    		productService.saveProduct(currentProduct, pieceList, processList, supplyList, rawMaterialList);
     	} else {// se esta editando un producto
     		currentProduct.setName(product_name);
     		currentProduct.setDetails(product_details);
             currentProduct.setCode(product_code);
             currentProduct.setPrice(product_price);;
-    		currentProduct = productService.updateProduct(currentProduct, pieceList, processList, supplyList);
+    		currentProduct = productService.updateProduct(currentProduct, pieceList, processList, supplyList, rawMaterialList);
     	}
 		// mostrar mensaje al user
 		Clients.showNotification("Producto guardado");
@@ -457,6 +501,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
   			pieceListModel = new ListModelList<Piece>(pieceList);
   	        pieceListbox.setModel(pieceListModel);
   	        supplyList = new ArrayList<Supply>();
+  	        rawMaterialList = new ArrayList<RawMaterial>();
   		} else {
   			productCaption.setLabel("Edicion de Producto");
   		    deleteProductButton.setDisabled(false);
@@ -474,9 +519,12 @@ public class ProductCreationController extends SelectorComposer<Component>{
   	        pieceListModel = new ListModelList<Piece>(pieceList);
   	        pieceListbox.setModel(pieceListModel);
   	        supplyList = supplyService.getSupplyList(currentProduct.getId());
+  	        rawMaterialList = rawMaterialService.getRawMaterialList(currentProduct.getId());
   		}
   		refreshViewSupply();
   		refreshSupplyTypePopup();
+  		refreshViewRawMaterial();
+  		refreshRawMaterialTypePopup();
   	}
   	
   	private void refreshViewPiece() {
@@ -812,165 +860,337 @@ public class ProductCreationController extends SelectorComposer<Component>{
     	pieceUnitsByProductIntbox.setValue(piece.getUnits());
   	}
   	
-  	@Listen("onClick = #openSupplyListButton")
-    public void showSupplyCreationBlock() {
-  		supplyCreationBlock.setVisible(true);
+  	// supply methods
+  	
+   	@Listen("onClick = #openSupplyListButton")
+     public void showSupplyCreationBlock() {
+   		supplyCreationBlock.setVisible(true);
+     }
+   	
+   	@Listen("onClick = #closeSupplyListButton")
+     public void hideSupplyCreationBlock() {
+   		supplyCreationBlock.setVisible(false);
+     }
+   	
+   	private void refreshViewSupply() {
+   		if (currentSupply == null) {
+   			// borramos el text del insumo
+   			// deseleccionamos la tabla y borramos la cantidad
+   			supplyTypeBandbox.setDisabled(false);
+   			supplyTypeBandbox.setValue("");
+   			supplyQuantityDoublebox.setValue(null);
+   			currentSupplyType = null;
+   			deleteSupplyButton.setDisabled(true);
+   			cancelSupplyButton.setDisabled(true);
+   		} else {
+   			currentSupplyType = supplyTypeService.getSupplyType(currentSupply.getIdSupplyType());
+   			supplyTypeBandbox.setDisabled(true);// no se permite modificar en la edicion
+   			supplyTypeBandbox.setValue(currentSupplyType.getDescription());
+   			supplyQuantityDoublebox.setValue(currentSupply.getQuantity());
+   			deleteSupplyButton.setDisabled(false);
+   			cancelSupplyButton.setDisabled(false);
+   		}
+   		supplyTypePopupListbox.clearSelection();
+   		refreshSupplyListbox();
+   	}
+   	
+   	private void refreshSupplyListbox() {
+   		supplyListModel = new ListModelList<Supply>(supplyList);
+   		supplyListbox.setModel(supplyListModel);
+   	}
+   	
+   	private void refreshSupplyTypePopup() {// el popup se actualiza en base a la lista
+   		supplyTypePopupList = supplyTypeService.getSupplyTypeList();
+     	for(Supply supply : supplyList) {
+     		SupplyType aux = supplyTypeService.getSupplyType(supply.getIdSupplyType());
+     		supplyTypePopupList.remove(aux);// sacamos del popup
+     	}
+     	supplyTypePopupListModel = new ListModelList<SupplyType>(supplyTypePopupList);
+     	supplyTypePopupListbox.setModel(supplyTypePopupListModel);
+ 	}
+   	
+   	@Listen("onSelect = #supplyTypePopupListbox")
+     public void selectionSupplyTypePopupListbox() {
+         currentSupplyType = (SupplyType) supplyTypePopupListbox.getSelectedItem().getValue();
+         supplyTypeBandbox.setValue(currentSupplyType.getDescription());
+         supplyTypeBandbox.close();
+     }
+   	
+   	@Listen("onSelect = #supplyListbox")
+ 	public void selectSupply() {
+ 		if(supplyListModel.isSelectionEmpty()){
+ 			//just in case for the no selection
+ 			currentSupply = null;
+ 		} else {
+ 			if(currentSupply == null) {// permite la seleccion solo si no existe nada seleccionado
+ 				currentSupply = supplyListModel.getSelection().iterator().next();
+ 				currentSupplyType = supplyTypeService.getSupplyType(currentSupply.getIdSupplyType());
+ 				refreshViewSupply();
+ 			}
+ 		}
+ 		supplyListModel.clearSelection();
+ 	}
+   	
+   	@Listen("onClick = #cancelSupplyButton")
+     public void cancelSupply() {
+     	currentSupply = null;
+     	refreshViewSupply();
+     }
+   	
+   	@Listen("onClick = #resetSupplyButton")
+     public void resetSupply() {
+   		refreshViewSupply();
+   	}
+   	
+   	@Listen("onClick = #deleteSupplyButton")
+     public void deleteSupply() {
+   		if(currentSupply != null) {
+   			Messagebox.show("Esta seguro que desea eliminar " + supplyTypeService.getSupplyType(currentSupply.getIdSupplyType()).getDescription() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+   			    public void onEvent(Event evt) throws InterruptedException {
+   			        if (evt.getName().equals("onOK")) {
+   			        	if(currentSupply.getId() != null) {// si el detalle existe en la bd
+   			        		lateDeleteSupplyList.add(currentSupply);// agregamos a la lista de eliminacion por las dudas que se vuelva a agregar
+   			        	}
+   			        	supplyList.remove(currentSupply);// quitamos de la lista
+   			        	currentSupply = null;// eliminamos
+   			        	refreshSupplyTypePopup();// actualizamos el popup para que aparezca el insumo eliminado
+   			        	refreshViewSupply();
+   			        }
+   			    }
+   			});
+   		} 
+   	}
+   	
+   	@Listen("onClick = #saveSupplyButton")
+     public void saveSupply() {
+ 		if(supplyQuantityDoublebox.getValue()==null || supplyQuantityDoublebox.getValue()<=0) {
+ 			Clients.showNotification("Ingresar Cantidad del Insumo", supplyQuantityDoublebox);
+ 			return;
+ 		}
+ 		if(currentSupplyType == null) {
+ 			Clients.showNotification("Debe seleccionar un Insumo", supplyTypeBandbox);
+ 			return;
+ 		}
+ 		// buscamos si no esta eliminado
+ 		Supply aux = null;
+ 		for(Supply lateDeleteSupply : lateDeleteSupplyList) {
+ 			if(currentSupplyType.getId().equals(lateDeleteSupply.getId())) {
+ 				aux = lateDeleteSupply;
+ 			}
+ 		}
+ 		if(aux != null) {
+ 			lateDeleteSupplyList.remove(aux);// lo eliminamos de la lista de eliminacion tardia porque el sera agregado nuevamente
+ 		}
+ 		int supplyTypeId = currentSupplyType.getId();
+ 		double supplyQuantity = supplyQuantityDoublebox.getValue();
+ 		if(currentSupply == null) { // es nuevo
+ 			if(aux != null) {// si ya estaba en un detalle
+ 				aux.setQuantity(supplyQuantity);;
+ 				supplyList.add(aux);
+ 			} else {
+ 				// se crea un detalle sin id porque recien se le asignara uno al momento de grabarse definitivamente
+ 				currentSupply = new Supply(null, null, supplyTypeId, supplyQuantity);
+ 				supplyList.add(currentSupply);
+ 			}
+ 		} else { // se edita
+ 			currentSupply.setIdSupplyType(supplyTypeId);;
+ 			currentSupply.setQuantity(supplyQuantity);
+ 			updateSupplyList(currentSupply);// actualizamos la lista
+ 		}
+ 		refreshSupplyTypePopup();// actualizamos el popup
+ 		currentSupply = null;
+ 		refreshViewSupply();
+     }
+   	
+   	private Supply updateSupplyList(Supply supply) {
+ 		if(supply.getId() == null) {
+ 			throw new IllegalArgumentException("can't update a null-id Supply");
+ 		} else {
+ 			supply = Supply.clone(supply);
+ 			int size = supplyList.size();
+ 			for(int i = 0; i < size; i++) {
+ 				Supply t = supplyList.get(i);
+ 				if(t.getIdSupplyType().equals(supply.getIdSupplyType())) {
+ 					supplyList.set(i, supply);
+ 					return supply;
+ 				}
+ 			}
+ 			throw new RuntimeException("Supply not found " + supply.getId());
+ 		}
+ 	}
+   	
+   	public SupplyType getSupplyType(int idSupplyType) {
+     	return supplyTypeService.getSupplyType(idSupplyType);
+     }
+   	
+  	// raw material methods
+  	
+  	@Listen("onClick = #openRawMaterialListButton")
+    public void showRawMaterialCreationBlock() {
+  		rawMaterialCreationBlock.setVisible(true);
     }
   	
-  	@Listen("onClick = #closeSupplyListButton")
-    public void hideSupplyCreationBlock() {
-  		supplyCreationBlock.setVisible(false);
+  	@Listen("onClick = #closeRawMaterialListButton")
+    public void hideRawMaterialCreationBlock() {
+  		rawMaterialCreationBlock.setVisible(false);
     }
   	
-  	private void refreshViewSupply() {
-  		if (currentSupply == null) {
-  			// borramos el text del insumo
+  	private void refreshViewRawMaterial() {
+  		if (currentRawMaterial == null) {
+  			// borramos el text de la materia prima
   			// deseleccionamos la tabla y borramos la cantidad
-  			supplyTypeBandbox.setDisabled(false);
-  			supplyTypeBandbox.setValue("");
-  			supplyQuantityDoublebox.setValue(null);
-  			currentSupplyType = null;
-  			deleteSupplyButton.setDisabled(true);
-  			cancelSupplyButton.setDisabled(true);
+  			rawMaterialTypeBandbox.setDisabled(false);
+  			rawMaterialTypeBandbox.setValue("");
+  			rawMaterialQuantityDoublebox.setValue(null);
+  			currentRawMaterialType = null;
+  			deleteRawMaterialButton.setDisabled(true);
+  			cancelRawMaterialButton.setDisabled(true);
   		} else {
-  			currentSupplyType = supplyTypeService.getSupplyType(currentSupply.getIdSupplyType());
-  			supplyTypeBandbox.setDisabled(true);// no se permite modificar el producto solo las unidades
-  			supplyTypeBandbox.setValue(currentSupplyType.getDescription());
-  			supplyQuantityDoublebox.setValue(currentSupply.getQuantity());
-  			deleteSupplyButton.setDisabled(false);
-  			cancelSupplyButton.setDisabled(false);
+  			currentRawMaterialType = rawMaterialTypeService.getRawMaterialType(currentRawMaterial.getIdRawMaterialType());
+  			rawMaterialTypeBandbox.setDisabled(true);// no se permite modificar en la edicion
+  			rawMaterialTypeBandbox.setValue(currentRawMaterialType.getName());
+  			rawMaterialQuantityDoublebox.setValue(currentRawMaterial.getQuantity());
+  			deleteRawMaterialButton.setDisabled(false);
+  			cancelRawMaterialButton.setDisabled(false);
   		}
-  		supplyTypePopupListbox.clearSelection();
-  		refreshSupplyListbox();
+  		rawMaterialTypePopupListbox.clearSelection();
+  		refreshRawMaterialListbox();
   	}
   	
-  	private void refreshSupplyListbox() {
-  		supplyListModel = new ListModelList<Supply>(supplyList);
-  		supplyListbox.setModel(supplyListModel);
+  	private void refreshRawMaterialListbox() {
+  		rawMaterialListModel = new ListModelList<RawMaterial>(rawMaterialList);
+  		rawMaterialListbox.setModel(rawMaterialListModel);
   	}
   	
-  	private void refreshSupplyTypePopup() {// el popup se actualiza en base a la lista
-  		supplyTypePopupList = supplyTypeService.getSupplyTypeList();
-    	for(Supply supply : supplyList) {
-    		SupplyType aux = supplyTypeService.getSupplyType(supply.getIdSupplyType());
-    		supplyTypePopupList.remove(aux);// sacamos del popup
+  	private void refreshRawMaterialTypePopup() {// el popup se actualiza en base a la lista
+  		rawMaterialTypePopupList = rawMaterialTypeService.getRawMaterialTypeList();
+    	for(RawMaterial rawMaterial : rawMaterialList) {
+    		RawMaterialType aux = rawMaterialTypeService.getRawMaterialType(rawMaterial.getIdRawMaterialType());
+    		rawMaterialTypePopupList.remove(aux);// sacamos del popup
     	}
-    	supplyTypePopupListModel = new ListModelList<SupplyType>(supplyTypePopupList);
-    	supplyTypePopupListbox.setModel(supplyTypePopupListModel);
+    	rawMaterialTypePopupListModel = new ListModelList<RawMaterialType>(rawMaterialTypePopupList);
+    	rawMaterialTypePopupListbox.setModel(rawMaterialTypePopupListModel);
 	}
   	
-  	@Listen("onSelect = #supplyTypePopupListbox")
-    public void selectionSupplyTypePopupListbox() {
-        currentSupplyType = (SupplyType) supplyTypePopupListbox.getSelectedItem().getValue();
-        supplyTypeBandbox.setValue(currentSupplyType.getDescription());
-        supplyTypeBandbox.close();
+  	@Listen("onSelect = #rawMaterialTypePopupListbox")
+    public void selectionRawMaterialTypePopupListbox() {
+        currentRawMaterialType = (RawMaterialType) rawMaterialTypePopupListbox.getSelectedItem().getValue();
+        rawMaterialTypeBandbox.setValue(currentRawMaterialType.getName());
+        rawMaterialTypeBandbox.close();
     }
   	
-  	@Listen("onSelect = #supplyListbox")
-	public void selectSupply() {
-		if(supplyListModel.isSelectionEmpty()){
+  	@Listen("onSelect = #rawMaterialListbox")
+	public void selectRawMaterial() {
+		if(rawMaterialListModel.isSelectionEmpty()){
 			//just in case for the no selection
-			currentSupply = null;
+			currentRawMaterial = null;
 		} else {
-			if(currentSupply == null) {// permite la seleccion solo si no existe nada seleccionado
-				currentSupply = supplyListModel.getSelection().iterator().next();
-				currentSupplyType = supplyTypeService.getSupplyType(currentSupply.getIdSupplyType());
-				refreshViewSupply();
+			if(currentRawMaterial == null) {// permite la seleccion solo si no existe nada seleccionado
+				currentRawMaterial = rawMaterialListModel.getSelection().iterator().next();
+				currentRawMaterialType = rawMaterialTypeService.getRawMaterialType(currentRawMaterial.getIdRawMaterialType());
+				refreshViewRawMaterial();
 			}
 		}
-		supplyListModel.clearSelection();
+		rawMaterialListModel.clearSelection();
 	}
   	
-  	@Listen("onClick = #cancelSupplyButton")
-    public void cancelSupply() {
-    	currentSupply = null;
-    	refreshViewSupply();
+  	@Listen("onClick = #cancelRawMaterialButton")
+    public void cancelRawMaterial() {
+    	currentRawMaterial = null;
+    	refreshViewRawMaterial();
     }
   	
-  	@Listen("onClick = #resetSupplyButton")
-    public void resetSupply() {
-  		refreshViewSupply();
+  	@Listen("onClick = #resetRawMaterialButton")
+    public void resetRawMaterial() {
+  		refreshViewRawMaterial();
   	}
   	
-  	@Listen("onClick = #deleteSupplyButton")
-    public void deleteSupply() {
-  		if(currentSupply != null) {
-  			Messagebox.show("Esta seguro que desea eliminar " + supplyTypeService.getSupplyType(currentSupply.getIdSupplyType()).getDescription() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+  	@Listen("onClick = #deleteRawMaterialButton")
+    public void deleteRawMaterial() {
+  		if(currentRawMaterial != null) {
+  			Messagebox.show("Esta seguro que desea eliminar " + rawMaterialTypeService.getRawMaterialType(currentRawMaterial.getIdRawMaterialType()).getName() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
   			    public void onEvent(Event evt) throws InterruptedException {
   			        if (evt.getName().equals("onOK")) {
-  			        	if(currentSupply.getId() != null) {// si el detalle existe en la bd
-  			        		lateDeleteSupplyList.add(currentSupply);// agregamos a la lista de eliminacion tardia que se realiza al grabar definitivamente
+  			        	if(currentRawMaterial.getId() != null) {// si el detalle existe en la bd
+  			        		lateDeleteRawMaterialList.add(currentRawMaterial);// agregamos a la lista de eliminacion por las dudas que se vuelva a agregar
   			        	}
-  			        	supplyList.remove(currentSupply);// quitamos de la lista
-  			        	currentSupply = null;// eliminamos
-  			        	refreshSupplyTypePopup();// actualizamos el popup para que aparezca el insumo eliminado
-  			        	refreshViewSupply();
-  			            //alert("Insumo eliminado.");
+  			        	rawMaterialList.remove(currentRawMaterial);// quitamos de la lista
+  			        	currentRawMaterial = null;// eliminamos
+  			        	refreshRawMaterialTypePopup();// actualizamos el popup para que aparezca vuelva a aparecer el eliminado
+  			        	refreshViewRawMaterial();
   			        }
   			    }
   			});
   		} 
   	}
   	
-  	@Listen("onClick = #saveSupplyButton")
-    public void saveSupply() {
-		if(supplyQuantityDoublebox.getValue()==null || supplyQuantityDoublebox.getValue()<=0) {
-			Clients.showNotification("Ingresar Cantidad del Insumo", supplyQuantityDoublebox);
+  	@Listen("onClick = #saveRawMaterialButton")
+    public void saveRawMaterial() {
+		if(rawMaterialQuantityDoublebox.getValue()==null || rawMaterialQuantityDoublebox.getValue()<=0) {
+			Clients.showNotification("Ingresar Cantidad de la Materia Prima", rawMaterialQuantityDoublebox);
 			return;
 		}
-		if(currentSupplyType == null) {
-			Clients.showNotification("Debe seleccionar un Insumo", supplyTypeBandbox);
+		if(currentRawMaterialType == null) {
+			Clients.showNotification("Debe seleccionar una Materia Prima", rawMaterialTypeBandbox);
 			return;
 		}
 		// buscamos si no esta eliminado
-		Supply aux = null;
-		for(Supply lateDeleteSupply : lateDeleteSupplyList) {
-			if(currentSupplyType.getId().equals(lateDeleteSupply.getIdSupplyType())) {
-				aux = lateDeleteSupply;
+		RawMaterial aux = null;
+		for(RawMaterial lateDeleteRawMaterial : lateDeleteRawMaterialList) {
+			if(currentRawMaterialType.getId().equals(lateDeleteRawMaterial.getId())) {
+				aux = lateDeleteRawMaterial;
 			}
 		}
 		if(aux != null) {
-			lateDeleteSupplyList.remove(aux);// lo eliminamos de la lista de eliminacion tardia porque el sera agregado nuevamente
+			lateDeleteRawMaterialList.remove(aux);// lo eliminamos de la lista de eliminacion tardia porque el sera agregado nuevamente
 		}
-		int supplyTypeId = currentSupplyType.getId();
-		double supplyQuantity = supplyQuantityDoublebox.getValue();
-		if(currentSupply == null) { // es nuevo
+		int rawMaterialTypeId = currentRawMaterialType.getId();
+		double rawMaterialQuantity = rawMaterialQuantityDoublebox.getValue();
+		if(currentRawMaterial == null) { // es nuevo
 			if(aux != null) {// si ya estaba en un detalle
-				aux.setQuantity(supplyQuantity);;
-				supplyList.add(aux);
+				aux.setQuantity(rawMaterialQuantity);;
+				rawMaterialList.add(aux);
 			} else {
 				// se crea un detalle sin id porque recien se le asignara uno al momento de grabarse definitivamente
-				currentSupply = new Supply(null, null, supplyTypeId, supplyQuantity);
-				supplyList.add(currentSupply);
+				currentRawMaterial = new RawMaterial(null, null, rawMaterialTypeId, rawMaterialQuantity);
+				rawMaterialList.add(currentRawMaterial);
 			}
 		} else { // se edita
-			currentSupply.setIdSupplyType(supplyTypeId);;
-			currentSupply.setQuantity(supplyQuantity);
-			updateSupplyList(currentSupply);// actualizamos la lista
+			currentRawMaterial.setIdRawMaterialType(rawMaterialTypeId);;
+			currentRawMaterial.setQuantity(rawMaterialQuantity);
+			updateRawMaterialList(currentRawMaterial);// actualizamos la lista
 		}
-		refreshSupplyTypePopup();// actualizamos el popup
-		currentSupply = null;
-		refreshViewSupply();
+		refreshRawMaterialTypePopup();// actualizamos el popup
+		currentRawMaterial = null;
+		refreshViewRawMaterial();
     }
   	
-  	private  Supply updateSupplyList(Supply supply) {
-		if(supply.getId() == null) {
-			throw new IllegalArgumentException("can't update a null-id Supply");
+  	private RawMaterial updateRawMaterialList(RawMaterial rawMaterial) {
+		if(rawMaterial.getId() == null) {
+			throw new IllegalArgumentException("can't update a null-id RawMaterial");
 		} else {
-			supply = Supply.clone(supply);
-			int size = supplyList.size();
+			rawMaterial = RawMaterial.clone(rawMaterial);
+			int size = rawMaterialList.size();
 			for(int i = 0; i < size; i++) {
-				Supply t = supplyList.get(i);
-				if(t.getIdSupplyType().equals(supply.getIdSupplyType())) {
-					supplyList.set(i, supply);
-					return supply;
+				RawMaterial t = rawMaterialList.get(i);
+				if(t.getIdRawMaterialType().equals(rawMaterial.getIdRawMaterialType())) {
+					rawMaterialList.set(i, rawMaterial);
+					return rawMaterial;
 				}
 			}
-			throw new RuntimeException("Supply not found " + supply.getId());
+			throw new RuntimeException("RawMaterial not found " + rawMaterial.getId());
 		}
 	}
   	
-  	public SupplyType getSupplyType(int idSupplyType) {
-    	return supplyTypeService.getSupplyType(idSupplyType);
+  	public RawMaterialType getRawMaterialType(int idRawMaterialType) {
+    	return rawMaterialTypeService.getRawMaterialType(idRawMaterialType);
+    }
+  	
+  	public String getMeasureUnitName(int idMeasureUnit) {
+    	if(measureUnitService.getMeasureUnit(idMeasureUnit) != null) {
+    		return measureUnitService.getMeasureUnit(idMeasureUnit).getName();
+    	} else {
+    		return "[Sin Unidad de Medida]";
+    	}
     }
 }

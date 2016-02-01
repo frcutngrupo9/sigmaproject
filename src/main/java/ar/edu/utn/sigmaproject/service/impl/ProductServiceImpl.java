@@ -6,10 +6,12 @@ import java.util.List;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.domain.RawMaterial;
 import ar.edu.utn.sigmaproject.domain.Supply;
 import ar.edu.utn.sigmaproject.service.PieceService;
 import ar.edu.utn.sigmaproject.service.ProcessService;
 import ar.edu.utn.sigmaproject.service.ProductService;
+import ar.edu.utn.sigmaproject.service.RawMaterialService;
 import ar.edu.utn.sigmaproject.service.SupplyService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
@@ -132,13 +134,20 @@ public class ProductServiceImpl implements ProductService {
 		return product;
 	}
 	
-	public synchronized Product saveProduct(Product product, List<Piece> pieceList, List<Process> processList, List<Supply> supplyList) {
+	public synchronized Product saveProduct(Product product, List<Piece> pieceList, List<Process> processList, List<Supply> supplyList, List<RawMaterial> rawMaterialList) {
 		product = saveProduct(product, pieceList, processList);
 		SupplyService supplyService = new SupplyServiceImpl();
 		if(supplyList != null && supplyList.isEmpty() == false) {// se guardan los insumos
     		for(int i = 0; i < supplyList.size(); i++) {
     			supplyList.get(i).setIdProduct(product.getId());// se le asigna el id del producto
     			supplyService.saveSupply(supplyList.get(i));
+    		}
+    	}
+		RawMaterialService rawMaterialService = new RawMaterialServiceImpl();
+		if(rawMaterialList != null && rawMaterialList.isEmpty() == false) {// se guardan las materias primas
+    		for(int i = 0; i < rawMaterialList.size(); i++) {
+    			rawMaterialList.get(i).setIdProduct(product.getId());// se le asigna el id del producto
+    			rawMaterialService.saveRawMaterial(rawMaterialList.get(i));
     		}
     	}
 		return product;
@@ -198,12 +207,12 @@ public class ProductServiceImpl implements ProductService {
 		return product;
 	}
 	
-	public synchronized Product updateProduct(Product product, List<Piece> pieceList, List<Process> processList, List<Supply> supplyList) {
+	public synchronized Product updateProduct(Product product, List<Piece> pieceList, List<Process> processList, List<Supply> supplyList, List<RawMaterial> rawMaterialList) {
 		product = updateProduct(product, pieceList, processList);
 		if(supplyList != null) {
 			// primero eliminamos los insumos que estan en el service, pero que no existen mas en el producto
 			SupplyService supplyService = new SupplyServiceImpl();
-			List<Supply> completeSupplyList = supplyService.getSupplyList();
+			List<Supply> completeSupplyList = supplyService.getSupplyList(product.getId());
             for(Supply auxSupply:completeSupplyList) {// recorremos la lista completa de insumos que estan en el servicio
             	Supply aux = searchSupply(auxSupply.getId(), supplyList);
                 if(aux == null) {// si el insumo no esta en la lista se debe eliminar del service
@@ -220,13 +229,33 @@ public class ProductServiceImpl implements ProductService {
 				}
     		}
 		}
+		if(rawMaterialList != null) {
+			// primero eliminamos las materias primas que estan en el service, pero que no existen mas en el producto
+			RawMaterialService rawMaterialService = new RawMaterialServiceImpl();
+			List<RawMaterial> completeRawMaterialList = rawMaterialService.getRawMaterialList(product.getId());
+            for(RawMaterial auxRawMaterial:completeRawMaterialList) {// recorremos la lista completa de insumos que estan en el servicio
+            	RawMaterial aux = searchRawMaterial(auxRawMaterial.getId(), rawMaterialList);
+                if(aux == null) {// si la materia prima no esta en la lista se debe eliminar del service
+                	rawMaterialService.deleteRawMaterial(auxRawMaterial);
+                }
+            }
+			// ahora recorremos la lista para actualizar las materias primas que ya existen o agregar los que no
+			for(int i = 0; i < rawMaterialList.size(); i++) {
+				if(rawMaterialList.get(i).getId() == null) {// es una nueva materia prima, se guarda
+					rawMaterialList.get(i).setIdProduct(product.getId());// se le asigna el id del producto
+					rawMaterialService.saveRawMaterial(rawMaterialList.get(i));
+				} else {// se actualiza
+					rawMaterialService.updateRawMaterial(rawMaterialList.get(i));
+				}
+    		}
+		}
 		return product;
 	}
 	
-	private synchronized Piece searchPiece(Integer idPiece, List<Piece> pieceList) {
-  		int size = pieceList.size();
+	private synchronized Piece searchPiece(Integer idPiece, List<Piece> list) {
+  		int size = list.size();
   		for(int i = 0; i < size; i++) {
-  			Piece t = pieceList.get(i);
+  			Piece t = list.get(i);
   			if(t.getId().equals(idPiece)) {
   				return Piece.clone(t);
   			}
@@ -245,12 +274,23 @@ public class ProductServiceImpl implements ProductService {
   		return null;
     }
 	
-	private synchronized Supply searchSupply(Integer idSupply, List<Supply> supplyList) {
-  		int size = supplyList.size();
+	private synchronized Supply searchSupply(Integer idSupply, List<Supply> list) {
+  		int size = list.size();
   		for(int i = 0; i < size; i++) {
-  			Supply t = supplyList.get(i);
-  			if(t.getId().equals(idSupply)) {
+  			Supply t = list.get(i);
+  			if(t.getId() != null && t.getId().equals(idSupply)) {
   				return Supply.clone(t);
+  			}
+  		}
+  		return null;
+    }
+	
+	private synchronized RawMaterial searchRawMaterial(Integer idRawMaterial, List<RawMaterial> list) {
+  		int size = list.size();
+  		for(int i = 0; i < size; i++) {
+  			RawMaterial t = list.get(i);
+  			if(t.getId() != null && t.getId().equals(idRawMaterial)) {
+  				return RawMaterial.clone(t);
   			}
   		}
   		return null;
