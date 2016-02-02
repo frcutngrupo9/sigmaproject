@@ -11,15 +11,15 @@
 		</auxhead>
         <columns>
         	<column width="40px" />
-            <column label="Id" width="40px" />
-            <column label="Numero"/>
-            <column label="Cliente"/>
-            <column label="Fecha"/>
-            <column label="Cantidad Productos"/>
-            <column label="Estado"/>
-            <column label="Monto Total"/>
-            <column label="Editar" width="120px" />
-            <column label="Cancelar" width="120px" />
+            <column label="Id" width="40px" align="center"/>
+            <column label="Numero" align="center"/>
+            <column label="Cliente" align="center"/>
+            <column label="Fecha" align="center"/>
+            <column label="Cantidad Productos" align="center"/>
+            <column label="Estado" align="center"/>
+            <column label="Monto Total" align="center"/>
+            <column label="Editar" width="120px" align="center"/>
+            <column label="Cancelar" width="120px" align="center"/>
         </columns>
         <template name="model">
             <row>

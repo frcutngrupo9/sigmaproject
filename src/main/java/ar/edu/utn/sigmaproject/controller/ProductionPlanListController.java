@@ -104,9 +104,17 @@ public class ProductionPlanListController  extends SelectorComposer<Component>{
 	
 	@Listen("onGenerateProductionOrder = #productionPlanGrid")
     public void goToProductionOrderCreation(ForwardEvent evt) {
-    	int idProductionPlan = (Integer) evt.getData();
-    	Executions.getCurrent().setAttribute("selected_production_plan", productionPlanService.getProductionPlan(idProductionPlan));
+		ProductionPlan productionPlan = (ProductionPlan) evt.getData();
+    	Executions.getCurrent().setAttribute("selected_production_plan", productionPlan);
         Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
     	include.setSrc("/production_order_creation.zul");
+    }
+	
+	@Listen("onOpenRequirementPlan = #productionPlanGrid")
+    public void goToRequirementPlanCreation(ForwardEvent evt) {
+		ProductionPlan productionPlan = (ProductionPlan) evt.getData();
+    	Executions.getCurrent().setAttribute("selected_production_plan", productionPlan);
+        Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
+    	include.setSrc("/requirement_plan_creation.zul");
     }
 }

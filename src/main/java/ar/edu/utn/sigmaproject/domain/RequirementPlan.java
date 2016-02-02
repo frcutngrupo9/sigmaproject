@@ -8,13 +8,11 @@ public class RequirementPlan implements Serializable, Cloneable {
 	
 	Integer id;
 	Integer idProductionPlan;
-	Date date;
 	Date fulfilledDate;
 
-	public RequirementPlan(Integer id, Integer idProductionPlan, Date date, Date fulfilledDate) {
+	public RequirementPlan(Integer id, Integer idProductionPlan, Date fulfilledDate) {
 		this.id = id;
 		this.idProductionPlan = idProductionPlan;
-		this.date = date;
 		this.fulfilledDate = fulfilledDate;
 	}
 	
@@ -32,14 +30,6 @@ public class RequirementPlan implements Serializable, Cloneable {
 
 	public void setIdProductionPlan(Integer idProductionPlan) {
 		this.idProductionPlan = idProductionPlan;
-	}
-
-	public Date getDate() {
-		return date;
-	}
-
-	public void setDate(Date date) {
-		this.date = date;
 	}
 
 	public Date getFulfilledDate() {

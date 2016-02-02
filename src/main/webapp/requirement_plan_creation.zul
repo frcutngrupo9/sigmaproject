@@ -1,0 +1,71 @@
+<window id="win_requirement_plan_creation" apply="ar.edu.utn.sigmaproject.controller.RequirementPlanCreationController" width="95%" style="background:white">
+    <panel title="Plan de Requerimiento de Materiales" id="requirementPlanCreationBlock" border="rounded">
+        <panelchildren>
+            <vlayout>
+            	<separator/>
+            	<hlayout>
+            		<label value="Nombre Plan de Produccion: "/>
+					<textbox id="productionPlanNameTextbox" width="180px"/>
+				</hlayout>
+            	<hlayout>
+            		<label value="Fecha Plan de Produccion: "/>
+					<datebox id="productionPlanDatebox" cols="12" format="dd-MM-yyyy"/>
+            	</hlayout>
+            	<hlayout>
+            		<label value="Fecha Abastecimiento: "/>
+					<datebox id="fulfilledDateDatebox" cols="12" format="dd-MM-yyyy"/>
+            	</hlayout>
+                <separator/>
+    			<listbox id="rawMaterialRequirementListbox" sizedByContent="true" span="true">
+    				<auxhead>
+						<auxheader label="Requerimiento de Materias Primas" colspan="4"/>
+					</auxhead>
+        			<listhead>
+        				<listheader label="Materia Prima"/>
+		                <listheader label="Cantidad Necesaria"/>
+		                <listheader label="Stock Actual"/>
+		                <listheader label="Esta Abastecido?"/>
+		            </listhead>
+		            <template name="model">
+		                <listitem>
+		                	<listcell label="${win_requirement_plan_creation$composer.getRawMaterial(each.idRawMaterialType).name}"/>
+		                    <listcell label="${each.quantity}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialStock(each.idRawMaterialType)}"/>
+		                    <listcell>
+			                    <checkbox inplace="true" value="${each.isFulfilled}" forward="onChange=rawMaterialRequirementListbox.onFulfillRawMaterialRequirement(${each})"/>
+			                </listcell>
+						</listitem>
+		            </template>
+    			</listbox>
+    			<separator/>
+    			<listbox id="supplyRequirementListbox" sizedByContent="true" span="true">
+    				<auxhead>
+						<auxheader label="Requerimiento de Insumos" colspan="7"/>
+					</auxhead>
+        			<listhead>
+        				<listheader label="Insumo"/>
+		            	<listheader label="Codigo"/>
+			            <listheader label="Detalles"/>
+			            <listheader label="Medida"/>
+			            <listheader label="Cantidad Necesaria"/>
+		                <listheader label="Stock Actual"/>
+		                <listheader label="Esta Abastecido?"/>
+		            </listhead>
+		            <template name="model">
+		                <listitem>
+		                	<listcell label="${win_requirement_plan_creation$composer.getSupply(each.idSupplyType).description}"/>
+		                	<listcell label="${win_requirement_plan_creation$composer.getSupply(each.idSupplyType).code}"/>
+		                	<listcell label="${win_requirement_plan_creation$composer.getSupply(each.idSupplyType).details}"/>
+		                	<listcell label="${win_requirement_plan_creation$composer.getSupply(each.idSupplyType).measure}"/>
+		                    <listcell label="${each.quantity}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyStock(each.idSupplyType)}"/>
+		                    <listcell>
+			                    <checkbox inplace="true" value="${each.isFulfilled}" forward="onChange=supplyRequirementListbox.onFulfillSupplyRequirement(${each})"/>
+			                </listcell>
+						</listitem>
+		            </template>
+    			</listbox>
+            </vlayout>
+        </panelchildren>
+    </panel>
+</window>

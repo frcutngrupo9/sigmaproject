@@ -10,12 +10,12 @@
 			<auxheader label="Productos" colspan="6"/>
 		</auxhead>
         <listhead>
-        	<listheader label="Id"/>
+        	<listheader label="Id" align="center"/>
             <listheader label="Codigo"/>
             <listheader label="Descripcion"/>
-            <listheader label="Stock Actual"/>
-            <listheader label="Stock Minimo"/>
-            <listheader label="Stock Reposicion"/>
+            <listheader label="Stock Actual" align="center"/>
+            <listheader label="Stock Minimo" align="center"/>
+            <listheader label="Stock Reposicion" align="center"/>
         </listhead>
         <template name="model">
             <listitem>

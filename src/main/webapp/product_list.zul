@@ -16,7 +16,7 @@
             <column label="Nombre" align="center"/>
             <column label="Detalles" align="center"/>
             <column label="Precio" align="center"/>
-            <column label="Editar" width="100px" />
+            <column label="Editar" width="100px" align="center"/>
         </columns>
         <template name="model">
             <row>

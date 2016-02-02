@@ -9,7 +9,7 @@
 				</hlayout>
             	<hlayout>
             		<label value="Fecha Plan de Produccion: "/>
-					<datebox id="productionPlanDateBox" cols="12" format="dd-MM-yyyy"/>
+					<datebox id="productionPlanDatebox" cols="12" format="dd-MM-yyyy"/>
             	</hlayout>
                 <separator/>
     			<listbox id="productionOrderListbox" sizedByContent="true" span="true">
@@ -23,7 +23,7 @@
 		                <listheader label="Nombre Producto"/>
 		                <listheader label="Unidades"/>
 		                <listheader label="Empleado Asignado"/>
-		                <listheader label="Fecha"/>
+		                <listheader label="Fecha Inicio"/>
 		                <listheader label="Fecha Finalizado"/>
 		            </listhead>
 		            <template name="model">
@@ -32,8 +32,8 @@
                     		<listcell>
 	                        	<textbox inplace="true" value="${each.number}" forward="onChange=productionOrderListbox.onEditProductionOrderNumber(${each})" width="180px"/>
                     		</listcell>
-		                	<listcell label="${win_production_order_creation$composer.getProductCode(each.idProduct)}"/>
-		                    <listcell label="${win_production_order_creation$composer.getProductName(each.idProduct)}"/>
+		                	<listcell label="${win_production_order_creation$composer.getProduct(each.idProduct).code}"/>
+		                    <listcell label="${win_production_order_creation$composer.getProduct(each.idProduct).name}"/>
 		                    <listcell label="${each.units}"/>
 		                    <listcell label="${win_production_order_creation$composer.getWorkerName(each.idWorker)}"/>
 		                    <listcell label="${each.date}"/>

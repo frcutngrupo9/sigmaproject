@@ -5,20 +5,21 @@
         <button id="searchButton" label="Buscar"/>
     </hlayout>
     <separator/>
-    <grid id="productionPlanGrid" mold="paging" pageSize="7">
+    <grid id="productionPlanGrid" mold="paging" pageSize="7" sizedByContent="true" span="true">
     	<auxhead>
-			<auxheader label="Planes de Produccion" colspan="9"/>
+			<auxheader label="Planes de Produccion" colspan="10"/>
 		</auxhead>
         <columns>
         	<column width="40px" />
-        	<column label="Id"/>
-            <column label="Nombre"/>
-            <column label="Fecha Creacion"/>
-            <column label="Cantidad Pedidos"/>
-            <column label="Cantidad Productos"/>
-            <column label="Estado"/>
-            <column label="Editar" width="120px" />
-            <column width="120px" />
+        	<column label="Id" align="center"/>
+            <column label="Nombre" align="center"/>
+            <column label="Fecha Creacion" align="center"/>
+            <column label="Cantidad Pedidos" align="center"/>
+            <column label="Cantidad Productos" align="center"/>
+            <column label="Estado" align="center"/>
+            <column label="Editar" align="center"/>
+            <column label="Generar" align="center"/>
+            <column label="Abrir" align="center"/>
         </columns>
         <template name="model">
             <row>
@@ -35,7 +36,8 @@
                 <label value="${win_production_plan_list$composer.getQuantityOfProduct(each.id)}"/>
                 <label value="${win_production_plan_list$composer.getProductionPlanStateName(each.id)}"/>
                 <button forward="onClick=productionPlanGrid.onEditProductionPlan(${each.id})"  image="/img/edit16x16.png"/>
-                <button forward="onClick=productionPlanGrid.onGenerateProductionOrder(${each.id})" label="Ordenes" />
+                <button forward="onClick=productionPlanGrid.onGenerateProductionOrder(${each})" label="Listado de Ordenes" />
+                <button forward="onClick=productionPlanGrid.onOpenRequirementPlan(${each})" label="Plan de Requerimiento de Materiales" />
             </row>
         </template>
     </grid>

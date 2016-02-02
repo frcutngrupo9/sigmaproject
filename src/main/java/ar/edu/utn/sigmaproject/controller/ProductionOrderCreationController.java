@@ -15,6 +15,7 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Spinner;
 import org.zkoss.zul.Textbox;
 
+import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductTotal;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
@@ -34,7 +35,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	@Wire
 	Textbox productionPlanNameTextbox;
 	@Wire
-    Datebox productionPlanDateBox;
+    Datebox productionPlanDatebox;
 	@Wire
     Listbox productionOrderListbox;
 	
@@ -85,20 +86,16 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 	private void refreshView() {
 		productionPlanNameTextbox.setDisabled(true);
-		productionPlanDateBox.setDisabled(true);
+		productionPlanDatebox.setDisabled(true);
 		if(currentProductionPlan != null) {
 			productionPlanNameTextbox.setText(currentProductionPlan.getName());
-			productionPlanDateBox.setValue(currentProductionPlan.getDate());
+			productionPlanDatebox.setValue(currentProductionPlan.getDate());
 		}
 		
 	}
 	
-	public String getProductName(int idProduct) {
-    	return productService.getProduct(idProduct).getName();
-    }
-    
-    public String getProductCode(int idProduct) {
-    	return productService.getProduct(idProduct).getCode();
+	public Product getProduct(int idProduct) {
+    	return productService.getProduct(idProduct);
     }
     
     public String getProductUnits(int idProduct) {
