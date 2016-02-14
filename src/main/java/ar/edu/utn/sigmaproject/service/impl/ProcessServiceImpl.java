@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.Process;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.service.ProcessService;
+import ar.edu.utn.sigmaproject.service.ProductionOrderDetailService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
 public class ProcessServiceImpl implements ProcessService {
@@ -36,6 +38,16 @@ public class ProcessServiceImpl implements ProcessService {
 		List<Process> list = new ArrayList<Process>();
 		for(Process process:processList) {
 			if(process.getIdPiece().equals(idPiece) && process.isClone() == false) {
+				list.add(Process.clone(process));
+			}
+		}
+		return list;
+	}
+	
+	public synchronized List<Process> getCompleteProcessList(Integer idPiece) {// devuelve tambien procesos clones
+		List<Process> list = new ArrayList<Process>();
+		for(Process process:processList) {
+			if(process.getIdPiece().equals(idPiece)) {
 				list.add(Process.clone(process));
 			}
 		}
@@ -84,6 +96,10 @@ public class ProcessServiceImpl implements ProcessService {
 			for(int i = 0; i < size; i++) {
 				Process t = processList.get(i);
 				if(t.getId().equals(process.getId())) {
+					if(isInsideProductionOrder(process.getId())) {
+						// debemos clonar el proceso y asignar el detalle de la orden de produccion al clon
+						cloneAndAssignToProductionOrder(process);
+					}
 					processList.set(i, process);
 					serializator.grabarLista(processList);
 					return process;
@@ -99,6 +115,10 @@ public class ProcessServiceImpl implements ProcessService {
 			for(int i = 0; i < size; i++) {
 				Process t = processList.get(i);
 				if(t.getId().equals(process.getId())) {
+					if(isInsideProductionOrder(process.getId())) {
+						// debemos clonar el proceso y asignar el detalle de la orden de produccion al clon
+						cloneAndAssignToProductionOrder(process);
+					}
 					processList.remove(i);
 					serializator.grabarLista(processList);
 					return;
@@ -129,6 +149,27 @@ public class ProcessServiceImpl implements ProcessService {
 		Process aux = new Process(null, other.getIdPiece(), other.getIdProcessType(), other.getDetails(), other.getTime());
 		aux.setClone(true);
 		return aux;
+	}
+	
+	private boolean isInsideProductionOrder(Integer id) {
+		ProductionOrderDetailService productionOrderDetailService = new ProductionOrderDetailServiceImpl();
+		List<ProductionOrderDetail> productionOrderDetailList = productionOrderDetailService.getProductionOrderDetailListByProcessId(id);
+		boolean value = false;
+		if(productionOrderDetailList.size() >= 1) {
+			value = true;// existe en por lo menos 1 detalle
+		}
+		return value;
+	}
+	
+	private void cloneAndAssignToProductionOrder(Process process) {
+		Process clone = generateClone(process);
+		clone = saveProcess(clone);// para que devuelva un proceso con id agregado
+		ProductionOrderDetailService productionOrderDetailService = new ProductionOrderDetailServiceImpl();
+		List<ProductionOrderDetail> productionOrderDetailList = productionOrderDetailService.getProductionOrderDetailListByProcessId(process.getId());
+		for(ProductionOrderDetail productionOrderDetail:productionOrderDetailList) {
+			productionOrderDetail.setIdProcess(clone.getId());// asignamos la referencia al clon
+			productionOrderDetailService.updateProductionOrderDetail(productionOrderDetail);// actualizamos el detalle
+		}
 	}
 	
 }

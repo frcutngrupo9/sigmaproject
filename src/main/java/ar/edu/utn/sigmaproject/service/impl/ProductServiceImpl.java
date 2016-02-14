@@ -32,7 +32,9 @@ public class ProductServiceImpl implements ProductService {
 	public synchronized List<Product> getProductList() {
 		List<Product> list = new ArrayList<Product>();
 		for(Product product:productList){
-			list.add(Product.clone(product));
+			if(product.isClone() == false) {// se devuelven solo los que no sean clones
+				list.add(Product.clone(product));
+			}
 		}
 		return list;
 	}
@@ -295,5 +297,4 @@ public class ProductServiceImpl implements ProductService {
   		}
   		return null;
     }
-
 }

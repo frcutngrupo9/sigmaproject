@@ -1,6 +1,7 @@
 package ar.edu.utn.sigmaproject.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.Worker;
@@ -92,7 +93,7 @@ public class WorkerServiceImpl implements WorkerService {
         return lastId + 1;
     }
 
-	public Worker getWorker(String name) {
+	public synchronized Worker getWorker(String name) {
 		int size = workerList.size();
         for(int i=0; i<size; i++) {
         	Worker t = workerList.get(i);

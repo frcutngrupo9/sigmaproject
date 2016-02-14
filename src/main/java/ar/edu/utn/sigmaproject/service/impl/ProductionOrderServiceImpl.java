@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
+import ar.edu.utn.sigmaproject.service.ProductionOrderDetailService;
 import ar.edu.utn.sigmaproject.service.ProductionOrderService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
@@ -100,6 +102,28 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         	}
         }
         return list;
+	}
+
+	public ProductionOrder updateProductionOrder(
+			ProductionOrder productionOrder,
+			List<ProductionOrderDetail> productionOrderDetailList) {
+		ProductionOrderDetailService productionOrderDetailService = new ProductionOrderDetailServiceImpl();
+		productionOrder = updateProductionOrder(productionOrder);
+		for(ProductionOrderDetail productionOrderDetail:productionOrderDetailList) {
+			productionOrderDetailService.updateProductionOrderDetail(productionOrderDetail);
+		}
+		return productionOrder;
+	}
+
+	public ProductionOrder saveProductionOrder(ProductionOrder productionOrder,
+			List<ProductionOrderDetail> productionOrderDetailList) {
+		ProductionOrderDetailService productionOrderDetailService = new ProductionOrderDetailServiceImpl();
+		productionOrder = saveProductionOrder(productionOrder);// devuelve con id agregado
+		for(ProductionOrderDetail productionOrderDetail:productionOrderDetailList) {
+			productionOrderDetail.setIdProductionOrder(productionOrder.getId());
+			productionOrderDetailService.saveProductionOrderDetail(productionOrderDetail);
+		}
+		return productionOrder;
 	}
 
 }

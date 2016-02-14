@@ -1,0 +1,20 @@
+<zk>
+    <grid model="${arg.processes}" sizedByContent="true" span="true">
+        <columns>
+        	<column label="Id" align="center"/>
+            <column label="Proceso" align="center"/>
+            <column label="Pieza" align="center"/>
+            <column label="Detalles" align="center"/>
+            <column label="Tiempo" align="center"/>
+        </columns>
+        <template name="model">
+            <row>
+                <label value="${each.idProcessType}"/>
+            	<label value="${win_production_order_list$composer.getProcessType(each.idProcessType).name}"/>
+            	<label value="${win_production_order_list$composer.getPiece(each.idPiece).name}"/>
+            	<label value="${each.details}"/>
+            	<label value="${win_production_order_list$composer.getFormatedTime(each.time)}"/>
+            </row>
+        </template>
+    </grid>
+</zk>

@@ -2,19 +2,23 @@ package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
 
+import javax.xml.datatype.Duration;
+
 public class ProductionOrderDetail implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 	
 	Integer idProductionOrder;
 	Integer idProcess;
-	Integer quantityTotal;
+	Duration timeTotal;
+	Integer quantityPiece;
 	Double quantityFinished;
 	boolean isFinished;
 
-	public ProductionOrderDetail(Integer idProductionOrder, Integer idProcess, Integer quantityTotal) {
+	public ProductionOrderDetail(Integer idProductionOrder, Integer idProcess, Duration timeTotal, Integer quantityPiece) {
 		this.idProductionOrder = idProductionOrder;
 		this.idProcess = idProcess;
-		this.quantityTotal = quantityTotal;
+		this.timeTotal = timeTotal;
+		this.quantityPiece = quantityPiece;
 		quantityFinished = 0.0; 
 		isFinished = false;
 	}
@@ -35,12 +39,20 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 		this.idProcess = idProcess;
 	}
 
-	public Integer getQuantityTotal() {
-		return quantityTotal;
+	public Duration getTimeTotal() {
+		return timeTotal;
 	}
 
-	public void setQuantityTotal(Integer quantityTotal) {
-		this.quantityTotal = quantityTotal;
+	public void setTimeTotal(Duration timeTotal) {
+		this.timeTotal = timeTotal;
+	}
+
+	public Integer getQuantityPiece() {
+		return quantityPiece;
+	}
+
+	public void setQuantityPiece(Integer quantityPiece) {
+		this.quantityPiece = quantityPiece;
 	}
 
 	public Double getQuantityFinished() {

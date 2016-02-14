@@ -10,6 +10,8 @@ public interface ProductionOrderDetailService {
 	
 	List<ProductionOrderDetail> getProductionOrderDetailList(Integer idProductionOrder);
 	
+	List<ProductionOrderDetail> getProductionOrderDetailListByProcessId(Integer idProcess);
+	
 	ProductionOrderDetail getProductionOrderDetail(Integer idProductionOrder, Integer idProcess);
 
 	ProductionOrderDetail saveProductionOrderDetail(ProductionOrderDetail productionOrderDetail);

@@ -3,53 +3,64 @@
     <panel title="Plan de Produccion" id="productionPlanCreationBlock" border="rounded">
         <panelchildren>
             <vlayout>
-            	<hlayout>
-            		<label value="Estado: "/>
-                    <selectbox id="productionPlanStateTypeSelectBox">
-                        <template name="model">
-                            <label value="${each.name}" />
-                        </template>
-                    </selectbox>
-                </hlayout>
-            	<hlayout>
-            		<label value="Nombre: "/>
-					<textbox id="productionPlanNameTextbox" width="180px"/>
-				</hlayout>
-            	<hlayout>
-            		<label value="Fecha: "/>
-					<datebox id="productionPlanDateBox" cols="12" format="dd-MM-yyyy"/>
-            	</hlayout>
-            	<hlayout>
-            	   <label value="Pedido: "/>
-                	<bandbox id="orderBandbox" buttonVisible = "true" autodrop = "true">
-    					<bandpopup>
-    						<vbox>
-    							<hbox>
-    								Buscar
-    								<textbox />
-    							</hbox>
-    							<listbox id="orderPopupListbox" width="200px">
-    							<listhead>
-    								<listheader label="Pedido"/>
-    								<listheader label="Cliente"/>
-    								<listheader label="Fecha"/>
-    								<listheader label="Cantidad de Productos"/>
-    							</listhead>
-    							<template name="model">
-    								<listitem>
-    									<listcell label="${each.id}"/>
-    									<listcell label="${win_production_plan_creation$composer.getClientNameByOrderId(each.id)}"/>
-    									<listcell label="${each.date}"/>
-    									<listcell label="${win_production_plan_creation$composer.quantityOfDetail(each.id)}"/>
-    								</listitem>
-    							</template>
-    							</listbox>
-    						</vbox>
-    					</bandpopup>
-    				</bandbox>
-    				<button id="addOrderButton" label="Agregar Pedido"/>
-				</hlayout>
-                <separator/>
+            	<grid hflex="1" sclass="sigma-form">
+                    <columns>
+                        <column align="right" width="30%"/>
+                        <column align="left"/>
+                    </columns>
+                    <rows>
+                    	<row>
+                            <label value="Estado: "/>
+		                    <selectbox id="productionPlanStateTypeSelectBox">
+		                        <template name="model">
+		                            <label value="${each.name}" />
+		                        </template>
+		                    </selectbox>
+                        </row>
+                        <row>
+                            <label value="Nombre Plan de Produccion: "/>
+							<textbox id="productionPlanNameTextbox" width="180px"/>
+                        </row>
+                        <row>
+                            <label value="Fecha Creacion: "/>
+							<datebox id="productionPlanDateBox" cols="12" format="dd-MM-yyyy"/>
+                        </row>
+                        <row>
+                            <label value="Seleccionar Pedido: "/>
+                            <cell style="text-align:left">
+	                    		<hlayout>
+				                	<bandbox id="orderBandbox" buttonVisible = "true" autodrop = "true">
+				    					<bandpopup>
+				    						<vbox>
+				    							<hbox>
+				    								Buscar
+				    								<textbox />
+				    							</hbox>
+				    							<listbox id="orderPopupListbox" width="200px">
+				    							<listhead>
+				    								<listheader label="Pedido"/>
+				    								<listheader label="Cliente"/>
+				    								<listheader label="Fecha"/>
+				    								<listheader label="Cantidad de Productos"/>
+				    							</listhead>
+				    							<template name="model">
+				    								<listitem>
+				    									<listcell label="${each.id}"/>
+				    									<listcell label="${win_production_plan_creation$composer.getClientNameByOrderId(each.id)}"/>
+				    									<listcell label="${each.date}"/>
+				    									<listcell label="${win_production_plan_creation$composer.quantityOfDetail(each.id)}"/>
+				    								</listitem>
+				    							</template>
+				    							</listbox>
+				    						</vbox>
+				    					</bandpopup>
+				    				</bandbox>
+				    				<button id="addOrderButton" label="Agregar Pedido"/>
+								</hlayout>
+			                </cell>
+                        </row>
+                   </rows>
+                </grid>
     			<grid id="productionPlanDetailGrid" mold="paging" pageSize="7">
     				<auxhead>
 						<auxheader label="Pedidos" colspan="6"/>

@@ -96,4 +96,15 @@ public class ProductionOrderDetailServiceImpl implements ProductionOrderDetailSe
     		deleteProductionOrderDetail(delete);
 		}
 	}
+
+	public synchronized List<ProductionOrderDetail> getProductionOrderDetailListByProcessId(
+			Integer idProcess) {
+		List<ProductionOrderDetail> list = new ArrayList<ProductionOrderDetail>();
+		for(ProductionOrderDetail productionPlanDetail:productionOrderDetailList) {
+			if(productionPlanDetail.getIdProcess().equals(idProcess)) {
+				list.add(ProductionOrderDetail.clone(productionPlanDetail));
+			}
+		}
+		return list;
+	}
 }

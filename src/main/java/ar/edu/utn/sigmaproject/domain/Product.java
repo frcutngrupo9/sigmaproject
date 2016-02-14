@@ -11,6 +11,7 @@ public class Product implements Serializable, Cloneable {
 	String details;
     String code;
     BigDecimal price;
+    boolean isClone;
 
 	public Product(Integer id, String code , String name, String details, BigDecimal price) {
 		this.id = id;
@@ -18,6 +19,7 @@ public class Product implements Serializable, Cloneable {
 		this.details = details;
         this.code = code;
         this.price = price;
+        isClone = false;
 	}
 	
 	public void setId(Integer id) {
@@ -58,6 +60,14 @@ public class Product implements Serializable, Cloneable {
 
 	public void setPrice(BigDecimal price) {
 		this.price = price;
+	}
+
+	public boolean isClone() {
+		return isClone;
+	}
+
+	public void setClone(boolean isClone) {
+		this.isClone = isClone;
 	}
 
 	@Override

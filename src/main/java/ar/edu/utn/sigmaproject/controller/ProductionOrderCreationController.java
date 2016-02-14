@@ -1,32 +1,54 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import javax.xml.datatype.Duration;
 
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
+import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.util.Clients;
+import org.zkoss.zul.Button;
+import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Datebox;
+import org.zkoss.zul.Doublebox;
+import org.zkoss.zul.Grid;
+import org.zkoss.zul.Include;
+import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Selectbox;
 import org.zkoss.zul.Spinner;
 import org.zkoss.zul.Textbox;
 
+import ar.edu.utn.sigmaproject.domain.Piece;
+import ar.edu.utn.sigmaproject.domain.Process;
+import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
-import ar.edu.utn.sigmaproject.domain.ProductTotal;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.Worker;
+import ar.edu.utn.sigmaproject.service.PieceService;
+import ar.edu.utn.sigmaproject.service.ProcessService;
+import ar.edu.utn.sigmaproject.service.ProcessTypeService;
 import ar.edu.utn.sigmaproject.service.ProductService;
+import ar.edu.utn.sigmaproject.service.ProductionOrderDetailService;
 import ar.edu.utn.sigmaproject.service.ProductionOrderService;
-import ar.edu.utn.sigmaproject.service.ProductionPlanDetailService;
+import ar.edu.utn.sigmaproject.service.ProductionPlanService;
 import ar.edu.utn.sigmaproject.service.WorkerService;
+import ar.edu.utn.sigmaproject.service.impl.PieceServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.ProcessServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.ProcessTypeServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.ProductionOrderDetailServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductionOrderServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProductionPlanDetailServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.ProductionPlanServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.WorkerServiceImpl;
 
 public class ProductionOrderCreationController extends SelectorComposer<Component> {
@@ -35,100 +57,206 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	@Wire
 	Textbox productionPlanNameTextbox;
 	@Wire
+	Textbox productNameTextbox;
+	@Wire
     Datebox productionPlanDatebox;
 	@Wire
-    Listbox productionOrderListbox;
+	Grid productionOrderDetailGrid;
+	@Wire
+	Spinner productionOrderNumberSpinner;
+	@Wire
+	Intbox productUnitsIntbox;
+	@Wire
+	Selectbox workerSelectbox;
+	@Wire
+	Datebox productionOrderDatebox;
+	@Wire
+	Datebox productionOrderFinishedDatebox;
+	@Wire
+    Button saveButton;
+    @Wire
+    Button cancelButton;
+    @Wire
+    Button resetButton;
 	
 	// services
     private ProductionOrderService productionOrderService = new ProductionOrderServiceImpl();
+    private ProductionOrderDetailService productionOrderDetailService = new ProductionOrderDetailServiceImpl();
+    private ProductionPlanService productionPlanService = new ProductionPlanServiceImpl();
     private ProductService productService = new ProductServiceImpl();
-    private ProductionPlanDetailService productionPlanDetailService = new ProductionPlanDetailServiceImpl();
+    private PieceService pieceService = new PieceServiceImpl();
+    private ProcessService processService = new ProcessServiceImpl();
+    private ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
     private WorkerService workerService = new WorkerServiceImpl();
     
     // atributes
-    private ProductionPlan currentProductionPlan;
+    private ProductionOrder currentProductionOrder;
     
     // list
-    private List<ProductionOrder> productionOrderList;
-    private List<ProductTotal> productTotalList;
+    private List<ProductionOrderDetail> productionOrderDetailList;
+    private List<Worker> workerList;
     
     // list models
-    private ListModelList<ProductionOrder> productionOrderListModel;
+    private ListModelList<ProductionOrderDetail> productionOrderDetailListModel;
+    private ListModelList<Worker> workerListModel;
 	
 	@Override
     public void doAfterCompose(Component comp) throws Exception{
         super.doAfterCompose(comp);
         
-        currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
+        currentProductionOrder = (ProductionOrder) Executions.getCurrent().getAttribute("selected_production_order");
         
-        if(currentProductionPlan != null) {
-        	Integer id_production_plan = currentProductionPlan.getId();
-        	productionOrderList = productionOrderService.getProductionOrderList(id_production_plan);
-        	
-        	if(productionOrderList.isEmpty()) {// se deben crear las ordenes de produccion
-        		ArrayList<ProductTotal> productTotalList = productionPlanDetailService.getProductTotalList(id_production_plan);
-        		for(ProductTotal productTotal : productTotalList) {
-        			Integer id_product = productTotal.getId();
-        			Integer product_units = productTotal.getTotalUnits();
-        			Integer id_worker = null;
-        			productionOrderList.add(new ProductionOrder(null, id_production_plan, id_product, id_worker, null, product_units, null, null));
+        if(currentProductionOrder != null) {
+        	if(currentProductionOrder.getId() == null) {// es una nueva orden de produccion, se deben crear los detalles de orden de produccion
+        		Product product = productService.getProduct(currentProductionOrder.getIdProduct());
+        		List<Process> processList = new ArrayList<Process>();// lista donde se guardaran todos los procesos del producto
+          		List<Piece> auxPieceList = pieceService.getPieceList(product.getId());
+          		for(Piece piece : auxPieceList) {
+          			List<Process> auxProcessList = processService.getProcessList(piece.getId());
+          			for(Process process : auxProcessList) {
+          				processList.add(Process.clone(process));
+        			}
         		}
+          		// por cada proceso hay que crear un detalle de orden de produccion
+          		productionOrderDetailList = new ArrayList<ProductionOrderDetail>(); 
+        		for(Process process : processList) {
+        			Integer idProcess = process.getId();
+        			Integer quantityPiece = currentProductionOrder.getUnits() * pieceService.getPiece(process.getIdPiece()).getUnits();// cantidad total de la pieza
+        			Duration timeTotal = process.getTime().multiply(quantityPiece);// cantidad total de tiempo del proceso
+        			productionOrderDetailList.add(new ProductionOrderDetail(null, idProcess, timeTotal, quantityPiece));
+        		}
+        	} else {// es una orden de produccion ya creada, se buscan sus detalles
+        		productionOrderDetailList = productionOrderDetailService.getProductionOrderDetailList(currentProductionOrder.getId());
         	}
-        	
-        } else {
-        	productionOrderList = new ArrayList<ProductionOrder>();
         }
-        productionOrderListModel = new ListModelList<ProductionOrder>(productionOrderList);
-        productionOrderListbox.setModel(productionOrderListModel);
+        productionOrderDetailListModel = new ListModelList<ProductionOrderDetail>(productionOrderDetailList);
+        
+        workerList = workerService.getWorkerList();
+    	workerListModel = new ListModelList<Worker>(workerList);
+    	workerSelectbox.setModel(workerListModel);
         
         refreshView();
     }
 
 	private void refreshView() {
 		productionPlanNameTextbox.setDisabled(true);
+		productNameTextbox.setDisabled(true);
 		productionPlanDatebox.setDisabled(true);
-		if(currentProductionPlan != null) {
+		productUnitsIntbox.setDisabled(true);
+		
+		productionOrderDetailGrid.setModel(productionOrderDetailListModel);
+		
+		if(currentProductionOrder != null) {
+			if(currentProductionOrder.getId() == null) {// nueva orden de produccion
+				productionOrderNumberSpinner.setValue(getNewProductionOrderNumber());
+				productionOrderDatebox.setValue(new Date());
+			} else {// edicion de orden de produccion
+				productionOrderNumberSpinner.setValue(currentProductionOrder.getNumber());
+				productionOrderDatebox.setValue(currentProductionOrder.getDate());
+			}
+			ProductionPlan currentProductionPlan = productionPlanService.getProductionPlan(currentProductionOrder.getIdProductionPlan());
 			productionPlanNameTextbox.setText(currentProductionPlan.getName());
 			productionPlanDatebox.setValue(currentProductionPlan.getDate());
+			productNameTextbox.setText(productService.getProduct(currentProductionOrder.getIdProduct()).getName());
+			productUnitsIntbox.setValue(currentProductionOrder.getUnits());
+			
+			Integer workerId = currentProductionOrder.getIdWorker();
+        	if(workerId != null) {
+        		Worker aux = workerService.getWorker(workerId);
+        		workerListModel.addToSelection(aux);
+        		workerSelectbox.setModel(workerListModel);
+        	} else {
+        		workerSelectbox.setSelectedIndex(-1);
+        	}
+			productionOrderFinishedDatebox.setValue(currentProductionOrder.getDateFinished());
+			saveButton.setDisabled(false);
+			cancelButton.setDisabled(false);
+			resetButton.setDisabled(false);
 		}
 		
 	}
 	
-	public Product getProduct(int idProduct) {
-    	return productService.getProduct(idProduct);
+	private Integer getNewProductionOrderNumber() {
+		Integer aux = 0;
+		List<ProductionOrder> list = productionOrderService.getProductionOrderList(currentProductionOrder.getIdProductionPlan());
+		for(ProductionOrder each:list) {
+			if(each.getNumber() != null && each.getNumber() > aux) {
+				aux = each.getNumber();
+			}
+		}
+		return aux + 1;
+	}
+
+	@Listen("onClick = #saveButton")
+    public void saveButtonClick() {
+		int selectedIndexWorker = workerSelectbox.getSelectedIndex();
+        if(selectedIndexWorker == -1) {// no hay un empleado seleccionado
+        	Clients.showNotification("Debe seleccionar un Empleado", workerSelectbox);
+			return;
+        }
+        
+        currentProductionOrder.setNumber(productionOrderNumberSpinner.getValue());
+        currentProductionOrder.setIdWorker(workerListModel.getElementAt(workerSelectbox.getSelectedIndex()).getId());
+        currentProductionOrder.setDate(productionOrderDatebox.getValue());
+        currentProductionOrder.setDateFinished(productionOrderFinishedDatebox.getValue());
+        
+        if(currentProductionOrder.getId() == null) {// nueva orden de produccion
+        	currentProductionOrder = productionOrderService.saveProductionOrder(currentProductionOrder, productionOrderDetailList);
+        } else {// se edita
+        	currentProductionOrder = productionOrderService.updateProductionOrder(currentProductionOrder, productionOrderDetailList);
+        }
+        alert("Orden de Produccion Guardada.");
+        cancelButtonClick();// volvemos a la lista de ordenes de produccion
+	}
+	
+	@Listen("onClick = #cancelButton")
+    public void cancelButtonClick() {
+		ProductionPlan currentProductionPlan = productionPlanService.getProductionPlan(currentProductionOrder.getIdProductionPlan());
+    	Executions.getCurrent().setAttribute("selected_production_plan", currentProductionPlan);
+    	Include include = (Include) Selectors.iterable(productionOrderDetailGrid.getPage(), "#mainInclude").iterator().next();
+    	include.setSrc("/production_order_list.zul");
     }
     
-    public String getProductUnits(int idProduct) {
-    	int product_units = 0;
-    	for(ProductTotal productTotal : productTotalList) {
-    		if(productTotal.getId().equals(idProduct)) {
-    			product_units = productTotal.getTotalUnits();
-    		}
-    	}
-    	return "" + product_units;
+    @Listen("onClick = #resetButton")
+    public void resetButtonClick() {
+        refreshView();
     }
     
-    public String getWorkerName(int idWorker) {
-    	Worker aux = workerService.getWorker(idWorker);
-    	if(aux != null) {
-    		return aux.getName();
-    	} else {
-    		return "[sin empleado]";
-    	}
-    }
-    
-    @Listen("onEditProductionOrderNumber = #productionOrderListbox")
-	public void doEditProductionOrderNumber(ForwardEvent evt) {
-    	ProductionOrder data = (ProductionOrder) evt.getData();// obtenemos el objeto pasado por parametro
-    	Spinner element = (Spinner) evt.getOrigin().getTarget();// obtenemos el elemento web
-    	data.setNumber(element.getValue());// cargamos al objeto el valor actualizado del elemento web
-    }
-    
-    @Listen("onEditProductionOrderDate = #productionOrderListbox")
-	public void doEditProductionOrderDate(ForwardEvent evt) {
-    	ProductionOrder data = (ProductionOrder) evt.getData();// obtenemos el objeto pasado por parametro
-    	Datebox element = (Datebox) evt.getOrigin().getTarget();// obtenemos el elemento web
-    	data.setDate(element.getValue());// cargamos al objeto el valor actualizado del elemento web
+    public Process getProcess(int idProcess) {
+    	return processService.getProcess(idProcess);
     }
 	
+    public ProcessType getProcessType(int idProcess) {
+    	return processTypeService.getProcessType(getProcess(idProcess).getIdProcessType());
+    }
+    
+    public String getProcessTime(int idProcess) {
+    	return getFormatedTime(getProcess(idProcess).getTime());
+    }
+    
+    public Piece getPiece(int idPiece) {
+    	return pieceService.getPiece(idPiece);
+    }
+    
+    public Piece getPieceByProcessId(int idProcess) {
+    	return pieceService.getPiece(getProcess(idProcess).getIdPiece());
+    }
+    
+    public String getFormatedTime(Duration time) {
+    	return String.format("Dias: %d Horas: %d Minutos: %d", time.getDays(), time.getHours(), time.getMinutes());
+    }
+    
+    @Listen("onEditProductionOrderDetailQuantityFinished = #productionOrderDetailGrid")
+	public void doEditProductionOrderDetailQuantityFinished(ForwardEvent evt) {
+    	ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
+    	Doublebox element = (Doublebox) evt.getOrigin().getTarget();// obtenemos el elemento web
+    	data.setQuantityFinished(element.getValue());// cargamos al objeto el valor actualizado del elemento web
+    }
+    
+    @Listen("onEditProductionOrderDetailIsFinished = #productionOrderDetailGrid")
+	public void doEditProductionOrderDetailIsFinished(ForwardEvent evt) {
+    	ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
+    	Checkbox element = (Checkbox) evt.getOrigin().getTarget();// obtenemos el elemento web
+    	data.setFinished(element.isChecked());// cargamos al objeto el valor actualizado del elemento web
+    }
 }

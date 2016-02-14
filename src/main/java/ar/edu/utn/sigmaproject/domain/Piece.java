@@ -18,6 +18,7 @@ public class Piece implements Serializable, Cloneable {
 	String size;
 	boolean isGroup;
 	Integer units;
+	boolean isClone;
 
 	public Piece(Integer id, Integer idProduct, String name, BigDecimal length, Integer lengthIdMeasureUnit, BigDecimal depth, Integer depthIdMeasureUnit, BigDecimal width, Integer widthIdMeasureUnit, String size, boolean isGroup, Integer units) {
 		this.id = id;
@@ -32,12 +33,17 @@ public class Piece implements Serializable, Cloneable {
 		this.size = size;
 		this.isGroup = isGroup;
 		this.units = units;
+		isClone = false;
 	}
 
 	public Integer getId() {
 		return id;
 	}
 	
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
 	public Integer getIdProduct() {
 		return idProduct;
 	}
@@ -124,6 +130,14 @@ public class Piece implements Serializable, Cloneable {
 
 	public void setUnits(Integer units) {
 		this.units = units;
+	}
+
+	public boolean isClone() {
+		return isClone;
+	}
+
+	public void setClone(boolean isClone) {
+		this.isClone = isClone;
 	}
 
 	@Override

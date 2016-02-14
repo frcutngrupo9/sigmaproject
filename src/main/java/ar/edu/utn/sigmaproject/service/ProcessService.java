@@ -10,6 +10,8 @@ public interface ProcessService {
 	
 	List<Process> getProcessList(Integer idPiece);
 	
+	List<Process> getCompleteProcessList(Integer idPiece);
+	
 	Process getProcess(Integer id);
 	
 	Process getProcess(Integer idPiece, Integer idProcessType);

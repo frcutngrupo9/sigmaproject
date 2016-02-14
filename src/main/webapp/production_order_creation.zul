@@ -1,49 +1,86 @@
 <window id="win_production_order_creation" apply="ar.edu.utn.sigmaproject.controller.ProductionOrderCreationController" width="95%" style="background:white">
-    <panel title="Ordenes de Produccion" id="productionOrderCreationBlock" border="rounded">
+    <panel title="Orden de Produccion" id="productionOrderCreationBlock" border="rounded">
         <panelchildren>
-            <vlayout>
-            	<separator/>
-            	<hlayout>
-            		<label value="Nombre Plan de Produccion: "/>
-					<textbox id="productionPlanNameTextbox" width="180px"/>
-				</hlayout>
-            	<hlayout>
-            		<label value="Fecha Plan de Produccion: "/>
-					<datebox id="productionPlanDatebox" cols="12" format="dd-MM-yyyy"/>
-            	</hlayout>
-                <separator/>
-    			<listbox id="productionOrderListbox" sizedByContent="true" span="true">
+        	<vlayout>
+        		<grid hflex="1" sclass="sigma-form">
+                    <columns>
+                        <column align="right" width="30%"/>
+                        <column align="left"/>
+                    </columns>
+                    <rows>
+                    	<row>
+                            <label value="Nombre Plan de Produccion: "/>
+							<textbox id="productionPlanNameTextbox" width="180px"/>
+                        </row>
+                        <row>
+                            <label value="Fecha Plan de Produccion: "/>
+							<datebox id="productionPlanDatebox" cols="12" format="dd-MM-yyyy"/>
+                        </row>
+                        <row>
+                            <label value="Producto a Fabricar: "/>
+							<textbox id="productNameTextbox" width="400px"/>
+                        </row>
+                        <row>
+                            <label value="Unidades a Fabricar: "/>
+							<intbox id="productUnitsIntbox"/>
+                        </row>
+                        <row>
+                            <label value="Numero Orden de Produccion: "/>
+							<spinner id="productionOrderNumberSpinner"/>
+                        </row>
+                        <row>
+                            <label value="Empleado Asignado: "/>
+							<selectbox id="workerSelectbox">
+			                    <template name="model">
+			                        <label value="${each.name}" />
+			                    </template>
+			                </selectbox>
+                        </row>
+                        <row>
+                            <label value="Fecha Inicio Orden de Produccion: "/>
+							<datebox id="productionOrderDatebox" cols="12" format="dd-MM-yyyy"/>
+                        </row>
+                        <row>
+                            <label value="Fecha Fin Orden de Produccion: "/>
+							<datebox id="productionOrderFinishedDatebox" cols="12" format="dd-MM-yyyy"/>
+                        </row>
+                   </rows>
+                </grid>
+        		<grid id="productionOrderDetailGrid" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Ordenes de Produccion" colspan="8"/>
+						<auxheader label="Detalles Orden de Produccion" colspan="10"/>
 					</auxhead>
-        			<listhead>
-        				<listheader label="Id Orden Produccion"/>
-        				<listheader label="Numero Orden Produccion"/>
-		            	<listheader label="Codigo Producto"/>
-		                <listheader label="Nombre Producto"/>
-		                <listheader label="Unidades"/>
-		                <listheader label="Empleado Asignado"/>
-		                <listheader label="Fecha Inicio"/>
-		                <listheader label="Fecha Finalizado"/>
-		            </listhead>
+        			<columns>
+        				<column label="Id" align="center"/>
+			            <column label="Proceso" align="center"/>
+			            <column label="Pieza" align="center"/>
+			            <column label="Detalles" align="center"/>
+			            <column label="Tiempo" align="center"/>
+			            <column label="Tiempo Total" align="center"/>
+			            <column label="Cantidad Pieza" align="center"/>
+			            <column label="Cantidad Finalizada" align="center"/>
+			            <column label="Esta Finalizado?" align="center"/>
+		            </columns>
 		            <template name="model">
-		                <listitem>
-		                	<listcell label="${each.id}"/>
-                    		<listcell>
-	                        	<textbox inplace="true" value="${each.number}" forward="onChange=productionOrderListbox.onEditProductionOrderNumber(${each})" width="180px"/>
-                    		</listcell>
-		                	<listcell label="${win_production_order_creation$composer.getProduct(each.idProduct).code}"/>
-		                    <listcell label="${win_production_order_creation$composer.getProduct(each.idProduct).name}"/>
-		                    <listcell label="${each.units}"/>
-		                    <listcell label="${win_production_order_creation$composer.getWorkerName(each.idWorker)}"/>
-		                    <listcell label="${each.date}"/>
-		                    <listcell>
-	                        	<datebox inplace="true" value="${each.date}" forward="onChange=productionOrderListbox.onEditProductionOrderDate(${each})" cols="12" format="dd-MM-yyyy"/>
-                    		</listcell>
-						</listitem>
+		                <row>
+		                	<label value="${each.idProductionOrder}"/>
+			            	<label value="${win_production_order_creation$composer.getProcessType(each.idProcess).name}"/>
+			            	<label value="${win_production_order_creation$composer.getPieceByProcessId(each.idProcess).name}"/>
+			            	<label value="${win_production_order_creation$composer.getProcess(each.idProcess).details}"/>
+			            	<label value="${win_production_order_creation$composer.getProcessTime(each.idProcess)}"/>
+			            	<label value="${win_production_order_creation$composer.getFormatedTime(each.timeTotal)}"/>
+			            	<label value="${each.quantityPiece}"/>
+			            	<doublebox inplace="true" value="${each.quantityFinished}" forward="onChange=productionOrderDetailGrid.onEditProductionOrderDetailQuantityFinished(${each})"/>
+			            	<checkbox checked="${each.isFinished()}" forward="onCheck=productionOrderDetailGrid.onEditProductionOrderDetailIsFinished(${each})"/>
+						</row>
 		            </template>
-    			</listbox>
-            </vlayout>
+    			</grid>
+    			<hlayout>
+				    <button id="saveButton" label="Guardar"/>
+				    <button id="resetButton" label="Reset"/>
+				    <button id="cancelButton" label="Cancelar"/>
+			    </hlayout>
+			</vlayout>
         </panelchildren>
     </panel>
 </window>
