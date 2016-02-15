@@ -22,7 +22,6 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.RawMaterial;
 import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.RawMaterialType;
-import ar.edu.utn.sigmaproject.domain.RequirementPlanDetailSupply;
 import ar.edu.utn.sigmaproject.domain.Supply;
 import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
@@ -32,8 +31,6 @@ import ar.edu.utn.sigmaproject.service.ProductionPlanService;
 import ar.edu.utn.sigmaproject.service.RawMaterialRequirementService;
 import ar.edu.utn.sigmaproject.service.RawMaterialService;
 import ar.edu.utn.sigmaproject.service.RawMaterialTypeService;
-import ar.edu.utn.sigmaproject.service.RequirementPlanDetailSupplyService;
-import ar.edu.utn.sigmaproject.service.RequirementPlanService;
 import ar.edu.utn.sigmaproject.service.SupplyRequirementService;
 import ar.edu.utn.sigmaproject.service.SupplyService;
 import ar.edu.utn.sigmaproject.service.SupplyTypeService;
@@ -43,8 +40,6 @@ import ar.edu.utn.sigmaproject.service.impl.ProductionPlanServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.RawMaterialRequirementServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.RawMaterialServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.RawMaterialTypeServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.RequirementPlanDetailSupplyServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.RequirementPlanServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.SupplyRequirementServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.SupplyServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.SupplyTypeServiceImpl;
@@ -182,7 +177,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
     
     @Listen("onFulfillSupplyRequirement = #supplyRequirementListbox")
 	public void doFulfillSupplyRequirement(ForwardEvent evt) {
-    	RequirementPlanDetailSupply data = (RequirementPlanDetailSupply) evt.getData();// obtenemos el objeto pasado por parametro
+    	SupplyRequirement data = (SupplyRequirement) evt.getData();// obtenemos el objeto pasado por parametro
     	Checkbox element = (Checkbox) evt.getOrigin().getTarget();// obtenemos el elemento web
     	data.setFulfilled(element.isChecked());// cargamos al objeto el valor actualizado del elemento web
     }
