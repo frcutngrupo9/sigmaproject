@@ -67,7 +67,7 @@ import ar.edu.utn.sigmaproject.service.impl.SupplyTypeServiceImpl;
 
 public class ProductCreationController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
-	
+
 	@Wire
 	Component productCreationBlock;
 	@Wire
@@ -88,25 +88,25 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	Button resetProductButton;
 	@Wire
 	Button deleteProductButton;
-	
+
 	@Wire
 	Component pieceCreationBlock;
 	@Wire
 	Textbox pieceNameTextbox;
 	@Wire
-    Textbox productCodeTextbox;
-    @Wire
+	Textbox productCodeTextbox;
+	@Wire
 	Doublebox pieceLengthDoublebox;
 	@Wire
 	Doublebox pieceDepthDoublebox;
 	@Wire
 	Doublebox pieceWidthDoublebox;
 	@Wire
-    Selectbox lengthMeasureUnitSelectbox;
-    @Wire
-    Selectbox depthMeasureUnitSelectbox;
-    @Wire
-    Selectbox widthMeasureUnitSelectbox;
+	Selectbox lengthMeasureUnitSelectbox;
+	@Wire
+	Selectbox depthMeasureUnitSelectbox;
+	@Wire
+	Selectbox widthMeasureUnitSelectbox;
 	@Wire
 	Textbox pieceSizeTextbox;
 	@Wire
@@ -127,7 +127,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	Caption productCaption;
 	@Wire
 	Button pieceCopyButton;
-	
+
 	// supply
 	@Wire
 	Button openSupplyListButton;
@@ -136,11 +136,11 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	@Wire
 	Component supplyCreationBlock;
 	@Wire
-    Bandbox supplyTypeBandbox;
+	Bandbox supplyTypeBandbox;
 	@Wire
-    Listbox supplyTypePopupListbox;
+	Listbox supplyTypePopupListbox;
 	@Wire
-    Listbox supplyListbox;
+	Listbox supplyListbox;
 	@Wire
 	Doublebox supplyQuantityDoublebox;
 	@Wire
@@ -151,7 +151,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	Button deleteSupplyButton;
 	@Wire
 	Button cancelSupplyButton;
-	
+
 	// raw material
 	@Wire
 	Button openRawMaterialListButton;
@@ -160,11 +160,11 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	@Wire
 	Component rawMaterialCreationBlock;
 	@Wire
-    Bandbox rawMaterialTypeBandbox;
+	Bandbox rawMaterialTypeBandbox;
 	@Wire
-    Listbox rawMaterialTypePopupListbox;
+	Listbox rawMaterialTypePopupListbox;
 	@Wire
-    Listbox rawMaterialListbox;
+	Listbox rawMaterialListbox;
 	@Wire
 	Doublebox rawMaterialQuantityDoublebox;
 	@Wire
@@ -175,8 +175,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	Button deleteRawMaterialButton;
 	@Wire
 	Button cancelRawMaterialButton;
-     
-    // services
+
+	// services
 	private ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
 	private ProcessService processService = new ProcessServiceImpl();
 	private PieceService pieceService = new PieceServiceImpl();
@@ -187,284 +187,284 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	private SupplyService supplyService = new SupplyServiceImpl();
 	private RawMaterialTypeService rawMaterialTypeService = new RawMaterialTypeServiceImpl();
 	private RawMaterialService rawMaterialService = new RawMaterialServiceImpl();
-	
-    // attributes
-    private Product currentProduct;
+
+	// attributes
+	private Product currentProduct;
 	private Piece currentPiece;
 	private EventQueue eq;
 	private Supply currentSupply;
 	private SupplyType currentSupplyType;
 	private RawMaterial currentRawMaterial;
 	private RawMaterialType currentRawMaterialType;
-	
+
 	// list
 	private List<Piece> pieceList;
 	private List<Process> processList;
 	private List<ProcessType> processTypeList;
 	private List<Supply> supplyList;
-    private List<Supply> lateDeleteSupplyList;
-    private List<SupplyType> supplyTypePopupList;
-    private List<RawMaterial> rawMaterialList;
-    private List<RawMaterial> lateDeleteRawMaterialList;
-    private List<RawMaterialType> rawMaterialTypePopupList;
-	
+	private List<Supply> lateDeleteSupplyList;
+	private List<SupplyType> supplyTypePopupList;
+	private List<RawMaterial> rawMaterialList;
+	private List<RawMaterial> lateDeleteRawMaterialList;
+	private List<RawMaterialType> rawMaterialTypePopupList;
+
 	// list models
 	private ListModelList<ProcessType> processTypeListModel;
 	private ListModelList<Piece> pieceListModel;
 	private ListModelList<MeasureUnit> lengthMeasureUnitListModel;
-    private ListModelList<MeasureUnit> depthMeasureUnitListModel;
-    private ListModelList<MeasureUnit> widthMeasureUnitListModel;
-    private ListModelList<Supply> supplyListModel;
-    private ListModelList<SupplyType> supplyTypePopupListModel;
-    private ListModelList<RawMaterial> rawMaterialListModel;
-    private ListModelList<RawMaterialType> rawMaterialTypePopupListModel;
-     
-    @Override
-    public void doAfterCompose(Component comp) throws Exception{
-        super.doAfterCompose(comp);
-        processTypeList = processTypeService.getProcessTypeList();
-        processTypeListModel = new ListModelList<ProcessType>(processTypeList);
-        processListbox.setModel(processTypeListModel);
-        
-        pieceList = new ArrayList<Piece>();
-        pieceListModel = new ListModelList<Piece>(pieceList);
-        pieceListbox.setModel(pieceListModel);
-        
-        processList = new ArrayList<Process>();
-        
-        Integer idMeasureUnitType = measureUnitTypeService.getMeasureUnitType("Longitud").getId();
-        List<MeasureUnit> measureUnitList = measureUnitService.getMeasureUnitList(idMeasureUnitType);
-        lengthMeasureUnitListModel = new ListModelList<MeasureUnit>(measureUnitList);
-        depthMeasureUnitListModel = new ListModelList<MeasureUnit>(measureUnitList);
-        widthMeasureUnitListModel = new ListModelList<MeasureUnit>(measureUnitList);
-        lengthMeasureUnitSelectbox.setModel(lengthMeasureUnitListModel);
-        depthMeasureUnitSelectbox.setModel(depthMeasureUnitListModel);
-        widthMeasureUnitSelectbox.setModel(widthMeasureUnitListModel);
-        
-        currentProduct = (Product) Executions.getCurrent().getAttribute("selected_product");
-        currentPiece = null;
-        
-        // agregamos un listener para cuando se seleccione una pieza en el modal de copia de otra pieza
-        eq = EventQueues.lookup("Piece Selection Queue", EventQueues.DESKTOP, true);
-        eq.subscribe(new EventListener() {
-            public void onEvent(Event event) throws Exception {
-            	Piece value = (Piece)event.getData();
-            	fillPieceCopy(value);
-            }
-        });
-        
-        lateDeleteSupplyList = new ArrayList<Supply>();
-        supplyList = new ArrayList<Supply>();
-        supplyListModel = new ListModelList<Supply>(supplyList);
-        supplyListbox.setModel(supplyListModel);
-        currentSupply = null;
-        currentSupplyType = null;
-        
-        lateDeleteRawMaterialList = new ArrayList<RawMaterial>();
-        rawMaterialList = new ArrayList<RawMaterial>();
-        rawMaterialListModel = new ListModelList<RawMaterial>(rawMaterialList);
-        rawMaterialListbox.setModel(rawMaterialListModel);
-        currentRawMaterial = null;
-        currentRawMaterialType = null;
-        
-        refreshViewProduct();
-    }
-    
-    @Listen("onClick = #saveProductButton")
-    public void saveProduct() {
-    	if(Strings.isBlank(productNameTextbox.getValue())){
+	private ListModelList<MeasureUnit> depthMeasureUnitListModel;
+	private ListModelList<MeasureUnit> widthMeasureUnitListModel;
+	private ListModelList<Supply> supplyListModel;
+	private ListModelList<SupplyType> supplyTypePopupListModel;
+	private ListModelList<RawMaterial> rawMaterialListModel;
+	private ListModelList<RawMaterialType> rawMaterialTypePopupListModel;
+
+	@Override
+	public void doAfterCompose(Component comp) throws Exception{
+		super.doAfterCompose(comp);
+		processTypeList = processTypeService.getProcessTypeList();
+		processTypeListModel = new ListModelList<ProcessType>(processTypeList);
+		processListbox.setModel(processTypeListModel);
+
+		pieceList = new ArrayList<Piece>();
+		pieceListModel = new ListModelList<Piece>(pieceList);
+		pieceListbox.setModel(pieceListModel);
+
+		processList = new ArrayList<Process>();
+
+		Integer idMeasureUnitType = measureUnitTypeService.getMeasureUnitType("Longitud").getId();
+		List<MeasureUnit> measureUnitList = measureUnitService.getMeasureUnitList(idMeasureUnitType);
+		lengthMeasureUnitListModel = new ListModelList<MeasureUnit>(measureUnitList);
+		depthMeasureUnitListModel = new ListModelList<MeasureUnit>(measureUnitList);
+		widthMeasureUnitListModel = new ListModelList<MeasureUnit>(measureUnitList);
+		lengthMeasureUnitSelectbox.setModel(lengthMeasureUnitListModel);
+		depthMeasureUnitSelectbox.setModel(depthMeasureUnitListModel);
+		widthMeasureUnitSelectbox.setModel(widthMeasureUnitListModel);
+
+		currentProduct = (Product) Executions.getCurrent().getAttribute("selected_product");
+		currentPiece = null;
+
+		// agregamos un listener para cuando se seleccione una pieza en el modal de copia de otra pieza
+		eq = EventQueues.lookup("Piece Selection Queue", EventQueues.DESKTOP, true);
+		eq.subscribe(new EventListener() {
+			public void onEvent(Event event) throws Exception {
+				Piece value = (Piece)event.getData();
+				fillPieceCopy(value);
+			}
+		});
+
+		lateDeleteSupplyList = new ArrayList<Supply>();
+		supplyList = new ArrayList<Supply>();
+		supplyListModel = new ListModelList<Supply>(supplyList);
+		supplyListbox.setModel(supplyListModel);
+		currentSupply = null;
+		currentSupplyType = null;
+
+		lateDeleteRawMaterialList = new ArrayList<RawMaterial>();
+		rawMaterialList = new ArrayList<RawMaterial>();
+		rawMaterialListModel = new ListModelList<RawMaterial>(rawMaterialList);
+		rawMaterialListbox.setModel(rawMaterialListModel);
+		currentRawMaterial = null;
+		currentRawMaterialType = null;
+
+		refreshViewProduct();
+	}
+
+	@Listen("onClick = #saveProductButton")
+	public void saveProduct() {
+		if(Strings.isBlank(productNameTextbox.getValue())){
 			Clients.showNotification("Ingresar Nombre Producto", productNameTextbox);
 			return;
 		}
-    	String product_name = productNameTextbox.getText();
-    	String product_details = productDetailsTextbox.getText();
-        String product_code = productCodeTextbox.getText();
-        BigDecimal product_price = new BigDecimal(productPriceDoublebox.doubleValue());
-    	
-    	if(currentProduct == null) {// se esta creando un nuevo producto
-    		currentProduct = new Product(null, product_code, product_name, product_details, product_price);
-    		productService.saveProduct(currentProduct, pieceList, processList, supplyList, rawMaterialList);
-    	} else {// se esta editando un producto
-    		currentProduct.setName(product_name);
-    		currentProduct.setDetails(product_details);
-            currentProduct.setCode(product_code);
-            currentProduct.setPrice(product_price);;
-    		currentProduct = productService.updateProduct(currentProduct, pieceList, processList, supplyList, rawMaterialList);
-    	}
+		String product_name = productNameTextbox.getText();
+		String product_details = productDetailsTextbox.getText();
+		String product_code = productCodeTextbox.getText();
+		BigDecimal product_price = new BigDecimal(productPriceDoublebox.doubleValue());
+
+		if(currentProduct == null) {// se esta creando un nuevo producto
+			currentProduct = new Product(null, product_code, product_name, product_details, product_price);
+			productService.saveProduct(currentProduct, pieceList, processList, supplyList, rawMaterialList);
+		} else {// se esta editando un producto
+			currentProduct.setName(product_name);
+			currentProduct.setDetails(product_details);
+			currentProduct.setCode(product_code);
+			currentProduct.setPrice(product_price);;
+			currentProduct = productService.updateProduct(currentProduct, pieceList, processList, supplyList, rawMaterialList);
+		}
 		// mostrar mensaje al user
 		Clients.showNotification("Producto guardado");
-		
+
 		// limpiar todo
 		currentProduct = null;
 		currentPiece = null;
 		refreshViewProduct();
-    	refreshViewPiece();
-    }
-    
-    @Listen("onClick = #createPieceButton")
-    public void createNewPiece() {
-    	currentPiece = null;
-    	refreshViewPiece();
-    	pieceCreationBlock.setVisible(true);
-    	processCreationBlock.setVisible(false);
-    }
-    
-    @Listen("onClick = #cancelPieceButton")
-    public void cancelPiece() {
-    	currentPiece = null;
-    	refreshViewPiece();
-    }
-    
-    @Listen("onClick = #createProcessButton")
-    public void createNewProcess() {
-    	if(Strings.isBlank(pieceNameTextbox.getValue())){
+		refreshViewPiece();
+	}
+
+	@Listen("onClick = #createPieceButton")
+	public void createNewPiece() {
+		currentPiece = null;
+		refreshViewPiece();
+		pieceCreationBlock.setVisible(true);
+		processCreationBlock.setVisible(true);
+	}
+
+	@Listen("onClick = #cancelPieceButton")
+	public void cancelPiece() {
+		currentPiece = null;
+		refreshViewPiece();
+	}
+
+	@Listen("onClick = #createProcessButton")
+	public void createNewProcess() {
+		if(Strings.isBlank(pieceNameTextbox.getValue())){
 			Clients.showNotification("Ingrese el Nombre de la Pieza", pieceNameTextbox);
 			return;
 		}
-    	if(pieceUnitsByProductIntbox.getValue() == null || pieceUnitsByProductIntbox.getValue() <= 0){
+		if(pieceUnitsByProductIntbox.getValue() == null || pieceUnitsByProductIntbox.getValue() <= 0){
 			Clients.showNotification("La cantidad debe ser mayor a 0.", pieceUnitsByProductIntbox);
 			return;
 		}
-    	processCreationBlock.setVisible(true);
-    	pieceCreationBlock.setVisible(false);
-    }
-    
-    @Listen("onClick = #cancelProcessButton")
-    public void cancelProcess() {
-    	pieceCreationBlock.setVisible(true);
-    	processCreationBlock.setVisible(false);
-    }
-    
-    @Listen("onClick = #finishProcessButton")
-    public void finishPiece() {
-    	// comprobamos que no existan checkbox activados que no posean valores de duracion
-    	for(int i = 1; i < processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
-    		Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
-    		Intbox intboxDays = (Intbox)processListbox.getChildren().get(i).getChildren().get(3).getChildren().get(0);
-      		Intbox intboxHours = (Intbox)processListbox.getChildren().get(i).getChildren().get(4).getChildren().get(0);
-      		Intbox intboxMinutes = (Intbox)processListbox.getChildren().get(i).getChildren().get(5).getChildren().get(0);
-    		if(chkbox.isChecked() && intboxDays.intValue() == 0 && intboxHours.intValue() == 0 && intboxMinutes.intValue() == 0){
-    			Clients.showNotification("Ingrese el Tiempo para el Proceso", intboxMinutes);
-    			return;
-    		}
-    	}
-    	// actualizamos la lista de piezas
-    	Integer piece_id = 0;
-    	String piece_name = pieceNameTextbox.getText();
-    	Integer length_id_measure_unit = null;
-    	Integer depth_id_measure_unit = null;
-    	Integer width_id_measure_unit = null;
-    	if(lengthMeasureUnitSelectbox.getSelectedIndex() != -1) {
-    		length_id_measure_unit = lengthMeasureUnitListModel.getElementAt(lengthMeasureUnitSelectbox.getSelectedIndex()).getId();
-    	}
-    	if(depthMeasureUnitSelectbox.getSelectedIndex() != -1) {
-    		depth_id_measure_unit = depthMeasureUnitListModel.getElementAt(depthMeasureUnitSelectbox.getSelectedIndex()).getId();
-    	}
-    	if(widthMeasureUnitSelectbox.getSelectedIndex() != -1) {
-    		width_id_measure_unit = widthMeasureUnitListModel.getElementAt(widthMeasureUnitSelectbox.getSelectedIndex()).getId();
-    	}
-    	BigDecimal piece_length = new BigDecimal(pieceLengthDoublebox.doubleValue());
-    	BigDecimal piece_depth = new BigDecimal(pieceDepthDoublebox.doubleValue());
-    	BigDecimal piece_width = new BigDecimal(pieceWidthDoublebox.doubleValue());
-    	String piece_size = pieceSizeTextbox.getText();
-    	Integer piece_units = pieceUnitsByProductIntbox.getValue();
-    	boolean piece_isGroup = pieceGroupCheckbox.isChecked();
-    	
-    	if(currentPiece == null) { // no se esta editando una pieza
-    		Integer serviceNewPieceId = pieceService.getNewId();
-    		if(pieceList.isEmpty() == true) {// buscamos un id para la pieza nueva
-        		piece_id = serviceNewPieceId;
-        	} else {
-        		piece_id = getLastPieceId() + 1;// buscamos el ultimo id y sumamos 1
-        		if(piece_id < serviceNewPieceId) { // si el ultimo id es menor que uno nuevo del servicio quiere decir que las piezas en la lista son viejas y hay que agarra el id mas grande osea el que viene del servicio
-        			piece_id = serviceNewPieceId;
-        		}
-        	}
-    		currentPiece = new Piece(piece_id, null, piece_name, piece_length, length_id_measure_unit, piece_depth, depth_id_measure_unit, piece_width, width_id_measure_unit, piece_size, piece_isGroup, piece_units);
-    		pieceList.add(currentPiece);// lo agregamos a la lista
-        	pieceListModel.add(currentPiece);
-        	pieceListbox.setModel(pieceListModel);// y al modelo para que aparezca en la pantalla
-    	} else { // se esta editando una pieza
-    	    currentPiece.setName(piece_name);
-    		currentPiece.setLength(piece_length);
-    		currentPiece.setLengthIdMeasureUnit(length_id_measure_unit);
-    		currentPiece.setDepth(piece_depth);
-    		currentPiece.setDepthIdMeasureUnit(depth_id_measure_unit);
-    		currentPiece.setWidth(piece_width);
-    		currentPiece.setWidthIdMeasureUnit(width_id_measure_unit);
-    		currentPiece.setSize(piece_size);
-    		currentPiece.setUnits(piece_units);
-    		currentPiece.setGroup(piece_isGroup);
-    		updatePieceList(currentPiece);// actualizamos la lista
-    		pieceListModel = new ListModelList<Piece>(pieceList); 
-    		pieceListbox.setModel(pieceListModel);// actualizamos el modelo para que aparezca en la pantalla
-    	}
-    	
-    	// actualizamos la lista de procesos
-    	for(int i = 1; i < processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
-    		Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
-    		Label lbl = (Label)processListbox.getChildren().get(i).getChildren().get(1).getChildren().get(0);
-    		Textbox txtboxDetails = (Textbox)processListbox.getChildren().get(i).getChildren().get(2).getChildren().get(0);
-    		Intbox intboxDays = (Intbox)processListbox.getChildren().get(i).getChildren().get(3).getChildren().get(0);
-      		Intbox intboxHours = (Intbox)processListbox.getChildren().get(i).getChildren().get(4).getChildren().get(0);
-      		Intbox intboxMinutes = (Intbox)processListbox.getChildren().get(i).getChildren().get(5).getChildren().get(0);
-    		Integer idPiece = currentPiece.getId();
+		processCreationBlock.setVisible(true);
+		pieceCreationBlock.setVisible(false);
+	}
+
+	@Listen("onClick = #cancelProcessButton")
+	public void cancelProcess() {
+		pieceCreationBlock.setVisible(true);
+		processCreationBlock.setVisible(false);
+	}
+
+	@Listen("onClick = #finishProcessButton")
+	public void finishPiece() {
+		// comprobamos que no existan checkbox activados que no posean valores de duracion
+		for(int i = 1; i < processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
+			Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
+			Intbox intboxDays = (Intbox)processListbox.getChildren().get(i).getChildren().get(3).getChildren().get(0);
+			Intbox intboxHours = (Intbox)processListbox.getChildren().get(i).getChildren().get(4).getChildren().get(0);
+			Intbox intboxMinutes = (Intbox)processListbox.getChildren().get(i).getChildren().get(5).getChildren().get(0);
+			if(chkbox.isChecked() && intboxDays.intValue() == 0 && intboxHours.intValue() == 0 && intboxMinutes.intValue() == 0){
+				Clients.showNotification("Ingrese el Tiempo para el Proceso", intboxMinutes);
+				return;
+			}
+		}
+		// actualizamos la lista de piezas
+		Integer piece_id = 0;
+		String piece_name = pieceNameTextbox.getText();
+		Integer length_id_measure_unit = null;
+		Integer depth_id_measure_unit = null;
+		Integer width_id_measure_unit = null;
+		if(lengthMeasureUnitSelectbox.getSelectedIndex() != -1) {
+			length_id_measure_unit = lengthMeasureUnitListModel.getElementAt(lengthMeasureUnitSelectbox.getSelectedIndex()).getId();
+		}
+		if(depthMeasureUnitSelectbox.getSelectedIndex() != -1) {
+			depth_id_measure_unit = depthMeasureUnitListModel.getElementAt(depthMeasureUnitSelectbox.getSelectedIndex()).getId();
+		}
+		if(widthMeasureUnitSelectbox.getSelectedIndex() != -1) {
+			width_id_measure_unit = widthMeasureUnitListModel.getElementAt(widthMeasureUnitSelectbox.getSelectedIndex()).getId();
+		}
+		BigDecimal piece_length = new BigDecimal(pieceLengthDoublebox.doubleValue());
+		BigDecimal piece_depth = new BigDecimal(pieceDepthDoublebox.doubleValue());
+		BigDecimal piece_width = new BigDecimal(pieceWidthDoublebox.doubleValue());
+		String piece_size = pieceSizeTextbox.getText();
+		Integer piece_units = pieceUnitsByProductIntbox.getValue();
+		boolean piece_isGroup = pieceGroupCheckbox.isChecked();
+
+		if(currentPiece == null) { // no se esta editando una pieza
+			Integer serviceNewPieceId = pieceService.getNewId();
+			if(pieceList.isEmpty() == true) {// buscamos un id para la pieza nueva
+				piece_id = serviceNewPieceId;
+			} else {
+				piece_id = getLastPieceId() + 1;// buscamos el ultimo id y sumamos 1
+				if(piece_id < serviceNewPieceId) { // si el ultimo id es menor que uno nuevo del servicio quiere decir que las piezas en la lista son viejas y hay que agarra el id mas grande osea el que viene del servicio
+					piece_id = serviceNewPieceId;
+				}
+			}
+			currentPiece = new Piece(piece_id, null, piece_name, piece_length, length_id_measure_unit, piece_depth, depth_id_measure_unit, piece_width, width_id_measure_unit, piece_size, piece_isGroup, piece_units);
+			pieceList.add(currentPiece);// lo agregamos a la lista
+			pieceListModel.add(currentPiece);
+			pieceListbox.setModel(pieceListModel);// y al modelo para que aparezca en la pantalla
+		} else { // se esta editando una pieza
+			currentPiece.setName(piece_name);
+			currentPiece.setLength(piece_length);
+			currentPiece.setLengthIdMeasureUnit(length_id_measure_unit);
+			currentPiece.setDepth(piece_depth);
+			currentPiece.setDepthIdMeasureUnit(depth_id_measure_unit);
+			currentPiece.setWidth(piece_width);
+			currentPiece.setWidthIdMeasureUnit(width_id_measure_unit);
+			currentPiece.setSize(piece_size);
+			currentPiece.setUnits(piece_units);
+			currentPiece.setGroup(piece_isGroup);
+			updatePieceList(currentPiece);// actualizamos la lista
+			pieceListModel = new ListModelList<Piece>(pieceList); 
+			pieceListbox.setModel(pieceListModel);// actualizamos el modelo para que aparezca en la pantalla
+		}
+
+		// actualizamos la lista de procesos
+		for(int i = 1; i < processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
+			Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
+			Label lbl = (Label)processListbox.getChildren().get(i).getChildren().get(1).getChildren().get(0);
+			Textbox txtboxDetails = (Textbox)processListbox.getChildren().get(i).getChildren().get(2).getChildren().get(0);
+			Intbox intboxDays = (Intbox)processListbox.getChildren().get(i).getChildren().get(3).getChildren().get(0);
+			Intbox intboxHours = (Intbox)processListbox.getChildren().get(i).getChildren().get(4).getChildren().get(0);
+			Intbox intboxMinutes = (Intbox)processListbox.getChildren().get(i).getChildren().get(5).getChildren().get(0);
+			Integer idPiece = currentPiece.getId();
 			Integer idProcessType = processTypeList.get(i - 1).getId(); // restamos 1 para empezar del indice 0
-    		Process currentProcess = searchProcess(idPiece, idProcessType); // buscamos si ya esta creado
-    		if(chkbox.isChecked()) {
-    			String details = txtboxDetails.getText();
-    			Integer days = intboxDays.intValue();
-    			Integer hours = intboxHours.intValue();
-    			Integer minutes = intboxMinutes.intValue();
-    			Duration duration = null;
+			Process currentProcess = searchProcess(idPiece, idProcessType); // buscamos si ya esta creado
+			if(chkbox.isChecked()) {
+				String details = txtboxDetails.getText();
+				Integer days = intboxDays.intValue();
+				Integer hours = intboxHours.intValue();
+				Integer minutes = intboxMinutes.intValue();
+				Duration duration = null;
 				try {
 					duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, days, hours, minutes, 0);
 				} catch (DatatypeConfigurationException e) {
 					System.out.println("Error en finalizar pieza, en convertir a duracion: " + e.toString());
 				}
-    			if(currentProcess == null) { // no esta creado
-	    			currentProcess = new Process(null, idPiece, idProcessType, details, duration);
-	    			processList.add(currentProcess);
-    			} else { // esta creado
-    				currentProcess.setDetails(details);
-    				currentProcess.setTime(duration);
-    				currentProcess = updateProcessList(currentProcess);
-    			}
-    		} else {
-    			if(currentProcess != null) { // esta creado pero el check en false, hay que eliminarlo
-	    			deleteProcess(currentProcess);
-    			}
-    		}
-    	}
-    	// actualizamos el view
-    	currentPiece = null;
-    	refreshViewPiece();
-    }
-	
-    //when user checks on the checkbox of each process on the list
-  	@Listen("onProcessCheck = #processListbox")
-  	public void doProcessCheck(ForwardEvent evt) {// se usa para mostrar u ocultar el ingreso de texo en base al checkbox
-  		//get data from event
-  		Checkbox cbox = (Checkbox)evt.getOrigin().getTarget();
-  		Listitem litem = (Listitem)cbox.getParent().getParent();
-  		Textbox txtboxDetails = (Textbox)litem.getChildren().get(2).getFirstChild();
-  		Intbox intboxDays = (Intbox)litem.getChildren().get(3).getFirstChild();
-  		Intbox intboxHours = (Intbox)litem.getChildren().get(4).getFirstChild();
-  		Intbox intboxMinutes = (Intbox)litem.getChildren().get(5).getFirstChild();
-  		if(cbox.isChecked()) {
-  			txtboxDetails.setVisible(true);
-  			intboxDays.setVisible(true);
-  			intboxHours.setVisible(true);
-  			intboxMinutes.setVisible(true);
-  		} else {
-  			txtboxDetails.setVisible(false);
-  			intboxDays.setVisible(false);
-  			intboxHours.setVisible(false);
-  			intboxMinutes.setVisible(false);
-  		}
-  	}
-  	
-  	/* este metodo era para hacer invisible el ingreso de valores si la pieza es grupo
+				if(currentProcess == null) { // no esta creado
+					currentProcess = new Process(null, idPiece, idProcessType, details, duration);
+					processList.add(currentProcess);
+				} else { // esta creado
+					currentProcess.setDetails(details);
+					currentProcess.setTime(duration);
+					currentProcess = updateProcessList(currentProcess);
+				}
+			} else {
+				if(currentProcess != null) { // esta creado pero el check en false, hay que eliminarlo
+					deleteProcess(currentProcess);
+				}
+			}
+		}
+		// actualizamos el view
+		currentPiece = null;
+		refreshViewPiece();
+	}
+
+	//when user checks on the checkbox of each process on the list
+	@Listen("onProcessCheck = #processListbox")
+	public void doProcessCheck(ForwardEvent evt) {// se usa para mostrar u ocultar el ingreso de texo en base al checkbox
+		//get data from event
+		Checkbox cbox = (Checkbox)evt.getOrigin().getTarget();
+		Listitem litem = (Listitem)cbox.getParent().getParent();
+		Textbox txtboxDetails = (Textbox)litem.getChildren().get(2).getFirstChild();
+		Intbox intboxDays = (Intbox)litem.getChildren().get(3).getFirstChild();
+		Intbox intboxHours = (Intbox)litem.getChildren().get(4).getFirstChild();
+		Intbox intboxMinutes = (Intbox)litem.getChildren().get(5).getFirstChild();
+		if(cbox.isChecked()) {
+			txtboxDetails.setVisible(true);
+			intboxDays.setVisible(true);
+			intboxHours.setVisible(true);
+			intboxMinutes.setVisible(true);
+		} else {
+			txtboxDetails.setVisible(false);
+			intboxDays.setVisible(false);
+			intboxHours.setVisible(false);
+			intboxMinutes.setVisible(false);
+		}
+	}
+
+	/* este metodo era para hacer invisible el ingreso de valores si la pieza es grupo
   	@Listen("onCheck = #pieceGroup")
   	public void doPieceGroupCheck() {
   		Row measureUnitRow = (Row)(measureUnitSelectBox.getParent());
@@ -487,170 +487,171 @@ public class ProductCreationController extends SelectorComposer<Component>{
   	    	pieceSize2Row.setVisible(true);
   		}
   	}
-  	*/
-  	private void refreshViewProduct() {
-  		if (currentProduct == null) {
-  			productCaption.setLabel("Creacion de Producto");
-  		    deleteProductButton.setDisabled(true);
-  			productNameTextbox.setText("");
-  			productDetailsTextbox.setText("");
-  			productCodeTextbox.setText("");
-  			productPriceDoublebox.setText("");
-  			processList = new ArrayList<Process>();
-  			pieceList = new ArrayList<Piece>();
-  			pieceListModel = new ListModelList<Piece>(pieceList);
-  	        pieceListbox.setModel(pieceListModel);
-  	        supplyList = new ArrayList<Supply>();
-  	        rawMaterialList = new ArrayList<RawMaterial>();
-  		} else {
-  			productCaption.setLabel("Edicion de Producto");
-  		    deleteProductButton.setDisabled(false);
-  			productNameTextbox.setText(currentProduct.getName());
-  			productDetailsTextbox.setText(currentProduct.getDetails());
-  			productCodeTextbox.setText(currentProduct.getCode());
-  			BigDecimal product_price = currentProduct.getPrice();
-  			if(product_price != null) {
-  				productPriceDoublebox.setValue(product_price.doubleValue());
-  			}else {
-  				productPriceDoublebox.setValue(null);
-  			}
-  			processList = getProcessList(currentProduct.getId());
-  			pieceList = pieceService.getPieceList(currentProduct.getId());
-  	        pieceListModel = new ListModelList<Piece>(pieceList);
-  	        pieceListbox.setModel(pieceListModel);
-  	        supplyList = supplyService.getSupplyList(currentProduct.getId());
-  	        rawMaterialList = rawMaterialService.getRawMaterialList(currentProduct.getId());
-  		}
-  		refreshViewSupply();
-  		refreshSupplyTypePopup();
-  		refreshViewRawMaterial();
-  		refreshRawMaterialTypePopup();
-  	}
-  	
-  	private void refreshViewPiece() {
-  		if (currentPiece == null) {// no se esta editando ninguna pieza
-  			pieceCreationBlock.setVisible(false);
-  			processCreationBlock.setVisible(false);
-  			deletePieceButton.setDisabled(true);
-  	    	// limpiar form pieza
-  	    	pieceNameTextbox.setText("");
-  	    	pieceGroupCheckbox.setChecked(false);
-  	    	// seleccionamos metros y pulgadas como valores predeterminados de las dimensiones de las piezas
-  	    	Integer id_measure_unit_meters = measureUnitService.getMeasureUnit("Metros").getId();
-  	    	MeasureUnit meters = measureUnitService.getMeasureUnit(id_measure_unit_meters);
-  	    	Integer id_measure_unit_inch = measureUnitService.getMeasureUnit("Pulgadas").getId();
-  	    	MeasureUnit inch = measureUnitService.getMeasureUnit(id_measure_unit_inch);
-    		lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(meters));
-  	        depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(inch));
-  	        widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(inch));
-  	    	pieceLengthDoublebox.setValue(0);
-  	    	pieceWidthDoublebox.setValue(0);
-  	    	pieceDepthDoublebox.setValue(0);
-  	    	pieceSizeTextbox.setText("");
-  	    	pieceUnitsByProductIntbox.setValue(0);
-  	    	// limpiar procesos (ponerlos en vacio y sin check)
-  	    	for(int i=1; i<processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
-  	    		Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
-  	    		Textbox txtboxDetails = (Textbox)processListbox.getChildren().get(i).getChildren().get(2).getChildren().get(0);
-  	    		Intbox intboxDays = (Intbox)processListbox.getChildren().get(i).getChildren().get(3).getChildren().get(0);
-  	    		Intbox intboxHours = (Intbox)processListbox.getChildren().get(i).getChildren().get(4).getChildren().get(0);
-  	    		Intbox intboxMinutes = (Intbox)processListbox.getChildren().get(i).getChildren().get(5).getChildren().get(0);
-  	    		
-  	    		chkbox.setChecked(false);
-  	    		txtboxDetails.setVisible(false);
-  	    		intboxDays.setVisible(false);
-  	    		intboxHours.setVisible(false);
-  	    		intboxMinutes.setVisible(false);
-  	    		txtboxDetails.setText("");
-  	    		intboxDays.setValue(0);
-  	    		intboxHours.setValue(0);
-  	    		intboxMinutes.setValue(0);
-  	    	}
-  		} else { // se esta editando una pieza
-  			pieceCreationBlock.setVisible(true);
-  	    	processCreationBlock.setVisible(true);
-  	    	deletePieceButton.setDisabled(false);
-  	    	// cargar form pieza
-  	    	pieceNameTextbox.setText(currentPiece.getName());
-  	    	pieceGroupCheckbox.setChecked(currentPiece.isGroup());
-  	    	lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getLengthIdMeasureUnit())));
-  	    	depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getDepthIdMeasureUnit())));
-  	    	widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getWidthIdMeasureUnit())));
-  	    	BigDecimal lenght = currentPiece.getLength();
-  			if(lenght != null) {
-  				pieceLengthDoublebox.setValue(lenght.doubleValue());
-  			} else {
-  				pieceLengthDoublebox.setValue(0);
-  			}
-  			BigDecimal depth = currentPiece.getDepth();
-  			if(depth != null) {
-  				pieceDepthDoublebox.setValue(depth.doubleValue());
-  			} else {
-  				pieceDepthDoublebox.setValue(0);
-  			}
-  			BigDecimal width = currentPiece.getWidth();
-  			if(width != null) {
-  				pieceWidthDoublebox.setValue(width.doubleValue());
-  			} else {
-  				pieceWidthDoublebox.setValue(0);
-  			}
-  	    	pieceSizeTextbox.setValue(currentPiece.getSize());
-  	    	pieceUnitsByProductIntbox.setValue(currentPiece.getUnits());
-  	    	// cargar procesos (cargar detalles, tiempos y checks)
-  	    	processTypeList = processTypeService.getProcessTypeList();
-  	    	// recorremos los elementos del DOM
-  	    	for(int i = 1; i < processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
-  	    		// obtenemos las referencias a los elementos
-  	    		Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
-  	    		Textbox txtboxDetails = (Textbox)processListbox.getChildren().get(i).getChildren().get(2).getChildren().get(0);
-  	    		Intbox intboxDays = (Intbox)processListbox.getChildren().get(i).getChildren().get(3).getChildren().get(0);
-  	    		Intbox intboxHours = (Intbox)processListbox.getChildren().get(i).getChildren().get(4).getChildren().get(0);
-  	    		Intbox intboxMinutes = (Intbox)processListbox.getChildren().get(i).getChildren().get(5).getChildren().get(0);
-  	    		// cargamos los valores, de los procesos a los elementos
-  	    		Process currentProcess = null;
-  	    		for(int j = 0; j < processList.size(); j++) {
-  	    			if(processList.get(j).getIdPiece().equals(currentPiece.getId()) && processList.get(j).getIdProcessType().equals(processTypeList.get(i - 1).getId())) { // el tipo de proceso i -1 es para empezar desde el indice 0
-  	    				currentProcess = processList.get(j);
-  	    			}
-  	    		}
-  	    		if(currentProcess == null) { //si no se encontro el proceso esta en null
-  	    			chkbox.setChecked(false);
-  	    			txtboxDetails.setVisible(false);
-  	  	    		intboxDays.setVisible(false);
-  	  	    		intboxHours.setVisible(false);
-  	  	    		intboxMinutes.setVisible(false);
-  	    			txtboxDetails.setText("");
-  	    			intboxDays.setValue(0);
-  	  	    		intboxHours.setValue(0);
-  	  	    		intboxMinutes.setValue(0);
-  	    		} else {
-  	    			chkbox.setChecked(true);
-  	    			txtboxDetails.setVisible(true);
-  	    			intboxDays.setVisible(true);
-  	  	    		intboxHours.setVisible(true);
-  	  	    		intboxMinutes.setVisible(true);
-  	    			txtboxDetails.setText(currentProcess.getDetails());
-  	    			intboxDays.setValue(currentProcess.getTime().getDays());
-  	  	    		intboxHours.setValue(currentProcess.getTime().getHours());
-  	  	    		intboxMinutes.setValue(currentProcess.getTime().getMinutes());
-  	    		}
-  	    	}
-  		}
-  	}
-  	
-  	private int getLastPieceId() {
-  		int piece_id = 0;
-  		int size = pieceList.size();
-  		for(int i = 0; i < size; i++) {
-  			Piece t = pieceList.get(i);
-  			if(piece_id < t.getId()) { // asignamos el mas alto a la variable piece id
-  				piece_id = t.getId(); 
-  			}
-  		}
-  		return piece_id;
-    }
-  	
-  	private  Piece updatePieceList(Piece piece) {
+	 */
+	private void refreshViewProduct() {
+		if (currentProduct == null) {
+			productCaption.setLabel("Creacion de Producto");
+			deleteProductButton.setDisabled(true);
+			productNameTextbox.setText("");
+			productDetailsTextbox.setText("");
+			productCodeTextbox.setText("");
+			productPriceDoublebox.setText("");
+			processList = new ArrayList<Process>();
+			pieceList = new ArrayList<Piece>();
+			pieceListModel = new ListModelList<Piece>(pieceList);
+			pieceListbox.setModel(pieceListModel);
+			supplyList = new ArrayList<Supply>();
+			rawMaterialList = new ArrayList<RawMaterial>();
+		} else {
+			productCaption.setLabel("Edicion de Producto");
+			deleteProductButton.setDisabled(false);
+			productNameTextbox.setText(currentProduct.getName());
+			productDetailsTextbox.setText(currentProduct.getDetails());
+			productCodeTextbox.setText(currentProduct.getCode());
+			BigDecimal product_price = currentProduct.getPrice();
+			if(product_price != null) {
+				productPriceDoublebox.setValue(product_price.doubleValue());
+			}else {
+				productPriceDoublebox.setValue(null);
+			}
+			processList = getProcessList(currentProduct.getId());
+			pieceList = pieceService.getPieceList(currentProduct.getId());
+			pieceListModel = new ListModelList<Piece>(pieceList);
+			pieceListbox.setModel(pieceListModel);
+			supplyList = supplyService.getSupplyList(currentProduct.getId());
+			rawMaterialList = rawMaterialService.getRawMaterialList(currentProduct.getId());
+		}
+		refreshViewSupply();
+		refreshSupplyTypePopup();
+		refreshViewRawMaterial();
+		refreshRawMaterialTypePopup();
+	}
+
+	private void refreshViewPiece() {
+		if (currentPiece == null) {// no se esta editando ninguna pieza
+			pieceCreationBlock.setVisible(false);
+			processCreationBlock.setVisible(false);
+			deletePieceButton.setDisabled(true);
+			// limpiar form pieza
+			pieceNameTextbox.setText("");
+			pieceGroupCheckbox.setChecked(false);
+			// seleccionamos metros y pulgadas como valores predeterminados de las dimensiones de las piezas
+			Integer id_measure_unit_meters = measureUnitService.getMeasureUnit("Metros").getId();
+			MeasureUnit meters = measureUnitService.getMeasureUnit(id_measure_unit_meters);
+			Integer id_measure_unit_inch = measureUnitService.getMeasureUnit("Pulgadas").getId();
+			MeasureUnit inch = measureUnitService.getMeasureUnit(id_measure_unit_inch);
+			lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(meters));
+			depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(inch));
+			widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(inch));
+			pieceLengthDoublebox.setValue(0);
+			pieceWidthDoublebox.setValue(0);
+			pieceDepthDoublebox.setValue(0);
+			pieceSizeTextbox.setText("");
+			pieceUnitsByProductIntbox.setValue(0);
+			// limpiar procesos (ponerlos en vacio y sin check)
+			for(int i=1; i<processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
+				Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
+				Textbox txtboxDetails = (Textbox)processListbox.getChildren().get(i).getChildren().get(2).getChildren().get(0);
+				Intbox intboxDays = (Intbox)processListbox.getChildren().get(i).getChildren().get(3).getChildren().get(0);
+				Intbox intboxHours = (Intbox)processListbox.getChildren().get(i).getChildren().get(4).getChildren().get(0);
+				Intbox intboxMinutes = (Intbox)processListbox.getChildren().get(i).getChildren().get(5).getChildren().get(0);
+
+				chkbox.setChecked(false);
+				txtboxDetails.setVisible(false);
+				intboxDays.setVisible(false);
+				intboxHours.setVisible(false);
+				intboxMinutes.setVisible(false);
+				txtboxDetails.setText("");
+				intboxDays.setValue(0);
+				intboxHours.setValue(0);
+				intboxMinutes.setValue(0);
+			}
+		} else { // se esta editando una pieza
+			pieceCreationBlock.setVisible(true);
+			processCreationBlock.setVisible(true);
+			deletePieceButton.setDisabled(false);
+			// cargar form pieza
+			pieceNameTextbox.setText(currentPiece.getName());
+			pieceGroupCheckbox.setChecked(currentPiece.isGroup());
+			lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getLengthIdMeasureUnit())));
+			depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getDepthIdMeasureUnit())));
+			widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getWidthIdMeasureUnit())));
+			BigDecimal lenght = currentPiece.getLength();
+			if(lenght != null) {
+				pieceLengthDoublebox.setValue(lenght.doubleValue());
+			} else {
+				pieceLengthDoublebox.setValue(0);
+			}
+			BigDecimal depth = currentPiece.getDepth();
+			if(depth != null) {
+				pieceDepthDoublebox.setValue(depth.doubleValue());
+			} else {
+				pieceDepthDoublebox.setValue(0);
+			}
+			BigDecimal width = currentPiece.getWidth();
+			if(width != null) {
+				pieceWidthDoublebox.setValue(width.doubleValue());
+			} else {
+				pieceWidthDoublebox.setValue(0);
+			}
+			pieceSizeTextbox.setValue(currentPiece.getSize());
+			pieceUnitsByProductIntbox.setValue(currentPiece.getUnits());
+			// cargar procesos (cargar detalles, tiempos y checks)
+			List<Process> processesPieceList = processService.getProcessList(currentPiece.getId());
+			// recorremos los elementos del DOM
+			for(int i = 1; i < processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
+				// obtenemos las referencias a los elementos
+				Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
+				Textbox txtboxDetails = (Textbox)processListbox.getChildren().get(i).getChildren().get(2).getChildren().get(0);
+				Intbox intboxDays = (Intbox)processListbox.getChildren().get(i).getChildren().get(3).getChildren().get(0);
+				Intbox intboxHours = (Intbox)processListbox.getChildren().get(i).getChildren().get(4).getChildren().get(0);
+				Intbox intboxMinutes = (Intbox)processListbox.getChildren().get(i).getChildren().get(5).getChildren().get(0);
+
+				Process currentProcess = null;
+				for(int j = 0; j < processesPieceList.size(); j++) {// buscamos si existe el proceso
+					if(processesPieceList.get(j).getIdPiece().equals(currentPiece.getId()) && processesPieceList.get(j).getIdProcessType().equals(processTypeList.get(i - 1).getId())) { // el tipo de proceso i -1 es para empezar desde el indice 0
+						currentProcess = processesPieceList.get(j);
+					}
+				}
+				// cargamos los valores, de los procesos a los elementos
+				if(currentProcess == null) { //si no se encontro el proceso, esta en null
+					chkbox.setChecked(false);
+					txtboxDetails.setVisible(false);
+					intboxDays.setVisible(false);
+					intboxHours.setVisible(false);
+					intboxMinutes.setVisible(false);
+					txtboxDetails.setText("");
+					intboxDays.setValue(0);
+					intboxHours.setValue(0);
+					intboxMinutes.setValue(0);
+				} else {
+					txtboxDetails.setVisible(true);
+					intboxDays.setVisible(true);
+					intboxHours.setVisible(true);
+					intboxMinutes.setVisible(true);
+					txtboxDetails.setText(currentProcess.getDetails());
+					intboxDays.setValue(currentProcess.getTime().getDays());
+					intboxHours.setValue(currentProcess.getTime().getHours());
+					intboxMinutes.setValue(currentProcess.getTime().getMinutes());
+					chkbox.setChecked(true);
+				}
+			}
+		}
+	}
+
+	private int getLastPieceId() {
+		int piece_id = 0;
+		int size = pieceList.size();
+		for(int i = 0; i < size; i++) {
+			Piece t = pieceList.get(i);
+			if(piece_id < t.getId()) { // asignamos el mas alto a la variable piece id
+				piece_id = t.getId(); 
+			}
+		}
+		return piece_id;
+	}
+
+	private  Piece updatePieceList(Piece piece) {
 		if(piece.getId() == null) {
 			throw new IllegalArgumentException("can't update a null-id piece");
 		} else {
@@ -666,44 +667,44 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			throw new RuntimeException("Piece not found " + piece.getId());
 		}
 	}
-  	
-  	private void deletePiece(Piece piece) {
+
+	private void deletePiece(Piece piece) {
 		if(piece.getId() != null) {
-		    //eliminamos los procesos vinculados a esta pieza
-		    List<Process> deleteProcessList = new ArrayList<Process>();
-            for(Process auxProcess:processList) {
-                if(auxProcess.getIdPiece().equals(piece.getId())) {
-                    deleteProcessList.add(auxProcess);// no podemos eliminar directamte mientras se recorre la lista porque se la modifica
-                }
-            }
-            for(Process auxProcess:deleteProcessList) {
-                processList.remove(auxProcess);// eliminamos los procesos de la pieza
-            }
-            Piece deletePiece = null;
+			//eliminamos los procesos vinculados a esta pieza
+			List<Process> deleteProcessList = new ArrayList<Process>();
+			for(Process auxProcess:processList) {
+				if(auxProcess.getIdPiece().equals(piece.getId())) {
+					deleteProcessList.add(auxProcess);// no podemos eliminar directamte mientras se recorre la lista porque se la modifica
+				}
+			}
+			for(Process auxProcess:deleteProcessList) {
+				processList.remove(auxProcess);// eliminamos los procesos de la pieza
+			}
+			Piece deletePiece = null;
 			for(Piece auxPiece:pieceList) {
 				if(auxPiece.getId().equals(piece.getId())) {
-				    deletePiece = auxPiece;
+					deletePiece = auxPiece;
 				}
 			}
 			if(deletePiece != null) {
-			    pieceList.remove(deletePiece);// eliminamos la pieza
-            }
+				pieceList.remove(deletePiece);// eliminamos la pieza
+			}
 		}
 	}
-  	
-  	private List<Process> getProcessList(Integer idProduct) {// buscar todos los procesos de ese producto
-  		List<Process> list = new ArrayList<Process>();
-  		List<Piece> auxPieceList = pieceService.getPieceList(idProduct);
-  		for(Piece piece : auxPieceList) {
-  			List<Process> auxProcessList = processService.getProcessList(piece.getId());
-  			for(Process process : auxProcessList) {
-  				list.add(Process.clone(process));
+
+	private List<Process> getProcessList(Integer idProduct) {// buscar todos los procesos de ese producto
+		List<Process> list = new ArrayList<Process>();
+		List<Piece> auxPieceList = pieceService.getPieceList(idProduct);
+		for(Piece piece : auxPieceList) {
+			List<Process> auxProcessList = processService.getProcessList(piece.getId());
+			for(Process process : auxProcessList) {
+				list.add(Process.clone(process));
 			}
 		}
 		return list;
 	}
-  	
-  	private  Process updateProcessList(Process process) {
+
+	private  Process updateProcessList(Process process) {
 		if(process.getIdPiece() == null && process.getIdProcessType() == null) {
 			throw new IllegalArgumentException("can't update a null-id process");
 		}else {
@@ -719,35 +720,35 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			throw new RuntimeException("Process not found " + process.getIdPiece()+" "+process.getIdProcessType());
 		}
 	}
-  	
-  	private void deleteProcess(Process process) {
+
+	private void deleteProcess(Process process) {
 		if(process.getIdPiece()!=null && process.getIdProcessType()!=null) {
-		    Process deleteProcess = null;
-            for(Process auxProcess:processList) {
-                if(auxProcess.getIdPiece().equals(process.getIdPiece()) && auxProcess.getIdProcessType().equals(process.getIdProcessType())) {
-                    deleteProcess = auxProcess;// no podemos eliminar directamte mientras se recorre la lista porque se la modifica
-                }
-            }
-            if(deleteProcess != null) {
-                processList.remove(deleteProcess);
-                return;
-            }
+			Process deleteProcess = null;
+			for(Process auxProcess:processList) {
+				if(auxProcess.getIdPiece().equals(process.getIdPiece()) && auxProcess.getIdProcessType().equals(process.getIdProcessType())) {
+					deleteProcess = auxProcess;// no podemos eliminar directamte mientras se recorre la lista porque se la modifica
+				}
+			}
+			if(deleteProcess != null) {
+				processList.remove(deleteProcess);
+				return;
+			}
 		}
 	}
-  	
-  	public String quantityOfProcess(int idPiece) {
-  		int quantity = 0;
-  		if(processList != null && processList.isEmpty() == false) {
-    		for(int i=0; i<processList.size(); i++) {
-    			if(processList.get(i).getIdPiece() == idPiece) {
-    				quantity++;
-    			}
-    		}
-    	}
-    	return "" + quantity;
-    }
-  	
-  	@Listen("onSelect = #pieceListbox")
+
+	public String quantityOfProcess(int idPiece) {
+		int quantity = 0;
+		if(processList != null && processList.isEmpty() == false) {
+			for(int i=0; i<processList.size(); i++) {
+				if(processList.get(i).getIdPiece() == idPiece) {
+					quantity++;
+				}
+			}
+		}
+		return "" + quantity;
+	}
+
+	@Listen("onSelect = #pieceListbox")
 	public void selectPiece() {
 		if(pieceListModel.isSelectionEmpty()){
 			//just in case for the no selection
@@ -760,326 +761,367 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		}
 		pieceListModel.clearSelection();
 	}
-  	
-  	@Listen("onClick = #deleteProductButton")
-    public void deleteProduct() {
-  		if(currentProduct != null) {
-  			Messagebox.show("Esta seguro que quiere eliminar el producto? Se eliminaran las piezas y procesos relacionados", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
-  			    public void onEvent(Event evt) throws InterruptedException {
-  			        if (evt.getName().equals("onOK")) {
-  			            // la eliminacion de las piezas y procesos relacionados al producto se realizan en el servicio
-  		    			productService.deleteProduct(currentProduct);
-  		    			currentProduct = null;
-  		    			currentPiece = null;
-  		    			refreshViewProduct();
-  		    			refreshViewPiece();
-  			            alert("Producto eliminado.");
-  			        }
-  			    }
-  			});
-  		}
-  	}
-  	
-  	@Listen("onClick = #deletePieceButton")
-    public void deletePiece() {
-  		if(currentPiece != null) {
-  			Messagebox.show("Esta seguro que desea eliminar la pieza " + currentPiece.getName() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
-  			    public void onEvent(Event evt) throws InterruptedException {
-  			        if (evt.getName().equals("onOK")) {
-  			        	//eliminamos la pieza, los procesos tambien se eliminan en el metodo
-  			        	deletePiece(currentPiece);
-  			        	pieceListModel.remove(currentPiece);
-  			        	pieceListbox.setModel(pieceListModel);
-  			        	currentPiece = null;
-  			        	refreshViewPiece();
-  			            alert("Pieza eliminada.");
-  			        }
-  			    }
-  			});
-  			
-  		}
-  	}
-  	
-  	@Listen("onClick = #resetProductButton")
-    public void resetProduct() {
-  		refreshViewProduct();
-  		refreshViewPiece();
-  	}
-  	
-  	@Listen("onClick = #resetPieceButton")
-    public void resetPiece() {
-  		refreshViewPiece();
-  		pieceCreationBlock.setVisible(true);
-  	}
-  	
-  	private Process searchProcess(Integer idPiece, Integer idProcessType) {
-  		int size = processList.size();
-  		for(int i = 0; i < size; i++) {
-  			Process t = processList.get(i);
-  			if(t.getIdPiece().equals(idPiece) && t.getIdProcessType().equals(idProcessType)) {
-  				return Process.clone(t);
-  			}
-  		}
-  		return null;
-    }
-  	
-  	@Listen("onClick = #pieceCopyButton")
-    public void doPieceCopyButtonClick() {
-  		createNewPiece();
-  		// mostramos el modal para seleccionar la pieza
-        Window window = (Window)Executions.createComponents(
-                "/piece_selection_modal.zul", null, null);
-        window.doModal();
-    }
-  	
-  	private void fillPieceCopy(Piece piece) {
-  		pieceNameTextbox.setText(piece.getName());
-    	pieceGroupCheckbox.setChecked(piece.isGroup());
-    	lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getLengthIdMeasureUnit())));
-    	depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getDepthIdMeasureUnit())));
-    	widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getWidthIdMeasureUnit())));
-    	BigDecimal lenght = piece.getLength();
+
+	@Listen("onClick = #deleteProductButton")
+	public void deleteProduct() {
+		if(currentProduct != null) {
+			Messagebox.show("Esta seguro que quiere eliminar el producto? Se eliminaran las piezas y procesos relacionados", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+				public void onEvent(Event evt) throws InterruptedException {
+					if (evt.getName().equals("onOK")) {
+						// la eliminacion de las piezas y procesos relacionados al producto se realizan en el servicio
+						productService.deleteProduct(currentProduct);
+						currentProduct = null;
+						currentPiece = null;
+						refreshViewProduct();
+						refreshViewPiece();
+						alert("Producto eliminado.");
+					}
+				}
+			});
+		}
+	}
+
+	@Listen("onClick = #deletePieceButton")
+	public void deletePiece() {
+		if(currentPiece != null) {
+			Messagebox.show("Esta seguro que desea eliminar la pieza " + currentPiece.getName() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+				public void onEvent(Event evt) throws InterruptedException {
+					if (evt.getName().equals("onOK")) {
+						//eliminamos la pieza, los procesos tambien se eliminan en el metodo
+						deletePiece(currentPiece);
+						pieceListModel.remove(currentPiece);
+						pieceListbox.setModel(pieceListModel);
+						currentPiece = null;
+						refreshViewPiece();
+						alert("Pieza eliminada.");
+					}
+				}
+			});
+
+		}
+	}
+
+	@Listen("onClick = #resetProductButton")
+	public void resetProduct() {
+		refreshViewProduct();
+		currentPiece = null;
+		refreshViewPiece();
+	}
+
+	@Listen("onClick = #resetPieceButton")
+	public void resetPiece() {
+		refreshViewPiece();
+	}
+
+	private Process searchProcess(Integer idPiece, Integer idProcessType) {
+		int size = processList.size();
+		for(int i = 0; i < size; i++) {
+			Process t = processList.get(i);
+			if(t.getIdPiece().equals(idPiece) && t.getIdProcessType().equals(idProcessType)) {
+				return Process.clone(t);
+			}
+		}
+		return null;
+	}
+
+	@Listen("onClick = #pieceCopyButton")
+	public void doPieceCopyButtonClick() {
+		createNewPiece();
+		// mostramos el modal para seleccionar la pieza
+		Window window = (Window)Executions.createComponents(
+				"/piece_selection_modal.zul", null, null);
+		window.doModal();
+	}
+
+	private void fillPieceCopy(Piece pieceCopy) {
+		pieceNameTextbox.setText(pieceCopy.getName());
+		pieceGroupCheckbox.setChecked(pieceCopy.isGroup());
+		lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(pieceCopy.getLengthIdMeasureUnit())));
+		depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(pieceCopy.getDepthIdMeasureUnit())));
+		widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(pieceCopy.getWidthIdMeasureUnit())));
+		BigDecimal lenght = pieceCopy.getLength();
 		if(lenght != null) {
 			pieceLengthDoublebox.setValue(lenght.doubleValue());
 		} else {
 			pieceLengthDoublebox.setValue(0);
 		}
-		BigDecimal depth = piece.getDepth();
+		BigDecimal depth = pieceCopy.getDepth();
 		if(depth != null) {
 			pieceDepthDoublebox.setValue(depth.doubleValue());
 		} else {
 			pieceDepthDoublebox.setValue(0);
 		}
-		BigDecimal width = piece.getWidth();
+		BigDecimal width = pieceCopy.getWidth();
 		if(width != null) {
 			pieceWidthDoublebox.setValue(width.doubleValue());
 		} else {
 			pieceWidthDoublebox.setValue(0);
 		}
-    	pieceSizeTextbox.setValue(piece.getSize());
-    	pieceUnitsByProductIntbox.setValue(piece.getUnits());
-  	}
-  	
-  	// supply methods
-  	
-   	@Listen("onClick = #openSupplyListButton")
-     public void showSupplyCreationBlock() {
-   		supplyCreationBlock.setVisible(true);
-     }
-   	
-   	@Listen("onClick = #closeSupplyListButton")
-     public void hideSupplyCreationBlock() {
-   		supplyCreationBlock.setVisible(false);
-     }
-   	
-   	private void refreshViewSupply() {
-   		if (currentSupply == null) {
-   			// borramos el text del insumo
-   			// deseleccionamos la tabla y borramos la cantidad
-   			supplyTypeBandbox.setDisabled(false);
-   			supplyTypeBandbox.setValue("");
-   			supplyQuantityDoublebox.setValue(null);
-   			currentSupplyType = null;
-   			deleteSupplyButton.setDisabled(true);
-   			cancelSupplyButton.setDisabled(true);
-   		} else {
-   			currentSupplyType = supplyTypeService.getSupplyType(currentSupply.getIdSupplyType());
-   			supplyTypeBandbox.setDisabled(true);// no se permite modificar en la edicion
-   			supplyTypeBandbox.setValue(currentSupplyType.getDescription());
-   			supplyQuantityDoublebox.setValue(currentSupply.getQuantity());
-   			deleteSupplyButton.setDisabled(false);
-   			cancelSupplyButton.setDisabled(false);
-   		}
-   		supplyTypePopupListbox.clearSelection();
-   		refreshSupplyListbox();
-   	}
-   	
-   	private void refreshSupplyListbox() {
-   		supplyListModel = new ListModelList<Supply>(supplyList);
-   		supplyListbox.setModel(supplyListModel);
-   	}
-   	
-   	private void refreshSupplyTypePopup() {// el popup se actualiza en base a la lista
-   		supplyTypePopupList = supplyTypeService.getSupplyTypeList();
-     	for(Supply supply : supplyList) {
-     		SupplyType aux = supplyTypeService.getSupplyType(supply.getIdSupplyType());
-     		supplyTypePopupList.remove(aux);// sacamos del popup
-     	}
-     	supplyTypePopupListModel = new ListModelList<SupplyType>(supplyTypePopupList);
-     	supplyTypePopupListbox.setModel(supplyTypePopupListModel);
- 	}
-   	
-   	@Listen("onSelect = #supplyTypePopupListbox")
-     public void selectionSupplyTypePopupListbox() {
-         currentSupplyType = (SupplyType) supplyTypePopupListbox.getSelectedItem().getValue();
-         supplyTypeBandbox.setValue(currentSupplyType.getDescription());
-         supplyTypeBandbox.close();
-     }
-   	
-   	@Listen("onSelect = #supplyListbox")
- 	public void selectSupply() {
- 		if(supplyListModel.isSelectionEmpty()){
- 			//just in case for the no selection
- 			currentSupply = null;
- 		} else {
- 			if(currentSupply == null) {// permite la seleccion solo si no existe nada seleccionado
- 				currentSupply = supplyListModel.getSelection().iterator().next();
- 				currentSupplyType = supplyTypeService.getSupplyType(currentSupply.getIdSupplyType());
- 				refreshViewSupply();
- 			}
- 		}
- 		supplyListModel.clearSelection();
- 	}
-   	
-   	@Listen("onClick = #cancelSupplyButton")
-     public void cancelSupply() {
-     	currentSupply = null;
-     	refreshViewSupply();
-     }
-   	
-   	@Listen("onClick = #resetSupplyButton")
-     public void resetSupply() {
-   		refreshViewSupply();
-   	}
-   	
-   	@Listen("onClick = #deleteSupplyButton")
-     public void deleteSupply() {
-   		if(currentSupply != null) {
-   			Messagebox.show("Esta seguro que desea eliminar " + supplyTypeService.getSupplyType(currentSupply.getIdSupplyType()).getDescription() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
-   			    public void onEvent(Event evt) throws InterruptedException {
-   			        if (evt.getName().equals("onOK")) {
-   			        	if(currentSupply.getId() != null) {// si el detalle existe en la bd
-   			        		lateDeleteSupplyList.add(currentSupply);// agregamos a la lista de eliminacion por las dudas que se vuelva a agregar
-   			        	}
-   			        	supplyList.remove(currentSupply);// quitamos de la lista
-   			        	currentSupply = null;// eliminamos
-   			        	refreshSupplyTypePopup();// actualizamos el popup para que aparezca el insumo eliminado
-   			        	refreshViewSupply();
-   			        }
-   			    }
-   			});
-   		} 
-   	}
-   	
-   	@Listen("onClick = #saveSupplyButton")
-     public void saveSupply() {
- 		if(supplyQuantityDoublebox.getValue()==null || supplyQuantityDoublebox.getValue()<=0) {
- 			Clients.showNotification("Ingresar Cantidad del Insumo", supplyQuantityDoublebox);
- 			return;
- 		}
- 		if(currentSupplyType == null) {
- 			Clients.showNotification("Debe seleccionar un Insumo", supplyTypeBandbox);
- 			return;
- 		}
- 		// buscamos si no esta eliminado
- 		Supply aux = null;
- 		for(Supply lateDeleteSupply : lateDeleteSupplyList) {
- 			if(currentSupplyType.getId().equals(lateDeleteSupply.getId())) {
- 				aux = lateDeleteSupply;
- 			}
- 		}
- 		if(aux != null) {
- 			lateDeleteSupplyList.remove(aux);// lo eliminamos de la lista de eliminacion tardia porque el sera agregado nuevamente
- 		}
- 		int supplyTypeId = currentSupplyType.getId();
- 		double supplyQuantity = supplyQuantityDoublebox.getValue();
- 		if(currentSupply == null) { // es nuevo
- 			if(aux != null) {// si ya estaba en un detalle
- 				aux.setQuantity(supplyQuantity);;
- 				supplyList.add(aux);
- 			} else {
- 				// se crea un detalle sin id porque recien se le asignara uno al momento de grabarse definitivamente
- 				currentSupply = new Supply(null, null, supplyTypeId, supplyQuantity);
- 				supplyList.add(currentSupply);
- 			}
- 		} else { // se edita
- 			currentSupply.setIdSupplyType(supplyTypeId);;
- 			currentSupply.setQuantity(supplyQuantity);
- 			updateSupplyList(currentSupply);// actualizamos la lista
- 		}
- 		refreshSupplyTypePopup();// actualizamos el popup
- 		currentSupply = null;
- 		refreshViewSupply();
-     }
-   	
-   	private Supply updateSupplyList(Supply supply) {
- 		if(supply.getId() == null) {
- 			throw new IllegalArgumentException("can't update a null-id Supply");
- 		} else {
- 			supply = Supply.clone(supply);
- 			int size = supplyList.size();
- 			for(int i = 0; i < size; i++) {
- 				Supply t = supplyList.get(i);
- 				if(t.getIdSupplyType().equals(supply.getIdSupplyType())) {
- 					supplyList.set(i, supply);
- 					return supply;
- 				}
- 			}
- 			throw new RuntimeException("Supply not found " + supply.getId());
- 		}
- 	}
-   	
-   	public SupplyType getSupplyType(int idSupplyType) {
-     	return supplyTypeService.getSupplyType(idSupplyType);
-     }
-   	
-  	// raw material methods
-  	
-  	@Listen("onClick = #openRawMaterialListButton")
-    public void showRawMaterialCreationBlock() {
-  		rawMaterialCreationBlock.setVisible(true);
-    }
-  	
-  	@Listen("onClick = #closeRawMaterialListButton")
-    public void hideRawMaterialCreationBlock() {
-  		rawMaterialCreationBlock.setVisible(false);
-    }
-  	
-  	private void refreshViewRawMaterial() {
-  		if (currentRawMaterial == null) {
-  			// borramos el text de la materia prima
-  			// deseleccionamos la tabla y borramos la cantidad
-  			rawMaterialTypeBandbox.setDisabled(false);
-  			rawMaterialTypeBandbox.setValue("");
-  			rawMaterialQuantityDoublebox.setValue(null);
-  			currentRawMaterialType = null;
-  			deleteRawMaterialButton.setDisabled(true);
-  			cancelRawMaterialButton.setDisabled(true);
-  		} else {
-  			currentRawMaterialType = rawMaterialTypeService.getRawMaterialType(currentRawMaterial.getIdRawMaterialType());
-  			rawMaterialTypeBandbox.setDisabled(true);// no se permite modificar en la edicion
-  			rawMaterialTypeBandbox.setValue(currentRawMaterialType.getName());
-  			rawMaterialQuantityDoublebox.setValue(currentRawMaterial.getQuantity());
-  			deleteRawMaterialButton.setDisabled(false);
-  			cancelRawMaterialButton.setDisabled(false);
-  		}
-  		rawMaterialTypePopupListbox.clearSelection();
-  		refreshRawMaterialListbox();
-  	}
-  	
-  	private void refreshRawMaterialListbox() {
-  		rawMaterialListModel = new ListModelList<RawMaterial>(rawMaterialList);
-  		rawMaterialListbox.setModel(rawMaterialListModel);
-  	}
-  	
-  	private void refreshRawMaterialTypePopup() {// el popup se actualiza en base a la lista
-  		rawMaterialTypePopupList = rawMaterialTypeService.getRawMaterialTypeList();
-    	for(RawMaterial rawMaterial : rawMaterialList) {
-    		RawMaterialType aux = rawMaterialTypeService.getRawMaterialType(rawMaterial.getIdRawMaterialType());
-    		rawMaterialTypePopupList.remove(aux);// sacamos del popup
-    	}
-    	rawMaterialTypePopupListModel = new ListModelList<RawMaterialType>(rawMaterialTypePopupList);
-    	rawMaterialTypePopupListbox.setModel(rawMaterialTypePopupListModel);
+		pieceSizeTextbox.setValue(pieceCopy.getSize());
+		pieceUnitsByProductIntbox.setValue(pieceCopy.getUnits());
+		fillProcessCopy(pieceCopy);
 	}
-  	
-  	@Listen("onSelect = #rawMaterialTypePopupListbox")
-    public void selectionRawMaterialTypePopupListbox() {
-        currentRawMaterialType = (RawMaterialType) rawMaterialTypePopupListbox.getSelectedItem().getValue();
-        rawMaterialTypeBandbox.setValue(currentRawMaterialType.getName());
-        rawMaterialTypeBandbox.close();
-    }
-  	
-  	@Listen("onSelect = #rawMaterialListbox")
+
+	private void fillProcessCopy(Piece pieceCopy) {
+		processCreationBlock.setVisible(true);
+		List<Process> processListCopy = processService.getProcessList(pieceCopy.getId());
+		for(int i = 1; i < processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
+			// obtenemos las referencias a los elementos
+			Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
+			Textbox txtboxDetails = (Textbox)processListbox.getChildren().get(i).getChildren().get(2).getChildren().get(0);
+			Intbox intboxDays = (Intbox)processListbox.getChildren().get(i).getChildren().get(3).getChildren().get(0);
+			Intbox intboxHours = (Intbox)processListbox.getChildren().get(i).getChildren().get(4).getChildren().get(0);
+			Intbox intboxMinutes = (Intbox)processListbox.getChildren().get(i).getChildren().get(5).getChildren().get(0);
+			Process currentProcess = null;
+			for(int j = 0; j < processListCopy.size(); j++) {
+				if(processListCopy.get(j).getIdPiece().equals(pieceCopy.getId()) && processListCopy.get(j).getIdProcessType().equals(processTypeList.get(i - 1).getId())) { // el tipo de proceso i -1 es para empezar desde el indice 0
+					currentProcess = processListCopy.get(j);
+				}
+			}
+			if(currentProcess == null) { //si no se encontro el proceso esta en null
+				chkbox.setChecked(false);
+				txtboxDetails.setVisible(false);
+				intboxDays.setVisible(false);
+				intboxHours.setVisible(false);
+				intboxMinutes.setVisible(false);
+				txtboxDetails.setText("");
+				intboxDays.setValue(0);
+				intboxHours.setValue(0);
+				intboxMinutes.setValue(0);
+			} else {
+				chkbox.setChecked(true);
+				txtboxDetails.setVisible(true);
+				intboxDays.setVisible(true);
+				intboxHours.setVisible(true);
+				intboxMinutes.setVisible(true);
+				txtboxDetails.setText(currentProcess.getDetails());
+				intboxDays.setValue(currentProcess.getTime().getDays());
+				intboxHours.setValue(currentProcess.getTime().getHours());
+				intboxMinutes.setValue(currentProcess.getTime().getMinutes());
+			}
+		}
+	}
+
+	// supply methods
+
+	@Listen("onClick = #openSupplyListButton")
+	public void showSupplyCreationBlock() {
+		supplyCreationBlock.setVisible(true);
+	}
+
+	@Listen("onClick = #closeSupplyListButton")
+	public void hideSupplyCreationBlock() {
+		supplyCreationBlock.setVisible(false);
+	}
+
+	private void refreshViewSupply() {
+		if (currentSupply == null) {
+			// borramos el text del insumo
+			// deseleccionamos la tabla y borramos la cantidad
+			supplyTypeBandbox.setDisabled(false);
+			supplyTypeBandbox.setValue("");
+			supplyQuantityDoublebox.setValue(null);
+			currentSupplyType = null;
+			deleteSupplyButton.setDisabled(true);
+			cancelSupplyButton.setDisabled(true);
+		} else {
+			currentSupplyType = supplyTypeService.getSupplyType(currentSupply.getIdSupplyType());
+			supplyTypeBandbox.setDisabled(true);// no se permite modificar en la edicion
+			supplyTypeBandbox.setValue(currentSupplyType.getDescription());
+			supplyQuantityDoublebox.setValue(currentSupply.getQuantity());
+			deleteSupplyButton.setDisabled(false);
+			cancelSupplyButton.setDisabled(false);
+		}
+		supplyTypePopupListbox.clearSelection();
+		refreshSupplyListbox();
+	}
+
+	private void refreshSupplyListbox() {
+		supplyListModel = new ListModelList<Supply>(supplyList);
+		supplyListbox.setModel(supplyListModel);
+	}
+
+	private void refreshSupplyTypePopup() {// el popup se actualiza en base a la lista
+		supplyTypePopupList = supplyTypeService.getSupplyTypeList();
+		for(Supply supply : supplyList) {
+			SupplyType aux = supplyTypeService.getSupplyType(supply.getIdSupplyType());
+			supplyTypePopupList.remove(aux);// sacamos del popup
+		}
+		supplyTypePopupListModel = new ListModelList<SupplyType>(supplyTypePopupList);
+		supplyTypePopupListbox.setModel(supplyTypePopupListModel);
+	}
+
+	@Listen("onSelect = #supplyTypePopupListbox")
+	public void selectionSupplyTypePopupListbox() {
+		currentSupplyType = (SupplyType) supplyTypePopupListbox.getSelectedItem().getValue();
+		supplyTypeBandbox.setValue(currentSupplyType.getDescription());
+		supplyTypeBandbox.close();
+	}
+
+	@Listen("onSelect = #supplyListbox")
+	public void selectSupply() {
+		if(supplyListModel.isSelectionEmpty()){
+			//just in case for the no selection
+			currentSupply = null;
+		} else {
+			if(currentSupply == null) {// permite la seleccion solo si no existe nada seleccionado
+				currentSupply = supplyListModel.getSelection().iterator().next();
+				currentSupplyType = supplyTypeService.getSupplyType(currentSupply.getIdSupplyType());
+				refreshViewSupply();
+			}
+		}
+		supplyListModel.clearSelection();
+	}
+
+	@Listen("onClick = #cancelSupplyButton")
+	public void cancelSupply() {
+		currentSupply = null;
+		refreshViewSupply();
+	}
+
+	@Listen("onClick = #resetSupplyButton")
+	public void resetSupply() {
+		refreshViewSupply();
+	}
+
+	@Listen("onClick = #deleteSupplyButton")
+	public void deleteSupply() {
+		if(currentSupply != null) {
+			Messagebox.show("Esta seguro que desea eliminar " + supplyTypeService.getSupplyType(currentSupply.getIdSupplyType()).getDescription() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+				public void onEvent(Event evt) throws InterruptedException {
+					if (evt.getName().equals("onOK")) {
+						if(currentSupply.getId() != null) {// si el detalle existe en la bd
+							lateDeleteSupplyList.add(currentSupply);// agregamos a la lista de eliminacion por las dudas que se vuelva a agregar
+						}
+						supplyList.remove(currentSupply);// quitamos de la lista
+						currentSupply = null;// eliminamos
+						refreshSupplyTypePopup();// actualizamos el popup para que aparezca el insumo eliminado
+						refreshViewSupply();
+					}
+				}
+			});
+		} 
+	}
+
+	@Listen("onClick = #saveSupplyButton")
+	public void saveSupply() {
+		if(supplyQuantityDoublebox.getValue()==null || supplyQuantityDoublebox.getValue()<=0) {
+			Clients.showNotification("Ingresar Cantidad del Insumo", supplyQuantityDoublebox);
+			return;
+		}
+		if(currentSupplyType == null) {
+			Clients.showNotification("Debe seleccionar un Insumo", supplyTypeBandbox);
+			return;
+		}
+		// buscamos si no esta eliminado
+		Supply aux = null;
+		for(Supply lateDeleteSupply : lateDeleteSupplyList) {
+			if(currentSupplyType.getId().equals(lateDeleteSupply.getId())) {
+				aux = lateDeleteSupply;
+			}
+		}
+		if(aux != null) {
+			lateDeleteSupplyList.remove(aux);// lo eliminamos de la lista de eliminacion tardia porque el sera agregado nuevamente
+		}
+		int supplyTypeId = currentSupplyType.getId();
+		double supplyQuantity = supplyQuantityDoublebox.getValue();
+		if(currentSupply == null) { // es nuevo
+			if(aux != null) {// si ya estaba en un detalle
+				aux.setQuantity(supplyQuantity);;
+				supplyList.add(aux);
+			} else {
+				// se crea un detalle sin id porque recien se le asignara uno al momento de grabarse definitivamente
+				currentSupply = new Supply(null, null, supplyTypeId, supplyQuantity);
+				supplyList.add(currentSupply);
+			}
+		} else { // se edita
+			currentSupply.setIdSupplyType(supplyTypeId);;
+			currentSupply.setQuantity(supplyQuantity);
+			updateSupplyList(currentSupply);// actualizamos la lista
+		}
+		refreshSupplyTypePopup();// actualizamos el popup
+		currentSupply = null;
+		refreshViewSupply();
+	}
+
+	private Supply updateSupplyList(Supply supply) {
+		if(supply.getId() == null) {
+			throw new IllegalArgumentException("can't update a null-id Supply");
+		} else {
+			supply = Supply.clone(supply);
+			int size = supplyList.size();
+			for(int i = 0; i < size; i++) {
+				Supply t = supplyList.get(i);
+				if(t.getIdSupplyType().equals(supply.getIdSupplyType())) {
+					supplyList.set(i, supply);
+					return supply;
+				}
+			}
+			throw new RuntimeException("Supply not found " + supply.getId());
+		}
+	}
+
+	public SupplyType getSupplyType(int idSupplyType) {
+		return supplyTypeService.getSupplyType(idSupplyType);
+	}
+
+	// raw material methods
+
+	@Listen("onClick = #openRawMaterialListButton")
+	public void showRawMaterialCreationBlock() {
+		rawMaterialCreationBlock.setVisible(true);
+	}
+
+	@Listen("onClick = #closeRawMaterialListButton")
+	public void hideRawMaterialCreationBlock() {
+		rawMaterialCreationBlock.setVisible(false);
+	}
+
+	private void refreshViewRawMaterial() {
+		if (currentRawMaterial == null) {
+			// borramos el text de la materia prima
+			// deseleccionamos la tabla y borramos la cantidad
+			rawMaterialTypeBandbox.setDisabled(false);
+			rawMaterialTypeBandbox.setValue("");
+			rawMaterialQuantityDoublebox.setValue(null);
+			currentRawMaterialType = null;
+			deleteRawMaterialButton.setDisabled(true);
+			cancelRawMaterialButton.setDisabled(true);
+		} else {
+			currentRawMaterialType = rawMaterialTypeService.getRawMaterialType(currentRawMaterial.getIdRawMaterialType());
+			rawMaterialTypeBandbox.setDisabled(true);// no se permite modificar en la edicion
+			rawMaterialTypeBandbox.setValue(currentRawMaterialType.getName());
+			rawMaterialQuantityDoublebox.setValue(currentRawMaterial.getQuantity());
+			deleteRawMaterialButton.setDisabled(false);
+			cancelRawMaterialButton.setDisabled(false);
+		}
+		rawMaterialTypePopupListbox.clearSelection();
+		refreshRawMaterialListbox();
+	}
+
+	private void refreshRawMaterialListbox() {
+		rawMaterialListModel = new ListModelList<RawMaterial>(rawMaterialList);
+		rawMaterialListbox.setModel(rawMaterialListModel);
+	}
+
+	private void refreshRawMaterialTypePopup() {// el popup se actualiza en base a la lista
+		rawMaterialTypePopupList = rawMaterialTypeService.getRawMaterialTypeList();
+		for(RawMaterial rawMaterial : rawMaterialList) {
+			RawMaterialType aux = rawMaterialTypeService.getRawMaterialType(rawMaterial.getIdRawMaterialType());
+			rawMaterialTypePopupList.remove(aux);// sacamos del popup
+		}
+		rawMaterialTypePopupListModel = new ListModelList<RawMaterialType>(rawMaterialTypePopupList);
+		rawMaterialTypePopupListbox.setModel(rawMaterialTypePopupListModel);
+	}
+
+	@Listen("onSelect = #rawMaterialTypePopupListbox")
+	public void selectionRawMaterialTypePopupListbox() {
+		currentRawMaterialType = (RawMaterialType) rawMaterialTypePopupListbox.getSelectedItem().getValue();
+		rawMaterialTypeBandbox.setValue(currentRawMaterialType.getName());
+		rawMaterialTypeBandbox.close();
+	}
+
+	@Listen("onSelect = #rawMaterialListbox")
 	public void selectRawMaterial() {
 		if(rawMaterialListModel.isSelectionEmpty()){
 			//just in case for the no selection
@@ -1093,39 +1135,39 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		}
 		rawMaterialListModel.clearSelection();
 	}
-  	
-  	@Listen("onClick = #cancelRawMaterialButton")
-    public void cancelRawMaterial() {
-    	currentRawMaterial = null;
-    	refreshViewRawMaterial();
-    }
-  	
-  	@Listen("onClick = #resetRawMaterialButton")
-    public void resetRawMaterial() {
-  		refreshViewRawMaterial();
-  	}
-  	
-  	@Listen("onClick = #deleteRawMaterialButton")
-    public void deleteRawMaterial() {
-  		if(currentRawMaterial != null) {
-  			Messagebox.show("Esta seguro que desea eliminar " + rawMaterialTypeService.getRawMaterialType(currentRawMaterial.getIdRawMaterialType()).getName() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
-  			    public void onEvent(Event evt) throws InterruptedException {
-  			        if (evt.getName().equals("onOK")) {
-  			        	if(currentRawMaterial.getId() != null) {// si el detalle existe en la bd
-  			        		lateDeleteRawMaterialList.add(currentRawMaterial);// agregamos a la lista de eliminacion por las dudas que se vuelva a agregar
-  			        	}
-  			        	rawMaterialList.remove(currentRawMaterial);// quitamos de la lista
-  			        	currentRawMaterial = null;// eliminamos
-  			        	refreshRawMaterialTypePopup();// actualizamos el popup para que aparezca vuelva a aparecer el eliminado
-  			        	refreshViewRawMaterial();
-  			        }
-  			    }
-  			});
-  		} 
-  	}
-  	
-  	@Listen("onClick = #saveRawMaterialButton")
-    public void saveRawMaterial() {
+
+	@Listen("onClick = #cancelRawMaterialButton")
+	public void cancelRawMaterial() {
+		currentRawMaterial = null;
+		refreshViewRawMaterial();
+	}
+
+	@Listen("onClick = #resetRawMaterialButton")
+	public void resetRawMaterial() {
+		refreshViewRawMaterial();
+	}
+
+	@Listen("onClick = #deleteRawMaterialButton")
+	public void deleteRawMaterial() {
+		if(currentRawMaterial != null) {
+			Messagebox.show("Esta seguro que desea eliminar " + rawMaterialTypeService.getRawMaterialType(currentRawMaterial.getIdRawMaterialType()).getName() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+				public void onEvent(Event evt) throws InterruptedException {
+					if (evt.getName().equals("onOK")) {
+						if(currentRawMaterial.getId() != null) {// si el detalle existe en la bd
+							lateDeleteRawMaterialList.add(currentRawMaterial);// agregamos a la lista de eliminacion por las dudas que se vuelva a agregar
+						}
+						rawMaterialList.remove(currentRawMaterial);// quitamos de la lista
+						currentRawMaterial = null;// eliminamos
+						refreshRawMaterialTypePopup();// actualizamos el popup para que aparezca vuelva a aparecer el eliminado
+						refreshViewRawMaterial();
+					}
+				}
+			});
+		} 
+	}
+
+	@Listen("onClick = #saveRawMaterialButton")
+	public void saveRawMaterial() {
 		if(rawMaterialQuantityDoublebox.getValue()==null || rawMaterialQuantityDoublebox.getValue()<=0) {
 			Clients.showNotification("Ingresar Cantidad de la Materia Prima", rawMaterialQuantityDoublebox);
 			return;
@@ -1163,9 +1205,9 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		refreshRawMaterialTypePopup();// actualizamos el popup
 		currentRawMaterial = null;
 		refreshViewRawMaterial();
-    }
-  	
-  	private RawMaterial updateRawMaterialList(RawMaterial rawMaterial) {
+	}
+
+	private RawMaterial updateRawMaterialList(RawMaterial rawMaterial) {
 		if(rawMaterial.getId() == null) {
 			throw new IllegalArgumentException("can't update a null-id RawMaterial");
 		} else {
@@ -1181,16 +1223,16 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			throw new RuntimeException("RawMaterial not found " + rawMaterial.getId());
 		}
 	}
-  	
-  	public RawMaterialType getRawMaterialType(int idRawMaterialType) {
-    	return rawMaterialTypeService.getRawMaterialType(idRawMaterialType);
-    }
-  	
-  	public String getMeasureUnitName(int idMeasureUnit) {
-    	if(measureUnitService.getMeasureUnit(idMeasureUnit) != null) {
-    		return measureUnitService.getMeasureUnit(idMeasureUnit).getName();
-    	} else {
-    		return "[Sin Unidad de Medida]";
-    	}
-    }
+
+	public RawMaterialType getRawMaterialType(int idRawMaterialType) {
+		return rawMaterialTypeService.getRawMaterialType(idRawMaterialType);
+	}
+
+	public String getMeasureUnitName(int idMeasureUnit) {
+		if(measureUnitService.getMeasureUnit(idMeasureUnit) != null) {
+			return measureUnitService.getMeasureUnit(idMeasureUnit).getName();
+		} else {
+			return "[Sin Unidad de Medida]";
+		}
+	}
 }

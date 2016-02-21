@@ -9,6 +9,7 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
@@ -42,6 +43,12 @@ public class SupplyController extends SelectorComposer<Component>{
 	@Wire
 	Textbox measureTextBox;
 	@Wire
+	Doublebox stockDoublebox;
+	@Wire
+	Doublebox stockMinDoublebox;
+	@Wire
+	Doublebox stockRepoDoublebox;
+	@Wire
     Button saveButton;
 	@Wire
     Button cancelButton;
@@ -49,7 +56,7 @@ public class SupplyController extends SelectorComposer<Component>{
     Button resetButton;
     @Wire
     Button deleteButton;
-	
+    
     // services
     private SupplyTypeService supplyTypeService = new SupplyTypeServiceImpl();
     
@@ -79,7 +86,7 @@ public class SupplyController extends SelectorComposer<Component>{
     
     @Listen("onClick = #newButton")
     public void newButtonClick() {
-        currentSupplyType = new SupplyType(null, "", "", "", "", "", "");
+        currentSupplyType = new SupplyType(null, "", "", "", "", "", "", 0.0, 0.0, 0.0);
         refreshView();
     }
     
@@ -95,6 +102,9 @@ public class SupplyController extends SelectorComposer<Component>{
         currentSupplyType.setBrand(brandTextBox.getText());
         currentSupplyType.setPresentation(presentationTextBox.getText());
         currentSupplyType.setMeasure(measureTextBox.getText());
+        currentSupplyType.setStock(stockDoublebox.getValue());
+        currentSupplyType.setStockMin(stockMinDoublebox.getValue());
+        currentSupplyType.setStockRepo(stockRepoDoublebox.getValue());
         if(currentSupplyType.getId() == null) {
         	// es un nuevo insumo
         	currentSupplyType = supplyTypeService.saveSupplyType(currentSupplyType);
@@ -152,6 +162,9 @@ public class SupplyController extends SelectorComposer<Component>{
         	brandTextBox.setValue(null);
         	presentationTextBox.setValue(null);
         	measureTextBox.setValue(null);
+        	stockDoublebox.setValue(null);
+        	stockMinDoublebox.setValue(null);
+        	stockRepoDoublebox.setValue(null);
 			saveButton.setDisabled(true);
 			cancelButton.setDisabled(true);
 			resetButton.setDisabled(true);
@@ -165,6 +178,9 @@ public class SupplyController extends SelectorComposer<Component>{
         	brandTextBox.setValue(currentSupplyType.getBrand());
         	presentationTextBox.setValue(currentSupplyType.getPresentation());
         	measureTextBox.setValue(currentSupplyType.getMeasure());
+        	stockDoublebox.setValue(currentSupplyType.getStock());
+        	stockMinDoublebox.setValue(currentSupplyType.getStockMin());
+        	stockRepoDoublebox.setValue(currentSupplyType.getStockRepo());
 			saveButton.setDisabled(false);
 			cancelButton.setDisabled(false);
 			resetButton.setDisabled(false);

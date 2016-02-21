@@ -21,9 +21,9 @@
 	            <listitem>
 	            	<listcell label="${modalDialog$composer.getProductName(each.idProduct)}"/>
 	            	<listcell label="${each.name}"/>
-	                <listcell label="${each.length.doubleValue()} ${modalDialog$composer.getMeasureUnitName(each.idMeasureUnit)}"/>
-	                <listcell label="${each.width.doubleValue()} ${modalDialog$composer.getMeasureUnitName(each.idMeasureUnit)}"/>
-	                <listcell label="${each.depth.doubleValue()} ${modalDialog$composer.getMeasureUnitName(each.idMeasureUnit)}"/>
+	                <listcell label="${each.length.doubleValue()} ${modalDialog$composer.getMeasureUnitName(each.lengthIdMeasureUnit)}"/>
+	                <listcell label="${each.width.doubleValue()} ${modalDialog$composer.getMeasureUnitName(each.widthIdMeasureUnit)}"/>
+	                <listcell label="${each.depth.doubleValue()} ${modalDialog$composer.getMeasureUnitName(each.depthIdMeasureUnit)}"/>
 	                <listcell label="${each.size}"/>
 	                <listcell label="${each.units}"/>
 	            </listitem>

@@ -11,28 +11,32 @@
             		<label value="Fecha Plan de Produccion: "/>
 					<datebox id="productionPlanDatebox" cols="12" format="dd-MM-yyyy"/>
             	</hlayout>
-            	<hlayout>
-            		<label value="Fecha Abastecimiento: "/>
-					<datebox id="fulfilledDateDatebox" cols="12" format="dd-MM-yyyy"/>
-            	</hlayout>
                 <separator/>
     			<listbox id="rawMaterialRequirementListbox" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Requerimiento de Materias Primas" colspan="4"/>
+						<auxheader label="Requerimiento de Materias Primas" colspan="7"/>
 					</auxhead>
         			<listhead>
         				<listheader label="Materia Prima"/>
 		                <listheader label="Cantidad Necesaria"/>
 		                <listheader label="Stock Actual"/>
+		                <listheader label="Cantidad Reservada"/>
+		                <listheader label="Cantidad Faltante"/>
 		                <listheader label="Esta Abastecido?"/>
+		                <listheader label="Generar Reserva"/>
 		            </listhead>
 		            <template name="model">
 		                <listitem>
 		                	<listcell label="${win_requirement_plan_creation$composer.getRawMaterialType(each.idRawMaterialType).name}"/>
 		                    <listcell label="${each.quantity}"/>
 		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialStock(each.idRawMaterialType)}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialStockReserved(each)}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialStockMissing(each)}"/>
 		                    <listcell>
 			                    <checkbox value="${each.isFulfilled()}" forward="onCheck=rawMaterialRequirementListbox.onFulfillRawMaterialRequirement(${each})"/>
+			                </listcell>
+			                <listcell>
+			                    <button label="Reservar"/>
 			                </listcell>
 						</listitem>
 		            </template>
@@ -40,7 +44,7 @@
     			<separator/>
     			<listbox id="supplyRequirementListbox" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Requerimiento de Insumos" colspan="7"/>
+						<auxheader label="Requerimiento de Insumos" colspan="10"/>
 					</auxhead>
         			<listhead>
         				<listheader label="Insumo"/>
@@ -49,7 +53,10 @@
 			            <listheader label="Medida"/>
 			            <listheader label="Cantidad Necesaria"/>
 		                <listheader label="Stock Actual"/>
+		                <listheader label="Cantidad Reservada"/>
+		                <listheader label="Cantidad Faltante"/>
 		                <listheader label="Esta Abastecido?"/>
+		                <listheader label="Generar Reserva"/>
 		            </listhead>
 		            <template name="model">
 		                <listitem>
@@ -58,13 +65,56 @@
 		                	<listcell label="${win_requirement_plan_creation$composer.getSupplyType(each.idSupplyType).details}"/>
 		                	<listcell label="${win_requirement_plan_creation$composer.getSupplyType(each.idSupplyType).measure}"/>
 		                    <listcell label="${each.quantity}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyStock(each.idSupplyType)}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyType(each.idSupplyType).stock}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyStockReserved(each)}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyStockMissing(each)}"/>
 		                    <listcell>
 			                    <checkbox value="${each.isFulfilled()}" forward="onCheck=supplyRequirementListbox.onFulfillSupplyRequirement(${each})"/>
+			                </listcell>
+			                <listcell>
+			                    <button label="Reservar" forward="onClick=supplyRequirementListbox.onClickReservation(${each})"/>
 			                </listcell>
 						</listitem>
 		            </template>
     			</listbox>
+    			<separator/>
+				<grid id="supplyReservationGrid" width="400px" sclass="sigma-form" visible="false">
+			        <columns>
+		                <column hflex="min" align="right"/>
+		                <column />
+		            </columns>
+			        <rows>
+			            <row>
+			                <label>Codigo:</label>
+			                <textbox id="codeTextBox" value="" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Descripcion:</label>
+			                <textbox id="descriptionTextBox" value="" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Stock Actual:</label>
+			                <doublebox id="stockDoublebox" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Cantidad a Reservar:</label>
+			                <doublebox id="stockReservedDoublebox" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Cantidad Faltante:</label>
+			                <doublebox id="stockMissingDoublebox" hflex="1"/>
+			            </row>
+			            <row>
+			                <cell colspan="2" style="text-align:center">
+			                    <hlayout>
+			                        <button id="saveButton" label="Guardar"/>
+			                        <button id="cancelButton" label="Cancelar"/>
+			                        <button id="resetButton" label="Reset"/>
+			                    </hlayout>
+			                </cell>
+			            </row>
+			        </rows>
+		    	</grid>
             </vlayout>
         </panelchildren>
     </panel>

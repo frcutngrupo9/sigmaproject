@@ -13,6 +13,9 @@
             <listheader label="Marca"/>
             <listheader label="Presentacion"/>
             <listheader label="Medida"/>
+            <listheader label="Stock Actual"/>
+            <listheader label="Stock Minimo"/>
+            <listheader label="Stock Reposicion"/>
         </listhead>
         <template name="model">
             <listitem>
@@ -22,6 +25,9 @@
                 <listcell label="${each.brand}"/>
                 <listcell label="${each.presentation}"/>
                 <listcell label="${each.measure}"/>
+                <listcell label="${each.stock}"/>
+                <listcell label="${each.stockMin}"/>
+                <listcell label="${each.stockRepo}"/>
             </listitem>
         </template>
     </listbox>
@@ -60,6 +66,18 @@
 	            <row>
 	                <label>Medida:</label>
 	                <textbox id="measureTextBox" value="" hflex="1"/>
+	            </row>
+	            <row>
+	                <label>Stock Actual:</label>
+	                <doublebox id="stockDoublebox" value="0" width="150px" hflex="1"/>
+	            </row>
+	            <row>
+	                <label>Stock Minimo:</label>
+	                <doublebox id="stockMinDoublebox" value="0" width="150px" hflex="1"/>
+	            </row>
+	            <row>
+	                <label>Stock Reposicion:</label>
+	                <doublebox id="stockRepoDoublebox" value="0" width="150px" hflex="1"/>
 	            </row>
 	            <row>
 	                <cell colspan="2" style="text-align:center">

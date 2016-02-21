@@ -29,7 +29,7 @@
                 <label value="${each.name}"/>
                 <label value="${each.details}"/>
                 <label value="${each.price.doubleValue()} $"/>
-                <button forward="onClick=productGrid.onEditProduct(${each.id})" image="/img/edit16x16.png"/>
+                <button forward="onClick=productGrid.onEditProduct(${each})" image="/img/edit16x16.png"/>
             </row>
         </template>
     </grid>

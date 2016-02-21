@@ -8,7 +8,9 @@ public interface SupplyReservedService {
 	
 	List<SupplyReserved> getSupplyReservedList();
     
-	SupplyReserved getSupplyReserved(Integer idSupplyType);
+	SupplyReserved getSupplyReserved(Integer idSupplyReserved);
+	
+	SupplyReserved getSupplyReserved(Integer idSupplyType, Integer idSupplyRequirement);
 
 	SupplyReserved saveSupplyReserved(SupplyReserved supplyReserved);
 

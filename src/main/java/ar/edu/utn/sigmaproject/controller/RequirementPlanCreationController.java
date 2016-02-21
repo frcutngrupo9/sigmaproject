@@ -11,36 +11,38 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Datebox;
+import org.zkoss.zul.Doublebox;
+import org.zkoss.zul.Grid;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductTotal;
-import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.RawMaterial;
 import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.RawMaterialType;
 import ar.edu.utn.sigmaproject.domain.Supply;
 import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
+import ar.edu.utn.sigmaproject.domain.SupplyReserved;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.service.ProductService;
 import ar.edu.utn.sigmaproject.service.ProductionPlanDetailService;
-import ar.edu.utn.sigmaproject.service.ProductionPlanService;
 import ar.edu.utn.sigmaproject.service.RawMaterialRequirementService;
 import ar.edu.utn.sigmaproject.service.RawMaterialService;
 import ar.edu.utn.sigmaproject.service.RawMaterialTypeService;
 import ar.edu.utn.sigmaproject.service.SupplyRequirementService;
+import ar.edu.utn.sigmaproject.service.SupplyReservedService;
 import ar.edu.utn.sigmaproject.service.SupplyService;
 import ar.edu.utn.sigmaproject.service.SupplyTypeService;
 import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProductionPlanDetailServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProductionPlanServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.RawMaterialRequirementServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.RawMaterialServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.RawMaterialTypeServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.SupplyRequirementServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.SupplyReservedServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.SupplyServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.SupplyTypeServiceImpl;
 
@@ -55,6 +57,18 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
     Listbox rawMaterialRequirementListbox;
 	@Wire
     Listbox supplyRequirementListbox;
+	@Wire
+    Grid supplyReservationGrid;
+	@Wire
+	Textbox codeTextBox;
+	@Wire
+	Textbox descriptionTextBox;
+	@Wire
+	Doublebox stockDoublebox;
+	@Wire
+	Doublebox stockReservedDoublebox;
+	@Wire
+	Doublebox stockMissingDoublebox;
 	
 	// services
     private SupplyRequirementService supplyRequirementService = new SupplyRequirementServiceImpl();
@@ -63,6 +77,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
     private ProductionPlanDetailService productionPlanDetailService = new ProductionPlanDetailServiceImpl();
     private SupplyTypeService supplyTypeService = new SupplyTypeServiceImpl();
 	private SupplyService supplyService = new SupplyServiceImpl();
+	private SupplyReservedService supplyReservedService = new SupplyReservedServiceImpl();
 	private RawMaterialTypeService rawMaterialTypeService = new RawMaterialTypeServiceImpl();
 	private RawMaterialService rawMaterialService = new RawMaterialServiceImpl();
     
@@ -163,8 +178,22 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
     	return supplyTypeService.getSupplyType(idSupplyType);
     }
 	
-	public String getSupplyStock(int idSupplyType) {
-		return "[impl pen]";
+	public String getSupplyStockReserved(SupplyRequirement supplyRequirement) {
+		SupplyReserved aux = supplyReservedService.getSupplyReserved(supplyRequirement.getIdSupplyType(), supplyRequirement.getId());
+		if(aux != null) {
+			return aux.getStockReserved() + "";
+		} else {
+			return "0";
+		}
+    }
+	
+	public double getSupplyStockMissing(SupplyRequirement supplyRequirement) {
+		SupplyReserved aux = supplyReservedService.getSupplyReserved(supplyRequirement.getIdSupplyType(), supplyRequirement.getId());
+		if(aux != null) {
+			return supplyRequirement.getQuantity() - aux.getStockReserved();
+		} else {
+			return supplyRequirement.getQuantity();
+		}
     }
 	
 	public RawMaterialType getRawMaterialType(int idRawMaterialType) {
@@ -172,7 +201,15 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
     }
 	
 	public String getRawMaterialStock(int idRawMaterialType) {
-    	return "[impl pen]";
+    	return "0";
+    }
+	
+	public String getRawMaterialStockReserved(RawMaterialRequirement rawMaterialRequirement) {
+    	return "0";
+    }
+	
+	public String getRawMaterialStockMissing(RawMaterialRequirement rawMaterialRequirement) {
+    	return rawMaterialRequirement.getQuantity() + "";
     }
     
     @Listen("onFulfillSupplyRequirement = #supplyRequirementListbox")
@@ -180,5 +217,25 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
     	SupplyRequirement data = (SupplyRequirement) evt.getData();// obtenemos el objeto pasado por parametro
     	Checkbox element = (Checkbox) evt.getOrigin().getTarget();// obtenemos el elemento web
     	data.setFulfilled(element.isChecked());// cargamos al objeto el valor actualizado del elemento web
+    }
+    
+    @Listen("onClickReservation = #supplyRequirementListbox")
+	public void doSupplyRequirementReservation(ForwardEvent evt) {
+    	SupplyRequirement data = (SupplyRequirement) evt.getData();// obtenemos el objeto pasado por parametro
+    	openSupplyReservationGrid(data);
+    }
+    
+    private void openSupplyReservationGrid(SupplyRequirement supplyRequirement) {
+    	supplyReservationGrid.setVisible(true);
+    	codeTextBox.setDisabled(true);
+    	descriptionTextBox.setDisabled(true);
+    	stockDoublebox.setDisabled(true);
+    	stockReservedDoublebox.setDisabled(false);
+    	stockMissingDoublebox.setDisabled(true);
+    	codeTextBox.setText(supplyTypeService.getSupplyType(supplyRequirement.getIdSupplyType()).getCode());
+    	descriptionTextBox.setText(supplyTypeService.getSupplyType(supplyRequirement.getIdSupplyType()).getDescription());
+    	stockDoublebox.setValue(supplyTypeService.getSupplyType(supplyRequirement.getIdSupplyType()).getStock());
+    	stockReservedDoublebox.setValue(0.0);
+    	stockMissingDoublebox.setValue(supplyRequirement.getQuantity());
     }
 }

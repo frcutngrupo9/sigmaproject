@@ -5,15 +5,35 @@ import java.io.Serializable;
 public class SupplyReserved  implements Serializable, Cloneable {
     private static final long serialVersionUID = 1L;
     
+    Integer id;
     Integer idSupplyType;
-    Double stock;
+    Integer idSupplyRequirement;
+    Double stockReserved;
     
-    public SupplyReserved(Integer idSupplyType, Double stock) {
+    public SupplyReserved(Integer id, Integer idSupplyType, Integer idSupplyRequirement, Double stockReserved) {
+    	this.id = id;
     	this.idSupplyType = idSupplyType;
-        this.stock = stock;
+        this.idSupplyRequirement = idSupplyRequirement;
+        this.stockReserved = stockReserved;
     }
     
-    public Integer getIdSupplyType() {
+    public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Integer getIdSupplyRequirement() {
+		return idSupplyRequirement;
+	}
+
+	public void setIdSupplyRequirement(Integer idSupplyRequirement) {
+		this.idSupplyRequirement = idSupplyRequirement;
+	}
+
+	public Integer getIdSupplyType() {
 		return idSupplyType;
 	}
 
@@ -21,12 +41,12 @@ public class SupplyReserved  implements Serializable, Cloneable {
 		this.idSupplyType = idSupplyType;
 	}
 
-	public Double getStock() {
-		return stock;
+	public Double getStockReserved() {
+		return stockReserved;
 	}
 
-	public void setStock(Double stock) {
-		this.stock = stock;
+	public void setStockReserved(Double stock) {
+		this.stockReserved = stock;
 	}
 
 	@Override

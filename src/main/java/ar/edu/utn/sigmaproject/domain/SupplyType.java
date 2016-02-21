@@ -12,8 +12,11 @@ public class SupplyType implements Serializable, Cloneable {
 	String brand;
 	String presentation;
 	String measure;
+	Double stock;
+    Double stockMin;
+    Double stockRepo;
 	
-	public SupplyType(Integer id, String code, String description, String details, String brand, String presentation, String measure) {
+	public SupplyType(Integer id, String code, String description, String details, String brand, String presentation, String measure, Double stock, Double stockMin, Double stockRepo) {
 		this.id = id;
 		this.code = code;
 		this.description = description;
@@ -21,6 +24,9 @@ public class SupplyType implements Serializable, Cloneable {
 		this.brand = brand;
 		this.presentation = presentation;
 		this.measure = measure;
+		this.stock = stock;
+        this.stockMin = stockMin;
+        this.stockRepo = stockRepo;
 	}
 	
 	public Integer getId() {
@@ -77,6 +83,30 @@ public class SupplyType implements Serializable, Cloneable {
 
 	public void setMeasure(String measure) {
 		this.measure = measure;
+	}
+
+	public Double getStock() {
+		return stock;
+	}
+
+	public void setStock(Double stock) {
+		this.stock = stock;
+	}
+
+	public Double getStockMin() {
+		return stockMin;
+	}
+
+	public void setStockMin(Double stockMin) {
+		this.stockMin = stockMin;
+	}
+
+	public Double getStockRepo() {
+		return stockRepo;
+	}
+
+	public void setStockRepo(Double stockRepo) {
+		this.stockRepo = stockRepo;
 	}
 
 	@Override
