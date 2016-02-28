@@ -17,7 +17,7 @@ public class OrderStateTypeServiceImpl implements OrderStateTypeService {
 		orderStateTypeList.add(new OrderStateType(orderStateTypeId++,"en produccion", ""));
 		orderStateTypeList.add(new OrderStateType(orderStateTypeId++,"finalizado", ""));
 	}
-	
+
 	public List<OrderStateType> getOrderStateTypeList() {
 		List<OrderStateType> list = new ArrayList<OrderStateType>();
 		for(OrderStateType orderStateType:orderStateTypeList) {
@@ -25,7 +25,7 @@ public class OrderStateTypeServiceImpl implements OrderStateTypeService {
 		}
 		return list;
 	}
-	
+
 	public synchronized OrderStateType getOrderStateType(Integer id) {
 		int size = orderStateTypeList.size();
 		for(int i = 0; i < size; i++){
@@ -36,7 +36,7 @@ public class OrderStateTypeServiceImpl implements OrderStateTypeService {
 		}
 		return null;
 	}
-	
+
 	public synchronized OrderStateType getOrderStateType(String name) {
 		int size = orderStateTypeList.size();
 		for(int i = 0; i < size; i++){

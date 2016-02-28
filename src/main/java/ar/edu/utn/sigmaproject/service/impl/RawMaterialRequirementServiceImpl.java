@@ -8,10 +8,10 @@ import ar.edu.utn.sigmaproject.service.RawMaterialRequirementService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
 public class RawMaterialRequirementServiceImpl implements RawMaterialRequirementService {
-	
+
 	static List<RawMaterialRequirement> rawMaterialRequirementList = new ArrayList<RawMaterialRequirement>();
 	private SerializationService serializator = new SerializationService("raw_material_requirement");
-	
+
 	public RawMaterialRequirementServiceImpl() {
 		List<RawMaterialRequirement> aux = serializator.obtenerLista();
 		if(aux != null) {
@@ -20,7 +20,7 @@ public class RawMaterialRequirementServiceImpl implements RawMaterialRequirement
 			serializator.grabarLista(rawMaterialRequirementList);
 		}
 	}
-	
+
 	//synchronized para prevenir acceso concurrente al servicio de lista
 	public synchronized List<RawMaterialRequirement> getRawMaterialRequirementList() {
 		List<RawMaterialRequirement> list = new ArrayList<RawMaterialRequirement>();
@@ -29,7 +29,7 @@ public class RawMaterialRequirementServiceImpl implements RawMaterialRequirement
 		}
 		return list;
 	}
-	
+
 	public synchronized List<RawMaterialRequirement> getRawMaterialRequirementList(Integer idProductionPlan) {
 		List<RawMaterialRequirement> list = new ArrayList<RawMaterialRequirement>();
 		for(RawMaterialRequirement each:rawMaterialRequirementList) {
@@ -39,7 +39,7 @@ public class RawMaterialRequirementServiceImpl implements RawMaterialRequirement
 		}
 		return list;
 	}
-	
+
 	public synchronized RawMaterialRequirement getRawMaterialRequirement(Integer id) {
 		int size = rawMaterialRequirementList.size();
 		for(int i = 0; i < size; i++) {
@@ -50,7 +50,7 @@ public class RawMaterialRequirementServiceImpl implements RawMaterialRequirement
 		}
 		return null;
 	}
-	
+
 	public synchronized RawMaterialRequirement getRawMaterialRequirement(Integer idProductionPlan, Integer idRawMaterialType) {
 		int size = rawMaterialRequirementList.size();
 		for(int i = 0; i < size; i++) {
@@ -61,7 +61,7 @@ public class RawMaterialRequirementServiceImpl implements RawMaterialRequirement
 		}
 		return null;
 	}
-	
+
 	public synchronized RawMaterialRequirement saveRawMaterialRequirement(RawMaterialRequirement rawMaterialRequirement) {
 		if(rawMaterialRequirement.getId() == null) {
 			Integer newId = getNewId();
@@ -72,7 +72,7 @@ public class RawMaterialRequirementServiceImpl implements RawMaterialRequirement
 		serializator.grabarLista(rawMaterialRequirementList);
 		return rawMaterialRequirement;
 	}
-	
+
 	public synchronized RawMaterialRequirement updateRawMaterialRequirement(RawMaterialRequirement rawMaterialRequirement) {
 		if(rawMaterialRequirement.getId() == null) {
 			throw new IllegalArgumentException("can't update a null-id RawMaterialRequirement, save it first");
@@ -90,7 +90,7 @@ public class RawMaterialRequirementServiceImpl implements RawMaterialRequirement
 			throw new RuntimeException("RawMaterialRequirement not found "+rawMaterialRequirement.getId());
 		}
 	}
-	
+
 	public synchronized void deleteRawMaterialRequirement(RawMaterialRequirement rawMaterialRequirement) {
 		if(rawMaterialRequirement.getId() != null) {
 			int size = rawMaterialRequirementList.size();
@@ -108,10 +108,10 @@ public class RawMaterialRequirementServiceImpl implements RawMaterialRequirement
 	public void deleteAll(Integer idProductionPlan) {
 		List<RawMaterialRequirement> deleteList = getRawMaterialRequirementList(idProductionPlan);
 		for(RawMaterialRequirement delete : deleteList) {
-    		deleteRawMaterialRequirement(delete);
+			deleteRawMaterialRequirement(delete);
 		}
 	}
-	
+
 	private synchronized Integer getNewId() {
 		Integer lastId = 0;
 		for(int i = 0; i < rawMaterialRequirementList.size(); i++) {

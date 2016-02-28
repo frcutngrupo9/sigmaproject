@@ -48,12 +48,14 @@
                 </grid>
         		<grid id="productionOrderDetailGrid" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Detalles Orden de Produccion" colspan="10"/>
+						<auxheader label="Detalles Orden de Produccion" colspan="11"/>
 					</auxhead>
         			<columns>
         				<column label="Id" align="center"/>
 			            <column label="Proceso" align="center"/>
 			            <column label="Pieza" align="center"/>
+			            <column label="Id Pieza" align="center"/>
+			            <column label="Id Tipo Proceso" align="center"/>
 			            <column label="Detalles" align="center"/>
 			            <column label="Tiempo" align="center"/>
 			            <column label="Tiempo Total" align="center"/>
@@ -63,9 +65,11 @@
 		            </columns>
 		            <template name="model">
 		                <row>
-		                	<label value="${each.idProductionOrder}"/>
+		                	<label value="${each.idProcess}"/>
 			            	<label value="${win_production_order_creation$composer.getProcessType(each.idProcess).name}"/>
 			            	<label value="${win_production_order_creation$composer.getPieceByProcessId(each.idProcess).name}"/>
+			            	<label value="${win_production_order_creation$composer.getPieceByProcessId(each.idProcess).id}"/>
+			            	<label value="${win_production_order_creation$composer.getProcessType(each.idProcess).id}"/>
 			            	<label value="${win_production_order_creation$composer.getProcess(each.idProcess).details}"/>
 			            	<label value="${win_production_order_creation$composer.getProcessTime(each.idProcess)}"/>
 			            	<label value="${win_production_order_creation$composer.getFormatedTime(each.timeTotal)}"/>

@@ -6,14 +6,14 @@ import javax.xml.datatype.Duration;
 
 public class Process implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
-	
+
 	Integer id;
 	Integer idPiece;
 	Integer idProcessType;
 	String details;
 	Duration time;
 	boolean isClone;
-	
+
 	public Process(Integer id, Integer idPiece, Integer idProcessType, String details, Duration time) {
 		this.id = id;
 		this.idPiece = idPiece;
@@ -38,7 +38,7 @@ public class Process implements Serializable, Cloneable {
 	public void setIdPiece(Integer idPiece) {
 		this.idPiece = idPiece;
 	}
-	
+
 	public Integer getIdProcessType() {
 		return idProcessType;
 	}
@@ -46,7 +46,7 @@ public class Process implements Serializable, Cloneable {
 	public void setIdProcessType(Integer idProcessType) {
 		this.idProcessType = idProcessType;
 	}
-	
+
 	public String getDetails() {
 		return details;
 	}
@@ -54,7 +54,7 @@ public class Process implements Serializable, Cloneable {
 	public void setDetails(String details) {
 		this.details = details;
 	}
-	
+
 	public Duration getTime() {
 		return time;
 	}
@@ -70,7 +70,7 @@ public class Process implements Serializable, Cloneable {
 	public void setClone(boolean isClone) {
 		this.isClone = isClone;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -104,5 +104,5 @@ public class Process implements Serializable, Cloneable {
 		}
 		return null;
 	}
-	
+
 }

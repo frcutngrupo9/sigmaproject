@@ -26,7 +26,7 @@ public class ProcessTypeServiceImpl implements ProcessTypeService {
 		processTypeList.add(new ProcessType(processTypeId++,"lijado"));
 		processTypeList.add(new ProcessType(processTypeId++,"armado"));
 	}
-	
+
 	public List<ProcessType> getProcessTypeList() {
 		List<ProcessType> list = new ArrayList<ProcessType>();
 		for(ProcessType processType:processTypeList) {
@@ -34,7 +34,7 @@ public class ProcessTypeServiceImpl implements ProcessTypeService {
 		}
 		return list;
 	}
-	
+
 	public synchronized ProcessType getProcessType(Integer id) {
 		int size = processTypeList.size();
 		for(int i = 0; i < size; i++){

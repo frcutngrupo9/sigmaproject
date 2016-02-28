@@ -5,16 +5,16 @@ import java.util.List;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
 
 public interface OrderDetailService {
-    
-    List<OrderDetail> getOrderDetailList();
-    
-    OrderDetail getOrderDetail(Integer idOrder, Integer idProduct);
 
-    OrderDetail saveOrderDetail(OrderDetail orderDetail);
+	List<OrderDetail> getOrderDetailList();
 
-    OrderDetail updateOrderDetail(OrderDetail orderDetail);
+	OrderDetail getOrderDetail(Integer idOrder, Integer idProduct);
 
-    void deleteOrderDetail(OrderDetail orderDetail);
+	OrderDetail saveOrderDetail(OrderDetail orderDetail);
+
+	OrderDetail updateOrderDetail(OrderDetail orderDetail);
+
+	void deleteOrderDetail(OrderDetail orderDetail);
 
 	List<OrderDetail> getOrderDetailList(Integer idOrder);
 

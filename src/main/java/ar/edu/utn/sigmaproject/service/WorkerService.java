@@ -5,17 +5,17 @@ import java.util.List;
 import ar.edu.utn.sigmaproject.domain.Worker;
 
 public interface WorkerService {
-    
-    List<Worker> getWorkerList();
-    
-    Worker getWorker(Integer idWorker);
-    
-    Worker getWorker(String nameWorker);
 
-    Worker saveWorker(Worker worker);
+	List<Worker> getWorkerList();
 
-    Worker updateWorker(Worker worker);
+	Worker getWorker(Integer idWorker);
 
-    void deleteWorker(Worker worker);
+	Worker getWorker(String nameWorker);
+
+	Worker saveWorker(Worker worker);
+
+	Worker updateWorker(Worker worker);
+
+	void deleteWorker(Worker worker);
 
 }

@@ -78,7 +78,7 @@ public class User implements Serializable,Cloneable {
 			return false;
 		return true;
 	}
-	
+
 	public static User clone(User user){
 		try {
 			return (User)user.clone();

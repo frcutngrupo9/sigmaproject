@@ -5,23 +5,23 @@ import java.math.BigDecimal;
 
 public class Product implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
-	
+
 	Integer id;
 	String name;
 	String details;
-    String code;
-    BigDecimal price;
-    boolean isClone;
+	String code;
+	BigDecimal price;
+	boolean isClone;
 
 	public Product(Integer id, String code , String name, String details, BigDecimal price) {
 		this.id = id;
 		this.name = name;
 		this.details = details;
-        this.code = code;
-        this.price = price;
-        isClone = false;
+		this.code = code;
+		this.price = price;
+		isClone = false;
 	}
-	
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
@@ -41,19 +41,19 @@ public class Product implements Serializable, Cloneable {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public void setDetails(String details) {
 		this.details = details;
 	}
-	
-    public String getCode() {
+
+	public String getCode() {
 		return code;
 	}
 
 	public void setCode(String code) {
 		this.code = code;
 	}
-	
+
 	public BigDecimal getPrice() {
 		return price;
 	}
@@ -94,7 +94,7 @@ public class Product implements Serializable, Cloneable {
 			return false;
 		return true;
 	}
-	
+
 	public static Product clone(Product product){
 		try {
 			return (Product)product.clone();

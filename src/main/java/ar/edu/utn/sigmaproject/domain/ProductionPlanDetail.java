@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class ProductionPlanDetail implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
-	
+
 	Integer idProductionPlan;
 	Integer idOrder;
 
@@ -12,7 +12,7 @@ public class ProductionPlanDetail implements Serializable, Cloneable {
 		this.idProductionPlan = idProductionPlan;
 		this.idOrder = idOrder;
 	}
-	
+
 	public Integer getIdProductionPlan() {
 		return idProductionPlan;
 	}
@@ -55,6 +55,6 @@ public class ProductionPlanDetail implements Serializable, Cloneable {
 		}
 		return null;
 	}
-	
+
 }
 

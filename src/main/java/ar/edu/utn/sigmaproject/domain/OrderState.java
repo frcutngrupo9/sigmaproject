@@ -5,11 +5,11 @@ import java.util.Date;
 
 public class OrderState implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
-	
+
 	Integer idOrder;
 	Integer idOrderStateType;
 	Date date;
-	
+
 	public OrderState(Integer idOrder, Integer idOrderStateType, Date date) {
 		this.idOrder = idOrder;
 		this.idOrderStateType = idOrderStateType;
@@ -23,7 +23,7 @@ public class OrderState implements Serializable, Cloneable {
 	public void setIdOrder(Integer idOrder) {
 		this.idOrder = idOrder;
 	}
-	
+
 	public Integer getIdOrderStateType() {
 		return idOrderStateType;
 	}
@@ -31,7 +31,7 @@ public class OrderState implements Serializable, Cloneable {
 	public void setIdOrderStateType(Integer idOrderType) {
 		this.idOrderStateType = idOrderType;
 	}
-	
+
 	public Date getDate() {
 		return date;
 	}

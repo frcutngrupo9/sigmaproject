@@ -4,12 +4,12 @@ import java.io.Serializable;
 
 public class SupplyRequirement implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
-	
+
 	Integer id;
 	Integer idProductionPlan;
 	Integer idSupplyType;
 	Double quantity;
-    boolean isFulfilled;
+	boolean isFulfilled;
 
 	public SupplyRequirement(Integer id, Integer idProductionPlan, Integer idSupplyType, Double quantity) {
 		this.id = id;
@@ -18,7 +18,7 @@ public class SupplyRequirement implements Serializable, Cloneable {
 		this.quantity = quantity;
 		isFulfilled = false;
 	}
-	
+
 	public Integer getId() {
 		return id;
 	}
@@ -58,7 +58,7 @@ public class SupplyRequirement implements Serializable, Cloneable {
 	public void setFulfilled(boolean isFulfilled) {
 		this.isFulfilled = isFulfilled;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -83,7 +83,7 @@ public class SupplyRequirement implements Serializable, Cloneable {
 			return false;
 		return true;
 	}
-	
+
 	public static SupplyRequirement clone(SupplyRequirement obj){
 		try {
 			return (SupplyRequirement)obj.clone();

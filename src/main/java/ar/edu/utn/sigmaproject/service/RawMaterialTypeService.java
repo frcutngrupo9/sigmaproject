@@ -5,9 +5,9 @@ import java.util.List;
 import ar.edu.utn.sigmaproject.domain.RawMaterialType;
 
 public interface RawMaterialTypeService {
-	
+
 	List<RawMaterialType> getRawMaterialTypeList();
-	
+
 	RawMaterialType getRawMaterialType(Integer idRawMaterialType);
 
 	RawMaterialType saveRawMaterialType(RawMaterialType rawMaterialType);

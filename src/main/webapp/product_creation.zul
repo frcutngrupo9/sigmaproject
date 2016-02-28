@@ -141,23 +141,24 @@
         			</listhead>
 					<template name="model">
 					            <listitem>
+					            	<custom-attributes process_checked="${win_product_creation$composer.isProcessCheck(each)}"/>
 					                <listcell>
-					                    <checkbox forward="onCheck=processListbox.onProcessCheck"/>
+					                    <checkbox checked="${process_checked}" forward="onCheck=processListbox.onProcessCheck(${each})"/>
 					                </listcell>
 					                <listcell>
 					                    <label value="${each.name}"/>
 					                </listcell>
 					                <listcell>
-					                    <textbox visible="false" width="400px"/>
+					                    <textbox visible="${process_checked}" value="${win_product_creation$composer.getProcessDetails(each)}"  forward="onChange=processListbox.onProcessDetailsChange(${each})" width="400px"/>
 					                </listcell>
 					                <listcell>
-					                    <intbox visible="false" width="36px"/>
+					                    <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessDays(each)}" forward="onChange=processListbox.onProcessDaysChange(${each})" width="36px"/>
 					                </listcell>
 					                <listcell>
-					                    <intbox visible="false" width="36px"/>
+					                    <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessHours(each)}" forward="onChange=processListbox.onProcessHoursChange(${each})" width="36px"/>
 					                </listcell>
 					                <listcell>
-					                    <intbox visible="false" width="36px"/>
+					                    <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessMinutes(each)}" forward="onChange=processListbox.onProcessMinutesChange(${each})" width="36px"/>
 					                </listcell>
 					            </listitem>
 					</template>

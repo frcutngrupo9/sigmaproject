@@ -5,11 +5,11 @@ public class ProductTotal  extends Product {
 	// que integran un plan de produccion
 	private static final long serialVersionUID = 1L;
 	Integer totalUnits;
-	
+
 	public ProductTotal(Product product) {
 		super(product.getId(), product.getCode(), product.getName(), product.getDetails(), product.getPrice());
 	}
-	
+
 	public Integer getTotalUnits() {
 		return totalUnits;
 	}
@@ -17,5 +17,5 @@ public class ProductTotal  extends Product {
 	public void setTotalUnits(Integer totalUnits) {
 		this.totalUnits = totalUnits;
 	}
-	
+
 }

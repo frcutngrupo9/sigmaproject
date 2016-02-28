@@ -41,13 +41,13 @@ import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
 
 public class ProductStockController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
-	
+
 	@Wire
-    Textbox searchTextbox;
+	Textbox searchTextbox;
 	@Wire
-    Listbox productListbox;
+	Listbox productListbox;
 	@Wire
-    Grid productExistenceGrid;
+	Grid productExistenceGrid;
 	@Wire
 	Textbox codeTextBox;
 	@Wire
@@ -59,98 +59,98 @@ public class ProductStockController extends SelectorComposer<Component>{
 	@Wire
 	Intbox stockRepoIntbox;
 	@Wire
-    Button saveButton;
+	Button saveButton;
 	@Wire
-    Button cancelButton;
-    @Wire
-    Button resetButton;
-    @Wire
-    Button newProvisionOrderButton;
-    @Wire
+	Button cancelButton;
+	@Wire
+	Button resetButton;
+	@Wire
+	Button newProvisionOrderButton;
+	@Wire
 	Component orderCreationBlock;
-    @Wire
-    Listbox orderDetailListbox;
-    @Wire
-    Intbox orderNumberIntbox;
-    @Wire
-    Datebox orderNeedDateBox;
-    
-    // services
-    private ProductExistenceService productExistenceService = new ProductExistenceServiceImpl();
-    private ProductService productService = new ProductServiceImpl();
-    private ClientService clientService = new ClientServiceImpl();
-    private OrderService orderService = new OrderServiceImpl();
-    private OrderDetailService orderDetailService = new OrderDetailServiceImpl();
-    private OrderStateService orderStateService = new OrderStateServiceImpl();
-    private OrderStateTypeService orderStateTypeService = new OrderStateTypeServiceImpl();
-    
-    // attributes
-    private ProductExistence currentProductExistence;
-    private Product currentProduct;
-    private Order currentOrder;
-    
-    // list
-    private List<Product> productList;
-    private List<OrderDetail> orderDetailList;
-    
-    // list models
-    private ListModelList<Product> productListModel;
-    private ListModelList<OrderDetail> orderDetailListModel;
-	
+	@Wire
+	Listbox orderDetailListbox;
+	@Wire
+	Intbox orderNumberIntbox;
+	@Wire
+	Datebox orderNeedDateBox;
+
+	// services
+	private ProductExistenceService productExistenceService = new ProductExistenceServiceImpl();
+	private ProductService productService = new ProductServiceImpl();
+	private ClientService clientService = new ClientServiceImpl();
+	private OrderService orderService = new OrderServiceImpl();
+	private OrderDetailService orderDetailService = new OrderDetailServiceImpl();
+	private OrderStateService orderStateService = new OrderStateServiceImpl();
+	private OrderStateTypeService orderStateTypeService = new OrderStateTypeServiceImpl();
+
+	// attributes
+	private ProductExistence currentProductExistence;
+	private Product currentProduct;
+	private Order currentOrder;
+
+	// list
+	private List<Product> productList;
+	private List<OrderDetail> orderDetailList;
+
+	// list models
+	private ListModelList<Product> productListModel;
+	private ListModelList<OrderDetail> orderDetailListModel;
+
 	@Override
-    public void doAfterCompose(Component comp) throws Exception{
-        super.doAfterCompose(comp);
-        productList = productService.getProductList();
-        productListModel = new ListModelList<Product>(productList);
-        productListbox.setModel(productListModel);
-        currentProduct = null;
-        refreshView();
-        
-        currentOrder = null;
-        refreshViewOrder();
-    }
-	
-	@Listen("onClick = #searchButton")
-    public void search() {
-    }
-	
-	@Listen("onClick = #cancelButton")
-    public void cancelButtonClick() {
+	public void doAfterCompose(Component comp) throws Exception{
+		super.doAfterCompose(comp);
+		productList = productService.getProductList();
+		productListModel = new ListModelList<Product>(productList);
+		productListbox.setModel(productListModel);
 		currentProduct = null;
-        refreshView();
-    }
-    
-    @Listen("onClick = #resetButton")
-    public void resetButtonClick() {
-        refreshView();
-    }
-    
-    @Listen("onSelect = #productListbox")
-    public void doListBoxSelect() {
-        if(productListModel.isSelectionEmpty()) {
-            //just in case for the no selection
-        	currentProduct = null;
-        } else {
-        	if(currentProduct == null && currentOrder == null) {// si no hay nada editandose
-        		currentProduct = productListModel.getSelection().iterator().next();
-        		refreshView();
-        	}
-        }
-        productListModel.clearSelection();
-    }
-	
+		refreshView();
+
+		currentOrder = null;
+		refreshViewOrder();
+	}
+
+	@Listen("onClick = #searchButton")
+	public void search() {
+	}
+
+	@Listen("onClick = #cancelButton")
+	public void cancelButtonClick() {
+		currentProduct = null;
+		refreshView();
+	}
+
+	@Listen("onClick = #resetButton")
+	public void resetButtonClick() {
+		refreshView();
+	}
+
+	@Listen("onSelect = #productListbox")
+	public void doListBoxSelect() {
+		if(productListModel.isSelectionEmpty()) {
+			//just in case for the no selection
+			currentProduct = null;
+		} else {
+			if(currentProduct == null && currentOrder == null) {// si no hay nada editandose
+				currentProduct = productListModel.getSelection().iterator().next();
+				refreshView();
+			}
+		}
+		productListModel.clearSelection();
+	}
+
 	private void refreshView() {
 		productListModel.clearSelection();
 		productListbox.setModel(productListModel);// se actualiza la lista
 		codeTextBox.setDisabled(true);
 		nameTextBox.setDisabled(true);// no se deben poder modificar
-        if(currentProduct == null) {// no editando ni creando
-        	productExistenceGrid.setVisible(false);
-        	codeTextBox.setValue(null);
-        	nameTextBox.setValue(null);
-        	stockIntbox.setValue(null);
-        	stockMinIntbox.setValue(null);
-        	stockRepoIntbox.setValue(null);
+		if(currentProduct == null) {// no editando ni creando
+			productExistenceGrid.setVisible(false);
+			codeTextBox.setValue(null);
+			nameTextBox.setValue(null);
+			stockIntbox.setValue(null);
+			stockMinIntbox.setValue(null);
+			stockRepoIntbox.setValue(null);
 			saveButton.setDisabled(true);
 			cancelButton.setDisabled(true);
 			resetButton.setDisabled(true);
@@ -179,79 +179,79 @@ public class ProductStockController extends SelectorComposer<Component>{
 			resetButton.setDisabled(false);
 			newProvisionOrderButton.setDisabled(true);
 		}
-    }
-	
+	}
+
 	@Listen("onClick = #saveButton")
-    public void saveButtonClick() {
+	public void saveButtonClick() {
 		currentProductExistence.setStock(stockIntbox.intValue());
 		currentProductExistence.setStockMin(stockMinIntbox.intValue());
 		currentProductExistence.setStockRepo(stockRepoIntbox.intValue());
-        if(currentProductExistence.getIdProduct() == null) {
-        	// es nuevo
-        	currentProductExistence.setIdProduct(currentProduct.getId());
-        	currentProductExistence = productExistenceService.saveProductExistence(currentProductExistence);
-        } else {
-            // es una edicion
-        	currentProductExistence = productExistenceService.updateProductExistence(currentProductExistence);
-        }
-        productList = productService.getProductList();
-        productListModel = new ListModelList<Product>(productList);
-        currentProduct = null;
-        refreshView();
-    }
-	
+		if(currentProductExistence.getIdProduct() == null) {
+			// es nuevo
+			currentProductExistence.setIdProduct(currentProduct.getId());
+			currentProductExistence = productExistenceService.saveProductExistence(currentProductExistence);
+		} else {
+			// es una edicion
+			currentProductExistence = productExistenceService.updateProductExistence(currentProductExistence);
+		}
+		productList = productService.getProductList();
+		productListModel = new ListModelList<Product>(productList);
+		currentProduct = null;
+		refreshView();
+	}
+
 	public String getProductStock(int idProduct) {
 		Integer value = 0;
 		ProductExistence aux = productExistenceService.getProductExistence(idProduct);
 		if(aux != null) {
 			value = aux.getStock();
 		}
-    	return value + "";
-    }
-	
+		return value + "";
+	}
+
 	public String getProductStockMin(int idProduct) {
 		Integer value = 0;
 		ProductExistence aux = productExistenceService.getProductExistence(idProduct);
 		if(aux != null) {
 			value = aux.getStockMin();
 		}
-    	return value + "";
-    }
-	
+		return value + "";
+	}
+
 	public String getProductStockRepo(int idProduct) {
 		Integer value = 0;
 		ProductExistence aux = productExistenceService.getProductExistence(idProduct);
 		if(aux != null) {
 			value = aux.getStockRepo();
 		}
-    	return value + "";
-    }
-	
+		return value + "";
+	}
+
 	// creacion de pedido de auto abastecimiento
 	@Listen("onClick = #newProvisionOrderButton")
-    public void newProvisionOrder() {
+	public void newProvisionOrder() {
 		Integer order_client_id = clientService.getClient("Auto Abastecimiento").getId();// deberia ser el id del cliente auto abastecimiento
 		Integer order_number = null;
 		Date order_date = new Date();
 		Date order_need_date = null;
 		currentOrder = new Order(null, order_client_id, order_number, order_date, order_need_date);
-		
+
 		refreshViewOrder();
-    }
-	
+	}
+
 	@Listen("onClick = #resetOrderButton")
-    public void resetOrder() {
+	public void resetOrder() {
 		refreshViewOrder();
-    }
-	
+	}
+
 	@Listen("onClick = #cancelOrderButton")
-    public void cancelOrder() {
+	public void cancelOrder() {
 		currentOrder = null;
 		refreshViewOrder();
-    }
-	
+	}
+
 	@Listen("onClick = #saveOrderButton")
-    public void saveOrder() {
+	public void saveOrder() {
 		int order_number = orderNumberIntbox.intValue();
 		Date order_need_date = orderNeedDateBox.getValue();
 		int order_state_type_id = orderStateTypeService.getOrderStateType("iniciado").getId();
@@ -261,8 +261,8 @@ public class ProductStockController extends SelectorComposer<Component>{
 		Clients.showNotification("Pedido guardado");
 		currentOrder = null;
 		refreshViewOrder();
-    }
-	
+	}
+
 	private void refreshViewOrder() {
 		if(currentOrder == null) {
 			orderCreationBlock.setVisible(false);
@@ -326,29 +326,29 @@ public class ProductStockController extends SelectorComposer<Component>{
 				orderNumberIntbox.setValue(currentOrder.getNumber());
 				orderNeedDateBox.setValue(null);
 				orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
-		        orderDetailListbox.setModel(orderDetailListModel);
-		        newProvisionOrderButton.setDisabled(true);
+				orderDetailListbox.setModel(orderDetailListModel);
+				newProvisionOrderButton.setDisabled(true);
 			}
-	        
+
 		}
-		
+
 	}
-	
+
 	public String getProductName(int idProduct) {
 		Product aux = productService.getProduct(idProduct);
 		return aux.getName();
-    }
-	
+	}
+
 	public String getProductCode(int idProduct) {
 		Product aux = productService.getProduct(idProduct);
 		return aux.getCode();
-    }
-	
+	}
+
 	@Listen("onEditOrderDetailUnits = #orderDetailListbox")
 	public void doEditOrderDetailUnits(ForwardEvent evt) {
 		OrderDetail orderDetail = (OrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
 		Spinner spinner = (Spinner) evt.getOrigin().getTarget();// obtenemos el elemento web
 		orderDetail.setUnits(spinner.getValue());// cargamos al objeto el valor actualizado del elemento web
-    }
-	
+	}
+
 }

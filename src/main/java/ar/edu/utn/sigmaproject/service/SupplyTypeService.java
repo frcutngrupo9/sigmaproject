@@ -5,14 +5,14 @@ import java.util.List;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 
 public interface SupplyTypeService {
-    
-    List<SupplyType> getSupplyTypeList();
-    
-    SupplyType getSupplyType(Integer idSupplyType);
 
-    SupplyType saveSupplyType(SupplyType supplyType);
+	List<SupplyType> getSupplyTypeList();
 
-    SupplyType updateSupplyType(SupplyType supplyType);
+	SupplyType getSupplyType(Integer idSupplyType);
 
-    void deleteSupplyType(SupplyType supply);
+	SupplyType saveSupplyType(SupplyType supplyType);
+
+	SupplyType updateSupplyType(SupplyType supplyType);
+
+	void deleteSupplyType(SupplyType supply);
 }

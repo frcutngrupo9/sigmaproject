@@ -9,14 +9,14 @@ import ar.edu.utn.sigmaproject.service.UserInfoService;
 
 public class UserInfoServiceImpl implements UserInfoService,Serializable{
 	private static final long serialVersionUID = 1L;
-	
+
 	static protected List<User> userList = new ArrayList<User>();  
 	static{
 		userList.add(new User("anonymous","1234","Anonymous","anonumous@your.com"));
 		userList.add(new User("admin","1234","Admin","admin@your.com"));
 		userList.add(new User("sigma","1234","SIGMA","sigma@sigmaproject.com"));
 	}
-	
+
 	/** synchronized is just because we use static userList to prevent concurrent access **/
 	public synchronized User findUser(String account) {
 		int s = userList.size();
@@ -28,7 +28,7 @@ public class UserInfoServiceImpl implements UserInfoService,Serializable{
 		}
 		return null;
 	}
-	
+
 	/** synchronized is just because we use static userList to prevent concurrent access **/
 	public synchronized User updateUser(User user) {
 		int s = userList.size();

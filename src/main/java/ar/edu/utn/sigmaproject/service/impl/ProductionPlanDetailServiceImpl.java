@@ -15,10 +15,10 @@ import ar.edu.utn.sigmaproject.service.ProductionPlanDetailService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
 public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailService {
-	
+
 	static List<ProductionPlanDetail> productionPlanDetailList = new ArrayList<ProductionPlanDetail>();
 	private SerializationService serializator = new SerializationService("production_plan_detail");
-	
+
 	public ProductionPlanDetailServiceImpl() {
 		List<ProductionPlanDetail> aux = serializator.obtenerLista();
 		if(aux != null) {
@@ -27,7 +27,7 @@ public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailServ
 			serializator.grabarLista(productionPlanDetailList);
 		}
 	}
-	
+
 	//synchronized para prevenir acceso concurrente al servicio de lista
 	public synchronized List<ProductionPlanDetail> getProductionPlanDetailList() {
 		List<ProductionPlanDetail> list = new ArrayList<ProductionPlanDetail>();
@@ -36,7 +36,7 @@ public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailServ
 		}
 		return list;
 	}
-	
+
 	public synchronized List<ProductionPlanDetail> getProductionPlanDetailList(Integer idProductionPlan) {
 		List<ProductionPlanDetail> list = new ArrayList<ProductionPlanDetail>();
 		for(ProductionPlanDetail productionPlanDetail:productionPlanDetailList) {
@@ -46,7 +46,7 @@ public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailServ
 		}
 		return list;
 	}
-	
+
 	public synchronized ProductionPlanDetail getProductionPlanDetail(Integer idProductionPlan, Integer idOrder) {
 		int size = productionPlanDetailList.size();
 		for(int i = 0; i < size; i++) {
@@ -57,14 +57,14 @@ public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailServ
 		}
 		return null;
 	}
-	
+
 	public synchronized ProductionPlanDetail saveProductionPlanDetail(ProductionPlanDetail productionPlanDetail) {
 		productionPlanDetail = ProductionPlanDetail.clone(productionPlanDetail);
 		productionPlanDetailList.add(productionPlanDetail);
 		serializator.grabarLista(productionPlanDetailList);
 		return productionPlanDetail;
 	}
-	
+
 	public synchronized ProductionPlanDetail updateProductionPlanDetail(ProductionPlanDetail productionPlanDetail) {
 		if(productionPlanDetail.getIdProductionPlan()==null || productionPlanDetail.getIdOrder()==null) {
 			throw new IllegalArgumentException("can't update a null-id productionPlanDetail, save it first");
@@ -82,7 +82,7 @@ public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailServ
 			throw new RuntimeException("ProductionPlanDetail not found "+productionPlanDetail.getIdProductionPlan()+" "+productionPlanDetail.getIdOrder());
 		}
 	}
-	
+
 	public synchronized void deleteProductionPlanDetail(ProductionPlanDetail productionPlanDetail) {
 		if(productionPlanDetail.getIdProductionPlan()!=null && productionPlanDetail.getIdOrder()!=null) {
 			int size = productionPlanDetailList.size();
@@ -135,8 +135,8 @@ public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailServ
 		for(ProductionPlanDetail delete : deleteList) {
 			// debemos volver el estado de los pedidos a "iniciado"
 			orderStateService.setNewOrderState("iniciado", delete.getIdOrder());
-    		// eliminamos el detalle
-    		deleteProductionPlanDetail(delete);
+			// eliminamos el detalle
+			deleteProductionPlanDetail(delete);
 		}
 	}
 }

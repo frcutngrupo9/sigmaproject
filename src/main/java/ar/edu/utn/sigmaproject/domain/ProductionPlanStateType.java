@@ -4,11 +4,11 @@ import java.io.Serializable;
 
 public class ProductionPlanStateType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
-	
+
 	Integer id;
 	String name;
 	String details;
-	
+
 	public ProductionPlanStateType(Integer id, String name, String details) {
 		this.id = id;
 		this.name = name;
@@ -21,7 +21,7 @@ public class ProductionPlanStateType implements Serializable, Cloneable {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -29,7 +29,7 @@ public class ProductionPlanStateType implements Serializable, Cloneable {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public String getDetails() {
 		return details;
 	}
@@ -37,7 +37,7 @@ public class ProductionPlanStateType implements Serializable, Cloneable {
 	public void setDetails(String details) {
 		this.details = details;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

@@ -7,11 +7,11 @@ import ar.edu.utn.sigmaproject.domain.RawMaterial;
 public interface RawMaterialService {
 
 	List<RawMaterial> getRawMaterialList();
-	
+
 	List<RawMaterial> getRawMaterialList(Integer idProduct);
-	
+
 	RawMaterial getRawMaterial(Integer id);
-	
+
 	RawMaterial getRawMaterial(Integer idProduct, Integer idRawMaterialType);
 
 	RawMaterial saveRawMaterial(RawMaterial rawMaterial);
@@ -19,7 +19,7 @@ public interface RawMaterialService {
 	RawMaterial updateRawMaterial(RawMaterial rawMaterial);
 
 	void deleteRawMaterial(RawMaterial rawMaterial);
-	
+
 	void deleteAll(Integer idProduct);
 
 }

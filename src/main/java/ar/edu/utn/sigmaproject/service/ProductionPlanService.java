@@ -6,9 +6,9 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 
 public interface ProductionPlanService  {
-	
+
 	List<ProductionPlan> getProductionPlanList();
-	
+
 	ProductionPlan getProductionPlan(Integer idProductionPlan);
 
 	ProductionPlan saveProductionPlan(ProductionPlan productionPlan);

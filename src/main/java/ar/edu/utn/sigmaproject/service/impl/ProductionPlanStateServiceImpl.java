@@ -14,7 +14,7 @@ public class ProductionPlanStateServiceImpl implements ProductionPlanStateServic
 
 	static List<ProductionPlanState> productionPlanStateList = new ArrayList<ProductionPlanState>();
 	private SerializationService serializator = new SerializationService("production_plan_state");
-	
+
 	public ProductionPlanStateServiceImpl() {
 		List<ProductionPlanState> aux = serializator.obtenerLista();
 		if(aux != null) {
@@ -23,7 +23,7 @@ public class ProductionPlanStateServiceImpl implements ProductionPlanStateServic
 			serializator.grabarLista(productionPlanStateList);
 		}
 	}
-	
+
 	public synchronized List<ProductionPlanState> getProductionPlanStateList() {
 		List<ProductionPlanState> list = new ArrayList<ProductionPlanState>();
 		for(ProductionPlanState productionPlanState:productionPlanStateList) {
@@ -31,7 +31,7 @@ public class ProductionPlanStateServiceImpl implements ProductionPlanStateServic
 		}
 		return list;
 	}
-	
+
 	public synchronized List<ProductionPlanState> getProductionPlanStateList(Integer idProductionPlan) {
 		List<ProductionPlanState> list = new ArrayList<ProductionPlanState>();
 		for(ProductionPlanState productionPlanState:productionPlanStateList) {
@@ -41,18 +41,18 @@ public class ProductionPlanStateServiceImpl implements ProductionPlanStateServic
 		}
 		return list;
 	}
-	
+
 	public synchronized ProductionPlanState getProductionPlanState(Integer idProductionPlan, Integer idProductionPlanStateType) {
 		int size = productionPlanStateList.size();
-  		for(int i = 0; i < size; i++) {
-  			ProductionPlanState t = productionPlanStateList.get(i);
-  			if(t.getIdProductionPlan().equals(idProductionPlan) && t.getIdProductionPlanStateType().equals(idProductionPlanStateType)) {
-  				return ProductionPlanState.clone(t);
-  			}
-  		}
-  		return null;
+		for(int i = 0; i < size; i++) {
+			ProductionPlanState t = productionPlanStateList.get(i);
+			if(t.getIdProductionPlan().equals(idProductionPlan) && t.getIdProductionPlanStateType().equals(idProductionPlanStateType)) {
+				return ProductionPlanState.clone(t);
+			}
+		}
+		return null;
 	}
-	
+
 	public synchronized ProductionPlanState getLastProductionPlanState(Integer idProductionPlan) {
 		List<ProductionPlanState> list = getProductionPlanStateList(idProductionPlan);
 		ProductionPlanState aux = null;
@@ -67,14 +67,14 @@ public class ProductionPlanStateServiceImpl implements ProductionPlanStateServic
 		}
 		return aux;
 	}
-	
+
 	public synchronized ProductionPlanState saveProductionPlanState(ProductionPlanState productionPlanState) {
 		productionPlanState = ProductionPlanState.clone(productionPlanState);
 		productionPlanStateList.add(productionPlanState);
 		serializator.grabarLista(productionPlanStateList);
 		return productionPlanState;
 	}
-	
+
 	public synchronized ProductionPlanState updateProductionPlanState(ProductionPlanState productionPlanState) {
 		if(productionPlanState.getIdProductionPlan() == null || productionPlanState.getIdProductionPlanStateType() == null) {
 			throw new IllegalArgumentException("can't update a null-id ProductionPlanState, save it first");
@@ -92,7 +92,7 @@ public class ProductionPlanStateServiceImpl implements ProductionPlanStateServic
 			throw new RuntimeException("ProductionPlanState not found " + productionPlanState.getIdProductionPlan()+" "+productionPlanState.getIdProductionPlanStateType());
 		}
 	}
-	
+
 	public synchronized void deleteProductionPlanState(ProductionPlanState productionPlanState) {
 		if(productionPlanState.getIdProductionPlan()!=null && productionPlanState.getIdProductionPlanStateType()!=null) {
 			int size = productionPlanStateList.size();
@@ -113,7 +113,7 @@ public class ProductionPlanStateServiceImpl implements ProductionPlanStateServic
 			deleteProductionPlanState(delete);
 		}
 	}
-	
+
 	public void setNewProductionPlanState(String stateName, Integer idProductionPlan) {// crea un nuevo estado en base al nombre pasado por parametro
 		ProductionPlanStateTypeService productionPlanStateTypeService = new ProductionPlanStateTypeServiceImpl();
 		ProductionPlanStateType production_plan_state_type = productionPlanStateTypeService.getProductionPlanStateType(stateName);

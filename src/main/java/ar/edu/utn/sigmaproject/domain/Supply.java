@@ -3,23 +3,23 @@ package ar.edu.utn.sigmaproject.domain;
 import java.io.Serializable;
 
 public class Supply implements Serializable, Cloneable {
-    private static final long serialVersionUID = 1L;
-    
-    Integer id;
-    Integer idProduct;
-    Integer idSupplyType;
-    Double quantity;
-    boolean isClone;
-    
-    public Supply(Integer id, Integer idProduct, Integer idSupplyType, Double quantity) {
-    	this.id = id;
-    	this.idProduct = idProduct;
-        this.idSupplyType = idSupplyType;
-        this.quantity = quantity;
-        isClone = false;
-    }
-    
-    public Integer getId() {
+	private static final long serialVersionUID = 1L;
+
+	Integer id;
+	Integer idProduct;
+	Integer idSupplyType;
+	Double quantity;
+	boolean isClone;
+
+	public Supply(Integer id, Integer idProduct, Integer idSupplyType, Double quantity) {
+		this.id = id;
+		this.idProduct = idProduct;
+		this.idSupplyType = idSupplyType;
+		this.quantity = quantity;
+		isClone = false;
+	}
+
+	public Integer getId() {
 		return id;
 	}
 

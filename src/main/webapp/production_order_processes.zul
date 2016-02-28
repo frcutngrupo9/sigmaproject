@@ -1,19 +1,29 @@
 <zk>
-    <grid model="${arg.processes}" sizedByContent="true" span="true">
+    <grid model="${arg.production_order_detail_list}" sizedByContent="true" span="true">
         <columns>
-        	<column label="Id" align="center"/>
+        	<column label="Id Proceso" align="center"/>
             <column label="Proceso" align="center"/>
             <column label="Pieza" align="center"/>
+            <column label="Id Pieza" align="center"/>
+            <column label="Id Producto" align="center"/>
             <column label="Detalles" align="center"/>
             <column label="Tiempo" align="center"/>
+            <column label="Cantidad Total" align="center"/>
+            <column label="Cantidad Finalizada" align="center"/>
+            <column label="Esta Finalizado?" align="center"/>
         </columns>
         <template name="model">
             <row>
-                <label value="${each.idProcessType}"/>
-            	<label value="${win_production_order_list$composer.getProcessType(each.idProcessType).name}"/>
-            	<label value="${win_production_order_list$composer.getPiece(each.idPiece).name}"/>
-            	<label value="${each.details}"/>
-            	<label value="${win_production_order_list$composer.getFormatedTime(each.time)}"/>
+                <label value="${each.idProcess}"/>
+            	<label value="${win_production_order_list$composer.getProcessTypeByProcessId(each.idProcess).name}"/>
+            	<label value="${win_production_order_list$composer.getPieceByProcessId(each.idProcess).name}"/>
+            	<label value="${win_production_order_list$composer.getPieceByProcessId(each.idProcess).id}"/>
+            	<label value="${win_production_order_list$composer.getPieceByProcessId(each.idProcess).idProduct}"/>
+            	<label value="${win_production_order_list$composer.getProcessByProcessId(each.idProcess).details}"/>
+            	<label value="${win_production_order_list$composer.getFormatedTime(each.timeTotal)}"/>
+            	<label value="${each.quantityPiece}"/>
+            	<label value="${each.quantityFinished}"/>
+            	<label value="${win_production_order_list$composer.getIsFinished(each.isFinished())}"/>
             </row>
         </template>
     </grid>

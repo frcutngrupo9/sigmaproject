@@ -5,17 +5,17 @@ import java.util.List;
 import ar.edu.utn.sigmaproject.domain.MeasureUnitType;
 
 public interface MeasureUnitTypeService {
-    
-    List<MeasureUnitType> getMeasureUnitTypeList();
-    
-    MeasureUnitType getMeasureUnitType(Integer idMeasureUnitType);
-    
-    MeasureUnitType getMeasureUnitType(String nameMeasureUnitType);
 
-    MeasureUnitType saveMeasureUnitType(MeasureUnitType measureUnitType);
+	List<MeasureUnitType> getMeasureUnitTypeList();
 
-    MeasureUnitType updateMeasureUnitType(MeasureUnitType measureUnitType);
+	MeasureUnitType getMeasureUnitType(Integer idMeasureUnitType);
 
-    void deleteMeasureUnitType(MeasureUnitType measureUnitType);
+	MeasureUnitType getMeasureUnitType(String nameMeasureUnitType);
+
+	MeasureUnitType saveMeasureUnitType(MeasureUnitType measureUnitType);
+
+	MeasureUnitType updateMeasureUnitType(MeasureUnitType measureUnitType);
+
+	void deleteMeasureUnitType(MeasureUnitType measureUnitType);
 
 }

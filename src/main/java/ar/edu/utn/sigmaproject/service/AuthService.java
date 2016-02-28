@@ -11,9 +11,9 @@ package ar.edu.utn.sigmaproject.service;
  * @author gfzabarino
  */
 public interface AuthService {
-	
+
 	public boolean login(String account, String password);
 	public void logout();
 	public UserCredential getUserCredential();
-	
+
 }

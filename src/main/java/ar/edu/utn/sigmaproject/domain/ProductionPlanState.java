@@ -5,17 +5,17 @@ import java.util.Date;
 
 public class ProductionPlanState implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
-	
+
 	Integer idProductionPlan;
 	Integer idProductionPlanStateType;
 	Date date;
-	
+
 	public ProductionPlanState(Integer idProductionPlan, Integer idProductionPlanStateType, Date date) {
 		this.idProductionPlan = idProductionPlan;
 		this.idProductionPlanStateType = idProductionPlanStateType;
 		this.date = date;
 	}
-	
+
 	public Integer getIdProductionPlan() {
 		return idProductionPlan;
 	}

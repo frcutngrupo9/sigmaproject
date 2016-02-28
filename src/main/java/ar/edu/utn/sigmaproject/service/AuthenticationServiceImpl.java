@@ -13,7 +13,7 @@ import org.zkoss.zk.ui.Sessions;
 
 public class AuthenticationServiceImpl implements AuthService,Serializable{
 	private static final long serialVersionUID = 1L;
-	
+
 	UserInfoService userInfoService = new UserInfoServiceImpl();
 
 	public UserCredential getUserCredential(){
@@ -25,14 +25,14 @@ public class AuthenticationServiceImpl implements AuthService,Serializable{
 		}
 		return cre;
 	}
-	
+
 	public boolean login(String nm, String pd) {
 		User user = userInfoService.findUser(nm);
 		//a simple plan text password verification
 		if(user==null || !user.getPassword().equals(pd)){
 			return false;
 		}
-		
+
 		Session sess = Sessions.getCurrent();
 		UserCredential cre = new UserCredential(user.getAccount(),user.getFullName());
 		//just in case for this demo.
@@ -40,11 +40,11 @@ public class AuthenticationServiceImpl implements AuthService,Serializable{
 			return false;
 		}
 		sess.setAttribute("userCredential",cre);
-		
+
 		//TODO handle the role here for authorization
 		return true;
 	}
-	
+
 	public void logout() {
 		Session sess = Sessions.getCurrent();
 		sess.removeAttribute("userCredential");

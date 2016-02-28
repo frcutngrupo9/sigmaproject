@@ -15,10 +15,10 @@ import ar.edu.utn.sigmaproject.service.ProductionPlanStateService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
 public class ProductionPlanServiceImpl  implements ProductionPlanService {
-	
+
 	static List<ProductionPlan> productionPlanList = new ArrayList<ProductionPlan>();
 	private SerializationService serializator = new SerializationService("production_plan");
-	
+
 	public ProductionPlanServiceImpl() {
 		List<ProductionPlan> aux = serializator.obtenerLista();
 		if(aux != null) {
@@ -27,7 +27,7 @@ public class ProductionPlanServiceImpl  implements ProductionPlanService {
 			serializator.grabarLista(productionPlanList);
 		}
 	}
-	
+
 	public synchronized List<ProductionPlan> getProductionPlanList() {
 		List<ProductionPlan> list = new ArrayList<ProductionPlan>();
 		for(ProductionPlan productionPlan:productionPlanList) {
@@ -35,7 +35,7 @@ public class ProductionPlanServiceImpl  implements ProductionPlanService {
 		}
 		return list;
 	}
-	
+
 	public synchronized ProductionPlan getProductionPlan(Integer id) {
 		int size = productionPlanList.size();
 		for(int i = 0; i < size; i++) {
@@ -46,41 +46,41 @@ public class ProductionPlanServiceImpl  implements ProductionPlanService {
 		}
 		return null;
 	}
-	
+
 	public synchronized ProductionPlan saveProductionPlan(ProductionPlan productionPlan) {
 		if(productionPlan.getId() == null) {
 			productionPlan.setId(getNewId());
-        }
+		}
 		productionPlan = ProductionPlan.clone(productionPlan);
 		productionPlanList.add(productionPlan);
 		serializator.grabarLista(productionPlanList);
 		return productionPlan;
 	}
-	
+
 	public synchronized ProductionPlan updateProductionPlan(ProductionPlan productionPlan) {
-	    if(productionPlan.getId() == null) {
-	        throw new IllegalArgumentException("can't update a null-id production plan, save it first");
-	    } else {
-	        productionPlan = ProductionPlan.clone(productionPlan);
-	        int size = productionPlanList.size();
-	        for(int i = 0; i < size; i++) {
-	            ProductionPlan aux = productionPlanList.get(i);
-	            if(aux.getId().equals(productionPlan.getId())) {
-	                productionPlanList.set(i, productionPlan);
-	                serializator.grabarLista(productionPlanList);
-	                return productionPlan;
-	            }
-	        }
-	        throw new RuntimeException("Product Plan not found "+productionPlan.getId());
-	    }
+		if(productionPlan.getId() == null) {
+			throw new IllegalArgumentException("can't update a null-id production plan, save it first");
+		} else {
+			productionPlan = ProductionPlan.clone(productionPlan);
+			int size = productionPlanList.size();
+			for(int i = 0; i < size; i++) {
+				ProductionPlan aux = productionPlanList.get(i);
+				if(aux.getId().equals(productionPlan.getId())) {
+					productionPlanList.set(i, productionPlan);
+					serializator.grabarLista(productionPlanList);
+					return productionPlan;
+				}
+			}
+			throw new RuntimeException("Product Plan not found "+productionPlan.getId());
+		}
 	}
-	
+
 	public synchronized void deleteProductionPlan(ProductionPlan productionPlan) {
 		if(productionPlan.getId() != null) {
 			// primero eliminamos los detalles y cambiamos los estados
 			ProductionPlanDetailService productionPlanDetailService = new ProductionPlanDetailServiceImpl();
 			productionPlanDetailService.deleteAll(productionPlan.getId());
-			
+
 			int size = productionPlanList.size();
 			for(int i = 0; i < size; i++) {
 				ProductionPlan t = productionPlanList.get(i);
@@ -95,7 +95,7 @@ public class ProductionPlanServiceImpl  implements ProductionPlanService {
 			productionPlanStateService.deleteAll(productionPlan.getId());
 		}
 	}
-	
+
 	public synchronized Integer getNewId() {
 		Integer lastId = 0;
 		for(int i = 0; i < productionPlanList.size(); i++) {
@@ -118,7 +118,7 @@ public class ProductionPlanServiceImpl  implements ProductionPlanService {
 			productionPlanDetail.setIdProductionPlan(productionPlan.getId());
 			productionPlanDetail = productionPlanDetailService.saveProductionPlanDetail(productionPlanDetail);
 			// debemos cambiar el estado de todos los pedidos a "planificado"
-    		orderStateService.setNewOrderState("planificado", productionPlanDetail.getIdOrder());
+			orderStateService.setNewOrderState("planificado", productionPlanDetail.getIdOrder());
 		}
 		ProductionPlanState aux = new ProductionPlanState(productionPlan.getId(), productionPlanStateTypeId, new Date());
 		ProductionPlanStateService productionPlanStateService = new ProductionPlanStateServiceImpl();
@@ -158,8 +158,8 @@ public class ProductionPlanServiceImpl  implements ProductionPlanService {
 			if(is_in_list == false) {// no esta en la lista que sera grabada, por lo tanto se debe eliminar
 				// debemos volver el estado de los pedidos a "iniciado"
 				orderStateService.setNewOrderState("iniciado", serializedProductionPlanDetail.getIdOrder());// grabamos el estado del pedido
-	    		// eliminamos el detalle
-	    		productionPlanDetailService.deleteProductionPlanDetail(serializedProductionPlanDetail);
+				// eliminamos el detalle
+				productionPlanDetailService.deleteProductionPlanDetail(serializedProductionPlanDetail);
 			}
 		}
 		ProductionPlanStateService productionPlanStateService = new ProductionPlanStateServiceImpl();

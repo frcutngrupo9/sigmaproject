@@ -3,17 +3,17 @@ package ar.edu.utn.sigmaproject.domain;
 import java.io.Serializable;
 
 public class Category implements Serializable, Cloneable {
-    private static final long serialVersionUID = 1L;
-    
-    Integer idProduct;
-    Integer idCategoryType;
-    
-    public Category(Integer idProduct, Integer idCategoryType) {
-    	this.idProduct = idProduct;
-        this.idCategoryType = idCategoryType;
-    }
-    
-    public Integer getIdProduct() {
+	private static final long serialVersionUID = 1L;
+
+	Integer idProduct;
+	Integer idCategoryType;
+
+	public Category(Integer idProduct, Integer idCategoryType) {
+		this.idProduct = idProduct;
+		this.idCategoryType = idCategoryType;
+	}
+
+	public Integer getIdProduct() {
 		return idProduct;
 	}
 

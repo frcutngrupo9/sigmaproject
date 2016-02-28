@@ -4,12 +4,12 @@ import java.io.Serializable;
 
 public class RawMaterialRequirement implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
-	
+
 	Integer id;
 	Integer idProductionPlan;
 	Integer idRawMaterialType;
 	Double quantity;
-    boolean isFulfilled;
+	boolean isFulfilled;
 
 	public RawMaterialRequirement(Integer id, Integer idProductionPlan, Integer idRawMaterialType, Double quantity) {
 		this.id = id;
@@ -18,7 +18,7 @@ public class RawMaterialRequirement implements Serializable, Cloneable {
 		this.quantity = quantity;
 		isFulfilled = false;
 	}
-	
+
 	public Integer getId() {
 		return id;
 	}
@@ -58,7 +58,7 @@ public class RawMaterialRequirement implements Serializable, Cloneable {
 	public void setFulfilled(boolean isFulfilled) {
 		this.isFulfilled = isFulfilled;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -83,7 +83,7 @@ public class RawMaterialRequirement implements Serializable, Cloneable {
 			return false;
 		return true;
 	}
-	
+
 	public static RawMaterialRequirement clone(RawMaterialRequirement obj){
 		try {
 			return (RawMaterialRequirement)obj.clone();

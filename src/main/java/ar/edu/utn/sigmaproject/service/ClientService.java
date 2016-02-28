@@ -5,16 +5,16 @@ import java.util.List;
 import ar.edu.utn.sigmaproject.domain.Client;
 
 public interface ClientService {
-    
-    List<Client> getClientList();
-    
-    Client getClient(Integer idClient);
-    
-    Client getClient(String name);
 
-    Client saveClient(Client client);
+	List<Client> getClientList();
 
-    Client updateClient(Client client);
+	Client getClient(Integer idClient);
 
-    void deleteClient(Client client);
+	Client getClient(String name);
+
+	Client saveClient(Client client);
+
+	Client updateClient(Client client);
+
+	void deleteClient(Client client);
 }

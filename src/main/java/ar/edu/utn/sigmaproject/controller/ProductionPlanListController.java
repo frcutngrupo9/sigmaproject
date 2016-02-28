@@ -31,90 +31,90 @@ import ar.edu.utn.sigmaproject.service.impl.ProductionPlanStateTypeServiceImpl;
 
 public class ProductionPlanListController  extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
-	
+
 	@Wire
-    Grid productionPlanGrid;
+	Grid productionPlanGrid;
 	@Wire
 	Button newButton;
-	
+
 	// services
 	private ProductionPlanService productionPlanService = new ProductionPlanServiceImpl();
 	private ProductionPlanDetailService productionPlanDetailService = new ProductionPlanDetailServiceImpl();
 	private ProductionPlanStateService productionPlanStateService = new ProductionPlanStateServiceImpl();
 	private ProductionPlanStateTypeService productionPlanStateTypeService = new ProductionPlanStateTypeServiceImpl();
-	
+
 	// list
 	private List<ProductionPlan> productionPlanList;
-	
+
 	// list models
 	private ListModelList<ProductionPlan> productionPlanListModel;
-	
-	
+
+
 	@Override
-    public void doAfterCompose(Component comp) throws Exception {
-        super.doAfterCompose(comp);
-        productionPlanList = productionPlanService.getProductionPlanList();
-        productionPlanListModel = new ListModelList<ProductionPlan>(productionPlanList);
-        productionPlanGrid.setModel(productionPlanListModel);
-    }
-	
+	public void doAfterCompose(Component comp) throws Exception {
+		super.doAfterCompose(comp);
+		productionPlanList = productionPlanService.getProductionPlanList();
+		productionPlanListModel = new ListModelList<ProductionPlan>(productionPlanList);
+		productionPlanGrid.setModel(productionPlanListModel);
+	}
+
 	@Listen("onEditProductionPlan = #productionPlanGrid")
-    public void doEditProductionPlan(ForwardEvent evt) {
-    	int idProductionPlan = (Integer) evt.getData();
-    	Executions.getCurrent().setAttribute("selected_production_plan", productionPlanService.getProductionPlan(idProductionPlan));
-        Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
-    	include.setSrc("/production_plan_creation.zul");
-    }
-	
+	public void doEditProductionPlan(ForwardEvent evt) {
+		int idProductionPlan = (Integer) evt.getData();
+		Executions.getCurrent().setAttribute("selected_production_plan", productionPlanService.getProductionPlan(idProductionPlan));
+		Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/production_plan_creation.zul");
+	}
+
 	private void refreshList() {
 		productionPlanList = productionPlanService.getProductionPlanList();
-        productionPlanListModel = new ListModelList<ProductionPlan>(productionPlanList);
-        productionPlanGrid.setModel(productionPlanListModel);
+		productionPlanListModel = new ListModelList<ProductionPlan>(productionPlanList);
+		productionPlanGrid.setModel(productionPlanListModel);
 	}
-	
+
 	public String getQuantityOfOrder(int idProductionPlan) {
-    	return productionPlanDetailService.getProductionPlanDetailList(idProductionPlan).size() + "";// porque hay 1 pedido por detalle
-    }
-	
+		return productionPlanDetailService.getProductionPlanDetailList(idProductionPlan).size() + "";// porque hay 1 pedido por detalle
+	}
+
 	public String getQuantityOfProduct(int idProductionPlan) {
-    	return productionPlanDetailService.getProductTotalList(idProductionPlan).size() + "";
-    }
-	
+		return productionPlanDetailService.getProductTotalList(idProductionPlan).size() + "";
+	}
+
 	public String getProductionPlanStateName(int idProductionPlan) {
 		ProductionPlanState lastState = productionPlanStateService.getLastProductionPlanState(idProductionPlan);
-    	if(lastState != null) {
-    		ProductionPlanStateType aux = productionPlanStateTypeService.getProductionPlanStateType(lastState.getIdProductionPlanStateType());
-    		return aux.getName();
-    	} else {
-    		return "[sin estado]";
-    	}
-    }
-	
+		if(lastState != null) {
+			ProductionPlanStateType aux = productionPlanStateTypeService.getProductionPlanStateType(lastState.getIdProductionPlanStateType());
+			return aux.getName();
+		} else {
+			return "[sin estado]";
+		}
+	}
+
 	@Listen("onClick = #newButton")
-    public void goToProductionPlanCreation() {
-    	Executions.getCurrent().setAttribute("selected_production_plan", null);
-    	Include include = (Include) Selectors.iterable(productionPlanGrid.getPage(), "#mainInclude").iterator().next();
-    	include.setSrc("/production_plan_creation.zul");
-    }
-	
+	public void goToProductionPlanCreation() {
+		Executions.getCurrent().setAttribute("selected_production_plan", null);
+		Include include = (Include) Selectors.iterable(productionPlanGrid.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/production_plan_creation.zul");
+	}
+
 	public ListModel<ProductTotal> getProductionPlanProducts(int idProductionPlan) {
 		ArrayList<ProductTotal> productTotalList = productionPlanDetailService.getProductTotalList(idProductionPlan);
 		return new ListModelList<ProductTotal>(productTotalList);
-    }
-	
+	}
+
 	@Listen("onGenerateProductionOrder = #productionPlanGrid")
-    public void goToProductionOrderList(ForwardEvent evt) {
+	public void goToProductionOrderList(ForwardEvent evt) {
 		ProductionPlan productionPlan = (ProductionPlan) evt.getData();
-    	Executions.getCurrent().setAttribute("selected_production_plan", productionPlan);
-        Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
-    	include.setSrc("/production_order_list.zul");
-    }
-	
+		Executions.getCurrent().setAttribute("selected_production_plan", productionPlan);
+		Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/production_order_list.zul");
+	}
+
 	@Listen("onOpenRequirementPlan = #productionPlanGrid")
-    public void goToRequirementPlanCreation(ForwardEvent evt) {
+	public void goToRequirementPlanCreation(ForwardEvent evt) {
 		ProductionPlan productionPlan = (ProductionPlan) evt.getData();
-    	Executions.getCurrent().setAttribute("selected_production_plan", productionPlan);
-        Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
-    	include.setSrc("/requirement_plan_creation.zul");
-    }
+		Executions.getCurrent().setAttribute("selected_production_plan", productionPlan);
+		Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/requirement_plan_creation.zul");
+	}
 }

@@ -8,10 +8,10 @@ import ar.edu.utn.sigmaproject.service.SupplyRequirementService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
 public class SupplyRequirementServiceImpl implements SupplyRequirementService {
-	
+
 	static List<SupplyRequirement> supplyRequirementList = new ArrayList<SupplyRequirement>();
 	private SerializationService serializator = new SerializationService("supply_requirement");
-	
+
 	public SupplyRequirementServiceImpl() {
 		List<SupplyRequirement> aux = serializator.obtenerLista();
 		if(aux != null) {
@@ -20,7 +20,7 @@ public class SupplyRequirementServiceImpl implements SupplyRequirementService {
 			serializator.grabarLista(supplyRequirementList);
 		}
 	}
-	
+
 	//synchronized para prevenir acceso concurrente al servicio de lista
 	public synchronized List<SupplyRequirement> getSupplyRequirementList() {
 		List<SupplyRequirement> list = new ArrayList<SupplyRequirement>();
@@ -29,7 +29,7 @@ public class SupplyRequirementServiceImpl implements SupplyRequirementService {
 		}
 		return list;
 	}
-	
+
 	public synchronized List<SupplyRequirement> getSupplyRequirementList(Integer idProductionPlan) {
 		List<SupplyRequirement> list = new ArrayList<SupplyRequirement>();
 		for(SupplyRequirement each:supplyRequirementList) {
@@ -39,7 +39,7 @@ public class SupplyRequirementServiceImpl implements SupplyRequirementService {
 		}
 		return list;
 	}
-	
+
 	public synchronized SupplyRequirement getSupplyRequirement(Integer id) {
 		int size = supplyRequirementList.size();
 		for(int i = 0; i < size; i++) {
@@ -50,7 +50,7 @@ public class SupplyRequirementServiceImpl implements SupplyRequirementService {
 		}
 		return null;
 	}
-	
+
 	public synchronized SupplyRequirement getSupplyRequirement(Integer idProductionPlan, Integer idSupplyType) {
 		int size = supplyRequirementList.size();
 		for(int i = 0; i < size; i++) {
@@ -61,7 +61,7 @@ public class SupplyRequirementServiceImpl implements SupplyRequirementService {
 		}
 		return null;
 	}
-	
+
 	public synchronized SupplyRequirement saveSupplyRequirement(SupplyRequirement supplyRequirement) {
 		if(supplyRequirement.getId() == null) {
 			Integer newId = getNewId();
@@ -72,7 +72,7 @@ public class SupplyRequirementServiceImpl implements SupplyRequirementService {
 		serializator.grabarLista(supplyRequirementList);
 		return supplyRequirement;
 	}
-	
+
 	public synchronized SupplyRequirement updateSupplyRequirement(SupplyRequirement supplyRequirement) {
 		if(supplyRequirement.getId() == null) {
 			throw new IllegalArgumentException("can't update a null-id SupplyRequirement, save it first");
@@ -90,7 +90,7 @@ public class SupplyRequirementServiceImpl implements SupplyRequirementService {
 			throw new RuntimeException("SupplyRequirement not found "+supplyRequirement.getId());
 		}
 	}
-	
+
 	public synchronized void deleteSupplyRequirement(SupplyRequirement supplyRequirement) {
 		if(supplyRequirement.getId() != null) {
 			int size = supplyRequirementList.size();
@@ -108,10 +108,10 @@ public class SupplyRequirementServiceImpl implements SupplyRequirementService {
 	public void deleteAll(Integer idProductionPlan) {
 		List<SupplyRequirement> deleteList = getSupplyRequirementList(idProductionPlan);
 		for(SupplyRequirement delete : deleteList) {
-    		deleteSupplyRequirement(delete);
+			deleteSupplyRequirement(delete);
 		}
 	}
-	
+
 	private synchronized Integer getNewId() {
 		Integer lastId = 0;
 		for(int i = 0; i < supplyRequirementList.size(); i++) {

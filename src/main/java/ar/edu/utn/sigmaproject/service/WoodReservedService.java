@@ -5,15 +5,15 @@ import java.util.List;
 import ar.edu.utn.sigmaproject.domain.WoodReserved;
 
 public interface WoodReservedService {
-	
+
 	List<WoodReserved> getWoodReservedList();
-    
+
 	WoodReserved getWoodReserved(Integer idWood);
 
 	WoodReserved saveWoodReserved(WoodReserved woodReserved);
 
 	WoodReserved updateWoodReserved(WoodReserved woodReserved);
 
-    void deleteWoodReserved(WoodReserved woodReserved);
+	void deleteWoodReserved(WoodReserved woodReserved);
 
 }

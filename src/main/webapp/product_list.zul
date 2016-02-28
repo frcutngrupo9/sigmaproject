@@ -60,7 +60,7 @@
             </listitem>
         </template>
     </listbox>
-    <listbox id="pieceListbox" mold="paging" pageSize="5" sizedByContent="true" span="true" visible="false">
+    <listbox id="pieceListbox" mold="paging" pageSize="5" sizedByContent="true" span="true" visible="true">
     	<auxhead>
 			<auxheader label="Piezas" colspan="10"/>
 		</auxhead>
@@ -74,6 +74,7 @@
             <listheader label="Ancho"/>
             <listheader label="Otras Medidas"/>
             <listheader label="Unidades"/>
+            <listheader label="Es clon?"/>
         </listhead>
         <template name="model">
             <listitem>
@@ -86,12 +87,13 @@
                 <listcell label="${each.width.doubleValue()} ${win_product_list$composer.getMeasureUnitName(each.widthIdMeasureUnit)}"/>
                 <listcell label="${each.size}"/>
                 <listcell label="${each.units}"/>
+                <listcell label="${each.isClone()}"/>
             </listitem>
         </template>
     </listbox>
-    <listbox id="processListbox" mold="paging" pageSize="5" sizedByContent="true" span="true" visible="false">
+    <listbox id="processListbox" mold="paging" pageSize="5" sizedByContent="true" span="true" visible="true">
     	<auxhead>
-			<auxheader label="Procesos" colspan="7"/>
+			<auxheader label="Procesos" colspan="8"/>
 		</auxhead>
         <listhead>
         	<listheader label="Id Proceso"/>
@@ -101,6 +103,7 @@
             <listheader label="Id Pieza"/>
             <listheader label="Id Tipo Proceso"/>
             <listheader label="Tiempo"/>
+            <listheader label="Es clon?"/>
         </listhead>
         <template name="model">
             <listitem>
@@ -111,6 +114,7 @@
                 <listcell label="${each.idPiece}"/>
                 <listcell label="${each.idProcessType}"/>
                 <listcell label="${win_product_list$composer.getFormatedTime(each.time)}"/>
+                <listcell label="${each.isClone()}"/>
             </listitem>
         </template>
     </listbox>	

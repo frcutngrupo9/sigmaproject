@@ -13,7 +13,7 @@ import org.zkoss.zul.Textbox;
 
 public class LoginController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
-	
+
 	//wire components
 	@Wire
 	Textbox account;
@@ -21,16 +21,16 @@ public class LoginController extends SelectorComposer<Component> {
 	Textbox password;
 	@Wire
 	Label message;
-	
+
 	//services
 	AuthService authService = new AuthenticationServiceImpl();
 
-	
+
 	@Listen("onClick=#login; onOK=#loginWin")
 	public void doLogin(){
 		String nm = account.getValue();
 		String pd = password.getValue();
-		
+
 		if(!authService.login(nm,pd)){
 			message.setValue("usuario o password incorrecto.");
 			return;
@@ -38,8 +38,8 @@ public class LoginController extends SelectorComposer<Component> {
 		UserCredential cre= authService.getUserCredential();
 		message.setValue("Bienvenido, "+cre.getName());
 		message.setSclass("");
-		
+
 		Executions.sendRedirect("/");
-		
+
 	}
 }

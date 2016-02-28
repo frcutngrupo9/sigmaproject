@@ -4,10 +4,10 @@ import java.io.Serializable;
 
 public class ProcessType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
-	
+
 	Integer id;
 	String name;
-	
+
 	public ProcessType(Integer id, String name) {
 		this.id = id;
 		this.name = name;
@@ -20,7 +20,7 @@ public class ProcessType implements Serializable, Cloneable {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -28,7 +28,7 @@ public class ProcessType implements Serializable, Cloneable {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -62,5 +62,5 @@ public class ProcessType implements Serializable, Cloneable {
 		}
 		return null;
 	}
-	
+
 }

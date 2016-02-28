@@ -6,7 +6,7 @@ import javax.xml.datatype.Duration;
 
 public class ProductionOrderDetail implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
-	
+
 	Integer idProductionOrder;
 	Integer idProcess;
 	Duration timeTotal;
@@ -22,7 +22,7 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 		quantityFinished = 0.0; 
 		isFinished = false;
 	}
-	
+
 	public Integer getIdProductionOrder() {
 		return idProductionOrder;
 	}

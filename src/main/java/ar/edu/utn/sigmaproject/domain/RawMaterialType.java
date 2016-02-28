@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 
 public class RawMaterialType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
-	
+
 	Integer id;
 	String name;
 	BigDecimal length;
@@ -33,7 +33,7 @@ public class RawMaterialType implements Serializable, Cloneable {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -114,7 +114,7 @@ public class RawMaterialType implements Serializable, Cloneable {
 			return false;
 		return true;
 	}
-	
+
 	public static RawMaterialType clone(RawMaterialType rawMaterialType){
 		try {
 			return (RawMaterialType)rawMaterialType.clone();

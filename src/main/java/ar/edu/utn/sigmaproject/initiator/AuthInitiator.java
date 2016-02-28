@@ -14,16 +14,16 @@ import org.zkoss.zk.ui.Executions;
  */
 public class AuthInitiator implements Initiator {
 
-    //services
-    AuthService authService = new AuthenticationServiceImpl();
-     
-    public void doInit(Page page, Map<String, Object> args) throws Exception {
-         
-        UserCredential cre = authService.getUserCredential();
-        if(cre==null || cre.isAnonymous()){
-            Executions.sendRedirect("/login.zul");
-            return;
-        }
-    }
-    
+	//services
+	AuthService authService = new AuthenticationServiceImpl();
+
+	public void doInit(Page page, Map<String, Object> args) throws Exception {
+
+		UserCredential cre = authService.getUserCredential();
+		if(cre==null || cre.isAnonymous()){
+			Executions.sendRedirect("/login.zul");
+			return;
+		}
+	}
+
 }

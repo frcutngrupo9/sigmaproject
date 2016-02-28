@@ -31,9 +31,9 @@
 		            </columns>
 		            <template name="model">
 		                <row>
-		                	<custom-attributes processes="${win_production_order_list$composer.getProductionOrderProcesses(each.idProduct)}"/>
+		                	<custom-attributes production_order_detail_list="${win_production_order_list$composer.getProductionOrderDetailList(each.id)}"/>
 			            	<detail open="false" fulfill="onOpen">
-			            		<include src="/production_order_processes.zul" processes="${processes}"/>
+			            		<include src="/production_order_processes.zul" production_order_detail_list="${production_order_detail_list}"/>
 			            	</detail>
 		                	<label value="${each.id}"/>
                     		<label value="${each.number}"/>

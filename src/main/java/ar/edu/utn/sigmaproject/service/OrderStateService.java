@@ -5,13 +5,13 @@ import java.util.List;
 import ar.edu.utn.sigmaproject.domain.OrderState;
 
 public interface OrderStateService {
-	
+
 	List<OrderState> getOrderStateList();
-	
+
 	List<OrderState> getOrderStateList(Integer idOrder);
-	
+
 	OrderState getOrderState(Integer idOrder, Integer idOrderStateType);
-	
+
 	OrderState getLastOrderState(Integer idOrder);
 
 	OrderState saveOrderState(OrderState orderState);

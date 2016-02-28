@@ -51,124 +51,124 @@ import org.zkoss.zul.Treeitem;
  */
 public class SidebarController extends SelectorComposer<Component> {
 
-    /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
 	private static String SIDEBAR_CONTROLLER_PAGE_ATTRIBUTE_NAME = "mainPage";
-    
-    @Wire 
-    private Tree tree;
-    
-    public static Page mainPage() {
-        return (Page)Executions.getCurrent().getDesktop().getAttribute(SIDEBAR_CONTROLLER_PAGE_ATTRIBUTE_NAME);
-    }
 
-    @Override
-    public void doAfterCompose(Component comp) throws Exception {
-        super.doAfterCompose(comp);
-        
-        Executions.getCurrent().getDesktop().setAttribute(SIDEBAR_CONTROLLER_PAGE_ATTRIBUTE_NAME, getPage());
-        
-        @SuppressWarnings("unchecked")
+	@Wire 
+	private Tree tree;
+
+	public static Page mainPage() {
+		return (Page)Executions.getCurrent().getDesktop().getAttribute(SIDEBAR_CONTROLLER_PAGE_ATTRIBUTE_NAME);
+	}
+
+	@Override
+	public void doAfterCompose(Component comp) throws Exception {
+		super.doAfterCompose(comp);
+
+		Executions.getCurrent().getDesktop().setAttribute(SIDEBAR_CONTROLLER_PAGE_ATTRIBUTE_NAME, getPage());
+
+		@SuppressWarnings("unchecked")
 		TreeNode<MenuTreeRow> rootNode = new DefaultTreeNode<MenuTreeRow>(null, Arrays.asList(
-            new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Productos"), Arrays.asList(
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Paste.png", "Listado Productos", "/product_list.zul")),
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Stationery.png", "Crear Producto", "/product_creation.zul"))
-            )),
-            new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Pedidos"), Arrays.asList(
-            		new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Pedidos", "/order_list.zul")),
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Pedido", "/order_creation.zul"))
-                    
-            )),
-            new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Produccion"), Arrays.asList(
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Planes de Produccion", "/production_plan_list.zul")),
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Plan de Produccion", "/production_plan_creation.zul"))
-            )),
-            new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Stock"), Arrays.asList(
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Stock Productos", "/product_stock.zul")),
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Stock Materia Prima", "/raw_material_stock.zul")),
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Stock Insumos", "/supply_stock.zul")),
-                    new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Maquinas", "/machine_stock.zul"))
-            )),
-            new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Clientes", "/client.zul")),
-            new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Materias Primas", "/raw_material.zul")),
-            new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Insumos", "/supply.zul")),
-            new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Maquinas", "/machine.zul")),
-            new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Herramientas", "/tool.zul")),
-            new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Reportes"))
-        ));
-        tree.setModel(new DefaultTreeModel<MenuTreeRow>(rootNode));
-        tree.addEventListener(Events.ON_CLICK, new EventListener<MouseEvent>() {
-            public void onEvent(MouseEvent event) throws Exception {
-                Treeitem treeitem = tree.getSelectedItem();
-                DefaultTreeNode<MenuTreeRow> treeNode = treeitem.<DefaultTreeNode<MenuTreeRow>>getValue();
-                MenuTreeRow row = treeNode.getData();
-                if (row.destination != null) {
-                    //redirect current url to new location
-                    if (row.destination.startsWith("http")) {
-                        //open a new browser tab
-                        Executions.getCurrent().sendRedirect(row.destination);
-                    } else {
-                        //use iterable to find the first include only
-                        Include include = (Include) Selectors.iterable(tree.getPage(), "#mainInclude")
-                                .iterator().next();
-                        
-                        // clear and set this destination as the first page
-                        Stack<String> pages = SigmaDesktopInit.pagesStack();
-                        pages.clear();
-                        pages.push(row.destination);
-                        
-                        include.setSrc(row.destination);
-                    }
-                }
-                if (!treeNode.isLeaf()) {
-                    treeitem.setOpen(!treeitem.isOpen());
-                }
-            }
-            
-        });
-        
-    }
-    
-    public class MenuTreeRow {
-        private String image;
-        private String name;
-        private String destination;
-        
-        public MenuTreeRow(String image, String name, String destination) {
-            this.image = image;
-            this.name = name;
-            this.destination = destination;
-        }
-        
-        public MenuTreeRow(String image, String name) {
-            this(image, name, null);
-        }
+				new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Productos"), Arrays.asList(
+						new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Paste.png", "Listado Productos", "/product_list.zul")),
+						new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Stationery.png", "Crear Producto", "/product_creation.zul"))
+						)),
+						new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Pedidos"), Arrays.asList(
+								new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Pedidos", "/order_list.zul")),
+								new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Pedido", "/order_creation.zul"))
 
-        public String getImage() {
-            return image;
-        }
+								)),
+								new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Produccion"), Arrays.asList(
+										new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Planes de Produccion", "/production_plan_list.zul")),
+										new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Plan de Produccion", "/production_plan_creation.zul"))
+										)),
+										new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Stock"), Arrays.asList(
+												new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Stock Productos", "/product_stock.zul")),
+												new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Stock Materia Prima", "/raw_material_stock.zul")),
+												new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Stock Insumos", "/supply_stock.zul")),
+												new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Maquinas", "/machine_stock.zul"))
+												)),
+												new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Clientes", "/client.zul")),
+												new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Materias Primas", "/raw_material.zul")),
+												new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Insumos", "/supply.zul")),
+												new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Maquinas", "/machine.zul")),
+												new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Herramientas", "/tool.zul")),
+												new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Reportes"))
+				));
+		tree.setModel(new DefaultTreeModel<MenuTreeRow>(rootNode));
+		tree.addEventListener(Events.ON_CLICK, new EventListener<MouseEvent>() {
+			public void onEvent(MouseEvent event) throws Exception {
+				Treeitem treeitem = tree.getSelectedItem();
+				DefaultTreeNode<MenuTreeRow> treeNode = treeitem.<DefaultTreeNode<MenuTreeRow>>getValue();
+				MenuTreeRow row = treeNode.getData();
+				if (row.destination != null) {
+					//redirect current url to new location
+					if (row.destination.startsWith("http")) {
+						//open a new browser tab
+						Executions.getCurrent().sendRedirect(row.destination);
+					} else {
+						//use iterable to find the first include only
+						Include include = (Include) Selectors.iterable(tree.getPage(), "#mainInclude")
+								.iterator().next();
 
-        public void setImage(String image) {
-            this.image = image;
-        }
+						// clear and set this destination as the first page
+						Stack<String> pages = SigmaDesktopInit.pagesStack();
+						pages.clear();
+						pages.push(row.destination);
 
-        public String getName() {
-            return name;
-        }
+						include.setSrc(row.destination);
+					}
+				}
+				if (!treeNode.isLeaf()) {
+					treeitem.setOpen(!treeitem.isOpen());
+				}
+			}
 
-        public void setName(String name) {
-            this.name = name;
-        }
+		});
 
-        public String getDestination() {
-            return destination;
-        }
+	}
 
-        public void setDestination(String destination) {
-            this.destination = destination;
-        }
-    }
+	public class MenuTreeRow {
+		private String image;
+		private String name;
+		private String destination;
+
+		public MenuTreeRow(String image, String name, String destination) {
+			this.image = image;
+			this.name = name;
+			this.destination = destination;
+		}
+
+		public MenuTreeRow(String image, String name) {
+			this(image, name, null);
+		}
+
+		public String getImage() {
+			return image;
+		}
+
+		public void setImage(String image) {
+			this.image = image;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public String getDestination() {
+			return destination;
+		}
+
+		public void setDestination(String destination) {
+			this.destination = destination;
+		}
+	}
 }

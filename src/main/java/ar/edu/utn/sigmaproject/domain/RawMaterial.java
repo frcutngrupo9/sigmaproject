@@ -3,23 +3,23 @@ package ar.edu.utn.sigmaproject.domain;
 import java.io.Serializable;
 
 public class RawMaterial  implements Serializable, Cloneable {
-    private static final long serialVersionUID = 1L;
-    
-    Integer id;
-    Integer idProduct;
-    Integer idRawMaterialType;
-    Double quantity;
-    boolean isClone;
-    
-    public RawMaterial(Integer id, Integer idProduct, Integer idRawMaterialType, Double quantity) {
-    	this.id = id;
-    	this.idProduct = idProduct;
-        this.idRawMaterialType = idRawMaterialType;
-        this.quantity = quantity;
-        isClone = false;
-    }
-    
-    public Integer getId() {
+	private static final long serialVersionUID = 1L;
+
+	Integer id;
+	Integer idProduct;
+	Integer idRawMaterialType;
+	Double quantity;
+	boolean isClone;
+
+	public RawMaterial(Integer id, Integer idProduct, Integer idRawMaterialType, Double quantity) {
+		this.id = id;
+		this.idProduct = idProduct;
+		this.idRawMaterialType = idRawMaterialType;
+		this.quantity = quantity;
+		isClone = false;
+	}
+
+	public Integer getId() {
 		return id;
 	}
 

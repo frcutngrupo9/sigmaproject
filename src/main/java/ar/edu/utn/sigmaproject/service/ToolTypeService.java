@@ -6,13 +6,13 @@ import ar.edu.utn.sigmaproject.domain.ToolType;
 
 public interface ToolTypeService {
 
-    List<ToolType> getToolTypeList();
-    
-    ToolType getToolType(Integer idToolType);
+	List<ToolType> getToolTypeList();
 
-    ToolType saveToolType(ToolType supplyType);
+	ToolType getToolType(Integer idToolType);
 
-    ToolType updateToolType(ToolType supplyType);
+	ToolType saveToolType(ToolType supplyType);
 
-    void deleteToolType(ToolType supply);
+	ToolType updateToolType(ToolType supplyType);
+
+	void deleteToolType(ToolType supply);
 }

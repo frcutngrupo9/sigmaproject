@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 
 public class Piece implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
-	
+
 	Integer id;
 	Integer idProduct;
 	String name;
@@ -39,7 +39,7 @@ public class Piece implements Serializable, Cloneable {
 	public Integer getId() {
 		return id;
 	}
-	
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
@@ -51,7 +51,7 @@ public class Piece implements Serializable, Cloneable {
 	public void setIdProduct(Integer idProduct) {
 		this.idProduct = idProduct;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -67,7 +67,7 @@ public class Piece implements Serializable, Cloneable {
 	public void setLength(BigDecimal length) {
 		this.length = length;
 	}
-	
+
 	public BigDecimal getDepth() {
 		return depth;
 	}
@@ -164,7 +164,7 @@ public class Piece implements Serializable, Cloneable {
 			return false;
 		return true;
 	}
-	
+
 	public static Piece clone(Piece piece){
 		try {
 			return (Piece)piece.clone();

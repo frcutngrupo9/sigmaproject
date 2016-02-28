@@ -10,7 +10,7 @@ import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 public class CategoryServiceImpl implements CategoryService {
 	static List<Category> categoryList = new ArrayList<Category>();
 	private SerializationService serializator = new SerializationService("category");
-	
+
 	public CategoryServiceImpl() {
 		List<Category> aux = serializator.obtenerLista();
 		if(aux != null) {
@@ -19,7 +19,7 @@ public class CategoryServiceImpl implements CategoryService {
 			serializator.grabarLista(categoryList);
 		}
 	}
-	
+
 	public synchronized List<Category> getCategoryList() {
 		List<Category> list = new ArrayList<Category>();
 		for(Category each:categoryList) {
@@ -27,7 +27,7 @@ public class CategoryServiceImpl implements CategoryService {
 		}
 		return list;
 	}
-	
+
 	public synchronized List<Category> getCategoryList(Integer idProduct) {
 		List<Category> list = new ArrayList<Category>();
 		for(Category each:categoryList) {
@@ -37,7 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
 		}
 		return list;
 	}
-	
+
 	public synchronized Category getCategory(Integer idProduct, Integer idCategoryType) {
 		int size = categoryList.size();
 		for(int i = 0; i < size; i++) {
@@ -48,14 +48,14 @@ public class CategoryServiceImpl implements CategoryService {
 		}
 		return null;
 	}
-	
+
 	public synchronized Category saveCategory(Category category) {
 		category = Category.clone(category);
 		categoryList.add(category);
 		serializator.grabarLista(categoryList);
 		return category;
 	}
-	
+
 	public synchronized Category updateCategory(Category category) {
 		if(category.getIdProduct()==null || category.getIdCategoryType()==null) {
 			throw new IllegalArgumentException("can't update a null-id Category, save it first");
@@ -73,7 +73,7 @@ public class CategoryServiceImpl implements CategoryService {
 			throw new RuntimeException("Category not found "+category.getIdProduct()+" "+category.getIdCategoryType());
 		}
 	}
-	
+
 	public synchronized void deleteCategory(Category category) {
 		if(category.getIdProduct()!=null && category.getIdCategoryType()!=null) {
 			int size = categoryList.size();
@@ -87,7 +87,7 @@ public class CategoryServiceImpl implements CategoryService {
 			}
 		}
 	}
-	
+
 	public synchronized void deleteAll(Integer idProduct) {
 		List<Category> listDelete = getCategoryList(idProduct);
 		for(Category delete:listDelete) {

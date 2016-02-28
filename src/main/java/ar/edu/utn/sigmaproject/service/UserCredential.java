@@ -6,10 +6,10 @@ import java.util.Set;
 
 public class UserCredential implements Serializable{
 	private static final long serialVersionUID = 1L;
-	
+
 	String account;
 	String name;
-	
+
 	Set<String> roles = new HashSet<String>();
 
 	public UserCredential(String account, String name) {
@@ -42,11 +42,11 @@ public class UserCredential implements Serializable{
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public boolean hasRole(String role){
 		return roles.contains(role);
 	}
-	
+
 	public void addRole(String role){
 		roles.add(role);
 	}

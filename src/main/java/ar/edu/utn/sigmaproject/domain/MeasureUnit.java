@@ -4,12 +4,12 @@ import java.io.Serializable;
 
 public class MeasureUnit implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
-	
+
 	Integer id;
 	String name;
 	String shortName;
 	Integer idMeasureUnitType;
-	
+
 	public MeasureUnit(Integer id, String name, String shortName, Integer idMeasureUnitType) {
 		this.id = id;
 		this.name = name;
@@ -28,7 +28,7 @@ public class MeasureUnit implements Serializable, Cloneable {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public String getShortName() {
 		return shortName;
 	}
@@ -36,14 +36,14 @@ public class MeasureUnit implements Serializable, Cloneable {
 	public void setShortName(String shortName) {
 		this.shortName = shortName;
 	}
-	
-	public Integer getIdMeasureUnitType() {
-        return idMeasureUnitType;
-    }
 
-    public void setIdMeasureUnitType(Integer idMeasureUnitType) {
-        this.idMeasureUnitType = idMeasureUnitType;
-    }
+	public Integer getIdMeasureUnitType() {
+		return idMeasureUnitType;
+	}
+
+	public void setIdMeasureUnitType(Integer idMeasureUnitType) {
+		this.idMeasureUnitType = idMeasureUnitType;
+	}
 
 	@Override
 	public int hashCode() {
@@ -69,7 +69,7 @@ public class MeasureUnit implements Serializable, Cloneable {
 			return false;
 		return true;
 	}
-	
+
 	public static MeasureUnit clone(MeasureUnit measureUnit){
 		try {
 			return (MeasureUnit)measureUnit.clone();

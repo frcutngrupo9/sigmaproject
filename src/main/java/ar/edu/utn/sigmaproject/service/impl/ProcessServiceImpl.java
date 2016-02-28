@@ -13,7 +13,7 @@ public class ProcessServiceImpl implements ProcessService {
 
 	static List<Process> processList = new ArrayList<Process>();
 	private SerializationService serializator = new SerializationService("process");
-	
+
 	public ProcessServiceImpl() {
 		List<Process> aux = serializator.obtenerLista();
 		if(aux != null) {
@@ -22,7 +22,7 @@ public class ProcessServiceImpl implements ProcessService {
 			serializator.grabarLista(processList);
 		}
 	}
-	
+
 	//synchronized para prevenir acceso concurrente al servicio de lista
 	public synchronized List<Process> getProcessList() {
 		List<Process> list = new ArrayList<Process>();
@@ -33,7 +33,15 @@ public class ProcessServiceImpl implements ProcessService {
 		}
 		return list;
 	}
-	
+
+	public List<Process> getCompleteProcessList() {// devuelve tambien procesos clones
+		List<Process> list = new ArrayList<Process>();
+		for(Process process:processList) {
+			list.add(Process.clone(process));
+		}
+		return list;
+	}
+
 	public synchronized List<Process> getProcessList(Integer idPiece) {
 		List<Process> list = new ArrayList<Process>();
 		for(Process process:processList) {
@@ -43,7 +51,7 @@ public class ProcessServiceImpl implements ProcessService {
 		}
 		return list;
 	}
-	
+
 	public synchronized List<Process> getCompleteProcessList(Integer idPiece) {// devuelve tambien procesos clones
 		List<Process> list = new ArrayList<Process>();
 		for(Process process:processList) {
@@ -53,29 +61,29 @@ public class ProcessServiceImpl implements ProcessService {
 		}
 		return list;
 	}
-	
+
 	public synchronized Process getProcess(Integer id) {
 		int size = processList.size();
-  		for(int i = 0; i < size; i++) {
-  			Process t = processList.get(i);
-  			if(t.getId().equals(id)) {
-  				return Process.clone(t);
-  			}
-  		}
-  		return null;
+		for(int i = 0; i < size; i++) {
+			Process t = processList.get(i);
+			if(t.getId().equals(id)) {
+				return Process.clone(t);
+			}
+		}
+		return null;
 	}
-	
+
 	public synchronized Process getProcess(Integer idPiece, Integer idProcessType) {
 		int size = processList.size();
-  		for(int i = 0; i < size; i++) {
-  			Process aux = processList.get(i);
-  			if(aux.getIdPiece().equals(idPiece) && aux.getIdProcessType().equals(idProcessType) && aux.isClone() == false) {
-  				return Process.clone(aux);
-  			}
-  		}
-  		return null;
+		for(int i = 0; i < size; i++) {
+			Process aux = processList.get(i);
+			if(aux.isClone() == false && aux.getIdPiece().equals(idPiece) && aux.getIdProcessType().equals(idProcessType)) {
+				return Process.clone(aux);
+			}
+		}
+		return null;
 	}
-	
+
 	public synchronized Process saveProcess(Process process) {
 		if(process.getId() == null) {
 			Integer newId = getNewId();
@@ -86,7 +94,7 @@ public class ProcessServiceImpl implements ProcessService {
 		serializator.grabarLista(processList);
 		return process;
 	}
-	
+
 	public synchronized Process updateProcess(Process process) {
 		if(process.getId() == null) {
 			throw new IllegalArgumentException("can't update a null-id process, save it first");
@@ -96,10 +104,6 @@ public class ProcessServiceImpl implements ProcessService {
 			for(int i = 0; i < size; i++) {
 				Process t = processList.get(i);
 				if(t.getId().equals(process.getId())) {
-					if(isInsideProductionOrder(process.getId())) {
-						// debemos clonar el proceso y asignar el detalle de la orden de produccion al clon
-						cloneAndAssignToProductionOrder(process);
-					}
 					processList.set(i, process);
 					serializator.grabarLista(processList);
 					return process;
@@ -108,7 +112,7 @@ public class ProcessServiceImpl implements ProcessService {
 			throw new RuntimeException("Process not found " + process.getId());
 		}
 	}
-	
+
 	public synchronized void deleteProcess(Process process) {
 		if(process.getId() != null) {
 			int size = processList.size();
@@ -119,7 +123,7 @@ public class ProcessServiceImpl implements ProcessService {
 						// debemos clonar el proceso y asignar el detalle de la orden de produccion al clon
 						cloneAndAssignToProductionOrder(process);
 					}
-					processList.remove(i);
+					processList.remove(t);
 					serializator.grabarLista(processList);
 					return;
 				}
@@ -133,7 +137,7 @@ public class ProcessServiceImpl implements ProcessService {
 			deleteProcess(delete);
 		}
 	}
-	
+
 	public synchronized Integer getNewId() {
 		Integer lastId = 0;
 		for(int i = 0; i < processList.size(); i++) {
@@ -150,7 +154,7 @@ public class ProcessServiceImpl implements ProcessService {
 		aux.setClone(true);
 		return aux;
 	}
-	
+
 	private boolean isInsideProductionOrder(Integer id) {
 		ProductionOrderDetailService productionOrderDetailService = new ProductionOrderDetailServiceImpl();
 		List<ProductionOrderDetail> productionOrderDetailList = productionOrderDetailService.getProductionOrderDetailListByProcessId(id);
@@ -160,16 +164,15 @@ public class ProcessServiceImpl implements ProcessService {
 		}
 		return value;
 	}
-	
-	private void cloneAndAssignToProductionOrder(Process process) {
-		Process clone = generateClone(process);
+
+	private void cloneAndAssignToProductionOrder(Process oldProcess) {
+		Process clone = generateClone(oldProcess);
 		clone = saveProcess(clone);// para que devuelva un proceso con id agregado
 		ProductionOrderDetailService productionOrderDetailService = new ProductionOrderDetailServiceImpl();
-		List<ProductionOrderDetail> productionOrderDetailList = productionOrderDetailService.getProductionOrderDetailListByProcessId(process.getId());
+		List<ProductionOrderDetail> productionOrderDetailList = productionOrderDetailService.getProductionOrderDetailListByProcessId(oldProcess.getId());
 		for(ProductionOrderDetail productionOrderDetail:productionOrderDetailList) {
 			productionOrderDetail.setIdProcess(clone.getId());// asignamos la referencia al clon
-			productionOrderDetailService.updateProductionOrderDetail(productionOrderDetail);// actualizamos el detalle
+			productionOrderDetailService.updateCloneProductionOrderDetail(productionOrderDetail, oldProcess);// actualizamos el detalle
 		}
 	}
-	
 }

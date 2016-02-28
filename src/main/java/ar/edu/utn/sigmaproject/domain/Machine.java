@@ -3,15 +3,15 @@ package ar.edu.utn.sigmaproject.domain;
 import java.io.Serializable;
 
 public class Machine implements Serializable, Cloneable {
-    private static final long serialVersionUID = 1L;
-    
-    Integer idProcessType;
-    Integer idMachineType;
-    
-    public Machine(Integer idProcessType, Integer idMachineType) {
-    	this.idProcessType = idProcessType;
-        this.idMachineType = idMachineType;
-    }
+	private static final long serialVersionUID = 1L;
+
+	Integer idProcessType;
+	Integer idMachineType;
+
+	public Machine(Integer idProcessType, Integer idMachineType) {
+		this.idProcessType = idProcessType;
+		this.idMachineType = idMachineType;
+	}
 
 	public Integer getIdProcessType() {
 		return idProcessType;

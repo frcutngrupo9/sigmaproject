@@ -5,14 +5,14 @@ import java.util.List;
 import ar.edu.utn.sigmaproject.domain.Wood;
 
 public interface WoodService {
-    
-    List<Wood> getWoodList();
-    
-    Wood getWood(Integer idWood);
 
-    Wood saveWood(Wood wood);
+	List<Wood> getWoodList();
 
-    Wood updateWood(Wood wood);
+	Wood getWood(Integer idWood);
 
-    void deleteWood(Wood wood);
+	Wood saveWood(Wood wood);
+
+	Wood updateWood(Wood wood);
+
+	void deleteWood(Wood wood);
 }

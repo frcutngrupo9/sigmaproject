@@ -5,11 +5,13 @@ import java.util.List;
 import ar.edu.utn.sigmaproject.domain.Piece;
 
 public interface PieceService {
-	
+
 	List<Piece> getPieceList();
-	
+
+	List<Piece> getCompletePieceList();
+
 	List<Piece> getPieceList(Integer idProduct);
-	
+
 	Piece getPiece(Integer idPiece);
 
 	Piece savePiece(Piece piece);

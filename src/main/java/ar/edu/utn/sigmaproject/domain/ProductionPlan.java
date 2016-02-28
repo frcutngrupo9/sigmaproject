@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class ProductionPlan  implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
-	
+
 	Integer id;
 	String name;
 	String details;
@@ -21,7 +21,7 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	public Integer getId() {
 		return id;
 	}
-	
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
@@ -29,7 +29,7 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	public String getName() {
 		return name;
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -37,15 +37,15 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	public String getDetails() {
 		return details;
 	}
-	
+
 	public void setDetails(String details) {
 		this.details = details;
 	}
-	
+
 	public Date getDate() {
 		return date;
 	}
-	
+
 	public void setDate(Date date) {
 		this.date = date;
 	}
@@ -74,7 +74,7 @@ public class ProductionPlan  implements Serializable, Cloneable {
 			return false;
 		return true;
 	}
-	
+
 	public static ProductionPlan clone(ProductionPlan productionPlan){
 		try {
 			return (ProductionPlan)productionPlan.clone();

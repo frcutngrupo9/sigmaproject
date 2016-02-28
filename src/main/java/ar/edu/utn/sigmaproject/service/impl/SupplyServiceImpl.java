@@ -10,7 +10,7 @@ import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 public class SupplyServiceImpl implements SupplyService {
 	static List<Supply> supplyList = new ArrayList<Supply>();
 	private SerializationService serializator = new SerializationService("supply");
-	
+
 	public SupplyServiceImpl() {
 		List<Supply> aux = serializator.obtenerLista();
 		if(aux != null) {
@@ -19,7 +19,7 @@ public class SupplyServiceImpl implements SupplyService {
 			serializator.grabarLista(supplyList);
 		}
 	}
-	
+
 	public synchronized List<Supply> getSupplyList() {
 		List<Supply> list = new ArrayList<Supply>();
 		for(Supply supply:supplyList) {
@@ -29,7 +29,7 @@ public class SupplyServiceImpl implements SupplyService {
 		}
 		return list;
 	}
-	
+
 	public synchronized List<Supply> getSupplyList(Integer idProduct) {
 		List<Supply> list = new ArrayList<Supply>();
 		for(Supply supply:supplyList) {
@@ -39,7 +39,7 @@ public class SupplyServiceImpl implements SupplyService {
 		}
 		return list;
 	}
-	
+
 	public synchronized Supply getSupply(Integer id) {
 		int size = supplyList.size();
 		for(int i = 0; i < size; i++) {
@@ -50,7 +50,7 @@ public class SupplyServiceImpl implements SupplyService {
 		}
 		return null;
 	}
-	
+
 	public synchronized Supply getSupply(Integer idProduct, Integer idSupplyType) {
 		int size = supplyList.size();
 		for(int i = 0; i < size; i++) {
@@ -61,7 +61,7 @@ public class SupplyServiceImpl implements SupplyService {
 		}
 		return null;
 	}
-	
+
 	public synchronized Supply saveSupply(Supply supply) {
 		if(supply.getId() == null) {
 			Integer newId = getNewId();
@@ -72,7 +72,7 @@ public class SupplyServiceImpl implements SupplyService {
 		serializator.grabarLista(supplyList);
 		return supply;
 	}
-	
+
 	public synchronized Supply updateSupply(Supply supply) {
 		if(supply.getId() == null) {
 			throw new IllegalArgumentException("can't update a null-id supply, save it first");
@@ -90,7 +90,7 @@ public class SupplyServiceImpl implements SupplyService {
 			throw new RuntimeException("Supply not found " + supply.getId());
 		}
 	}
-	
+
 	public synchronized void deleteSupply(Supply supply) {
 		if(supply.getId() != null) {
 			int size = supplyList.size();
@@ -104,14 +104,14 @@ public class SupplyServiceImpl implements SupplyService {
 			}
 		}
 	}
-	
+
 	public synchronized void deleteAll(Integer idProduct) {
 		List<Supply> listDelete = getSupplyList(idProduct);
 		for(Supply delete:listDelete) {
 			deleteSupply(delete);
 		}
 	}
-	
+
 	public synchronized Integer getNewId() {
 		Integer lastId = 0;
 		for(int i = 0; i < supplyList.size(); i++) {
