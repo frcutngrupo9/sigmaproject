@@ -327,7 +327,6 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			return;
 		}
 		processCreationBlock.setVisible(true);
-		pieceCreationBlock.setVisible(false);
 	}
 
 	@Listen("onClick = #cancelProcessButton")
@@ -483,6 +482,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			pieceCreationBlock.setVisible(false);
 			processCreationBlock.setVisible(false);
 			deletePieceButton.setDisabled(true);
+			pieceCopyButton.setDisabled(false);
 			// limpiar form pieza
 			pieceNameTextbox.setText("");
 			pieceGroupCheckbox.setChecked(false);
@@ -504,6 +504,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			pieceCreationBlock.setVisible(true);
 			processCreationBlock.setVisible(true);
 			deletePieceButton.setDisabled(false);
+			pieceCopyButton.setDisabled(true);
 			// cargar form pieza
 			pieceNameTextbox.setText(currentPiece.getName());
 			pieceGroupCheckbox.setChecked(currentPiece.isGroup());
@@ -894,6 +895,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	@Listen("onClick = #resetPieceButton")
 	public void resetPiece() {
 		refreshViewPiece();
+		pieceCreationBlock.setVisible(true);
+		processCreationBlock.setVisible(true);
 	}
 
 	private Process searchProcess(Integer idPiece, Integer idProcessType) {
