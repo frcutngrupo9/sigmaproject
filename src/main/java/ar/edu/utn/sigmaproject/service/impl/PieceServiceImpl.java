@@ -25,6 +25,20 @@ public class PieceServiceImpl implements PieceService {
 		}
 	}
 
+	private void eliminarClones() {
+		List<Piece> list = new ArrayList<Piece>();
+		for(Piece piece:pieceList) {
+			if(piece.isClone() == true) {
+				list.add(Piece.clone(piece));
+			}
+		}
+		int nroClones = list.size();
+		for(Piece piece:list) {
+			deletePiece(piece);
+		}
+		System.out.println("se eliminaron los " + nroClones + " clones de piezas");
+	}
+
 	public synchronized List<Piece> getPieceList() {
 		List<Piece> list = new ArrayList<Piece>();
 		for(Piece piece:pieceList) {

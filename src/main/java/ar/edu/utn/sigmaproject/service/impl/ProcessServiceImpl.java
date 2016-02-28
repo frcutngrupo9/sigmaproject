@@ -23,6 +23,20 @@ public class ProcessServiceImpl implements ProcessService {
 		}
 	}
 
+	private void eliminarClones() {
+		List<Process> list = new ArrayList<Process>();
+		for(Process process:processList) {
+			if(process.isClone() == true) {
+				list.add(Process.clone(process));
+			}
+		}
+		int nroClones = list.size();
+		for(Process process:list) {
+			deleteProcess(process);
+		}
+		System.out.println("se eliminaron los " + nroClones + " clones de procesos");
+	}
+
 	//synchronized para prevenir acceso concurrente al servicio de lista
 	public synchronized List<Process> getProcessList() {
 		List<Process> list = new ArrayList<Process>();
