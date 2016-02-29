@@ -86,7 +86,6 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	Button resetProductButton;
 	@Wire
 	Button deleteProductButton;
-
 	@Wire
 	Component pieceCreationBlock;
 	@Wire
@@ -277,19 +276,19 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			Clients.showNotification("Ingresar Nombre Producto", productNameTextbox);
 			return;
 		}
-		String product_name = productNameTextbox.getText();
-		String product_details = productDetailsTextbox.getText();
-		String product_code = productCodeTextbox.getText();
-		BigDecimal product_price = new BigDecimal(productPriceDoublebox.doubleValue());
+		String productName = productNameTextbox.getText();
+		String productDetails = productDetailsTextbox.getText();
+		String productCode = productCodeTextbox.getText();
+		BigDecimal productPrice = new BigDecimal(productPriceDoublebox.doubleValue());
 
 		if(currentProduct == null) {// se esta creando un nuevo producto
-			currentProduct = new Product(null, product_code, product_name, product_details, product_price);
+			currentProduct = new Product(null, productCode, productName, productDetails, productPrice);
 			productService.saveProduct(currentProduct, pieceList, processList, supplyList, rawMaterialList);
 		} else {// se esta editando un producto
-			currentProduct.setName(product_name);
-			currentProduct.setDetails(product_details);
-			currentProduct.setCode(product_code);
-			currentProduct.setPrice(product_price);;
+			currentProduct.setName(productName);
+			currentProduct.setDetails(productDetails);
+			currentProduct.setCode(productCode);
+			currentProduct.setPrice(productPrice);
 			currentProduct = productService.updateProduct(currentProduct, pieceList, processList, supplyList, rawMaterialList);
 		}
 		// mostrar mensaje al user
@@ -349,87 +348,83 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			}
 		}
 		// actualizamos la lista de piezas
-		Integer piece_id = 0;
-		String piece_name = pieceNameTextbox.getText();
-		Integer length_id_measure_unit = null;
-		Integer depth_id_measure_unit = null;
-		Integer width_id_measure_unit = null;
+		Integer pieceId = 0;
+		String pieceName = pieceNameTextbox.getText();
+		Integer lengthIdMeasureUnit = null;
+		Integer depthIdMeasureUnit = null;
+		Integer widthIdMeasureUnit = null;
 		if(lengthMeasureUnitSelectbox.getSelectedIndex() != -1) {
-			length_id_measure_unit = lengthMeasureUnitListModel.getElementAt(lengthMeasureUnitSelectbox.getSelectedIndex()).getId();
+			lengthIdMeasureUnit = lengthMeasureUnitListModel.getElementAt(lengthMeasureUnitSelectbox.getSelectedIndex()).getId();
 		}
 		if(depthMeasureUnitSelectbox.getSelectedIndex() != -1) {
-			depth_id_measure_unit = depthMeasureUnitListModel.getElementAt(depthMeasureUnitSelectbox.getSelectedIndex()).getId();
+			depthIdMeasureUnit = depthMeasureUnitListModel.getElementAt(depthMeasureUnitSelectbox.getSelectedIndex()).getId();
 		}
 		if(widthMeasureUnitSelectbox.getSelectedIndex() != -1) {
-			width_id_measure_unit = widthMeasureUnitListModel.getElementAt(widthMeasureUnitSelectbox.getSelectedIndex()).getId();
+			widthIdMeasureUnit = widthMeasureUnitListModel.getElementAt(widthMeasureUnitSelectbox.getSelectedIndex()).getId();
 		}
-		BigDecimal piece_length = new BigDecimal(pieceLengthDoublebox.doubleValue());
-		BigDecimal piece_depth = new BigDecimal(pieceDepthDoublebox.doubleValue());
-		BigDecimal piece_width = new BigDecimal(pieceWidthDoublebox.doubleValue());
-		String piece_size = pieceSizeTextbox.getText();
-		Integer piece_units = pieceUnitsByProductIntbox.getValue();
-		boolean piece_isGroup = pieceGroupCheckbox.isChecked();
+		BigDecimal pieceLength = new BigDecimal(pieceLengthDoublebox.doubleValue());
+		BigDecimal pieceDepth = new BigDecimal(pieceDepthDoublebox.doubleValue());
+		BigDecimal pieceWidth = new BigDecimal(pieceWidthDoublebox.doubleValue());
+		String pieceSize = pieceSizeTextbox.getText();
+		Integer pieceUnits = pieceUnitsByProductIntbox.getValue();
+		boolean pieceIsGroup = pieceGroupCheckbox.isChecked();
 
 		if(currentPiece == null) { // se esta creando una pieza
 			Integer serviceNewPieceId = pieceService.getNewId();
 			if(pieceList.isEmpty() == true) {// buscamos un id para la pieza nueva
-				piece_id = serviceNewPieceId;
+				pieceId = serviceNewPieceId;
 			} else {
-				piece_id = getLastPieceId() + 1;// buscamos el ultimo id y sumamos 1
-				if(piece_id < serviceNewPieceId) { // si el ultimo id es menor que uno nuevo del servicio quiere decir que las piezas en la lista son viejas y hay que agarra el id mas grande osea el que viene del servicio
-					piece_id = serviceNewPieceId;
+				pieceId = getLastPieceId() + 1;// buscamos el ultimo id y sumamos 1
+				if(pieceId < serviceNewPieceId) { // si el ultimo id es menor que uno nuevo del servicio quiere decir que las piezas en la lista son viejas y hay que agarra el id mas grande osea el que viene del servicio
+					pieceId = serviceNewPieceId;
 				}
 			}
-			currentPiece = new Piece(piece_id, null, piece_name, piece_length, length_id_measure_unit, piece_depth, depth_id_measure_unit, piece_width, width_id_measure_unit, piece_size, piece_isGroup, piece_units);
+			currentPiece = new Piece(pieceId, null, pieceName, pieceLength, lengthIdMeasureUnit, pieceDepth, depthIdMeasureUnit, pieceWidth, widthIdMeasureUnit, pieceSize, pieceIsGroup, pieceUnits);
 			pieceList.add(currentPiece);// lo agregamos a la lista
 			pieceListModel.add(currentPiece);
 			pieceListbox.setModel(pieceListModel);// y al modelo para que aparezca en la pantalla
 
 			// es una pieza nueva se inserta el id de la pieza a los procesos y se agregan a la lista total
 			for(Process process : listboxProcessList) {
-				process.setIdPiece(piece_id);
+				process.setIdPiece(pieceId);
 				processList.add(process);
 			}
 
 		} else { // se esta editando una pieza
-			currentPiece.setName(piece_name);
-			currentPiece.setLength(piece_length);
-			currentPiece.setLengthIdMeasureUnit(length_id_measure_unit);
-			currentPiece.setDepth(piece_depth);
-			currentPiece.setDepthIdMeasureUnit(depth_id_measure_unit);
-			currentPiece.setWidth(piece_width);
-			currentPiece.setWidthIdMeasureUnit(width_id_measure_unit);
-			currentPiece.setSize(piece_size);
-			currentPiece.setUnits(piece_units);
-			currentPiece.setGroup(piece_isGroup);
+			currentPiece.setName(pieceName);
+			currentPiece.setLength(pieceLength);
+			currentPiece.setLengthIdMeasureUnit(lengthIdMeasureUnit);
+			currentPiece.setDepth(pieceDepth);
+			currentPiece.setDepthIdMeasureUnit(depthIdMeasureUnit);
+			currentPiece.setWidth(pieceWidth);
+			currentPiece.setWidthIdMeasureUnit(widthIdMeasureUnit);
+			currentPiece.setSize(pieceSize);
+			currentPiece.setUnits(pieceUnits);
+			currentPiece.setGroup(pieceIsGroup);
 			updatePieceList(currentPiece);// actualizamos la lista
 			pieceListModel = new ListModelList<Piece>(pieceList); 
 			pieceListbox.setModel(pieceListModel);// actualizamos el modelo para que aparezca en la pantalla
-
-			// obtenemos la lista de procesos de la pieza
-			List<Process> completeProcessFromPieceList = new ArrayList<Process>();
-			for(Process process : processList) {
-				if(process.getIdPiece().equals(currentPiece.getId())) {
-					completeProcessFromPieceList.add(process);
-				}
-			}
-			// primero eliminamos de la lista total, los procesos que referencian a la pieza, y sus tipos de procesos ya no existan en la lista del listbox
-			for(Process process : completeProcessFromPieceList) {
-				Process aux = searchProcessInList(process, listboxProcessList);
-				if(aux == null) {
-					deleteProcess(process);
-				}
-			}
-			// actualizamos la lista total de procesos con los procesos del listbox
-			for(Process process : listboxProcessList) {
-				process.setIdPiece(currentPiece.getId());// asignamos el id de la pieza a todos los procesos, ya que los recien creados no lo van a tener
-				Process auxProcess = searchProcess(process.getIdPiece(), process.getIdProcessType()); // buscamos si ya esta creado
-				if(auxProcess == null) { // no esta creado
-					processList.add(process);
-				} else { // esta creado
-					auxProcess.setDetails(process.getDetails());
-					auxProcess.setTime(process.getTime());
-					updateProcessList(auxProcess);
+			
+			for(ProcessType processType : processTypeList) {
+				Process insideCompleteList = searchProcess(currentPiece, processType);
+				Process insideCurrentList = getProcessFromListbox(processType);
+				
+				if(insideCompleteList != null) {
+					if (insideCurrentList != null) {
+						// esta en las 2 listas, se actualiza la lista total
+						insideCompleteList.setDetails(insideCurrentList.getDetails());
+						insideCompleteList.setTime(insideCurrentList.getTime());
+						updateProcessList(insideCompleteList);
+					} else {
+						// no esta mas en la lista del listbox, se elimina de la lista total
+						deleteProcess(insideCompleteList);
+					}
+				} else {
+					if (insideCurrentList != null) {
+						// esta en la lista del listbox pero no en la lista total, se agrega a la lista total
+						insideCurrentList.setIdPiece(currentPiece.getId());// se agrega el id de la pieza, ya que al crearse no se agrega
+						processList.add(insideCurrentList);
+					}
 				}
 			}
 		}
@@ -487,10 +482,10 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			pieceNameTextbox.setText("");
 			pieceGroupCheckbox.setChecked(false);
 			// seleccionamos metros y pulgadas como valores predeterminados de las dimensiones de las piezas
-			Integer id_measure_unit_meters = measureUnitService.getMeasureUnit("Metros").getId();
-			MeasureUnit meters = measureUnitService.getMeasureUnit(id_measure_unit_meters);
-			Integer id_measure_unit_inch = measureUnitService.getMeasureUnit("Pulgadas").getId();
-			MeasureUnit inch = measureUnitService.getMeasureUnit(id_measure_unit_inch);
+			Integer idMeasureUnitMeters = measureUnitService.getMeasureUnit("Metros").getId();
+			MeasureUnit meters = measureUnitService.getMeasureUnit(idMeasureUnitMeters);
+			Integer idMeasureUnitInch = measureUnitService.getMeasureUnit("Pulgadas").getId();
+			MeasureUnit inch = measureUnitService.getMeasureUnit(idMeasureUnitInch);
 			lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(meters));
 			depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(inch));
 			widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(inch));
@@ -653,7 +648,6 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		Textbox origin = (Textbox)evt.getOrigin().getTarget();
 		Process process = getProcessFromListbox(data);
 		process.setDetails(origin.getText());
-		updateProcessFromListbox(process);// no seria necesario si el de arriba modifica el objeto adentro del list
 		refreshViewProcess();
 	}
 
@@ -809,17 +803,6 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		}
 	}
 
-	private Process searchProcessInList(Process other, List<Process> processList) {
-		int size = processList.size();
-		for(int i = 0; i < size; i++) {
-			Process t = processList.get(i);
-			if(t.getIdPiece().equals(other.getIdPiece()) && t.getIdProcessType().equals(other.getIdProcessType())) {
-				return Process.clone(t);
-			}
-		}
-		return null;
-	}
-
 	public String quantityOfProcess(int idPiece) {
 		int quantity = 0;
 		if(processList != null && processList.isEmpty() == false) {
@@ -899,11 +882,11 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		processCreationBlock.setVisible(true);
 	}
 
-	private Process searchProcess(Integer idPiece, Integer idProcessType) {
+	private Process searchProcess(Piece piece, ProcessType processType) {
 		int size = processList.size();
 		for(int i = 0; i < size; i++) {
 			Process t = processList.get(i);
-			if(t.getIdPiece().equals(idPiece) && t.getIdProcessType().equals(idProcessType)) {
+			if(t.getIdPiece().equals(piece.getId()) && t.getIdProcessType().equals(processType.getId())) {
 				return Process.clone(t);
 			}
 		}
