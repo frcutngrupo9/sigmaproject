@@ -13,6 +13,7 @@ public class ToolTypeServiceImpl implements ToolTypeService {
 	private SerializationService serializator = new SerializationService("tool_type");
 
 	public ToolTypeServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<ToolType> aux = serializator.obtenerLista();
 		if(aux != null) {
 			toolTypeList = aux;

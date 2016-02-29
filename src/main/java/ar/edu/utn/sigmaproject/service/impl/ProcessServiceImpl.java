@@ -15,26 +15,13 @@ public class ProcessServiceImpl implements ProcessService {
 	private SerializationService serializator = new SerializationService("process");
 
 	public ProcessServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<Process> aux = serializator.obtenerLista();
 		if(aux != null) {
 			processList = aux;
 		} else {
 			serializator.grabarLista(processList);
 		}
-	}
-
-	private void eliminarClones() {
-		List<Process> list = new ArrayList<Process>();
-		for(Process process:processList) {
-			if(process.isClone() == true) {
-				list.add(Process.clone(process));
-			}
-		}
-		int nroClones = list.size();
-		for(Process process:list) {
-			deleteProcess(process);
-		}
-		System.out.println("se eliminaron los " + nroClones + " clones de procesos");
 	}
 
 	//synchronized para prevenir acceso concurrente al servicio de lista

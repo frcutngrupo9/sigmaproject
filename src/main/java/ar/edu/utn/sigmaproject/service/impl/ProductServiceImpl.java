@@ -21,6 +21,7 @@ public class ProductServiceImpl implements ProductService {
 	private SerializationService serializator = new SerializationService("product");
 
 	public ProductServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<Product> aux = serializator.obtenerLista();
 		if(aux != null) {
 			productList = aux;

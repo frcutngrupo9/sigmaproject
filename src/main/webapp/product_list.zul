@@ -37,7 +37,7 @@
     <button id="newProductButton" label="Crear Producto Nuevo"/>
     <separator/>
     
-    <!-- las listbox siguientes estaran  NO VISIBLES ya que no son necesarias -->
+    <!-- las listbox siguientes estaran para debugueo ya que no son necesarias -->
     
     <listbox id="productListbox" mold="paging" pageSize="7" sizedByContent="true" span="true" visible="false">
     	<auxhead>
@@ -65,9 +65,9 @@
 			<auxheader label="Piezas" colspan="10"/>
 		</auxhead>
         <listhead>
-        	<listheader label="Producto"/>
+        	<listheader label="Id Pieza"/>
         	<listheader label="Pieza"/>
-            <listheader label="Id"/>
+        	<listheader label="Producto"/>
             <listheader label="Id Producto"/>
             <listheader label="Largo"/>
             <listheader label="Espesor"/>
@@ -78,9 +78,9 @@
         </listhead>
         <template name="model">
             <listitem>
-            	<listcell label="${win_product_list$composer.getProductName(each.idProduct)}"/>
+            	<listcell label="${each.id}"/>
             	<listcell label="${each.name}"/>
-                <listcell label="${each.id}"/>
+            	<listcell label="${win_product_list$composer.getProductName(each.idProduct)}"/>
                 <listcell label="${each.idProduct}"/>
                 <listcell label="${each.length.doubleValue()} ${win_product_list$composer.getMeasureUnitName(each.lengthIdMeasureUnit)}"/>
                 <listcell label="${each.depth.doubleValue()} ${win_product_list$composer.getMeasureUnitName(each.depthIdMeasureUnit)}"/>

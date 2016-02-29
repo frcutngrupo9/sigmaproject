@@ -20,6 +20,7 @@ public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailServ
 	private SerializationService serializator = new SerializationService("production_plan_detail");
 
 	public ProductionPlanDetailServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<ProductionPlanDetail> aux = serializator.obtenerLista();
 		if(aux != null) {
 			productionPlanDetailList = aux;

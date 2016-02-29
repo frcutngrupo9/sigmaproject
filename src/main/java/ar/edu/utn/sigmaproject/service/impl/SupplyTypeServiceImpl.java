@@ -13,6 +13,7 @@ public class SupplyTypeServiceImpl implements SupplyTypeService {
 	private SerializationService serializator = new SerializationService("supply_type");
 
 	public SupplyTypeServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<SupplyType> aux = serializator.obtenerLista();
 		if(aux != null) {
 			supplyTypeList = aux;

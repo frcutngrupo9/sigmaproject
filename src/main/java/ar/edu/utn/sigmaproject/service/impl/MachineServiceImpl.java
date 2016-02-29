@@ -12,6 +12,7 @@ public class MachineServiceImpl implements MachineService {
 	private SerializationService serializator = new SerializationService("machine");
 
 	public MachineServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<Machine> aux = serializator.obtenerLista();
 		if(aux != null) {
 			machineList = aux;

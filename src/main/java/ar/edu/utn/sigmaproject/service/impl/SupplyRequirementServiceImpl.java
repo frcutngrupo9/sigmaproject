@@ -13,6 +13,7 @@ public class SupplyRequirementServiceImpl implements SupplyRequirementService {
 	private SerializationService serializator = new SerializationService("supply_requirement");
 
 	public SupplyRequirementServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<SupplyRequirement> aux = serializator.obtenerLista();
 		if(aux != null) {
 			supplyRequirementList = aux;

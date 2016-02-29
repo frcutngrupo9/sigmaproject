@@ -15,6 +15,7 @@ public class ProductExistenceServiceImpl implements ProductExistenceService {
 	private SerializationService serializator = new SerializationService("product_existence");
 
 	public ProductExistenceServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<ProductExistence> aux = serializator.obtenerLista();
 		if(aux != null) {
 			productExistenceList = aux;

@@ -13,6 +13,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 	private SerializationService serializator = new SerializationService("order_detail");
 
 	public OrderDetailServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<OrderDetail> aux = serializator.obtenerLista();
 		if(aux != null) {
 			orderDetailList = aux;

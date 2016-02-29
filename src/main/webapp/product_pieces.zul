@@ -2,7 +2,7 @@
     <grid model="${arg.pieces}" span="true">
         <columns>
         	<column width="40px" />
-        	<column label="Id" align="center"/>
+        	<column label="Id Pieza" align="center"/>
             <column label="Pieza" align="center"/>
             <column label="Largo" align="center"/>
             <column label="Espesor" align="center"/>

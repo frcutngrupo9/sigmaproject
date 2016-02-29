@@ -13,6 +13,7 @@ public class ClientServiceImpl implements ClientService {
 	private SerializationService serializator = new SerializationService("client");
 
 	public ClientServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<Client> aux = serializator.obtenerLista();
 		if(aux != null) {
 			clientList = aux;

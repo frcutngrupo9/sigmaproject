@@ -17,6 +17,10 @@ public class MeasureUnit implements Serializable, Cloneable {
 		this.idMeasureUnitType = idMeasureUnitType;
 	}
 
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
 	public Integer getId() {
 		return id;
 	}

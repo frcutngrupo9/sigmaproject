@@ -28,6 +28,7 @@ public class MeasureUnitServiceImpl implements MeasureUnitService {
 	}
 
 	public MeasureUnitServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<MeasureUnit> aux = serializator.obtenerLista();
 		if(aux != null) {
 			measureUnitList = aux;
@@ -73,6 +74,9 @@ public class MeasureUnitServiceImpl implements MeasureUnitService {
 	}
 
 	public synchronized MeasureUnit saveMeasureUnit(MeasureUnit aux) {
+		if(aux.getId() == null) {
+			aux.setId(getNewId());
+		}
 		aux = MeasureUnit.clone(aux);
 		measureUnitList.add(aux);
 		serializator.grabarLista(measureUnitList);

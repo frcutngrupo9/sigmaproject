@@ -13,6 +13,7 @@ public class RawMaterialTypeServiceImpl implements RawMaterialTypeService {
 	private SerializationService serializator = new SerializationService("raw_material_type");
 
 	public RawMaterialTypeServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<RawMaterialType> aux = serializator.obtenerLista();
 		if(aux != null) {
 			rawMaterialTypeList = aux;

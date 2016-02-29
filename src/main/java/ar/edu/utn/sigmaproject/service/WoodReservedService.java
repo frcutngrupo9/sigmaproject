@@ -8,7 +8,7 @@ public interface WoodReservedService {
 
 	List<WoodReserved> getWoodReservedList();
 
-	WoodReserved getWoodReserved(Integer idWood);
+	WoodReserved getWoodReserved(Integer id);
 
 	WoodReserved saveWoodReserved(WoodReserved woodReserved);
 

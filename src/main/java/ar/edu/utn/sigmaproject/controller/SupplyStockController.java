@@ -39,6 +39,10 @@ public class SupplyStockController extends SelectorComposer<Component> {
 	@Wire
 	Doublebox stockRepoDoublebox;
 	@Wire
+	Button stockIncreaseButton;
+	@Wire
+	Button stockDecreaseButton;
+	@Wire
 	Button saveButton;
 	@Wire
 	Button cancelButton;
@@ -139,5 +143,15 @@ public class SupplyStockController extends SelectorComposer<Component> {
 		supplyTypeListModel = new ListModelList<SupplyType>(supplyTypeList);
 		currentSupplyType = null;
 		refreshView();
+	}
+	
+	@Listen("onClick = #stockIncreaseButton")
+	public void stockIncreaseButtonClick() {
+		// TODO
+	}
+	
+	@Listen("onClick = #stockDecreaseButton")
+	public void stockDecreaseButtonClick() {
+		// TODO
 	}
 }

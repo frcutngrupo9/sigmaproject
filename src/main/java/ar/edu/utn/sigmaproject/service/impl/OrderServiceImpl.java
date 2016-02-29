@@ -18,6 +18,7 @@ public class OrderServiceImpl implements OrderService {
 	private SerializationService serializator = new SerializationService("order");
 
 	public OrderServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<Order> aux = serializator.obtenerLista();
 		if(aux != null) {
 			orderList = aux;

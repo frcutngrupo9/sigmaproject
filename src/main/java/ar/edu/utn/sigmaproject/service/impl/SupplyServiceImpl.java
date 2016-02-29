@@ -12,6 +12,7 @@ public class SupplyServiceImpl implements SupplyService {
 	private SerializationService serializator = new SerializationService("supply");
 
 	public SupplyServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<Supply> aux = serializator.obtenerLista();
 		if(aux != null) {
 			supplyList = aux;

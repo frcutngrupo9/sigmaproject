@@ -16,6 +16,7 @@ public class ProductionPlanStateServiceImpl implements ProductionPlanStateServic
 	private SerializationService serializator = new SerializationService("production_plan_state");
 
 	public ProductionPlanStateServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<ProductionPlanState> aux = serializator.obtenerLista();
 		if(aux != null) {
 			productionPlanStateList = aux;

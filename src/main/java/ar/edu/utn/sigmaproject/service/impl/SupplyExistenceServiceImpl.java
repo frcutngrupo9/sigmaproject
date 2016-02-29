@@ -15,6 +15,7 @@ public class SupplyExistenceServiceImpl implements SupplyExistenceService {
 	private SerializationService serializator = new SerializationService("supply_existence");
 
 	public SupplyExistenceServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<SupplyExistence> aux = serializator.obtenerLista();
 		if(aux != null) {
 			supplyExistenceList = aux;

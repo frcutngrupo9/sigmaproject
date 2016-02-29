@@ -15,13 +15,16 @@ public class CategoryTypeServiceImpl implements CategoryTypeService {
 	static {
 		categoryTypeList.add(new CategoryType(categoryTypeId++,"Mesa"));
 		categoryTypeList.add(new CategoryType(categoryTypeId++,"Silla"));
+		categoryTypeList.add(new CategoryType(categoryTypeId++,"Banco"));
 		categoryTypeList.add(new CategoryType(categoryTypeId++,"Cama"));
 		categoryTypeList.add(new CategoryType(categoryTypeId++,"Escritorio"));
 		categoryTypeList.add(new CategoryType(categoryTypeId++,"Armario"));
+		categoryTypeList.add(new CategoryType(categoryTypeId++,"Comoda"));
 		categoryTypeList.add(new CategoryType(categoryTypeId++,"Biblioteca"));
 	}
 
 	public CategoryTypeServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<CategoryType> aux = serializator.obtenerLista();
 		if(aux != null) {
 			categoryTypeList = aux;
@@ -57,6 +60,9 @@ public class CategoryTypeServiceImpl implements CategoryTypeService {
 	}
 
 	public synchronized CategoryType saveCategory(CategoryType aux) {
+		if(aux.getId() == null) {
+			aux.setId(getNewId());
+		}
 		aux = CategoryType.clone(aux);
 		categoryTypeList.add(aux);
 		serializator.grabarLista(categoryTypeList);

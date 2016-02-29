@@ -12,6 +12,7 @@ public class CategoryServiceImpl implements CategoryService {
 	private SerializationService serializator = new SerializationService("category");
 
 	public CategoryServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<Category> aux = serializator.obtenerLista();
 		if(aux != null) {
 			categoryList = aux;

@@ -12,6 +12,7 @@ public class WorkerServiceImpl implements WorkerService {
 	private SerializationService serializator = new SerializationService("worker");
 
 	public WorkerServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<Worker> aux = serializator.obtenerLista();
 		if(aux != null) {
 			workerList = aux;

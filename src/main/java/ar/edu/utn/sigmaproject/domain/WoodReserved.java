@@ -5,12 +5,24 @@ import java.io.Serializable;
 public class WoodReserved  implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
+	Integer id;
 	Integer idWood;
-	Double stock;
+	Integer idRawMaterialRequirement;
+	Double stockReserved;
 
-	public WoodReserved(Integer idWood, Double stock) {
+	public WoodReserved(Integer id, Integer idWood, Integer idRawMaterialRequirement, Double stockReserved) {
+		this.id = id;
 		this.idWood = idWood;
-		this.stock = stock;
+		this.idRawMaterialRequirement = idRawMaterialRequirement;
+		this.stockReserved = stockReserved;
+	}
+	
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	public Integer getIdWood() {
@@ -21,19 +33,27 @@ public class WoodReserved  implements Serializable, Cloneable {
 		this.idWood = idWood;
 	}
 
-	public Double getStock() {
-		return stock;
+	public Integer getIdRawMaterialRequirement() {
+		return idRawMaterialRequirement;
 	}
 
-	public void setStock(Double stock) {
-		this.stock = stock;
+	public void setIdRawMaterialRequirement(Integer idRawMaterialRequirement) {
+		this.idRawMaterialRequirement = idRawMaterialRequirement;
+	}
+
+	public Double getStockReserved() {
+		return stockReserved;
+	}
+
+	public void setStockReserved(Double stockReserved) {
+		this.stockReserved = stockReserved;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((idWood == null) ? 0 : idWood.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
 
@@ -46,10 +66,10 @@ public class WoodReserved  implements Serializable, Cloneable {
 		if (getClass() != obj.getClass())
 			return false;
 		WoodReserved other = (WoodReserved) obj;
-		if (idWood == null) {
-			if (other.idWood != null)
+		if (id == null) {
+			if (other.id != null)
 				return false;
-		} else if (!idWood.equals(other.idWood))
+		} else if (!id.equals(other.id))
 			return false;
 		return true;
 	}

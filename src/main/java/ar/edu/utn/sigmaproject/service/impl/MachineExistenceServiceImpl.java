@@ -12,6 +12,7 @@ public class MachineExistenceServiceImpl implements MachineExistenceService {
 	private SerializationService serializator = new SerializationService("machine_existence");
 
 	public MachineExistenceServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<MachineExistence> aux = serializator.obtenerLista();
 		if(aux != null) {
 			machineExistenceList = aux;

@@ -13,6 +13,7 @@ public class SupplyReservedServiceImpl implements SupplyReservedService {
 	private SerializationService serializator = new SerializationService("supply_reserved");
 
 	public SupplyReservedServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<SupplyReserved> aux = serializator.obtenerLista();
 		if(aux != null) {
 			supplyReservedList = aux;

@@ -593,20 +593,6 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		return null;
 	}
 
-	private Process updateProcessFromListbox(Process other) {
-		if(listboxProcessList != null) {
-			int size = listboxProcessList.size();
-			for(int i = 0; i < size; i++) {
-				Process t = listboxProcessList.get(i);
-				if(t.getIdPiece().equals(other.getIdPiece()) && t.getIdProcessType().equals(other.getIdProcessType())){
-					other = listboxProcessList.set(i, other);
-					return other;
-				}
-			}
-		}
-		return null;
-	}
-
 	private void deleteProcessFromListbox(ProcessType processType) {
 		Process aux = getProcessFromListbox(processType);
 		if(aux != null) {

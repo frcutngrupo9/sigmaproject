@@ -14,6 +14,7 @@ public class ProductionOrderDetailServiceImpl implements ProductionOrderDetailSe
 	private SerializationService serializator = new SerializationService("production_order_detail");
 
 	public ProductionOrderDetailServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<ProductionOrderDetail> aux = serializator.obtenerLista();
 		if(aux != null) {
 			productionOrderDetailList = aux;

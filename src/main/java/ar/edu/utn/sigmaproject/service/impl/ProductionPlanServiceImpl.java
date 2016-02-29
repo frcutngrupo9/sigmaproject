@@ -8,7 +8,6 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.service.OrderStateService;
-import ar.edu.utn.sigmaproject.service.OrderStateTypeService;
 import ar.edu.utn.sigmaproject.service.ProductionPlanDetailService;
 import ar.edu.utn.sigmaproject.service.ProductionPlanService;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateService;
@@ -20,6 +19,7 @@ public class ProductionPlanServiceImpl  implements ProductionPlanService {
 	private SerializationService serializator = new SerializationService("production_plan");
 
 	public ProductionPlanServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<ProductionPlan> aux = serializator.obtenerLista();
 		if(aux != null) {
 			productionPlanList = aux;
@@ -112,7 +112,6 @@ public class ProductionPlanServiceImpl  implements ProductionPlanService {
 			List<ProductionPlanDetail> productionPlanDetailList) {
 		productionPlan = saveProductionPlan(productionPlan);// se obtiene un plan con id agregado
 		ProductionPlanDetailService productionPlanDetailService = new ProductionPlanDetailServiceImpl();
-		OrderStateTypeService orderStateTypeService = new OrderStateTypeServiceImpl();
 		OrderStateService orderStateService = new OrderStateServiceImpl();
 		for(ProductionPlanDetail productionPlanDetail : productionPlanDetailList) {// agregamos el id del plan a todos los detalles y los guardamos
 			productionPlanDetail.setIdProductionPlan(productionPlan.getId());

@@ -12,6 +12,7 @@ public class WoodTypeServiceImpl implements WoodTypeService {
 	private SerializationService serializator = new SerializationService("wood_type");
 
 	public WoodTypeServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<WoodType> aux = serializator.obtenerLista();
 		if(aux != null) {
 			woodTypeList = aux;

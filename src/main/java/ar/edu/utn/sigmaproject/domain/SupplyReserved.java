@@ -66,10 +66,10 @@ public class SupplyReserved  implements Serializable, Cloneable {
 		if (getClass() != obj.getClass())
 			return false;
 		SupplyReserved other = (SupplyReserved) obj;
-		if (idSupplyType == null) {
-			if (other.idSupplyType != null)
+		if (id == null) {
+			if (other.id != null)
 				return false;
-		} else if (!idSupplyType.equals(other.idSupplyType))
+		} else if (!id.equals(other.id))
 			return false;
 		return true;
 	}

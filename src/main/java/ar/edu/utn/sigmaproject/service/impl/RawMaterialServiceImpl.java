@@ -12,6 +12,7 @@ public class RawMaterialServiceImpl implements RawMaterialService {
 	private SerializationService serializator = new SerializationService("raw_material");
 
 	public RawMaterialServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<RawMaterial> aux = serializator.obtenerLista();
 		if(aux != null) {
 			rawMaterialList = aux;

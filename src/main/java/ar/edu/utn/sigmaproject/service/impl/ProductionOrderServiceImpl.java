@@ -14,6 +14,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 	private SerializationService serializator = new SerializationService("production_order");
 
 	public ProductionOrderServiceImpl() {
+		@SuppressWarnings("unchecked")
 		List<ProductionOrder> aux = serializator.obtenerLista();
 		if(aux != null) {
 			productionOrderList = aux;
