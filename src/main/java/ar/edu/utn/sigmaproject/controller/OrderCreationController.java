@@ -398,6 +398,7 @@ public class OrderCreationController extends SelectorComposer<Component>{
 		refreshViewOrderDetail();
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Listen("onClick = #deleteOrderDetailButton")
 	public void deleteOrderDetail() {
 		if(currentOrderDetail != null) {
@@ -418,6 +419,7 @@ public class OrderCreationController extends SelectorComposer<Component>{
 		} 
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Listen("onClick = #deleteOrderButton")
 	public void deleteOrder() {
 		if(currentOrder != null) {

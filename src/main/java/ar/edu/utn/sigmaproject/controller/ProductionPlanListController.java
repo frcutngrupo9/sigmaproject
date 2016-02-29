@@ -66,12 +66,6 @@ public class ProductionPlanListController  extends SelectorComposer<Component>{
 		include.setSrc("/production_plan_creation.zul");
 	}
 
-	private void refreshList() {
-		productionPlanList = productionPlanService.getProductionPlanList();
-		productionPlanListModel = new ListModelList<ProductionPlan>(productionPlanList);
-		productionPlanGrid.setModel(productionPlanListModel);
-	}
-
 	public String getQuantityOfOrder(int idProductionPlan) {
 		return productionPlanDetailService.getProductionPlanDetailList(idProductionPlan).size() + "";// porque hay 1 pedido por detalle
 	}

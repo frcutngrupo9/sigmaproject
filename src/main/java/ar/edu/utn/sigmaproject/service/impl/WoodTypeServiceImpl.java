@@ -10,6 +10,13 @@ import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 public class WoodTypeServiceImpl implements WoodTypeService {
 	static List<WoodType> woodTypeList = new ArrayList<WoodType>();
 	private SerializationService serializator = new SerializationService("wood_type");
+	static int woodTypeId = 1;
+	static {
+		woodTypeList.add(new WoodType(woodTypeId++,"Pino", "semi-pesada, semi-dura"));
+		woodTypeList.add(new WoodType(woodTypeId++,"Caoba", "tradicional, dura y compacta"));
+		woodTypeList.add(new WoodType(woodTypeId++,"Nogal", "dura, homogénea"));
+		woodTypeList.add(new WoodType(woodTypeId++,"Roble", "resistente, duradera y compacta"));
+	}
 
 	public WoodTypeServiceImpl() {
 		@SuppressWarnings("unchecked")

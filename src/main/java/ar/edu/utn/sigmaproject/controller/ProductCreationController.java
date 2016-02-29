@@ -188,6 +188,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	// attributes
 	private Product currentProduct;
 	private Piece currentPiece;
+	@SuppressWarnings("rawtypes")
 	private EventQueue eq;
 	private Supply currentSupply;
 	private SupplyType currentSupplyType;
@@ -217,6 +218,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	private ListModelList<RawMaterial> rawMaterialListModel;
 	private ListModelList<RawMaterialType> rawMaterialTypePopupListModel;
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void doAfterCompose(Component comp) throws Exception{
 		super.doAfterCompose(comp);
@@ -815,6 +817,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		pieceListModel.clearSelection();
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Listen("onClick = #deleteProductButton")
 	public void deleteProduct() {
 		if(currentProduct != null) {
@@ -834,6 +837,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		}
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Listen("onClick = #deletePieceButton")
 	public void deletePiece() {
 		if(currentPiece != null) {
@@ -1008,6 +1012,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		refreshViewSupply();
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Listen("onClick = #deleteSupplyButton")
 	public void deleteSupply() {
 		if(currentSupply != null) {
@@ -1171,6 +1176,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		refreshViewRawMaterial();
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Listen("onClick = #deleteRawMaterialButton")
 	public void deleteRawMaterial() {
 		if(currentRawMaterial != null) {

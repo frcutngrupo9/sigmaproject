@@ -15,6 +15,7 @@ public class SerializationService {
 		pathArchivo = "src/main/java/ar/edu/utn/sigmaproject/persistence/" + nombreArchivo + ".drh";
 	}
 
+	@SuppressWarnings("rawtypes")
 	public List obtenerLista()
 	{
 		List datos = null;
@@ -32,6 +33,7 @@ public class SerializationService {
 		return datos;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public void grabarLista(List lista)
 	{
 		try

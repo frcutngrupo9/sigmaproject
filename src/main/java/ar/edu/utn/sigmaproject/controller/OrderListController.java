@@ -83,6 +83,7 @@ public class OrderListController extends SelectorComposer<Component>{
 		include.setSrc("/order_creation.zul");
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Listen("onCancelOrder = #orderGrid")
 	public void doCancelOrder(final ForwardEvent ForwEvt) {
 		Messagebox.show("Esta seguro que quiere cancelar el pedido?", "Confirmar Cancelacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
