@@ -5,15 +5,16 @@
         <button id="searchButton" label="Buscar"/>
     </hlayout>
     <separator/>
-    <listbox id="rawMaterialTypeListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
+    <listbox id="woodListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
     	<auxhead>
-			<auxheader label="Materia Prima" colspan="7"/>
+			<auxheader label="Materia Prima" colspan="8"/>
 		</auxhead>
         <listhead>
         	<listheader label="Id" align="center"/>
-            <listheader label="Codigo"/>
-            <listheader label="Descripcion"/>
+        	<listheader label="Codigo"/>
+            <listheader label="Nombre"/>
             <listheader label="Medidas"/>
+            <listheader label="Madera"/>
             <listheader label="Stock Actual" align="center"/>
             <listheader label="Stock Minimo" align="center"/>
             <listheader label="Stock Reposicion" align="center"/>
@@ -22,8 +23,9 @@
             <listitem>
                 <listcell label="${each.id}"/>
                 <listcell label="${each.code}"/>
-                <listcell label="${each.description}"/>
-                <listcell label="${each.measure}"/>
+                <listcell label="${win_raw_material_stock$composer.getRawMaterialType(each).name}"/>
+                <listcell label="${win_raw_material_stock$composer.getMeasureFormated(each)}"/>
+                <listcell label="${win_raw_material_stock$composer.getWoodType(each).name}"/>
                 <listcell label="${each.stock}"/>
                 <listcell label="${each.stockMin}"/>
                 <listcell label="${each.stockRepo}"/>
@@ -31,19 +33,39 @@
         </template>
     </listbox>
     <vlayout>
+    	<separator/>
+        <hbox>
+            <button id="newWoodButton" label="Nueva Materia Prima en Stock"/>
+        </hbox>
         <separator/>
-		<grid id="rawMaterialTypeExistenceGrid" width="40%" sclass="sigma-form" visible="false">
+		<grid id="woodCreationGrid" width="45%" sclass="sigma-form" visible="false">
 	        <columns>
                 <column hflex="min" align="right"/>
                 <column />
             </columns>
 	        <rows>
-	            <row>
+	        	<row>
 	                <label>Codigo:</label>
 	                <textbox id="codeTextBox" value="" hflex="1"/>
 	            </row>
+	        	<row>
+	                <label>Materia Prima:</label>
+	                <selectbox id="rawMaterialTypeSelectbox">
+                        <template name="model">
+                            <label value="${each.name}" />
+                        </template>
+                    </selectbox>
+	            </row>
 	            <row>
-	                <label>Descripcion:</label>
+	                <label>Madera:</label>
+	                <selectbox id="woodTypeSelectbox">
+                        <template name="model">
+                            <label value="${each.name}" />
+                        </template>
+                    </selectbox>
+	            </row>
+	            <row>
+	                <label>Nombre Materia Prima:</label>
 	                <textbox id="nameTextBox" value="" hflex="1"/>
 	            </row>
 	            <row>

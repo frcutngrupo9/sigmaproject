@@ -6,16 +6,26 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Selectbox;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.RawMaterialType;
+import ar.edu.utn.sigmaproject.domain.Wood;
+import ar.edu.utn.sigmaproject.domain.WoodType;
+import ar.edu.utn.sigmaproject.service.MeasureUnitService;
 import ar.edu.utn.sigmaproject.service.RawMaterialTypeService;
+import ar.edu.utn.sigmaproject.service.WoodService;
+import ar.edu.utn.sigmaproject.service.WoodTypeService;
+import ar.edu.utn.sigmaproject.service.impl.MeasureUnitServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.RawMaterialTypeServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.WoodServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.WoodTypeServiceImpl;
 
 public class RawMaterialStockController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
@@ -23,13 +33,17 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	@Wire
 	Textbox searchTextbox;
 	@Wire
-	Listbox rawMaterialTypeListbox;
+	Listbox woodListbox;
 	@Wire
-	Grid rawMaterialTypeExistenceGrid;
+	Grid woodCreationGrid;
 	@Wire
-	Textbox codeTextBox;
+	Selectbox rawMaterialTypeSelectbox;
+	@Wire
+	Selectbox woodTypeSelectbox;
 	@Wire
 	Textbox nameTextBox;
+	@Wire
+	Textbox codeTextBox;
 	@Wire
 	Textbox measureTextBox;
 	@Wire
@@ -48,26 +62,41 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	Button cancelButton;
 	@Wire
 	Button resetButton;
+	@Wire
+	Button newWoodButton;
 
 	// services
 	private RawMaterialTypeService rawMaterialTypeService = new RawMaterialTypeServiceImpl();
+	private MeasureUnitService measureUnitService = new MeasureUnitServiceImpl();
+	private WoodService woodService = new WoodServiceImpl();
+	private WoodTypeService woodTypeService = new WoodTypeServiceImpl();
 
 	// attributes
-	private RawMaterialType currentRawMaterialType;
+	private Wood currentWood;
 
 	// list
 	private List<RawMaterialType> rawMaterialTypeList;
+	private List<Wood> woodList;
+	private List<WoodType> woodTypeList;
 
 	// list models
 	private ListModelList<RawMaterialType> rawMaterialTypeListModel;
+	private ListModelList<Wood> woodListModel;
+	private ListModelList<WoodType> woodTypeListModel;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception{
 		super.doAfterCompose(comp);
 		rawMaterialTypeList = rawMaterialTypeService.getRawMaterialTypeList();
 		rawMaterialTypeListModel = new ListModelList<RawMaterialType>(rawMaterialTypeList);
-		rawMaterialTypeListbox.setModel(rawMaterialTypeListModel);
-		currentRawMaterialType = null;
+		rawMaterialTypeSelectbox.setModel(rawMaterialTypeListModel);
+		woodTypeList = woodTypeService.getWoodTypeList();
+		woodTypeListModel = new ListModelList<WoodType>(woodTypeList);
+		woodTypeSelectbox.setModel(woodTypeListModel);
+		woodList = woodService.getWoodList();
+		woodListModel = new ListModelList<Wood>(woodList);
+		woodListbox.setModel(woodListModel);
+		currentWood = null;
 		refreshView();
 	}
 
@@ -75,81 +104,155 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	public void search() {
 	}
 
+	@Listen("onSelect = #woodListbox")
+	public void doWoodListBoxSelect() {
+		if(woodListModel.isSelectionEmpty()) {
+			//just in case for the no selection
+			currentWood = null;
+		} else {
+			if(currentWood == null) {// si no hay nada editandose
+				currentWood = woodListbox.getSelectedItem().getValue();
+				refreshView();
+			}
+		}
+		woodListModel.clearSelection();
+	}
+
+	private void refreshView() {
+		woodListModel.clearSelection();
+		woodListbox.setModel(woodListModel);// se actualiza la lista limpiar la seleccion
+		nameTextBox.setDisabled(true);
+		measureTextBox.setDisabled(true);// no se deben poder modificar
+		if(currentWood == null) {// nuevo
+			woodCreationGrid.setVisible(false);
+			codeTextBox.setValue("");
+			woodTypeSelectbox.setSelectedIndex(-1);
+			rawMaterialTypeSelectbox.setSelectedIndex(-1);
+			nameTextBox.setValue("(seleccionar Materia Prima)");
+			measureTextBox.setValue("(seleccionar Materia Prima)");
+			stockDoublebox.setValue(0.0);
+			stockMinDoublebox.setValue(0.0);
+			stockRepoDoublebox.setValue(0.0);
+			codeTextBox.setDisabled(false);
+			woodTypeSelectbox.setDisabled(false);
+			rawMaterialTypeSelectbox.setDisabled(false);
+			stockDoublebox.setDisabled(false);
+			stockMinDoublebox.setDisabled(false);
+			stockRepoDoublebox.setDisabled(false);
+			saveButton.setDisabled(false);
+			cancelButton.setDisabled(true);
+			resetButton.setDisabled(false);
+			stockIncreaseButton.setDisabled(true);
+			stockDecreaseButton.setDisabled(true);
+		}else {// editar
+			woodCreationGrid.setVisible(true);
+			codeTextBox.setValue(currentWood.getCode());
+			WoodType auxWoodType = woodTypeService.getWoodType(currentWood.getIdWoodType());
+			woodTypeSelectbox.setSelectedIndex(woodTypeListModel.indexOf(auxWoodType));
+			RawMaterialType currentRawMaterialType = rawMaterialTypeService.getRawMaterialType(currentWood.getIdRawMaterialType());
+			rawMaterialTypeSelectbox.setSelectedIndex(rawMaterialTypeListModel.indexOf(currentRawMaterialType));
+			nameTextBox.setValue(currentRawMaterialType.getName());
+			measureTextBox.setValue(getMeasureFormated(currentWood));
+			stockDoublebox.setValue(currentWood.getStock());
+			stockMinDoublebox.setValue(currentWood.getStockMin());
+			stockRepoDoublebox.setValue(currentWood.getStockRepo());
+			codeTextBox.setDisabled(true);
+			woodTypeSelectbox.setDisabled(true);
+			rawMaterialTypeSelectbox.setDisabled(true);
+			stockDoublebox.setDisabled(true);
+			stockMinDoublebox.setDisabled(false);
+			stockRepoDoublebox.setDisabled(false);
+			saveButton.setDisabled(false);
+			cancelButton.setDisabled(false);
+			resetButton.setDisabled(false);
+			stockIncreaseButton.setDisabled(false);
+			stockDecreaseButton.setDisabled(false);
+		}
+	}
+
+	public String getMeasureFormated(Wood wood) {
+		RawMaterialType rawMaterialType = getRawMaterialType(wood);
+		String lenght = "(L) " + rawMaterialType.getLength().doubleValue() + " " + getMeasureUnitName(rawMaterialType.getLengthIdMeasureUnit());
+		String depth = "(E) " + rawMaterialType.getDepth().doubleValue() + " " + getMeasureUnitName(rawMaterialType.getDepthIdMeasureUnit());
+		String width = "(A) " + rawMaterialType.getWidth().doubleValue() + " " + getMeasureUnitName(rawMaterialType.getWidthIdMeasureUnit());
+		return lenght + " x " + depth + " x " + width;
+	}
+
+	public RawMaterialType getRawMaterialType(Wood wood) {
+		return rawMaterialTypeService.getRawMaterialType(wood.getIdRawMaterialType());
+	}
+
+	public WoodType getWoodType(Wood wood) {
+		return woodTypeService.getWoodType(wood.getIdWoodType());
+	}
+
+	public String getMeasureUnitName(int idMeasureUnit) {
+		if(measureUnitService.getMeasureUnit(idMeasureUnit) != null) {
+			return measureUnitService.getMeasureUnit(idMeasureUnit).getName();
+		} else {
+			return "[Sin Unidad de Medida]";
+		}
+	}
+	@Listen("onClick = #newWoodButton")
+	public void newWoodButtonClick() {
+		currentWood = null;
+		refreshView();
+		woodCreationGrid.setVisible(true);
+	}
+
+	@Listen("onClick = #saveButton")
+	public void saveButtonClick() {
+		if(rawMaterialTypeSelectbox.getSelectedIndex() == -1) {
+			Clients.showNotification("Debe seleccionar una Materia Prima", rawMaterialTypeSelectbox);
+			return;
+		}
+		if(woodTypeSelectbox.getSelectedIndex() == -1) {
+			Clients.showNotification("Debe seleccionar una Madera", woodTypeSelectbox);
+			return;
+		}
+		String code = codeTextBox.getText();
+		Integer idRawMaterialType = rawMaterialTypeListModel.getElementAt(rawMaterialTypeSelectbox.getSelectedIndex()).getId();
+		Integer idWoodType = woodTypeListModel.getElementAt(woodTypeSelectbox.getSelectedIndex()).getId();
+		Double stock = stockDoublebox.getValue();
+		Double stockMin = stockMinDoublebox.getValue();
+		Double stockRepo = stockRepoDoublebox.getValue();
+		if(currentWood == null) {// nuevo
+			woodService.saveWood(new Wood(null, idRawMaterialType, idWoodType, code, stock, stockMin, stockRepo));
+		} else {// edicion
+			currentWood.setCode(code);
+			currentWood.setIdRawMaterialType(idRawMaterialType);
+			currentWood.setIdWoodType(idWoodType);
+			currentWood.setStock(stock);
+			currentWood.setStockRepo(stockRepo);
+			currentWood.setStockMin(stockMin);
+			woodService.updateWood(currentWood);
+		}
+		woodList = woodService.getWoodList();
+		woodListModel = new ListModelList<Wood>(woodList);
+		currentWood = null;
+		refreshView();
+	}
+
 	@Listen("onClick = #cancelButton")
 	public void cancelButtonClick() {
-		currentRawMaterialType = null;
+		currentWood = null;
 		refreshView();
 	}
 
 	@Listen("onClick = #resetButton")
 	public void resetButtonClick() {
 		refreshView();
-	}
-
-	@Listen("onSelect = #supplyTypeListbox")
-	public void doListBoxSelect() {
-		if(rawMaterialTypeListModel.isSelectionEmpty()) {
-			//just in case for the no selection
-			currentRawMaterialType = null;
-		} else {
-			if(currentRawMaterialType == null) {// si no hay nada editandose
-				currentRawMaterialType = rawMaterialTypeListModel.getSelection().iterator().next();
-				refreshView();
-			}
+		if(currentWood == null) {
+			woodCreationGrid.setVisible(true);
 		}
-		rawMaterialTypeListModel.clearSelection();
+
 	}
 
-	private void refreshView() {
-		rawMaterialTypeListModel.clearSelection();
-		rawMaterialTypeListbox.setModel(rawMaterialTypeListModel);// se actualiza la lista
-		codeTextBox.setDisabled(true);// no se deben poder modificar
-		nameTextBox.setDisabled(true);
-		measureTextBox.setDisabled(true);
-		stockDoublebox.setDisabled(true);
-		if(currentRawMaterialType == null) {// no editando
-			rawMaterialTypeExistenceGrid.setVisible(false);
-			codeTextBox.setValue(null);
-			nameTextBox.setValue(null);
-			measureTextBox.setValue(null);
-			stockDoublebox.setValue(null);
-			stockMinDoublebox.setValue(null);
-			stockRepoDoublebox.setValue(null);
-			saveButton.setDisabled(true);
-			cancelButton.setDisabled(true);
-			resetButton.setDisabled(true);
-		}else {// editando
-			rawMaterialTypeExistenceGrid.setVisible(true);
-//			codeTextBox.setValue(currentRawMaterialType.getCode());
-//			nameTextBox.setValue(currentRawMaterialType.getDescription());
-//			measureTextBox.setValue(currentRawMaterialType.getMeasure());
-//			stockDoublebox.setValue(currentRawMaterialType.getStock());
-//			stockMinDoublebox.setValue(currentRawMaterialType.getStockMin());
-//			stockRepoDoublebox.setValue(currentRawMaterialType.getStockRepo());
-			saveButton.setDisabled(false);
-			cancelButton.setDisabled(false);
-			resetButton.setDisabled(false);
-		}
-	}
-
-	@Listen("onClick = #saveButton")
-	public void saveButtonClick() {
-//		currentRawMaterialType.setStock(stockDoublebox.getValue());
-//		currentRawMaterialType.setStockMin(stockMinDoublebox.getValue());
-//		currentRawMaterialType.setStockRepo(stockRepoDoublebox.getValue());
-//		// es siempre una edicion ya que debe existir para poder modificar su stock
-//		currentRawMaterialType = supplyTypeService.updateSupplyType(currentRawMaterialType);
-//		supplyTypeList = supplyTypeService.getSupplyTypeList();
-//		supplyTypeListModel = new ListModelList<SupplyType>(supplyTypeList);
-//		currentRawMaterialType = null;
-		refreshView();
-	}
-	
 	@Listen("onClick = #stockIncreaseButton")
 	public void stockIncreaseButtonClick() {
 		// TODO
 	}
-	
+
 	@Listen("onClick = #stockDecreaseButton")
 	public void stockDecreaseButtonClick() {
 		// TODO

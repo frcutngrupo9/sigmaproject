@@ -8,14 +8,16 @@ public class Wood implements Serializable, Cloneable {
 	Integer id;
 	Integer idRawMaterialType;
 	Integer idWoodType;
+	String code;
 	Double stock;
 	Double stockMin;
 	Double stockRepo;
 
-	public Wood(Integer id, Integer idRawMaterialType, Integer idWoodType, Double stock, Double stockMin, Double stockRepo) {
+	public Wood(Integer id, Integer idRawMaterialType, Integer idWoodType, String code, Double stock, Double stockMin, Double stockRepo) {
 		this.id = id;
 		this.idRawMaterialType = idRawMaterialType;
 		this.idWoodType = idWoodType;
+		this.code = code;
 		this.stock = stock;
 		this.stockMin = stockMin;
 		this.stockRepo = stockRepo;
@@ -43,6 +45,14 @@ public class Wood implements Serializable, Cloneable {
 
 	public void setIdWoodType(Integer idWoodType) {
 		this.idWoodType = idWoodType;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public Double getStock() {
