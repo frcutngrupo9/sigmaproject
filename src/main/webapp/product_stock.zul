@@ -42,11 +42,11 @@
 	        <rows>
 	            <row>
 	                <label>Codigo:</label>
-	                <textbox id="codeTextBox" value="" hflex="1"/>
+	                <textbox id="codeTextbox" value="" hflex="1"/>
 	            </row>
 	            <row>
 	                <label>Descripcion:</label>
-	                <textbox id="nameTextBox" value="" hflex="1"/>
+	                <textbox id="nameTextbox" value="" hflex="1"/>
 	            </row>
 	            <row>
 	                <label>Stock Actual:</label>
@@ -81,7 +81,7 @@
                     <separator/>
                     <separator/>
                     <label value="Fecha de necesidad: "/>
-                    <datebox id="orderNeedDateBox" cols="12" format="dd-MM-yyyy"/>
+                    <datebox id="orderNeedDatebox" cols="12" format="dd-MM-yyyy"/>
                 </hlayout>
                 <separator/>
                 <hlayout>

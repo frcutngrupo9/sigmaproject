@@ -27,11 +27,11 @@ public class SupplyStockController extends SelectorComposer<Component> {
 	@Wire
 	Grid supplyTypeExistenceGrid;
 	@Wire
-	Textbox codeTextBox;
+	Textbox codeTextbox;
 	@Wire
-	Textbox nameTextBox;
+	Textbox nameTextbox;
 	@Wire
-	Textbox measureTextBox;
+	Textbox measureTextbox;
 	@Wire
 	Doublebox stockDoublebox;
 	@Wire
@@ -103,15 +103,15 @@ public class SupplyStockController extends SelectorComposer<Component> {
 	private void refreshView() {
 		supplyTypeListModel.clearSelection();
 		supplyTypeListbox.setModel(supplyTypeListModel);// se actualiza la lista
-		codeTextBox.setDisabled(true);// no se deben poder modificar
-		nameTextBox.setDisabled(true);
-		measureTextBox.setDisabled(true);
+		codeTextbox.setDisabled(true);// no se deben poder modificar
+		nameTextbox.setDisabled(true);
+		measureTextbox.setDisabled(true);
 		stockDoublebox.setDisabled(true);
 		if(currentSupplyType == null) {// no editando
 			supplyTypeExistenceGrid.setVisible(false);
-			codeTextBox.setValue(null);
-			nameTextBox.setValue(null);
-			measureTextBox.setValue(null);
+			codeTextbox.setValue(null);
+			nameTextbox.setValue(null);
+			measureTextbox.setValue(null);
 			stockDoublebox.setValue(null);
 			stockMinDoublebox.setValue(null);
 			stockRepoDoublebox.setValue(null);
@@ -120,9 +120,9 @@ public class SupplyStockController extends SelectorComposer<Component> {
 			resetButton.setDisabled(true);
 		}else {// editando
 			supplyTypeExistenceGrid.setVisible(true);
-			codeTextBox.setValue(currentSupplyType.getCode());
-			nameTextBox.setValue(currentSupplyType.getDescription());
-			measureTextBox.setValue(currentSupplyType.getMeasure());
+			codeTextbox.setValue(currentSupplyType.getCode());
+			nameTextbox.setValue(currentSupplyType.getDescription());
+			measureTextbox.setValue(currentSupplyType.getMeasure());
 			stockDoublebox.setValue(currentSupplyType.getStock());
 			stockMinDoublebox.setValue(currentSupplyType.getStockMin());
 			stockRepoDoublebox.setValue(currentSupplyType.getStockRepo());

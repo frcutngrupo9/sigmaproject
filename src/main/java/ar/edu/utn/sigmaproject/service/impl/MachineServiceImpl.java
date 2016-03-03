@@ -8,84 +8,89 @@ import ar.edu.utn.sigmaproject.service.MachineService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
 public class MachineServiceImpl implements MachineService {
-	static List<Machine> machineList = new ArrayList<Machine>();
-	private SerializationService serializator = new SerializationService("machine");
+	static List<Machine> machineExistenceList = new ArrayList<Machine>();
+	private SerializationService serializator = new SerializationService("machine_existence");
 
 	public MachineServiceImpl() {
 		@SuppressWarnings("unchecked")
 		List<Machine> aux = serializator.obtenerLista();
 		if(aux != null) {
-			machineList = aux;
+			machineExistenceList = aux;
 		} else {
-			serializator.grabarLista(machineList);
+			serializator.grabarLista(machineExistenceList);
 		}
 	}
 
-	public synchronized List<Machine> getMachineList() {
+	public synchronized List<Machine> getMachineExistenceList() {
 		List<Machine> list = new ArrayList<Machine>();
-		for(Machine each:machineList) {
+		for(Machine each: machineExistenceList) {
 			list.add(Machine.clone(each));
 		}
 		return list;
 	}
 
-	public synchronized List<Machine> getMachineList(Integer idProcessType) {
-		List<Machine> list = new ArrayList<Machine>();
-		for(Machine each:machineList) {
-			if(each.getIdProcessType().equals(idProcessType)) {
-				list.add(Machine.clone(each));
-			}
-		}
-		return list;
-	}
-
-	public synchronized Machine getMachine(Integer idProcessType, Integer idMachineType) {
-		int size = machineList.size();
-		for(int i = 0; i < size; i++) {
-			Machine aux = machineList.get(i);
-			if(aux.getIdProcessType().equals(idProcessType) && aux.getIdMachineType().equals(idMachineType)) {
-				return Machine.clone(aux);
+	public synchronized Machine getMachineExistence(Integer id) {
+		int size = machineExistenceList.size();
+		for(int i=0; i<size; i++) {
+			Machine t = machineExistenceList.get(i);
+			if(t.getId().equals(id)) {
+				return Machine.clone(t);
 			}
 		}
 		return null;
 	}
 
-	public synchronized Machine saveMachine(Machine machine) {
-		machine = Machine.clone(machine);
-		machineList.add(machine);
-		serializator.grabarLista(machineList);
-		return machine;
+	public synchronized Machine saveMachineExistence(Machine machineExistence) {
+		if(machineExistence.getId() == null) {
+			machineExistence.setId(getNewId());
+		}
+		machineExistence = Machine.clone(machineExistence);
+		machineExistenceList.add(machineExistence);
+		serializator.grabarLista(machineExistenceList);
+		return machineExistence;
 	}
 
-	public synchronized Machine updateMachine(Machine supply) {
-		if(supply.getIdProcessType()==null || supply.getIdMachineType()==null) {
-			throw new IllegalArgumentException("can't update a null-id Machine, save it first");
-		} else {
-			supply = Machine.clone(supply);
-			int size = machineList.size();
-			for(int i = 0; i < size; i++) {
-				Machine aux = machineList.get(i);
-				if(aux.getIdProcessType().equals(supply.getIdProcessType()) && aux.getIdMachineType().equals(supply.getIdMachineType())) {
-					machineList.set(i, supply);
-					serializator.grabarLista(machineList);
-					return supply;
+	public synchronized Machine updateMachineExistence(Machine machineExistence) {
+		if(machineExistence.getId() == null) {
+			throw new IllegalArgumentException("can't update a null-id MachineExistence, save it first");
+		}else {
+			machineExistence = Machine.clone(machineExistence);
+			int size = machineExistenceList.size();
+			for(int i=0; i<size; i++) {
+				Machine t = machineExistenceList.get(i);
+				if(t.getId().equals(machineExistence.getId())){
+					machineExistenceList.set(i, machineExistence);
+					serializator.grabarLista(machineExistenceList);
+					return machineExistence;
 				}
 			}
-			throw new RuntimeException("Machine not found "+supply.getIdProcessType()+" "+supply.getIdMachineType());
+			throw new RuntimeException("MachineExistence not found " + machineExistence.getId());
 		}
 	}
 
-	public synchronized void deleteMachine(Machine supply) {
-		if(supply.getIdProcessType()!=null && supply.getIdMachineType()!=null) {
-			int size = machineList.size();
-			for(int i = 0; i < size; i++) {
-				Machine aux = machineList.get(i);
-				if(aux.getIdProcessType().equals(supply.getIdProcessType()) && aux.getIdMachineType().equals(supply.getIdMachineType())) {
-					machineList.remove(i);
-					serializator.grabarLista(machineList);
+	public synchronized void deleteMachineExistence(Machine machineExistence) {
+		if(machineExistence.getId() != null) {
+			int size = machineExistenceList.size();
+			for(int i=0; i<size; i++) {
+				Machine t = machineExistenceList.get(i);
+				if(t.getId().equals(machineExistence.getId())){
+					machineExistenceList.remove(i);
+					serializator.grabarLista(machineExistenceList);
 					return;
 				}
 			}
 		}
 	}
+
+	private synchronized Integer getNewId() {
+		Integer lastId = 0;
+		for(int i=0; i<machineExistenceList.size(); i++) {
+			Machine aux = machineExistenceList.get(i);
+			if(lastId < aux.getId()){
+				lastId = aux.getId();
+			}
+		}
+		return lastId + 1;
+	}
+
 }

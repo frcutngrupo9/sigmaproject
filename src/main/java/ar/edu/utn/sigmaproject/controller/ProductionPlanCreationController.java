@@ -72,7 +72,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	@Wire
 	Textbox productionPlanNameTextbox;
 	@Wire
-	Datebox productionPlanDateBox;
+	Datebox productionPlanDatebox;
 	@Wire
 	Button addOrderButton;
 	@Wire
@@ -88,7 +88,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	@Wire
 	Listbox productTotalListbox;
 	@Wire
-	Selectbox productionPlanStateTypeSelectBox;
+	Selectbox productionPlanStateTypeSelectbox;
 	@Wire
 	Caption productionPlanCaption;
 
@@ -133,7 +133,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 
 		productionPlanStateTypeList = productionPlanStateTypeService.getProductionPlanStateTypeList();
 		productionPlanStateTypeListModel = new ListModelList<ProductionPlanStateType>(productionPlanStateTypeList);
-		productionPlanStateTypeSelectBox.setModel(productionPlanStateTypeListModel);
+		productionPlanStateTypeSelectbox.setModel(productionPlanStateTypeListModel);
 
 		refreshViewProductionPlan();
 		refreshProcessListBox();
@@ -190,8 +190,8 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			return;
 		}
 		String production_plan_name = productionPlanNameTextbox.getText();
-		Date production_plan_date = productionPlanDateBox.getValue();
-		int production_plan_state_type_id = productionPlanStateTypeListModel.getElementAt(productionPlanStateTypeSelectBox.getSelectedIndex()).getId();
+		Date production_plan_date = productionPlanDatebox.getValue();
+		int production_plan_state_type_id = productionPlanStateTypeListModel.getElementAt(productionPlanStateTypeSelectbox.getSelectedIndex()).getId();
 		if(currentProductionPlan == null) { // es un plan nuevo
 			// creamos el nuevo plan
 			currentProductionPlan = new ProductionPlan(null, production_plan_name, null, production_plan_date);
@@ -251,32 +251,32 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		if (currentProductionPlan == null) {// nuevo plan de produccion
 			productionPlanCaption.setLabel("Creacion de Plan de Produccion");
 			productionPlanStateTypeListModel.addToSelection(productionPlanStateTypeService.getProductionPlanStateType("iniciado"));
-			productionPlanStateTypeSelectBox.setModel(productionPlanStateTypeListModel);
+			productionPlanStateTypeSelectbox.setModel(productionPlanStateTypeListModel);
 			productionPlanNameTextbox.setText("");
-			productionPlanDateBox.setValue(new Date());
+			productionPlanDatebox.setValue(new Date());
 			currentProductionPlanDetailList = new ArrayList<ProductionPlanDetail>();
 			deleteProductionPlanButton.setDisabled(true);
-			productionPlanStateTypeSelectBox.setDisabled(true);
+			productionPlanStateTypeSelectbox.setDisabled(true);
 		} else {// se edita plan de produccion
 			productionPlanCaption.setLabel("Edicion de Plan de Produccion");
 			currentProductionPlanState = productionPlanStateService.getLastProductionPlanState(currentProductionPlan.getId());
 			if(currentProductionPlanState != null) {
 				productionPlanStateTypeListModel.addToSelection(productionPlanStateTypeService.getProductionPlanStateType(currentProductionPlanState.getIdProductionPlanStateType()));
-				productionPlanStateTypeSelectBox.setModel(productionPlanStateTypeListModel);
+				productionPlanStateTypeSelectbox.setModel(productionPlanStateTypeListModel);
 			} else {
-				productionPlanStateTypeSelectBox.setSelectedIndex(-1);
+				productionPlanStateTypeSelectbox.setSelectedIndex(-1);
 			}
 			if(currentProductionPlan.getName() != null) {
 				productionPlanNameTextbox.setText(currentProductionPlan.getName());
 			} else {
 				productionPlanNameTextbox.setText("");
 			}
-			productionPlanDateBox.setValue(currentProductionPlan.getDate());
+			productionPlanDatebox.setValue(currentProductionPlan.getDate());
 			currentProductionPlanDetailList = productionPlanDetailService.getProductionPlanDetailList(currentProductionPlan.getId());
 			deleteProductionPlanButton.setDisabled(false);
-			productionPlanStateTypeSelectBox.setDisabled(false);
+			productionPlanStateTypeSelectbox.setDisabled(false);
 		}
-		productionPlanDateBox.setDisabled(true);// nunca se debe poder modificar
+		productionPlanDatebox.setDisabled(true);// nunca se debe poder modificar
 		refreshOrderPopupList();
 		refreshProductionPlanDetailListGrid();
 		refreshProductTotalListbox();

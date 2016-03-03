@@ -49,9 +49,9 @@ public class ProductStockController extends SelectorComposer<Component>{
 	@Wire
 	Grid productExistenceGrid;
 	@Wire
-	Textbox codeTextBox;
+	Textbox codeTextbox;
 	@Wire
-	Textbox nameTextBox;
+	Textbox nameTextbox;
 	@Wire
 	Intbox stockIntbox;
 	@Wire
@@ -73,7 +73,7 @@ public class ProductStockController extends SelectorComposer<Component>{
 	@Wire
 	Intbox orderNumberIntbox;
 	@Wire
-	Datebox orderNeedDateBox;
+	Datebox orderNeedDatebox;
 
 	// services
 	private ProductExistenceService productExistenceService = new ProductExistenceServiceImpl();
@@ -142,12 +142,12 @@ public class ProductStockController extends SelectorComposer<Component>{
 	private void refreshView() {
 		productListModel.clearSelection();
 		productListbox.setModel(productListModel);// se actualiza la lista
-		codeTextBox.setDisabled(true);
-		nameTextBox.setDisabled(true);// no se deben poder modificar
+		codeTextbox.setDisabled(true);
+		nameTextbox.setDisabled(true);// no se deben poder modificar
 		if(currentProduct == null) {// no editando ni creando
 			productExistenceGrid.setVisible(false);
-			codeTextBox.setValue(null);
-			nameTextBox.setValue(null);
+			codeTextbox.setValue(null);
+			nameTextbox.setValue(null);
 			stockIntbox.setValue(null);
 			stockMinIntbox.setValue(null);
 			stockRepoIntbox.setValue(null);
@@ -158,8 +158,8 @@ public class ProductStockController extends SelectorComposer<Component>{
 			currentProductExistence = null;
 		}else {// editando o creando
 			productExistenceGrid.setVisible(true);
-			codeTextBox.setValue(currentProduct.getCode());
-			nameTextBox.setValue(currentProduct.getName());
+			codeTextbox.setValue(currentProduct.getCode());
+			nameTextbox.setValue(currentProduct.getName());
 			int stock = 0;
 			int stock_min = 0;
 			int stock_repo = 0;
@@ -253,7 +253,7 @@ public class ProductStockController extends SelectorComposer<Component>{
 	@Listen("onClick = #saveOrderButton")
 	public void saveOrder() {
 		int order_number = orderNumberIntbox.intValue();
-		Date order_need_date = orderNeedDateBox.getValue();
+		Date order_need_date = orderNeedDatebox.getValue();
 		int order_state_type_id = orderStateTypeService.getOrderStateType("iniciado").getId();
 		currentOrder.setNumber(order_number);
 		currentOrder.setNeedDate(order_need_date);
@@ -324,7 +324,7 @@ public class ProductStockController extends SelectorComposer<Component>{
 			} else {
 				orderCreationBlock.setVisible(true);
 				orderNumberIntbox.setValue(currentOrder.getNumber());
-				orderNeedDateBox.setValue(null);
+				orderNeedDatebox.setValue(null);
 				orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
 				orderDetailListbox.setModel(orderDetailListModel);
 				newProvisionOrderButton.setDisabled(true);

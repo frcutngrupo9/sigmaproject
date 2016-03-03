@@ -30,17 +30,17 @@ public class SupplyController extends SelectorComposer<Component>{
 	@Wire
 	Grid supplyGrid;
 	@Wire
-	Textbox codeTextBox;
+	Textbox codeTextbox;
 	@Wire
-	Textbox descriptionTextBox;
+	Textbox descriptionTextbox;
 	@Wire
-	Textbox detailsTextBox;
+	Textbox detailsTextbox;
 	@Wire
-	Textbox brandTextBox;
+	Textbox brandTextbox;
 	@Wire
-	Textbox presentationTextBox;
+	Textbox presentationTextbox;
 	@Wire
-	Textbox measureTextBox;
+	Textbox measureTextbox;
 	@Wire
 	Button saveButton;
 	@Wire
@@ -86,16 +86,16 @@ public class SupplyController extends SelectorComposer<Component>{
 
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
-		if(Strings.isBlank(descriptionTextBox.getText())){
-			Clients.showNotification("Debe ingresar una descripcion", descriptionTextBox);
+		if(Strings.isBlank(descriptionTextbox.getText())){
+			Clients.showNotification("Debe ingresar una descripcion", descriptionTextbox);
 			return;
 		}
-		String code = codeTextBox.getText();
-		String description = descriptionTextBox.getText();
-		String details = detailsTextBox.getText();
-		String brand = brandTextBox.getText();
-		String presentation = presentationTextBox.getText();
-		String measure = measureTextBox.getText();
+		String code = codeTextbox.getText();
+		String description = descriptionTextbox.getText();
+		String details = detailsTextbox.getText();
+		String brand = brandTextbox.getText();
+		String presentation = presentationTextbox.getText();
+		String measure = measureTextbox.getText();
 		if(currentSupplyType == null) {
 			// es un nuevo insumo
 			currentSupplyType = new SupplyType(null, code, description, details, brand, presentation, measure, 0.0, 0.0, 0.0);
@@ -157,22 +157,22 @@ public class SupplyController extends SelectorComposer<Component>{
 		newButton.setDisabled(false);
 		if(currentSupplyType == null) {// creando
 			supplyGrid.setVisible(false);
-			codeTextBox.setValue(null);
-			descriptionTextBox.setValue(null);
-			detailsTextBox.setValue(null);
-			brandTextBox.setValue(null);
-			presentationTextBox.setValue(null);
-			measureTextBox.setValue(null);
+			codeTextbox.setValue(null);
+			descriptionTextbox.setValue(null);
+			detailsTextbox.setValue(null);
+			brandTextbox.setValue(null);
+			presentationTextbox.setValue(null);
+			measureTextbox.setValue(null);
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
 		}else {// editando
 			supplyGrid.setVisible(true);
-			codeTextBox.setValue(currentSupplyType.getCode());
-			descriptionTextBox.setValue(currentSupplyType.getDescription());
-			detailsTextBox.setValue(currentSupplyType.getDetails());
-			brandTextBox.setValue(currentSupplyType.getBrand());
-			presentationTextBox.setValue(currentSupplyType.getPresentation());
-			measureTextBox.setValue(currentSupplyType.getMeasure());
+			codeTextbox.setValue(currentSupplyType.getCode());
+			descriptionTextbox.setValue(currentSupplyType.getDescription());
+			detailsTextbox.setValue(currentSupplyType.getDetails());
+			brandTextbox.setValue(currentSupplyType.getBrand());
+			presentationTextbox.setValue(currentSupplyType.getPresentation());
+			measureTextbox.setValue(currentSupplyType.getMeasure());
 			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
 		}

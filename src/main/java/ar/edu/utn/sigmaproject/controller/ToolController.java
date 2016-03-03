@@ -38,13 +38,13 @@ public class ToolController extends SelectorComposer<Component>{
 	@Wire
 	Button deleteButton;
 	@Wire
-	Textbox nameTextBox;
+	Textbox nameTextbox;
 	@Wire
-	Textbox descriptionTextBox;
+	Textbox descriptionTextbox;
 	@Wire
-	Textbox detailsTextBox;
+	Textbox detailsTextbox;
 	@Wire
-	Textbox brandTextBox;
+	Textbox brandTextbox;
 
 	// services
 	private ToolTypeService toolTypeService = new ToolTypeServiceImpl();
@@ -81,14 +81,14 @@ public class ToolController extends SelectorComposer<Component>{
 
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
-		if(Strings.isBlank(nameTextBox.getText())){
-			Clients.showNotification("Debe ingresar un nombre", nameTextBox);
+		if(Strings.isBlank(nameTextbox.getText())){
+			Clients.showNotification("Debe ingresar un nombre", nameTextbox);
 			return;
 		}
-		String name = nameTextBox.getText();
-		String description = descriptionTextBox.getText();
-		String details = detailsTextBox.getText();
-		String brand = brandTextBox.getText();
+		String name = nameTextbox.getText();
+		String description = descriptionTextbox.getText();
+		String details = detailsTextbox.getText();
+		String brand = brandTextbox.getText();
 		if(currentToolType == null) {// nuevo
 			currentToolType = new ToolType(null, name, description, details, brand);
 			currentToolType = toolTypeService.saveToolType(currentToolType);
@@ -146,18 +146,18 @@ public class ToolController extends SelectorComposer<Component>{
 		newButton.setDisabled(false);
 		if(currentToolType == null) {// creando
 			toolGrid.setVisible(false);
-			nameTextBox.setValue(null);
-			descriptionTextBox.setValue(null);
-			detailsTextBox.setValue(null);
-			brandTextBox.setValue(null);
+			nameTextbox.setValue(null);
+			descriptionTextbox.setValue(null);
+			detailsTextbox.setValue(null);
+			brandTextbox.setValue(null);
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
 		} else {// editando
 			toolGrid.setVisible(true);
-			nameTextBox.setValue(currentToolType.getName());
-			descriptionTextBox.setValue(currentToolType.getDescription());
-			detailsTextBox.setValue(currentToolType.getDetails());
-			brandTextBox.setValue(currentToolType.getBrand());
+			nameTextbox.setValue(currentToolType.getName());
+			descriptionTextbox.setValue(currentToolType.getDescription());
+			detailsTextbox.setValue(currentToolType.getDetails());
+			brandTextbox.setValue(currentToolType.getBrand());
 			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
 		}

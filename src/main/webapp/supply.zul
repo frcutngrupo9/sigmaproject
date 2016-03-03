@@ -39,27 +39,27 @@
 	        <rows>
 	            <row>
 	                <label>Codigo:</label>
-	                <textbox id="codeTextBox" value="" hflex="1"/>
+	                <textbox id="codeTextbox" value="" hflex="1"/>
 	            </row>
 	            <row>
 	                <label>Descripcion:</label>
-	                <textbox id="descriptionTextBox" value="" hflex="1"/>
+	                <textbox id="descriptionTextbox" value="" hflex="1"/>
 	            </row>
 	            <row>
 	                <label>Detalles:</label>
-	                <textbox id="detailsTextBox" value="" hflex="1"/>
+	                <textbox id="detailsTextbox" value="" hflex="1"/>
 	            </row>
 	            <row>
 	                <label>Marca:</label>
-	                <textbox id="brandTextBox" value="" hflex="1"/>
+	                <textbox id="brandTextbox" value="" hflex="1"/>
 	            </row>
 	            <row>
 	                <label>Presentacion:</label>
-	                <textbox id="presentationTextBox" value="" hflex="1"/>
+	                <textbox id="presentationTextbox" value="" hflex="1"/>
 	            </row>
 	            <row>
 	                <label>Medida:</label>
-	                <textbox id="measureTextBox" value="" hflex="1"/>
+	                <textbox id="measureTextbox" value="" hflex="1"/>
 	            </row>
 	            <row>
 	                <cell colspan="2" style="text-align:center">

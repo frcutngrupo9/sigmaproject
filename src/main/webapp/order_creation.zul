@@ -11,7 +11,7 @@
                     <rows>
                     	<row>
                             <label value="Estado: "/>
-		                    <selectbox id="orderStateTypeSelectBox">
+		                    <selectbox id="orderStateTypeSelectbox">
 		                        <template name="model">
 		                            <label value="${each.name}" />
 		                        </template>
@@ -19,7 +19,7 @@
                         </row>
                         <row>
                             <label value="Numero de Pedido: "/>
-                    		<intbox id="orderNumber" constraint="no negative"/>
+                    		<intbox id="orderNumberIntbox" constraint="no negative"/>
                         </row>
                         <row>
                             <label value="Cliente: "/>
@@ -48,11 +48,11 @@
                         </row>
                         <row>
                             <label value="Fecha Creacion: "/>
-                    		<datebox id="orderDateBox" cols="12" format="dd-MM-yyyy"/>
+                    		<datebox id="orderDatebox" cols="12" format="dd-MM-yyyy"/>
                         </row>
                         <row>
                             <label value="Fecha Necesidad: "/>
-                    		<datebox id="orderNeedDateBox" cols="12" format="dd-MM-yyyy"/>
+                    		<datebox id="orderNeedDatebox" cols="12" format="dd-MM-yyyy"/>
                         </row>
                         <row>
                         	<cell colspan="2" style="text-align:center">
@@ -81,9 +81,9 @@
 				                        </bandpopup>
 				                    </bandbox>
 				                    <label value="Cantidad: "/>
-				                    <intbox id="productUnits" constraint="no negative" width="36px"/>
+				                    <intbox id="productUnitsIntbox" constraint="no negative" width="36px"/>
 				                    <label value="Precio Unitario: "/>
-				                    <doublebox id="productPrice" constraint="no negative" format=",###.##" width="77px"/>
+				                    <doublebox id="productPriceDoublebox" constraint="no negative" format=",###.##" width="77px"/>
 				                    <button id="saveOrderDetailButton" label="Grabar Detalle"/>
 				                    <button id="resetOrderDetailButton" label="Reset Detalle"/>
 				                    <button id="deleteOrderDetailButton" label="Eliminar Detalle"/>

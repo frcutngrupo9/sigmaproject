@@ -43,9 +43,9 @@ public class MachineController extends SelectorComposer<Component>{
 	@Wire
 	Button deleteButton;
 	@Wire
-	Textbox nameTextBox;
+	Textbox nameTextbox;
 	@Wire
-	Textbox detailsTextBox;
+	Textbox detailsTextbox;
 	@Wire
 	Intbox deteriorationTimeIntboxYears;
 	@Wire
@@ -88,12 +88,12 @@ public class MachineController extends SelectorComposer<Component>{
 
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
-		if(Strings.isBlank(nameTextBox.getText())){
-			Clients.showNotification("Debe ingresar un nombre", nameTextBox);
+		if(Strings.isBlank(nameTextbox.getText())){
+			Clients.showNotification("Debe ingresar un nombre", nameTextbox);
 			return;
 		}
-		String name = nameTextBox.getText();
-		String details = detailsTextBox.getText();
+		String name = nameTextbox.getText();
+		String details = detailsTextbox.getText();
 		Integer years = deteriorationTimeIntboxYears.intValue();
 		Integer days = deteriorationTimeIntboxDays.intValue();
 		Integer hours = deteriorationTimeIntboxHours.intValue();
@@ -159,20 +159,20 @@ public class MachineController extends SelectorComposer<Component>{
 		newButton.setDisabled(false);
 		if(currentMachineType == null) {// creando
 			machineGrid.setVisible(false);
-			nameTextBox.setValue(null);
+			nameTextbox.setValue(null);
 			deteriorationTimeIntboxYears.setValue(null);
 			deteriorationTimeIntboxDays.setValue(null);
 			deteriorationTimeIntboxHours.setValue(null);
-			detailsTextBox.setValue(null);
+			detailsTextbox.setValue(null);
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
 		} else {// editando
 			machineGrid.setVisible(true);
-			nameTextBox.setValue(currentMachineType.getName());
+			nameTextbox.setValue(currentMachineType.getName());
 			deteriorationTimeIntboxYears.setValue(currentMachineType.getDeteriorationTime().getYears());
 			deteriorationTimeIntboxDays.setValue(currentMachineType.getDeteriorationTime().getDays());
 			deteriorationTimeIntboxHours.setValue(currentMachineType.getDeteriorationTime().getHours());
-			detailsTextBox.setValue(currentMachineType.getDetails());
+			detailsTextbox.setValue(currentMachineType.getDetails());
 			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
 		}

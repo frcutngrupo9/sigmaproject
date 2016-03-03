@@ -5,20 +5,28 @@ import java.io.Serializable;
 public class Machine implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	Integer idProcessType;
+	Integer id;
 	Integer idMachineType;
+	String code;
+	String name;
+	Integer year;
+	Long usedTime;
 
-	public Machine(Integer idProcessType, Integer idMachineType) {
-		this.idProcessType = idProcessType;
+	public Machine(Integer id, Integer idMachineType, String code, String name, Integer year, Long usedTime) {
+		this.id = id;
 		this.idMachineType = idMachineType;
+		this.code = code;
+		this.name = name;
+		this.year = year;
+		this.usedTime = usedTime;
 	}
 
-	public Integer getIdProcessType() {
-		return idProcessType;
+	public Integer getId() {
+		return id;
 	}
 
-	public void setIdProcessType(Integer idProcessType) {
-		this.idProcessType = idProcessType;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	public Integer getIdMachineType() {
@@ -27,6 +35,46 @@ public class Machine implements Serializable, Cloneable {
 
 	public void setIdMachineType(Integer idMachineType) {
 		this.idMachineType = idMachineType;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Integer getYear() {
+		return year;
+	}
+
+	public void setYear(Integer year) {
+		this.year = year;
+	}
+
+	public Long getUsedTime() {
+		return usedTime;
+	}
+
+	public void setUsedTime(Long usedTime) {
+		this.usedTime = usedTime;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
 	}
 
 	@Override
@@ -38,20 +86,19 @@ public class Machine implements Serializable, Cloneable {
 		if (getClass() != obj.getClass())
 			return false;
 		Machine other = (Machine) obj;
-		if (idProcessType != null && idMachineType != null) {
-			if (other.idProcessType != null  && other.idMachineType != null) {
-				if (other.idProcessType.equals(idProcessType) && other.idMachineType.equals(idMachineType))
-					return true;
-			}
-		}
-		return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
 	}
 
-	public static Machine clone(Machine other) {
+	public static Machine clone(Machine other){
 		try {
-			return (Machine) other.clone();
+			return (Machine)other.clone();
 		} catch (CloneNotSupportedException e) {
-			// not possible
+			//not possible
 		}
 		return null;
 	}

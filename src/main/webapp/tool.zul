@@ -35,19 +35,19 @@
             <rows>
                 <row>	
                     <label>Nombre:</label>
-                    <textbox id="nameTextBox" value="" hflex="1"/>
+                    <textbox id="nameTextbox" value="" hflex="1"/>
                 </row>
                 <row>	
                     <label>Descripcion:</label>
-                    <textbox id="descriptionTextBox" value="" hflex="1"/>
+                    <textbox id="descriptionTextbox" value="" hflex="1"/>
                 </row>
                 <row>	
                     <label>Detalles:</label>
-                    <textbox id="detailsTextBox" value="" hflex="1"/>
+                    <textbox id="detailsTextbox" value="" hflex="1"/>
                 </row>
                 <row>	
                     <label>Marca:</label>
-                    <textbox id="brandTextBox" value="" hflex="1"/>
+                    <textbox id="brandTextbox" value="" hflex="1"/>
                 </row>
                 <row>
 					<cell colspan="2" style="text-align:center">

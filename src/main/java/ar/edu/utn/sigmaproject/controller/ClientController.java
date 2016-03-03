@@ -38,15 +38,15 @@ public class ClientController extends SelectorComposer<Component>{
 	@Wire
 	Button deleteButton;
 	@Wire
-	Textbox nameTextBox;
+	Textbox nameTextbox;
 	@Wire
-	Textbox phoneTextBox;
+	Textbox phoneTextbox;
 	@Wire
-	Textbox emailTextBox;
+	Textbox emailTextbox;
 	@Wire
-	Textbox addressTextBox;
+	Textbox addressTextbox;
 	@Wire
-	Textbox detailsTextBox;
+	Textbox detailsTextbox;
 
 
 	// services
@@ -84,15 +84,15 @@ public class ClientController extends SelectorComposer<Component>{
 
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
-		if(Strings.isBlank(nameTextBox.getText())){
-			Clients.showNotification("Debe ingresar un nombre", nameTextBox);
+		if(Strings.isBlank(nameTextbox.getText())){
+			Clients.showNotification("Debe ingresar un nombre", nameTextbox);
 			return;
 		}
-		String name = nameTextBox.getText();
-		String phone = phoneTextBox.getText();
-		String email = emailTextBox.getText();
-		String address = addressTextBox.getText();
-		String details = detailsTextBox.getText();
+		String name = nameTextbox.getText();
+		String phone = phoneTextbox.getText();
+		String email = emailTextbox.getText();
+		String address = addressTextbox.getText();
+		String details = detailsTextbox.getText();
 		if(currentClient == null) {// nuevo
 			currentClient = new Client(null, name, phone, email, address, details);
 			currentClient = clientService.saveClient(currentClient);
@@ -151,19 +151,20 @@ public class ClientController extends SelectorComposer<Component>{
 		newButton.setDisabled(false);
 		if(currentClient == null) {// creando
 			clientGrid.setVisible(false);
-			nameTextBox.setValue(null);
-			phoneTextBox.setValue(null);
-			addressTextBox.setValue(null);
-			detailsTextBox.setValue(null);
+			nameTextbox.setValue(null);
+			phoneTextbox.setValue(null);
+			emailTextbox.setValue(null);
+			addressTextbox.setValue(null);
+			detailsTextbox.setValue(null);
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
 		} else {// editando
 			clientGrid.setVisible(true);
-			nameTextBox.setValue(currentClient.getName());
-			phoneTextBox.setValue(currentClient.getPhone());
-			emailTextBox.setValue(currentClient.getEmail());
-			addressTextBox.setValue(currentClient.getAddress());
-			detailsTextBox.setValue(currentClient.getDetails());
+			nameTextbox.setValue(currentClient.getName());
+			phoneTextbox.setValue(currentClient.getPhone());
+			emailTextbox.setValue(currentClient.getEmail());
+			addressTextbox.setValue(currentClient.getAddress());
+			detailsTextbox.setValue(currentClient.getDetails());
 			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
 		}

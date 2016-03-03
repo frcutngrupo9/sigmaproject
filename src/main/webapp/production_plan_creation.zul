@@ -11,7 +11,7 @@
                     <rows>
                     	<row>
                             <label value="Estado: "/>
-		                    <selectbox id="productionPlanStateTypeSelectBox">
+		                    <selectbox id="productionPlanStateTypeSelectbox">
 		                        <template name="model">
 		                            <label value="${each.name}" />
 		                        </template>
@@ -23,7 +23,7 @@
                         </row>
                         <row>
                             <label value="Fecha Creacion: "/>
-							<datebox id="productionPlanDateBox" cols="12" format="dd-MM-yyyy"/>
+							<datebox id="productionPlanDatebox" cols="12" format="dd-MM-yyyy"/>
                         </row>
                         <row>
                             <label value="Seleccionar Pedido: "/>

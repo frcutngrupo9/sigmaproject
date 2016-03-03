@@ -46,7 +46,7 @@
 	        <rows>
 	        	<row>
 	                <label>Codigo:</label>
-	                <textbox id="codeTextBox" value="" hflex="1"/>
+	                <textbox id="codeTextbox" value="" hflex="1"/>
 	            </row>
 	        	<row>
 	                <label>Materia Prima:</label>
@@ -66,11 +66,11 @@
 	            </row>
 	            <row>
 	                <label>Nombre Materia Prima:</label>
-	                <textbox id="nameTextBox" value="" hflex="1"/>
+	                <textbox id="nameTextbox" value="" hflex="1"/>
 	            </row>
 	            <row>
 	                <label>Medidas:</label>
-	                <textbox id="measureTextBox" value="" hflex="1"/>
+	                <textbox id="measureTextbox" value="" hflex="1"/>
 	            </row>
 	            <row>
 	                <label>Stock Actual:</label>

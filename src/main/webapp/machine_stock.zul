@@ -1,4 +1,4 @@
-<window id="win_machine" title="Maquinas" closable="false" apply="ar.edu.utn.sigmaproject.controller.MachineController" sclass="sigma-content">
+<window id="win_machine_stock" title="Listado de Maquinas" closable="false" apply="ar.edu.utn.sigmaproject.controller.MachineStockController" sclass="sigma-content">
     <hlayout>
         <label>Buscar:</label>
         <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
@@ -7,15 +7,21 @@
     <separator/>
     <listbox id="machineListbox"  mold="paging" pageSize="7">
         <listhead>
+            <listheader label="Id"/>
+            <listheader label="Tipo Maquina"/>
+            <listheader label="Codigo"/>
             <listheader label="Nombre"/>
-            <listheader label="Detalles"/>
-            <listheader label="Tiempo de deterioro"/>
+            <listheader label="Anio"/>
+            <listheader label="Tiempo de Uso"/>
         </listhead>
         <template name="model">
             <listitem>
+                <listcell label="${each.id}"/>
+                <listcell label="${each.idMachineType}"/>
+                <listcell label="${each.code}"/>
                 <listcell label="${each.name}"/>
-                <listcell label="${each.details}"/>
-                <listcell label="${win_machine$composer.getFormatedTime(each.deteriorationTime)}"/>
+                <listcell label="${each.year}"/>
+                <listcell label="${each.usedTime}"/>
             </listitem>
         </template>
     </listbox>
@@ -31,24 +37,29 @@
                 <column />
             </columns>
             <rows>
-                <row>	
+            	<row>
+            		<label>Maquina:</label>
+	                <selectbox id="machineTypeSelectbox">
+                        <template name="model">
+                            <label value="${each.name}" />
+                        </template>
+                    </selectbox>
+            	</row>
+            	<row>
+                    <label>Codigo:</label>
+                    <textbox id="codeTextbox" value="" hflex="1"/>
+                </row>
+                <row>
                     <label>Nombre:</label>
                     <textbox id="nameTextbox" value="" hflex="1"/>
                 </row>
-                <row>	
-                    <label>Detalles:</label>
-                    <textbox id="detailsTextbox" value="" hflex="1"/>
+                <row>
+                    <label>Anio:</label>
+                    <intbox id="yearIntbox" value="" hflex="1"/>
                 </row>
-                <row>   
-                    <label>Tiempo de Deterioro:</label>
-                    <hbox>
-                    	<label value="(Anios)"/>
-                    	<intbox id="deteriorationTimeIntboxYears" width="26px"/>
-                    	<label value="(Dias)"/>
-                    	<intbox id="deteriorationTimeIntboxDays" width="26px"/>
-                    	<label value="(Horas)"/>
-                    	<intbox id="deteriorationTimeIntboxHours" width="36px"/>
-                    </hbox>
+                <row>
+                    <label>Tiempo de uso:</label>
+                    <textbox id="usedTimeTextbox" value="" hflex="1"/>
                 </row>
                 <row>
 					<cell colspan="2" style="text-align:center">

@@ -41,11 +41,11 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	@Wire
 	Selectbox woodTypeSelectbox;
 	@Wire
-	Textbox nameTextBox;
+	Textbox nameTextbox;
 	@Wire
-	Textbox codeTextBox;
+	Textbox codeTextbox;
 	@Wire
-	Textbox measureTextBox;
+	Textbox measureTextbox;
 	@Wire
 	Doublebox stockDoublebox;
 	@Wire
@@ -121,22 +121,22 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	private void refreshView() {
 		woodListModel.clearSelection();
 		woodListbox.setModel(woodListModel);// se actualiza la lista limpiar la seleccion
-		nameTextBox.setDisabled(true);
-		measureTextBox.setDisabled(true);// no se deben poder modificar
+		nameTextbox.setDisabled(true);
+		measureTextbox.setDisabled(true);// no se deben poder modificar
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		newButton.setDisabled(false);
 		if(currentWood == null) {// nuevo
 			woodCreationGrid.setVisible(false);
-			codeTextBox.setValue("");
+			codeTextbox.setValue("");
 			woodTypeSelectbox.setSelectedIndex(-1);
 			rawMaterialTypeSelectbox.setSelectedIndex(-1);
-			nameTextBox.setValue("(seleccionar Materia Prima)");
-			measureTextBox.setValue("(seleccionar Materia Prima)");
+			nameTextbox.setValue("(seleccionar Materia Prima)");
+			measureTextbox.setValue("(seleccionar Materia Prima)");
 			stockDoublebox.setValue(0.0);
 			stockMinDoublebox.setValue(0.0);
 			stockRepoDoublebox.setValue(0.0);
-			codeTextBox.setDisabled(false);
+			codeTextbox.setDisabled(false);
 			woodTypeSelectbox.setDisabled(false);
 			rawMaterialTypeSelectbox.setDisabled(false);
 			stockDoublebox.setDisabled(false);
@@ -147,17 +147,17 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 			resetButton.setDisabled(true);
 		}else {// editar
 			woodCreationGrid.setVisible(true);
-			codeTextBox.setValue(currentWood.getCode());
+			codeTextbox.setValue(currentWood.getCode());
 			WoodType auxWoodType = woodTypeService.getWoodType(currentWood.getIdWoodType());
 			woodTypeSelectbox.setSelectedIndex(woodTypeListModel.indexOf(auxWoodType));
 			RawMaterialType currentRawMaterialType = rawMaterialTypeService.getRawMaterialType(currentWood.getIdRawMaterialType());
 			rawMaterialTypeSelectbox.setSelectedIndex(rawMaterialTypeListModel.indexOf(currentRawMaterialType));
-			nameTextBox.setValue(currentRawMaterialType.getName());
-			measureTextBox.setValue(getMeasureFormated(currentWood));
+			nameTextbox.setValue(currentRawMaterialType.getName());
+			measureTextbox.setValue(getMeasureFormated(currentWood));
 			stockDoublebox.setValue(currentWood.getStock());
 			stockMinDoublebox.setValue(currentWood.getStockMin());
 			stockRepoDoublebox.setValue(currentWood.getStockRepo());
-			codeTextBox.setDisabled(true);
+			codeTextbox.setDisabled(true);
 			woodTypeSelectbox.setDisabled(true);
 			rawMaterialTypeSelectbox.setDisabled(true);
 			stockDoublebox.setDisabled(true);
@@ -209,7 +209,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 			Clients.showNotification("Debe seleccionar una Madera", woodTypeSelectbox);
 			return;
 		}
-		String code = codeTextBox.getText();
+		String code = codeTextbox.getText();
 		Integer idRawMaterialType = rawMaterialTypeListModel.getElementAt(rawMaterialTypeSelectbox.getSelectedIndex()).getId();
 		Integer idWoodType = woodTypeListModel.getElementAt(woodTypeSelectbox.getSelectedIndex()).getId();
 		Double stock = stockDoublebox.getValue();

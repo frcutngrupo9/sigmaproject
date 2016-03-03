@@ -37,23 +37,23 @@
             <rows>
                 <row>	
                     <label>Nombre:</label>
-                    <textbox id="nameTextBox" value="" hflex="1"/>
+                    <textbox id="nameTextbox" value="" hflex="1"/>
                 </row>
                 <row>	
                     <label>Telefono:</label>
-                    <textbox id="phoneTextBox" value="" hflex="1"/>
+                    <textbox id="phoneTextbox" value="" hflex="1"/>
                 </row>
                 <row>   
                     <label>Email:</label>
-                    <textbox id="emailTextBox" value="" hflex="1"/>
+                    <textbox id="emailTextbox" value="" hflex="1"/>
                 </row>
                 <row>	
                     <label>Direccion:</label>
-                    <textbox id="addressTextBox" value="" hflex="1"/>
+                    <textbox id="addressTextbox" value="" hflex="1"/>
                 </row>
                 <row>   
                     <label>Detalles:</label>
-                    <textbox id="detailsTextBox" value="" hflex="1"/>
+                    <textbox id="detailsTextbox" value="" hflex="1"/>
                 </row>
                 <row>
 					<cell colspan="2" style="text-align:center">

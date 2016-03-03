@@ -86,11 +86,11 @@
 			        <rows>
 			            <row>
 			                <label>Codigo:</label>
-			                <textbox id="codeTextBox" value="" hflex="1"/>
+			                <textbox id="codeTextbox" value="" hflex="1"/>
 			            </row>
 			            <row>
 			                <label>Descripcion:</label>
-			                <textbox id="descriptionTextBox" value="" hflex="1"/>
+			                <textbox id="descriptionTextbox" value="" hflex="1"/>
 			            </row>
 			            <row>
 			                <label>Stock Actual:</label>

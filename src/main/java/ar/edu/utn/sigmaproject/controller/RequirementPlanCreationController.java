@@ -60,9 +60,9 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	@Wire
 	Grid supplyReservationGrid;
 	@Wire
-	Textbox codeTextBox;
+	Textbox codeTextbox;
 	@Wire
-	Textbox descriptionTextBox;
+	Textbox descriptionTextbox;
 	@Wire
 	Doublebox stockDoublebox;
 	@Wire
@@ -227,13 +227,13 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 
 	private void openSupplyReservationGrid(SupplyRequirement supplyRequirement) {
 		supplyReservationGrid.setVisible(true);
-		codeTextBox.setDisabled(true);
-		descriptionTextBox.setDisabled(true);
+		codeTextbox.setDisabled(true);
+		descriptionTextbox.setDisabled(true);
 		stockDoublebox.setDisabled(true);
 		stockReservedDoublebox.setDisabled(false);
 		stockMissingDoublebox.setDisabled(true);
-		codeTextBox.setText(supplyTypeService.getSupplyType(supplyRequirement.getIdSupplyType()).getCode());
-		descriptionTextBox.setText(supplyTypeService.getSupplyType(supplyRequirement.getIdSupplyType()).getDescription());
+		codeTextbox.setText(supplyTypeService.getSupplyType(supplyRequirement.getIdSupplyType()).getCode());
+		descriptionTextbox.setText(supplyTypeService.getSupplyType(supplyRequirement.getIdSupplyType()).getDescription());
 		stockDoublebox.setValue(supplyTypeService.getSupplyType(supplyRequirement.getIdSupplyType()).getStock());
 		stockReservedDoublebox.setValue(0.0);
 		stockMissingDoublebox.setValue(supplyRequirement.getQuantity());
