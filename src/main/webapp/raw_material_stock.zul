@@ -35,7 +35,7 @@
     <vlayout>
     	<separator/>
         <hbox>
-            <button id="newWoodButton" label="Nueva Materia Prima en Stock"/>
+            <button id="newButton" label="Nueva Materia Prima en Stock"/>
         </hbox>
         <separator/>
 		<grid id="woodCreationGrid" width="45%" sclass="sigma-form" visible="false">
@@ -77,7 +77,7 @@
 	                <cell colspan="1" style="text-align:center">
 	                	<hbox>
 		                	<doublebox id="stockDoublebox" value="0" width="200px"/>
-		                	<button id="stockIncreaseButton" label="Ingreso a stock"/>
+		                	<button id="stockIncreaseButton" label="Ingresar a Stock"/>
 		                	<button id="stockDecreaseButton" label="Retirar para Produccion"/>
 	                	</hbox>
 	                </cell>

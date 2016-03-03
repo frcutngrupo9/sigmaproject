@@ -79,8 +79,9 @@ public class SupplyController extends SelectorComposer<Component>{
 
 	@Listen("onClick = #newButton")
 	public void newButtonClick() {
-		currentSupplyType = new SupplyType(null, "", "", "", "", "", "", 0.0, 0.0, 0.0);
+		currentSupplyType = null;
 		refreshView();
+		supplyGrid.setVisible(true);
 	}
 
 	@Listen("onClick = #saveButton")
@@ -89,17 +90,24 @@ public class SupplyController extends SelectorComposer<Component>{
 			Clients.showNotification("Debe ingresar una descripcion", descriptionTextBox);
 			return;
 		}
-		currentSupplyType.setCode(codeTextBox.getText());
-		currentSupplyType.setDescription(descriptionTextBox.getText());
-		currentSupplyType.setDetails(detailsTextBox.getText());
-		currentSupplyType.setBrand(brandTextBox.getText());
-		currentSupplyType.setPresentation(presentationTextBox.getText());
-		currentSupplyType.setMeasure(measureTextBox.getText());
-		if(currentSupplyType.getId() == null) {
+		String code = codeTextBox.getText();
+		String description = descriptionTextBox.getText();
+		String details = detailsTextBox.getText();
+		String brand = brandTextBox.getText();
+		String presentation = presentationTextBox.getText();
+		String measure = measureTextBox.getText();
+		if(currentSupplyType == null) {
 			// es un nuevo insumo
+			currentSupplyType = new SupplyType(null, code, description, details, brand, presentation, measure, 0.0, 0.0, 0.0);
 			currentSupplyType = supplyTypeService.saveSupplyType(currentSupplyType);
 		} else {
 			// es una edicion
+			currentSupplyType.setCode(code);
+			currentSupplyType.setDescription(description);
+			currentSupplyType.setDetails(details);
+			currentSupplyType.setBrand(brand);
+			currentSupplyType.setPresentation(presentation);
+			currentSupplyType.setMeasure(measure);
 			currentSupplyType = supplyTypeService.updateSupplyType(currentSupplyType);
 		}
 		supplyTypeList = supplyTypeService.getSupplyTypeList();
@@ -144,7 +152,9 @@ public class SupplyController extends SelectorComposer<Component>{
 	private void refreshView() {
 		supplyTypeListModel.clearSelection();
 		supplyListbox.setModel(supplyTypeListModel);// se actualiza la lista
-		if(currentSupplyType == null) {// no editando ni creando
+		saveButton.setDisabled(false);
+		cancelButton.setDisabled(false);
+		if(currentSupplyType == null) {// creando
 			supplyGrid.setVisible(false);
 			codeTextBox.setValue(null);
 			descriptionTextBox.setValue(null);
@@ -152,12 +162,10 @@ public class SupplyController extends SelectorComposer<Component>{
 			brandTextBox.setValue(null);
 			presentationTextBox.setValue(null);
 			measureTextBox.setValue(null);
-			saveButton.setDisabled(true);
-			cancelButton.setDisabled(true);
-			resetButton.setDisabled(true);
 			deleteButton.setDisabled(true);
+			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
 			newButton.setDisabled(false);
-		}else {// editando o creando
+		}else {// editando
 			supplyGrid.setVisible(true);
 			codeTextBox.setValue(currentSupplyType.getCode());
 			descriptionTextBox.setValue(currentSupplyType.getDescription());
@@ -165,14 +173,8 @@ public class SupplyController extends SelectorComposer<Component>{
 			brandTextBox.setValue(currentSupplyType.getBrand());
 			presentationTextBox.setValue(currentSupplyType.getPresentation());
 			measureTextBox.setValue(currentSupplyType.getMeasure());
-			saveButton.setDisabled(false);
-			cancelButton.setDisabled(false);
+			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
-			if(currentSupplyType.getId() == null) {
-				deleteButton.setDisabled(true);
-			} else {
-				deleteButton.setDisabled(false);
-			}
 			newButton.setDisabled(true);
 		}
 	}

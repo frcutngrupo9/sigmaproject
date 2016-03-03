@@ -15,9 +15,9 @@
         <template name="model">
             <listitem>
                 <listcell label="${each.name}"/>
-                <listcell label="${each.length.doubleValue()} ${win_raw_material$composer.getMeasureUnitName(each.lengthIdMeasureUnit)}"/>
-                <listcell label="${each.depth.doubleValue()} ${win_raw_material$composer.getMeasureUnitName(each.depthIdMeasureUnit)}"/>
-                <listcell label="${each.width.doubleValue()} ${win_raw_material$composer.getMeasureUnitName(each.widthIdMeasureUnit)}"/>
+                <listcell label="${each.length} ${win_raw_material$composer.getMeasureUnitName(each.lengthIdMeasureUnit)}"/>
+                <listcell label="${each.depth} ${win_raw_material$composer.getMeasureUnitName(each.depthIdMeasureUnit)}"/>
+                <listcell label="${each.width} ${win_raw_material$composer.getMeasureUnitName(each.widthIdMeasureUnit)}"/>
             </listitem>
         </template>
     </listbox>

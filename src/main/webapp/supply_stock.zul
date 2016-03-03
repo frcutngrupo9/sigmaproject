@@ -55,7 +55,7 @@
 	                <cell colspan="1" style="text-align:center">
 	                	<hbox>
 		                	<doublebox id="stockDoublebox" value="0" width="200px"/>
-		                	<button id="stockIncreaseButton" label="Ingreso a stock"/>
+		                	<button id="stockIncreaseButton" label="Ingresar a Stock"/>
 		                	<button id="stockDecreaseButton" label="Retirar para Produccion"/>
 	                	</hbox>
 	                </cell>

@@ -74,8 +74,9 @@ public class ToolController extends SelectorComposer<Component>{
 
 	@Listen("onClick = #newButton")
 	public void newButtonClick() {
-		currentToolType = new ToolType(null, "", "", "", "");
+		currentToolType = null;
 		refreshView();
+		toolGrid.setVisible(true);
 	}
 
 	@Listen("onClick = #saveButton")
@@ -84,14 +85,18 @@ public class ToolController extends SelectorComposer<Component>{
 			Clients.showNotification("Debe ingresar un nombre", nameTextBox);
 			return;
 		}
-		currentToolType.setName(nameTextBox.getText());
-		currentToolType.setDescription(descriptionTextBox.getText());
-		currentToolType.setDetails(detailsTextBox.getText());
-		currentToolType.setBrand(brandTextBox.getText());
-		if(currentToolType.getId() == null) {// nuevo
+		String name = nameTextBox.getText();
+		String description = descriptionTextBox.getText();
+		String details = detailsTextBox.getText();
+		String brand = brandTextBox.getText();
+		if(currentToolType == null) {// nuevo
+			currentToolType = new ToolType(null, name, description, details, brand);
 			currentToolType = toolTypeService.saveToolType(currentToolType);
-		} else {
-			// es una actualizacion
+		} else {// actualizacion
+			currentToolType.setName(name);
+			currentToolType.setDescription(description);
+			currentToolType.setDetails(details);
+			currentToolType.setBrand(brand);
 			currentToolType = toolTypeService.updateToolType(currentToolType);
 		}
 		toolTypeList = toolTypeService.getToolTypeList();
@@ -136,29 +141,25 @@ public class ToolController extends SelectorComposer<Component>{
 	private void refreshView() {
 		toolTypeListModel.clearSelection();
 		toolListbox.setModel(toolTypeListModel);// se actualiza la lista
-		if(currentToolType == null) {// no se esta editando ni creando
+		saveButton.setDisabled(false);
+		cancelButton.setDisabled(false);
+		if(currentToolType == null) {// creando
 			toolGrid.setVisible(false);
-
-			saveButton.setDisabled(true);
-			cancelButton.setDisabled(true);
-			resetButton.setDisabled(true);
+			nameTextBox.setValue(null);
+			descriptionTextBox.setValue(null);
+			detailsTextBox.setValue(null);
+			brandTextBox.setValue(null);
 			deleteButton.setDisabled(true);
+			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
 			newButton.setDisabled(false);
-		} else {// editando o creando
+		} else {// editando
 			toolGrid.setVisible(true);
 			nameTextBox.setValue(currentToolType.getName());
 			descriptionTextBox.setValue(currentToolType.getDescription());
 			detailsTextBox.setValue(currentToolType.getDetails());
 			brandTextBox.setValue(currentToolType.getBrand());
-
-			saveButton.setDisabled(false);
-			cancelButton.setDisabled(false);
+			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
-			if(currentToolType.getId() == null) {
-				deleteButton.setDisabled(true);
-			} else {
-				deleteButton.setDisabled(false);
-			}
 			newButton.setDisabled(true);
 		}
 	}

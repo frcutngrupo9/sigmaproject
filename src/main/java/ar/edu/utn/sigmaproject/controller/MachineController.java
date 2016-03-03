@@ -81,14 +81,9 @@ public class MachineController extends SelectorComposer<Component>{
 
 	@Listen("onClick = #newButton")
 	public void newButtonClick() {
-		Duration duration = null;
-		try {
-			duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, 0, 0, 0, 0);
-		} catch (DatatypeConfigurationException e) {
-			System.out.println("Error en finalizar maquina, en convertir a duracion: " + e.toString());
-		}
-		currentMachineType = new MachineType(null, "", "", duration);
+		currentMachineType = null;
 		refreshView();
+		machineGrid.setVisible(true);
 	}
 
 	@Listen("onClick = #saveButton")
@@ -97,8 +92,8 @@ public class MachineController extends SelectorComposer<Component>{
 			Clients.showNotification("Debe ingresar un nombre", nameTextBox);
 			return;
 		}
-		currentMachineType.setName(nameTextBox.getText());
-		currentMachineType.setDetails(detailsTextBox.getText());
+		String name = nameTextBox.getText();
+		String details = detailsTextBox.getText();
 		Integer years = deteriorationTimeIntboxYears.intValue();
 		Integer days = deteriorationTimeIntboxDays.intValue();
 		Integer hours = deteriorationTimeIntboxHours.intValue();
@@ -108,11 +103,13 @@ public class MachineController extends SelectorComposer<Component>{
 		} catch (DatatypeConfigurationException e) {
 			System.out.println("Error en finalizar maquina, en convertir a duracion: " + e.toString());
 		}
-		currentMachineType.setDeteriorationTime(duration);
-		if(currentMachineType.getId() == null) {// nuevo
+		if(currentMachineType == null) {// nuevo
+			currentMachineType = new MachineType(null, name, details, duration);
 			currentMachineType = machineTypeService.saveMachineType(currentMachineType);
-		} else {
-			// es una actualizacion
+		} else {// edicion
+			currentMachineType.setName(name);
+			currentMachineType.setDetails(details);
+			currentMachineType.setDeteriorationTime(duration);
 			currentMachineType = machineTypeService.updateMachineType(currentMachineType);
 		}
 		machineTypeList = machineTypeService.getMachineTypeList();
@@ -157,30 +154,27 @@ public class MachineController extends SelectorComposer<Component>{
 	private void refreshView() {
 		machineTypeListModel.clearSelection();
 		machineListbox.setModel(machineTypeListModel);// se actualiza la lista
-		if(currentMachineType == null) {// no se esta editando ni creando
+		saveButton.setDisabled(false);
+		cancelButton.setDisabled(false);
+		if(currentMachineType == null) {// creando
 			machineGrid.setVisible(false);
-
-			saveButton.setDisabled(true);
-			cancelButton.setDisabled(true);
-			resetButton.setDisabled(true);
+			nameTextBox.setValue(null);
+			deteriorationTimeIntboxYears.setValue(null);
+			deteriorationTimeIntboxDays.setValue(null);
+			deteriorationTimeIntboxHours.setValue(null);
+			detailsTextBox.setValue(null);
 			deleteButton.setDisabled(true);
+			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
 			newButton.setDisabled(false);
-		} else {// editando o creando
+		} else {// editando
 			machineGrid.setVisible(true);
 			nameTextBox.setValue(currentMachineType.getName());
 			deteriorationTimeIntboxYears.setValue(currentMachineType.getDeteriorationTime().getYears());
 			deteriorationTimeIntboxDays.setValue(currentMachineType.getDeteriorationTime().getDays());
 			deteriorationTimeIntboxHours.setValue(currentMachineType.getDeteriorationTime().getHours());
 			detailsTextBox.setValue(currentMachineType.getDetails());
-
-			saveButton.setDisabled(false);
-			cancelButton.setDisabled(false);
+			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
-			if(currentMachineType.getId() == null) {
-				deleteButton.setDisabled(true);
-			} else {
-				deleteButton.setDisabled(false);
-			}
 			newButton.setDisabled(true);
 		}
 	}

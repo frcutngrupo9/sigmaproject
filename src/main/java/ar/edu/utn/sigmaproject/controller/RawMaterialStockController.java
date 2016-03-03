@@ -63,7 +63,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	@Wire
 	Button resetButton;
 	@Wire
-	Button newWoodButton;
+	Button newButton;
 
 	// services
 	private RawMaterialTypeService rawMaterialTypeService = new RawMaterialTypeServiceImpl();
@@ -123,6 +123,8 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		woodListbox.setModel(woodListModel);// se actualiza la lista limpiar la seleccion
 		nameTextBox.setDisabled(true);
 		measureTextBox.setDisabled(true);// no se deben poder modificar
+		saveButton.setDisabled(false);
+		cancelButton.setDisabled(false);
 		if(currentWood == null) {// nuevo
 			woodCreationGrid.setVisible(false);
 			codeTextBox.setValue("");
@@ -139,11 +141,10 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 			stockDoublebox.setDisabled(false);
 			stockMinDoublebox.setDisabled(false);
 			stockRepoDoublebox.setDisabled(false);
-			saveButton.setDisabled(false);
-			cancelButton.setDisabled(true);
-			resetButton.setDisabled(false);
 			stockIncreaseButton.setDisabled(true);
 			stockDecreaseButton.setDisabled(true);
+			resetButton.setDisabled(true);
+			newButton.setDisabled(false);
 		}else {// editar
 			woodCreationGrid.setVisible(true);
 			codeTextBox.setValue(currentWood.getCode());
@@ -162,11 +163,10 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 			stockDoublebox.setDisabled(true);
 			stockMinDoublebox.setDisabled(false);
 			stockRepoDoublebox.setDisabled(false);
-			saveButton.setDisabled(false);
-			cancelButton.setDisabled(false);
-			resetButton.setDisabled(false);
 			stockIncreaseButton.setDisabled(false);
 			stockDecreaseButton.setDisabled(false);
+			resetButton.setDisabled(false);
+			newButton.setDisabled(true);
 		}
 	}
 
@@ -193,8 +193,8 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 			return "[Sin Unidad de Medida]";
 		}
 	}
-	@Listen("onClick = #newWoodButton")
-	public void newWoodButtonClick() {
+	@Listen("onClick = #newButton")
+	public void newButtonClick() {
 		currentWood = null;
 		refreshView();
 		woodCreationGrid.setVisible(true);
@@ -217,7 +217,8 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		Double stockMin = stockMinDoublebox.getValue();
 		Double stockRepo = stockRepoDoublebox.getValue();
 		if(currentWood == null) {// nuevo
-			woodService.saveWood(new Wood(null, idRawMaterialType, idWoodType, code, stock, stockMin, stockRepo));
+			currentWood = new Wood(null, idRawMaterialType, idWoodType, code, stock, stockMin, stockRepo);
+			currentWood = woodService.saveWood(currentWood);
 		} else {// edicion
 			currentWood.setCode(code);
 			currentWood.setIdRawMaterialType(idRawMaterialType);
@@ -225,7 +226,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 			currentWood.setStock(stock);
 			currentWood.setStockRepo(stockRepo);
 			currentWood.setStockMin(stockMin);
-			woodService.updateWood(currentWood);
+			currentWood = woodService.updateWood(currentWood);
 		}
 		woodList = woodService.getWoodList();
 		woodListModel = new ListModelList<Wood>(woodList);
@@ -242,10 +243,6 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	@Listen("onClick = #resetButton")
 	public void resetButtonClick() {
 		refreshView();
-		if(currentWood == null) {
-			woodCreationGrid.setVisible(true);
-		}
-
 	}
 
 	@Listen("onClick = #stockIncreaseButton")

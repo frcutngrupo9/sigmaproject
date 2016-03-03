@@ -1,6 +1,5 @@
 package ar.edu.utn.sigmaproject.controller;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.zkoss.lang.Strings;
@@ -104,12 +103,9 @@ public class RawMaterialController extends SelectorComposer<Component>{
 
 	@Listen("onClick = #newButton")
 	public void newRawMaterial() {
-		// arrancamos con seleccion de metros x pulgada x pulgada
-		Integer length_id_measure_unit = measureUnitService.getMeasureUnit("Metros").getId();
-		Integer depth_id_measure_unit = measureUnitService.getMeasureUnit("Pulgadas").getId();
-		Integer width_id_measure_unit = measureUnitService.getMeasureUnit("Pulgadas").getId();
-		currentRawMaterialType = new RawMaterialType(null, "", BigDecimal.ZERO, length_id_measure_unit, BigDecimal.ZERO, depth_id_measure_unit, BigDecimal.ZERO, width_id_measure_unit);
+		currentRawMaterialType = null;
 		refreshView();
+		rawMaterialGrid.setVisible(true);
 	}
 
 	@Listen("onClick = #saveButton")
@@ -118,32 +114,40 @@ public class RawMaterialController extends SelectorComposer<Component>{
 			Clients.showNotification("Debe ingresar un nombre", nameTextbox);
 			return;
 		}
-		int selected_index_length = lengthMeasureUnitSelectbox.getSelectedIndex();
-		if(selected_index_length == -1) {// no hay una unidad de medida seleccionada
+		int lengthSelectedIndex = lengthMeasureUnitSelectbox.getSelectedIndex();
+		if(lengthSelectedIndex == -1) {// no hay una unidad de medida seleccionada
 			Clients.showNotification("Debe seleccionar una unidad de medida", lengthMeasureUnitSelectbox);
 			return;
 		}
-		int selected_index_depth = depthMeasureUnitSelectbox.getSelectedIndex();
-		if(selected_index_depth == -1) {// no hay una unidad de medida seleccionada
+		int depthSelectedIndex = depthMeasureUnitSelectbox.getSelectedIndex();
+		if(depthSelectedIndex == -1) {// no hay una unidad de medida seleccionada
 			Clients.showNotification("Debe seleccionar una unidad de medida", depthMeasureUnitSelectbox);
 			return;
 		}
-		int selected_index_width = widthMeasureUnitSelectbox.getSelectedIndex();
-		if(selected_index_width == -1) {// no hay una unidad de medida seleccionada
+		int widthSelectedIndex = widthMeasureUnitSelectbox.getSelectedIndex();
+		if(widthSelectedIndex == -1) {// no hay una unidad de medida seleccionada
 			Clients.showNotification("Debe seleccionar una unidad de medida", widthMeasureUnitSelectbox);
 			return;
 		}
-		currentRawMaterialType.setName(nameTextbox.getText());
-		currentRawMaterialType.setLength(new BigDecimal(lengthDoublebox.doubleValue()));
-		currentRawMaterialType.setDepth(new BigDecimal(depthDoublebox.doubleValue()));
-		currentRawMaterialType.setWidth(new BigDecimal(widthDoublebox.doubleValue()));
-		currentRawMaterialType.setLengthIdMeasureUnit(lengthMeasureUnitListModel.getElementAt(selected_index_length).getId());
-		currentRawMaterialType.setDepthIdMeasureUnit(depthMeasureUnitListModel.getElementAt(selected_index_depth).getId());
-		currentRawMaterialType.setWidthIdMeasureUnit(widthMeasureUnitListModel.getElementAt(selected_index_width).getId());
-		if(currentRawMaterialType.getId() == null)	{// si es nuevo
+		String name = nameTextbox.getText();
+		Double length = lengthDoublebox.doubleValue();
+		Integer lengthIdMeasureUnit = lengthMeasureUnitListModel.getElementAt(lengthSelectedIndex).getId();
+		Double depth = depthDoublebox.doubleValue();
+		Integer depthIdMeasureUnit = depthMeasureUnitListModel.getElementAt(depthSelectedIndex).getId();
+		Double width = widthDoublebox.doubleValue();
+		Integer widthIdMeasureUnit = widthMeasureUnitListModel.getElementAt(widthSelectedIndex).getId();
+		if(currentRawMaterialType == null)	{// si es nuevo
+			currentRawMaterialType = new RawMaterialType(null, name, length, lengthIdMeasureUnit, depth, depthIdMeasureUnit, width, widthIdMeasureUnit);
 			currentRawMaterialType = rawMaterialTypeService.saveRawMaterialType(currentRawMaterialType);
 		} else {
 			// si es una edicion
+			currentRawMaterialType.setName(name);
+			currentRawMaterialType.setLength(length);
+			currentRawMaterialType.setDepth(depth);
+			currentRawMaterialType.setWidth(width);
+			currentRawMaterialType.setLengthIdMeasureUnit(lengthIdMeasureUnit);
+			currentRawMaterialType.setDepthIdMeasureUnit(depthIdMeasureUnit);
+			currentRawMaterialType.setWidthIdMeasureUnit(widthIdMeasureUnit);
 			currentRawMaterialType = rawMaterialTypeService.updateRawMaterialType(currentRawMaterialType);
 		}
 		rawMaterialTypeList = rawMaterialTypeService.getRawMaterialTypeList();
@@ -161,6 +165,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
 	@Listen("onClick = #resetButton")
 	public void resetButtonClick() {
 		refreshView();
+		rawMaterialGrid.setVisible(true);
 	}
 
 	@Listen("onClick = #deleteButton")
@@ -196,74 +201,53 @@ public class RawMaterialController extends SelectorComposer<Component>{
 	private void refreshView() {
 		rawMaterialTypeListModel.clearSelection();
 		rawMaterialListbox.setModel(rawMaterialTypeListModel);
-		if(currentRawMaterialType == null) {
-			//limpiar
+		saveButton.setDisabled(false);
+		cancelButton.setDisabled(false);
+		if(currentRawMaterialType == null) {// creando
 			rawMaterialGrid.setVisible(false);
-			nameTextbox.setValue(null);
+			nameTextbox.setValue( null);
 			lengthDoublebox.setValue(null);
 			depthDoublebox.setValue(null);
 			widthDoublebox.setValue(null);
-			lengthMeasureUnitSelectbox.setSelectedIndex(-1);
-			depthMeasureUnitSelectbox.setSelectedIndex(-1);
-			widthMeasureUnitSelectbox.setSelectedIndex(-1);
-
-			saveButton.setDisabled(true);
-			cancelButton.setDisabled(true);
-			resetButton.setDisabled(true);
+			// arrancamos con seleccion de metros x pulgada x pulgada
+			Integer lengthIdMeasureUnit = measureUnitService.getMeasureUnit("Metros").getId();
+			Integer depthIdMeasureUnit = measureUnitService.getMeasureUnit("Pulgadas").getId();
+			Integer widthIdMeasureUnit = measureUnitService.getMeasureUnit("Pulgadas").getId();
+			lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(lengthIdMeasureUnit)));
+			depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(depthIdMeasureUnit)));
+			widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(widthIdMeasureUnit)));
 			deleteButton.setDisabled(true);
+			resetButton.setDisabled(true);
 			newButton.setDisabled(false);
-			rawMaterialListbox.clearSelection();
-		}else {
+		} else {// editando
 			rawMaterialGrid.setVisible(true);
 			nameTextbox.setValue(currentRawMaterialType.getName());
-			BigDecimal lenght = currentRawMaterialType.getLength();
-			if(lenght != null) {
-				lengthDoublebox.setValue(lenght.doubleValue());
-			} else {
-				lengthDoublebox.setValue(0);
-			}
-			BigDecimal depth = currentRawMaterialType.getDepth();
-			if(depth != null) {
-				depthDoublebox.setValue(depth.doubleValue());
-			} else {
-				depthDoublebox.setValue(0);
-			}
-			BigDecimal width = currentRawMaterialType.getWidth();
-			if(width != null) {
-				widthDoublebox.setValue(width.doubleValue());
-			} else {
-				widthDoublebox.setValue(0);
-			}
-
-			Integer length_id_measure_unit = currentRawMaterialType.getLengthIdMeasureUnit();
-			if(length_id_measure_unit != null) {
-				MeasureUnit aux = measureUnitService.getMeasureUnit(length_id_measure_unit);
+			lengthDoublebox.setValue(currentRawMaterialType.getLength());
+			depthDoublebox.setValue(currentRawMaterialType.getDepth());
+			widthDoublebox.setValue(currentRawMaterialType.getWidth());
+			Integer lengthIdMeasureUnit = currentRawMaterialType.getLengthIdMeasureUnit();
+			if(lengthIdMeasureUnit != null) {
+				MeasureUnit aux = measureUnitService.getMeasureUnit(lengthIdMeasureUnit);
 				lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(aux));
 			} else {
 				lengthMeasureUnitSelectbox.setSelectedIndex(-1);
 			}
-			Integer depth_id_measure_unit = currentRawMaterialType.getDepthIdMeasureUnit();
-			if(depth_id_measure_unit != null) {
-				MeasureUnit aux = measureUnitService.getMeasureUnit(depth_id_measure_unit);
+			Integer depthIdMeasureUnit = currentRawMaterialType.getDepthIdMeasureUnit();
+			if(depthIdMeasureUnit != null) {
+				MeasureUnit aux = measureUnitService.getMeasureUnit(depthIdMeasureUnit);
 				depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(aux));
 			} else {
 				depthMeasureUnitSelectbox.setSelectedIndex(-1);
 			}
-			Integer width_id_measure_unit = currentRawMaterialType.getWidthIdMeasureUnit();
-			if(width_id_measure_unit != null) {
-				MeasureUnit aux = measureUnitService.getMeasureUnit(width_id_measure_unit);
+			Integer widthIdMeasureUnit = currentRawMaterialType.getWidthIdMeasureUnit();
+			if(widthIdMeasureUnit != null) {
+				MeasureUnit aux = measureUnitService.getMeasureUnit(widthIdMeasureUnit);
 				widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(aux));
 			} else {
 				widthMeasureUnitSelectbox.setSelectedIndex(-1);
 			}
-			saveButton.setDisabled(false);
-			cancelButton.setDisabled(false);
+			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
-			if(currentRawMaterialType.getId() == null) {
-				deleteButton.setDisabled(true);
-			} else {
-				deleteButton.setDisabled(false);
-			}
 			newButton.setDisabled(true);
 		}
 	}

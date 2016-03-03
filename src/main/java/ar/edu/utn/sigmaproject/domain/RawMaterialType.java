@@ -1,21 +1,20 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 public class RawMaterialType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	Integer id;
 	String name;
-	BigDecimal length;
+	Double length;
 	Integer lengthIdMeasureUnit;
-	BigDecimal depth;
+	Double depth;
 	Integer depthIdMeasureUnit;
-	BigDecimal width;
+	Double width;
 	Integer widthIdMeasureUnit;
 
-	public RawMaterialType(Integer id, String name, BigDecimal length, Integer lengthIdMeasureUnit, BigDecimal depth, Integer depthIdMeasureUnit, BigDecimal width, Integer widthIdMeasureUnit) {
+	public RawMaterialType(Integer id, String name, Double length, Integer lengthIdMeasureUnit, Double depth, Integer depthIdMeasureUnit, Double width, Integer widthIdMeasureUnit) {
 		this.id = id;
 		this.name = name;
 		this.length = length;
@@ -42,27 +41,27 @@ public class RawMaterialType implements Serializable, Cloneable {
 		this.name = name;
 	}
 
-	public BigDecimal getWidth() {
+	public Double getWidth() {
 		return width;
 	}
 
-	public void setWidth(BigDecimal width) {
+	public void setWidth(Double width) {
 		this.width = width;
 	}
 
-	public BigDecimal getLength() {
+	public Double getLength() {
 		return length;
 	}
 
-	public void setLength(BigDecimal length) {
+	public void setLength(Double length) {
 		this.length = length;
 	}
 
-	public BigDecimal getDepth() {
+	public Double getDepth() {
 		return depth;
 	}
 
-	public void setDepth(BigDecimal depth) {
+	public void setDepth(Double depth) {
 		this.depth = depth;
 	}
 

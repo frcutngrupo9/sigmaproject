@@ -77,8 +77,9 @@ public class ClientController extends SelectorComposer<Component>{
 
 	@Listen("onClick = #newButton")
 	public void newButtonClick() {
-		currentClient = new Client(null, "", "", "", "", "");
+		currentClient = null;
 		refreshView();
+		clientGrid.setVisible(true);
 	}
 
 	@Listen("onClick = #saveButton")
@@ -87,15 +88,20 @@ public class ClientController extends SelectorComposer<Component>{
 			Clients.showNotification("Debe ingresar un nombre", nameTextBox);
 			return;
 		}
-		currentClient.setName(nameTextBox.getText());
-		currentClient.setPhone(phoneTextBox.getText());
-		currentClient.setEmail(emailTextBox.getText());
-		currentClient.setAddress(addressTextBox.getText());
-		currentClient.setDetails(detailsTextBox.getText());
-		if(currentClient.getId() == null) {// nuevo cliente
+		String name = nameTextBox.getText();
+		String phone = phoneTextBox.getText();
+		String email = emailTextBox.getText();
+		String address = addressTextBox.getText();
+		String details = detailsTextBox.getText();
+		if(currentClient == null) {// nuevo
+			currentClient = new Client(null, name, phone, email, address, details);
 			currentClient = clientService.saveClient(currentClient);
-		} else {
-			// si es una actualizacion
+		} else {// actualizacion
+			currentClient.setName(name);
+			currentClient.setPhone(phone);
+			currentClient.setEmail(email);
+			currentClient.setAddress(address);
+			currentClient.setDetails(details);
 			currentClient = clientService.updateClient(currentClient);
 		}
 		clientList = clientService.getClientList();
@@ -140,34 +146,26 @@ public class ClientController extends SelectorComposer<Component>{
 	private void refreshView() {
 		clientListModel.clearSelection();
 		clientListbox.setModel(clientListModel);// se actualiza la lista
-		if(currentClient == null) {// no se esta editando ni creando
+		saveButton.setDisabled(false);
+		cancelButton.setDisabled(false);
+		if(currentClient == null) {// creando
 			clientGrid.setVisible(false);
 			nameTextBox.setValue(null);
 			phoneTextBox.setValue(null);
 			addressTextBox.setValue(null);
 			detailsTextBox.setValue(null);
-
-			saveButton.setDisabled(true);
-			cancelButton.setDisabled(true);
-			resetButton.setDisabled(true);
 			deleteButton.setDisabled(true);
+			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
 			newButton.setDisabled(false);
-		} else {// editando o creando
+		} else {// editando
 			clientGrid.setVisible(true);
 			nameTextBox.setValue(currentClient.getName());
 			phoneTextBox.setValue(currentClient.getPhone());
 			emailTextBox.setValue(currentClient.getEmail());
 			addressTextBox.setValue(currentClient.getAddress());
 			detailsTextBox.setValue(currentClient.getDetails());
-
-			saveButton.setDisabled(false);
-			cancelButton.setDisabled(false);
+			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
-			if(currentClient.getId() == null) {
-				deleteButton.setDisabled(true);
-			} else {
-				deleteButton.setDisabled(false);
-			}
 			newButton.setDisabled(true);
 		}
 	}
