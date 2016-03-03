@@ -148,6 +148,7 @@ public class ClientController extends SelectorComposer<Component>{
 		clientListbox.setModel(clientListModel);// se actualiza la lista
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
+		newButton.setDisabled(false);
 		if(currentClient == null) {// creando
 			clientGrid.setVisible(false);
 			nameTextBox.setValue(null);
@@ -156,7 +157,6 @@ public class ClientController extends SelectorComposer<Component>{
 			detailsTextBox.setValue(null);
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
-			newButton.setDisabled(false);
 		} else {// editando
 			clientGrid.setVisible(true);
 			nameTextBox.setValue(currentClient.getName());
@@ -166,7 +166,6 @@ public class ClientController extends SelectorComposer<Component>{
 			detailsTextBox.setValue(currentClient.getDetails());
 			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
-			newButton.setDisabled(true);
 		}
 	}
 }

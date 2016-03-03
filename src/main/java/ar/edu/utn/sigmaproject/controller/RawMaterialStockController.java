@@ -125,6 +125,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		measureTextBox.setDisabled(true);// no se deben poder modificar
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
+		newButton.setDisabled(false);
 		if(currentWood == null) {// nuevo
 			woodCreationGrid.setVisible(false);
 			codeTextBox.setValue("");
@@ -144,7 +145,6 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 			stockIncreaseButton.setDisabled(true);
 			stockDecreaseButton.setDisabled(true);
 			resetButton.setDisabled(true);
-			newButton.setDisabled(false);
 		}else {// editar
 			woodCreationGrid.setVisible(true);
 			codeTextBox.setValue(currentWood.getCode());
@@ -166,7 +166,6 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 			stockIncreaseButton.setDisabled(false);
 			stockDecreaseButton.setDisabled(false);
 			resetButton.setDisabled(false);
-			newButton.setDisabled(true);
 		}
 	}
 

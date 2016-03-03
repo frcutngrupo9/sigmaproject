@@ -156,6 +156,7 @@ public class MachineController extends SelectorComposer<Component>{
 		machineListbox.setModel(machineTypeListModel);// se actualiza la lista
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
+		newButton.setDisabled(false);
 		if(currentMachineType == null) {// creando
 			machineGrid.setVisible(false);
 			nameTextBox.setValue(null);
@@ -165,7 +166,6 @@ public class MachineController extends SelectorComposer<Component>{
 			detailsTextBox.setValue(null);
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
-			newButton.setDisabled(false);
 		} else {// editando
 			machineGrid.setVisible(true);
 			nameTextBox.setValue(currentMachineType.getName());
@@ -175,7 +175,6 @@ public class MachineController extends SelectorComposer<Component>{
 			detailsTextBox.setValue(currentMachineType.getDetails());
 			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
-			newButton.setDisabled(true);
 		}
 	}
 

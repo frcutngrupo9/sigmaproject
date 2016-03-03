@@ -154,6 +154,7 @@ public class SupplyController extends SelectorComposer<Component>{
 		supplyListbox.setModel(supplyTypeListModel);// se actualiza la lista
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
+		newButton.setDisabled(false);
 		if(currentSupplyType == null) {// creando
 			supplyGrid.setVisible(false);
 			codeTextBox.setValue(null);
@@ -164,7 +165,6 @@ public class SupplyController extends SelectorComposer<Component>{
 			measureTextBox.setValue(null);
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
-			newButton.setDisabled(false);
 		}else {// editando
 			supplyGrid.setVisible(true);
 			codeTextBox.setValue(currentSupplyType.getCode());
@@ -175,7 +175,6 @@ public class SupplyController extends SelectorComposer<Component>{
 			measureTextBox.setValue(currentSupplyType.getMeasure());
 			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
-			newButton.setDisabled(true);
 		}
 	}
 }

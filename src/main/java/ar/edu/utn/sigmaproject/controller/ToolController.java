@@ -143,6 +143,7 @@ public class ToolController extends SelectorComposer<Component>{
 		toolListbox.setModel(toolTypeListModel);// se actualiza la lista
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
+		newButton.setDisabled(false);
 		if(currentToolType == null) {// creando
 			toolGrid.setVisible(false);
 			nameTextBox.setValue(null);
@@ -151,7 +152,6 @@ public class ToolController extends SelectorComposer<Component>{
 			brandTextBox.setValue(null);
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
-			newButton.setDisabled(false);
 		} else {// editando
 			toolGrid.setVisible(true);
 			nameTextBox.setValue(currentToolType.getName());
@@ -160,7 +160,6 @@ public class ToolController extends SelectorComposer<Component>{
 			brandTextBox.setValue(currentToolType.getBrand());
 			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
-			newButton.setDisabled(true);
 		}
 	}
 }

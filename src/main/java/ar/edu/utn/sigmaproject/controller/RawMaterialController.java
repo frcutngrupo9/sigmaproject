@@ -203,6 +203,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
 		rawMaterialListbox.setModel(rawMaterialTypeListModel);
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
+		newButton.setDisabled(false);
 		if(currentRawMaterialType == null) {// creando
 			rawMaterialGrid.setVisible(false);
 			nameTextbox.setValue( null);
@@ -218,7 +219,6 @@ public class RawMaterialController extends SelectorComposer<Component>{
 			widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(widthIdMeasureUnit)));
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);
-			newButton.setDisabled(false);
 		} else {// editando
 			rawMaterialGrid.setVisible(true);
 			nameTextbox.setValue(currentRawMaterialType.getName());
@@ -248,7 +248,6 @@ public class RawMaterialController extends SelectorComposer<Component>{
 			}
 			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
-			newButton.setDisabled(true);
 		}
 	}
 }
