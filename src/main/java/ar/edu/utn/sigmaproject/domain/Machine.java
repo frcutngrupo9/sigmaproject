@@ -2,6 +2,8 @@ package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
 
+import javax.xml.datatype.Duration;
+
 public class Machine implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
@@ -10,9 +12,9 @@ public class Machine implements Serializable, Cloneable {
 	String code;
 	String name;
 	Integer year;
-	Long usedTime;
+	Duration usedTime;
 
-	public Machine(Integer id, Integer idMachineType, String code, String name, Integer year, Long usedTime) {
+	public Machine(Integer id, Integer idMachineType, String code, String name, Integer year, Duration usedTime) {
 		this.id = id;
 		this.idMachineType = idMachineType;
 		this.code = code;
@@ -61,11 +63,11 @@ public class Machine implements Serializable, Cloneable {
 		this.year = year;
 	}
 
-	public Long getUsedTime() {
+	public Duration getUsedTime() {
 		return usedTime;
 	}
 
-	public void setUsedTime(Long usedTime) {
+	public void setUsedTime(Duration usedTime) {
 		this.usedTime = usedTime;
 	}
 

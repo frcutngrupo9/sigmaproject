@@ -8,31 +8,31 @@ import ar.edu.utn.sigmaproject.service.MachineService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
 
 public class MachineServiceImpl implements MachineService {
-	static List<Machine> machineExistenceList = new ArrayList<Machine>();
-	private SerializationService serializator = new SerializationService("machine_existence");
+	static List<Machine> machineList = new ArrayList<Machine>();
+	private SerializationService serializator = new SerializationService("machine");
 
 	public MachineServiceImpl() {
 		@SuppressWarnings("unchecked")
 		List<Machine> aux = serializator.obtenerLista();
 		if(aux != null) {
-			machineExistenceList = aux;
+			machineList = aux;
 		} else {
-			serializator.grabarLista(machineExistenceList);
+			serializator.grabarLista(machineList);
 		}
 	}
 
-	public synchronized List<Machine> getMachineExistenceList() {
+	public synchronized List<Machine> getMachineList() {
 		List<Machine> list = new ArrayList<Machine>();
-		for(Machine each: machineExistenceList) {
+		for(Machine each: machineList) {
 			list.add(Machine.clone(each));
 		}
 		return list;
 	}
 
-	public synchronized Machine getMachineExistence(Integer id) {
-		int size = machineExistenceList.size();
+	public synchronized Machine getMachine(Integer id) {
+		int size = machineList.size();
 		for(int i=0; i<size; i++) {
-			Machine t = machineExistenceList.get(i);
+			Machine t = machineList.get(i);
 			if(t.getId().equals(id)) {
 				return Machine.clone(t);
 			}
@@ -40,42 +40,42 @@ public class MachineServiceImpl implements MachineService {
 		return null;
 	}
 
-	public synchronized Machine saveMachineExistence(Machine machineExistence) {
-		if(machineExistence.getId() == null) {
-			machineExistence.setId(getNewId());
+	public synchronized Machine saveMachine(Machine machine) {
+		if(machine.getId() == null) {
+			machine.setId(getNewId());
 		}
-		machineExistence = Machine.clone(machineExistence);
-		machineExistenceList.add(machineExistence);
-		serializator.grabarLista(machineExistenceList);
-		return machineExistence;
+		machine = Machine.clone(machine);
+		machineList.add(machine);
+		serializator.grabarLista(machineList);
+		return machine;
 	}
 
-	public synchronized Machine updateMachineExistence(Machine machineExistence) {
-		if(machineExistence.getId() == null) {
-			throw new IllegalArgumentException("can't update a null-id MachineExistence, save it first");
+	public synchronized Machine updateMachine(Machine machine) {
+		if(machine.getId() == null) {
+			throw new IllegalArgumentException("can't update a null-id Machine, save it first");
 		}else {
-			machineExistence = Machine.clone(machineExistence);
-			int size = machineExistenceList.size();
+			machine = Machine.clone(machine);
+			int size = machineList.size();
 			for(int i=0; i<size; i++) {
-				Machine t = machineExistenceList.get(i);
-				if(t.getId().equals(machineExistence.getId())){
-					machineExistenceList.set(i, machineExistence);
-					serializator.grabarLista(machineExistenceList);
-					return machineExistence;
+				Machine t = machineList.get(i);
+				if(t.getId().equals(machine.getId())){
+					machineList.set(i, machine);
+					serializator.grabarLista(machineList);
+					return machine;
 				}
 			}
-			throw new RuntimeException("MachineExistence not found " + machineExistence.getId());
+			throw new RuntimeException("Machine not found " + machine.getId());
 		}
 	}
 
-	public synchronized void deleteMachineExistence(Machine machineExistence) {
-		if(machineExistence.getId() != null) {
-			int size = machineExistenceList.size();
+	public synchronized void deleteMachine(Machine machine) {
+		if(machine.getId() != null) {
+			int size = machineList.size();
 			for(int i=0; i<size; i++) {
-				Machine t = machineExistenceList.get(i);
-				if(t.getId().equals(machineExistence.getId())){
-					machineExistenceList.remove(i);
-					serializator.grabarLista(machineExistenceList);
+				Machine t = machineList.get(i);
+				if(t.getId().equals(machine.getId())){
+					machineList.remove(i);
+					serializator.grabarLista(machineList);
 					return;
 				}
 			}
@@ -84,8 +84,8 @@ public class MachineServiceImpl implements MachineService {
 
 	private synchronized Integer getNewId() {
 		Integer lastId = 0;
-		for(int i=0; i<machineExistenceList.size(); i++) {
-			Machine aux = machineExistenceList.get(i);
+		for(int i=0; i<machineList.size(); i++) {
+			Machine aux = machineList.get(i);
 			if(lastId < aux.getId()){
 				lastId = aux.getId();
 			}

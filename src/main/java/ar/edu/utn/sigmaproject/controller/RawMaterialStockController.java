@@ -192,6 +192,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 			return "[Sin Unidad de Medida]";
 		}
 	}
+	
 	@Listen("onClick = #newButton")
 	public void newButtonClick() {
 		currentWood = null;

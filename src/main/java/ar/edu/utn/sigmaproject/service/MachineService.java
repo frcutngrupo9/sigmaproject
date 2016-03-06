@@ -5,14 +5,14 @@ import java.util.List;
 import ar.edu.utn.sigmaproject.domain.Machine;
 
 public interface MachineService {
-	List<Machine> getMachineExistenceList();
+	List<Machine> getMachineList();
 
-	Machine getMachineExistence(Integer idMachineExistence);
+	Machine getMachine(Integer idMachine);
 
-	Machine saveMachineExistence(Machine machineExistence);
+	Machine saveMachine(Machine machine);
 
-	Machine updateMachineExistence(Machine machineExistence);
+	Machine updateMachine(Machine machine);
 
-	void deleteMachineExistence(Machine machineExistence);
+	void deleteMachine(Machine machine);
 
 }

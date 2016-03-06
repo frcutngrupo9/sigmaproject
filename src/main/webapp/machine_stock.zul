@@ -7,21 +7,21 @@
     <separator/>
     <listbox id="machineListbox"  mold="paging" pageSize="7">
         <listhead>
-            <listheader label="Id"/>
-            <listheader label="Tipo Maquina"/>
-            <listheader label="Codigo"/>
+            <listheader label="Id" width="40px" align="center"/>
             <listheader label="Nombre"/>
+            <listheader label="Codigo"/>
+            <listheader label="Tipo Maquina"/>
             <listheader label="Anio"/>
             <listheader label="Tiempo de Uso"/>
         </listhead>
         <template name="model">
             <listitem>
                 <listcell label="${each.id}"/>
-                <listcell label="${each.idMachineType}"/>
-                <listcell label="${each.code}"/>
                 <listcell label="${each.name}"/>
+                <listcell label="${each.code}"/>
+                <listcell label="${win_machine_stock$composer.getMachineType(each).name}"/>
                 <listcell label="${each.year}"/>
-                <listcell label="${each.usedTime}"/>
+                <listcell label="${win_machine_stock$composer.getDurationFormated(each)}"/>
             </listitem>
         </template>
     </listbox>
@@ -47,19 +47,24 @@
             	</row>
             	<row>
                     <label>Codigo:</label>
-                    <textbox id="codeTextbox" value="" hflex="1"/>
+                    <textbox id="codeTextbox" hflex="1"/>
                 </row>
                 <row>
                     <label>Nombre:</label>
-                    <textbox id="nameTextbox" value="" hflex="1"/>
+                    <textbox id="nameTextbox" hflex="1"/>
                 </row>
                 <row>
                     <label>Anio:</label>
-                    <intbox id="yearIntbox" value="" hflex="1"/>
+                    <intbox id="yearIntbox" hflex="1"/>
                 </row>
                 <row>
                     <label>Tiempo de uso:</label>
-                    <textbox id="usedTimeTextbox" value="" hflex="1"/>
+                    <hbox>
+                    	<intbox id="usedTimeIntboxHours" width="36px"/>
+                    	<label value="(Horas)"/>
+                    	<intbox id="usedTimeIntboxMinutes" width="36px"/>
+                    	<label value="(Minutos)"/>
+                    </hbox>
                 </row>
                 <row>
 					<cell colspan="2" style="text-align:center">
