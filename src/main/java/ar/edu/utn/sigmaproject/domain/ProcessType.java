@@ -6,11 +6,15 @@ public class ProcessType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	Integer id;
+	Integer idMachineType;
 	String name;
+	Integer stepNumber;
 
-	public ProcessType(Integer id, String name) {
+	public ProcessType(Integer id, Integer idMachineType, String name, Integer stepNumber) {
 		this.id = id;
+		this.idMachineType = idMachineType;
 		this.name = name;
+		this.stepNumber = stepNumber;
 	}
 
 	public Integer getId() {
@@ -21,12 +25,28 @@ public class ProcessType implements Serializable, Cloneable {
 		this.id = id;
 	}
 
+	public Integer getIdMachineType() {
+		return idMachineType;
+	}
+
+	public void setIdMachineType(Integer idMachineType) {
+		this.idMachineType = idMachineType;
+	}
+
 	public String getName() {
 		return name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public Integer getStepNumber() {
+		return stepNumber;
+	}
+
+	public void setStepNumber(Integer stepNumber) {
+		this.stepNumber = stepNumber;
 	}
 
 	@Override

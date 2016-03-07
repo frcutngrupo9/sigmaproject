@@ -11,20 +11,20 @@ public class ProcessTypeServiceImpl implements ProcessTypeService {
 	static int processTypeId = 1;
 	static List<ProcessType> processTypeList = new ArrayList<ProcessType>();  
 	static{
-		processTypeList.add(new ProcessType(processTypeId++,"trozado de tablas"));
-		processTypeList.add(new ProcessType(processTypeId++,"garlopeado"));
-		processTypeList.add(new ProcessType(processTypeId++,"cepillado"));
-		processTypeList.add(new ProcessType(processTypeId++,"cortar el ancho en escuadradora"));
-		processTypeList.add(new ProcessType(processTypeId++,"cortar el largo en escuadradora"));
-		processTypeList.add(new ProcessType(processTypeId++,"escoplado"));
-		processTypeList.add(new ProcessType(processTypeId++,"espigado"));
-		processTypeList.add(new ProcessType(processTypeId++,"hacer molduras"));
-		processTypeList.add(new ProcessType(processTypeId++,"hacer canal"));
-		processTypeList.add(new ProcessType(processTypeId++,"replanado"));
-		processTypeList.add(new ProcessType(processTypeId++,"masillado"));
-		processTypeList.add(new ProcessType(processTypeId++,"clavado"));
-		processTypeList.add(new ProcessType(processTypeId++,"lijado"));
-		processTypeList.add(new ProcessType(processTypeId++,"armado"));
+		processTypeList.add(new ProcessType(processTypeId++, null, "trozado de tablas", 1));
+		processTypeList.add(new ProcessType(processTypeId++, null, "garlopeado", 1));
+		processTypeList.add(new ProcessType(processTypeId++, null, "cepillado", 1));
+		processTypeList.add(new ProcessType(processTypeId++, null, "cortar el ancho en escuadradora", 1));
+		processTypeList.add(new ProcessType(processTypeId++, null, "cortar el largo en escuadradora", 1));
+		processTypeList.add(new ProcessType(processTypeId++, null, "escoplado", 1));
+		processTypeList.add(new ProcessType(processTypeId++, null, "espigado", 1));
+		processTypeList.add(new ProcessType(processTypeId++, null, "hacer molduras", 1));
+		processTypeList.add(new ProcessType(processTypeId++, null, "hacer canal", 1));
+		processTypeList.add(new ProcessType(processTypeId++, null, "replanado", 1));
+		processTypeList.add(new ProcessType(processTypeId++, null, "masillado", 1));
+		processTypeList.add(new ProcessType(processTypeId++, null, "clavado", 1));
+		processTypeList.add(new ProcessType(processTypeId++, null, "lijado", 1));
+		processTypeList.add(new ProcessType(processTypeId++, null, "armado", 1));
 	}
 
 	public List<ProcessType> getProcessTypeList() {
