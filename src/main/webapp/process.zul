@@ -5,7 +5,7 @@
         <button id="searchButton" label="Buscar"/>
     </hlayout>
     <separator/>
-    <listbox id="processTypeListbox" mold="paging" pageSize="15">
+    <listbox id="processTypeListbox" mold="paging" pageSize="10">
         <listhead>
             <listheader label="Id" width="40px"/>
             <listheader label="Nombre"/>
@@ -43,11 +43,11 @@
 	            </row>
 	            <row>
 	                <label>Maquina Necesaria:</label>
-	                <selectbox id="machineTypeSelectbox">
+	                <combobox id="machineTypeCombobox">
                         <template name="model">
-                            <label value="${each.name}" />
+                            <comboitem label="${each.name}" />
                         </template>
-                    </selectbox>
+                    </combobox>
 	            </row>
 	            <row>
 	                <cell colspan="2" style="text-align:center">

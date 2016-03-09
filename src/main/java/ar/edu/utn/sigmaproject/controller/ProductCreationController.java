@@ -993,7 +993,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			currentSupply = null;
 		} else {
 			if(currentSupply == null) {// permite la seleccion solo si no existe nada seleccionado
-				currentSupply = supplyListModel.getSelection().iterator().next();
+				currentSupply = supplyListbox.getSelectedItem().getValue();
 				currentSupplyType = supplyTypeService.getSupplyType(currentSupply.getIdSupplyType());
 				refreshViewSupply();
 			}
@@ -1157,7 +1157,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			currentRawMaterial = null;
 		} else {
 			if(currentRawMaterial == null) {// permite la seleccion solo si no existe nada seleccionado
-				currentRawMaterial = rawMaterialListModel.getSelection().iterator().next();
+				currentRawMaterial = rawMaterialListbox.getSelectedItem().getValue();
 				currentRawMaterialType = rawMaterialTypeService.getRawMaterialType(currentRawMaterial.getIdRawMaterialType());
 				refreshViewRawMaterial();
 			}

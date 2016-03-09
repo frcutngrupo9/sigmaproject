@@ -31,7 +31,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
 	@Wire
 	Textbox searchTextbox;
 	@Wire
-	Listbox rawMaterialListbox;
+	Listbox rawMaterialTypeListbox;
 	@Wire
 	Button saveButton;
 	@Wire
@@ -57,7 +57,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
 	@Wire
 	Selectbox widthMeasureUnitSelectbox;
 	@Wire
-	Grid rawMaterialGrid;
+	Grid rawMaterialTypeGrid;
 
 	// services
 	private RawMaterialTypeService rawMaterialTypeService = new RawMaterialTypeServiceImpl();
@@ -82,7 +82,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
 		super.doAfterCompose(comp);
 		rawMaterialTypeList = rawMaterialTypeService.getRawMaterialTypeList();
 		rawMaterialTypeListModel = new ListModelList<RawMaterialType>(rawMaterialTypeList);
-		rawMaterialListbox.setModel(rawMaterialTypeListModel);
+		rawMaterialTypeListbox.setModel(rawMaterialTypeListModel);
 		currentRawMaterialType = null;
 
 		Integer idMeasureUnitType = measureUnitTypeService.getMeasureUnitType("Longitud").getId();
@@ -105,7 +105,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
 	public void newRawMaterial() {
 		currentRawMaterialType = null;
 		refreshView();
-		rawMaterialGrid.setVisible(true);
+		rawMaterialTypeGrid.setVisible(true);
 	}
 
 	@Listen("onClick = #saveButton")
@@ -165,7 +165,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
 	@Listen("onClick = #resetButton")
 	public void resetButtonClick() {
 		refreshView();
-		rawMaterialGrid.setVisible(true);
+		rawMaterialTypeGrid.setVisible(true);
 	}
 
 	@Listen("onClick = #deleteButton")
@@ -176,14 +176,14 @@ public class RawMaterialController extends SelectorComposer<Component>{
 		refreshView();
 	}
 
-	@Listen("onSelect = #rawMaterialListbox")
+	@Listen("onSelect = #rawMaterialTypeListbox")
 	public void doListBoxSelect() {
 		if(rawMaterialTypeListModel.isSelectionEmpty()) {
 			//just in case for the no selection
 			currentRawMaterialType = null;
 		}else {
 			if(currentRawMaterialType == null) {
-				currentRawMaterialType = rawMaterialTypeListModel.getSelection().iterator().next();
+				currentRawMaterialType = rawMaterialTypeListbox.getSelectedItem().getValue();
 				refreshView();
 			}
 		}
@@ -200,12 +200,12 @@ public class RawMaterialController extends SelectorComposer<Component>{
 
 	private void refreshView() {
 		rawMaterialTypeListModel.clearSelection();
-		rawMaterialListbox.setModel(rawMaterialTypeListModel);
+		rawMaterialTypeListbox.setModel(rawMaterialTypeListModel);
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		newButton.setDisabled(false);
 		if(currentRawMaterialType == null) {// creando
-			rawMaterialGrid.setVisible(false);
+			rawMaterialTypeGrid.setVisible(false);
 			nameTextbox.setValue( null);
 			lengthDoublebox.setValue(null);
 			depthDoublebox.setValue(null);
@@ -220,7 +220,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);
 		} else {// editando
-			rawMaterialGrid.setVisible(true);
+			rawMaterialTypeGrid.setVisible(true);
 			nameTextbox.setValue(currentRawMaterialType.getName());
 			lengthDoublebox.setValue(currentRawMaterialType.getLength());
 			depthDoublebox.setValue(currentRawMaterialType.getDepth());

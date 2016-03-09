@@ -1,6 +1,7 @@
 package ar.edu.utn.sigmaproject.service;
 
 import java.util.List;
+
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 
 public interface ProcessTypeService {
@@ -8,5 +9,11 @@ public interface ProcessTypeService {
 	List<ProcessType> getProcessTypeList();
 
 	ProcessType getProcessType(Integer id);
+	
+	ProcessType saveProcessType(ProcessType processType);
+
+	ProcessType updateProcessType(ProcessType processType);
+
+	void deleteProcessType(ProcessType processType);
 
 }

@@ -5,7 +5,7 @@
         <button id="searchButton" label="Buscar"/>
     </hlayout>
     <separator/>
-    <listbox id="supplyListbox" mold="paging" pageSize="7">
+    <listbox id="supplyTypeListbox" mold="paging" pageSize="7">
         <listhead>
             <listheader label="Codigo"/>
             <listheader label="Descripcion"/>
@@ -31,7 +31,7 @@
             <button id="newButton" label="Nuevo"/>
         </hbox>
         <separator/>
-		<grid id="supplyGrid" width="400px" sclass="sigma-form" visible="false">
+		<grid id="supplyTypeGrid" width="400px" sclass="sigma-form" visible="false">
 	        <columns>
                 <column hflex="min" align="right"/>
                 <column />

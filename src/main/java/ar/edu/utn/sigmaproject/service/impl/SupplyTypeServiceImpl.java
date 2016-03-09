@@ -54,7 +54,7 @@ public class SupplyTypeServiceImpl implements SupplyTypeService {
 	public synchronized SupplyType updateSupplyType(SupplyType supplyType) {
 		if(supplyType.getId() == null) {
 			throw new IllegalArgumentException("can't update a null-id supply type, save it first");
-		}else {
+		} else {
 			supplyType = SupplyType.clone(supplyType);
 			int size = supplyTypeList.size();
 			for(int i=0; i<size; i++) {

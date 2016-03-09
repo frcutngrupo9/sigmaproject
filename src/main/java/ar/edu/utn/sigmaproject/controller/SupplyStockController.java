@@ -93,7 +93,7 @@ public class SupplyStockController extends SelectorComposer<Component> {
 			currentSupplyType = null;
 		} else {
 			if(currentSupplyType == null) {// si no hay nada editandose
-				currentSupplyType = supplyTypeListModel.getSelection().iterator().next();
+				currentSupplyType = supplyTypeListbox.getSelectedItem().getValue();
 				refreshView();
 			}
 		}

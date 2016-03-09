@@ -55,7 +55,7 @@ public class PieceSelectionModalController extends SelectorComposer<Component>{
 
 	@Listen("onSelect = #pieceListbox")
 	public void doListBoxSelect() {
-		Piece selected_piece = pieceListModel.getSelection().iterator().next();
+		Piece selected_piece = pieceListbox.getSelectedItem().getValue();
 		EventQueue<Event> eq = EventQueues.lookup("Piece Selection Queue", EventQueues.DESKTOP, true);
 		eq.publish(new Event("onPieceSelect", null, selected_piece));
 		modalDialog.detach();

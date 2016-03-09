@@ -5,7 +5,7 @@
         <button id="searchButton" label="Buscar"/>
     </hlayout>
     <separator/>
-    <listbox id="rawMaterialListbox"  mold="paging" pageSize="7">
+    <listbox id="rawMaterialTypeListbox"  mold="paging" pageSize="7">
         <listhead>
             <listheader label="Nombre"/>
             <listheader label="Largo (L)"/>
@@ -27,7 +27,7 @@
             <button id="newButton" label="Nuevo"/>
         </hbox>
         <separator/>
-        <grid id="rawMaterialGrid" width="400px" sclass="sigma-form" visible="false">
+        <grid id="rawMaterialTypeGrid" width="400px" sclass="sigma-form" visible="false">
             <columns>
                 <column hflex="min" align="right"/>
                 <column />
@@ -39,33 +39,39 @@
                 </row>
                 <row>	
                     <label>Largo:</label>
-                    <doublebox id="lengthDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
-                	<selectbox id="lengthMeasureUnitSelectbox">
-                        <template name="model">
-                            <label value="${each.name}" />
-                        </template>
-                    </selectbox>
+                    <hlayout>
+	                    <doublebox id="lengthDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
+	                	<selectbox id="lengthMeasureUnitSelectbox">
+	                        <template name="model">
+	                            <label value="${each.name}" />
+	                        </template>
+	                    </selectbox>
+                    </hlayout>
                 </row>
                 <row>	
                     <label>Espesor:</label>
-                    <doublebox id="depthDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
-                	<selectbox id="depthMeasureUnitSelectbox">
-                        <template name="model">
-                            <label value="${each.name}" />
-                        </template>
-                    </selectbox>
+                    <hlayout>
+	                    <doublebox id="depthDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
+	                	<selectbox id="depthMeasureUnitSelectbox">
+	                        <template name="model">
+	                            <label value="${each.name}" />
+	                        </template>
+	                    </selectbox>
+                    </hlayout>
                 </row>
                 <row>	
                     <label>Ancho:</label>
-                    <doublebox id="widthDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
-                	<selectbox id="widthMeasureUnitSelectbox">
-                        <template name="model">
-                            <label value="${each.name}" />
-                        </template>
-                    </selectbox>
+                    <hlayout>
+	                    <doublebox id="widthDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
+	                	<selectbox id="widthMeasureUnitSelectbox">
+	                        <template name="model">
+	                            <label value="${each.name}" />
+	                        </template>
+	                    </selectbox>
+                    </hlayout>
                 </row>
                 <row>
-                    <cell colspan="3" style="text-align:center">
+                    <cell colspan="2" style="text-align:center">
 	                    <hlayout>
 	                        <button id="saveButton" label="Guardar"/>
 	                        <button id="cancelButton" label="Cancelar"/>

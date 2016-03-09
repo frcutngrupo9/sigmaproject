@@ -132,7 +132,7 @@ public class ProductStockController extends SelectorComposer<Component>{
 			currentProduct = null;
 		} else {
 			if(currentProduct == null && currentOrder == null) {// si no hay nada editandose
-				currentProduct = productListModel.getSelection().iterator().next();
+				currentProduct = productListbox.getSelectedItem().getValue();
 				refreshView();
 			}
 		}

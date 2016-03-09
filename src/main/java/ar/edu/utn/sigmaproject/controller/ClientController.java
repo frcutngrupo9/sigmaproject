@@ -136,7 +136,7 @@ public class ClientController extends SelectorComposer<Component>{
 			currentClient = null;
 		} else {
 			if(currentClient == null) {// si no hay nada editandose
-				currentClient = clientListModel.getSelection().iterator().next();
+				currentClient = clientListbox.getSelectedItem().getValue();
 				refreshView();
 			}
 		}

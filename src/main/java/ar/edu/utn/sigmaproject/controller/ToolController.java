@@ -24,11 +24,11 @@ public class ToolController extends SelectorComposer<Component>{
 	@Wire
 	Textbox searchTextbox;
 	@Wire
-	Listbox toolListbox;
+	Listbox toolTypeListbox;
 	@Wire
 	Button newButton;
 	@Wire
-	Grid toolGrid;
+	Grid toolTypeGrid;
 	@Wire
 	Button saveButton;
 	@Wire
@@ -63,7 +63,7 @@ public class ToolController extends SelectorComposer<Component>{
 		super.doAfterCompose(comp);
 		toolTypeList = toolTypeService.getToolTypeList();
 		toolTypeListModel = new ListModelList<ToolType>(toolTypeList);
-		toolListbox.setModel(toolTypeListModel);
+		toolTypeListbox.setModel(toolTypeListModel);
 		currentToolType = null;
 		refreshView();
 	}
@@ -76,7 +76,7 @@ public class ToolController extends SelectorComposer<Component>{
 	public void newButtonClick() {
 		currentToolType = null;
 		refreshView();
-		toolGrid.setVisible(true);
+		toolTypeGrid.setVisible(true);
 	}
 
 	@Listen("onClick = #saveButton")
@@ -124,14 +124,14 @@ public class ToolController extends SelectorComposer<Component>{
 		refreshView();
 	}
 
-	@Listen("onSelect = #toolListbox")
+	@Listen("onSelect = #toolTypeListbox")
 	public void doListBoxSelect() {
 		if(toolTypeListModel.isSelectionEmpty()) {
 			//just in case for the no selection
 			currentToolType = null;
 		} else {
 			if(currentToolType == null) {// si no hay nada editandose
-				currentToolType = toolTypeListModel.getSelection().iterator().next();
+				currentToolType = toolTypeListbox.getSelectedItem().getValue();
 				refreshView();
 			}
 		}
@@ -140,12 +140,12 @@ public class ToolController extends SelectorComposer<Component>{
 
 	private void refreshView() {
 		toolTypeListModel.clearSelection();
-		toolListbox.setModel(toolTypeListModel);// se actualiza la lista
+		toolTypeListbox.setModel(toolTypeListModel);// se actualiza la lista
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		newButton.setDisabled(false);
 		if(currentToolType == null) {// creando
-			toolGrid.setVisible(false);
+			toolTypeGrid.setVisible(false);
 			nameTextbox.setValue(null);
 			descriptionTextbox.setValue(null);
 			detailsTextbox.setValue(null);
@@ -153,7 +153,7 @@ public class ToolController extends SelectorComposer<Component>{
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
 		} else {// editando
-			toolGrid.setVisible(true);
+			toolTypeGrid.setVisible(true);
 			nameTextbox.setValue(currentToolType.getName());
 			descriptionTextbox.setValue(currentToolType.getDescription());
 			detailsTextbox.setValue(currentToolType.getDetails());

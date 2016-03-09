@@ -24,11 +24,11 @@ public class SupplyController extends SelectorComposer<Component>{
 	@Wire
 	Textbox searchTextbox;
 	@Wire
-	Listbox supplyListbox;
+	Listbox supplyTypeListbox;
 	@Wire
 	Button newButton;
 	@Wire
-	Grid supplyGrid;
+	Grid supplyTypeGrid;
 	@Wire
 	Textbox codeTextbox;
 	@Wire
@@ -67,7 +67,7 @@ public class SupplyController extends SelectorComposer<Component>{
 		super.doAfterCompose(comp);
 		supplyTypeList = supplyTypeService.getSupplyTypeList();
 		supplyTypeListModel = new ListModelList<SupplyType>(supplyTypeList);
-		supplyListbox.setModel(supplyTypeListModel);
+		supplyTypeListbox.setModel(supplyTypeListModel);
 		currentSupplyType = null;
 
 		refreshView();
@@ -81,7 +81,7 @@ public class SupplyController extends SelectorComposer<Component>{
 	public void newButtonClick() {
 		currentSupplyType = null;
 		refreshView();
-		supplyGrid.setVisible(true);
+		supplyTypeGrid.setVisible(true);
 	}
 
 	@Listen("onClick = #saveButton")
@@ -135,14 +135,14 @@ public class SupplyController extends SelectorComposer<Component>{
 		refreshView();
 	}
 
-	@Listen("onSelect = #supplyListbox")
+	@Listen("onSelect = #supplyTypeListbox")
 	public void doListBoxSelect() {
 		if(supplyTypeListModel.isSelectionEmpty()) {
 			//just in case for the no selection
 			currentSupplyType = null;
 		} else {
 			if(currentSupplyType == null) {// si no hay nada editandose
-				currentSupplyType = supplyTypeListModel.getSelection().iterator().next();
+				currentSupplyType = supplyTypeListbox.getSelectedItem().getValue();
 				refreshView();
 			}
 		}
@@ -151,12 +151,12 @@ public class SupplyController extends SelectorComposer<Component>{
 
 	private void refreshView() {
 		supplyTypeListModel.clearSelection();
-		supplyListbox.setModel(supplyTypeListModel);// se actualiza la lista
+		supplyTypeListbox.setModel(supplyTypeListModel);// se actualiza la lista
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		newButton.setDisabled(false);
 		if(currentSupplyType == null) {// creando
-			supplyGrid.setVisible(false);
+			supplyTypeGrid.setVisible(false);
 			codeTextbox.setValue(null);
 			descriptionTextbox.setValue(null);
 			detailsTextbox.setValue(null);
@@ -166,7 +166,7 @@ public class SupplyController extends SelectorComposer<Component>{
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
 		}else {// editando
-			supplyGrid.setVisible(true);
+			supplyTypeGrid.setVisible(true);
 			codeTextbox.setValue(currentSupplyType.getCode());
 			descriptionTextbox.setValue(currentSupplyType.getDescription());
 			detailsTextbox.setValue(currentSupplyType.getDetails());

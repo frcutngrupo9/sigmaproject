@@ -5,7 +5,7 @@
         <button id="searchButton" label="Buscar"/>
     </hlayout>
     <separator/>
-    <listbox id="machineListbox"  mold="paging" pageSize="7">
+    <listbox id="machineTypeListbox"  mold="paging" pageSize="7">
         <listhead>
             <listheader label="Nombre"/>
             <listheader label="Detalles"/>
@@ -25,7 +25,7 @@
             <button id="newButton" label="Nuevo"/>
         </hbox>
         <separator/>
-        <grid id="machineGrid" width="400px" sclass="sigma-form" visible="false">
+        <grid id="machineTypeGrid" width="400px" sclass="sigma-form" visible="false">
             <columns>
                 <column hflex="min" align="right"/>
                 <column />
@@ -41,14 +41,14 @@
                 </row>
                 <row>   
                     <label>Tiempo de Deterioro:</label>
-                    <hbox>
-                    	<label value="(Anios)"/>
+                    <hlayout>
                     	<intbox id="deteriorationTimeIntboxYears" width="26px"/>
-                    	<label value="(Dias)"/>
+                    	<label value="(Anios)"/>
                     	<intbox id="deteriorationTimeIntboxDays" width="26px"/>
-                    	<label value="(Horas)"/>
+                    	<label value="(Dias)"/>
                     	<intbox id="deteriorationTimeIntboxHours" width="36px"/>
-                    </hbox>
+                    	<label value="(Horas)"/>
+                    </hlayout>
                 </row>
                 <row>
 					<cell colspan="2" style="text-align:center">

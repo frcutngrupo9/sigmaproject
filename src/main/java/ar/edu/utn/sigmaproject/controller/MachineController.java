@@ -29,11 +29,11 @@ public class MachineController extends SelectorComposer<Component>{
 	@Wire
 	Textbox searchTextbox;
 	@Wire
-	Listbox machineListbox;
+	Listbox machineTypeListbox;
 	@Wire
 	Button newButton;
 	@Wire
-	Grid machineGrid;
+	Grid machineTypeGrid;
 	@Wire
 	Button saveButton;
 	@Wire
@@ -70,7 +70,7 @@ public class MachineController extends SelectorComposer<Component>{
 		super.doAfterCompose(comp);
 		machineTypeList = machineTypeService.getMachineTypeList();
 		machineTypeListModel = new ListModelList<MachineType>(machineTypeList);
-		machineListbox.setModel(machineTypeListModel);
+		machineTypeListbox.setModel(machineTypeListModel);
 		currentMachineType = null;
 		refreshView();
 	}
@@ -83,7 +83,7 @@ public class MachineController extends SelectorComposer<Component>{
 	public void newButtonClick() {
 		currentMachineType = null;
 		refreshView();
-		machineGrid.setVisible(true);
+		machineTypeGrid.setVisible(true);
 	}
 
 	@Listen("onClick = #saveButton")
@@ -137,14 +137,14 @@ public class MachineController extends SelectorComposer<Component>{
 		refreshView();
 	}
 
-	@Listen("onSelect = #machineListbox")
+	@Listen("onSelect = #machineTypeListbox")
 	public void doListBoxSelect() {
 		if(machineTypeListModel.isSelectionEmpty()) {
 			//just in case for the no selection
 			currentMachineType = null;
 		} else {
 			if(currentMachineType == null) {// si no hay nada editandose
-				currentMachineType = machineTypeListModel.getSelection().iterator().next();
+				currentMachineType = machineTypeListbox.getSelectedItem().getValue();
 				refreshView();
 			}
 		}
@@ -153,12 +153,12 @@ public class MachineController extends SelectorComposer<Component>{
 
 	private void refreshView() {
 		machineTypeListModel.clearSelection();
-		machineListbox.setModel(machineTypeListModel);// se actualiza la lista
+		machineTypeListbox.setModel(machineTypeListModel);// se actualiza la lista
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		newButton.setDisabled(false);
 		if(currentMachineType == null) {// creando
-			machineGrid.setVisible(false);
+			machineTypeGrid.setVisible(false);
 			nameTextbox.setValue(null);
 			deteriorationTimeIntboxYears.setValue(null);
 			deteriorationTimeIntboxDays.setValue(null);
@@ -167,7 +167,7 @@ public class MachineController extends SelectorComposer<Component>{
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
 		} else {// editando
-			machineGrid.setVisible(true);
+			machineTypeGrid.setVisible(true);
 			nameTextbox.setValue(currentMachineType.getName());
 			deteriorationTimeIntboxYears.setValue(currentMachineType.getDeteriorationTime().getYears());
 			deteriorationTimeIntboxDays.setValue(currentMachineType.getDeteriorationTime().getDays());

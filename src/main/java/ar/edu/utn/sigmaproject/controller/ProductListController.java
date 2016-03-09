@@ -91,11 +91,6 @@ public class ProductListController extends SelectorComposer<Component>{
 	//    	include.setSrc("/product_creation.zul");
 	//    }
 
-	//    @Listen("onClick = #searchButton")
-	//    public void search() {
-	//        //String query = searchTextbox.getValue();
-	//    }
-
 	@Listen("onClick = #newProductButton")
 	public void goToNewProduct() {
 		Executions.getCurrent().setAttribute("selected_product", null);

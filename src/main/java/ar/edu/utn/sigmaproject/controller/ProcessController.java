@@ -9,11 +9,11 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Selectbox;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.MachineType;
@@ -39,7 +39,7 @@ public class ProcessController extends SelectorComposer<Component>{
 	@Wire
 	Intbox stepNumberIntbox;
 	@Wire
-	Selectbox machineTypeSelectbox;
+	Combobox machineTypeCombobox;
 	@Wire
 	Button saveButton;
 	@Wire
@@ -69,7 +69,7 @@ public class ProcessController extends SelectorComposer<Component>{
 		super.doAfterCompose(comp);
 		machineTypeList = machineTypeService.getMachineTypeList();
 		machineTypeListModel = new ListModelList<MachineType>(machineTypeList);
-		machineTypeSelectbox.setModel(machineTypeListModel);
+		machineTypeCombobox.setModel(machineTypeListModel);
 		processTypeList = processTypeService.getProcessTypeList();
 		processTypeListModel = new ListModelList<ProcessType>(processTypeList);
 		processTypeListbox.setModel(processTypeListModel);
@@ -96,7 +96,10 @@ public class ProcessController extends SelectorComposer<Component>{
 		}
 		String name = nameTextbox.getText();
 		Integer stepNumber = stepNumberIntbox.getValue();
-		MachineType machineType = machineTypeListModel.getElementAt(machineTypeSelectbox.getSelectedIndex());
+		MachineType machineType = null;
+		if(machineTypeCombobox.getSelectedItem() != null) {
+			machineType = machineTypeCombobox.getSelectedItem().getValue();
+		}
 		Integer idMachineType = null;
 		if(machineType != null) {
 			idMachineType = machineType.getId();
@@ -104,13 +107,13 @@ public class ProcessController extends SelectorComposer<Component>{
 		if(currentProcessType == null) {
 			// es un nuevo insumo
 			currentProcessType = new ProcessType(null, idMachineType, name, stepNumber);
-//			currentProcessType = processTypeService.saveProcessType(currentProcessType);
+			currentProcessType = processTypeService.saveProcessType(currentProcessType);
 		} else {
 			// es una edicion
 			currentProcessType.setName(name);
 			currentProcessType.setStepNumber(stepNumber);
 			currentProcessType.setIdMachineType(idMachineType);
-//			currentProcessType = processTypeService.updateProcessType(currentProcessType);
+			currentProcessType = processTypeService.updateProcessType(currentProcessType);
 		}
 		processTypeList = processTypeService.getProcessTypeList();
 		processTypeListModel = new ListModelList<ProcessType>(processTypeList);
@@ -131,7 +134,7 @@ public class ProcessController extends SelectorComposer<Component>{
 
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
-//		processTypeService.deleteProcessType(currentProcessType);
+		processTypeService.deleteProcessType(currentProcessType);
 		processTypeListModel.remove(currentProcessType);
 		currentProcessType = null;
 		refreshView();
@@ -144,7 +147,7 @@ public class ProcessController extends SelectorComposer<Component>{
 			currentProcessType = null;
 		} else {
 			if(currentProcessType == null) {// si no hay nada editandose
-				currentProcessType = processTypeListModel.getSelection().iterator().next();
+				currentProcessType = processTypeListbox.getSelectedItem().getValue();
 				refreshView();
 			}
 		}
@@ -161,14 +164,14 @@ public class ProcessController extends SelectorComposer<Component>{
 			processTypeGrid.setVisible(false);
 			nameTextbox.setValue(null);
 			stepNumberIntbox.setValue(null);
-			machineTypeSelectbox.setSelectedIndex(-1);
+			machineTypeCombobox.setSelectedIndex(-1);
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
 		}else {// editando
 			processTypeGrid.setVisible(true);
 			nameTextbox.setValue(currentProcessType.getName());
 			stepNumberIntbox.setValue(currentProcessType.getStepNumber());
-			machineTypeSelectbox.setSelectedIndex(machineTypeListModel.indexOf(machineTypeService.getMachineType(currentProcessType.getIdMachineType())));
+			machineTypeCombobox.setSelectedIndex(machineTypeListModel.indexOf(machineTypeService.getMachineType(currentProcessType.getIdMachineType())));
 			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
 		}
