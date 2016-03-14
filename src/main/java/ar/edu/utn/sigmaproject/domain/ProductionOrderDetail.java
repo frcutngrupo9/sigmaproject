@@ -9,14 +9,16 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 
 	Integer idProductionOrder;
 	Integer idProcess;
+	Integer idMachine;
 	Duration timeTotal;
 	Integer quantityPiece;
 	Double quantityFinished;
 	boolean isFinished;
 
-	public ProductionOrderDetail(Integer idProductionOrder, Integer idProcess, Duration timeTotal, Integer quantityPiece) {
+	public ProductionOrderDetail(Integer idProductionOrder, Integer idProcess, Integer idMachine, Duration timeTotal, Integer quantityPiece) {
 		this.idProductionOrder = idProductionOrder;
 		this.idProcess = idProcess;
+		this.idMachine = idMachine;
 		this.timeTotal = timeTotal;
 		this.quantityPiece = quantityPiece;
 		quantityFinished = 0.0; 
@@ -37,6 +39,14 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 
 	public void setIdProcess(Integer idProcess) {
 		this.idProcess = idProcess;
+	}
+
+	public Integer getIdMachine() {
+		return idMachine;
+	}
+
+	public void setIdMachine(Integer idMachine) {
+		this.idMachine = idMachine;
 	}
 
 	public Duration getTimeTotal() {

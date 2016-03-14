@@ -16,6 +16,8 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
+import org.zkoss.zul.Combobox;
+import org.zkoss.zul.Comboitem;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Grid;
@@ -26,6 +28,8 @@ import org.zkoss.zul.Selectbox;
 import org.zkoss.zul.Spinner;
 import org.zkoss.zul.Textbox;
 
+import ar.edu.utn.sigmaproject.domain.Machine;
+import ar.edu.utn.sigmaproject.domain.MachineType;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
@@ -34,6 +38,8 @@ import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.Worker;
+import ar.edu.utn.sigmaproject.service.MachineService;
+import ar.edu.utn.sigmaproject.service.MachineTypeService;
 import ar.edu.utn.sigmaproject.service.PieceService;
 import ar.edu.utn.sigmaproject.service.ProcessService;
 import ar.edu.utn.sigmaproject.service.ProcessTypeService;
@@ -42,6 +48,8 @@ import ar.edu.utn.sigmaproject.service.ProductionOrderDetailService;
 import ar.edu.utn.sigmaproject.service.ProductionOrderService;
 import ar.edu.utn.sigmaproject.service.ProductionPlanService;
 import ar.edu.utn.sigmaproject.service.WorkerService;
+import ar.edu.utn.sigmaproject.service.impl.MachineServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.MachineTypeServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.PieceServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProcessServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProcessTypeServiceImpl;
@@ -88,6 +96,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	private ProcessService processService = new ProcessServiceImpl();
 	private ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
 	private WorkerService workerService = new WorkerServiceImpl();
+	private MachineService machineService = new MachineServiceImpl();
+	private MachineTypeService machineTypeService = new MachineTypeServiceImpl();
 
 	// atributes
 	private ProductionOrder currentProductionOrder;
@@ -95,6 +105,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	// list
 	private List<ProductionOrderDetail> productionOrderDetailList;
 	private List<Worker> workerList;
+	private List<Machine> machineList;
 
 	// list models
 	private ListModelList<ProductionOrderDetail> productionOrderDetailListModel;
@@ -123,7 +134,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 					Integer idProcess = process.getId();
 					Integer quantityPiece = currentProductionOrder.getUnits() * pieceService.getPiece(process.getIdPiece()).getUnits();// cantidad total de la pieza
 					Duration timeTotal = process.getTime().multiply(quantityPiece);// cantidad total de tiempo del proceso
-					productionOrderDetailList.add(new ProductionOrderDetail(null, idProcess, timeTotal, quantityPiece));
+					productionOrderDetailList.add(new ProductionOrderDetail(null, idProcess, null, timeTotal, quantityPiece));
 				}
 			} else {// es una orden de produccion ya creada, se buscan sus detalles
 				productionOrderDetailList = productionOrderDetailService.getProductionOrderDetailList(currentProductionOrder.getId());
@@ -134,6 +145,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		workerList = workerService.getWorkerList();
 		workerListModel = new ListModelList<Worker>(workerList);
 		workerSelectbox.setModel(workerListModel);
+		
+		machineList = machineService.getMachineList();
 
 		refreshView();
 	}
@@ -244,6 +257,44 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 	public String getFormatedTime(Duration time) {
 		return String.format("Dias: %d Horas: %d Minutos: %d", time.getDays(), time.getHours(), time.getMinutes());
+	}
+	
+	public ListModelList<Machine> getMachineListModel() {
+		return new ListModelList<Machine>(machineList);
+	}
+	
+	public String getMachineTypeName(ProductionOrderDetail productionOrderDetail) {
+		String name = "Ninguna";
+		Process process = processService.getProcess(productionOrderDetail.getIdProcess());
+		ProcessType processType = processTypeService.getProcessType(process.getIdProcessType());
+		MachineType machineType = machineTypeService.getMachineType(processType.getIdMachineType());
+		if(machineType != null) {
+			name = machineType.getName();
+		}
+		return name;
+	}
+	
+	@Listen("onCreateMachineCombobox = #productionOrderDetailGrid")
+	public void doCreateMachineCombobox(ForwardEvent evt) {
+		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
+		Combobox element = (Combobox) evt.getOrigin().getTarget();// obtenemos el elemento web
+		int value = -1;
+		for(int i = 0; i < element.getItems().size(); i++){
+			if(element.getItems().get(i) != null){
+				Comboitem item = (Comboitem)element.getItems().get(i);
+				if(((Machine)item.getValue()).getId().equals(data.getIdMachine())){
+					value = i;
+				}
+			}
+		}
+		element.setSelectedIndex(value);
+	}
+	
+	@Listen("onEditProductionOrderDetailMachine = #productionOrderDetailGrid")
+	public void doEditProductionOrderDetailMachine(ForwardEvent evt) {
+		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
+		Combobox element = (Combobox) evt.getOrigin().getTarget();// obtenemos el elemento web
+		data.setIdMachine(((Machine)element.getSelectedItem().getValue()).getId());// cargamos al objeto el valor actualizado del elemento web
 	}
 
 	@Listen("onEditProductionOrderDetailQuantityFinished = #productionOrderDetailGrid")

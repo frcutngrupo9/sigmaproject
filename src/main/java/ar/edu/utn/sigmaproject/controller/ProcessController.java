@@ -178,7 +178,7 @@ public class ProcessController extends SelectorComposer<Component>{
 	}
 	
 	public String getMachineTypeName(ProcessType processType) {
-		String name = "ninguna";
+		String name = "Ninguna";
 		MachineType machineType = machineTypeService.getMachineType(processType.getIdMachineType());
 		if(machineType != null) {
 			name = machineType.getName();
