@@ -259,8 +259,17 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		return String.format("Dias: %d Horas: %d Minutos: %d", time.getDays(), time.getHours(), time.getMinutes());
 	}
 	
-	public ListModelList<Machine> getMachineListModel() {
-		return new ListModelList<Machine>(machineList);
+	public ListModelList<Machine> getMachineListModel(ProductionOrderDetail productionOrderDetail) {
+		List<Machine> list = new ArrayList<Machine>();
+		MachineType machineType = machineTypeService.getMachineType(processTypeService.getProcessType(processService.getProcess(productionOrderDetail.getIdProcess()).getIdProcessType()).getIdMachineType());
+		if(machineType != null) {
+			for(Machine machine : machineList) {
+				if(machineType.getId().equals(machine.getIdMachineType())) {
+					list.add(Machine.clone(machine));
+				}
+			}
+		}
+		return new ListModelList<Machine>(list);
 	}
 	
 	public String getMachineTypeName(ProductionOrderDetail productionOrderDetail) {

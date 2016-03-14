@@ -4,10 +4,12 @@
         	<column label="Id Proceso" align="center"/>
             <column label="Proceso" align="center"/>
             <column label="Pieza" align="center"/>
+            <column label="Maquina Necesaria" align="center"/>
             <column label="Id Pieza" align="center"/>
             <column label="Id Producto" align="center"/>
             <column label="Detalles" align="center"/>
             <column label="Tiempo" align="center"/>
+            <column label="Maquina Asignada" align="center"/>
             <column label="Cantidad Total" align="center"/>
             <column label="Cantidad Finalizada" align="center"/>
             <column label="Esta Finalizado?" align="center"/>
@@ -17,10 +19,12 @@
                 <label value="${each.idProcess}"/>
             	<label value="${win_production_order_list$composer.getProcessTypeByProcessId(each.idProcess).name}"/>
             	<label value="${win_production_order_list$composer.getPieceByProcessId(each.idProcess).name}"/>
+            	<label value="${win_production_order_list$composer.getMachineTypeName(each)}"/>
             	<label value="${win_production_order_list$composer.getPieceByProcessId(each.idProcess).id}"/>
             	<label value="${win_production_order_list$composer.getPieceByProcessId(each.idProcess).idProduct}"/>
             	<label value="${win_production_order_list$composer.getProcessByProcessId(each.idProcess).details}"/>
             	<label value="${win_production_order_list$composer.getFormatedTime(each.timeTotal)}"/>
+            	<label value="${win_production_order_list$composer.getMachineName(each)}"/>
             	<label value="${each.quantityPiece}"/>
             	<label value="${each.quantityFinished}"/>
             	<label value="${win_production_order_list$composer.getIsFinished(each.isFinished())}"/>

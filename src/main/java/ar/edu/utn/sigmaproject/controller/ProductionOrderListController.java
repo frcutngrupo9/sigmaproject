@@ -19,6 +19,8 @@ import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Textbox;
 
+import ar.edu.utn.sigmaproject.domain.Machine;
+import ar.edu.utn.sigmaproject.domain.MachineType;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
@@ -28,6 +30,8 @@ import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.Worker;
+import ar.edu.utn.sigmaproject.service.MachineService;
+import ar.edu.utn.sigmaproject.service.MachineTypeService;
 import ar.edu.utn.sigmaproject.service.PieceService;
 import ar.edu.utn.sigmaproject.service.ProcessService;
 import ar.edu.utn.sigmaproject.service.ProcessTypeService;
@@ -36,6 +40,8 @@ import ar.edu.utn.sigmaproject.service.ProductionOrderDetailService;
 import ar.edu.utn.sigmaproject.service.ProductionOrderService;
 import ar.edu.utn.sigmaproject.service.ProductionPlanDetailService;
 import ar.edu.utn.sigmaproject.service.WorkerService;
+import ar.edu.utn.sigmaproject.service.impl.MachineServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.MachineTypeServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.PieceServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProcessServiceImpl;
 import ar.edu.utn.sigmaproject.service.impl.ProcessTypeServiceImpl;
@@ -64,6 +70,8 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 	private ProductionPlanDetailService productionPlanDetailService = new ProductionPlanDetailServiceImpl();
 	private WorkerService workerService = new WorkerServiceImpl();
 	private ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
+	private MachineTypeService machineTypeService = new MachineTypeServiceImpl();
+	private MachineService machineService = new MachineServiceImpl();
 
 	// atributes
 	private ProductionPlan currentProductionPlan;
@@ -223,5 +231,25 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		} else {
 			return "0";
 		}
+	}
+	
+	public String getMachineTypeName(ProductionOrderDetail productionOrderDetail) {
+		String name = "Ninguna";
+		Process process = processService.getProcess(productionOrderDetail.getIdProcess());
+		ProcessType processType = processTypeService.getProcessType(process.getIdProcessType());
+		MachineType machineType = machineTypeService.getMachineType(processType.getIdMachineType());
+		if(machineType != null) {
+			name = machineType.getName();
+		}
+		return name;
+	}
+	
+	public String getMachineName(ProductionOrderDetail productionOrderDetail) {
+		String name = "Ninguna";
+		Machine machine = machineService.getMachine(productionOrderDetail.getIdMachine());
+		if(machine != null) {
+			name = machine.getName();
+		}
+		return name;
 	}
 }

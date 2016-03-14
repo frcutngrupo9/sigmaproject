@@ -78,7 +78,7 @@
 			            	<label value="${win_production_order_creation$composer.getFormatedTime(each.timeTotal)}"/>
 			            	<combobox inplace="true"
 			            		forward="onSelect=productionOrderDetailGrid.onEditProductionOrderDetailMachine(${each}), onCreate=productionOrderDetailGrid.onCreateMachineCombobox(${each})"
-                        		model="${win_production_order_creation$composer.getMachineListModel()}" hflex="1" >
+                        		model="${win_production_order_creation$composer.getMachineListModel(each)}" hflex="1" >
 		                        <template name="model">
 		                            <comboitem label="${each.name}" />
 		                        </template>

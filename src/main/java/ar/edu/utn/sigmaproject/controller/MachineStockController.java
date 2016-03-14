@@ -160,7 +160,9 @@ public class MachineStockController extends SelectorComposer<Component> {
 		String name = nameTextbox.getText();
 		Integer year = yearIntbox.getValue();
 		Integer usedTimeHours = usedTimeIntboxHours.getValue();
+		if(usedTimeHours == null) { usedTimeHours = 0; }
 		Integer usedTimeMinutes = usedTimeIntboxMinutes.getValue();
+		if(usedTimeMinutes == null) { usedTimeMinutes = 0; }
 		Duration usedTime = null;
 		try {
 			usedTime = DatatypeFactory.newInstance().newDuration(true, 0, 0, 0, usedTimeHours, usedTimeMinutes, 0);
