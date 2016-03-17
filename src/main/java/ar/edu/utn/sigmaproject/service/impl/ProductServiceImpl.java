@@ -3,13 +3,17 @@ package ar.edu.utn.sigmaproject.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.zkoss.image.Image;
+
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.domain.ProductImage;
 import ar.edu.utn.sigmaproject.domain.RawMaterial;
 import ar.edu.utn.sigmaproject.domain.Supply;
 import ar.edu.utn.sigmaproject.service.PieceService;
 import ar.edu.utn.sigmaproject.service.ProcessService;
+import ar.edu.utn.sigmaproject.service.ProductImageService;
 import ar.edu.utn.sigmaproject.service.ProductService;
 import ar.edu.utn.sigmaproject.service.RawMaterialService;
 import ar.edu.utn.sigmaproject.service.SupplyService;
@@ -85,6 +89,7 @@ public class ProductServiceImpl implements ProductService {
 		if(product.getId() != null) {// hay que agregar un checkeo para no eliminar el producto si esta siendo referenciado por otros objetos u enviar alguna confirmacion
 			new PieceServiceImpl().deleteAll(product.getId());// se realiza una eliminacion en cascada de las piezas relacionadas al producto, los procesos se eliminan en el servicio de la pieza
 			new RawMaterialServiceImpl().deleteAll(product.getId());
+			new ProductImageServiceImpl().deleteAll(product.getId());
 			int size = productList.size();
 			for(int i = 0; i < size; i++) {
 				Product t = productList.get(i);
@@ -300,5 +305,47 @@ public class ProductServiceImpl implements ProductService {
 			}
 		}
 		return null;
+	}
+
+	public Image findImage(Product currentProduct) {
+		ProductImageService productImageService = new ProductImageServiceImpl();
+		ProductImage aux = productImageService.findFirstProductImage(currentProduct.getId());
+		if(aux != null) {
+			return aux.getImage();
+		} else {
+			return null;
+		}
+	}
+
+	public Product saveProduct(Product currentProduct, Image image,
+			List<Piece> pieceList, List<Process> processList,
+			List<Supply> supplyList, List<RawMaterial> rawMaterialList) {
+		currentProduct = saveProduct(currentProduct, pieceList, processList, supplyList, rawMaterialList);
+		ProductImageService productImageService = new ProductImageServiceImpl();
+		if(image != null) {
+			productImageService.save(new ProductImage(null, currentProduct.getId(), image));
+		}
+		return currentProduct;
+	}
+
+	public Product updateProduct(Product currentProduct, Image image,
+			List<Piece> pieceList, List<Process> processList,
+			List<Supply> supplyList, List<RawMaterial> rawMaterialList) {
+		currentProduct = updateProduct(currentProduct, pieceList, processList, supplyList, rawMaterialList);
+		ProductImageService productImageService = new ProductImageServiceImpl();
+		ProductImage aux = productImageService.findFirstProductImage(currentProduct.getId());
+		if(image != null) {
+			if(aux != null) {
+				aux.setImage(image);
+				productImageService.save(aux);
+			} else {
+				productImageService.save(new ProductImage(null, currentProduct.getId(), image));
+			}
+		} else {
+			if(aux != null) {
+				productImageService.deleteProductImage(aux);
+			} 
+		}
+		return currentProduct;
 	}
 }

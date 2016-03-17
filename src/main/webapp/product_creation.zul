@@ -3,50 +3,51 @@
     <panel title="Producto" id="productCreationBlock" border="rounded">
         <panelchildren>
             <vlayout>
-                <grid hflex="1">
-                    <columns>
-                        <column align="right" width="25%"/>
-                        <column align="left"/>
-                    </columns>
-                    <rows>
-                    	<row>
-                            <label value="Codigo :"/>
-                            <textbox id="productCodeTextbox" width="50%" placeholder="Codigo del Producto"/>
-                        </row>
-                        <row>
-                            <label value="Nombre :"/>
-                            <textbox id="productNameTextbox" width="50%" placeholder="Nombre del Producto"/>
-                        </row>
-                        <row>
-                            <label value="Detalles :"/>
-                            <textbox id="productDetailsTextbox" width="50%" rows="3" height="100px" />
-                        </row>
-                        <row>
-                            <label value="Precio :"/>
-                            <doublebox id="productPriceDoublebox" width="50%" placeholder="Precio del Producto"/>
-                        </row>
-                    </rows>
-                </grid>
-                <separator/>
-                <hlayout>
+            	<hbox hflex="1">
+            		<image id="productImage"/>
+	                <grid id="productGrid" hflex="1">
+	                    <columns>
+	                        <column align="right" width="25%"/>
+	                        <column align="left"/>
+	                    </columns>
+	                    <rows>
+	                    	<row>
+	                            <label value="Codigo :"/>
+	                            <textbox id="productCodeTextbox" width="50%" placeholder="Codigo del Producto"/>
+	                        </row>
+	                        <row>
+	                            <label value="Nombre :"/>
+	                            <textbox id="productNameTextbox" width="50%" placeholder="Nombre del Producto"/>
+	                        </row>
+	                        <row>
+	                            <label value="Detalles :"/>
+	                            <textbox id="productDetailsTextbox" width="50%" rows="3" height="100px" />
+	                        </row>
+	                        <row>
+	                            <label value="Precio :"/>
+	                            <doublebox id="productPriceDoublebox" width="50%" placeholder="Precio del Producto"/>
+	                        </row>
+	                    </rows>
+	                </grid>
+                </hbox>
+                <hlayout style="margin: 4px">
                     <button id="saveProductButton" label="Guardar Producto"/>
                     <button id="resetProductButton" label="Reset Producto"/>
                     <button id="deleteProductButton" label="Eliminar Producto"/>
                 </hlayout>
-                <separator/>
-                <hlayout>
-	                <button id="createPieceButton" label="Agregar Nueva Pieza"/>
-	                <button id="pieceCopyButton" label="Copiar Otra Pieza"/>
+                <hlayout style="margin: 4px">
+                	<button id="uploadProductPhotoButton" label="Subir Foto Producto" upload="true" onUpload="win_product_creation$composer.doUploadProductPhoto(event.getMedia())"/>
+	                <button id="deleteProductPhotoButton" label="Eliminar Foto Producto"/>
 	                <button id="openSupplyListButton" label="Insumos"/>
                     <button id="openRawMaterialListButton" label="Materias Primas"/>
                 </hlayout>
-    			<listbox id="pieceListbox">
+    			<listbox id="pieceListbox" style="margin: 4px">
     				<auxhead>
 						<auxheader label="Piezas" colspan="2"/>
 					</auxhead>
         			<listhead>
             			<listheader label="Nombre Pieza"/>
-            			<listheader label="Numero de Procesos"/>
+            			<listheader label="Cantidad Procesos"/>
         			</listhead>
         			<template name="model">
             			<listitem>
@@ -55,6 +56,10 @@
             			</listitem>
         			</template>
     			</listbox>
+    			<hlayout style="margin: 4px">
+	                <button id="createPieceButton" label="Agregar Nueva Pieza"/>
+	                <button id="pieceCopyButton" label="Copiar Otra Pieza"/>
+                </hlayout>
             </vlayout>
         </panelchildren>
     </panel>

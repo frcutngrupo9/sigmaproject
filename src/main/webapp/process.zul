@@ -7,9 +7,9 @@
     <separator/>
     <listbox id="processTypeListbox" mold="paging" pageSize="10">
         <listhead>
-            <listheader label="Id" width="40px"/>
-            <listheader label="Nombre"/>
-            <listheader label="Nro Secuencia"/>
+            <listheader label="Id" sort="auto(id)" width="40px"/>
+            <listheader label="Nombre" sort="auto(name)"/>
+            <listheader label="Nro Secuencia" sort="auto(stepNumber)"/>
             <listheader label="Maquina Necesaria"/>
         </listhead>
         <template name="model">

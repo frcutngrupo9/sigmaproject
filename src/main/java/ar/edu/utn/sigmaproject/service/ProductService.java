@@ -30,4 +30,14 @@ public interface ProductService {
 
 	Integer getNewId();
 
+	org.zkoss.image.Image findImage(Product currentProduct);
+
+	Product saveProduct(Product currentProduct, org.zkoss.image.Image image,
+			List<Piece> pieceList, List<Process> processList,
+			List<Supply> supplyList, List<RawMaterial> rawMaterialList);
+
+	Product updateProduct(Product currentProduct, org.zkoss.image.Image image,
+			List<Piece> pieceList, List<Process> processList,
+			List<Supply> supplyList, List<RawMaterial> rawMaterialList);
+
 }

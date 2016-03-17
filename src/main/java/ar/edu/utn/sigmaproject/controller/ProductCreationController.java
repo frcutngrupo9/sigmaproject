@@ -25,6 +25,8 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Caption;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Doublebox;
+import org.zkoss.zul.Grid;
+import org.zkoss.zul.Image;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
@@ -87,6 +89,12 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	@Wire
 	Button deleteProductButton;
 	@Wire
+	Button uploadProductPhotoButton;
+	@Wire
+	Button deleteProductPhotoButton;
+	@Wire
+	Image productImage;
+	@Wire
 	Component pieceCreationBlock;
 	@Wire
 	Textbox pieceNameTextbox;
@@ -124,6 +132,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	Caption productCaption;
 	@Wire
 	Button pieceCopyButton;
+	@Wire
+	Grid productGrid;
 
 	// supply
 	@Wire
@@ -282,16 +292,17 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		String productDetails = productDetailsTextbox.getText();
 		String productCode = productCodeTextbox.getText();
 		BigDecimal productPrice = new BigDecimal(productPriceDoublebox.doubleValue());
+		org.zkoss.image.Image image = productImage.getContent();
 
 		if(currentProduct == null) {// se esta creando un nuevo producto
 			currentProduct = new Product(null, productCode, productName, productDetails, productPrice);
-			productService.saveProduct(currentProduct, pieceList, processList, supplyList, rawMaterialList);
+			productService.saveProduct(currentProduct, image, pieceList, processList, supplyList, rawMaterialList);
 		} else {// se esta editando un producto
 			currentProduct.setName(productName);
 			currentProduct.setDetails(productDetails);
 			currentProduct.setCode(productCode);
 			currentProduct.setPrice(productPrice);
-			currentProduct = productService.updateProduct(currentProduct, pieceList, processList, supplyList, rawMaterialList);
+			currentProduct = productService.updateProduct(currentProduct, image, pieceList, processList, supplyList, rawMaterialList);
 		}
 		// mostrar mensaje al user
 		Clients.showNotification("Producto guardado");
@@ -301,6 +312,31 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		currentPiece = null;
 		refreshViewProduct();
 		refreshViewPiece();
+	}
+	
+	public void doUploadProductPhoto(org.zkoss.image.AImage media) {
+		if (media instanceof org.zkoss.image.Image) {
+			org.zkoss.image.Image img = (org.zkoss.image.Image) media;
+			productImage.setHeight("225px");
+			productImage.setWidth("225px");
+			productImage.setStyle("margin: 8px");
+			productImage.setContent(img);
+		} else {
+			Messagebox.show("No es una imagen: "+media, "Error", Messagebox.OK, Messagebox.ERROR);
+		}
+	}
+	
+	@Listen("onClick = #deleteProductPhotoButton")
+	public void deleteProductPhoto() {
+		org.zkoss.image.Image img = productImage.getContent();
+		if(img != null) {// se borra solo  si hay una imagen
+			img = null;
+			productImage.setContent(img);
+			productImage.setHeight("0px");
+			productImage.setWidth("0px");
+			productImage.setStyle("margin: 0px");
+			productGrid.setHflex("2");
+		}
 	}
 
 	@Listen("onClick = #createPieceButton")
@@ -443,6 +479,11 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			productDetailsTextbox.setText("");
 			productCodeTextbox.setText("");
 			productPriceDoublebox.setText("");
+			org.zkoss.image.Image img = null;
+			productImage.setHeight("0px");
+			productImage.setWidth("0px");
+			productImage.setStyle("margin: 0px");
+			productImage.setContent(img);
 			processList = new ArrayList<Process>();
 			pieceList = new ArrayList<Piece>();
 			pieceListModel = new ListModelList<Piece>(pieceList);
@@ -458,9 +499,20 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			BigDecimal product_price = currentProduct.getPrice();
 			if(product_price != null) {
 				productPriceDoublebox.setValue(product_price.doubleValue());
-			}else {
+			} else {
 				productPriceDoublebox.setValue(null);
 			}
+			org.zkoss.image.Image img = productService.findImage(currentProduct);
+			if(img != null) {
+				productImage.setHeight("225px");
+				productImage.setWidth("225px");
+				productImage.setStyle("margin: 8px");
+			} else {
+				productImage.setHeight("0px");
+				productImage.setWidth("0px");
+				productImage.setStyle("margin: 0px");
+			}
+			productImage.setContent(img);
 			processList = getProcessList(currentProduct.getId());
 			pieceList = pieceService.getPieceList(currentProduct.getId());
 			pieceListModel = new ListModelList<Piece>(pieceList);
