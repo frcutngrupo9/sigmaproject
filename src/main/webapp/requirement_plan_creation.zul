@@ -2,15 +2,22 @@
     <panel title="Plan de Requerimiento de Materiales" id="requirementPlanCreationBlock" border="rounded">
         <panelchildren>
             <vlayout>
-            	<separator/>
-            	<hlayout>
-            		<label value="Nombre Plan de Produccion: "/>
-					<textbox id="productionPlanNameTextbox" width="180px"/>
-				</hlayout>
-            	<hlayout>
-            		<label value="Fecha Plan de Produccion: "/>
-					<datebox id="productionPlanDatebox" cols="12" format="dd-MM-yyyy"/>
-            	</hlayout>
+            	<grid hflex="1" sclass="sigma-form">
+                    <columns>
+                        <column align="right" width="30%"/>
+                        <column align="left"/>
+                    </columns>
+                    <rows>
+                    	<row>
+                            <label value="Nombre Plan de Produccion: "/>
+							<textbox id="productionPlanNameTextbox" width="25%"/>
+                        </row>
+                        <row>
+                            <label value="Fecha Plan de Produccion: "/>
+							<datebox id="productionPlanDatebox" cols="12" format="dd-MM-yyyy" width="25%"/>
+                        </row>
+                    </rows>
+                </grid>
                 <separator/>
     			<listbox id="rawMaterialRequirementListbox" sizedByContent="true" span="true">
     				<auxhead>

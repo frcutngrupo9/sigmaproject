@@ -5,13 +5,13 @@
             <vlayout>
             	<grid hflex="1" sclass="sigma-form">
                     <columns>
-                        <column align="right" width="30%"/>
+                        <column align="right" width="25%"/>
                         <column align="left"/>
                     </columns>
                     <rows>
                     	<row>
                             <label value="Estado: "/>
-		                    <selectbox id="orderStateTypeSelectbox">
+		                    <selectbox id="orderStateTypeSelectbox" width="25%">
 		                        <template name="model">
 		                            <label value="${each.name}" />
 		                        </template>
@@ -19,11 +19,11 @@
                         </row>
                         <row>
                             <label value="Numero de Pedido: "/>
-                    		<intbox id="orderNumberIntbox" constraint="no negative"/>
+                    		<intbox id="orderNumberIntbox" constraint="no negative" width="25%"/>
                         </row>
                         <row>
                             <label value="Cliente: "/>
-		                    <bandbox id="clientBandbox" buttonVisible = "true" autodrop = "true">
+		                    <bandbox id="clientBandbox" buttonVisible = "true" autodrop = "true" width="25%">
 		                        <bandpopup>
 		                            <vbox>
 		                                <hbox>
@@ -48,51 +48,47 @@
                         </row>
                         <row>
                             <label value="Fecha Creacion: "/>
-                    		<datebox id="orderDatebox" cols="12" format="dd-MM-yyyy"/>
+                    		<datebox id="orderDatebox" cols="12" format="dd-MM-yyyy" width="25%"/>
                         </row>
                         <row>
                             <label value="Fecha Necesidad: "/>
-                    		<datebox id="orderNeedDatebox" cols="12" format="dd-MM-yyyy"/>
-                        </row>
-                        <row>
-                        	<cell colspan="2" style="text-align:center">
-	                            <hlayout>
-	                            	<label value="Seleccionar Producto: "/>
-				                    <bandbox id="productBandbox" buttonVisible = "true" autodrop = "true">
-				                        <bandpopup>
-				                            <vbox>
-				                                <hbox>
-				                                    Buscar
-				                                    <textbox />
-				                                </hbox>
-				                                <listbox id="productPopupListbox" width="200px">
-				                                <listhead>
-				                                    <listheader label="Producto"/>
-				                                    <listheader label="Descripcion"/>
-				                                </listhead>
-				                                <template name="model">
-				                                    <listitem>
-				                                        <listcell label="${each.name}"/>
-				                                        <listcell label="${each.details}"/>
-				                                    </listitem>
-				                                </template>
-				                                </listbox>
-				                            </vbox>
-				                        </bandpopup>
-				                    </bandbox>
-				                    <label value="Cantidad: "/>
-				                    <intbox id="productUnitsIntbox" constraint="no negative" width="36px"/>
-				                    <label value="Precio Unitario: "/>
-				                    <doublebox id="productPriceDoublebox" constraint="no negative" format=",###.##" width="77px"/>
-				                    <button id="saveOrderDetailButton" label="Grabar Detalle"/>
-				                    <button id="resetOrderDetailButton" label="Reset Detalle"/>
-				                    <button id="deleteOrderDetailButton" label="Eliminar Detalle"/>
-				                    <button id="cancelOrderDetailButton" label="Cancelar Edicion"/>
-				                </hlayout>
-			                </cell>
+                    		<datebox id="orderNeedDatebox" cols="12" format="dd-MM-yyyy" width="25%"/>
                         </row>
                    </rows>
                 </grid>
+                <hbox hflex="1" style="margin: 4px">
+                	<label value="Seleccionar Producto: "/>
+                    <bandbox id="productBandbox" buttonVisible = "true" autodrop = "true">
+                        <bandpopup>
+                            <vbox>
+                                <hbox>
+                                    Buscar
+                                    <textbox />
+                                </hbox>
+                                <listbox id="productPopupListbox" width="200px">
+                                <listhead>
+                                    <listheader label="Producto"/>
+                                    <listheader label="Descripcion"/>
+                                </listhead>
+                                <template name="model">
+                                    <listitem>
+                                        <listcell label="${each.name}"/>
+                                        <listcell label="${each.details}"/>
+                                    </listitem>
+                                </template>
+                                </listbox>
+                            </vbox>
+                        </bandpopup>
+                    </bandbox>
+                    <label value="Cantidad: "/>
+                    <intbox id="productUnitsIntbox" constraint="no negative" width="36px"/>
+                    <label value="Precio Unitario: "/>
+                    <doublebox id="productPriceDoublebox" constraint="no negative" format=",###.##" width="77px"/>
+                    <button id="saveOrderDetailButton" label="Grabar Detalle"/>
+                    <button id="resetOrderDetailButton" label="Reset Detalle"/>
+                    <button id="deleteOrderDetailButton" label="Eliminar Detalle"/>
+                    <button id="cancelOrderDetailButton" label="Cancelar Edicion"/>
+                </hbox>
                 <listbox id="orderDetailListbox" mold="paging" pageSize="7">
                     <auxhead>
                         <auxheader label="Productos" colspan="4"/>
