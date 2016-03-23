@@ -10,14 +10,16 @@ public class Product implements Serializable, Cloneable {
 	String name;
 	String details;
 	String code;
+	ProductCategory category;
 	BigDecimal price;
 	boolean isClone;
 
-	public Product(Integer id, String code , String name, String details, BigDecimal price) {
+	public Product(Integer id, String code , String name, String details, ProductCategory category, BigDecimal price) {
 		this.id = id;
 		this.name = name;
 		this.details = details;
 		this.code = code;
+		this.category = category;
 		this.price = price;
 		isClone = false;
 	}
@@ -48,6 +50,14 @@ public class Product implements Serializable, Cloneable {
 
 	public String getCode() {
 		return code;
+	}
+
+	public ProductCategory getCategory() {
+		return category;
+	}
+
+	public void setCategory(ProductCategory category) {
+		this.category = category;
 	}
 
 	public void setCode(String code) {

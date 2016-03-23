@@ -8,6 +8,7 @@ import org.zkoss.image.Image;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.domain.ProductCategory;
 import ar.edu.utn.sigmaproject.domain.ProductImage;
 import ar.edu.utn.sigmaproject.domain.RawMaterial;
 import ar.edu.utn.sigmaproject.domain.Supply;
@@ -39,6 +40,18 @@ public class ProductServiceImpl implements ProductService {
 		for(Product product:productList){
 			if(product.isClone() == false) {// se devuelven solo los que no sean clones
 				list.add(Product.clone(product));
+			}
+		}
+		return list;
+	}
+	
+	public synchronized List<Product> getProductListByCategory(ProductCategory productCategory) {
+		List<Product> list = new ArrayList<Product>();
+		for(Product product:productList){
+			if(product.isClone() == false) {// se devuelven solo los que no sean clones
+				if(product.getCategory() == productCategory) {
+					list.add(Product.clone(product));
+				}
 			}
 		}
 		return list;

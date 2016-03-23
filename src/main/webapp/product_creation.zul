@@ -24,6 +24,14 @@
 	                            <textbox id="productDetailsTextbox" width="50%" rows="3" height="100px" />
 	                        </row>
 	                        <row>
+	                            <label value="Categoria :"/>
+				                <combobox id="productCategoryCombobox">
+			                        <template name="model">
+			                            <comboitem label="${each}" />
+			                        </template>
+			                    </combobox>
+	                        </row>
+	                        <row>
 	                            <label value="Precio :"/>
 	                            <doublebox id="productPriceDoublebox" width="50%" placeholder="Precio del Producto"/>
 	                        </row>

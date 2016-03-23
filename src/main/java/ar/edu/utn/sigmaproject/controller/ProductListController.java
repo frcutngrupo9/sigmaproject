@@ -6,6 +6,7 @@ import javax.xml.datatype.Duration;
 
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.CheckEvent;
 import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
@@ -17,11 +18,14 @@ import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Radio;
+import org.zkoss.zul.Radiogroup;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.domain.ProductCategory;
 import ar.edu.utn.sigmaproject.service.MeasureUnitService;
 import ar.edu.utn.sigmaproject.service.PieceService;
 import ar.edu.utn.sigmaproject.service.ProcessService;
@@ -50,6 +54,8 @@ public class ProductListController extends SelectorComposer<Component>{
 	Button newProductButton;
 	@Wire
 	Grid productGrid;
+	@Wire
+	Radiogroup productCategoryRadiogroup;
 
 	// services
 	private ProductService productService = new ProductServiceImpl();
@@ -142,5 +148,41 @@ public class ProductListController extends SelectorComposer<Component>{
 
 	public ListModel<Process> getPieceProcesses(int idPiece) {
 		return new ListModelList<Process>(processService.getProcessList(idPiece));
+	}
+
+	@Listen("onCheck = #productCategoryRadiogroup")
+	public void selectCategory(CheckEvent event) {
+		String selectedProductCategoryString = ((Radio) event.getTarget()).getLabel();
+		ProductCategory selectedProductCategory = null;
+		if(selectedProductCategoryString.equals("Armario")) {
+			selectedProductCategory = ProductCategory.Armario;
+		}
+		if(selectedProductCategoryString.equals("Biblioteca")) {
+			selectedProductCategory = ProductCategory.Biblioteca;
+		}
+		if(selectedProductCategoryString.equals("Comoda")) {
+			selectedProductCategory = ProductCategory.Comoda;
+		}
+		if(selectedProductCategoryString.equals("Cajonera")) {
+			selectedProductCategory = ProductCategory.Cajonera;
+		}
+		if(selectedProductCategoryString.equals("Cama")) {
+			selectedProductCategory = ProductCategory.Cama;
+		}
+		if(selectedProductCategoryString.equals("Mesa")) {
+			selectedProductCategory = ProductCategory.Mesa;
+		}
+		if(selectedProductCategoryString.equals("Silla")) {
+			selectedProductCategory = ProductCategory.Silla;
+		}
+		if(selectedProductCategoryString.equals("Sillon")) {
+			selectedProductCategory = ProductCategory.Sillon;
+		}
+		if (selectedProductCategoryString.equals("Todas")) {
+			productListModel = new ListModelList<Product>(productService.getProductList());
+		} else {
+			productListModel = new ListModelList<Product>(productService.getProductListByCategory(selectedProductCategory));
+		}
+		productGrid.setModel(productListModel);
 	}
 }

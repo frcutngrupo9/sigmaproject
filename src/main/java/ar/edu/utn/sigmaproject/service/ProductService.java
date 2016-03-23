@@ -5,12 +5,15 @@ import java.util.List;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.domain.ProductCategory;
 import ar.edu.utn.sigmaproject.domain.RawMaterial;
 import ar.edu.utn.sigmaproject.domain.Supply;
 
 public interface ProductService {
 
 	List<Product> getProductList();
+	
+	List<Product> getProductListByCategory(ProductCategory productCategory);
 
 	Product getProduct(Integer idProduct);
 

@@ -24,6 +24,7 @@ import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Caption;
 import org.zkoss.zul.Checkbox;
+import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Image;
@@ -40,6 +41,7 @@ import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.domain.ProductCategory;
 import ar.edu.utn.sigmaproject.domain.RawMaterial;
 import ar.edu.utn.sigmaproject.domain.RawMaterialType;
 import ar.edu.utn.sigmaproject.domain.Supply;
@@ -134,6 +136,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	Button pieceCopyButton;
 	@Wire
 	Grid productGrid;
+	@Wire
+	Combobox productCategoryCombobox;
 
 	// supply
 	@Wire
@@ -219,6 +223,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 
 	// list models
 	private ListModelList<Piece> pieceListModel;
+	private ListModelList<ProductCategory> productCategoryListModel;
 	private ListModelList<ProcessType> processTypeListModel;
 	private ListModelList<MeasureUnit> lengthMeasureUnitListModel;
 	private ListModelList<MeasureUnit> depthMeasureUnitListModel;
@@ -251,7 +256,6 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		lengthMeasureUnitSelectbox.setModel(lengthMeasureUnitListModel);
 		depthMeasureUnitSelectbox.setModel(depthMeasureUnitListModel);
 		widthMeasureUnitSelectbox.setModel(widthMeasureUnitListModel);
-
 		currentProduct = (Product) Executions.getCurrent().getAttribute("selected_product");
 		currentPiece = null;
 
@@ -277,30 +281,39 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		rawMaterialListbox.setModel(rawMaterialListModel);
 		currentRawMaterial = null;
 		currentRawMaterialType = null;
+		
+		productCategoryListModel = new ListModelList<ProductCategory>(ProductCategory.values());
+		productCategoryCombobox.setModel(productCategoryListModel);
 
 		refreshViewProduct();
 		refreshViewPiece();
 	}
-
+	
 	@Listen("onClick = #saveProductButton")
 	public void saveProduct() {
 		if(Strings.isBlank(productNameTextbox.getValue())){
 			Clients.showNotification("Ingresar Nombre Producto", productNameTextbox);
 			return;
 		}
+		if(productCategoryCombobox.getSelectedIndex() == -1){
+			Clients.showNotification("Seleccionar Categoria Producto", productCategoryCombobox);
+			return;
+		}
 		String productName = productNameTextbox.getText();
 		String productDetails = productDetailsTextbox.getText();
 		String productCode = productCodeTextbox.getText();
+		ProductCategory productCategory = productCategoryCombobox.getSelectedItem().getValue();
 		BigDecimal productPrice = new BigDecimal(productPriceDoublebox.doubleValue());
 		org.zkoss.image.Image image = productImage.getContent();
 
 		if(currentProduct == null) {// se esta creando un nuevo producto
-			currentProduct = new Product(null, productCode, productName, productDetails, productPrice);
+			currentProduct = new Product(null, productCode, productName, productDetails, productCategory, productPrice);
 			productService.saveProduct(currentProduct, image, pieceList, processList, supplyList, rawMaterialList);
 		} else {// se esta editando un producto
 			currentProduct.setName(productName);
 			currentProduct.setDetails(productDetails);
 			currentProduct.setCode(productCode);
+			currentProduct.setCategory(productCategory);
 			currentProduct.setPrice(productPrice);
 			currentProduct = productService.updateProduct(currentProduct, image, pieceList, processList, supplyList, rawMaterialList);
 		}
@@ -470,6 +483,15 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		currentPiece = null;
 		refreshViewPiece();
 	}
+	
+	@Listen("onAfterRender = #productCategoryCombobox")
+	public void productCategoryComboboxSelection() {
+		if (currentProduct == null) {
+			productCategoryCombobox.setSelectedIndex(-1);
+		} else {
+			productCategoryCombobox.setSelectedIndex(productCategoryListModel.indexOf(currentProduct.getCategory()));
+		}
+	}
 
 	private void refreshViewProduct() {
 		if (currentProduct == null) {
@@ -478,6 +500,9 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			productNameTextbox.setText("");
 			productDetailsTextbox.setText("");
 			productCodeTextbox.setText("");
+			if(productCategoryCombobox.getItemCount() != 0) {// si ya se renderizo el combobox
+				productCategoryCombobox.setSelectedIndex(-1);
+			}
 			productPriceDoublebox.setText("");
 			org.zkoss.image.Image img = null;
 			productImage.setHeight("0px");
@@ -495,6 +520,9 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			deleteProductButton.setDisabled(false);
 			productNameTextbox.setText(currentProduct.getName());
 			productDetailsTextbox.setText(currentProduct.getDetails());
+			if(productCategoryCombobox.getItemCount() != 0) {// si ya se renderizo el combobox
+				productCategoryCombobox.setSelectedIndex(productCategoryListModel.indexOf(currentProduct.getCategory()));
+			}
 			productCodeTextbox.setText(currentProduct.getCode());
 			BigDecimal product_price = currentProduct.getPrice();
 			if(product_price != null) {

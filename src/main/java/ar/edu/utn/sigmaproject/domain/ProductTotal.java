@@ -7,7 +7,7 @@ public class ProductTotal  extends Product {
 	Integer totalUnits;
 
 	public ProductTotal(Product product) {
-		super(product.getId(), product.getCode(), product.getName(), product.getDetails(), product.getPrice());
+		super(product.getId(), product.getCode(), product.getName(), product.getDetails(), product.getCategory(), product.getPrice());
 	}
 
 	public Integer getTotalUnits() {

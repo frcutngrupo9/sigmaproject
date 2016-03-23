@@ -32,7 +32,7 @@
 		            <template name="model">
 		                <row>
 		                	<custom-attributes production_order_detail_list="${win_production_order_list$composer.getProductionOrderDetailList(each.id)}"/>
-			            	<detail open="false" fulfill="onOpen">
+			            	<detail open="false" fulfill="onOpen" visible="${each.id != null}">
 			            		<include src="/production_order_processes.zul" production_order_detail_list="${production_order_detail_list}"/>
 			            	</detail>
 		                	<label value="${each.id}"/>

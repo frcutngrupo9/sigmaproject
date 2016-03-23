@@ -7,14 +7,34 @@
     <separator/>
     <grid id="productGrid" mold="paging" pageSize="7" span="true">
     	<auxhead>
-			<auxheader label="Productos" colspan="7"/>
+			<auxheader label="Productos" colspan="8"/>
 		</auxhead>
+		<auxhead sclass="category-center">
+            <auxheader label="Categoria" colspan="2" rowspan="1" />
+            <auxheader colspan="6" rowspan="1">
+                <radiogroup id="productCategoryRadiogroup">
+                    <hlayout width="100%">
+                        <radio label="Todas" checked="true" width="90px" />
+                        <radio label="Armario" width="90px" />
+                        <radio label="Biblioteca" width="90px" />
+                        <radio label="Comoda" width="90px" />
+                        <radio label="Cajonera" width="90px" />
+                        <radio label="Cama" width="90px" />
+                        <radio label="Mesa" width="90px" />
+                        <radio label="Silla" width="90px" />
+                        <radio label="Sillon" width="90px" />
+                        <radio label="Ninguna" width="90px" />
+                    </hlayout>
+                </radiogroup>
+            </auxheader>
+        </auxhead>
         <columns>
         	<column width="40px" />
             <column label="Id" width="50px" align="center"/>
             <column label="Codigo" align="center"/>
             <column label="Nombre" align="center" sort="auto(name)"/>
             <column label="Detalles" align="center"/>
+            <column label="Categoria" align="center"/>
             <column label="Precio" align="center" sort="auto(price)"/>
             <column label="Editar" width="100px" align="center"/>
         </columns>
@@ -28,6 +48,7 @@
                 <label value="${each.code}"/>
                 <label value="${each.name}"/>
                 <label value="${each.details}"/>
+                <label value="${each.category}"/>
                 <label value="${each.price.doubleValue()} $"/>
                 <button forward="onClick=productGrid.onEditProduct(${each})" image="/img/edit16x16.png"/>
             </row>

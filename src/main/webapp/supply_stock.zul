@@ -54,19 +54,19 @@
 	                <label>Stock Actual:</label>
 	                <cell colspan="1" style="text-align:center">
 	                	<hbox>
-		                	<doublebox id="stockDoublebox" value="0" width="200px"/>
-		                	<button id="stockIncreaseButton" label="Ingresar a Stock"/>
-		                	<button id="stockDecreaseButton" label="Retirar para Produccion"/>
+		                	<doublebox id="stockDoublebox" value="0" width="100px"/>
+		                	<button id="stockIncreaseButton" label="Registro Ingreso"/>
+		                	<button id="stockDecreaseButton" label="Registro Egreso"/>
 	                	</hbox>
 	                </cell>
 	            </row>
 	            <row>
 	                <label>Stock Minimo:</label>
-	                <doublebox id="stockMinDoublebox" value="0" width="200px"/>
+	                <doublebox id="stockMinDoublebox" value="0" width="100px"/>
 	            </row>
 	            <row>
 	                <label>Stock Reposicion:</label>
-	                <doublebox id="stockRepoDoublebox" value="0" width="200px"/>
+	                <doublebox id="stockRepoDoublebox" value="0" width="100px"/>
 	            </row>
 	            <row>
 	                <cell colspan="2" style="text-align:center">
@@ -79,5 +79,43 @@
 	            </row>
 	        </rows>
     	</grid>
+    	<grid id="stockModificationGrid" width="300px" visible="false">
+    		<columns>
+                <column hflex="min" align="right"/>
+                <column />
+            </columns>
+	        <rows>
+	        	<row>
+	                <cell colspan="2" style="text-align:center">
+	                    <label id="stockModificationLabel">Ingreso/Egreso Stock</label>
+	                </cell>
+	            </row>
+	        	<row>
+	                <label>Cantidad:</label>
+	                <intbox id="quantityIntbox"/>
+	            </row>
+	            <row>
+	                <label>Nro Remito:</label>
+	                <intbox id="numberIntbox"/>
+	            </row>
+	            <row>
+	                <label>Empleado Responsable:</label>
+	                <selectbox id="workerSelectbox">
+                        <template name="model">
+                            <label value="${each.name}" />
+                        </template>
+                    </selectbox>
+	            </row>
+	            <row>
+	                <cell colspan="2" style="text-align:center">
+	                    <hlayout>
+	                        <button id="saveNewStockButton" label="Guardar"/>
+	                        <button id="cancelNewStockButton" label="Cancelar"/>
+	                        <button id="resetNewStockButton" label="Reset"/>
+	                    </hlayout>
+	                </cell>
+	            </row>
+	        </rows>
+		</grid>
     </vlayout>
 </window>
