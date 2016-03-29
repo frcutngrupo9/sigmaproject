@@ -19,7 +19,7 @@ public class ProductionPlanStateTypeServiceImpl implements ProductionPlanStateTy
 		productionPlanStateTypeList.add(new ProductionPlanStateType(productionPlanStateTypeId++,"finalizado", ""));
 	}
 
-	public List<ProductionPlanStateType> getProductionPlanStateTypeList() {
+	public synchronized List<ProductionPlanStateType> getProductionPlanStateTypeList() {
 		List<ProductionPlanStateType> list = new ArrayList<ProductionPlanStateType>();
 		for(ProductionPlanStateType orderStateType:productionPlanStateTypeList) {
 			list.add(ProductionPlanStateType.clone(orderStateType));

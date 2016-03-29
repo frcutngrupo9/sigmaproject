@@ -21,7 +21,7 @@ public class ProductImageServiceImpl  implements ProductImageService {
 		}
 	}
 
-	public List<ProductImage> findAll() {
+	public synchronized List<ProductImage> findAll() {
 		List<ProductImage> list = new ArrayList<ProductImage>();
 		for(ProductImage each: productImageList) {
 			list.add(ProductImage.clone(each));
@@ -29,7 +29,7 @@ public class ProductImageServiceImpl  implements ProductImageService {
 		return list;
 	}
 	
-	public List<ProductImage> findbyProductId(Integer idProduct) {
+	public synchronized List<ProductImage> findbyProductId(Integer idProduct) {
 		List<ProductImage> list = new ArrayList<ProductImage>();
 		for(ProductImage each: productImageList) {
 			if(each.getIdProduct().equals(idProduct)) {
@@ -39,7 +39,7 @@ public class ProductImageServiceImpl  implements ProductImageService {
 		return list;
 	}
 
-	public ProductImage getProductImage(Integer id) {
+	public synchronized ProductImage getProductImage(Integer id) {
 		for(ProductImage each: productImageList) {
 			if(each.getId().equals(id)) {
 				return ProductImage.clone(each);
@@ -48,7 +48,7 @@ public class ProductImageServiceImpl  implements ProductImageService {
 		return null;
 	}
 
-	public ProductImage findFirstProductImage(Integer idProduct) {
+	public synchronized ProductImage findFirstProductImage(Integer idProduct) {
 		for(ProductImage each: productImageList) {
 			if(each.getIdProduct().equals(idProduct)) {
 				return ProductImage.clone(each);
@@ -57,7 +57,7 @@ public class ProductImageServiceImpl  implements ProductImageService {
 		return null;
 	}
 
-	public ProductImage save(ProductImage productImage) {
+	public synchronized ProductImage save(ProductImage productImage) {
 		if(productImage.getId() == null) {
 			productImage.setId(getNewId());
 			productImage = ProductImage.clone(productImage);
@@ -78,7 +78,7 @@ public class ProductImageServiceImpl  implements ProductImageService {
 		}
 	}
 
-	public void deleteProductImage(ProductImage productImage) {
+	public synchronized void deleteProductImage(ProductImage productImage) {
 		if(productImage.getId() != null) {
 			int size = productImageList.size();
 			for(int i=0; i<size; i++) {

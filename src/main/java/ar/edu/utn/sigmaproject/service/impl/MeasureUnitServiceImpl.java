@@ -45,7 +45,7 @@ public class MeasureUnitServiceImpl implements MeasureUnitService {
 		return list;
 	}
 
-	public List<MeasureUnit> getMeasureUnitList(Integer idMeasureUnitType) {
+	public synchronized List<MeasureUnit> getMeasureUnitList(Integer idMeasureUnitType) {
 		List<MeasureUnit> list = new ArrayList<MeasureUnit>();
 		for(MeasureUnit aux:measureUnitList) {
 			if(aux.getIdMeasureUnitType().equals(idMeasureUnitType)) {

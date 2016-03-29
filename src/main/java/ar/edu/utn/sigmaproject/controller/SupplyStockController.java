@@ -6,16 +6,23 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Grid;
+import org.zkoss.zul.Intbox;
+import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.SupplyType;
+import ar.edu.utn.sigmaproject.domain.Worker;
 import ar.edu.utn.sigmaproject.service.SupplyTypeService;
+import ar.edu.utn.sigmaproject.service.WorkerService;
 import ar.edu.utn.sigmaproject.service.impl.SupplyTypeServiceImpl;
+import ar.edu.utn.sigmaproject.service.impl.WorkerServiceImpl;
 
 public class SupplyStockController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
@@ -48,18 +55,37 @@ public class SupplyStockController extends SelectorComposer<Component> {
 	Button cancelButton;
 	@Wire
 	Button resetButton;
+	@Wire
+	Grid stockModificationGrid;
+	@Wire
+	Doublebox quantityDoublebox;
+	@Wire
+	Label stockModificationLabel;
+	@Wire
+	Intbox numberIntbox;
+	@Wire
+	Combobox workerCombobox;
+	@Wire
+	Button saveNewStockButton;
+	@Wire
+	Button cancelNewStockButton;
+	@Wire
+	Button resetNewStockButton;
 
 	// services
 	private SupplyTypeService supplyTypeService = new SupplyTypeServiceImpl();
+	private WorkerService workerService = new WorkerServiceImpl();
 
 	// attributes
 	private SupplyType currentSupplyType;
 
 	// list
 	private List<SupplyType> supplyTypeList;
+	private List<Worker> workerList;
 
 	// list models
 	private ListModelList<SupplyType> supplyTypeListModel;
+	private ListModelList<Worker> workerListModel;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception{
@@ -68,6 +94,9 @@ public class SupplyStockController extends SelectorComposer<Component> {
 		supplyTypeListModel = new ListModelList<SupplyType>(supplyTypeList);
 		supplyTypeListbox.setModel(supplyTypeListModel);
 		currentSupplyType = null;
+		workerList = workerService.getWorkerList();
+		workerListModel = new ListModelList<Worker>(workerList);
+		workerCombobox.setModel(workerListModel);
 		refreshView();
 	}
 
@@ -147,11 +176,65 @@ public class SupplyStockController extends SelectorComposer<Component> {
 	
 	@Listen("onClick = #stockIncreaseButton")
 	public void stockIncreaseButtonClick() {
-		// TODO
+		stockModificationGrid.setVisible(true);
+		stockModificationLabel.setValue("Ingreso Stock");
+		workerCombobox.setSelectedIndex(-1);
+		numberIntbox.setValue(null);
+		quantityDoublebox.setValue(null);
 	}
 	
 	@Listen("onClick = #stockDecreaseButton")
 	public void stockDecreaseButtonClick() {
-		// TODO
+		stockModificationGrid.setVisible(true);
+		stockModificationLabel.setValue("Egreso Stock");
+		workerCombobox.setSelectedIndex(-1);
+		numberIntbox.setValue(null);
+		quantityDoublebox.setValue(null);
+	}
+	
+	@Listen("onClick = #saveNewStockButton")
+	public void saveNewStockButton() {
+		if(numberIntbox.getValue() <= 0) {
+			Clients.showNotification("Debe ingresar un numero", numberIntbox);
+			return;
+		}
+		if(quantityDoublebox.getValue() <= 0) {
+			Clients.showNotification("Debe ingresar una cantidad", quantityDoublebox);
+			return;
+		}
+		if(workerCombobox.getSelectedIndex() == -1) {
+			Clients.showNotification("Debe seleccionar un empleado", workerCombobox);
+			return;
+		}
+		if(currentSupplyType != null) {
+			double  newStock = 0;
+			if(stockModificationLabel.getValue().equals("Ingreso Stock")) {
+				newStock = currentSupplyType.getStock() + quantityDoublebox.doubleValue();
+			} else {
+				if(currentSupplyType.getStock() > quantityDoublebox.getValue()) {// hay suficiente stock
+					newStock = currentSupplyType.getStock() - quantityDoublebox.doubleValue();
+				} else {
+					Clients.showNotification("No hay stock suficiente", quantityDoublebox);
+					return;
+				}
+			}
+			stockDoublebox.setValue(newStock);
+//			currentWood.setStock(newStock);
+//			currentWood = woodService.updateWood(currentWood);
+//			refreshView();
+		}
+		stockModificationGrid.setVisible(false);
+	}
+	
+	@Listen("onClick = #cancelNewStockButton")
+	public void cancelNewStockButtonClick() {
+		stockModificationGrid.setVisible(false);
+	}
+	
+	@Listen("onClick = #resetNewStockButton")
+	public void resetNewStockButtonClick() {
+		workerCombobox.setSelectedIndex(-1);
+		numberIntbox.setValue(null);
+		quantityDoublebox.setValue(null);
 	}
 }

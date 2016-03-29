@@ -330,7 +330,7 @@ public class ProductServiceImpl implements ProductService {
 		}
 	}
 
-	public Product saveProduct(Product currentProduct, Image image,
+	public synchronized Product saveProduct(Product currentProduct, Image image,
 			List<Piece> pieceList, List<Process> processList,
 			List<Supply> supplyList, List<RawMaterial> rawMaterialList) {
 		currentProduct = saveProduct(currentProduct, pieceList, processList, supplyList, rawMaterialList);
@@ -341,7 +341,7 @@ public class ProductServiceImpl implements ProductService {
 		return currentProduct;
 	}
 
-	public Product updateProduct(Product currentProduct, Image image,
+	public synchronized Product updateProduct(Product currentProduct, Image image,
 			List<Piece> pieceList, List<Process> processList,
 			List<Supply> supplyList, List<RawMaterial> rawMaterialList) {
 		currentProduct = updateProduct(currentProduct, pieceList, processList, supplyList, rawMaterialList);

@@ -106,7 +106,7 @@ public class RawMaterialRequirementServiceImpl implements RawMaterialRequirement
 		}
 	}
 
-	public void deleteAll(Integer idProductionPlan) {
+	public synchronized void deleteAll(Integer idProductionPlan) {
 		List<RawMaterialRequirement> deleteList = getRawMaterialRequirementList(idProductionPlan);
 		for(RawMaterialRequirement delete : deleteList) {
 			deleteRawMaterialRequirement(delete);

@@ -154,7 +154,7 @@ public class PieceServiceImpl implements PieceService {
 		return false;
 	}
 
-	private void cloneAndAssignToProcess(Piece piece) {
+	private synchronized void cloneAndAssignToProcess(Piece piece) {
 		Piece clone = new Piece(null, piece.getIdProduct(), piece.getName(), piece.getLength(), piece.getLengthIdMeasureUnit(), piece.getDepth(), piece.getDepthIdMeasureUnit(), piece.getWidth(), piece.getWidthIdMeasureUnit(), piece.getSize(), piece.isGroup(), piece.getUnits());
 		clone.setClone(true);
 		clone = savePiece(clone);// para que devuelva una pieza con id agregado

@@ -38,7 +38,7 @@ public class ProcessServiceImpl implements ProcessService {
 		return list;
 	}
 
-	public List<Process> getCompleteProcessList() {// devuelve tambien procesos clones
+	public synchronized List<Process> getCompleteProcessList() {// devuelve tambien procesos clones
 		List<Process> list = new ArrayList<Process>();
 		for(Process process:processList) {
 			list.add(Process.clone(process));

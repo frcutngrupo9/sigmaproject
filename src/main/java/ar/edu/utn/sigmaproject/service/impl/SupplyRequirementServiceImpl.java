@@ -106,7 +106,7 @@ public class SupplyRequirementServiceImpl implements SupplyRequirementService {
 		}
 	}
 
-	public void deleteAll(Integer idProductionPlan) {
+	public synchronized void deleteAll(Integer idProductionPlan) {
 		List<SupplyRequirement> deleteList = getSupplyRequirementList(idProductionPlan);
 		for(SupplyRequirement delete : deleteList) {
 			deleteSupplyRequirement(delete);

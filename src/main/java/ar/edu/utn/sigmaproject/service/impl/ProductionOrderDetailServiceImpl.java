@@ -110,7 +110,7 @@ public class ProductionOrderDetailServiceImpl implements ProductionOrderDetailSe
 		}
 	}
 
-	public void deleteAll(Integer idProductionOrder) {
+	public synchronized void deleteAll(Integer idProductionOrder) {
 		List<ProductionOrderDetail> deleteList = getProductionOrderDetailList(idProductionOrder);
 		for(ProductionOrderDetail delete : deleteList) {
 			deleteProductionOrderDetail(delete);

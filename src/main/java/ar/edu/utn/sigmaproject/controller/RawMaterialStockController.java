@@ -282,7 +282,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		quantityDoublebox.setValue(null);
 	}
 	
-	@Listen("onClick = #cancelNewStockButton")
+	@Listen("onClick = #saveNewStockButton")
 	public void saveNewStockButton() {
 		if(numberIntbox.getValue() <= 0) {
 			Clients.showNotification("Debe ingresar un numero", numberIntbox);
@@ -300,7 +300,6 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 			double  newStock = 0;
 			if(stockModificationLabel.getValue().equals("Ingreso Stock")) {
 				newStock = currentWood.getStock() + quantityDoublebox.doubleValue();
-				
 			} else {
 				if(currentWood.getStock() > quantityDoublebox.getValue()) {// hay suficiente stock
 					newStock = currentWood.getStock() - quantityDoublebox.doubleValue();
@@ -309,9 +308,10 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 					return;
 				}
 			}
-			currentWood.setStock(newStock);
-			currentWood = woodService.updateWood(currentWood);
-			refreshView();
+			stockDoublebox.setValue(newStock);
+//			currentWood.setStock(newStock);
+//			currentWood = woodService.updateWood(currentWood);
+//			refreshView();
 		}
 		stockModificationGrid.setVisible(false);
 	}
@@ -319,6 +319,13 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	@Listen("onClick = #cancelNewStockButton")
 	public void cancelNewStockButtonClick() {
 		stockModificationGrid.setVisible(false);
+	}
+	
+	@Listen("onClick = #resetNewStockButton")
+	public void resetNewStockButtonClick() {
+		workerCombobox.setSelectedIndex(-1);
+		numberIntbox.setValue(null);
+		quantityDoublebox.setValue(null);
 	}
 
 	@Listen("onClick = #stockDecreaseButton")

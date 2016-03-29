@@ -130,7 +130,7 @@ public class ProductionPlanDetailServiceImpl implements ProductionPlanDetailServ
 		return productTotalList;// devuelve el productTotalList lleno con todos los productos sin repetir y con el total, que conforman el plan de produccion
 	}
 
-	public void deleteAll(Integer idProductionPlan) {
+	public synchronized void deleteAll(Integer idProductionPlan) {
 		OrderStateService orderStateService = new OrderStateServiceImpl();
 		List<ProductionPlanDetail> deleteList = getProductionPlanDetailList(idProductionPlan);
 		for(ProductionPlanDetail delete : deleteList) {

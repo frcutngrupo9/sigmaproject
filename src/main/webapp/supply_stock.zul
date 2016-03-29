@@ -92,19 +92,19 @@
 	            </row>
 	        	<row>
 	                <label>Cantidad:</label>
-	                <intbox id="quantityIntbox"/>
+	                <doublebox id="quantityDoublebox" hflex="1"/>
 	            </row>
 	            <row>
 	                <label>Nro Remito:</label>
-	                <intbox id="numberIntbox"/>
+	                <intbox id="numberIntbox" hflex="1"/>
 	            </row>
 	            <row>
 	                <label>Empleado Responsable:</label>
-	                <selectbox id="workerSelectbox">
+	                <combobox id="workerCombobox" hflex="1">
                         <template name="model">
-                            <label value="${each.name}" />
+                            <comboitem label="${each.name}" value="${each}" />
                         </template>
-                    </selectbox>
+                    </combobox>
 	            </row>
 	            <row>
 	                <cell colspan="2" style="text-align:center">

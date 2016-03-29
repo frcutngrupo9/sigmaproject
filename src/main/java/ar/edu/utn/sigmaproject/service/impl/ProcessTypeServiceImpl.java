@@ -46,7 +46,7 @@ public class ProcessTypeServiceImpl implements ProcessTypeService {
 		}
 	}
 
-	public List<ProcessType> getProcessTypeList() {
+	public synchronized List<ProcessType> getProcessTypeList() {
 		List<ProcessType> list = new ArrayList<ProcessType>();
 		for(ProcessType processType:processTypeList) {
 			list.add(ProcessType.clone(processType));
@@ -65,7 +65,7 @@ public class ProcessTypeServiceImpl implements ProcessTypeService {
 		return null;
 	}
 
-	public ProcessType saveProcessType(ProcessType processType) {
+	public synchronized ProcessType saveProcessType(ProcessType processType) {
 		if(processType.getId() == null) {
 			processType.setId(processTypeId++);
 		}
@@ -75,7 +75,7 @@ public class ProcessTypeServiceImpl implements ProcessTypeService {
 		return processType;
 	}
 
-	public ProcessType updateProcessType(ProcessType processType) {
+	public synchronized ProcessType updateProcessType(ProcessType processType) {
 		if(processType.getId() == null) {
 			throw new IllegalArgumentException("can't update a null-id process type, save it first");
 		} else {
@@ -93,7 +93,7 @@ public class ProcessTypeServiceImpl implements ProcessTypeService {
 		}
 	}
 
-	public void deleteProcessType(ProcessType processType) {
+	public synchronized void deleteProcessType(ProcessType processType) {
 		if(processType.getId() != null) {
 			int size = processTypeList.size();
 			for(int i=0; i<size; i++) {

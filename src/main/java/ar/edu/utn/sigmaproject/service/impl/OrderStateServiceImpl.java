@@ -116,7 +116,7 @@ public class OrderStateServiceImpl implements OrderStateService {
 		}
 	}
 
-	public void setNewOrderState(String stateName, Integer idOrder) {// crea un nuevo estado en base al nombre pasado por parametro
+	public synchronized void setNewOrderState(String stateName, Integer idOrder) {// crea un nuevo estado en base al nombre pasado por parametro
 		OrderStateTypeService orderStateTypeService = new OrderStateTypeServiceImpl();
 		OrderStateType order_state_type = orderStateTypeService.getOrderStateType(stateName);
 		OrderState aux = new OrderState(idOrder, order_state_type.getId(), new Date());

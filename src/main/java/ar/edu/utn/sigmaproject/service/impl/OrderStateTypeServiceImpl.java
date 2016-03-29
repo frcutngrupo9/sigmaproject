@@ -18,7 +18,7 @@ public class OrderStateTypeServiceImpl implements OrderStateTypeService {
 		orderStateTypeList.add(new OrderStateType(orderStateTypeId++,"finalizado", ""));
 	}
 
-	public List<OrderStateType> getOrderStateTypeList() {
+	public synchronized List<OrderStateType> getOrderStateTypeList() {
 		List<OrderStateType> list = new ArrayList<OrderStateType>();
 		for(OrderStateType orderStateType:orderStateTypeList) {
 			list.add(OrderStateType.clone(orderStateType));

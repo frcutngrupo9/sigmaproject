@@ -92,7 +92,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 		}
 	}
 
-	public void deleteAll(Integer idOrder) {
+	public synchronized void deleteAll(Integer idOrder) {
 		List<OrderDetail> deleteList = getOrderDetailList(idOrder);
 		for(OrderDetail delete:deleteList) {
 			deleteOrderDetail(delete);

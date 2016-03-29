@@ -115,7 +115,7 @@ public class ProductionPlanStateServiceImpl implements ProductionPlanStateServic
 		}
 	}
 
-	public void setNewProductionPlanState(String stateName, Integer idProductionPlan) {// crea un nuevo estado en base al nombre pasado por parametro
+	public synchronized void setNewProductionPlanState(String stateName, Integer idProductionPlan) {// crea un nuevo estado en base al nombre pasado por parametro
 		ProductionPlanStateTypeService productionPlanStateTypeService = new ProductionPlanStateTypeServiceImpl();
 		ProductionPlanStateType production_plan_state_type = productionPlanStateTypeService.getProductionPlanStateType(stateName);
 		ProductionPlanState aux = new ProductionPlanState(idProductionPlan, production_plan_state_type.getId(), new Date());
