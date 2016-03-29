@@ -8,13 +8,11 @@ public class ProcessType implements Serializable, Cloneable {
 	Integer id;
 	Integer idMachineType;
 	String name;
-	Integer stepNumber;
 
-	public ProcessType(Integer id, Integer idMachineType, String name, Integer stepNumber) {
+	public ProcessType(Integer id, Integer idMachineType, String name) {
 		this.id = id;
 		this.idMachineType = idMachineType;
 		this.name = name;
-		this.stepNumber = stepNumber;
 	}
 
 	public Integer getId() {
@@ -39,14 +37,6 @@ public class ProcessType implements Serializable, Cloneable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public Integer getStepNumber() {
-		return stepNumber;
-	}
-
-	public void setStepNumber(Integer stepNumber) {
-		this.stepNumber = stepNumber;
 	}
 
 	@Override

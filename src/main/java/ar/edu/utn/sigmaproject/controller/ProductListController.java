@@ -86,7 +86,6 @@ public class ProductListController extends SelectorComposer<Component>{
 		List<Process> processList = processService.getCompleteProcessList();
 		processListModel = new ListModelList<Process>(processList);
 		processListbox.setModel(processListModel);
-
 	}
 
 	//    @Listen("onSelect = #productListbox")
@@ -154,33 +153,12 @@ public class ProductListController extends SelectorComposer<Component>{
 	public void selectCategory(CheckEvent event) {
 		String selectedProductCategoryString = ((Radio) event.getTarget()).getLabel();
 		ProductCategory selectedProductCategory = null;
-		if(selectedProductCategoryString.equals("Armario")) {
-			selectedProductCategory = ProductCategory.Armario;
-		}
-		if(selectedProductCategoryString.equals("Biblioteca")) {
-			selectedProductCategory = ProductCategory.Biblioteca;
-		}
-		if(selectedProductCategoryString.equals("Comoda")) {
-			selectedProductCategory = ProductCategory.Comoda;
-		}
-		if(selectedProductCategoryString.equals("Cajonera")) {
-			selectedProductCategory = ProductCategory.Cajonera;
-		}
-		if(selectedProductCategoryString.equals("Cama")) {
-			selectedProductCategory = ProductCategory.Cama;
-		}
-		if(selectedProductCategoryString.equals("Mesa")) {
-			selectedProductCategory = ProductCategory.Mesa;
-		}
-		if(selectedProductCategoryString.equals("Silla")) {
-			selectedProductCategory = ProductCategory.Silla;
-		}
-		if(selectedProductCategoryString.equals("Sillon")) {
-			selectedProductCategory = ProductCategory.Sillon;
-		}
-		if (selectedProductCategoryString.equals("Todas")) {
+		if(selectedProductCategoryString.equals("Todas")) {
 			productListModel = new ListModelList<Product>(productService.getProductList());
 		} else {
+			if(!selectedProductCategoryString.equals("Ninguna")) {
+				selectedProductCategory = ProductCategory.valueOf(selectedProductCategoryString);
+			}
 			productListModel = new ListModelList<Product>(productService.getProductListByCategory(selectedProductCategory));
 		}
 		productGrid.setModel(productListModel);

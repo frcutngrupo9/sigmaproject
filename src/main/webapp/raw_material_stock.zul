@@ -50,19 +50,19 @@
 	            </row>
 	        	<row>
 	                <label>Materia Prima:</label>
-	                <selectbox id="rawMaterialTypeSelectbox">
+	                <combobox id="rawMaterialTypeCombobox">
                         <template name="model">
-                            <label value="${each.name}" />
+                            <comboitem label="${each.name}" value="${each}"/>
                         </template>
-                    </selectbox>
+                    </combobox>
 	            </row>
 	            <row>
 	                <label>Madera:</label>
-	                <selectbox id="woodTypeSelectbox">
+	                <combobox id="woodTypeCombobox">
                         <template name="model">
-                            <label value="${each.name}" />
+                            <comboitem label="${each.name}" value="${each}"/>
                         </template>
-                    </selectbox>
+                    </combobox>
 	            </row>
 	            <row>
 	                <label>Nombre Materia Prima:</label>
@@ -101,7 +101,7 @@
 	            </row>
 	        </rows>
     	</grid>
-    	<grid id="stockModificationGrid" width="300px" visible="false">
+    	<grid id="stockModificationGrid" width="400px" visible="false">
     		<columns>
                 <column hflex="min" align="right"/>
                 <column />
@@ -114,19 +114,19 @@
 	            </row>
 	        	<row>
 	                <label>Cantidad:</label>
-	                <intbox id="quantityIntbox"/>
+	                <doublebox id="quantityDoublebox" hflex="1"/>
 	            </row>
 	            <row>
 	                <label>Nro Remito:</label>
-	                <intbox id="numberIntbox"/>
+	                <intbox id="numberIntbox" hflex="1"/>
 	            </row>
 	            <row>
 	                <label>Empleado Responsable:</label>
-	                <selectbox id="workerSelectbox">
+	                <combobox id="workerCombobox" hflex="1">
                         <template name="model">
-                            <label value="${each.name}" />
+                            <comboitem label="${each.name}" value="${each}" />
                         </template>
-                    </selectbox>
+                    </combobox>
 	            </row>
 	            <row>
 	                <cell colspan="2" style="text-align:center">

@@ -4,25 +4,41 @@
         	<vlayout>
         		<grid hflex="1" sclass="sigma-form">
                     <columns>
+                        <column align="right"/>
+                        <column align="left"/>
+                        <column align="right"/>
+                        <column align="left"/>
+                        <column align="right"/>
+                        <column align="left"/>
+                        <column align="right"/>
+                        <column align="left"/>
+                        <column align="right"/>
+                        <column align="left"/>
+                    </columns>
+                    <rows>
+                    	<row>
+                    		<label value="Producto a Fabricar: "/>
+							<textbox id="productNameTextbox" width="100%"/>
+							<label value="Unidades a Fabricar: "/>
+							<intbox id="productUnitsIntbox"/>
+                            <label value="Plan de Produccion: "/>
+							<textbox id="productionPlanNameTextbox" width="100%"/>
+							<label value="Estado Plan: "/>
+                            <textbox id="productionPlanStateTypeTextbox" width="100%"/>
+							<label value="Fecha: "/>
+							<datebox id="productionPlanDatebox" format="dd-MM-yyyy"/>
+                        </row>
+                   </rows>
+                </grid>
+        		<grid hflex="1" sclass="sigma-form">
+                    <columns>
                         <column align="right" width="30%"/>
                         <column align="left"/>
                     </columns>
                     <rows>
                     	<row>
-                            <label value="Nombre Plan de Produccion: "/>
-							<textbox id="productionPlanNameTextbox" width="180px"/>
-                        </row>
-                        <row>
-                            <label value="Fecha Plan de Produccion: "/>
-							<datebox id="productionPlanDatebox" cols="12" format="dd-MM-yyyy"/>
-                        </row>
-                        <row>
-                            <label value="Producto a Fabricar: "/>
-							<textbox id="productNameTextbox" width="400px"/>
-                        </row>
-                        <row>
-                            <label value="Unidades a Fabricar: "/>
-							<intbox id="productUnitsIntbox"/>
+                            <label value="Estado Orden de Produccion: "/>
+							<combobox id="productionOrderStateCombobox"/>
                         </row>
                         <row>
                             <label value="Numero Orden de Produccion: "/>

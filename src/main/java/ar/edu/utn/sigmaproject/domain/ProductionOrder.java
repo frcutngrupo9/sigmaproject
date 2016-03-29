@@ -14,8 +14,9 @@ public class ProductionOrder implements Serializable, Cloneable {
 	Integer units;
 	Date date;
 	Date dateFinished;
+	ProductionOrderState state;
 
-	public ProductionOrder(Integer id, Integer idProductionPlan, Integer idProduct, Integer idWorker, Integer number, Integer units, Date date, Date dateFinished) {
+	public ProductionOrder(Integer id, Integer idProductionPlan, Integer idProduct, Integer idWorker, Integer number, Integer units, Date date, Date dateFinished, ProductionOrderState state) {
 		this.id = id;
 		this.idProductionPlan = idProductionPlan;
 		this.idProduct = idProduct;
@@ -24,6 +25,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 		this.units = units;
 		this.date = date;
 		this.dateFinished = dateFinished;
+		this.state = state;
 	}
 
 	public Integer getId() {
@@ -88,6 +90,14 @@ public class ProductionOrder implements Serializable, Cloneable {
 
 	public void setDateFinished(Date dateFinished) {
 		this.dateFinished = dateFinished;
+	}
+
+	public ProductionOrderState getState() {
+		return state;
+	}
+
+	public void setState(ProductionOrderState state) {
+		this.state = state;
 	}
 
 	@Override

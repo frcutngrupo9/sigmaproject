@@ -2,8 +2,10 @@ package ar.edu.utn.sigmaproject.service;
 
 import java.util.List;
 
+import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
+import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 
 public interface ProductionOrderService {
 
@@ -23,4 +25,5 @@ public interface ProductionOrderService {
 
 	void deleteProductionOrder(ProductionOrder productionOrder);
 
+	ProductionOrder getProductionOrder(ProductionPlan productionPlan, Product product);
 }

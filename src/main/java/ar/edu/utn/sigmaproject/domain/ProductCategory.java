@@ -8,6 +8,7 @@ public enum ProductCategory {
 	Comoda,
 	Cajonera,
 	Cama,
+	Escritorio,
 	Mesa,
 	Silla,
 	Sillon;

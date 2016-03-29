@@ -3,8 +3,11 @@ package ar.edu.utn.sigmaproject.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
+import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
+import ar.edu.utn.sigmaproject.service.PieceService;
 import ar.edu.utn.sigmaproject.service.ProcessService;
 import ar.edu.utn.sigmaproject.service.ProductionOrderDetailService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
@@ -150,13 +153,13 @@ public class ProcessServiceImpl implements ProcessService {
 		return lastId + 1;
 	}
 
-	public Process generateClone(Process other) {
+	public synchronized Process generateClone(Process other) {
 		Process aux = new Process(null, other.getIdPiece(), other.getIdProcessType(), other.getDetails(), other.getTime());
 		aux.setClone(true);
 		return aux;
 	}
 
-	private boolean isInsideProductionOrder(Integer id) {
+	private synchronized boolean isInsideProductionOrder(Integer id) {
 		ProductionOrderDetailService productionOrderDetailService = new ProductionOrderDetailServiceImpl();
 		List<ProductionOrderDetail> productionOrderDetailList = productionOrderDetailService.getProductionOrderDetailListByProcessId(id);
 		boolean value = false;
@@ -166,7 +169,7 @@ public class ProcessServiceImpl implements ProcessService {
 		return value;
 	}
 
-	private void cloneAndAssignToProductionOrder(Process oldProcess) {
+	private synchronized void cloneAndAssignToProductionOrder(Process oldProcess) {
 		Process clone = generateClone(oldProcess);
 		clone = saveProcess(clone);// para que devuelva un proceso con id agregado
 		ProductionOrderDetailService productionOrderDetailService = new ProductionOrderDetailServiceImpl();
@@ -175,5 +178,18 @@ public class ProcessServiceImpl implements ProcessService {
 			productionOrderDetail.setIdProcess(clone.getId());// asignamos la referencia al clon
 			productionOrderDetailService.updateCloneProductionOrderDetail(productionOrderDetail, oldProcess);// actualizamos el detalle
 		}
+	}
+
+	public synchronized List<Process> getProcessListByProduct(Product product) {
+		List<Process> list = new ArrayList<Process>();
+		PieceService pieceService = new PieceServiceImpl();
+		List<Piece> auxPieceList = pieceService.getPieceList(product.getId());
+		for(Piece piece : auxPieceList) {
+			List<Process> auxProcessList = getProcessList(piece.getId());
+			for(Process process : auxProcessList) {
+				list.add(Process.clone(process));
+			}
+		}
+		return list;
 	}
 }

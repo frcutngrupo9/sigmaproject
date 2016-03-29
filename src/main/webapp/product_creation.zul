@@ -51,15 +51,17 @@
                 </hlayout>
     			<listbox id="pieceListbox" style="margin: 4px">
     				<auxhead>
-						<auxheader label="Piezas" colspan="2"/>
+						<auxheader label="Piezas" colspan="3"/>
 					</auxhead>
         			<listhead>
             			<listheader label="Nombre Pieza"/>
-            			<listheader label="Cantidad Procesos"/>
+            			<listheader label="Unidades por Producto"/>
+            			<listheader label="Cantidad de Procesos"/>
         			</listhead>
         			<template name="model">
             			<listitem>
                 			<listcell label="${each.name}"/>
+                			<listcell label="${each.units}"/>
                 			<listcell label="${win_product_creation$composer.quantityOfProcess(each.id)}"/>
             			</listitem>
         			</template>

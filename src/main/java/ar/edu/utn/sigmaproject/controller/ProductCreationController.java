@@ -284,7 +284,10 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		
 		productCategoryListModel = new ListModelList<ProductCategory>(ProductCategory.values());
 		productCategoryCombobox.setModel(productCategoryListModel);
-
+	}
+	
+	@Listen("onAfterRender = #productCategoryCombobox")
+	public void productCategoryComboboxSelection() {// se hace refresh despues de q se renderizo el combobox para que se le pueda setear un valor seleccionado
 		refreshViewProduct();
 		refreshViewPiece();
 	}
@@ -325,6 +328,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		currentPiece = null;
 		refreshViewProduct();
 		refreshViewPiece();
+		supplyCreationBlock.setVisible(false);
+		rawMaterialCreationBlock.setVisible(false);
 	}
 	
 	public void doUploadProductPhoto(org.zkoss.image.AImage media) {
@@ -484,15 +489,6 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		refreshViewPiece();
 	}
 	
-	@Listen("onAfterRender = #productCategoryCombobox")
-	public void productCategoryComboboxSelection() {
-		if (currentProduct == null) {
-			productCategoryCombobox.setSelectedIndex(-1);
-		} else {
-			productCategoryCombobox.setSelectedIndex(productCategoryListModel.indexOf(currentProduct.getCategory()));
-		}
-	}
-
 	private void refreshViewProduct() {
 		if (currentProduct == null) {
 			productCaption.setLabel("Creacion de Producto");
@@ -500,9 +496,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			productNameTextbox.setText("");
 			productDetailsTextbox.setText("");
 			productCodeTextbox.setText("");
-			if(productCategoryCombobox.getItemCount() != 0) {// si ya se renderizo el combobox
-				productCategoryCombobox.setSelectedIndex(-1);
-			}
+			productCategoryCombobox.setSelectedIndex(-1);
 			productPriceDoublebox.setText("");
 			org.zkoss.image.Image img = null;
 			productImage.setHeight("0px");
@@ -520,9 +514,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			deleteProductButton.setDisabled(false);
 			productNameTextbox.setText(currentProduct.getName());
 			productDetailsTextbox.setText(currentProduct.getDetails());
-			if(productCategoryCombobox.getItemCount() != 0) {// si ya se renderizo el combobox
-				productCategoryCombobox.setSelectedIndex(productCategoryListModel.indexOf(currentProduct.getCategory()));
-			}
+			productCategoryCombobox.setSelectedIndex(productCategoryListModel.indexOf(currentProduct.getCategory()));
 			productCodeTextbox.setText(currentProduct.getCode());
 			BigDecimal product_price = currentProduct.getPrice();
 			if(product_price != null) {

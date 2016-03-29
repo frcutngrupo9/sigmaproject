@@ -18,16 +18,16 @@
             <column label="Cantidad Productos" align="center"/>
             <column label="Estado" align="center"/>
             <column label="Editar" align="center"/>
-            <column label="Generar" align="center"/>
+            <column label="Listado" align="center"/>
             <column label="Abrir" align="center"/>
         </columns>
         <template name="model">
             <row>
             	<!-- se usa custom-attributes para guardar los productos en la fila, 
 				 		para que se puedan acceder cuando se usa onOpen del detail -->
-            	<custom-attributes products="${win_production_plan_list$composer.getProductionPlanProducts(each.id)}"/>
+            	<custom-attributes products="${win_production_plan_list$composer.getProductionPlanProducts(each)}" productionPlan="${each}"/>
             	<detail open="false" fulfill="onOpen">
-            		<include src="/production_plan_products.zul" products="${products}"/>
+            		<include src="/production_plan_products.zul" products="${products}" productionPlan="${productionPlan}"/>
             	</detail>
             	<label value="${each.id}"/>
                 <label value="${each.name}"/>
@@ -35,8 +35,8 @@
                 <label value="${win_production_plan_list$composer.getQuantityOfOrder(each.id)}"/>
                 <label value="${win_production_plan_list$composer.getQuantityOfProduct(each.id)}"/>
                 <label value="${win_production_plan_list$composer.getProductionPlanStateName(each.id)}"/>
-                <button forward="onClick=productionPlanGrid.onEditProductionPlan(${each.id})"  image="/img/edit16x16.png"/>
-                <button forward="onClick=productionPlanGrid.onGenerateProductionOrder(${each})" label="Listado de Ordenes" />
+                <button forward="onClick=productionPlanGrid.onEditProductionPlan(${each})"  image="/img/edit16x16.png"/>
+                <button forward="onClick=productionPlanGrid.onGenerateProductionOrder(${each})" label="Ordenes de Produccion" />
                 <button forward="onClick=productionPlanGrid.onOpenRequirementPlan(${each})" label="Requerimiento de Materiales" />
             </row>
         </template>

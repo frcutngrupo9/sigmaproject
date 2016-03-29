@@ -2,49 +2,61 @@
     <panel title="Ordenes de Produccion" id="productionOrderCreationBlock" border="rounded">
         <panelchildren>
             <vlayout>
-            	<separator/>
-            	<hlayout>
-            		<label value="Nombre Plan de Produccion: "/>
-					<textbox id="productionPlanNameTextbox" width="180px"/>
-				</hlayout>
-            	<hlayout>
-            		<label value="Fecha Plan de Produccion: "/>
-					<datebox id="productionPlanDatebox" cols="12" format="dd-MM-yyyy"/>
-            	</hlayout>
-                <separator/>
+            	<grid hflex="1" sclass="sigma-form">
+                    <columns>
+                        <column align="right"/>
+                        <column align="left"/>
+                        <column align="right"/>
+                        <column align="left"/>
+                        <column align="right"/>
+                        <column align="left"/>
+                    </columns>
+                    <rows>
+                    	<row>
+                            <label value="Plan de Produccion: "/>
+							<textbox id="productionPlanNameTextbox" width="100%"/>
+							<label value="Estado: "/>
+                            <textbox id="productionPlanStateTypeTextbox" width="180px"/>
+							<label value="Fecha: "/>
+							<datebox id="productionPlanDatebox" cols="12" format="dd-MM-yyyy"/>
+                        </row>
+                   </rows>
+                </grid>
     			<grid id="productionOrderGrid" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Ordenes de Produccion" colspan="11"/>
+						<auxheader label="Listado Ordenes de Produccion" colspan="12"/>
 					</auxhead>
         			<columns>
         				<column width="40px" align="center"/>
-        				<column label="Id" align="center"/>
-        				<column label="Numero" align="center"/>
-		            	<column label="Codigo Producto" align="center"/>
-		                <column label="Nombre Producto" align="center"/>
+        				<column label="Nombre Producto" align="center"/>
 		                <column label="Cantidad Producto" align="center"/>
+        				<column label="Codigo Producto" align="center"/>
+        				<column label="Estado Orden Prod" align="center"/>
+        				<column label="Id Orden" align="center"/>
+        				<column label="Numero" align="center"/>
 		                <column label="Empleado Asignado" align="center"/>
 		                <column label="Porcentaje Completado" align="center"/>
 		                <column label="Fecha Inicio" align="center"/>
 		                <column label="Fecha Finalizado" align="center"/>
-		                <column label="Abrir" align="center"/>
+		                <column label="Accion" align="center"/>
 		            </columns>
 		            <template name="model">
 		                <row>
-		                	<custom-attributes production_order_detail_list="${win_production_order_list$composer.getProductionOrderDetailList(each.id)}"/>
-			            	<detail open="false" fulfill="onOpen" visible="${each.id != null}">
+		                	<custom-attributes production_order_detail_list="${win_production_order_list$composer.getProductionOrderDetailList(each)}"/>
+			            	<detail open="false" fulfill="onOpen" visible="${win_production_order_list$composer.getProductionOrder(each) != null}">
 			            		<include src="/production_order_processes.zul" production_order_detail_list="${production_order_detail_list}"/>
 			            	</detail>
-		                	<label value="${each.id}"/>
-                    		<label value="${each.number}"/>
-		                	<label value="${win_production_order_list$composer.getProduct(each.idProduct).code}"/>
-		                    <label value="${win_production_order_list$composer.getProduct(each.idProduct).name}"/>
-		                    <label value="${each.units}"/>
-		                    <label value="${win_production_order_list$composer.getWorkerName(each.idWorker)}"/>
-		                    <label value="${win_production_order_list$composer.getPercentComplete(each.id)} %"/>
-		                    <label value="${each.date}"/>
-		                    <label value="${each.dateFinished}"/>
-		                    <button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})"  image="/img/edit16x16.png"/>
+		                	<label value="${each.name}"/>
+		                	<label value="${each.totalUnits}"/>
+		                	<label value="${each.code}"/>
+		                    <label value="${win_production_order_list$composer.getProductionOrderState(each)}"/>
+		                    <label value="${win_production_order_list$composer.getProductionOrderId(each)}"/>
+                    		<label value="${win_production_order_list$composer.getProductionOrderNumber(each)}"/>
+		                    <label value="${win_production_order_list$composer.getWorkerName(each)}"/>
+		                    <label value="${win_production_order_list$composer.getPercentComplete(each)}"/>
+		                    <label value="${win_production_order_list$composer.getProductionOrderDate(each)}"/>
+		                    <label value="${win_production_order_list$composer.getProductionOrderDateFinished(each)}"/>
+		                    <button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})"  label="${win_production_order_list$composer.getProductionOrderButtonLabel(each)}" disabled="${win_production_order_list$composer.isProductionPlanStateCancel()}"/>
 						</row>
 		            </template>
     			</grid>

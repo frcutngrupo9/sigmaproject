@@ -1,21 +1,19 @@
-<window id="win_process" title="Procesos" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProcessController" sclass="sigma-content">
+<window id="win_worker" title="Empleados" closable="false" apply="ar.edu.utn.sigmaproject.controller.WorkerController" sclass="sigma-content">
     <hlayout>
         <label>Buscar:</label>
         <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
         <button id="searchButton" label="Buscar"/>
     </hlayout>
     <separator/>
-    <listbox id="processTypeListbox" mold="paging" pageSize="10">
+    <listbox id="workerListbox" mold="paging" pageSize="7">
         <listhead>
-            <listheader label="Id" sort="auto(id)" width="40px"/>
-            <listheader label="Nombre" sort="auto(name)"/>
-            <listheader label="Maquina Necesaria"/>
+            <listheader label="Nombre"/>
+            <listheader label="Fecha Ingreso"/>
         </listhead>
         <template name="model">
             <listitem>
-                <listcell label="${each.id}"/>
                 <listcell label="${each.name}"/>
-                <listcell label="${win_process$composer.getMachineTypeName(each)}"/>
+                <listcell label="${each.dateEmployed}"/>
             </listitem>
         </template>
     </listbox>
@@ -25,7 +23,7 @@
             <button id="newButton" label="Nuevo"/>
         </hbox>
         <separator/>
-		<grid id="processTypeGrid" width="400px" sclass="sigma-form" visible="false">
+		<grid id="workerGrid" width="400px" sclass="sigma-form" visible="false">
 	        <columns>
                 <column hflex="min" align="right"/>
                 <column />
@@ -33,15 +31,11 @@
 	        <rows>
 	            <row>
 	                <label>Nombre:</label>
-	                <textbox id="nameTextbox" hflex="1"/>
+	                <textbox id="nameTextbox" value="" hflex="1"/>
 	            </row>
 	            <row>
-	                <label>Maquina Necesaria:</label>
-	                <combobox id="machineTypeCombobox">
-                        <template name="model">
-                            <comboitem label="${each.name}" />
-                        </template>
-                    </combobox>
+	                <label>Fecha Ingreso:</label>
+	                <datebox id="dateEmployedDatebox" cols="12" format="dd-MM-yyyy"/>
 	            </row>
 	            <row>
 	                <cell colspan="2" style="text-align:center">

@@ -13,20 +13,23 @@ public class ProcessTypeServiceImpl implements ProcessTypeService {
 	static List<ProcessType> processTypeList = new ArrayList<ProcessType>();
 	private SerializationService serializator = new SerializationService("process_type");
 	static{
-		processTypeList.add(new ProcessType(processTypeId++, null, "trozado de tablas", 1));
-		processTypeList.add(new ProcessType(processTypeId++, null, "garlopeado", 2));
-		processTypeList.add(new ProcessType(processTypeId++, null, "cepillado", 3));
-		processTypeList.add(new ProcessType(processTypeId++, null, "cortar el ancho en escuadradora", 4));
-		processTypeList.add(new ProcessType(processTypeId++, null, "cortar el largo en escuadradora", 5));
-		processTypeList.add(new ProcessType(processTypeId++, null, "escoplado", 6));
-		processTypeList.add(new ProcessType(processTypeId++, null, "espigado", 7));
-		processTypeList.add(new ProcessType(processTypeId++, null, "hacer molduras", 8));
-		processTypeList.add(new ProcessType(processTypeId++, null, "hacer canal", 9));
-		processTypeList.add(new ProcessType(processTypeId++, null, "replanado", 10));
-		processTypeList.add(new ProcessType(processTypeId++, null, "masillado", 11));
-		processTypeList.add(new ProcessType(processTypeId++, null, "clavado", 12));
-		processTypeList.add(new ProcessType(processTypeId++, null, "lijado", 13));
-		processTypeList.add(new ProcessType(processTypeId++, null, "armado", 14));
+		processTypeList.add(new ProcessType(processTypeId++, null, "Trozar Tablas"));
+		processTypeList.add(new ProcessType(processTypeId++, null, "Garlopear"));
+		processTypeList.add(new ProcessType(processTypeId++, null, "Asentar"));
+		processTypeList.add(new ProcessType(processTypeId++, null, "Cepillar"));
+		processTypeList.add(new ProcessType(processTypeId++, null, "Cortar el Ancho"));
+		processTypeList.add(new ProcessType(processTypeId++, null, "Cortar el Largo"));
+		processTypeList.add(new ProcessType(processTypeId++, null, "Hacer Cortes Curvos"));
+		processTypeList.add(new ProcessType(processTypeId++, null, "Hacer Escopladuras"));
+		processTypeList.add(new ProcessType(processTypeId++, null, "Hacer Espigas"));
+		processTypeList.add(new ProcessType(processTypeId++, null, "Hacer Molduras"));
+		processTypeList.add(new ProcessType(processTypeId++, null, "Hacer Canales"));
+		processTypeList.add(new ProcessType(processTypeId++, null, "Replanar"));
+		processTypeList.add(new ProcessType(processTypeId++, null, "Masillar"));
+		processTypeList.add(new ProcessType(processTypeId++, null, "Clavar"));
+		processTypeList.add(new ProcessType(processTypeId++, null, "Lijar Cruzado"));
+		processTypeList.add(new ProcessType(processTypeId++, null, "Lijar Derecho"));
+		processTypeList.add(new ProcessType(processTypeId++, null, "Armar"));
 	}
 	
 	public ProcessTypeServiceImpl() {

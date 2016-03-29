@@ -3,6 +3,7 @@ package ar.edu.utn.sigmaproject.service;
 import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.Process;
+import ar.edu.utn.sigmaproject.domain.Product;
 
 public interface ProcessService {
 
@@ -27,6 +28,8 @@ public interface ProcessService {
 	void deleteAll(Integer idPiece);
 
 	Process generateClone(Process process);
+
+	List<Process> getProcessListByProduct(Product product);
 
 }
 

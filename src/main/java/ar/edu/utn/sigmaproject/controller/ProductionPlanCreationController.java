@@ -104,7 +104,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	private ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
 	private ClientService clientService = new ClientServiceImpl();
 	private ProductionPlanStateService productionPlanStateService = new ProductionPlanStateServiceImpl();
-	private ProductionPlanStateTypeService productionPlanStateTypeService = new ProductionPlanStateTypeServiceImpl();;
+	private ProductionPlanStateTypeService productionPlanStateTypeService = new ProductionPlanStateTypeServiceImpl();
 
 	// list
 	private List<Order> orderPopupList;

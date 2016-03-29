@@ -1,5 +1,5 @@
 <zk>
-    <grid model="${arg.products}" sizedByContent="true" span="true">
+    <grid id="productionOrderGrid" model="${arg.products}" sizedByContent="true" span="true">
         <columns>
         	<column label="Producto" align="center" sort="auto(name)"/>
             <column label="Id Producto" align="center"/>
@@ -11,7 +11,6 @@
             <column label="Porcentaje Completado" align="center"/>
             <column label="Fecha Inicio" align="center"/>
             <column label="Fecha Finalizado" align="center"/>
-            <column label="Abrir" align="center"/>
         </columns>
         <template name="model">
             <row>
@@ -19,13 +18,12 @@
                 <label value="${each.id}" />
                 <label value="${each.code}" />
                 <label value="${each.totalUnits}" />
-                <label value="${win_production_plan_list$composer.getProductionOrderState(each).name}" />
-                <label value="${win_production_plan_list$composer.getProductionOrder(each).name}" />
-                <label value="${win_production_plan_list$composer.getWorkerName(each.idWorker)}"/>
-                <label value="${win_production_plan_list$composer.getPercentComplete(each.id)} %"/>
-                <label value="${win_production_plan_list$composer.getProductionOrder(each).date}" />
-                <label value="${win_production_plan_list$composer.getProductionOrder(each).dateFinished}" />
-                <button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})"  image="/img/edit16x16.png"/>
+                <label value="${win_production_plan_list$composer.getProductionOrderState(productionPlan, each)}" />
+                <label value="${win_production_plan_list$composer.getProductionOrderNumber(productionPlan, each)}" />
+                <label value="${win_production_plan_list$composer.getWorkerName(productionPlan, each)}"/>
+                <label value="${win_production_plan_list$composer.getPercentComplete(productionPlan, each)}"/>
+                <label value="${win_production_plan_list$composer.getProductionOrderDate(productionPlan, each)}" />
+                <label value="${win_production_plan_list$composer.getProductionOrderDateFinished(productionPlan, each)}" />
             </row>
         </template>
     </grid>

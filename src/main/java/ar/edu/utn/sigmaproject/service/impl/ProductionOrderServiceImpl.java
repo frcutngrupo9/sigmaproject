@@ -3,8 +3,10 @@ package ar.edu.utn.sigmaproject.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
+import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.service.ProductionOrderDetailService;
 import ar.edu.utn.sigmaproject.service.ProductionOrderService;
 import ar.edu.utn.sigmaproject.service.serialization.SerializationService;
@@ -30,7 +32,17 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 		}
 		return list;
 	}
-
+	
+	public synchronized List<ProductionOrder> getProductionOrderList(Integer idProductionPlan) {
+		List<ProductionOrder> list = new ArrayList<ProductionOrder>();
+		for(ProductionOrder each: productionOrderList) {
+			if(each.getIdProductionPlan().equals(idProductionPlan)) {
+				list.add(ProductionOrder.clone(each));
+			}
+		}
+		return list;
+	}
+	
 	public synchronized ProductionOrder getProductionOrder(Integer id) {
 		int size = productionOrderList.size();
 		for(int i=0; i<size; i++) {
@@ -55,7 +67,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 	public synchronized ProductionOrder updateProductionOrder(ProductionOrder productionOrder) {
 		if(productionOrder.getId() == null) {
 			throw new IllegalArgumentException("can't update a null-id ProductionOrder, save it first");
-		}else {
+		} else {
 			productionOrder = ProductionOrder.clone(productionOrder);
 			int size = productionOrderList.size();
 			for(int i=0; i<size; i++) {
@@ -94,18 +106,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 		}
 		return lastId + 1;
 	}
-
-	public List<ProductionOrder> getProductionOrderList(Integer idProductionPlan) {
-		List<ProductionOrder> list = new ArrayList<ProductionOrder>();
-		for(ProductionOrder each: productionOrderList) {
-			if(each.getIdProductionPlan().equals(idProductionPlan)) {
-				list.add(ProductionOrder.clone(each));
-			}
-		}
-		return list;
-	}
-
-	public ProductionOrder updateProductionOrder(
+	
+	public synchronized ProductionOrder updateProductionOrder(
 			ProductionOrder productionOrder,
 			List<ProductionOrderDetail> productionOrderDetailList) {
 		ProductionOrderDetailService productionOrderDetailService = new ProductionOrderDetailServiceImpl();
@@ -116,7 +118,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 		return productionOrder;
 	}
 
-	public ProductionOrder saveProductionOrder(ProductionOrder productionOrder,
+	public synchronized ProductionOrder saveProductionOrder(ProductionOrder productionOrder,
 			List<ProductionOrderDetail> productionOrderDetailList) {
 		ProductionOrderDetailService productionOrderDetailService = new ProductionOrderDetailServiceImpl();
 		productionOrder = saveProductionOrder(productionOrder);// devuelve con id agregado
@@ -127,4 +129,14 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 		return productionOrder;
 	}
 
+	public synchronized ProductionOrder getProductionOrder(ProductionPlan productionPlan, Product product) {
+		int size = productionOrderList.size();
+		for(int i=0; i<size; i++) {
+			ProductionOrder t = productionOrderList.get(i);
+			if(t.getIdProductionPlan().equals(productionPlan.getId()) && t.getIdProduct().equals(product.getId())) {
+				return ProductionOrder.clone(t);
+			}
+		}
+		return null;
+	}
 }
