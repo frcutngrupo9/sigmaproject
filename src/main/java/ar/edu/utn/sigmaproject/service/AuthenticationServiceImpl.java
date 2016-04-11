@@ -2,16 +2,12 @@ package ar.edu.utn.sigmaproject.service;
 
 import java.io.Serializable;
 
-import ar.edu.utn.sigmaproject.service.AuthenticationServiceImpl;
-import ar.edu.utn.sigmaproject.service.AuthService;
 import ar.edu.utn.sigmaproject.service.impl.UserInfoServiceImpl;
-import ar.edu.utn.sigmaproject.service.UserCredential;
-import ar.edu.utn.sigmaproject.service.UserInfoService;
 import ar.edu.utn.sigmaproject.domain.User;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.Sessions;
 
-public class AuthenticationServiceImpl implements AuthService,Serializable{
+public class AuthenticationServiceImpl implements AuthenticationService,Serializable{
 	private static final long serialVersionUID = 1L;
 
 	UserInfoService userInfoService = new UserInfoServiceImpl();

@@ -1,6 +1,6 @@
 package ar.edu.utn.sigmaproject.controller;
 
-import ar.edu.utn.sigmaproject.service.AuthService;
+import ar.edu.utn.sigmaproject.service.AuthenticationService;
 import ar.edu.utn.sigmaproject.service.AuthenticationServiceImpl;
 import ar.edu.utn.sigmaproject.service.UserCredential;
 import org.zkoss.zk.ui.Component;
@@ -23,7 +23,7 @@ public class LoginController extends SelectorComposer<Component> {
 	Label message;
 
 	//services
-	AuthService authService = new AuthenticationServiceImpl();
+	AuthenticationService authenticationService = new AuthenticationServiceImpl();
 
 
 	@Listen("onClick=#login; onOK=#loginWin")
@@ -31,11 +31,11 @@ public class LoginController extends SelectorComposer<Component> {
 		String nm = account.getValue();
 		String pd = password.getValue();
 
-		if(!authService.login(nm,pd)){
+		if(!authenticationService.login(nm,pd)){
 			message.setValue("usuario o password incorrecto.");
 			return;
 		}
-		UserCredential cre= authService.getUserCredential();
+		UserCredential cre= authenticationService.getUserCredential();
 		message.setValue("Bienvenido, "+cre.getName());
 		message.setSclass("");
 
