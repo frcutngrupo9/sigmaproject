@@ -16,11 +16,7 @@ import org.zkoss.zul.event.PagingEvent;
 import ar.edu.utn.sigmaproject.service.SearchableRepository;
 
 import java.io.Serializable;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
 *
@@ -112,6 +108,27 @@ public final class SortingPagingHelper<T> {
 		reset();
 	}
 
+	private PageRequest pageRequestForPageNumber(int pageNumber) {
+		PageRequest pageRequest;
+		if (sortOrder != null) {
+			pageRequest = new PageRequest(pageNumber, pager.getPageSize(), new Sort(sortOrder));
+		} else {
+			pageRequest = new PageRequest(pageNumber, pager.getPageSize());
+		}
+		return pageRequest;
+	}
+
+	private Page<T> getPage(PageRequest pageRequest) {
+		Page<T> page;
+		if (searchTextbox != null && !searchTextbox.getText().isEmpty() && repository instanceof SearchableRepository) {
+			SearchableRepository<T, ? extends Serializable> searchableRepository = (SearchableRepository<T, ? extends Serializable>) repository;
+			page = searchableRepository.findAll(searchTextbox.getText(), pageRequest);
+		} else {
+			page = repository.findAll(pageRequest);
+		}
+		return page;
+	}
+
 	class SortEventListener implements EventListener<SortEvent> {
 
 		@Override
@@ -156,35 +173,64 @@ public final class SortingPagingHelper<T> {
 
 	class PageCachePagingEventListener implements EventListener<PagingEvent> {
 
-		private Page<T> cachedPage;
+		private PageActiveModel pageActiveModel;
 
 		@Override
 		public void onEvent(PagingEvent event) throws Exception {
 			int currentPage = event.getActivePage();
-			if (cachedPage == null || currentPage != cachedPage.getNumber()) {
-				PageRequest pageRequest;
-				if (sortOrder != null) {
-					pageRequest = new PageRequest(currentPage, pager.getPageSize(), new Sort(sortOrder));
-				} else {
-					pageRequest = new PageRequest(currentPage, pager.getPageSize());
-				}
-				if (searchTextbox != null && !searchTextbox.getText().isEmpty() && repository instanceof SearchableRepository) {
-					SearchableRepository<T, ? extends Serializable> searchableRepository = (SearchableRepository<T, ? extends Serializable>) repository;
-					cachedPage = searchableRepository.findAll(searchTextbox.getText(), pageRequest);
-				} else {
-					cachedPage = repository.findAll(pageRequest);
-				}
-				pager.setTotalSize((int) cachedPage.getTotalElements());
+			if (pageActiveModel == null || currentPage != pageActiveModel.pageRequest.getPageNumber()) {
+				pageActiveModel = new PageActiveModel(pageRequestForPageNumber(currentPage));
+				pager.setTotalSize((int)pageActiveModel.getExecutionPage().getTotalElements());
 				if (listbox != null) {
-					listbox.setModel(new ListModelList<>(cachedPage.getContent()));
+					listbox.setModel(pageActiveModel);
 				} else {
-					grid.setModel(new ListModelList<>(cachedPage.getContent()));
+					grid.setModel(pageActiveModel);
 				}
 			}
 		}
 
 		public void clearCache() {
-			cachedPage = null;
+			pageActiveModel = null;
+		}
+
+	}
+
+	class PageActiveModel extends AbstractListModel<T> {
+
+		private final String CACHE_KEY = System.identityHashCode(this) + "_cache";
+		private PageRequest pageRequest;
+
+		public PageActiveModel(PageRequest pageRequest) {
+			super();
+			this.pageRequest = pageRequest;
+		}
+
+		@Override
+		public T getElementAt(int index) {
+			T targetElement = getExecutionPage().getContent().get(index);
+			if (targetElement == null) {
+				//if we cannot find the target object from database, there is inconsistency in the database
+				throw new RuntimeException("Element at index " + index + " cannot be found in the database.");
+			} else {
+				return targetElement;
+			}
+		}
+
+		private Page<T> getExecutionPage() {
+			Execution execution = Executions.getCurrent();
+			//we only reuse this cache in one execution to avoid accessing detached objects.
+			//our filter opens a session during a HTTP request
+			Page<T> cache = (Page<T>) execution.getAttribute(CACHE_KEY);
+			if (cache == null) {
+				cache = getPage(pageRequest);
+				execution.setAttribute(CACHE_KEY, cache);
+			}
+			return cache;
+		}
+
+		@Override
+		public int getSize() {
+			return getExecutionPage().getSize();
 		}
 
 	}

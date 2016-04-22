@@ -34,8 +34,8 @@
         </columns>
         <template name="model">
             <row>
-            	<custom-attributes pieces="${win_product_list$composer.getProductPieces(each.id)}"/>
-            	<detail open="false" fulfill="onOpen" forward="onOpen=win_product_list$composer.onDetail">
+            	<custom-attributes pieces="${each.pieces}"/>
+            	<detail open="false" fulfill="onOpen">
             		<include src="/product_pieces.zul" pieces="${pieces}"/>
             	</detail>
                 <label value="${each.id}"/>
