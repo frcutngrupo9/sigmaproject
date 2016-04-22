@@ -1,5 +1,6 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,12 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
+import ar.edu.utn.sigmaproject.domain.*;
+import ar.edu.utn.sigmaproject.domain.Process;
+import ar.edu.utn.sigmaproject.service.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.zkoss.image.AImage;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
@@ -18,7 +25,9 @@ import org.zkoss.zk.ui.event.EventQueues;
 import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Button;
@@ -36,39 +45,11 @@ import org.zkoss.zul.Selectbox;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
-import ar.edu.utn.sigmaproject.domain.MeasureUnit;
-import ar.edu.utn.sigmaproject.domain.Piece;
-import ar.edu.utn.sigmaproject.domain.Process;
-import ar.edu.utn.sigmaproject.domain.ProcessType;
-import ar.edu.utn.sigmaproject.domain.Product;
-import ar.edu.utn.sigmaproject.domain.ProductCategory;
-import ar.edu.utn.sigmaproject.domain.RawMaterial;
-import ar.edu.utn.sigmaproject.domain.RawMaterialType;
-import ar.edu.utn.sigmaproject.domain.Supply;
-import ar.edu.utn.sigmaproject.domain.SupplyType;
-import ar.edu.utn.sigmaproject.service.MeasureUnitService;
-import ar.edu.utn.sigmaproject.service.MeasureUnitTypeService;
-import ar.edu.utn.sigmaproject.service.PieceService;
-import ar.edu.utn.sigmaproject.service.ProcessService;
-import ar.edu.utn.sigmaproject.service.ProcessTypeService;
-import ar.edu.utn.sigmaproject.service.ProductService;
-import ar.edu.utn.sigmaproject.service.RawMaterialService;
-import ar.edu.utn.sigmaproject.service.RawMaterialTypeService;
-import ar.edu.utn.sigmaproject.service.SupplyService;
-import ar.edu.utn.sigmaproject.service.SupplyTypeService;
-import ar.edu.utn.sigmaproject.service.impl.MeasureUnitServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.MeasureUnitTypeServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.PieceServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProcessServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProcessTypeServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.RawMaterialServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.RawMaterialTypeServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.SupplyServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.SupplyTypeServiceImpl;
-
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProductCreationController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
+
+	final Logger logger = LoggerFactory.getLogger(ProductCreationController.class);
 
 	@Wire
 	Component productCreationBlock;
@@ -188,16 +169,26 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	Button cancelRawMaterialButton;
 
 	// services
-	private ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
-	private ProcessService processService = new ProcessServiceImpl();
-	private PieceService pieceService = new PieceServiceImpl();
-	private ProductService productService = new ProductServiceImpl();
-	private MeasureUnitService measureUnitService = new MeasureUnitServiceImpl();
-	private MeasureUnitTypeService measureUnitTypeService = new MeasureUnitTypeServiceImpl();
-	private SupplyTypeService supplyTypeService = new SupplyTypeServiceImpl();
-	private SupplyService supplyService = new SupplyServiceImpl();
-	private RawMaterialTypeService rawMaterialTypeService = new RawMaterialTypeServiceImpl();
-	private RawMaterialService rawMaterialService = new RawMaterialServiceImpl();
+	@WireVariable
+	MeasureUnitRepository measureUnitRepository;
+
+	@WireVariable
+	MeasureUnitTypeRepository measureUnitTypeRepository;
+
+	@WireVariable
+	ProcessTypeRepository processTypeRepository;
+
+	@WireVariable
+	ProductRepository productRepository;
+
+	@WireVariable
+	ProductCategoryRepository productCategoryRepository;
+
+	@WireVariable
+	RawMaterialTypeRepository rawMaterialTypeRepository;
+
+	@WireVariable
+	SupplyTypeRepository supplyTypeRepository;
 
 	// attributes
 	private Product currentProduct;
@@ -237,22 +228,21 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	@Override
 	public void doAfterCompose(Component comp) throws Exception{
 		super.doAfterCompose(comp);
-		processTypeList = processTypeService.getProcessTypeList();
-		processTypeListModel = new ListModelList<ProcessType>(processTypeList);
+		processTypeList = processTypeRepository.findAll();
+		processTypeListModel = new ListModelList<>(processTypeList);
 		processListbox.setModel(processTypeListModel);
-		listboxProcessList = new ArrayList<Process>();// listbox que contiene los procesos de la pieza seleccionada o vacio si es una nueva pieza
+		listboxProcessList = new ArrayList<>();// listbox que contiene los procesos de la pieza seleccionada o vacio si es una nueva pieza
 
-		pieceList = new ArrayList<Piece>();
+		pieceList = new ArrayList<>();
 		pieceListModel = new ListModelList<Piece>(pieceList);
 		pieceListbox.setModel(pieceListModel);
 
-		processList = new ArrayList<Process>();
+		processList = new ArrayList<>();
 
-		Integer idMeasureUnitType = measureUnitTypeService.getMeasureUnitType("Longitud").getId();
-		List<MeasureUnit> measureUnitList = measureUnitService.getMeasureUnitList(idMeasureUnitType);
-		lengthMeasureUnitListModel = new ListModelList<MeasureUnit>(measureUnitList);
-		depthMeasureUnitListModel = new ListModelList<MeasureUnit>(measureUnitList);
-		widthMeasureUnitListModel = new ListModelList<MeasureUnit>(measureUnitList);
+		List<MeasureUnit> measureUnitList = measureUnitTypeRepository.findByName("Longitud").getMeasureUnits();
+		lengthMeasureUnitListModel = new ListModelList<>(measureUnitList);
+		depthMeasureUnitListModel = new ListModelList<>(measureUnitList);
+		widthMeasureUnitListModel = new ListModelList<>(measureUnitList);
 		lengthMeasureUnitSelectbox.setModel(lengthMeasureUnitListModel);
 		depthMeasureUnitSelectbox.setModel(depthMeasureUnitListModel);
 		widthMeasureUnitSelectbox.setModel(widthMeasureUnitListModel);
@@ -275,14 +265,14 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		currentSupply = null;
 		currentSupplyType = null;
 
-		lateDeleteRawMaterialList = new ArrayList<RawMaterial>();
-		rawMaterialList = new ArrayList<RawMaterial>();
-		rawMaterialListModel = new ListModelList<RawMaterial>(rawMaterialList);
+		lateDeleteRawMaterialList = new ArrayList<>();
+		rawMaterialList = new ArrayList<>();
+		rawMaterialListModel = new ListModelList<>(rawMaterialList);
 		rawMaterialListbox.setModel(rawMaterialListModel);
 		currentRawMaterial = null;
 		currentRawMaterialType = null;
-		
-		productCategoryListModel = new ListModelList<ProductCategory>(ProductCategory.values());
+
+		productCategoryListModel = new ListModelList<>(productCategoryRepository.findAll());
 		productCategoryCombobox.setModel(productCategoryListModel);
 	}
 	
@@ -298,9 +288,18 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			Clients.showNotification("Ingresar Nombre Producto", productNameTextbox);
 			return;
 		}
-		if(productCategoryCombobox.getSelectedIndex() == -1){
-			Clients.showNotification("Seleccionar Categoria Producto", productCategoryCombobox);
-			return;
+		if (productCategoryCombobox.getSelectedIndex() == -1) {
+			String manuallyEnteredCategoryName = productCategoryCombobox.getValue();
+			if (manuallyEnteredCategoryName.trim().length() > 0) {
+				ProductCategory newProductCategory = new ProductCategory(manuallyEnteredCategoryName);
+				newProductCategory = productCategoryRepository.save(newProductCategory);
+				productCategoryListModel = new ListModelList<>(productCategoryRepository.findAll());
+				productCategoryCombobox.setModel(productCategoryListModel);
+				productCategoryCombobox.setSelectedIndex(productCategoryListModel.indexOf(newProductCategory));
+			} else {
+				Clients.showNotification("Seleccionar Categoria Producto", productCategoryCombobox);
+				return;
+			}
 		}
 		String productName = productNameTextbox.getText();
 		String productDetails = productDetailsTextbox.getText();
@@ -310,16 +309,17 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		org.zkoss.image.Image image = productImage.getContent();
 
 		if(currentProduct == null) {// se esta creando un nuevo producto
-			currentProduct = new Product(null, productCode, productName, productDetails, productCategory, productPrice);
-			productService.saveProduct(currentProduct, image, pieceList, processList, supplyList, rawMaterialList);
+			currentProduct = new Product(productCode, productName, productDetails, productCategory, productPrice);
 		} else {// se esta editando un producto
 			currentProduct.setName(productName);
 			currentProduct.setDetails(productDetails);
 			currentProduct.setCode(productCode);
 			currentProduct.setCategory(productCategory);
 			currentProduct.setPrice(productPrice);
-			currentProduct = productService.updateProduct(currentProduct, image, pieceList, processList, supplyList, rawMaterialList);
 		}
+		currentProduct.setImageData(image.getByteData());
+		productRepository.save(currentProduct);
+
 		// mostrar mensaje al user
 		Clients.showNotification("Producto guardado");
 
@@ -334,13 +334,13 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	
 	public void doUploadProductPhoto(org.zkoss.image.AImage media) {
 		if (media instanceof org.zkoss.image.Image) {
-			org.zkoss.image.Image img = (org.zkoss.image.Image) media;
+			org.zkoss.image.Image img = media;
 			productImage.setHeight("225px");
 			productImage.setWidth("225px");
 			productImage.setStyle("margin: 8px");
 			productImage.setContent(img);
 		} else {
-			Messagebox.show("No es una imagen: "+media, "Error", Messagebox.OK, Messagebox.ERROR);
+			Messagebox.show("No es una imagen: " + media, "Error", Messagebox.OK, Messagebox.ERROR);
 		}
 	}
 	
@@ -406,17 +406,17 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		// actualizamos la lista de piezas
 		Integer pieceId = 0;
 		String pieceName = pieceNameTextbox.getText();
-		Integer lengthIdMeasureUnit = null;
-		Integer depthIdMeasureUnit = null;
-		Integer widthIdMeasureUnit = null;
+		MeasureUnit lengthMeasureUnit = null;
+		MeasureUnit depthMeasureUnit = null;
+		MeasureUnit widthMeasureUnit = null;
 		if(lengthMeasureUnitSelectbox.getSelectedIndex() != -1) {
-			lengthIdMeasureUnit = lengthMeasureUnitListModel.getElementAt(lengthMeasureUnitSelectbox.getSelectedIndex()).getId();
+			lengthMeasureUnit = lengthMeasureUnitListModel.getElementAt(lengthMeasureUnitSelectbox.getSelectedIndex());
 		}
 		if(depthMeasureUnitSelectbox.getSelectedIndex() != -1) {
-			depthIdMeasureUnit = depthMeasureUnitListModel.getElementAt(depthMeasureUnitSelectbox.getSelectedIndex()).getId();
+			depthMeasureUnit = depthMeasureUnitListModel.getElementAt(depthMeasureUnitSelectbox.getSelectedIndex());
 		}
 		if(widthMeasureUnitSelectbox.getSelectedIndex() != -1) {
-			widthIdMeasureUnit = widthMeasureUnitListModel.getElementAt(widthMeasureUnitSelectbox.getSelectedIndex()).getId();
+			widthMeasureUnit = widthMeasureUnitListModel.getElementAt(widthMeasureUnitSelectbox.getSelectedIndex());
 		}
 		BigDecimal pieceLength = new BigDecimal(pieceLengthDoublebox.doubleValue());
 		BigDecimal pieceDepth = new BigDecimal(pieceDepthDoublebox.doubleValue());
@@ -426,39 +426,29 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		boolean pieceIsGroup = pieceGroupCheckbox.isChecked();
 
 		if(currentPiece == null) { // se esta creando una pieza
-			Integer serviceNewPieceId = pieceService.getNewId();
-			if(pieceList.isEmpty() == true) {// buscamos un id para la pieza nueva
-				pieceId = serviceNewPieceId;
-			} else {
-				pieceId = getLastPieceId() + 1;// buscamos el ultimo id y sumamos 1
-				if(pieceId < serviceNewPieceId) { // si el ultimo id es menor que uno nuevo del servicio quiere decir que las piezas en la lista son viejas y hay que agarra el id mas grande osea el que viene del servicio
-					pieceId = serviceNewPieceId;
-				}
-			}
-			currentPiece = new Piece(pieceId, null, pieceName, pieceLength, lengthIdMeasureUnit, pieceDepth, depthIdMeasureUnit, pieceWidth, widthIdMeasureUnit, pieceSize, pieceIsGroup, pieceUnits);
+			currentPiece = new Piece(null, pieceName, pieceLength, lengthMeasureUnit, pieceDepth, depthMeasureUnit, pieceWidth, widthMeasureUnit, pieceSize, pieceIsGroup, pieceUnits);
 			pieceList.add(currentPiece);// lo agregamos a la lista
 			pieceListModel.add(currentPiece);
 			pieceListbox.setModel(pieceListModel);// y al modelo para que aparezca en la pantalla
 
 			// es una pieza nueva se inserta el id de la pieza a los procesos y se agregan a la lista total
 			for(Process process : listboxProcessList) {
-				process.setIdPiece(pieceId);
+				process.setPiece(currentPiece);
 				processList.add(process);
 			}
 
 		} else { // se esta editando una pieza
 			currentPiece.setName(pieceName);
 			currentPiece.setLength(pieceLength);
-			currentPiece.setLengthIdMeasureUnit(lengthIdMeasureUnit);
+			currentPiece.setLengthMeasureUnit(lengthMeasureUnit);
 			currentPiece.setDepth(pieceDepth);
-			currentPiece.setDepthIdMeasureUnit(depthIdMeasureUnit);
+			currentPiece.setDepthMeasureUnit(depthMeasureUnit);
 			currentPiece.setWidth(pieceWidth);
-			currentPiece.setWidthIdMeasureUnit(widthIdMeasureUnit);
+			currentPiece.setWidthMeasureUnit(widthMeasureUnit);
 			currentPiece.setSize(pieceSize);
 			currentPiece.setUnits(pieceUnits);
 			currentPiece.setGroup(pieceIsGroup);
-			updatePieceList(currentPiece);// actualizamos la lista
-			pieceListModel = new ListModelList<Piece>(pieceList); 
+			pieceListModel = new ListModelList<>(pieceList);
 			pieceListbox.setModel(pieceListModel);// actualizamos el modelo para que aparezca en la pantalla
 			
 			for(ProcessType processType : processTypeList) {
@@ -478,7 +468,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 				} else {
 					if (insideCurrentList != null) {
 						// esta en la lista del listbox pero no en la lista total, se agrega a la lista total
-						insideCurrentList.setIdPiece(currentPiece.getId());// se agrega el id de la pieza, ya que al crearse no se agrega
+						insideCurrentList.setPiece(currentPiece);// se agrega el id de la pieza, ya que al crearse no se agrega
 						processList.add(insideCurrentList);
 					}
 				}
@@ -522,7 +512,12 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			} else {
 				productPriceDoublebox.setValue(null);
 			}
-			org.zkoss.image.Image img = productService.findImage(currentProduct);
+			org.zkoss.image.Image img = null;
+			try {
+				img = new AImage("", currentProduct.getImageData());
+			} catch (IOException exception) {
+
+			}
 			if(img != null) {
 				productImage.setHeight("225px");
 				productImage.setWidth("225px");
@@ -533,12 +528,12 @@ public class ProductCreationController extends SelectorComposer<Component>{
 				productImage.setStyle("margin: 0px");
 			}
 			productImage.setContent(img);
-			processList = getProcessList(currentProduct.getId());
-			pieceList = pieceService.getPieceList(currentProduct.getId());
-			pieceListModel = new ListModelList<Piece>(pieceList);
+			processList = getProcessList(currentProduct);
+			pieceList = currentProduct.getPieces();
+			pieceListModel = new ListModelList<>(pieceList);
 			pieceListbox.setModel(pieceListModel);
-			supplyList = supplyService.getSupplyList(currentProduct.getId());
-			rawMaterialList = rawMaterialService.getRawMaterialList(currentProduct.getId());
+			supplyList = currentProduct.getSupplies();
+			rawMaterialList = currentProduct.getRawMaterials();
 		}
 		refreshViewSupply();
 		refreshSupplyTypePopup();
@@ -556,10 +551,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			pieceNameTextbox.setText("");
 			pieceGroupCheckbox.setChecked(false);
 			// seleccionamos metros y pulgadas como valores predeterminados de las dimensiones de las piezas
-			Integer idMeasureUnitMeters = measureUnitService.getMeasureUnit("Metros").getId();
-			MeasureUnit meters = measureUnitService.getMeasureUnit(idMeasureUnitMeters);
-			Integer idMeasureUnitInch = measureUnitService.getMeasureUnit("Pulgadas").getId();
-			MeasureUnit inch = measureUnitService.getMeasureUnit(idMeasureUnitInch);
+			MeasureUnit meters = measureUnitRepository.findByName("Metros");
+			MeasureUnit inch = measureUnitRepository.findByName("Pulgadas");
 			lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(meters));
 			depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(inch));
 			widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(inch));
@@ -577,9 +570,9 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			// cargar form pieza
 			pieceNameTextbox.setText(currentPiece.getName());
 			pieceGroupCheckbox.setChecked(currentPiece.isGroup());
-			lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getLengthIdMeasureUnit())));
-			depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getDepthIdMeasureUnit())));
-			widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(currentPiece.getWidthIdMeasureUnit())));
+			lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(currentPiece.getLengthMeasureUnit()));
+			depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(currentPiece.getDepthMeasureUnit()));
+			widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(currentPiece.getWidthMeasureUnit()));
 			BigDecimal lenght = currentPiece.getLength();
 			if(lenght != null) {
 				pieceLengthDoublebox.setValue(lenght.doubleValue());
@@ -601,7 +594,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			pieceSizeTextbox.setValue(currentPiece.getSize());
 			pieceUnitsByProductIntbox.setValue(currentPiece.getUnits());
 
-			listboxProcessList = getListboxProcessList(currentPiece.getId());// actualizamos la lista de procesos del Listbox con la lista de procesos obtenida de los procesos totales
+			listboxProcessList = currentPiece.getProcesses();// actualizamos la lista de procesos del Listbox con la lista de procesos obtenida de los procesos totales
 		}
 		refreshViewProcess();
 	}
@@ -659,7 +652,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	private Process getProcessFromListbox(ProcessType processType) {
 		if(listboxProcessList != null) {
 			for(Process process : listboxProcessList) {
-				if(process.getIdProcessType().equals(processType.getId())) {
+				if(process.getType().equals(processType)) {
 					return process;
 				}
 			}
@@ -677,7 +670,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	private void addProcessToListbox(ProcessType processType) {
 		Process aux = getProcessFromListbox(processType);
 		if(aux != null) {
-			System.out.println("deberia estar en null: " + aux.getIdProcessType());// porque se esta agregando
+			System.out.println("deberia estar en null: " + aux.getType().getId());// porque se esta agregando
 		} else {
 			Duration duration = null;
 			try {
@@ -685,7 +678,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			} catch (DatatypeConfigurationException e) {
 				System.out.println("Error en convertir a duracion: " + e.toString());
 			}
-			listboxProcessList.add(new Process(null, null,  processType.getId(), "", duration));
+			listboxProcessList.add(new Process(null, processType, "", duration));
 		}
 	}
 
@@ -756,41 +749,12 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		refreshViewProcess();
 	}
 
-	private int getLastPieceId() {
-		int piece_id = 0;
-		int size = pieceList.size();
-		for(int i = 0; i < size; i++) {
-			Piece t = pieceList.get(i);
-			if(piece_id < t.getId()) { // asignamos el mas alto a la variable piece id
-				piece_id = t.getId(); 
-			}
-		}
-		return piece_id;
-	}
-
-	private  Piece updatePieceList(Piece piece) {
-		if(piece.getId() == null) {
-			throw new IllegalArgumentException("can't update a null-id piece");
-		} else {
-			piece = Piece.clone(piece);
-			int size = pieceList.size();
-			for(int i = 0; i < size; i++) {
-				Piece t = pieceList.get(i);
-				if(t.getId().equals(piece.getId())) {
-					pieceList.set(i, piece);
-					return piece;
-				}
-			}
-			throw new RuntimeException("Piece not found " + piece.getId());
-		}
-	}
-
 	private void deletePiece(Piece piece) {
 		if(piece.getId() != null) {
 			//eliminamos los procesos vinculados a esta pieza
-			List<Process> deleteProcessList = new ArrayList<Process>();
+			List<Process> deleteProcessList = new ArrayList<>();
 			for(Process auxProcess:processList) {
-				if(auxProcess.getIdPiece().equals(piece.getId())) {
+				if(auxProcess.getPiece().equals(piece)) {
 					deleteProcessList.add(auxProcess);// no podemos eliminar directamte mientras se recorre la lista porque se la modifica
 				}
 			}
@@ -809,50 +773,48 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		}
 	}
 
-	private List<Process> getProcessList(Integer idProduct) {// buscar todos los procesos de ese producto
-		List<Process> list = new ArrayList<Process>();
-		List<Piece> auxPieceList = pieceService.getPieceList(idProduct);
-		for(Piece piece : auxPieceList) {
-			List<Process> auxProcessList = processService.getProcessList(piece.getId());
-			for(Process process : auxProcessList) {
-				list.add(Process.clone(process));
+	private List<Process> getProcessList(Product product) {// buscar todos los procesos de ese producto
+		List<Process> list = new ArrayList<>();
+		for(Piece piece : product.getPieces()) {
+			for(Process process : piece.getProcesses()) {
+				list.add(process);
 			}
 		}
 		return list;
 	}
 
-	private List<Process> getListboxProcessList(Integer idPiece) {// buscar todos los procesos de la pieza en la lista total de procesos
-		List<Process> list = new ArrayList<Process>();
+	private List<Process> getListboxProcessList(Piece piece) {// buscar todos los procesos de la pieza en la lista total de procesos
+		List<Process> list = new ArrayList<>();
 		for(Process process : processList) {
-			if(idPiece.equals(process.getIdPiece())) {
-				list.add(Process.clone(process));
+			if(piece.equals(process.getPiece())) {
+				list.add(process);
 			}
 		}
 		return list;
 	}
 
 	private  Process updateProcessList(Process process) {
-		if(process.getIdPiece() == null && process.getIdProcessType() == null) {
+		if(process.getPiece() == null && process.getType() == null) {
 			throw new IllegalArgumentException("can't update a null-id process");
 		}else {
 			process = Process.clone(process);
 			int size = processList.size();
 			for(int i = 0; i < size; i++) {
 				Process t = processList.get(i);
-				if(t.getIdPiece().equals(process.getIdPiece()) && t.getIdProcessType().equals(process.getIdProcessType())){
+				if(t.getPiece().equals(process.getPiece()) && t.getType().equals(process.getType())){
 					processList.set(i, process);
 					return process;
 				}
 			}
-			throw new RuntimeException("Process not found " + process.getIdPiece()+" "+process.getIdProcessType());
+			throw new RuntimeException("Process not found " + process.getPiece()+" "+process.getType());
 		}
 	}
 
 	private void deleteProcess(Process process) {
-		if(process.getIdPiece()!=null && process.getIdProcessType()!=null) {
+		if(process.getPiece()!=null && process.getType()!=null) {
 			Process deleteProcess = null;
 			for(Process auxProcess:processList) {
-				if(auxProcess.getIdPiece().equals(process.getIdPiece()) && auxProcess.getIdProcessType().equals(process.getIdProcessType())) {
+				if(auxProcess.getPiece().equals(process.getPiece()) && auxProcess.getType().equals(process.getType())) {
 					deleteProcess = auxProcess;// no podemos eliminar directamte mientras se recorre la lista porque se la modifica
 				}
 			}
@@ -863,11 +825,11 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		}
 	}
 
-	public String quantityOfProcess(int idPiece) {
+	public String quantityOfProcess(Piece piece) {
 		int quantity = 0;
 		if(processList != null && processList.isEmpty() == false) {
-			for(int i=0; i<processList.size(); i++) {
-				if(processList.get(i).getIdPiece() == idPiece) {
+			for (int i=0; i<processList.size(); i++) {
+				if(processList.get(i).getPiece().equals(piece)) {
 					quantity++;
 				}
 			}
@@ -897,7 +859,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 				public void onEvent(Event evt) throws InterruptedException {
 					if (evt.getName().equals("onOK")) {
 						// la eliminacion de las piezas y procesos relacionados al producto se realizan en el servicio
-						productService.deleteProduct(currentProduct);
+						productRepository.delete(currentProduct);
 						currentProduct = null;
 						currentPiece = null;
 						refreshViewProduct();
@@ -946,9 +908,9 @@ public class ProductCreationController extends SelectorComposer<Component>{
 
 	private Process searchProcess(Piece piece, ProcessType processType) {
 		int size = processList.size();
-		for(int i = 0; i < size; i++) {
+		for (int i = 0; i < size; i++) {
 			Process t = processList.get(i);
-			if(t.getIdPiece().equals(piece.getId()) && t.getIdProcessType().equals(processType.getId())) {
+			if(t.getPiece().equals(piece) && t.getType().equals(processType)) {
 				return Process.clone(t);
 			}
 		}
@@ -967,9 +929,9 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	private void fillPieceCopy(Piece pieceCopy) {
 		pieceNameTextbox.setText(pieceCopy.getName());
 		pieceGroupCheckbox.setChecked(pieceCopy.isGroup());
-		lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(pieceCopy.getLengthIdMeasureUnit())));
-		depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(pieceCopy.getDepthIdMeasureUnit())));
-		widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(pieceCopy.getWidthIdMeasureUnit())));
+		lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(pieceCopy.getLengthMeasureUnit()));
+		depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(pieceCopy.getDepthMeasureUnit()));
+		widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(pieceCopy.getWidthMeasureUnit()));
 		BigDecimal lenght = pieceCopy.getLength();
 		if(lenght != null) {
 			pieceLengthDoublebox.setValue(lenght.doubleValue());
@@ -995,9 +957,9 @@ public class ProductCreationController extends SelectorComposer<Component>{
 
 	private void fillProcessCopy(Piece pieceCopy) {
 		processCreationBlock.setVisible(true);
-		List<Process> processListCopy = processService.getProcessList(pieceCopy.getId());
+		List<Process> processListCopy = pieceCopy.getProcesses();
 		for(Process processCopy : processListCopy) {
-			listboxProcessList.add(new Process(null, null,  processCopy.getIdProcessType(), processCopy.getDetails(), processCopy.getTime()));
+			listboxProcessList.add(new Process(null,  processCopy.getType(), processCopy.getDetails(), processCopy.getTime()));
 		}
 		refreshViewProcess();
 	}
@@ -1025,10 +987,10 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			deleteSupplyButton.setDisabled(true);
 			cancelSupplyButton.setDisabled(true);
 		} else {
-			currentSupplyType = supplyTypeService.getSupplyType(currentSupply.getIdSupplyType());
+			currentSupplyType = currentSupply.getSupplyType();
 			supplyTypeBandbox.setDisabled(true);// no se permite modificar en la edicion
 			supplyTypeBandbox.setValue(currentSupplyType.getDescription());
-			supplyQuantityDoublebox.setValue(currentSupply.getQuantity());
+			supplyQuantityDoublebox.setValue(currentSupply.getQuantity().doubleValue());
 			deleteSupplyButton.setDisabled(false);
 			cancelSupplyButton.setDisabled(false);
 		}
@@ -1042,10 +1004,9 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	}
 
 	private void refreshSupplyTypePopup() {// el popup se actualiza en base a la lista
-		supplyTypePopupList = supplyTypeService.getSupplyTypeList();
+		supplyTypePopupList = supplyTypeRepository.findAll();
 		for(Supply supply : supplyList) {
-			SupplyType aux = supplyTypeService.getSupplyType(supply.getIdSupplyType());
-			supplyTypePopupList.remove(aux);// sacamos del popup
+			supplyTypePopupList.remove(supply.getSupplyType());// sacamos del popup
 		}
 		supplyTypePopupListModel = new ListModelList<SupplyType>(supplyTypePopupList);
 		supplyTypePopupListbox.setModel(supplyTypePopupListModel);
@@ -1053,7 +1014,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 
 	@Listen("onSelect = #supplyTypePopupListbox")
 	public void selectionSupplyTypePopupListbox() {
-		currentSupplyType = (SupplyType) supplyTypePopupListbox.getSelectedItem().getValue();
+		currentSupplyType = supplyTypePopupListbox.getSelectedItem().getValue();
 		supplyTypeBandbox.setValue(currentSupplyType.getDescription());
 		supplyTypeBandbox.close();
 	}
@@ -1066,7 +1027,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		} else {
 			if(currentSupply == null) {// permite la seleccion solo si no existe nada seleccionado
 				currentSupply = supplyListbox.getSelectedItem().getValue();
-				currentSupplyType = supplyTypeService.getSupplyType(currentSupply.getIdSupplyType());
+				currentSupplyType = currentSupply.getSupplyType();
 				refreshViewSupply();
 			}
 		}
@@ -1088,7 +1049,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	@Listen("onClick = #deleteSupplyButton")
 	public void deleteSupply() {
 		if(currentSupply != null) {
-			Messagebox.show("Esta seguro que desea eliminar " + supplyTypeService.getSupplyType(currentSupply.getIdSupplyType()).getDescription() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+			Messagebox.show("Esta seguro que desea eliminar " + currentSupply.getSupplyType().getDescription() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 				public void onEvent(Event evt) throws InterruptedException {
 					if (evt.getName().equals("onOK")) {
 						if(currentSupply.getId() != null) {// si el detalle existe en la bd
@@ -1124,46 +1085,23 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		if(aux != null) {
 			lateDeleteSupplyList.remove(aux);// lo eliminamos de la lista de eliminacion tardia porque el sera agregado nuevamente
 		}
-		int supplyTypeId = currentSupplyType.getId();
 		double supplyQuantity = supplyQuantityDoublebox.getValue();
 		if(currentSupply == null) { // es nuevo
 			if(aux != null) {// si ya estaba en un detalle
-				aux.setQuantity(supplyQuantity);;
+				aux.setQuantity(BigDecimal.valueOf(supplyQuantity));;
 				supplyList.add(aux);
 			} else {
 				// se crea un detalle sin id porque recien se le asignara uno al momento de grabarse definitivamente
-				currentSupply = new Supply(null, null, supplyTypeId, supplyQuantity);
+				currentSupply = new Supply(null, currentSupplyType, BigDecimal.valueOf(supplyQuantity));
 				supplyList.add(currentSupply);
 			}
 		} else { // se edita
-			currentSupply.setIdSupplyType(supplyTypeId);;
-			currentSupply.setQuantity(supplyQuantity);
-			updateSupplyList(currentSupply);// actualizamos la lista
+			currentSupply.setSupplyType(currentSupplyType);;
+			currentSupply.setQuantity(BigDecimal.valueOf(supplyQuantity));
 		}
 		refreshSupplyTypePopup();// actualizamos el popup
 		currentSupply = null;
 		refreshViewSupply();
-	}
-
-	private Supply updateSupplyList(Supply supply) {
-		if(supply.getId() == null) {
-			throw new IllegalArgumentException("can't update a null-id Supply");
-		} else {
-			supply = Supply.clone(supply);
-			int size = supplyList.size();
-			for(int i = 0; i < size; i++) {
-				Supply t = supplyList.get(i);
-				if(t.getIdSupplyType().equals(supply.getIdSupplyType())) {
-					supplyList.set(i, supply);
-					return supply;
-				}
-			}
-			throw new RuntimeException("Supply not found " + supply.getId());
-		}
-	}
-
-	public SupplyType getSupplyType(int idSupplyType) {
-		return supplyTypeService.getSupplyType(idSupplyType);
 	}
 
 	// raw material methods
@@ -1189,10 +1127,10 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			deleteRawMaterialButton.setDisabled(true);
 			cancelRawMaterialButton.setDisabled(true);
 		} else {
-			currentRawMaterialType = rawMaterialTypeService.getRawMaterialType(currentRawMaterial.getIdRawMaterialType());
+			currentRawMaterialType = currentRawMaterial.getRawMaterialType();
 			rawMaterialTypeBandbox.setDisabled(true);// no se permite modificar en la edicion
 			rawMaterialTypeBandbox.setValue(currentRawMaterialType.getName());
-			rawMaterialQuantityDoublebox.setValue(currentRawMaterial.getQuantity());
+			rawMaterialQuantityDoublebox.setValue(currentRawMaterial.getQuantity().doubleValue());
 			deleteRawMaterialButton.setDisabled(false);
 			cancelRawMaterialButton.setDisabled(false);
 		}
@@ -1206,12 +1144,11 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	}
 
 	private void refreshRawMaterialTypePopup() {// el popup se actualiza en base a la lista
-		rawMaterialTypePopupList = rawMaterialTypeService.getRawMaterialTypeList();
+		rawMaterialTypePopupList = rawMaterialTypeRepository.findAll();
 		for(RawMaterial rawMaterial : rawMaterialList) {
-			RawMaterialType aux = rawMaterialTypeService.getRawMaterialType(rawMaterial.getIdRawMaterialType());
-			rawMaterialTypePopupList.remove(aux);// sacamos del popup
+			rawMaterialTypePopupList.remove(rawMaterial.getRawMaterialType());// sacamos del popup
 		}
-		rawMaterialTypePopupListModel = new ListModelList<RawMaterialType>(rawMaterialTypePopupList);
+		rawMaterialTypePopupListModel = new ListModelList<>(rawMaterialTypePopupList);
 		rawMaterialTypePopupListbox.setModel(rawMaterialTypePopupListModel);
 	}
 
@@ -1230,7 +1167,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		} else {
 			if(currentRawMaterial == null) {// permite la seleccion solo si no existe nada seleccionado
 				currentRawMaterial = rawMaterialListbox.getSelectedItem().getValue();
-				currentRawMaterialType = rawMaterialTypeService.getRawMaterialType(currentRawMaterial.getIdRawMaterialType());
+				currentRawMaterialType = currentRawMaterial.getRawMaterialType();
 				refreshViewRawMaterial();
 			}
 		}
@@ -1252,7 +1189,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	@Listen("onClick = #deleteRawMaterialButton")
 	public void deleteRawMaterial() {
 		if(currentRawMaterial != null) {
-			Messagebox.show("Esta seguro que desea eliminar " + rawMaterialTypeService.getRawMaterialType(currentRawMaterial.getIdRawMaterialType()).getName() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+			Messagebox.show("Esta seguro que desea eliminar " + currentRawMaterial.getRawMaterialType().getName() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 				public void onEvent(Event evt) throws InterruptedException {
 					if (evt.getName().equals("onOK")) {
 						if(currentRawMaterial.getId() != null) {// si el detalle existe en la bd
@@ -1288,53 +1225,31 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		if(aux != null) {
 			lateDeleteRawMaterialList.remove(aux);// lo eliminamos de la lista de eliminacion tardia porque el sera agregado nuevamente
 		}
-		int rawMaterialTypeId = currentRawMaterialType.getId();
 		double rawMaterialQuantity = rawMaterialQuantityDoublebox.getValue();
 		if(currentRawMaterial == null) { // es nuevo
 			if(aux != null) {// si ya estaba en un detalle
-				aux.setQuantity(rawMaterialQuantity);;
+				aux.setQuantity(BigDecimal.valueOf(rawMaterialQuantity));;
 				rawMaterialList.add(aux);
 			} else {
 				// se crea un detalle sin id porque recien se le asignara uno al momento de grabarse definitivamente
-				currentRawMaterial = new RawMaterial(null, null, rawMaterialTypeId, rawMaterialQuantity);
+				currentRawMaterial = new RawMaterial(null, currentRawMaterialType, BigDecimal.valueOf(rawMaterialQuantity));
 				rawMaterialList.add(currentRawMaterial);
 			}
 		} else { // se edita
-			currentRawMaterial.setIdRawMaterialType(rawMaterialTypeId);;
-			currentRawMaterial.setQuantity(rawMaterialQuantity);
-			updateRawMaterialList(currentRawMaterial);// actualizamos la lista
+			currentRawMaterial.setRawMaterialType(currentRawMaterialType);;
+			currentRawMaterial.setQuantity(BigDecimal.valueOf(rawMaterialQuantity));
 		}
 		refreshRawMaterialTypePopup();// actualizamos el popup
 		currentRawMaterial = null;
 		refreshViewRawMaterial();
 	}
 
-	private RawMaterial updateRawMaterialList(RawMaterial rawMaterial) {
-		if(rawMaterial.getId() == null) {
-			throw new IllegalArgumentException("can't update a null-id RawMaterial");
-		} else {
-			rawMaterial = RawMaterial.clone(rawMaterial);
-			int size = rawMaterialList.size();
-			for(int i = 0; i < size; i++) {
-				RawMaterial t = rawMaterialList.get(i);
-				if(t.getIdRawMaterialType().equals(rawMaterial.getIdRawMaterialType())) {
-					rawMaterialList.set(i, rawMaterial);
-					return rawMaterial;
-				}
-			}
-			throw new RuntimeException("RawMaterial not found " + rawMaterial.getId());
-		}
-	}
-
-	public RawMaterialType getRawMaterialType(int idRawMaterialType) {
-		return rawMaterialTypeService.getRawMaterialType(idRawMaterialType);
-	}
-
-	public String getMeasureUnitName(int idMeasureUnit) {
-		if(measureUnitService.getMeasureUnit(idMeasureUnit) != null) {
-			return measureUnitService.getMeasureUnit(idMeasureUnit).getName();
+	public String getMeasureUnitName(MeasureUnit measureUnit) {
+		if (measureUnit != null) {
+			return measureUnit.getName();
 		} else {
 			return "[Sin Unidad de Medida]";
 		}
 	}
+	
 }

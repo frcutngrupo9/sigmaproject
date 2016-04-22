@@ -1,7 +1,8 @@
 package ar.edu.utn.sigmaproject.service.impl;
 
 import java.io.Serializable;
-import java.lang.reflect.ParameterizedType;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -10,10 +11,12 @@ import javax.persistence.EntityManager;
 
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
+import org.hibernate.search.query.dsl.TermContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -45,11 +48,24 @@ public class SearchableRepositoryImpl<T, ID extends Serializable> extends Simple
         try {
             // This will ensure that index for already inserted data is created.
             fullTextEntityManager.createIndexer().startAndWait();
-        } catch (InterruptedException ex) {
+        } catch (InterruptedException ignored) {
 
         }
         QueryBuilder qb = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(this.clazz).get();
-        org.apache.lucene.search.Query query = qb.keyword().onFields("name").matching(queryString).createQuery();
+		List<String> fields = new ArrayList<>();
+		if (this.clazz.isAnnotationPresent(Indexed.class)) {
+			for (Field field : this.clazz.getDeclaredFields()) {
+				if (field.isAnnotationPresent(org.hibernate.search.annotations.Field.class)) {
+					fields.add(field.getName());
+				}
+			}
+		}
+		if (fields.isEmpty()) {
+			throw new java.lang.RuntimeException(
+					"The class " + this.clazz.getName() + " should have the @Indexed annotation present" +
+							" and it should have at least one field with the @Field annotation");
+		}
+		org.apache.lucene.search.Query query = qb.keyword().onFields(fields.toArray(new String[0])).matching(queryString).createQuery();
         FullTextQuery jpaQuery = fullTextEntityManager.createFullTextQuery(query, this.clazz);
 
         jpaQuery.setFirstResult(pageable.getOffset());

@@ -1,26 +1,46 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+@Entity
 public class ProductionOrder implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	Integer id;
-	Integer idProductionPlan;
-	Integer idProduct;
-	Integer idWorker;
-	Integer number;
-	Integer units;
-	Date date;
-	Date dateFinished;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
+
+	@ManyToOne
+	ProductionPlan productionPlan;
+
+	@ManyToOne
+	Product product;
+
+	@ManyToOne
+	Worker worker;
+
+	@OneToMany(mappedBy = "productionOrder")
+	@OrderColumn(name = "detail_index")
+	List<ProductionOrderDetail> details = new ArrayList<>();
+
+	Integer number = 0;
+	Integer units = 0;
+	Date date = new Date();
+	Date dateFinished = new Date();
 	ProductionOrderState state;
 
-	public ProductionOrder(Integer id, Integer idProductionPlan, Integer idProduct, Integer idWorker, Integer number, Integer units, Date date, Date dateFinished, ProductionOrderState state) {
-		this.id = id;
-		this.idProductionPlan = idProductionPlan;
-		this.idProduct = idProduct;
-		this.idWorker = idWorker;
+	public ProductionOrder() {
+
+	}
+
+	public ProductionOrder(ProductionPlan productionPlan, Product product, Worker worker, Integer number, Integer units, Date date, Date dateFinished, ProductionOrderState state) {
+		this.productionPlan = productionPlan;
+		this.product = product;
+		this.worker = worker;
 		this.number = number;
 		this.units = units;
 		this.date = date;
@@ -28,36 +48,48 @@ public class ProductionOrder implements Serializable, Cloneable {
 		this.state = state;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public Integer getIdProductionPlan() {
-		return idProductionPlan;
+	public ProductionPlan getProductionPlan() {
+		return productionPlan;
 	}
 
-	public void setIdProductionPlan(Integer idProductionPlan) {
-		this.idProductionPlan = idProductionPlan;
+	public void setProductionPlan(ProductionPlan productionPlan) {
+		this.productionPlan = productionPlan;
 	}
 
-	public Integer getIdProduct() {
-		return idProduct;
+	public Product getProduct() {
+		return product;
 	}
 
-	public void setIdProduct(Integer idProduct) {
-		this.idProduct = idProduct;
+	public void setProduct(Integer idProduct) {
+		this.product = product;
 	}
 
-	public Integer getIdWorker() {
-		return idWorker;
+	public Worker getWorker() {
+		return worker;
 	}
 
-	public void setIdWorker(Integer idWorker) {
-		this.idWorker = idWorker;
+	public void setWorker(Worker idWorker) {
+		this.worker = worker;
+	}
+
+	public void setProduct(Product product) {
+		this.product = product;
+	}
+
+	public List<ProductionOrderDetail> getDetails() {
+		return details;
+	}
+
+	public void setDetails(List<ProductionOrderDetail> details) {
+		this.details = details;
 	}
 
 	public Integer getNumber() {

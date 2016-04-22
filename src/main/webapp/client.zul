@@ -23,6 +23,7 @@
             </listitem>
         </template>
     </listbox>
+    <paging id="pager" pageSize="5" sclass="sigma-paging"/>
     <vlayout>
         <separator/>
         <hbox>

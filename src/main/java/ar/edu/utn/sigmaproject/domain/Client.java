@@ -2,32 +2,54 @@ package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.SortableField;
+
+@Entity
+@Indexed
 public class Client implements Serializable, Cloneable {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
+    
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@DocumentId
+	Long id;
 
-	Integer id;
-	String name;
-	String phone;
-	String email;
-	String address;
-	String details;
+    @Field
+    @SortableField
+    String name = "";
+    String phone = "";
 
-	public Client(Integer id, String name, String phone, String email, String address, String details) {
-		this.id = id;
-		this.name = name;
-		this.phone = phone;
-		this.email = email;
-		this.address = address;
-		this.details = details;
-	}
+    String email = "";
+    String address = "";
+    String details = "";
 
-	public Integer getId() {
-		return id;
-	}
+    public Client() {
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    }
+
+    public Client(String name, String phone, String email, String address, String details) {
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+        this.address = address;
+        this.details = details;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
 	public String getName() {
 		return name;

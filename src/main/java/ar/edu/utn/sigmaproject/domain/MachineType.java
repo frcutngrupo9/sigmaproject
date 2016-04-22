@@ -1,29 +1,49 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Serializable;
 
+import javax.persistence.*;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
+@Entity
 public class MachineType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	Integer id;
-	String name;
-	String details;
+	@Transient
+	final Logger logger = LoggerFactory.getLogger(MachineType.class);
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
+
+	String name = "";
+	String details = "";
+
+	@Transient
 	Duration deteriorationTime;
 
-	public MachineType(Integer id, String name, String details, Duration deteriorationTime) {
-		this.id = id;
-		this.name = name;
-		this.details = details;
-		this.deteriorationTime = deteriorationTime;
+	@Column
+	String deteriorationTimeInternal;
+
+	public MachineType() {
+
 	}
 
-	public Integer getId() {
+	public MachineType(String name, String details, Duration deteriorationTime) {
+		this.name = name;
+		this.details = details;
+		this.setDeteriorationTime(deteriorationTime);
+	}
+
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -44,11 +64,23 @@ public class MachineType implements Serializable, Cloneable {
 	}
 
 	public Duration getDeteriorationTime() {
+		if (this.deteriorationTime == null && this.deteriorationTimeInternal != null) {
+			try {
+				this.deteriorationTime = DatatypeFactory.newInstance().newDuration(this.deteriorationTimeInternal);
+			} catch (Exception e) {
+				logger.error("Error while trying to deserialize Duration representation(" + this.deteriorationTimeInternal + "): " + e.toString());
+			}
+		}
 		return deteriorationTime;
 	}
 
 	public void setDeteriorationTime(Duration deteriorationTime) {
 		this.deteriorationTime = deteriorationTime;
+		if (deteriorationTime != null) {
+			this.deteriorationTimeInternal = deteriorationTime.toString();
+		} else {
+			this.deteriorationTimeInternal = null;
+		}
 	}
 
 	@Override

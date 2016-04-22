@@ -24,7 +24,7 @@ import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class ClientController extends SelectorComposer<Component> implements SortingPagingHelper.SortingPagingHelperDelegate<Client> {
+public class ClientController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
 	@Wire
@@ -72,7 +72,7 @@ public class ClientController extends SelectorComposer<Component> implements Sor
 		super.doAfterCompose(comp);
 		LinkedHashMap<String, Boolean> sortProperties = new LinkedHashMap<String, Boolean>();
 		sortProperties.put("name", Boolean.TRUE);
-		sortingPagingHelper = new SortingPagingHelper<Client>(clientListbox, pager, sortProperties, this, 0);
+		sortingPagingHelper = new SortingPagingHelper<>(clientRepository, clientListbox, searchTextbox, pager, sortProperties, 0);
 		refreshView();
 	}
 
@@ -163,16 +163,5 @@ public class ClientController extends SelectorComposer<Component> implements Sor
 				deleteButton.setDisabled(false);
 			}
 		}
-	}
-
-	@Override
-	public Page<Client> getPageForPageRequest(SortingPagingHelper<Client> sortingPagingHelper, PageRequest pageRequest) {
-		Page<Client> results;
-		if (query != null && !query.isEmpty()) {
-			results = clientRepository.findAll(query, pageRequest);
-		} else {
-			results = clientRepository.findAll(pageRequest);
-		}
-		return results;
 	}
 }

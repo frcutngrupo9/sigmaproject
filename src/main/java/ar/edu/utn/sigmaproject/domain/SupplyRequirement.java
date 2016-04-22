@@ -1,53 +1,67 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
+@Entity
 public class SupplyRequirement implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	Integer id;
-	Integer idProductionPlan;
-	Integer idSupplyType;
-	Double quantity;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
+
+	@ManyToOne
+	ProductionPlan productionPlan;
+
+	@ManyToOne
+	SupplyType supplyType;
+
+	BigDecimal quantity = BigDecimal.ZERO;
+
 	boolean isFulfilled;
 
-	public SupplyRequirement(Integer id, Integer idProductionPlan, Integer idSupplyType, Double quantity) {
-		this.id = id;
-		this.idProductionPlan = idProductionPlan;
-		this.idSupplyType = idSupplyType;
+	public SupplyRequirement() {
+
+	}
+
+	public SupplyRequirement(ProductionPlan productionPlan, SupplyType supplyType, BigDecimal quantity) {
+		this.productionPlan = productionPlan;
+		this.supplyType = supplyType;
 		this.quantity = quantity;
 		isFulfilled = false;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public Integer getIdProductionPlan() {
-		return idProductionPlan;
+	public ProductionPlan getProductionPlan() {
+		return productionPlan;
 	}
 
-	public void setIdProductionPlan(Integer idProductionPlan) {
-		this.idProductionPlan = idProductionPlan;
+	public void setProductionPlan(ProductionPlan productionPlan) {
+		this.productionPlan = productionPlan;
 	}
 
-	public Integer getIdSupplyType() {
-		return idSupplyType;
+	public SupplyType getSupplyType() {
+		return supplyType;
 	}
 
-	public void setIdSupplyType(Integer idSupplyType) {
-		this.idSupplyType = idSupplyType;
+	public void setSupplyType(SupplyType supplyType) {
+		this.supplyType = supplyType;
 	}
 
-	public Double getQuantity() {
+	public BigDecimal getQuantity() {
 		return quantity;
 	}
 
-	public void setQuantity(Double quantity) {
+	public void setQuantity(BigDecimal quantity) {
 		this.quantity = quantity;
 	}
 

@@ -1,50 +1,63 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
+@Entity
 public class Wood implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	Integer id;
-	Integer idRawMaterialType;
-	Integer idWoodType;
-	String code;
-	Double stock;
-	Double stockMin;
-	Double stockRepo;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
 
-	public Wood(Integer id, Integer idRawMaterialType, Integer idWoodType, String code, Double stock, Double stockMin, Double stockRepo) {
-		this.id = id;
-		this.idRawMaterialType = idRawMaterialType;
-		this.idWoodType = idWoodType;
+	@ManyToOne
+	RawMaterialType rawMaterialType;
+
+	@ManyToOne
+	WoodType woodType;
+
+	String code = "";
+	BigDecimal stock = BigDecimal.ZERO;
+	BigDecimal stockMin = BigDecimal.ZERO;
+	BigDecimal stockRepo = BigDecimal.ZERO;
+
+	public Wood() {
+
+	}
+
+	public Wood(RawMaterialType rawMaterialType, WoodType woodType, String code, BigDecimal stock, BigDecimal stockMin, BigDecimal stockRepo) {
+		this.rawMaterialType = rawMaterialType;
+		this.woodType = woodType;
 		this.code = code;
 		this.stock = stock;
 		this.stockMin = stockMin;
 		this.stockRepo = stockRepo;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public Integer getIdRawMaterialType() {
-		return idRawMaterialType;
+	public RawMaterialType getRawMaterialType() {
+		return rawMaterialType;
 	}
 
-	public void setIdRawMaterialType(Integer idRawMaterialType) {
-		this.idRawMaterialType = idRawMaterialType;
+	public void setRawMaterialType(RawMaterialType rawMaterialType) {
+		this.rawMaterialType = rawMaterialType;
 	}
 
-	public Integer getIdWoodType() {
-		return idWoodType;
+	public WoodType getWoodType() {
+		return woodType;
 	}
 
-	public void setIdWoodType(Integer idWoodType) {
-		this.idWoodType = idWoodType;
+	public void setWoodType(WoodType woodType) {
+		this.woodType = woodType;
 	}
 
 	public String getCode() {
@@ -55,27 +68,27 @@ public class Wood implements Serializable, Cloneable {
 		this.code = code;
 	}
 
-	public Double getStock() {
+	public BigDecimal getStock() {
 		return stock;
 	}
 
-	public void setStock(Double stock) {
+	public void setStock(BigDecimal stock) {
 		this.stock = stock;
 	}
 
-	public Double getStockMin() {
+	public BigDecimal getStockMin() {
 		return stockMin;
 	}
 
-	public void setStockMin(Double stockMin) {
+	public void setStockMin(BigDecimal stockMin) {
 		this.stockMin = stockMin;
 	}
 
-	public Double getStockRepo() {
+	public BigDecimal getStockRepo() {
 		return stockRepo;
 	}
 
-	public void setStockRepo(Double stockRepo) {
+	public void setStockRepo(BigDecimal stockRepo) {
 		this.stockRepo = stockRepo;
 	}
 

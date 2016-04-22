@@ -2,34 +2,101 @@ package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
+import javax.persistence.*;
+
+@Entity
 public class Product implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	Integer id;
-	String name;
-	String details;
-	String code;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
+
+	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+	List<Piece> pieces;
+
+	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+	List<Supply> supplies;
+
+	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+	List<RawMaterial> rawMaterials;
+
+	@OneToOne(mappedBy = "product")
+	ProductExistence productExistence;
+
+	@Lob
+	byte[] imageData = new byte[0];
+
+	String name = "";
+	String details = "";
+	String code = "";
+
+	@ManyToOne
 	ProductCategory category;
-	BigDecimal price;
+
+	BigDecimal price = BigDecimal.ZERO;
 	boolean isClone;
 
-	public Product(Integer id, String code , String name, String details, ProductCategory category, BigDecimal price) {
-		this.id = id;
+	public Product() {
+
+	}
+
+	public Product(String code , String name, String details, ProductCategory category, BigDecimal price) {
 		this.name = name;
 		this.details = details;
-		this.code = code;
-		this.category = category;
-		this.price = price;
-		isClone = false;
+        this.code = code;
+
+        this.price = price;
 	}
 
-	public void setId(Integer id) {
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public Integer getId() {
-		return id;
+	public List<Piece> getPieces() {
+		return pieces;
+	}
+
+	public void setPieces(List<Piece> pieces) {
+		this.pieces = pieces;
+	}
+
+	public List<Supply> getSupplies() {
+		return supplies;
+	}
+
+	public void setSupplies(List<Supply> supplies) {
+		this.supplies = supplies;
+	}
+
+	public List<RawMaterial> getRawMaterials() {
+		return rawMaterials;
+	}
+
+	public void setRawMaterials(List<RawMaterial> rawMaterials) {
+		this.rawMaterials = rawMaterials;
+	}
+
+	public ProductExistence getProductExistence() {
+		return productExistence;
+	}
+
+	public void setProductExistence(ProductExistence productExistence) {
+		this.productExistence = productExistence;
+	}
+
+	public byte[] getImageData() {
+		return imageData;
+	}
+
+	public void setImageData(byte[] imageData) {
+		this.imageData = imageData;
 	}
 
 	public String getName() {
@@ -97,12 +164,7 @@ public class Product implements Serializable, Cloneable {
 		if (getClass() != obj.getClass())
 			return false;
 		Product other = (Product) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
+		return id != null && other.id != null && id.equals(other.id);
 	}
 
 	public static Product clone(Product product){

@@ -1,12 +1,19 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 
+import ar.edu.utn.sigmaproject.domain.MeasureUnitType;
+import ar.edu.utn.sigmaproject.service.MeasureUnitRepository;
+import ar.edu.utn.sigmaproject.service.MeasureUnitTypeRepository;
+import ar.edu.utn.sigmaproject.service.RawMaterialTypeRepository;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Doublebox;
@@ -18,13 +25,8 @@ import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
 import ar.edu.utn.sigmaproject.domain.RawMaterialType;
-import ar.edu.utn.sigmaproject.service.MeasureUnitService;
-import ar.edu.utn.sigmaproject.service.MeasureUnitTypeService;
-import ar.edu.utn.sigmaproject.service.RawMaterialTypeService;
-import ar.edu.utn.sigmaproject.service.impl.MeasureUnitServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.MeasureUnitTypeServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.RawMaterialTypeServiceImpl;
 
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class RawMaterialController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
 
@@ -60,9 +62,14 @@ public class RawMaterialController extends SelectorComposer<Component>{
 	Grid rawMaterialTypeGrid;
 
 	// services
-	private RawMaterialTypeService rawMaterialTypeService = new RawMaterialTypeServiceImpl();
-	private MeasureUnitService measureUnitService = new MeasureUnitServiceImpl();
-	private MeasureUnitTypeService measureUnitTypeService = new MeasureUnitTypeServiceImpl();
+	@WireVariable
+	private RawMaterialTypeRepository rawMaterialTypeRepository;
+
+	@WireVariable
+	private MeasureUnitRepository measureUnitRepository;
+
+	@WireVariable
+	private MeasureUnitTypeRepository measureUnitTypeRepository;
 
 	// atributes
 	private RawMaterialType currentRawMaterialType;
@@ -80,16 +87,16 @@ public class RawMaterialController extends SelectorComposer<Component>{
 	@Override
 	public void doAfterCompose(Component comp) throws Exception{
 		super.doAfterCompose(comp);
-		rawMaterialTypeList = rawMaterialTypeService.getRawMaterialTypeList();
-		rawMaterialTypeListModel = new ListModelList<RawMaterialType>(rawMaterialTypeList);
+		rawMaterialTypeList = rawMaterialTypeRepository.findAll();
+		rawMaterialTypeListModel = new ListModelList<>(rawMaterialTypeList);
 		rawMaterialTypeListbox.setModel(rawMaterialTypeListModel);
 		currentRawMaterialType = null;
 
-		Integer idMeasureUnitType = measureUnitTypeService.getMeasureUnitType("Longitud").getId();
-		measureUnitList = measureUnitService.getMeasureUnitList(idMeasureUnitType);
-		lengthMeasureUnitListModel = new ListModelList<MeasureUnit>(measureUnitList);
-		depthMeasureUnitListModel = new ListModelList<MeasureUnit>(measureUnitList);
-		widthMeasureUnitListModel = new ListModelList<MeasureUnit>(measureUnitList);
+		MeasureUnitType measureUnitType = measureUnitTypeRepository.findByName("Longitud");
+		measureUnitList = measureUnitType.getMeasureUnits();
+		lengthMeasureUnitListModel = new ListModelList<>(measureUnitList);
+		depthMeasureUnitListModel = new ListModelList<>(measureUnitList);
+		widthMeasureUnitListModel = new ListModelList<>(measureUnitList);
 		lengthMeasureUnitSelectbox.setModel(lengthMeasureUnitListModel);
 		depthMeasureUnitSelectbox.setModel(depthMeasureUnitListModel);
 		widthMeasureUnitSelectbox.setModel(widthMeasureUnitListModel);
@@ -130,28 +137,27 @@ public class RawMaterialController extends SelectorComposer<Component>{
 			return;
 		}
 		String name = nameTextbox.getText();
-		Double length = lengthDoublebox.doubleValue();
-		Integer lengthIdMeasureUnit = lengthMeasureUnitListModel.getElementAt(lengthSelectedIndex).getId();
-		Double depth = depthDoublebox.doubleValue();
-		Integer depthIdMeasureUnit = depthMeasureUnitListModel.getElementAt(depthSelectedIndex).getId();
-		Double width = widthDoublebox.doubleValue();
-		Integer widthIdMeasureUnit = widthMeasureUnitListModel.getElementAt(widthSelectedIndex).getId();
+		BigDecimal length = BigDecimal.valueOf(lengthDoublebox.doubleValue());
+		MeasureUnit lengthMeasureUnit = lengthMeasureUnitListModel.getElementAt(lengthSelectedIndex);
+		BigDecimal depth = BigDecimal.valueOf(depthDoublebox.doubleValue());
+		MeasureUnit depthMeasureUnit = depthMeasureUnitListModel.getElementAt(depthSelectedIndex);
+		BigDecimal width = BigDecimal.valueOf(widthDoublebox.doubleValue());
+		MeasureUnit widthMeasureUnit = widthMeasureUnitListModel.getElementAt(widthSelectedIndex);
 		if(currentRawMaterialType == null)	{// si es nuevo
-			currentRawMaterialType = new RawMaterialType(null, name, length, lengthIdMeasureUnit, depth, depthIdMeasureUnit, width, widthIdMeasureUnit);
-			currentRawMaterialType = rawMaterialTypeService.saveRawMaterialType(currentRawMaterialType);
+			currentRawMaterialType = new RawMaterialType(name, length, lengthMeasureUnit, depth, depthMeasureUnit, width, widthMeasureUnit);
 		} else {
 			// si es una edicion
 			currentRawMaterialType.setName(name);
 			currentRawMaterialType.setLength(length);
 			currentRawMaterialType.setDepth(depth);
 			currentRawMaterialType.setWidth(width);
-			currentRawMaterialType.setLengthIdMeasureUnit(lengthIdMeasureUnit);
-			currentRawMaterialType.setDepthIdMeasureUnit(depthIdMeasureUnit);
-			currentRawMaterialType.setWidthIdMeasureUnit(widthIdMeasureUnit);
-			currentRawMaterialType = rawMaterialTypeService.updateRawMaterialType(currentRawMaterialType);
+			currentRawMaterialType.setLengthMeasureUnit(lengthMeasureUnit);
+			currentRawMaterialType.setDepthMeasureUnit(depthMeasureUnit);
+			currentRawMaterialType.setWidthMeasureUnit(widthMeasureUnit);
 		}
-		rawMaterialTypeList = rawMaterialTypeService.getRawMaterialTypeList();
-		rawMaterialTypeListModel = new ListModelList<RawMaterialType>(rawMaterialTypeList);
+		rawMaterialTypeRepository.save(currentRawMaterialType);
+		rawMaterialTypeList = rawMaterialTypeRepository.findAll();
+		rawMaterialTypeListModel = new ListModelList<>(rawMaterialTypeList);
 		currentRawMaterialType = null;
 		refreshView();
 	}
@@ -170,7 +176,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
 
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
-		rawMaterialTypeService.deleteRawMaterialType(currentRawMaterialType);
+		rawMaterialTypeRepository.delete(currentRawMaterialType);
 		rawMaterialTypeListModel.remove(currentRawMaterialType);
 		currentRawMaterialType = null;
 		refreshView();
@@ -190,9 +196,9 @@ public class RawMaterialController extends SelectorComposer<Component>{
 		rawMaterialTypeListModel.clearSelection();
 	}
 
-	public String getMeasureUnitName(int idMeasureUnit) {
-		if(measureUnitService.getMeasureUnit(idMeasureUnit) != null) {
-			return measureUnitService.getMeasureUnit(idMeasureUnit).getName();
+	public String getMeasureUnitName(MeasureUnit measureUnit) {
+		if (measureUnit.getName() != null) {
+			return measureUnit.getName();
 		} else {
 			return "[Sin Unidad de Medida]";
 		}
@@ -211,38 +217,34 @@ public class RawMaterialController extends SelectorComposer<Component>{
 			depthDoublebox.setValue(null);
 			widthDoublebox.setValue(null);
 			// arrancamos con seleccion de metros x pulgada x pulgada
-			Integer lengthIdMeasureUnit = measureUnitService.getMeasureUnit("Metros").getId();
-			Integer depthIdMeasureUnit = measureUnitService.getMeasureUnit("Pulgadas").getId();
-			Integer widthIdMeasureUnit = measureUnitService.getMeasureUnit("Pulgadas").getId();
-			lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(lengthIdMeasureUnit)));
-			depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(depthIdMeasureUnit)));
-			widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(measureUnitService.getMeasureUnit(widthIdMeasureUnit)));
+			MeasureUnit lengthMeasureUnit = measureUnitRepository.findByName("Metros");
+			MeasureUnit inchesMeasureUnit = measureUnitRepository.findByName("Pulgadas");
+			lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(lengthMeasureUnit));
+			depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(inchesMeasureUnit));
+			widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(inchesMeasureUnit));
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);
 		} else {// editando
 			rawMaterialTypeGrid.setVisible(true);
 			nameTextbox.setValue(currentRawMaterialType.getName());
-			lengthDoublebox.setValue(currentRawMaterialType.getLength());
-			depthDoublebox.setValue(currentRawMaterialType.getDepth());
-			widthDoublebox.setValue(currentRawMaterialType.getWidth());
-			Integer lengthIdMeasureUnit = currentRawMaterialType.getLengthIdMeasureUnit();
-			if(lengthIdMeasureUnit != null) {
-				MeasureUnit aux = measureUnitService.getMeasureUnit(lengthIdMeasureUnit);
-				lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(aux));
+			lengthDoublebox.setValue(currentRawMaterialType.getLength().doubleValue());
+			depthDoublebox.setValue(currentRawMaterialType.getDepth().doubleValue());
+			widthDoublebox.setValue(currentRawMaterialType.getWidth().doubleValue());
+			MeasureUnit lengthMeasureUnit = currentRawMaterialType.getLengthMeasureUnit();
+			if(lengthMeasureUnit != null) {
+				lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(lengthMeasureUnit));
 			} else {
 				lengthMeasureUnitSelectbox.setSelectedIndex(-1);
 			}
-			Integer depthIdMeasureUnit = currentRawMaterialType.getDepthIdMeasureUnit();
-			if(depthIdMeasureUnit != null) {
-				MeasureUnit aux = measureUnitService.getMeasureUnit(depthIdMeasureUnit);
-				depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(aux));
+			MeasureUnit depthMeasureUnit = currentRawMaterialType.getDepthMeasureUnit();
+			if(depthMeasureUnit != null) {
+				depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(depthMeasureUnit));
 			} else {
 				depthMeasureUnitSelectbox.setSelectedIndex(-1);
 			}
-			Integer widthIdMeasureUnit = currentRawMaterialType.getWidthIdMeasureUnit();
-			if(widthIdMeasureUnit != null) {
-				MeasureUnit aux = measureUnitService.getMeasureUnit(widthIdMeasureUnit);
-				widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(aux));
+			MeasureUnit widthMeasureUnit = currentRawMaterialType.getWidthMeasureUnit();
+			if(widthMeasureUnit != null) {
+				widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(widthMeasureUnit));
 			} else {
 				widthMeasureUnitSelectbox.setSelectedIndex(-1);
 			}

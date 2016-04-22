@@ -2,54 +2,93 @@ package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+@Entity
 public class Piece implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	Integer id;
-	Integer idProduct;
-	String name;
-	BigDecimal length;
-	Integer lengthIdMeasureUnit;
-	BigDecimal depth;
-	Integer depthIdMeasureUnit;
-	BigDecimal width;
-	Integer widthIdMeasureUnit;
-	String size;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
+
+	@ManyToOne
+	Product product;
+
+	@OneToMany(mappedBy = "piece", cascade = CascadeType.ALL)
+	List<Process> processes = new ArrayList<>();
+
+	String name = "";
+	BigDecimal length = BigDecimal.ZERO;
+
+	@ManyToOne
+	MeasureUnit lengthMeasureUnit;
+
+	BigDecimal depth = BigDecimal.ZERO;
+
+	@ManyToOne
+	MeasureUnit depthMeasureUnit;
+
+	BigDecimal width = BigDecimal.ZERO;
+	@ManyToOne
+	MeasureUnit widthMeasureUnit;
+
+	String size = "";
 	boolean isGroup;
-	Integer units;
+	Integer units = 0;
+
 	boolean isClone;
 
-	public Piece(Integer id, Integer idProduct, String name, BigDecimal length, Integer lengthIdMeasureUnit, BigDecimal depth, Integer depthIdMeasureUnit, BigDecimal width, Integer widthIdMeasureUnit, String size, boolean isGroup, Integer units) {
-		this.id = id;
-		this.idProduct = idProduct;
+	public Piece() {
+
+	}
+
+	public Piece(Product product, String name, BigDecimal length, MeasureUnit lengthMeasureUnit, BigDecimal depth, MeasureUnit depthMeasureUnit, BigDecimal width, MeasureUnit widthMeasureUnit, String size, boolean isGroup, Integer units) {
+		this.product = product;
 		this.name = name;
 		this.length = length;
-		this.lengthIdMeasureUnit = lengthIdMeasureUnit;
-		this.depth = depth;
-		this.depthIdMeasureUnit = depthIdMeasureUnit;
+		this.lengthMeasureUnit = lengthMeasureUnit;
 		this.width = width;
-		this.widthIdMeasureUnit = widthIdMeasureUnit;
+		this.widthMeasureUnit = widthMeasureUnit;
+		this.depth = depth;
+		this.depthMeasureUnit = depthMeasureUnit;
 		this.size = size;
 		this.isGroup = isGroup;
 		this.units = units;
 		isClone = false;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public Integer getIdProduct() {
-		return idProduct;
+	public List<Process> getProcesses() {
+		return processes;
 	}
 
-	public void setIdProduct(Integer idProduct) {
-		this.idProduct = idProduct;
+	public void setProcesses(List<Process> processes) {
+		this.processes = processes;
+	}
+
+	public Product getProduct() {
+		return product;
+	}
+
+	public void setProduct(Product product) {
+		this.product = product;
 	}
 
 	public String getName() {
@@ -68,12 +107,28 @@ public class Piece implements Serializable, Cloneable {
 		this.length = length;
 	}
 
+	public MeasureUnit getLengthMeasureUnit() {
+		return this.lengthMeasureUnit;
+	}
+
+	public void setLengthMeasureUnit(MeasureUnit lengthMeasureUnit) {
+		this.lengthMeasureUnit = lengthMeasureUnit;
+	}
+
 	public BigDecimal getDepth() {
 		return depth;
 	}
 
 	public void setDepth(BigDecimal depth) {
 		this.depth = depth;
+	}
+
+	public MeasureUnit getDepthMeasureUnit() {
+		return this.depthMeasureUnit;
+	}
+
+	public void setDepthMeasureUnit(MeasureUnit depthMeasureUnit) {
+		this.depthMeasureUnit = depthMeasureUnit;
 	}
 
 	public BigDecimal getWidth() {
@@ -84,28 +139,12 @@ public class Piece implements Serializable, Cloneable {
 		this.width = width;
 	}
 
-	public Integer getLengthIdMeasureUnit() {
-		return lengthIdMeasureUnit;
+	public MeasureUnit getWidthMeasureUnit() {
+		return this.widthMeasureUnit;
 	}
 
-	public void setLengthIdMeasureUnit(Integer lengthIdMeasureUnit) {
-		this.lengthIdMeasureUnit = lengthIdMeasureUnit;
-	}
-
-	public Integer getDepthIdMeasureUnit() {
-		return depthIdMeasureUnit;
-	}
-
-	public void setDepthIdMeasureUnit(Integer depthIdMeasureUnit) {
-		this.depthIdMeasureUnit = depthIdMeasureUnit;
-	}
-
-	public Integer getWidthIdMeasureUnit() {
-		return widthIdMeasureUnit;
-	}
-
-	public void setWidthIdMeasureUnit(Integer widthIdMeasureUnit) {
-		this.widthIdMeasureUnit = widthIdMeasureUnit;
+	public void setWidthMeasureUnit(MeasureUnit widthMeasureUnit) {
+		this.widthMeasureUnit = widthMeasureUnit;
 	}
 
 	public String getSize() {
@@ -164,7 +203,7 @@ public class Piece implements Serializable, Cloneable {
 			return false;
 		return true;
 	}
-
+	
 	public static Piece clone(Piece piece){
 		try {
 			return (Piece)piece.clone();

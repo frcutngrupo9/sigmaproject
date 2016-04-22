@@ -6,11 +6,14 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
+import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Grid;
@@ -20,9 +23,8 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.MachineType;
-import ar.edu.utn.sigmaproject.service.MachineTypeService;
-import ar.edu.utn.sigmaproject.service.impl.MachineTypeServiceImpl;
 
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class MachineController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
 
@@ -54,7 +56,8 @@ public class MachineController extends SelectorComposer<Component>{
 	Intbox deteriorationTimeIntboxHours;
 
 	// services
-	private MachineTypeService machineTypeService = new MachineTypeServiceImpl();
+	@WireVariable
+	private MachineTypeRepository machineTypeRepository;
 
 	// atributes
 	private MachineType currentMachineType;
@@ -68,7 +71,7 @@ public class MachineController extends SelectorComposer<Component>{
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		machineTypeList = machineTypeService.getMachineTypeList();
+		machineTypeList = machineTypeRepository.findAll();
 		machineTypeListModel = new ListModelList<MachineType>(machineTypeList);
 		machineTypeListbox.setModel(machineTypeListModel);
 		currentMachineType = null;
@@ -104,16 +107,15 @@ public class MachineController extends SelectorComposer<Component>{
 			System.out.println("Error en finalizar maquina, en convertir a duracion: " + e.toString());
 		}
 		if(currentMachineType == null) {// nuevo
-			currentMachineType = new MachineType(null, name, details, duration);
-			currentMachineType = machineTypeService.saveMachineType(currentMachineType);
+			currentMachineType = new MachineType(name, details, duration);
 		} else {// edicion
 			currentMachineType.setName(name);
 			currentMachineType.setDetails(details);
 			currentMachineType.setDeteriorationTime(duration);
-			currentMachineType = machineTypeService.updateMachineType(currentMachineType);
 		}
-		machineTypeList = machineTypeService.getMachineTypeList();
-		machineTypeListModel = new ListModelList<MachineType>(machineTypeList);
+		machineTypeRepository.save(currentMachineType);
+		machineTypeList = machineTypeRepository.findAll();
+		machineTypeListModel = new ListModelList<>(machineTypeList);
 		currentMachineType = null;
 		refreshView();
 	}
@@ -131,7 +133,7 @@ public class MachineController extends SelectorComposer<Component>{
 
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
-		machineTypeService.deleteMachineType(currentMachineType);
+		machineTypeRepository.delete(currentMachineType);
 		machineTypeListModel.remove(currentMachineType);
 		currentMachineType = null;
 		refreshView();
@@ -179,6 +181,6 @@ public class MachineController extends SelectorComposer<Component>{
 	}
 
 	public String getFormatedTime(Duration time) {
-		return String.format("Años: %d Horas: %d Minutos: %d", time.getYears(), time.getHours(), time.getMinutes());
+		return String.format("Aï¿½os: %d Horas: %d Minutos: %d", time.getYears(), time.getHours(), time.getMinutes());
 	}
 }

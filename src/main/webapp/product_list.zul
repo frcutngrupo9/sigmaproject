@@ -12,21 +12,14 @@
 		<auxhead sclass="category-center">
             <auxheader label="Categoria" colspan="2" rowspan="1" />
             <auxheader colspan="6" rowspan="1">
-                <radiogroup id="productCategoryRadiogroup">
-                    <hlayout width="100%">
-                        <radio label="Todas" checked="true" width="90px" />
-                        <radio label="Armario" width="90px" />
-                        <radio label="Biblioteca" width="90px" />
-                        <radio label="Comoda" width="90px" />
-                        <radio label="Cajonera" width="90px" />
-                        <radio label="Escritorio" width="90px" />
-                        <radio label="Cama" width="90px" />
-                        <radio label="Mesa" width="90px" />
-                        <radio label="Silla" width="90px" />
-                        <radio label="Sillon" width="90px" />
-                        <radio label="Ninguna" width="90px" />
-                    </hlayout>
-                </radiogroup>
+				<hlayout width="100%">
+                	<radiogroup id="productCategoryRadiogroup">
+						<radio label="Todas" checked="true" width="90px" />
+						<template name="model">
+							<radio label="${each.name}" width="90px" />
+						</template>
+                	</radiogroup>
+				</hlayout>
             </auxheader>
         </auxhead>
         <columns>
@@ -42,7 +35,7 @@
         <template name="model">
             <row>
             	<custom-attributes pieces="${win_product_list$composer.getProductPieces(each.id)}"/>
-            	<detail open="false" fulfill="onOpen">
+            	<detail open="false" fulfill="onOpen" forward="onOpen=win_product_list$composer.onDetail">
             		<include src="/product_pieces.zul" pieces="${pieces}"/>
             	</detail>
                 <label value="${each.id}"/>
@@ -58,7 +51,7 @@
     <separator/>
     <button id="newProductButton" label="Crear Producto Nuevo"/>
     <separator/>
-    
+
     <!-- las listbox siguientes estaran para debugueo ya que no son necesarias -->
     <groupbox id="debugGroupbox" mold="default" width="100%" closable="true" open="false">
     	<caption label="Debug"/>

@@ -3,11 +3,15 @@ package ar.edu.utn.sigmaproject.controller;
 import java.util.Date;
 import java.util.List;
 
+import ar.edu.utn.sigmaproject.service.MachineRepository;
+import ar.edu.utn.sigmaproject.service.WorkerRepository;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Datebox;
@@ -17,9 +21,8 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Worker;
-import ar.edu.utn.sigmaproject.service.WorkerService;
-import ar.edu.utn.sigmaproject.service.impl.WorkerServiceImpl;
 
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class WorkerController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
@@ -45,7 +48,8 @@ public class WorkerController extends SelectorComposer<Component> {
 	Button deleteButton;
 
 	// services
-	private WorkerService workerService = new WorkerServiceImpl();
+	@WireVariable
+	WorkerRepository workerRepository;
 
 	// attributes
 	private Worker currentWorker;
@@ -59,8 +63,8 @@ public class WorkerController extends SelectorComposer<Component> {
 	@Override
 	public void doAfterCompose(Component comp) throws Exception{
 		super.doAfterCompose(comp);
-		workerList = workerService.getWorkerList();
-		workerListModel = new ListModelList<Worker>(workerList);
+		workerList = workerRepository.findAll();
+		workerListModel = new ListModelList<>(workerList);
 		workerListbox.setModel(workerListModel);
 		currentWorker = null;
 
@@ -88,15 +92,14 @@ public class WorkerController extends SelectorComposer<Component> {
 		Date dateEmployed = dateEmployedDatebox.getValue();
 		if(currentWorker == null) {
 			// es un nuevo insumo
-			currentWorker = new Worker(null, name, dateEmployed);
-			currentWorker = workerService.saveWorker(currentWorker);
+			currentWorker = new Worker(name, dateEmployed);
 		} else {
 			// es una edicion
 			currentWorker.setName(name);
 			currentWorker.setDateEmployed(dateEmployed);
-			currentWorker = workerService.updateWorker(currentWorker);
 		}
-		workerList = workerService.getWorkerList();
+		currentWorker = workerRepository.save(currentWorker);
+		workerList = workerRepository.findAll();
 		workerListModel = new ListModelList<Worker>(workerList);
 		currentWorker = null;
 		refreshView();
@@ -115,7 +118,7 @@ public class WorkerController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
-		workerService.deleteWorker(currentWorker);
+		workerRepository.delete(currentWorker);
 		workerListModel.remove(currentWorker);
 		currentWorker = null;
 		refreshView();

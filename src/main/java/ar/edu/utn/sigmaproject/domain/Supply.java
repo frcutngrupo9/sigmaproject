@@ -1,53 +1,66 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
+@Entity
 public class Supply implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	Integer id;
-	Integer idProduct;
-	Integer idSupplyType;
-	Double quantity;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
+
+	@ManyToOne
+	Product product;
+
+	@ManyToOne
+	SupplyType supplyType;
+
+	BigDecimal quantity = BigDecimal.ZERO;
 	boolean isClone;
 
-	public Supply(Integer id, Integer idProduct, Integer idSupplyType, Double quantity) {
-		this.id = id;
-		this.idProduct = idProduct;
-		this.idSupplyType = idSupplyType;
+	public Supply() {
+
+	}
+
+	public Supply(Product product, SupplyType supplyType, BigDecimal quantity) {
+		this.product = product;
+		this.supplyType = supplyType;
 		this.quantity = quantity;
 		isClone = false;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public Integer getIdProduct() {
-		return idProduct;
+	public Product getProduct() {
+		return product;
 	}
 
-	public void setIdProduct(Integer idProduct) {
-		this.idProduct = idProduct;
+	public void setProduct(Product product) {
+		this.product = product;
 	}
 
-	public Integer getIdSupplyType() {
-		return idSupplyType;
+	public SupplyType getSupplyType() {
+		return supplyType;
 	}
 
-	public void setIdSupplyType(Integer idSupplyType) {
-		this.idSupplyType = idSupplyType;
+	public void setSupplyType(SupplyType supplyType) {
+		this.supplyType = supplyType;
 	}
 
-	public Double getQuantity() {
+	public BigDecimal getQuantity() {
 		return quantity;
 	}
 
-	public void setQuantity(Double quantity) {
+	public void setQuantity(BigDecimal quantity) {
 		this.quantity = quantity;
 	}
 

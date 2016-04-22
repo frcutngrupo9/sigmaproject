@@ -3,33 +3,62 @@ package ar.edu.utn.sigmaproject.domain;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+
+@Entity
 public class OrderState implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	Integer idOrder;
-	Integer idOrderStateType;
-	Date date;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
 
-	public OrderState(Integer idOrder, Integer idOrderStateType, Date date) {
-		this.idOrder = idOrder;
-		this.idOrderStateType = idOrderStateType;
+	@ManyToOne(optional = false)
+	Order order;
+
+	@ManyToOne(optional = false)
+	OrderStateType type;
+
+	@Column(nullable = false)
+	Date date = new Date();
+
+	public OrderState() {
+
+	}
+
+	public OrderState(Order order, OrderStateType orderStateType, Date date) {
+		this.order = order;
+		this.type = orderStateType;
 		this.date = date;
 	}
 
-	public Integer getIdOrder() {
-		return idOrder;
+	public Long getId() {
+		return id;
 	}
 
-	public void setIdOrder(Integer idOrder) {
-		this.idOrder = idOrder;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
-	public Integer getIdOrderStateType() {
-		return idOrderStateType;
+	public Order getOrder() {
+		return order;
 	}
 
-	public void setIdOrderStateType(Integer idOrderType) {
-		this.idOrderStateType = idOrderType;
+	public void setOrder(Order order) {
+		this.order = order;
+	}
+
+	public OrderStateType getType() {
+		return type;
+	}
+
+	public void setType(OrderStateType type) {
+		this.type = type;
 	}
 
 	public Date getDate() {
@@ -49,11 +78,8 @@ public class OrderState implements Serializable, Cloneable {
 		if (getClass() != obj.getClass())
 			return false;
 		OrderState other = (OrderState) obj;
-		if (idOrder != null && idOrderStateType != null) {
-			if (other.idOrder != null && other.idOrderStateType != null) {
-				if (other.idOrder == idOrder && other.idOrderStateType == idOrderStateType)
-					return true;
-			}
+		if (id != null && other.id != null) {
+			return id.equals(other.id);
 		}
 		return false;
 	}

@@ -1,51 +1,64 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
-public class WoodReserved  implements Serializable, Cloneable {
+@Entity
+public class WoodReserved implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	Integer id;
-	Integer idWood;
-	Integer idRawMaterialRequirement;
-	Double stockReserved;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
+	
+	@ManyToOne
+	Wood wood;
 
-	public WoodReserved(Integer id, Integer idWood, Integer idRawMaterialRequirement, Double stockReserved) {
-		this.id = id;
-		this.idWood = idWood;
-		this.idRawMaterialRequirement = idRawMaterialRequirement;
+	@OneToOne
+	RawMaterialRequirement rawMaterialRequirement;
+
+	BigDecimal stockReserved = BigDecimal.ZERO;
+
+	public WoodReserved() {
+
+	}
+
+	public WoodReserved(Wood wood, RawMaterialRequirement rawMaterialRequirement, BigDecimal stockReserved) {
+		this.wood = wood;
+		this.rawMaterialRequirement = rawMaterialRequirement;
 		this.stockReserved = stockReserved;
 	}
-	
-	public Integer getId() {
+
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public Integer getIdWood() {
-		return idWood;
+	public Wood getWood() {
+		return wood;
 	}
 
-	public void setIdWood(Integer idWood) {
-		this.idWood = idWood;
+	public void setWood(Wood wood) {
+		this.wood = wood;
 	}
 
-	public Integer getIdRawMaterialRequirement() {
-		return idRawMaterialRequirement;
+	public RawMaterialRequirement getRawMaterialRequirement() {
+		return rawMaterialRequirement;
 	}
 
-	public void setIdRawMaterialRequirement(Integer idRawMaterialRequirement) {
-		this.idRawMaterialRequirement = idRawMaterialRequirement;
+	public void setRawMaterialRequirement(RawMaterialRequirement rawMaterialRequirement) {
+		this.rawMaterialRequirement = rawMaterialRequirement;
 	}
 
-	public Double getStockReserved() {
+	public BigDecimal getStockReserved() {
 		return stockReserved;
 	}
 
-	public void setStockReserved(Double stockReserved) {
+	public void setStockReserved(BigDecimal stockReserved) {
 		this.stockReserved = stockReserved;
 	}
 

@@ -1,53 +1,67 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
+@Entity
 public class RawMaterialRequirement implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	Integer id;
-	Integer idProductionPlan;
-	Integer idRawMaterialType;
-	Double quantity;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
+
+	@ManyToOne
+	ProductionPlan productionPlan;
+
+	@ManyToOne
+	RawMaterialType rawMaterialType;
+
+	BigDecimal quantity = BigDecimal.ZERO;
+
 	boolean isFulfilled;
 
-	public RawMaterialRequirement(Integer id, Integer idProductionPlan, Integer idRawMaterialType, Double quantity) {
-		this.id = id;
-		this.idProductionPlan = idProductionPlan;
-		this.idRawMaterialType = idRawMaterialType;
+	public RawMaterialRequirement() {
+
+	}
+
+	public RawMaterialRequirement(ProductionPlan productionPlan, RawMaterialType rawMaterialType, BigDecimal quantity) {
+		this.productionPlan = productionPlan;
+		this.rawMaterialType = rawMaterialType;
 		this.quantity = quantity;
 		isFulfilled = false;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public Integer getIdProductionPlan() {
-		return idProductionPlan;
+	public ProductionPlan getProductionPlan() {
+		return productionPlan;
 	}
 
-	public void setIdProductionPlan(Integer idProductionPlan) {
-		this.idProductionPlan = idProductionPlan;
+	public void setProductionPlan(ProductionPlan productionPlan) {
+		this.productionPlan = productionPlan;
 	}
 
-	public Integer getIdRawMaterialType() {
-		return idRawMaterialType;
+	public RawMaterialType getRawMaterialType() {
+		return rawMaterialType;
 	}
 
-	public void setIdRawMaterialType(Integer idRawMaterialType) {
-		this.idRawMaterialType = idRawMaterialType;
+	public void setRawMaterialType(RawMaterialType rawMaterialType) {
+		this.rawMaterialType = rawMaterialType;
 	}
 
-	public Double getQuantity() {
+	public BigDecimal getQuantity() {
 		return quantity;
 	}
 
-	public void setQuantity(Double quantity) {
+	public void setQuantity(BigDecimal quantity) {
 		this.quantity = quantity;
 	}
 

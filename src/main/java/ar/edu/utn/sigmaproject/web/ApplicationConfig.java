@@ -12,16 +12,22 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import ar.edu.utn.sigmaproject.service.impl.SearchableRepositoryImpl;
+
 @Configuration
-@ComponentScan("ar.edu.utn.sigmaproject")
+@ComponentScan({ "ar.edu.utn.sigmaproject.service", "ar.edu.utn.sigmaproject.service.impl"})
+@EnableJpaRepositories(value = "ar.edu.utn.sigmaproject.service", repositoryBaseClass = SearchableRepositoryImpl.class)
 @EnableTransactionManagement
 @PropertySource("classpath:db.properties")
 public class ApplicationConfig {
@@ -34,6 +40,9 @@ public class ApplicationConfig {
 	
 	@Value("${db.password}")
 	private String dbPassword;
+	
+	@Value("${hibernate.hbm2ddl.auto}")
+	private String hbm2ddl;
 
 	@Bean
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
@@ -72,14 +81,19 @@ public class ApplicationConfig {
 
 	Properties additionalProperties() {
 		Properties properties = new Properties();
-		properties.setProperty("hibernate.hbm2ddl.auto", "create-drop");
-		properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
+		properties.setProperty("hibernate.hbm2ddl.auto", this.hbm2ddl);
+		properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
 		return properties;
 	}
 	
 	@Bean
 	public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
 	    return new PropertySourcesPlaceholderConfigurer();
+	}
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
 	}
 
 }

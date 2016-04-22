@@ -2,11 +2,15 @@ package ar.edu.utn.sigmaproject.controller;
 
 import java.util.List;
 
+import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
+import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Combobox;
@@ -17,11 +21,8 @@ import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.MachineType;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
-import ar.edu.utn.sigmaproject.service.MachineTypeService;
-import ar.edu.utn.sigmaproject.service.ProcessTypeService;
-import ar.edu.utn.sigmaproject.service.impl.MachineTypeServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProcessTypeServiceImpl;
 
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProcessController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
 
@@ -47,8 +48,11 @@ public class ProcessController extends SelectorComposer<Component>{
 	Button deleteButton;
 
 	// services
-	private ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
-	private MachineTypeService machineTypeService = new MachineTypeServiceImpl();
+	@WireVariable
+	private ProcessTypeRepository processTypeRepository;
+
+	@WireVariable
+	private MachineTypeRepository machineTypeRepository;
 
 	// attributes
 	private ProcessType currentProcessType;
@@ -64,11 +68,11 @@ public class ProcessController extends SelectorComposer<Component>{
 	@Override
 	public void doAfterCompose(Component comp) throws Exception{
 		super.doAfterCompose(comp);
-		machineTypeList = machineTypeService.getMachineTypeList();
-		machineTypeListModel = new ListModelList<MachineType>(machineTypeList);
+		machineTypeList = machineTypeRepository.findAll();
+		machineTypeListModel = new ListModelList<>(machineTypeList);
 		machineTypeCombobox.setModel(machineTypeListModel);
-		processTypeList = processTypeService.getProcessTypeList();
-		processTypeListModel = new ListModelList<ProcessType>(processTypeList);
+		processTypeList = processTypeRepository.findAll();
+		processTypeListModel = new ListModelList<>(processTypeList);
 		processTypeListbox.setModel(processTypeListModel);
 		currentProcessType = null;
 		refreshView();
@@ -93,25 +97,20 @@ public class ProcessController extends SelectorComposer<Component>{
 		}
 		String name = nameTextbox.getText();
 		MachineType machineType = null;
-		if(machineTypeCombobox.getSelectedItem() != null) {
+		if (machineTypeCombobox.getSelectedItem() != null) {
 			machineType = machineTypeCombobox.getSelectedItem().getValue();
 		}
-		Integer idMachineType = null;
-		if(machineType != null) {
-			idMachineType = machineType.getId();
-		}
-		if(currentProcessType == null) {
+		if (currentProcessType == null) {
 			// es un nuevo insumo
-			currentProcessType = new ProcessType(null, idMachineType, name);
-			currentProcessType = processTypeService.saveProcessType(currentProcessType);
+			currentProcessType = new ProcessType(name, machineType);
 		} else {
 			// es una edicion
 			currentProcessType.setName(name);
-			currentProcessType.setIdMachineType(idMachineType);
-			currentProcessType = processTypeService.updateProcessType(currentProcessType);
+			currentProcessType.setMachineType(machineType);
 		}
-		processTypeList = processTypeService.getProcessTypeList();
-		processTypeListModel = new ListModelList<ProcessType>(processTypeList);
+		currentProcessType = processTypeRepository.save(currentProcessType);
+		processTypeList = processTypeRepository.findAll();
+		processTypeListModel = new ListModelList<>(processTypeList);
 		currentProcessType = null;
 		refreshView();
 	}
@@ -129,7 +128,7 @@ public class ProcessController extends SelectorComposer<Component>{
 
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
-		processTypeService.deleteProcessType(currentProcessType);
+		processTypeRepository.delete(currentProcessType);
 		processTypeListModel.remove(currentProcessType);
 		currentProcessType = null;
 		refreshView();
@@ -164,7 +163,7 @@ public class ProcessController extends SelectorComposer<Component>{
 		}else {// editando
 			processTypeGrid.setVisible(true);
 			nameTextbox.setValue(currentProcessType.getName());
-			machineTypeCombobox.setSelectedIndex(machineTypeListModel.indexOf(machineTypeService.getMachineType(currentProcessType.getIdMachineType())));
+			machineTypeCombobox.setSelectedIndex(machineTypeListModel.indexOf(currentProcessType.getMachineType()));
 			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
 		}
@@ -172,9 +171,8 @@ public class ProcessController extends SelectorComposer<Component>{
 	
 	public String getMachineTypeName(ProcessType processType) {
 		String name = "Ninguna";
-		MachineType machineType = machineTypeService.getMachineType(processType.getIdMachineType());
-		if(machineType != null) {
-			name = machineType.getName();
+		if (processType.getMachineType() != null) {
+			name = processType.getMachineType().getName();
 		}
 		return name;
 	}

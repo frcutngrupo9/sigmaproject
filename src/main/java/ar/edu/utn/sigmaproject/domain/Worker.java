@@ -1,26 +1,38 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.io.Serializable;
 import java.util.Date;
 
+@Entity
 public class Worker  implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	Integer id;
-	String name;
-	Date dateEmployed;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
 
-	public Worker(Integer id, String name, Date dateEmployed) {
-		this.id = id;
+	String name = "";
+
+	Date dateEmployed = new Date();
+
+	public Worker() {
+
+	}
+
+	public Worker(String name, Date dateEmployed) {
 		this.name = name;
 		this.dateEmployed = dateEmployed;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

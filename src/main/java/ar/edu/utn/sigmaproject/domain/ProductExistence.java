@@ -1,28 +1,48 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import javax.persistence.*;
 import java.io.Serializable;
 
+@Entity
 public class ProductExistence implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	Integer idProduct;
-	Integer stock;
-	Integer stockMin;
-	Integer stockRepo;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
 
-	public ProductExistence(Integer idProduct, Integer stock, Integer stockMin, Integer stockRepo) {
-		this.idProduct = idProduct;
+	@OneToOne
+	Product product;
+
+	Integer stock = 0;
+	Integer stockMin = 0;
+	Integer stockRepo = 0;
+
+	public ProductExistence() {
+
+	}
+
+	public ProductExistence(Product product, Integer stock, Integer stockMin, Integer stockRepo) {
+		this.product = product;
 		this.stock = stock;
 		this.stockMin = stockMin;
 		this.stockRepo = stockRepo;
 	}
 
-	public Integer getIdProduct() {
-		return idProduct;
+	public Long getId() {
+		return id;
 	}
 
-	public void setIdProduct(Integer idProduct) {
-		this.idProduct = idProduct;
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Product getProduct() {
+		return product;
+	}
+
+	public void setProduct(Product product) {
+		this.product = product;
 	}
 
 	public Integer getStock() {
@@ -50,28 +70,19 @@ public class ProductExistence implements Serializable, Cloneable {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((idProduct == null) ? 0 : idProduct.hashCode());
-		return result;
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		ProductExistence that = (ProductExistence) o;
+
+		return product.equals(that.product);
+
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ProductExistence other = (ProductExistence) obj;
-		if (idProduct == null) {
-			if (other.idProduct != null)
-				return false;
-		} else if (!idProduct.equals(other.idProduct))
-			return false;
-		return true;
+	public int hashCode() {
+		return product.hashCode();
 	}
 
 	public static ProductExistence clone(ProductExistence productExistence){

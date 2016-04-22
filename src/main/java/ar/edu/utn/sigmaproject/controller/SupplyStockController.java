@@ -1,11 +1,16 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 
+import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
+import ar.edu.utn.sigmaproject.service.WorkerRepository;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Combobox;
@@ -19,11 +24,8 @@ import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.domain.Worker;
-import ar.edu.utn.sigmaproject.service.SupplyTypeService;
-import ar.edu.utn.sigmaproject.service.WorkerService;
-import ar.edu.utn.sigmaproject.service.impl.SupplyTypeServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.WorkerServiceImpl;
 
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SupplyStockController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
@@ -73,8 +75,11 @@ public class SupplyStockController extends SelectorComposer<Component> {
 	Button resetNewStockButton;
 
 	// services
-	private SupplyTypeService supplyTypeService = new SupplyTypeServiceImpl();
-	private WorkerService workerService = new WorkerServiceImpl();
+	@WireVariable
+	SupplyTypeRepository supplyTypeRepository;
+
+	@WireVariable
+	WorkerRepository workerRepository;
 
 	// attributes
 	private SupplyType currentSupplyType;
@@ -90,11 +95,11 @@ public class SupplyStockController extends SelectorComposer<Component> {
 	@Override
 	public void doAfterCompose(Component comp) throws Exception{
 		super.doAfterCompose(comp);
-		supplyTypeList = supplyTypeService.getSupplyTypeList();
+		supplyTypeList = supplyTypeRepository.findAll();
 		supplyTypeListModel = new ListModelList<SupplyType>(supplyTypeList);
 		supplyTypeListbox.setModel(supplyTypeListModel);
 		currentSupplyType = null;
-		workerList = workerService.getWorkerList();
+		workerList = workerRepository.findAll();
 		workerListModel = new ListModelList<Worker>(workerList);
 		workerCombobox.setModel(workerListModel);
 		refreshView();
@@ -152,9 +157,9 @@ public class SupplyStockController extends SelectorComposer<Component> {
 			codeTextbox.setValue(currentSupplyType.getCode());
 			nameTextbox.setValue(currentSupplyType.getDescription());
 			measureTextbox.setValue(currentSupplyType.getMeasure());
-			stockDoublebox.setValue(currentSupplyType.getStock());
-			stockMinDoublebox.setValue(currentSupplyType.getStockMin());
-			stockRepoDoublebox.setValue(currentSupplyType.getStockRepo());
+			stockDoublebox.setValue(currentSupplyType.getStock().doubleValue());
+			stockMinDoublebox.setValue(currentSupplyType.getStockMin().doubleValue());
+			stockRepoDoublebox.setValue(currentSupplyType.getStockRepo().doubleValue());
 			saveButton.setDisabled(false);
 			cancelButton.setDisabled(false);
 			resetButton.setDisabled(false);
@@ -163,12 +168,12 @@ public class SupplyStockController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
-		currentSupplyType.setStock(stockDoublebox.getValue());
-		currentSupplyType.setStockMin(stockMinDoublebox.getValue());
-		currentSupplyType.setStockRepo(stockRepoDoublebox.getValue());
+		currentSupplyType.setStock(BigDecimal.valueOf(stockDoublebox.getValue()));
+		currentSupplyType.setStockMin(BigDecimal.valueOf(stockMinDoublebox.getValue()));
+		currentSupplyType.setStockRepo(BigDecimal.valueOf(stockRepoDoublebox.getValue()));
 		// es siempre una edicion ya que debe existir para poder modificar su stock
-		currentSupplyType = supplyTypeService.updateSupplyType(currentSupplyType);
-		supplyTypeList = supplyTypeService.getSupplyTypeList();
+		currentSupplyType = supplyTypeRepository.save(currentSupplyType);
+		supplyTypeList = supplyTypeRepository.findAll();
 		supplyTypeListModel = new ListModelList<SupplyType>(supplyTypeList);
 		currentSupplyType = null;
 		refreshView();
@@ -207,18 +212,19 @@ public class SupplyStockController extends SelectorComposer<Component> {
 			return;
 		}
 		if(currentSupplyType != null) {
-			double  newStock = 0;
+			BigDecimal newStock;
+			BigDecimal quantity = BigDecimal.valueOf(quantityDoublebox.getValue());
 			if(stockModificationLabel.getValue().equals("Ingreso Stock")) {
-				newStock = currentSupplyType.getStock() + quantityDoublebox.doubleValue();
+				newStock = currentSupplyType.getStock().add(quantity);
 			} else {
-				if(currentSupplyType.getStock() > quantityDoublebox.getValue()) {// hay suficiente stock
-					newStock = currentSupplyType.getStock() - quantityDoublebox.doubleValue();
+				if(currentSupplyType.getStock().compareTo(quantity) > 0) {// hay suficiente stock
+					newStock = currentSupplyType.getStock().subtract(quantity);
 				} else {
 					Clients.showNotification("No hay stock suficiente", quantityDoublebox);
 					return;
 				}
 			}
-			stockDoublebox.setValue(newStock);
+			stockDoublebox.setValue(newStock.doubleValue());
 //			currentWood.setStock(newStock);
 //			currentWood = woodService.updateWood(currentWood);
 //			refreshView();

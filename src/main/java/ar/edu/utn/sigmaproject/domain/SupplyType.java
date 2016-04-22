@@ -1,23 +1,34 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.List;
 
+import javax.persistence.*;
+
+@Entity
 public class SupplyType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	Integer id;
-	String code;
-	String description;
-	String details;
-	String brand;
-	String presentation;
-	String measure;
-	Double stock;
-	Double stockMin;
-	Double stockRepo;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
 
-	public SupplyType(Integer id, String code, String description, String details, String brand, String presentation, String measure, Double stock, Double stockMin, Double stockRepo) {
-		this.id = id;
+	String code = "";
+	String description = "";
+	String details = "";
+	String brand = "";
+	String presentation = "";
+	String measure = "";
+	BigDecimal stock = BigDecimal.ZERO;
+	BigDecimal stockMin = BigDecimal.ZERO;
+	BigDecimal stockRepo = BigDecimal.ZERO;
+
+	public SupplyType() {
+		
+	}
+	
+	public SupplyType(String code, String description, String details, String brand, String presentation, String measure, BigDecimal stock, BigDecimal stockMin, BigDecimal stockRepo) {
 		this.code = code;
 		this.description = description;
 		this.details = details;
@@ -27,13 +38,16 @@ public class SupplyType implements Serializable, Cloneable {
 		this.stock = stock;
 		this.stockMin = stockMin;
 		this.stockRepo = stockRepo;
+		this.stock = stock;
+		this.stockMin = stockMin;
+		this.stockRepo = stockRepo;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -85,27 +99,27 @@ public class SupplyType implements Serializable, Cloneable {
 		this.measure = measure;
 	}
 
-	public Double getStock() {
+	public BigDecimal getStock() {
 		return stock;
 	}
 
-	public void setStock(Double stock) {
+	public void setStock(BigDecimal stock) {
 		this.stock = stock;
 	}
 
-	public Double getStockMin() {
+	public BigDecimal getStockMin() {
 		return stockMin;
 	}
 
-	public void setStockMin(Double stockMin) {
+	public void setStockMin(BigDecimal stockMin) {
 		this.stockMin = stockMin;
 	}
 
-	public Double getStockRepo() {
+	public BigDecimal getStockRepo() {
 		return stockRepo;
 	}
 
-	public void setStockRepo(Double stockRepo) {
+	public void setStockRepo(BigDecimal stockRepo) {
 		this.stockRepo = stockRepo;
 	}
 

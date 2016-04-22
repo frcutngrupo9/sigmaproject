@@ -1,22 +1,22 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 
+import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
-
 import ar.edu.utn.sigmaproject.domain.SupplyType;
-import ar.edu.utn.sigmaproject.service.SupplyTypeService;
-import ar.edu.utn.sigmaproject.service.impl.SupplyTypeServiceImpl;
 
 public class SupplyController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
@@ -51,7 +51,8 @@ public class SupplyController extends SelectorComposer<Component>{
 	Button deleteButton;
 
 	// services
-	private SupplyTypeService supplyTypeService = new SupplyTypeServiceImpl();
+	@WireVariable
+	SupplyTypeRepository supplyTypeRepository;
 
 	// attributes
 	private SupplyType currentSupplyType;
@@ -65,8 +66,8 @@ public class SupplyController extends SelectorComposer<Component>{
 	@Override
 	public void doAfterCompose(Component comp) throws Exception{
 		super.doAfterCompose(comp);
-		supplyTypeList = supplyTypeService.getSupplyTypeList();
-		supplyTypeListModel = new ListModelList<SupplyType>(supplyTypeList);
+		supplyTypeList = supplyTypeRepository.findAll();
+		supplyTypeListModel = new ListModelList<>(supplyTypeList);
 		supplyTypeListbox.setModel(supplyTypeListModel);
 		currentSupplyType = null;
 
@@ -98,8 +99,7 @@ public class SupplyController extends SelectorComposer<Component>{
 		String measure = measureTextbox.getText();
 		if(currentSupplyType == null) {
 			// es un nuevo insumo
-			currentSupplyType = new SupplyType(null, code, description, details, brand, presentation, measure, 0.0, 0.0, 0.0);
-			currentSupplyType = supplyTypeService.saveSupplyType(currentSupplyType);
+			currentSupplyType = new SupplyType(code, description, details, brand, presentation, measure, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
 		} else {
 			// es una edicion
 			currentSupplyType.setCode(code);
@@ -108,10 +108,10 @@ public class SupplyController extends SelectorComposer<Component>{
 			currentSupplyType.setBrand(brand);
 			currentSupplyType.setPresentation(presentation);
 			currentSupplyType.setMeasure(measure);
-			currentSupplyType = supplyTypeService.updateSupplyType(currentSupplyType);
 		}
-		supplyTypeList = supplyTypeService.getSupplyTypeList();
-		supplyTypeListModel = new ListModelList<SupplyType>(supplyTypeList);
+		currentSupplyType = supplyTypeRepository.save(currentSupplyType);
+		supplyTypeList = supplyTypeRepository.findAll();
+		supplyTypeListModel = new ListModelList<>(supplyTypeList);
 		currentSupplyType = null;
 		refreshView();
 	}
@@ -129,7 +129,7 @@ public class SupplyController extends SelectorComposer<Component>{
 
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
-		supplyTypeService.deleteSupplyType(currentSupplyType);
+		supplyTypeRepository.delete(currentSupplyType);
 		supplyTypeListModel.remove(currentSupplyType);
 		currentSupplyType = null;
 		refreshView();

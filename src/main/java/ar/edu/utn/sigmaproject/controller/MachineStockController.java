@@ -6,11 +6,15 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
+import ar.edu.utn.sigmaproject.service.MachineRepository;
+import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Grid;
@@ -22,11 +26,8 @@ import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
-import ar.edu.utn.sigmaproject.service.MachineService;
-import ar.edu.utn.sigmaproject.service.MachineTypeService;
-import ar.edu.utn.sigmaproject.service.impl.MachineServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.MachineTypeServiceImpl;
 
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class MachineStockController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
@@ -60,8 +61,11 @@ public class MachineStockController extends SelectorComposer<Component> {
 	Button newButton;
 
 	// services
-	private MachineService machineService = new MachineServiceImpl();
-	private MachineTypeService machineTypeService = new MachineTypeServiceImpl();
+	@WireVariable
+	private MachineTypeRepository machineTypeRepository;
+
+	@WireVariable
+	private MachineRepository machineRepository;
 
 	// attributes
 	private Machine currentMachine;
@@ -77,10 +81,10 @@ public class MachineStockController extends SelectorComposer<Component> {
 	@Override
 	public void doAfterCompose(Component comp) throws Exception{
 		super.doAfterCompose(comp);
-		machineTypeList = machineTypeService.getMachineTypeList();
+		machineTypeList = machineTypeRepository.findAll();
 		machineTypeListModel = new ListModelList<MachineType>(machineTypeList);
 		machineTypeSelectbox.setModel(machineTypeListModel);
-		machineList = machineService.getMachineList();
+		machineList = machineRepository.findAll();
 		machineListModel = new ListModelList<Machine>(machineList);
 		machineListbox.setModel(machineListModel);
 		currentMachine = null;
@@ -123,7 +127,7 @@ public class MachineStockController extends SelectorComposer<Component> {
 			resetButton.setDisabled(true);
 		}else {// editar
 			machineGrid.setVisible(true);
-			machineTypeSelectbox.setSelectedIndex(machineTypeListModel.indexOf(machineTypeService.getMachineType(currentMachine.getIdMachineType())));
+			machineTypeSelectbox.setSelectedIndex(machineTypeListModel.indexOf(currentMachine.getMachineType()));
 			codeTextbox.setValue(currentMachine.getCode());
 			nameTextbox.setValue(currentMachine.getName());
 			yearIntbox.setValue(currentMachine.getYear());
@@ -155,7 +159,7 @@ public class MachineStockController extends SelectorComposer<Component> {
 			Clients.showNotification("Ingrese el Codigo de la Maquina", codeTextbox);
 			return;
 		}
-		Integer idMachineType = machineTypeListModel.getElementAt(machineTypeSelectbox.getSelectedIndex()).getId();
+		MachineType machineType = machineTypeListModel.getElementAt(machineTypeSelectbox.getSelectedIndex());
 		String code = codeTextbox.getText();
 		String name = nameTextbox.getText();
 		Integer year = yearIntbox.getValue();
@@ -170,18 +174,17 @@ public class MachineStockController extends SelectorComposer<Component> {
 			System.out.println("Error en convertir a duracion: " + e.toString());
 		}
 		if(currentMachine == null) {// nuevo
-			currentMachine = new Machine(null, idMachineType, code, name, year, usedTime);
-			currentMachine = machineService.saveMachine(currentMachine);
+			currentMachine = new Machine(machineType, code, name, year, usedTime);
 		} else {// edicion
-			currentMachine.setIdMachineType(idMachineType);
+			currentMachine.setMachineType(machineType);
 			currentMachine.setCode(code);
 			currentMachine.setName(name);
 			currentMachine.setYear(year);
 			currentMachine.setUsedTime(usedTime);
-			currentMachine = machineService.updateMachine(currentMachine);
 		}
-		machineList = machineService.getMachineList();
-		machineListModel = new ListModelList<Machine>(machineList);
+		currentMachine = machineRepository.save(currentMachine);
+		machineList = machineRepository.findAll();
+		machineListModel = new ListModelList<>(machineList);
 		currentMachine = null;
 		refreshView();
 	}
@@ -202,9 +205,5 @@ public class MachineStockController extends SelectorComposer<Component> {
 		String hours = duration.getHours() + " (Horas)";
 		String Minutes = duration.getMinutes() + " (Minutos)";
 		return hours + ":" + Minutes;
-	}
-	
-	public MachineType getMachineType(Machine machine) {
-		return machineTypeService.getMachineType(machine.getIdMachineType());
 	}
 }
