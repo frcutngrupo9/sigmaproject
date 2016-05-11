@@ -1,3 +1,4 @@
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <zk>
     <grid model="${arg.processes}" sizedByContent="true" span="true">
         <columns>
@@ -10,10 +11,10 @@
         <template name="model">
             <row>
                 <label value="${each.id}"/>
-                <label value="${each.idProcessType}"/>
-            	<label value="${win_product_list$composer.getProcessTypeName(each.idProcessType)}"/>
+                <label value="${each.type.id}"/>
+                <label value="${each.type.name}"/>
             	<label value="${each.details}"/>
-            	<label value="${win_product_list$composer.getFormatedTime(each.time)}"/>
+            	<label value="${r:getFormattedTime(each.time)}"/>
             </row>
         </template>
     </grid>

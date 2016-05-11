@@ -7,13 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.*;
 import org.zkoss.zk.ui.event.EventListener;
-import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zk.ui.event.SortEvent;
 import org.zkoss.zul.*;
 import org.zkoss.zul.event.PagingEvent;
 
 import ar.edu.utn.sigmaproject.service.SearchableRepository;
+import org.zkoss.zul.impl.MeshElement;
 
 import java.io.Serializable;
 import java.util.*;
@@ -26,48 +26,61 @@ import java.util.*;
 public final class SortingPagingHelper<T> {
 
 	private final JpaRepository<T, ? extends Serializable> repository;
-	private final Listbox listbox;
+	private final MeshElement meshElement;
+	private final Button searchButton;
 	private final Textbox searchTextbox;
-	private final Grid grid;
 	private final Paging pager;
-	private final LinkedHashMap<String, Boolean> sortProperties;
+	private final Map<String, Boolean> sortProperties;
 	private final PageCachePagingEventListener pageCachePagingEventListener;
+	private final SortingPagingHelperDelegate<T> delegate;
 	private Sort.Order sortOrder;
 
-	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, Listbox listbox, Textbox searchTextbox, Paging pager, LinkedHashMap<String, Boolean> sortProperties) {
-		this(repository, listbox, searchTextbox, pager, sortProperties, 0);
+	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Paging pager) {
+		this(repository, meshElement, pager, new HashMap<String, Boolean>());
 	}
 
-	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, Listbox listbox, Textbox searchTextbox, Paging pager, LinkedHashMap<String, Boolean> sortProperties, Integer defaultSortIndex) {
-		this(repository, listbox, searchTextbox, pager, sortProperties, defaultSortIndex, true);
+	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Paging pager, Map<String, Boolean> sortProperties) {
+		this(repository, meshElement, null, null, pager, sortProperties, null);
 	}
 
-	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, Listbox listbox, Textbox searchTextbox, Paging pager, LinkedHashMap<String, Boolean> sortProperties, Integer defaultSortIndex, boolean ascending) {
+	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Paging pager, Map<String, Boolean> sortProperties, SortingPagingHelperDelegate<T> delegate) {
+		this(repository, meshElement, null, null, pager, sortProperties, delegate);
+	}
+
+	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Button searchButton, Textbox searchTextbox, Paging pager) {
+		this(repository, meshElement, searchButton, searchTextbox, pager, new HashMap<String, Boolean>());
+	}
+
+	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Button searchButton, Textbox searchTextbox, Paging pager, Map<String, Boolean> sortProperties) {
+		this(repository, meshElement, searchButton, searchTextbox, pager, sortProperties, null);
+	}
+
+	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Button searchButton, Textbox searchTextbox, Paging pager, Map<String, Boolean> sortProperties, SortingPagingHelperDelegate<T> delegate) {
+		this(repository, meshElement, searchButton, searchTextbox, pager, sortProperties, delegate, 0);
+	}
+
+	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Button searchButton, Textbox searchTextbox, Paging pager, Map<String, Boolean> sortProperties, SortingPagingHelperDelegate<T> delegate, Integer defaultSortIndex) {
+		this(repository, meshElement, searchButton, searchTextbox, pager, sortProperties, delegate, defaultSortIndex, true);
+	}
+
+	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Button searchButton, Textbox searchTextbox, Paging pager, Map<String, Boolean> sortProperties, SortingPagingHelperDelegate<T> delegate, Integer defaultSortIndex, boolean ascending) {
+		if (!(meshElement instanceof Listbox) && !(meshElement instanceof Grid)) {
+			this.throwRuntimeExceptionBecauseOfIncompatibleMeshElement();
+		}
 		this.repository = repository;
-		this.listbox = listbox;
-		this.grid = null;
+		this.meshElement = meshElement;
+		this.searchButton = searchButton;
 		this.searchTextbox = searchTextbox;
 		this.pager = pager;
 		this.sortProperties = sortProperties;
-		pageCachePagingEventListener = new PageCachePagingEventListener();
-		pager.addEventListener("onPaging", pageCachePagingEventListener);
-		setup(defaultSortIndex, ascending);
-	}
-
-	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, Grid grid, Textbox searchTextbox, Paging pager, LinkedHashMap<String, Boolean> sortProperties, Integer defaultSortIndex, boolean ascending) {
-		this.repository = repository;
-		this.grid = grid;
-		this.listbox = null;
-		this.searchTextbox = searchTextbox;
-		this.pager = pager;
-		this.sortProperties = sortProperties;
+		this.delegate = delegate;
 		pageCachePagingEventListener = new PageCachePagingEventListener();
 		pager.addEventListener("onPaging", pageCachePagingEventListener);
 		setup(defaultSortIndex, ascending);
 	}
 
 	private void setup(Integer defaultSortIndex, boolean ascending) {
-		Component header = this.grid != null ? this.grid.getColumns() : this.listbox.getListhead();
+		Component header = this.getMeshElementHeader();
 		if (sortProperties != null) {
 			Iterator<Boolean> valueIterator = sortProperties.values().iterator();
 			for (Component component : header.getChildren()) {
@@ -75,7 +88,7 @@ public final class SortingPagingHelper<T> {
 					break;
 				}
 				if (valueIterator.next()) {
-					component.addEventListener("onSort", new SortEventListener());
+					component.addEventListener(Events.ON_SORT, new SortEventListener());
 					if (component instanceof Listheader) {
 						Listheader listHeader = (Listheader)component;
 						listHeader.setSortAscending(new DummyComparator());
@@ -90,6 +103,9 @@ public final class SortingPagingHelper<T> {
 			Events.postEvent(new SortEvent("onSort", header.getChildren().get(defaultSortIndex), ascending));
 		} else {
 			Events.postEvent(new PagingEvent("onPaging", pager, pager.getActivePage()));
+		}
+		if (this.searchButton != null) {
+			this.searchButton.addEventListener(Events.ON_CLICK, new SearchButtonClickEventListener());
 		}
 	}
 
@@ -120,13 +136,41 @@ public final class SortingPagingHelper<T> {
 
 	private Page<T> getPage(PageRequest pageRequest) {
 		Page<T> page;
-		if (searchTextbox != null && !searchTextbox.getText().isEmpty() && repository instanceof SearchableRepository) {
+		if (this.delegate != null) {
+			page = this.delegate.getPage(pageRequest);
+		} else if (searchTextbox != null && !searchTextbox.getText().isEmpty() && repository instanceof SearchableRepository) {
 			SearchableRepository<T, ? extends Serializable> searchableRepository = (SearchableRepository<T, ? extends Serializable>) repository;
 			page = searchableRepository.findAll(searchTextbox.getText(), pageRequest);
 		} else {
 			page = repository.findAll(pageRequest);
 		}
 		return page;
+	}
+
+	private Component getMeshElementHeader() {
+		Component header = null;
+		if (this.meshElement instanceof Listbox) {
+			header = ((Listbox) this.meshElement).getListhead();
+		} else if (this.meshElement instanceof Grid) {
+			header = ((Grid) this.meshElement).getColumns();
+		} else {
+			this.throwRuntimeExceptionBecauseOfIncompatibleMeshElement();
+		}
+		return header;
+	}
+
+	private void setModel(ListModel<T> model) {
+		if (this.meshElement instanceof Listbox) {
+			((Listbox) this.meshElement).setModel(model);
+		} else if (this.meshElement instanceof Grid) {
+			((Grid) this.meshElement).setModel(model);
+		} else {
+			this.throwRuntimeExceptionBecauseOfIncompatibleMeshElement();
+		}
+	}
+
+	private void throwRuntimeExceptionBecauseOfIncompatibleMeshElement() {
+		throw new RuntimeException("SortingPagingHelper only accepts Listbox or Grid MeshElement subclasses");
 	}
 
 	class SortEventListener implements EventListener<SortEvent> {
@@ -145,9 +189,22 @@ public final class SortingPagingHelper<T> {
 				column.setSortDirection(event.isAscending() ? "ascending" : "descending");
 			}
 			String[] sortKeys = sortProperties.keySet().toArray(new String[0]);
-			int columnIndex = listheader != null ? listheader.getColumnIndex() : grid.getHeads().iterator().next().getChildren().indexOf(column);
+			int columnIndex = -1;
+			if (listheader != null) {
+				columnIndex = listheader.getColumnIndex();
+			} else {
+				for (Component head : ((Grid) meshElement).getHeads()) {
+					if (head instanceof Columns) {
+						columnIndex = head.getChildren().indexOf(column);
+						break;
+					}
+				}
+			}
+			if (columnIndex == -1) {
+				throw new RuntimeException("SortingPagingHelper runtime error: Cannot find column index for column " + column);
+			}
 			sortOrder = new Sort.Order(event.isAscending() ? Sort.Direction.ASC : Sort.Direction.DESC, sortKeys[columnIndex]).ignoreCase();
-			Component header = grid != null ? grid.getColumns() : listbox.getListhead();
+			Component header = getMeshElementHeader();
 			for (Component component : header.getChildren()) {
 				if (component instanceof Listheader) {
 					Listheader otherListheader = (Listheader)component;
@@ -181,11 +238,7 @@ public final class SortingPagingHelper<T> {
 			if (pageActiveModel == null || currentPage != pageActiveModel.pageRequest.getPageNumber()) {
 				pageActiveModel = new PageActiveModel(pageRequestForPageNumber(currentPage));
 				pager.setTotalSize((int)pageActiveModel.getExecutionPage().getTotalElements());
-				if (listbox != null) {
-					listbox.setModel(pageActiveModel);
-				} else {
-					grid.setModel(pageActiveModel);
-				}
+				setModel(pageActiveModel);
 			}
 		}
 
@@ -193,6 +246,16 @@ public final class SortingPagingHelper<T> {
 			pageActiveModel = null;
 		}
 
+	}
+
+	class SearchButtonClickEventListener implements EventListener<Event> {
+
+		@Override
+		public void onEvent(Event event) throws Exception {
+			if (Objects.equals(event.getName(), Events.ON_CLICK)) {
+				resetUnsorted();
+			}
+		}
 	}
 
 	class PageActiveModel extends AbstractListModel<T> {
@@ -230,7 +293,7 @@ public final class SortingPagingHelper<T> {
 
 		@Override
 		public int getSize() {
-			return getExecutionPage().getSize();
+			return getExecutionPage().getNumberOfElements();
 		}
 
 	}

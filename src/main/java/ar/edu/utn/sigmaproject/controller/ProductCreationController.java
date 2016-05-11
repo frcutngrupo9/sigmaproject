@@ -14,6 +14,7 @@ import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 import org.zkoss.image.AImage;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
@@ -22,7 +23,9 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.EventQueue;
 import org.zkoss.zk.ui.event.EventQueues;
+import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.event.ForwardEvent;
+import org.zkoss.zk.ui.event.MouseEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -282,6 +285,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 		refreshViewPiece();
 	}
 	
+	@Transactional
 	@Listen("onClick = #saveProductButton")
 	public void saveProduct() {
 		if(Strings.isBlank(productNameTextbox.getValue())){
@@ -295,6 +299,7 @@ public class ProductCreationController extends SelectorComposer<Component>{
 				newProductCategory = productCategoryRepository.save(newProductCategory);
 				productCategoryListModel = new ListModelList<>(productCategoryRepository.findAll());
 				productCategoryCombobox.setModel(productCategoryListModel);
+				productCategoryCombobox.onInitRender(new MouseEvent(Events.ON_CLICK, productCategoryCombobox));
 				productCategoryCombobox.setSelectedIndex(productCategoryListModel.indexOf(newProductCategory));
 			} else {
 				Clients.showNotification("Seleccionar Categoria Producto", productCategoryCombobox);
@@ -317,7 +322,13 @@ public class ProductCreationController extends SelectorComposer<Component>{
 			currentProduct.setCategory(productCategory);
 			currentProduct.setPrice(productPrice);
 		}
-		currentProduct.setImageData(image.getByteData());
+		if (image != null) {
+			currentProduct.setImageData(image.getByteData());			
+		}
+		for (Piece piece : pieceList) {
+			piece.setProduct(currentProduct);
+		}
+		currentProduct.setPieces(pieceList);
 		productRepository.save(currentProduct);
 
 		// mostrar mensaje al user
@@ -907,10 +918,8 @@ public class ProductCreationController extends SelectorComposer<Component>{
 	}
 
 	private Process searchProcess(Piece piece, ProcessType processType) {
-		int size = processList.size();
-		for (int i = 0; i < size; i++) {
-			Process t = processList.get(i);
-			if(t.getPiece().equals(piece) && t.getType().equals(processType)) {
+		for (Process t : processList) {
+			if (t.getPiece().equals(piece) && t.getType().equals(processType)) {
 				return Process.clone(t);
 			}
 		}

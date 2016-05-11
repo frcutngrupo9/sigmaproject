@@ -10,7 +10,6 @@ import javax.persistence.Id;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.SortableField;
 
 @Entity
 @Indexed
@@ -23,7 +22,6 @@ public class Client implements Serializable, Cloneable {
 	Long id;
 
     @Field
-    @SortableField
     String name = "";
     String phone = "";
 

@@ -1,21 +1,22 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import java.io.Serializable;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.datatype.Duration;
 
 import ar.edu.utn.sigmaproject.domain.*;
 import ar.edu.utn.sigmaproject.domain.Process;
-import ar.edu.utn.sigmaproject.service.PieceRepository;
-import ar.edu.utn.sigmaproject.service.ProcessRepository;
-import ar.edu.utn.sigmaproject.service.ProductCategoryRepository;
-import ar.edu.utn.sigmaproject.service.ProductRepository;
-import org.hibernate.Hibernate;
+import ar.edu.utn.sigmaproject.service.*;
+import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
+import ar.edu.utn.sigmaproject.util.SortingPagingHelperDelegate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.event.CheckEvent;
-import org.zkoss.zk.ui.event.ForwardEvent;
-import org.zkoss.zk.ui.event.OpenEvent;
+import org.zkoss.zk.ui.event.*;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -25,15 +26,13 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.*;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class ProductListController extends SelectorComposer<Component>{
+public class ProductListController extends SelectorComposer<Component> implements SortingPagingHelperDelegate<Product> {
 	private static final long serialVersionUID = 1L;
 
 	@Wire
 	Textbox searchTextbox;
-	//    @Wire
-	//    Listbox productListbox;
-	//    @Wire
-	//    Paging pager;
+	@Wire
+	Button searchButton;
 	@Wire
 	Listbox pieceListbox;
 	@Wire
@@ -42,6 +41,8 @@ public class ProductListController extends SelectorComposer<Component>{
 	Button newProductButton;
 	@Wire
 	Grid productGrid;
+	@Wire
+	Paging pager;
 	@Wire
 	Radiogroup productCategoryRadiogroup;
 
@@ -60,24 +61,26 @@ public class ProductListController extends SelectorComposer<Component>{
 
 	// atributes
 	ProductCategory allProductCategory;
+	ProductCategory selectedProductCategory;
+	SortingPagingHelper<Product> sortingPagingHelper;
 
 	// list
 
 	// list models
-	private ListModelList<Product> productListModel;
 	private ListModelList<ProductCategory> productCategoryListModel;
 	private ListModelList<Piece> pieceListModel;
 	private ListModelList<Process> processListModel;
 
+	private static final int PRODUCT_CATEGORY_ALL_INDEX = 0;
+
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		List<Product> productList = productRepository.findAll();
-		productListModel = new ListModelList<>(productList);
-		productGrid.setModel(productListModel);
-		//        productListbox.setModel(productListModel);
+		Map<String, Boolean> sortProperties = new LinkedHashMap<String, Boolean>();
+		sortProperties.put("name", Boolean.TRUE);
+		sortingPagingHelper = new SortingPagingHelper<>(productRepository, productGrid, searchButton, searchTextbox, pager, sortProperties, this);
 		List<Piece> pieceList = pieceRepository.findAll();
-		pieceListModel = new ListModelList<Piece>(pieceList);
+		pieceListModel = new ListModelList<>(pieceList);
 		pieceListbox.setModel(pieceListModel);
 		List<Process> processList = processRepository.findAll();
 		processListModel = new ListModelList<>(processList);
@@ -86,8 +89,10 @@ public class ProductListController extends SelectorComposer<Component>{
 		List<ProductCategory> productCategoryList = productCategoryRepository.findAll();
 		productCategoryListModel = new ListModelList<>(productCategoryList);
 		allProductCategory = new ProductCategory("Todas");
-		productCategoryListModel.add(0, allProductCategory);
+		productCategoryListModel.add(PRODUCT_CATEGORY_ALL_INDEX, allProductCategory);
 		productCategoryRadiogroup.setModel(productCategoryListModel);
+		productCategoryRadiogroup.onInitRender(null);
+		productCategoryRadiogroup.setSelectedIndex(PRODUCT_CATEGORY_ALL_INDEX);
 	}
 
 	//    @Listen("onSelect = #productListbox")
@@ -105,7 +110,7 @@ public class ProductListController extends SelectorComposer<Component>{
 		include.setSrc("/product_creation.zul");
 	}
 
-	public String getFormatedTime(Duration time) {
+	public String getFormattedTime(Duration time) {
 		return String.format("Dias: %d Horas: %d Minutos: %d", time.getDays(), time.getHours(), time.getMinutes());
 	}
 
@@ -127,20 +132,31 @@ public class ProductListController extends SelectorComposer<Component>{
 
 	@Listen("onCheck = #productCategoryRadiogroup")
 	public void selectCategory(CheckEvent event) {
-		ProductCategory selectedProductCategory = null;
 		if (productCategoryRadiogroup.getSelectedItem() != null) {
 			selectedProductCategory = productCategoryRadiogroup.getSelectedItem().getValue();
-			String productCategoryName = selectedProductCategory.getName();
-			if (selectedProductCategory == allProductCategory) {
-				productListModel = new ListModelList<>(productRepository.findAll());
-			} else if (!productCategoryName.equals("Ninguna")) {
-				// avoid LazyInitializationException
-				selectedProductCategory = productCategoryRepository.getOne(selectedProductCategory.getId());
-				productListModel = new ListModelList<>(selectedProductCategory.getProducts());
-			} else {
-				productListModel = new ListModelList<>();
+			if (selectedProductCategory != allProductCategory) {
+				searchTextbox.setText("");
 			}
 		}
-		productGrid.setModel(productListModel);
+		sortingPagingHelper.reset();
+	}
+
+	@Override
+	public Page<Product> getPage(PageRequest pageRequest) {
+		Page<Product> page;
+		if (searchTextbox.getText().isEmpty()) {
+			if (selectedProductCategory == allProductCategory || selectedProductCategory == null) {
+				page = productRepository.findAll(pageRequest);
+			} else {
+				page = productRepository.findAllByCategory(selectedProductCategory, pageRequest);
+			}
+		} else {
+			page = productRepository.findAll(searchTextbox.getText(), pageRequest);
+			if (selectedProductCategory != allProductCategory) {
+				selectedProductCategory = allProductCategory;
+				productCategoryRadiogroup.setSelectedIndex(PRODUCT_CATEGORY_ALL_INDEX);
+			}
+		}
+		return page;
 	}
 }

@@ -91,7 +91,7 @@
 			            	<label value="${win_production_order_creation$composer.getProcessType(each.idProcess).id}"/>
 			            	<label value="${win_production_order_creation$composer.getProcess(each.idProcess).details}"/>
 			            	<label value="${win_production_order_creation$composer.getProcessTime(each.idProcess)}"/>
-			            	<label value="${win_production_order_creation$composer.getFormatedTime(each.timeTotal)}"/>
+			            	<label value="${win_production_order_creation$composer.getFormattedTime(each.timeTotal)}"/>
 			            	<combobox inplace="true"
 			            		forward="onSelect=productionOrderDetailGrid.onEditProductionOrderDetailMachine(${each}), onCreate=productionOrderDetailGrid.onCreateMachineCombobox(${each})"
                         		model="${win_production_order_creation$composer.getMachineListModel(each)}" hflex="1" >

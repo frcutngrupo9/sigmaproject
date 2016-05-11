@@ -180,7 +180,7 @@ public class MachineController extends SelectorComposer<Component>{
 		}
 	}
 
-	public String getFormatedTime(Duration time) {
+	public String getFormattedTime(Duration time) {
 		return String.format("A�os: %d Horas: %d Minutos: %d", time.getYears(), time.getHours(), time.getMinutes());
 	}
 }

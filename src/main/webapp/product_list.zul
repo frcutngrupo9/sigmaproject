@@ -1,3 +1,4 @@
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="win_product_list" title="Lista de Productos" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductListController" sclass="sigma-content">
     <hlayout>
         <label>Buscar:</label>
@@ -36,18 +37,19 @@
             <row>
             	<custom-attributes pieces="${each.pieces}"/>
             	<detail open="false" fulfill="onOpen">
-            		<include src="/product_pieces.zul" pieces="${pieces}"/>
+            		<include src="/product_pieces.zul" pieces="${r:listModel(pieces)}"/>
             	</detail>
                 <label value="${each.id}"/>
                 <label value="${each.code}"/>
                 <label value="${each.name}"/>
                 <label value="${each.details}"/>
-                <label value="${each.category}"/>
+                <label value="${each.category.name}"/>
                 <label value="${each.price.doubleValue()} $"/>
                 <button forward="onClick=productGrid.onEditProduct(${each})" image="/img/edit16x16.png"/>
             </row>
         </template>
     </grid>
+	<paging id="pager" pageSize="10" sclass="sigma-paging"/>
     <separator/>
     <button id="newProductButton" label="Crear Producto Nuevo"/>
     <separator/>
@@ -96,11 +98,11 @@
 	            <listitem>
 	            	<listcell label="${each.id}"/>
 	            	<listcell label="${each.name}"/>
-	            	<listcell label="${win_product_list$composer.getProductName(each.idProduct)}"/>
-	                <listcell label="${each.idProduct}"/>
-	                <listcell label="${each.length.doubleValue()} ${win_product_list$composer.getMeasureUnitName(each.lengthIdMeasureUnit)}"/>
-	                <listcell label="${each.depth.doubleValue()} ${win_product_list$composer.getMeasureUnitName(each.depthIdMeasureUnit)}"/>
-	                <listcell label="${each.width.doubleValue()} ${win_product_list$composer.getMeasureUnitName(each.widthIdMeasureUnit)}"/>
+	            	<listcell label="${each.product.name}"/>
+	                <listcell label="${each.product.id}"/>
+					<listcell label="${each.length.doubleValue()} ${each.lengthMeasureUnit.name}"/>
+					<listcell label="${each.depth.doubleValue()} ${each.depthMeasureUnit.name}"/>
+					<listcell label="${each.width.doubleValue()} ${each.widthMeasureUnit.name}"/>
 	                <listcell label="${each.size}"/>
 	                <listcell label="${each.units}"/>
 	                <listcell label="${each.isClone()}"/>
@@ -124,12 +126,12 @@
 	        <template name="model">
 	            <listitem>
 	            	<listcell label="${each.id}"/>
-	                <listcell label="${win_product_list$composer.getProductNameByPieceId(each.idPiece)}"/>
-	            	<listcell label="${win_product_list$composer.getPieceName(each.idPiece)}"/>
-	            	<listcell label="${win_product_list$composer.getProcessTypeName(each.idProcessType)}"/>
-	                <listcell label="${each.idPiece}"/>
-	                <listcell label="${each.idProcessType}"/>
-	                <listcell label="${win_product_list$composer.getFormatedTime(each.time)}"/>
+	                <listcell label="${each.piece.product.name}"/>
+	            	<listcell label="${each.piece.name}"/>
+	            	<listcell label="${each.type.name}"/>
+	                <listcell label="${each.id}"/>
+	                <listcell label="${each.type.id}"/>
+	                <listcell label="${r:getFormattedTime(each.time)}"/>
 	                <listcell label="${each.isClone()}"/>
 	            </listitem>
 	        </template>

@@ -15,7 +15,7 @@
             <listitem>
                 <listcell label="${each.name}"/>
                 <listcell label="${each.details}"/>
-                <listcell label="${win_machine$composer.getFormatedTime(each.deteriorationTime)}"/>
+                <listcell label="${win_machine$composer.getFormattedTime(each.deteriorationTime)}"/>
             </listitem>
         </template>
     </listbox>

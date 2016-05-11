@@ -1,5 +1,8 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
@@ -7,6 +10,7 @@ import java.util.List;
 import javax.persistence.*;
 
 @Entity
+@Indexed
 public class Product implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
@@ -29,6 +33,7 @@ public class Product implements Serializable, Cloneable {
 	@Lob
 	byte[] imageData = new byte[0];
 
+	@Field
 	String name = "";
 	String details = "";
 	String code = "";
@@ -46,8 +51,8 @@ public class Product implements Serializable, Cloneable {
 	public Product(String code , String name, String details, ProductCategory category, BigDecimal price) {
 		this.name = name;
 		this.details = details;
+		this.category = category;
         this.code = code;
-
         this.price = price;
 	}
 

@@ -1,9 +1,8 @@
 package ar.edu.utn.sigmaproject.controller;
 
-import java.util.LinkedHashMap;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -29,6 +28,8 @@ public class ClientController extends SelectorComposer<Component> {
 
 	@Wire
 	Textbox searchTextbox;
+	@Wire
+	Button searchButton;
 	@Wire
 	Listbox clientListbox;
 	@Wire
@@ -70,16 +71,10 @@ public class ClientController extends SelectorComposer<Component> {
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		LinkedHashMap<String, Boolean> sortProperties = new LinkedHashMap<String, Boolean>();
+		Map<String, Boolean> sortProperties = new HashMap<>();
 		sortProperties.put("name", Boolean.TRUE);
-		sortingPagingHelper = new SortingPagingHelper<>(clientRepository, clientListbox, searchTextbox, pager, sortProperties, 0);
+		sortingPagingHelper = new SortingPagingHelper<>(clientRepository, clientListbox, searchButton, searchTextbox, pager, sortProperties);
 		refreshView();
-	}
-
-	@Listen("onClick = #searchButton")
-	public void search() {
-		query = searchTextbox.getValue();
-		sortingPagingHelper.resetUnsorted();
 	}
 
 	@Listen("onClick = #newButton")

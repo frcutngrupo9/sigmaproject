@@ -30,7 +30,7 @@
                                 <label value="Categoria :"/>
                                 <combobox id="productCategoryCombobox">
                                     <template name="model">
-                                        <comboitem label="${each}" />
+                                        <comboitem label="${each.name}" />
                                     </template>
                                 </combobox>
                             </row>
@@ -65,7 +65,7 @@
             			<listitem>
                 			<listcell label="${each.name}"/>
                             <listcell label="${each.units}"/>
-                			<listcell label="${win_product_creation$composer.each.processes().size()}"/>
+                			<listcell label="${each.processes.size()}"/>
             			</listitem>
         			</template>
     			</listbox>

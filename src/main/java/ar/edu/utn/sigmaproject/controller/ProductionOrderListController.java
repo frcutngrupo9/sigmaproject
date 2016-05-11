@@ -169,7 +169,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		}
 	}
 
-	public String getFormatedTime(Duration time) {
+	public String getFormattedTime(Duration time) {
 		return String.format("Dias: %d Horas: %d Minutos: %d", time.getDays(), time.getHours(), time.getMinutes());
 	}
 

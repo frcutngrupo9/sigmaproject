@@ -21,7 +21,7 @@ public class Piece implements Serializable, Cloneable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
 
-	@ManyToOne
+	@ManyToOne(optional = false)
 	Product product;
 
 	@OneToMany(mappedBy = "piece", cascade = CascadeType.ALL)

@@ -5,11 +5,9 @@ import java.util.Properties;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import ar.edu.utn.sigmaproject.zk.spring.annotations.ZkSpringConfig;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -25,11 +23,16 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import ar.edu.utn.sigmaproject.service.impl.SearchableRepositoryImpl;
 
+import org.hibernate.cfg.AvailableSettings;
+import org.springframework.transaction.aspectj.AnnotationTransactionAspect;
+
 @Configuration
-@ComponentScan({ "ar.edu.utn.sigmaproject.service", "ar.edu.utn.sigmaproject.service.impl"})
+@EnableLoadTimeWeaving(aspectjWeaving = EnableLoadTimeWeaving.AspectJWeaving.ENABLED)
+@EnableTransactionManagement(mode = AdviceMode.ASPECTJ)
+@ComponentScan(value = { "ar.edu.utn.sigmaproject.controller", "ar.edu.utn.sigmaproject.service", "ar.edu.utn.sigmaproject.service.impl"})
 @EnableJpaRepositories(value = "ar.edu.utn.sigmaproject.service", repositoryBaseClass = SearchableRepositoryImpl.class)
-@EnableTransactionManagement
 @PropertySource("classpath:db.properties")
+@ZkSpringConfig
 public class ApplicationConfig {
 	
 	@Value("${db.url}")
@@ -71,6 +74,7 @@ public class ApplicationConfig {
 	public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
 		JpaTransactionManager transactionManager = new JpaTransactionManager();
 		transactionManager.setEntityManagerFactory(emf);
+		AnnotationTransactionAspect.aspectOf().setTransactionManager(transactionManager);
 		return transactionManager;
 	}
 
@@ -81,8 +85,9 @@ public class ApplicationConfig {
 
 	Properties additionalProperties() {
 		Properties properties = new Properties();
-		properties.setProperty("hibernate.hbm2ddl.auto", this.hbm2ddl);
-		properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
+		properties.setProperty(AvailableSettings.HBM2DDL_AUTO, this.hbm2ddl);
+		properties.setProperty(AvailableSettings.DIALECT, "org.hibernate.dialect.MySQL5InnoDBDialect");
+		properties.setProperty(AvailableSettings.ENABLE_LAZY_LOAD_NO_TRANS, "true");
 		return properties;
 	}
 	
