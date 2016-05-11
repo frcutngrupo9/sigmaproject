@@ -170,12 +170,4 @@ public class ProcessController extends SelectorComposer<Component>{
 			resetButton.setDisabled(false);
 		}
 	}
-	
-	public String getMachineTypeName(ProcessType processType) {
-		String name = "Ninguna";
-		if (processType.getMachineType() != null) {
-			name = processType.getMachineType().getName();
-		}
-		return name;
-	}
 }

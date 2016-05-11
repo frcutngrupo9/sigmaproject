@@ -15,7 +15,7 @@
             <listitem>
                 <listcell label="${each.id}"/>
                 <listcell label="${each.name}"/>
-                <listcell label="${win_process$composer.getMachineTypeName(each)}"/>
+                <listcell label="${empty each.machineType.name ? 'Ninguna' : each.machineType.name}"/>
             </listitem>
         </template>
     </listbox>
