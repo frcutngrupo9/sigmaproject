@@ -27,10 +27,10 @@
         	<column width="40px" />
             <column label="Id" width="50px" align="center"/>
             <column label="Codigo" align="center"/>
-            <column label="Nombre" align="center" sort="auto(name)"/>
+            <column label="Nombre" align="center"/>
             <column label="Detalles" align="center"/>
-            <column label="Categoria" align="center" sort="auto(category)"/>
-            <column label="Precio" align="center" sort="auto(price)"/>
+            <column label="Categoria" align="center"/>
+            <column label="Precio" align="center"/>
             <column label="Editar" width="100px" align="center"/>
         </columns>
         <template name="model">
