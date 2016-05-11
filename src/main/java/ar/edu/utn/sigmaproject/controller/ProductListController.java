@@ -34,12 +34,6 @@ public class ProductListController extends SelectorComposer<Component> implement
 	@Wire
 	Button searchButton;
 	@Wire
-	Listbox pieceListbox;
-	@Wire
-	Listbox processListbox;
-	@Wire
-	Button newProductButton;
-	@Wire
 	Grid productGrid;
 	@Wire
 	Paging pager;
@@ -47,12 +41,6 @@ public class ProductListController extends SelectorComposer<Component> implement
 	Radiogroup productCategoryRadiogroup;
 
 	// services
-	@WireVariable
-	PieceRepository pieceRepository;
-
-	@WireVariable
-	ProcessRepository processRepository;
-
 	@WireVariable
 	ProductRepository productRepository;
 
@@ -64,12 +52,8 @@ public class ProductListController extends SelectorComposer<Component> implement
 	ProductCategory selectedProductCategory;
 	SortingPagingHelper<Product> sortingPagingHelper;
 
-	// list
-
 	// list models
-	private ListModelList<ProductCategory> productCategoryListModel;
-	private ListModelList<Piece> pieceListModel;
-	private ListModelList<Process> processListModel;
+	private ListModel<ProductCategory> productCategoryListModel;
 
 	private static final int PRODUCT_CATEGORY_ALL_INDEX = 0;
 
@@ -79,29 +63,15 @@ public class ProductListController extends SelectorComposer<Component> implement
 		Map<String, Boolean> sortProperties = new LinkedHashMap<String, Boolean>();
 		sortProperties.put("name", Boolean.TRUE);
 		sortingPagingHelper = new SortingPagingHelper<>(productRepository, productGrid, searchButton, searchTextbox, pager, sortProperties, this);
-		List<Piece> pieceList = pieceRepository.findAll();
-		pieceListModel = new ListModelList<>(pieceList);
-		pieceListbox.setModel(pieceListModel);
-		List<Process> processList = processRepository.findAll();
-		processListModel = new ListModelList<>(processList);
-		processListbox.setModel(processListModel);
 
 		List<ProductCategory> productCategoryList = productCategoryRepository.findAll();
 		productCategoryListModel = new ListModelList<>(productCategoryList);
 		allProductCategory = new ProductCategory("Todas");
-		productCategoryListModel.add(PRODUCT_CATEGORY_ALL_INDEX, allProductCategory);
+		((ListModelList)productCategoryListModel).add(PRODUCT_CATEGORY_ALL_INDEX, allProductCategory);
 		productCategoryRadiogroup.setModel(productCategoryListModel);
 		productCategoryRadiogroup.onInitRender(null);
 		productCategoryRadiogroup.setSelectedIndex(PRODUCT_CATEGORY_ALL_INDEX);
 	}
-
-	//    @Listen("onSelect = #productListbox")
-	//    public void onProductSelect() {
-	//    	//Clients.showNotification("Usted hizo click en el Producto: " + ((Product) productListbox.getSelectedItem().getValue()).getName());
-	//        Executions.getCurrent().setAttribute("selected_product", ((Product) productListbox.getSelectedItem().getValue()));
-	//        Include include = (Include) Selectors.iterable(productListbox.getPage(), "#mainInclude").iterator().next();
-	//    	include.setSrc("/product_creation.zul");
-	//    }
 
 	@Listen("onClick = #newProductButton")
 	public void goToNewProduct() {

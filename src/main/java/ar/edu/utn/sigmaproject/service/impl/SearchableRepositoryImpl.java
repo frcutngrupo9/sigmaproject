@@ -70,18 +70,19 @@ public class SearchableRepositoryImpl<T, ID extends Serializable> extends Simple
 
         jpaQuery.setFirstResult(pageable.getOffset());
         jpaQuery.setMaxResults(pageable.getPageSize());
-        org.springframework.data.domain.Sort modelSort = pageable.getSort();
-        if (modelSort != null) {
-            Iterator<org.springframework.data.domain.Sort.Order> iterator = modelSort.iterator();
-            List<SortField> sortFields = new ArrayList<SortField>();
-            while (iterator.hasNext()) {
-                org.springframework.data.domain.Sort.Order order = iterator.next();
-                sortFields.add(new SortField(order.getProperty(), SortField.Type.STRING, !order.isAscending()));
-            }
-            SortField[] sortFieldsArray = sortFields.toArray(new SortField[0]);
-            Sort sort = new Sort(sortFieldsArray);
-            jpaQuery.setSort(sort);
-        }
+		// si alguna vez implementamos busqueda textual y ordenado, habria que usar algo asi
+//        org.springframework.data.domain.Sort modelSort = pageable.getSort();
+//        if (modelSort != null) {
+//            Iterator<org.springframework.data.domain.Sort.Order> iterator = modelSort.iterator();
+//            List<SortField> sortFields = new ArrayList<SortField>();
+//            while (iterator.hasNext()) {
+//                org.springframework.data.domain.Sort.Order order = iterator.next();
+//                sortFields.add(new SortField(order.getProperty(), SortField.Type.STRING, !order.isAscending()));
+//            }
+//            SortField[] sortFieldsArray = sortFields.toArray(new SortField[0]);
+//            Sort sort = new Sort(sortFieldsArray);
+//            jpaQuery.setSort(sort);
+//        }
 
         long resultSize = jpaQuery.getResultSize();
 

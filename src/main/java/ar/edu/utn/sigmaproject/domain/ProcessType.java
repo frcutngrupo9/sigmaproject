@@ -1,5 +1,8 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+
 import java.io.Serializable;
 
 import javax.persistence.Entity;
@@ -9,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 @Entity
+@Indexed
 public class ProcessType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
@@ -19,6 +23,7 @@ public class ProcessType implements Serializable, Cloneable {
 	@ManyToOne
 	MachineType machineType;
 
+	@Field
 	String name = "";
 
 	public ProcessType() {

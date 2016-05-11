@@ -19,6 +19,8 @@
             </listitem>
         </template>
     </listbox>
+    <paging id="pager" pageSize="10" sclass="sigma-paging"/>
+    <separator/>
     <vlayout>
         <separator/>
         <hbox>

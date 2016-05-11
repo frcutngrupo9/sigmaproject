@@ -1,9 +1,10 @@
 package ar.edu.utn.sigmaproject.controller;
 
-import java.util.List;
-
+import ar.edu.utn.sigmaproject.domain.MachineType;
+import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
+import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -12,15 +13,12 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
-import org.zkoss.zul.Button;
-import org.zkoss.zul.Combobox;
-import org.zkoss.zul.Grid;
-import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Textbox;
+import org.zkoss.zul.*;
+import org.zkoss.zul.ext.Selectable;
 
-import ar.edu.utn.sigmaproject.domain.MachineType;
-import ar.edu.utn.sigmaproject.domain.ProcessType;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProcessController extends SelectorComposer<Component>{
@@ -29,7 +27,11 @@ public class ProcessController extends SelectorComposer<Component>{
 	@Wire
 	Textbox searchTextbox;
 	@Wire
+	Button searchButton;
+	@Wire
 	Listbox processTypeListbox;
+	@Wire
+	Paging pager;
 	@Wire
 	Button newButton;
 	@Wire
@@ -56,13 +58,12 @@ public class ProcessController extends SelectorComposer<Component>{
 
 	// attributes
 	private ProcessType currentProcessType;
+	SortingPagingHelper<ProcessType> sortingPagingHelper;
 
 	// list
-	private List<ProcessType> processTypeList;
 	private List<MachineType> machineTypeList;
 
 	// list models
-	private ListModelList<ProcessType> processTypeListModel;
 	private ListModelList<MachineType> machineTypeListModel;
 
 	@Override
@@ -71,15 +72,13 @@ public class ProcessController extends SelectorComposer<Component>{
 		machineTypeList = machineTypeRepository.findAll();
 		machineTypeListModel = new ListModelList<>(machineTypeList);
 		machineTypeCombobox.setModel(machineTypeListModel);
-		processTypeList = processTypeRepository.findAll();
-		processTypeListModel = new ListModelList<>(processTypeList);
-		processTypeListbox.setModel(processTypeListModel);
+		Map<String, Boolean> sortProperties = new LinkedHashMap<String, Boolean>();
+		sortProperties.put("id", Boolean.TRUE);
+		sortProperties.put("name", Boolean.TRUE);
+		sortProperties.put("machineType", Boolean.TRUE);
+		sortingPagingHelper = new SortingPagingHelper<>(processTypeRepository, processTypeListbox, searchButton, searchTextbox, pager, sortProperties);
 		currentProcessType = null;
 		refreshView();
-	}
-
-	@Listen("onClick = #searchButton")
-	public void search() {
 	}
 
 	@Listen("onClick = #newButton")
@@ -109,8 +108,7 @@ public class ProcessController extends SelectorComposer<Component>{
 			currentProcessType.setMachineType(machineType);
 		}
 		currentProcessType = processTypeRepository.save(currentProcessType);
-		processTypeList = processTypeRepository.findAll();
-		processTypeListModel = new ListModelList<>(processTypeList);
+		sortingPagingHelper.reset();
 		currentProcessType = null;
 		refreshView();
 	}
@@ -129,14 +127,15 @@ public class ProcessController extends SelectorComposer<Component>{
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
 		processTypeRepository.delete(currentProcessType);
-		processTypeListModel.remove(currentProcessType);
+		sortingPagingHelper.reset();
 		currentProcessType = null;
 		refreshView();
 	}
 
 	@Listen("onSelect = #processTypeListbox")
 	public void doListBoxSelect() {
-		if(processTypeListModel.isSelectionEmpty()) {
+		Selectable model = (Selectable) processTypeListbox.getModel();
+		if (model.isSelectionEmpty()) {
 			//just in case for the no selection
 			currentProcessType = null;
 		} else {
@@ -145,12 +144,15 @@ public class ProcessController extends SelectorComposer<Component>{
 				refreshView();
 			}
 		}
-		processTypeListModel.clearSelection();
+		model.clearSelection();
 	}
 
 	private void refreshView() {
-		processTypeListModel.clearSelection();
-		processTypeListbox.setModel(processTypeListModel);// se actualiza la lista
+		Selectable model = (Selectable) processTypeListbox.getModel();
+		if (model != null) {
+			model.clearSelection();
+		}
+		sortingPagingHelper.reset();;// se actualiza la lista
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		newButton.setDisabled(false);

@@ -120,7 +120,21 @@ public final class SortingPagingHelper<T> {
 	}
 
 	public void resetUnsorted() {
-		sortOrder = null;
+		if (sortOrder != null) {
+			Component header = getMeshElementHeader();
+			for (Component component : header.getChildren()) {
+				if (component instanceof Listheader) {
+					Listheader otherListheader = (Listheader)component;
+					// clear sort icons on other columns
+					otherListheader.setSortDirection("natural");
+				} else {
+					Column otherColumn = (Column) component;
+					// clear sort icons on other columns
+					otherColumn.setSortDirection("natural");
+				}
+			}
+			sortOrder = null;
+		}
 		reset();
 	}
 
@@ -220,6 +234,9 @@ public final class SortingPagingHelper<T> {
 					}
 				}
 			}
+
+			searchTextbox.setText("");
+
 			reloadCurrentPage();
 
 			// stop propagation of the event so DummyComparator is never used
