@@ -16,6 +16,7 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.*;
 import org.zkoss.zul.ext.Selectable;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,10 +73,10 @@ public class ProcessController extends SelectorComposer<Component>{
 		machineTypeList = machineTypeRepository.findAll();
 		machineTypeListModel = new ListModelList<>(machineTypeList);
 		machineTypeCombobox.setModel(machineTypeListModel);
-		Map<String, Boolean> sortProperties = new LinkedHashMap<String, Boolean>();
-		sortProperties.put("id", Boolean.TRUE);
-		sortProperties.put("name", Boolean.TRUE);
-		sortProperties.put("machineType", Boolean.TRUE);
+		Map<Integer, String> sortProperties = new HashMap<>();
+		sortProperties.put(0, "id");
+		sortProperties.put(1, "name");
+		sortProperties.put(2, "machineType");
 		sortingPagingHelper = new SortingPagingHelper<>(processTypeRepository, processTypeListbox, searchButton, searchTextbox, pager, sortProperties);
 		currentProcessType = null;
 		refreshView();

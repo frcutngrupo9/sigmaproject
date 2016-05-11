@@ -1,6 +1,7 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,8 +61,8 @@ public class ProductListController extends SelectorComposer<Component> implement
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		Map<String, Boolean> sortProperties = new LinkedHashMap<String, Boolean>();
-		sortProperties.put("name", Boolean.TRUE);
+		Map<Integer, String> sortProperties = new HashMap<>();
+		sortProperties.put(0, "name");
 		sortingPagingHelper = new SortingPagingHelper<>(productRepository, productGrid, searchButton, searchTextbox, pager, sortProperties, this);
 
 		List<ProductCategory> productCategoryList = productCategoryRepository.findAll();

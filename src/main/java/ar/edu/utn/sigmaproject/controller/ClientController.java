@@ -1,6 +1,7 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.zkoss.lang.Strings;
@@ -71,8 +72,8 @@ public class ClientController extends SelectorComposer<Component> {
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		Map<String, Boolean> sortProperties = new HashMap<>();
-		sortProperties.put("name", Boolean.TRUE);
+		Map<Integer, String> sortProperties = new HashMap<>();
+		sortProperties.put(0, "name");
 		sortingPagingHelper = new SortingPagingHelper<>(clientRepository, clientListbox, searchButton, searchTextbox, pager, sortProperties);
 		refreshView();
 	}

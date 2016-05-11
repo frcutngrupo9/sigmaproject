@@ -1,8 +1,12 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import ar.edu.utn.sigmaproject.service.ToolTypeRepository;
+import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -10,13 +14,10 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
-import org.zkoss.zul.Button;
-import org.zkoss.zul.Grid;
-import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Textbox;
+import org.zkoss.zul.*;
 
 import ar.edu.utn.sigmaproject.domain.ToolType;
+import org.zkoss.zul.ext.Selectable;
 
 public class ToolController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
@@ -24,7 +25,11 @@ public class ToolController extends SelectorComposer<Component>{
 	@Wire
 	Textbox searchTextbox;
 	@Wire
+	Button searchButton;
+	@Wire
 	Listbox toolTypeListbox;
+	@Wire
+	Paging pager;
 	@Wire
 	Button newButton;
 	@Wire
@@ -52,19 +57,15 @@ public class ToolController extends SelectorComposer<Component>{
 
 	// atributes
 	private ToolType currentToolType;
-
-	// list
-	private List<ToolType> toolTypeList;
-
-	// list models
-	private ListModelList<ToolType> toolTypeListModel;
+	SortingPagingHelper<ToolType> sortingPagingHelper;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		toolTypeList = toolTypeRepository.findAll();
-		toolTypeListModel = new ListModelList<>(toolTypeList);
-		toolTypeListbox.setModel(toolTypeListModel);
+		Map<Integer, String> sortProperties = new HashMap<>();
+		sortProperties.put(0, "name");
+		sortProperties.put(3, "brand");
+		sortingPagingHelper = new SortingPagingHelper<>(toolTypeRepository, toolTypeListbox, searchButton, searchTextbox, pager, sortProperties);
 		currentToolType = null;
 		refreshView();
 	}
@@ -99,8 +100,7 @@ public class ToolController extends SelectorComposer<Component>{
 			currentToolType.setBrand(brand);
 		}
 		currentToolType = toolTypeRepository.save(currentToolType);
-		toolTypeList = toolTypeRepository.findAll();
-		toolTypeListModel = new ListModelList<>(toolTypeList);
+		sortingPagingHelper.reset();
 		currentToolType = null;
 		refreshView();
 	}
@@ -119,14 +119,15 @@ public class ToolController extends SelectorComposer<Component>{
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
 		toolTypeRepository.delete(currentToolType);
-		toolTypeListModel.remove(currentToolType);
+		sortingPagingHelper.reset();
 		currentToolType = null;
 		refreshView();
 	}
 
 	@Listen("onSelect = #toolTypeListbox")
 	public void doListBoxSelect() {
-		if(toolTypeListModel.isSelectionEmpty()) {
+		Selectable model = (Selectable) toolTypeListbox.getModel();
+		if(model.isSelectionEmpty()) {
 			//just in case for the no selection
 			currentToolType = null;
 		} else {
@@ -135,12 +136,15 @@ public class ToolController extends SelectorComposer<Component>{
 				refreshView();
 			}
 		}
-		toolTypeListModel.clearSelection();
+		model.clearSelection();
 	}
 
 	private void refreshView() {
-		toolTypeListModel.clearSelection();
-		toolTypeListbox.setModel(toolTypeListModel);// se actualiza la lista
+		Selectable model = (Selectable) toolTypeListbox.getModel();
+		if (model != null) {
+			model.clearSelection();
+		}
+		sortingPagingHelper.reset();;// se actualiza la lista
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		newButton.setDisabled(false);

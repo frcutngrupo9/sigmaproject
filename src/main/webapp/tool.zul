@@ -5,7 +5,7 @@
         <button id="searchButton" label="Buscar"/>
     </hlayout>
     <separator/>
-    <listbox id="toolTypeListbox"  mold="paging" pageSize="7">
+    <listbox id="toolTypeListbox">
         <listhead>
             <listheader label="Nombre"/>
             <listheader label="Descripcion"/>
@@ -21,6 +21,7 @@
             </listitem>
         </template>
     </listbox>
+    <paging id="pager" pageSize="10" sclass="sigma-paging"/>
     <vlayout>
         <separator/>
         <hbox>

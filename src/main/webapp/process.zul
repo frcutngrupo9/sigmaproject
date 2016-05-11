@@ -5,7 +5,7 @@
         <button id="searchButton" label="Buscar"/>
     </hlayout>
     <separator/>
-    <listbox id="processTypeListbox" mold="paging" pageSize="10">
+    <listbox id="processTypeListbox">
         <listhead>
             <listheader label="Id" sort="auto(id)" width="40px"/>
             <listheader label="Nombre" sort="auto(name)"/>

@@ -30,40 +30,40 @@ public final class SortingPagingHelper<T> {
 	private final Button searchButton;
 	private final Textbox searchTextbox;
 	private final Paging pager;
-	private final Map<String, Boolean> sortProperties;
+	private final Map<Integer, String> sortProperties;
 	private final PageCachePagingEventListener pageCachePagingEventListener;
 	private final SortingPagingHelperDelegate<T> delegate;
 	private Sort.Order sortOrder;
 
 	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Paging pager) {
-		this(repository, meshElement, pager, new HashMap<String, Boolean>());
+		this(repository, meshElement, pager, new HashMap<Integer, String>());
 	}
 
-	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Paging pager, Map<String, Boolean> sortProperties) {
+	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Paging pager, Map<Integer, String> sortProperties) {
 		this(repository, meshElement, null, null, pager, sortProperties, null);
 	}
 
-	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Paging pager, Map<String, Boolean> sortProperties, SortingPagingHelperDelegate<T> delegate) {
+	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Paging pager, Map<Integer, String> sortProperties, SortingPagingHelperDelegate<T> delegate) {
 		this(repository, meshElement, null, null, pager, sortProperties, delegate);
 	}
 
 	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Button searchButton, Textbox searchTextbox, Paging pager) {
-		this(repository, meshElement, searchButton, searchTextbox, pager, new HashMap<String, Boolean>());
+		this(repository, meshElement, searchButton, searchTextbox, pager, new HashMap<Integer, String>());
 	}
 
-	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Button searchButton, Textbox searchTextbox, Paging pager, Map<String, Boolean> sortProperties) {
+	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Button searchButton, Textbox searchTextbox, Paging pager, Map<Integer, String> sortProperties) {
 		this(repository, meshElement, searchButton, searchTextbox, pager, sortProperties, null);
 	}
 
-	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Button searchButton, Textbox searchTextbox, Paging pager, Map<String, Boolean> sortProperties, SortingPagingHelperDelegate<T> delegate) {
+	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Button searchButton, Textbox searchTextbox, Paging pager, Map<Integer, String> sortProperties, SortingPagingHelperDelegate<T> delegate) {
 		this(repository, meshElement, searchButton, searchTextbox, pager, sortProperties, delegate, 0);
 	}
 
-	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Button searchButton, Textbox searchTextbox, Paging pager, Map<String, Boolean> sortProperties, SortingPagingHelperDelegate<T> delegate, Integer defaultSortIndex) {
+	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Button searchButton, Textbox searchTextbox, Paging pager, Map<Integer, String> sortProperties, SortingPagingHelperDelegate<T> delegate, Integer defaultSortIndex) {
 		this(repository, meshElement, searchButton, searchTextbox, pager, sortProperties, delegate, defaultSortIndex, true);
 	}
 
-	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Button searchButton, Textbox searchTextbox, Paging pager, Map<String, Boolean> sortProperties, SortingPagingHelperDelegate<T> delegate, Integer defaultSortIndex, boolean ascending) {
+	public SortingPagingHelper(JpaRepository<T, ? extends Serializable> repository, MeshElement meshElement, Button searchButton, Textbox searchTextbox, Paging pager, Map<Integer, String> sortProperties, SortingPagingHelperDelegate<T> delegate, Integer defaultSortIndex, boolean ascending) {
 		if (!(meshElement instanceof Listbox) && !(meshElement instanceof Grid)) {
 			this.throwRuntimeExceptionBecauseOfIncompatibleMeshElement();
 		}
@@ -82,12 +82,9 @@ public final class SortingPagingHelper<T> {
 	private void setup(Integer defaultSortIndex, boolean ascending) {
 		Component header = this.getMeshElementHeader();
 		if (sortProperties != null) {
-			Iterator<Boolean> valueIterator = sortProperties.values().iterator();
+			Integer index = 0;
 			for (Component component : header.getChildren()) {
-				if (!valueIterator.hasNext()) {
-					break;
-				}
-				if (valueIterator.next()) {
+				if (sortProperties.get(index++) != null) {
 					component.addEventListener(Events.ON_SORT, new SortEventListener());
 					if (component instanceof Listheader) {
 						Listheader listHeader = (Listheader)component;
@@ -202,7 +199,6 @@ public final class SortingPagingHelper<T> {
 				// set current sort order on the client
 				column.setSortDirection(event.isAscending() ? "ascending" : "descending");
 			}
-			String[] sortKeys = sortProperties.keySet().toArray(new String[0]);
 			int columnIndex = -1;
 			if (listheader != null) {
 				columnIndex = listheader.getColumnIndex();
@@ -217,7 +213,7 @@ public final class SortingPagingHelper<T> {
 			if (columnIndex == -1) {
 				throw new RuntimeException("SortingPagingHelper runtime error: Cannot find column index for column " + column);
 			}
-			sortOrder = new Sort.Order(event.isAscending() ? Sort.Direction.ASC : Sort.Direction.DESC, sortKeys[columnIndex]).ignoreCase();
+			sortOrder = new Sort.Order(event.isAscending() ? Sort.Direction.ASC : Sort.Direction.DESC, sortProperties.get(columnIndex)).ignoreCase();
 			Component header = getMeshElementHeader();
 			for (Component component : header.getChildren()) {
 				if (component instanceof Listheader) {
