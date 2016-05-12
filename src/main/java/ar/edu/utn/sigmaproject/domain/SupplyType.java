@@ -1,5 +1,8 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
@@ -7,6 +10,7 @@ import java.util.List;
 import javax.persistence.*;
 
 @Entity
+@Indexed
 public class SupplyType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
@@ -14,12 +18,24 @@ public class SupplyType implements Serializable, Cloneable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
 
+	@Field
 	String code = "";
+
+	@Field
 	String description = "";
+
+	@Field
 	String details = "";
+
+	@Field
 	String brand = "";
+
+	@Field
 	String presentation = "";
+
+	@Field
 	String measure = "";
+
 	BigDecimal stock = BigDecimal.ZERO;
 	BigDecimal stockMin = BigDecimal.ZERO;
 	BigDecimal stockRepo = BigDecimal.ZERO;
