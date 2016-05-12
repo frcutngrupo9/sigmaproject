@@ -1,6 +1,8 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -8,6 +10,7 @@ import javax.xml.datatype.Duration;
 
 import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
+import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -16,13 +19,7 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
-import org.zkoss.zul.Button;
-import org.zkoss.zul.Grid;
-import org.zkoss.zul.Intbox;
-import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Selectbox;
-import org.zkoss.zul.Textbox;
+import org.zkoss.zul.*;
 
 import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
@@ -34,7 +31,11 @@ public class MachineStockController extends SelectorComposer<Component> {
 	@Wire
 	Textbox searchTextbox;
 	@Wire
+	Button searchButton;
+	@Wire
 	Listbox machineListbox;
+	@Wire
+	Paging pager;
 	@Wire
 	Grid machineGrid;
 	@Wire
@@ -62,31 +63,34 @@ public class MachineStockController extends SelectorComposer<Component> {
 
 	// services
 	@WireVariable
-	private MachineTypeRepository machineTypeRepository;
+	MachineTypeRepository machineTypeRepository;
 
 	@WireVariable
-	private MachineRepository machineRepository;
+	MachineRepository machineRepository;
 
 	// attributes
 	private Machine currentMachine;
+	SortingPagingHelper<Machine> sortingPagingHelper;
 
 	// list
-	private List<Machine> machineList;
 	private List<MachineType> machineTypeList;
 
 	// list models
-	private ListModelList<Machine> machineListModel;
 	private ListModelList<MachineType> machineTypeListModel;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception{
 		super.doAfterCompose(comp);
+		Map<Integer, String> sortProperties = new HashMap<>();
+		sortProperties.put(0, "id");
+		sortProperties.put(1, "name");
+		sortProperties.put(2, "code");
+		sortProperties.put(3, "machineType");
+		sortProperties.put(4, "year");
+		sortingPagingHelper = new SortingPagingHelper<>(machineRepository, machineListbox, searchButton, searchTextbox, pager, sortProperties);
 		machineTypeList = machineTypeRepository.findAll();
-		machineTypeListModel = new ListModelList<MachineType>(machineTypeList);
+		machineTypeListModel = new ListModelList<>(machineTypeList);
 		machineTypeSelectbox.setModel(machineTypeListModel);
-		machineList = machineRepository.findAll();
-		machineListModel = new ListModelList<Machine>(machineList);
-		machineListbox.setModel(machineListModel);
 		currentMachine = null;
 		refreshView();
 	}
@@ -97,7 +101,7 @@ public class MachineStockController extends SelectorComposer<Component> {
 
 	@Listen("onSelect = #machineListbox")
 	public void doWoodListBoxSelect() {
-		if(machineListModel.isSelectionEmpty()) {
+		if(machineListbox.getSelectedItem() == null) {
 			//just in case for the no selection
 			currentMachine = null;
 		} else {
@@ -106,12 +110,12 @@ public class MachineStockController extends SelectorComposer<Component> {
 				refreshView();
 			}
 		}
-		machineListModel.clearSelection();
+		machineListbox.clearSelection();
 	}
 
 	private void refreshView() {
-		machineListModel.clearSelection();
-		machineListbox.setModel(machineListModel);// se actualiza la lista limpiar la seleccion
+		machineListbox.clearSelection();
+		sortingPagingHelper.reset();// se actualiza la lista limpiar la seleccion
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		newButton.setDisabled(false);
@@ -183,8 +187,7 @@ public class MachineStockController extends SelectorComposer<Component> {
 			currentMachine.setUsedTime(usedTime);
 		}
 		currentMachine = machineRepository.save(currentMachine);
-		machineList = machineRepository.findAll();
-		machineListModel = new ListModelList<>(machineList);
+		sortingPagingHelper.reset();
 		currentMachine = null;
 		refreshView();
 	}
@@ -200,7 +203,7 @@ public class MachineStockController extends SelectorComposer<Component> {
 		refreshView();
 	}
 
-	public String getDurationFormated(Machine machine) {
+	public String getDurationFormatted(Machine machine) {
 		Duration duration = machine.getUsedTime();
 		String hours = duration.getHours() + " (Horas)";
 		String Minutes = duration.getMinutes() + " (Minutos)";

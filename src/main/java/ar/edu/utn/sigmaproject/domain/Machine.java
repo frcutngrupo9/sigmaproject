@@ -36,6 +36,8 @@ public class Machine implements Serializable, Cloneable {
 
 	@Field
 	String name = "";
+
+	@Field
 	Integer year = Calendar.getInstance().get(Calendar.YEAR);
 
 	@Transient
