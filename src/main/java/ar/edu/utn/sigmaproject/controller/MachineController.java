@@ -1,35 +1,40 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
+import ar.edu.utn.sigmaproject.domain.ToolType;
+import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
+import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
-import org.zkoss.zul.Button;
-import org.zkoss.zul.Grid;
-import org.zkoss.zul.Intbox;
-import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Textbox;
+import org.zkoss.zul.*;
 
 import ar.edu.utn.sigmaproject.domain.MachineType;
-import ar.edu.utn.sigmaproject.service.MachineTypeService;
-import ar.edu.utn.sigmaproject.service.impl.MachineTypeServiceImpl;
 
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class MachineController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
 
 	@Wire
 	Textbox searchTextbox;
 	@Wire
+	Button searchButton;
+	@Wire
 	Listbox machineTypeListbox;
+	@Wire
+	Paging pager;
 	@Wire
 	Button newButton;
 	@Wire
@@ -54,23 +59,19 @@ public class MachineController extends SelectorComposer<Component>{
 	Intbox deteriorationTimeIntboxHours;
 
 	// services
-	private MachineTypeService machineTypeService = new MachineTypeServiceImpl();
+	@WireVariable
+	private MachineTypeRepository machineTypeRepository;
 
 	// atributes
 	private MachineType currentMachineType;
-
-	// list
-	private List<MachineType> machineTypeList;
-
-	// list models
-	private ListModelList<MachineType> machineTypeListModel;
+	SortingPagingHelper<MachineType> sortingPagingHelper;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		machineTypeList = machineTypeService.getMachineTypeList();
-		machineTypeListModel = new ListModelList<MachineType>(machineTypeList);
-		machineTypeListbox.setModel(machineTypeListModel);
+		Map<Integer, String> sortProperties = new HashMap<>();
+		sortProperties.put(0, "name");
+		sortingPagingHelper = new SortingPagingHelper<>(machineTypeRepository, machineTypeListbox, searchButton, searchTextbox, pager, sortProperties);
 		currentMachineType = null;
 		refreshView();
 	}
@@ -104,16 +105,14 @@ public class MachineController extends SelectorComposer<Component>{
 			System.out.println("Error en finalizar maquina, en convertir a duracion: " + e.toString());
 		}
 		if(currentMachineType == null) {// nuevo
-			currentMachineType = new MachineType(null, name, details, duration);
-			currentMachineType = machineTypeService.saveMachineType(currentMachineType);
+			currentMachineType = new MachineType(name, details, duration);
 		} else {// edicion
 			currentMachineType.setName(name);
 			currentMachineType.setDetails(details);
 			currentMachineType.setDeteriorationTime(duration);
-			currentMachineType = machineTypeService.updateMachineType(currentMachineType);
 		}
-		machineTypeList = machineTypeService.getMachineTypeList();
-		machineTypeListModel = new ListModelList<MachineType>(machineTypeList);
+		machineTypeRepository.save(currentMachineType);
+		sortingPagingHelper.reset();
 		currentMachineType = null;
 		refreshView();
 	}
@@ -131,15 +130,15 @@ public class MachineController extends SelectorComposer<Component>{
 
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
-		machineTypeService.deleteMachineType(currentMachineType);
-		machineTypeListModel.remove(currentMachineType);
+		machineTypeRepository.delete(currentMachineType);
+		sortingPagingHelper.reset();
 		currentMachineType = null;
 		refreshView();
 	}
 
 	@Listen("onSelect = #machineTypeListbox")
 	public void doListBoxSelect() {
-		if(machineTypeListModel.isSelectionEmpty()) {
+		if(machineTypeListbox.getSelectedItem() == null) {
 			//just in case for the no selection
 			currentMachineType = null;
 		} else {
@@ -148,12 +147,12 @@ public class MachineController extends SelectorComposer<Component>{
 				refreshView();
 			}
 		}
-		machineTypeListModel.clearSelection();
+		machineTypeListbox.clearSelection();
 	}
 
 	private void refreshView() {
-		machineTypeListModel.clearSelection();
-		machineTypeListbox.setModel(machineTypeListModel);// se actualiza la lista
+		machineTypeListbox.clearSelection();
+		sortingPagingHelper.reset();// se actualiza la lista
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		newButton.setDisabled(false);
@@ -178,7 +177,7 @@ public class MachineController extends SelectorComposer<Component>{
 		}
 	}
 
-	public String getFormatedTime(Duration time) {
-		return String.format("Años: %d Horas: %d Minutos: %d", time.getYears(), time.getHours(), time.getMinutes());
+	public String getFormattedTime(Duration time) {
+		return String.format("Aï¿½os: %d Horas: %d Minutos: %d", time.getYears(), time.getHours(), time.getMinutes());
 	}
 }

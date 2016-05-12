@@ -1,11 +1,19 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 
+import ar.edu.utn.sigmaproject.domain.*;
+import ar.edu.utn.sigmaproject.service.RawMaterialTypeRepository;
+import ar.edu.utn.sigmaproject.service.WoodRepository;
+import ar.edu.utn.sigmaproject.service.WoodTypeRepository;
+import ar.edu.utn.sigmaproject.service.WorkerRepository;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Combobox;
@@ -17,21 +25,7 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
-import ar.edu.utn.sigmaproject.domain.RawMaterialType;
-import ar.edu.utn.sigmaproject.domain.Wood;
-import ar.edu.utn.sigmaproject.domain.WoodType;
-import ar.edu.utn.sigmaproject.domain.Worker;
-import ar.edu.utn.sigmaproject.service.MeasureUnitService;
-import ar.edu.utn.sigmaproject.service.RawMaterialTypeService;
-import ar.edu.utn.sigmaproject.service.WoodService;
-import ar.edu.utn.sigmaproject.service.WoodTypeService;
-import ar.edu.utn.sigmaproject.service.WorkerService;
-import ar.edu.utn.sigmaproject.service.impl.MeasureUnitServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.RawMaterialTypeServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.WoodServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.WoodTypeServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.WorkerServiceImpl;
-
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class RawMaterialStockController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
@@ -87,11 +81,17 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	Button resetNewStockButton;
 
 	// services
-	private RawMaterialTypeService rawMaterialTypeService = new RawMaterialTypeServiceImpl();
-	private MeasureUnitService measureUnitService = new MeasureUnitServiceImpl();
-	private WoodService woodService = new WoodServiceImpl();
-	private WoodTypeService woodTypeService = new WoodTypeServiceImpl();
-	private WorkerService workerService = new WorkerServiceImpl();
+	@WireVariable
+	RawMaterialTypeRepository rawMaterialTypeRepository;
+
+	@WireVariable
+	WoodRepository woodRepository;
+
+	@WireVariable
+	WoodTypeRepository woodTypeRepository;
+
+	@WireVariable
+	WorkerRepository workerRepository;
 
 	// attributes
 	private Wood currentWood;
@@ -111,18 +111,18 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	@Override
 	public void doAfterCompose(Component comp) throws Exception{
 		super.doAfterCompose(comp);
-		rawMaterialTypeList = rawMaterialTypeService.getRawMaterialTypeList();
-		rawMaterialTypeListModel = new ListModelList<RawMaterialType>(rawMaterialTypeList);
+		rawMaterialTypeList = rawMaterialTypeRepository.findAll();
+		rawMaterialTypeListModel = new ListModelList<>(rawMaterialTypeList);
 		rawMaterialTypeCombobox.setModel(rawMaterialTypeListModel);
-		woodTypeList = woodTypeService.getWoodTypeList();
-		woodTypeListModel = new ListModelList<WoodType>(woodTypeList);
+		woodTypeList = woodTypeRepository.findAll();
+		woodTypeListModel = new ListModelList<>(woodTypeList);
 		woodTypeCombobox.setModel(woodTypeListModel);
-		woodList = woodService.getWoodList();
-		woodListModel = new ListModelList<Wood>(woodList);
+		woodList = woodRepository.findAll();
+		woodListModel = new ListModelList<>(woodList);
 		woodListbox.setModel(woodListModel);
 		currentWood = null;
-		workerList = workerService.getWorkerList();
-		workerListModel = new ListModelList<Worker>(workerList);
+		workerList = workerRepository.findAll();
+		workerListModel = new ListModelList<>(workerList);
 		workerCombobox.setModel(workerListModel);
 		refreshView();
 	}
@@ -176,15 +176,14 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		}else {// editar
 			woodCreationGrid.setVisible(true);
 			codeTextbox.setValue(currentWood.getCode());
-			WoodType auxWoodType = woodTypeService.getWoodType(currentWood.getIdWoodType());
-			woodTypeCombobox.setSelectedIndex(woodTypeListModel.indexOf(auxWoodType));
-			RawMaterialType currentRawMaterialType = rawMaterialTypeService.getRawMaterialType(currentWood.getIdRawMaterialType());
+			woodTypeCombobox.setSelectedIndex(woodTypeListModel.indexOf(currentWood.getWoodType()));
+			RawMaterialType currentRawMaterialType = currentWood.getRawMaterialType();
 			rawMaterialTypeCombobox.setSelectedIndex(rawMaterialTypeListModel.indexOf(currentRawMaterialType));
 			nameTextbox.setValue(currentRawMaterialType.getName());
 			measureTextbox.setValue(getMeasureFormated(currentWood));
-			stockDoublebox.setValue(currentWood.getStock());
-			stockMinDoublebox.setValue(currentWood.getStockMin());
-			stockRepoDoublebox.setValue(currentWood.getStockRepo());
+			stockDoublebox.setValue(currentWood.getStock().doubleValue());
+			stockMinDoublebox.setValue(currentWood.getStockMin().doubleValue());
+			stockRepoDoublebox.setValue(currentWood.getStockRepo().doubleValue());
 			codeTextbox.setDisabled(true);
 			woodTypeCombobox.setDisabled(true);
 			rawMaterialTypeCombobox.setDisabled(true);
@@ -198,24 +197,16 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	}
 
 	public String getMeasureFormated(Wood wood) {
-		RawMaterialType rawMaterialType = getRawMaterialType(wood);
-		String lenght = "(L) " + rawMaterialType.getLength().doubleValue() + " " + getMeasureUnitName(rawMaterialType.getLengthIdMeasureUnit());
-		String depth = "(E) " + rawMaterialType.getDepth().doubleValue() + " " + getMeasureUnitName(rawMaterialType.getDepthIdMeasureUnit());
-		String width = "(A) " + rawMaterialType.getWidth().doubleValue() + " " + getMeasureUnitName(rawMaterialType.getWidthIdMeasureUnit());
+		RawMaterialType rawMaterialType = wood.getRawMaterialType();
+		String lenght = "(L) " + rawMaterialType.getLength().doubleValue() + " " + getMeasureUnitName(rawMaterialType.getLengthMeasureUnit());
+		String depth = "(E) " + rawMaterialType.getDepth().doubleValue() + " " + getMeasureUnitName(rawMaterialType.getDepthMeasureUnit());
+		String width = "(A) " + rawMaterialType.getWidth().doubleValue() + " " + getMeasureUnitName(rawMaterialType.getWidthMeasureUnit());
 		return lenght + " x " + depth + " x " + width;
 	}
 
-	public RawMaterialType getRawMaterialType(Wood wood) {
-		return rawMaterialTypeService.getRawMaterialType(wood.getIdRawMaterialType());
-	}
-
-	public WoodType getWoodType(Wood wood) {
-		return woodTypeService.getWoodType(wood.getIdWoodType());
-	}
-
-	public String getMeasureUnitName(int idMeasureUnit) {
-		if(measureUnitService.getMeasureUnit(idMeasureUnit) != null) {
-			return measureUnitService.getMeasureUnit(idMeasureUnit).getName();
+	public String getMeasureUnitName(MeasureUnit measureUnit) {
+		if (measureUnit != null) {
+			return measureUnit.getName();
 		} else {
 			return "[Sin Unidad de Medida]";
 		}
@@ -241,23 +232,22 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		String code = codeTextbox.getText();
 		RawMaterialType rawMaterialType = rawMaterialTypeCombobox.getSelectedItem().getValue();
 		WoodType woodType = woodTypeCombobox.getSelectedItem().getValue();
-		Double stock = stockDoublebox.getValue();
-		Double stockMin = stockMinDoublebox.getValue();
-		Double stockRepo = stockRepoDoublebox.getValue();
+		BigDecimal stock = BigDecimal.valueOf(stockDoublebox.getValue());
+		BigDecimal stockMin = BigDecimal.valueOf(stockMinDoublebox.getValue());
+		BigDecimal stockRepo = BigDecimal.valueOf(stockRepoDoublebox.getValue());
 		if(currentWood == null) {// nuevo
-			currentWood = new Wood(null, rawMaterialType.getId(), woodType.getId(), code, stock, stockMin, stockRepo);
-			currentWood = woodService.saveWood(currentWood);
+			currentWood = new Wood(rawMaterialType, woodType, code, stock, stockMin, stockRepo);
 		} else {// edicion
 			currentWood.setCode(code);
-			currentWood.setIdRawMaterialType(rawMaterialType.getId());
-			currentWood.setIdWoodType(woodType.getId());
+			currentWood.setRawMaterialType(rawMaterialType);
+			currentWood.setWoodType(woodType);
 			currentWood.setStock(stock);
 			currentWood.setStockRepo(stockRepo);
 			currentWood.setStockMin(stockMin);
-			currentWood = woodService.updateWood(currentWood);
 		}
-		woodList = woodService.getWoodList();
-		woodListModel = new ListModelList<Wood>(woodList);
+		currentWood = woodRepository.save(currentWood);
+		woodList = woodRepository.findAll();
+		woodListModel = new ListModelList<>(woodList);
 		currentWood = null;
 		refreshView();
 	}
@@ -297,20 +287,21 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 			return;
 		}
 		if(currentWood != null) {
-			double  newStock = 0;
+			BigDecimal newStock = BigDecimal.ZERO;
+			BigDecimal quantity = BigDecimal.valueOf(quantityDoublebox.doubleValue());
 			if(stockModificationLabel.getValue().equals("Ingreso Stock")) {
-				newStock = currentWood.getStock() + quantityDoublebox.doubleValue();
+				newStock = currentWood.getStock().add(quantity);
 			} else {
-				if(currentWood.getStock() > quantityDoublebox.getValue()) {// hay suficiente stock
-					newStock = currentWood.getStock() - quantityDoublebox.doubleValue();
+				if(currentWood.getStock().compareTo(quantity) > 0) {// hay suficiente stock
+					newStock = currentWood.getStock().subtract(quantity);
 				} else {
 					Clients.showNotification("No hay stock suficiente", quantityDoublebox);
 					return;
 				}
 			}
-			stockDoublebox.setValue(newStock);
+			stockDoublebox.setValue(newStock.doubleValue());
 //			currentWood.setStock(newStock);
-//			currentWood = woodService.updateWood(currentWood);
+//			currentWood = woodRepository.updateWood(currentWood);
 //			refreshView();
 		}
 		stockModificationGrid.setVisible(false);
@@ -345,9 +336,9 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		} else {
 			RawMaterialType rawMaterialType = (RawMaterialType)rawMaterialTypeCombobox.getSelectedItem().getValue();
 			nameTextbox.setValue(rawMaterialType.getName());
-			String lenght = "(L) " + rawMaterialType.getLength().doubleValue() + " " + getMeasureUnitName(rawMaterialType.getLengthIdMeasureUnit());
-			String depth = "(E) " + rawMaterialType.getDepth().doubleValue() + " " + getMeasureUnitName(rawMaterialType.getDepthIdMeasureUnit());
-			String width = "(A) " + rawMaterialType.getWidth().doubleValue() + " " + getMeasureUnitName(rawMaterialType.getWidthIdMeasureUnit());
+			String lenght = "(L) " + rawMaterialType.getLength().doubleValue() + " " + getMeasureUnitName(rawMaterialType.getLengthMeasureUnit());
+			String depth = "(E) " + rawMaterialType.getDepth().doubleValue() + " " + getMeasureUnitName(rawMaterialType.getDepthMeasureUnit());
+			String width = "(A) " + rawMaterialType.getWidth().doubleValue() + " " + getMeasureUnitName(rawMaterialType.getWidthMeasureUnit());
 			measureTextbox.setValue(lenght + " x " + depth + " x " + width);
 		}
 	}

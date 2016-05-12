@@ -5,7 +5,7 @@
         <button id="searchButton" label="Buscar"/>
     </hlayout>
     <separator/>
-    <listbox id="machineTypeListbox"  mold="paging" pageSize="7">
+    <listbox id="machineTypeListbox">
         <listhead>
             <listheader label="Nombre"/>
             <listheader label="Detalles"/>
@@ -15,10 +15,11 @@
             <listitem>
                 <listcell label="${each.name}"/>
                 <listcell label="${each.details}"/>
-                <listcell label="${win_machine$composer.getFormatedTime(each.deteriorationTime)}"/>
+                <listcell label="${win_machine$composer.getFormattedTime(each.deteriorationTime)}"/>
             </listitem>
         </template>
     </listbox>
+    <paging id="pager" pageSize="10" sclass="sigma-paging"/>
     <vlayout>
         <separator/>
         <hbox>

@@ -2,49 +2,80 @@ package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Entity
 public class Process implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	Integer id;
-	Integer idPiece;
-	Integer idProcessType;
-	String details;
+	@Transient
+	final Logger logger = LoggerFactory.getLogger(Process.class);
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
+
+	@ManyToOne
+	Piece piece;
+
+	@ManyToOne
+	ProcessType type;
+
+	String details = "";
+
+	@Transient
 	Duration time;
+
+	@Column
+	String timeInternal;
+
 	boolean isClone;
 
-	public Process(Integer id, Integer idPiece, Integer idProcessType, String details, Duration time) {
-		this.id = id;
-		this.idPiece = idPiece;
-		this.idProcessType = idProcessType;
+	public Process() {
+
+	}
+
+	public Process(Piece piece, ProcessType processType, String details, Duration time) {
+		this.piece = piece;
+		this.type = processType;
 		this.details = details;
-		this.time = time;
+		this.setTime(time);
 		isClone = false;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public Integer getIdPiece() {
-		return idPiece;
+	public Piece getPiece() {
+		return piece;
 	}
 
-	public void setIdPiece(Integer idPiece) {
-		this.idPiece = idPiece;
+	public void setPiece(Piece piece) {
+		this.piece = piece;
 	}
 
-	public Integer getIdProcessType() {
-		return idProcessType;
+	public ProcessType getType() {
+		return type;
 	}
 
-	public void setIdProcessType(Integer idProcessType) {
-		this.idProcessType = idProcessType;
+	public void setType(ProcessType type) {
+		this.type = type;
 	}
 
 	public String getDetails() {
@@ -54,13 +85,25 @@ public class Process implements Serializable, Cloneable {
 	public void setDetails(String details) {
 		this.details = details;
 	}
-
+	
 	public Duration getTime() {
+		if (time == null && this.timeInternal != null) {
+			try {
+				this.time = DatatypeFactory.newInstance().newDuration(this.timeInternal);
+			} catch (Exception e) {
+				logger.error("Error while trying to deserialize Duration representation(" + this.timeInternal + "): " + e.toString());
+			}
+		}
 		return time;
 	}
 
 	public void setTime(Duration time) {
 		this.time = time;
+		if (time != null) {
+			this.timeInternal = time.toString();
+		} else {
+			this.timeInternal = null;
+		}
 	}
 
 	public boolean isClone() {
@@ -69,6 +112,15 @@ public class Process implements Serializable, Cloneable {
 
 	public void setClone(boolean isClone) {
 		this.isClone = isClone;
+	}
+
+	public static Process clone(Process process) {
+		try {
+			return (Process) process.clone();
+		} catch (CloneNotSupportedException e) {
+			// not possible
+		}
+		return null;
 	}
 
 	@Override
@@ -81,28 +133,24 @@ public class Process implements Serializable, Cloneable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (!(obj instanceof Process)) {
 			return false;
+		}
 		Process other = (Process) obj;
 		if (id == null) {
-			if (other.id != null)
+			if (other.id != null) {
 				return false;
-		} else if (!id.equals(other.id))
+			}
+		} else if (!id.equals(other.id)) {
 			return false;
-		return true;
-	}
-
-	public static Process clone(Process process) {
-		try {
-			return (Process) process.clone();
-		} catch (CloneNotSupportedException e) {
-			// not possible
 		}
-		return null;
+		return true;
 	}
 
 }

@@ -7,13 +7,19 @@ import java.util.List;
 
 import javax.xml.datatype.Duration;
 
+import ar.edu.utn.sigmaproject.service.MachineRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
+import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
+import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
@@ -34,31 +40,8 @@ import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.Worker;
-import ar.edu.utn.sigmaproject.service.MachineService;
-import ar.edu.utn.sigmaproject.service.MachineTypeService;
-import ar.edu.utn.sigmaproject.service.PieceService;
-import ar.edu.utn.sigmaproject.service.ProcessService;
-import ar.edu.utn.sigmaproject.service.ProcessTypeService;
-import ar.edu.utn.sigmaproject.service.ProductService;
-import ar.edu.utn.sigmaproject.service.ProductionOrderDetailService;
-import ar.edu.utn.sigmaproject.service.ProductionOrderService;
-import ar.edu.utn.sigmaproject.service.ProductionPlanDetailService;
-import ar.edu.utn.sigmaproject.service.ProductionPlanStateService;
-import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeService;
-import ar.edu.utn.sigmaproject.service.WorkerService;
-import ar.edu.utn.sigmaproject.service.impl.MachineServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.MachineTypeServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.PieceServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProcessServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProcessTypeServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProductionOrderDetailServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProductionOrderServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProductionPlanDetailServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProductionPlanStateServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProductionPlanStateTypeServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.WorkerServiceImpl;
 
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProductionOrderListController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
@@ -72,18 +55,17 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 	Textbox productionPlanStateTypeTextbox;
 
 	// services
-	private ProductionOrderService productionOrderService = new ProductionOrderServiceImpl();
-	private ProductionOrderDetailService productionOrderDetailService = new ProductionOrderDetailServiceImpl();
-	private ProductService productService = new ProductServiceImpl();
-	private PieceService pieceService = new PieceServiceImpl();
-	private ProcessService processService = new ProcessServiceImpl();
-	private ProductionPlanDetailService productionPlanDetailService = new ProductionPlanDetailServiceImpl();
-	private WorkerService workerService = new WorkerServiceImpl();
-	private ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
-	private MachineTypeService machineTypeService = new MachineTypeServiceImpl();
-	private MachineService machineService = new MachineServiceImpl();
-	private ProductionPlanStateService productionPlanStateService = new ProductionPlanStateServiceImpl();
-	private ProductionPlanStateTypeService productionPlanStateTypeService = new ProductionPlanStateTypeServiceImpl();
+	@WireVariable
+	MachineRepository machineRepository;
+	
+	@WireVariable
+	ProductionOrderRepository productionOrderRepository;
+
+	@WireVariable
+	ProductionPlanRepository productionPlanRepository;
+
+	@WireVariable
+	ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
 
 	// atributes
 	private ProductionPlan currentProductionPlan;
@@ -101,8 +83,8 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 
 		currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
 		if(currentProductionPlan == null) {throw new RuntimeException("ProductionPlan not found");}
-		productionOrderList = productionOrderService.getProductionOrderList(currentProductionPlan.getId());
-		ArrayList<ProductTotal> productTotalList = productionPlanDetailService.getProductTotalList(currentProductionPlan.getId());
+		productionOrderList = currentProductionPlan.getOrders();
+		List<ProductTotal> productTotalList = currentProductionPlan.getProductTotalList();
 
 		productionOrderListModel = new ListModelList<ProductTotal>(productTotalList);
 		productionOrderGrid.setModel(productionOrderListModel);
@@ -117,18 +99,14 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		if(currentProductionPlan != null) {
 			productionPlanNameTextbox.setText(currentProductionPlan.getName());
 			productionPlanDatebox.setValue(currentProductionPlan.getDate());
-			ProductionPlanState lastProductionPlanState = productionPlanStateService.getLastProductionPlanState(currentProductionPlan.getId());
+			ProductionPlanState lastProductionPlanState = currentProductionPlan.getStates().get(currentProductionPlan.getStates().size() - 1);
 			if(lastProductionPlanState != null) {
-				productionPlanStateTypeTextbox.setText(productionPlanStateTypeService.getProductionPlanStateType(lastProductionPlanState.getIdProductionPlanStateType()).getName().toUpperCase());
+				productionPlanStateTypeTextbox.setText(lastProductionPlanState.getProductionPlanStateType().getName().toUpperCase());
 			} else {
 				productionPlanStateTypeTextbox.setText("[Sin Estado]");
 			}
 		}
 
-	}
-
-	public Product getProduct(int idProduct) {
-		return productService.getProduct(idProduct);
 	}
 
 	public String getProductUnits(int idProduct) {
@@ -146,9 +124,8 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		if(aux == null) {
 			return "";
 		} else {
-			Worker worker = workerService.getWorker(aux.getIdWorker());
-			if(worker != null) {
-				return worker.getName();
+			if(aux.getWorker() != null) {
+				return aux.getWorker().getName();
 			} else {
 				return "[no asignado]";
 			}
@@ -165,45 +142,23 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		include.setSrc("/production_order_creation.zul");
 	}
 
-	public ListModel<Process> getProductionOrderProcesses(Integer idProduct) {// buscar todos los procesos del producto
-		List<Process> list = new ArrayList<Process>();
-		List<Piece> auxPieceList = pieceService.getPieceList(idProduct);
-		for(Piece piece : auxPieceList) {
-			List<Process> auxProcessList = processService.getProcessList(piece.getId());
-			for(Process process : auxProcessList) {
+	public ListModel<Process> getProductionOrderProcesses(Product product) {// buscar todos los procesos del producto
+		List<Process> list = new ArrayList<>();
+		for(Piece piece : product.getPieces()) {
+			for(Process process : piece.getProcesses()) {
 				list.add(Process.clone(process));
 			}
 		}
-		return new ListModelList<Process>(list);
+		return new ListModelList<>(list);
 	}
 
 	public ListModel<ProductionOrderDetail> getProductionOrderDetailList(Product product) {// buscar todos los procesos del producto
-		List<ProductionOrderDetail> list = new ArrayList<ProductionOrderDetail>();
-		ProductionOrder aux = getProductionOrder(product);
+		List<ProductionOrderDetail> list = new ArrayList<>();
+		ProductionOrder aux = productionOrderRepository.findByProductionPlanAndProduct(currentProductionPlan, product);
 		if(aux != null) {
-			list = productionOrderDetailService.getProductionOrderDetailList(aux.getId());
+			list = aux.getDetails();
 		}
-		return new ListModelList<ProductionOrderDetail>(list);
-	}
-
-	public ProcessType getProcessType(int idProduct) {
-		return processTypeService.getProcessType(idProduct);
-	}
-
-	public Piece getPiece(int idPiece) {
-		return pieceService.getPiece(idPiece);
-	}
-
-	public ProcessType getProcessTypeByProcessId(int idProcess) {
-		return processTypeService.getProcessType(getProcessByProcessId(idProcess).getIdProcessType());
-	}
-
-	public Piece getPieceByProcessId(int idProcess) {
-		return pieceService.getPiece(getProcessByProcessId(idProcess).getIdPiece());
-	}
-
-	public Process getProcessByProcessId(int idProcess) {
-		return processService.getProcess(idProcess);
+		return new ListModelList<>(list);
 	}
 
 	public String getIsFinished(boolean value) {
@@ -214,14 +169,10 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		}
 	}
 
-	public String getFormatedTime(Duration time) {
-		return String.format("Dias: %d Horas: %d Minutos: %d", time.getDays(), time.getHours(), time.getMinutes());
-	}
-
 	public String getPercentComplete(Product product) {
 		ProductionOrder aux = getProductionOrder(product);
 		if(aux != null) {
-			List<ProductionOrderDetail> productionOrderDetailList = productionOrderDetailService.getProductionOrderDetailList(aux.getId());
+			List<ProductionOrderDetail> productionOrderDetailList = aux.getDetails();
 			int quantityFinished = 0;
 			for(ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
 				if(productionOrderDetail.isFinished()) {
@@ -242,9 +193,9 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 
 	public String getMachineTypeName(ProductionOrderDetail productionOrderDetail) {
 		String name = "Ninguna";
-		Process process = processService.getProcess(productionOrderDetail.getIdProcess());
-		ProcessType processType = processTypeService.getProcessType(process.getIdProcessType());
-		MachineType machineType = machineTypeService.getMachineType(processType.getIdMachineType());
+		Process process = productionOrderDetail.getProcess();
+		ProcessType processType = process.getType();
+		MachineType machineType = processType.getMachineType();
 		if(machineType != null) {
 			name = machineType.getName();
 		}
@@ -253,7 +204,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 
 	public String getMachineName(ProductionOrderDetail productionOrderDetail) {
 		String name = "Ninguna";
-		Machine machine = machineService.getMachine(productionOrderDetail.getIdMachine());
+		Machine machine = productionOrderDetail.getMachine();
 		if(machine != null) {
 			name = machine.getName();
 		}
@@ -262,8 +213,8 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 
 	public ProductionOrder getProductionOrder(Product product) {
 		for(ProductionOrder each : productionOrderList) {
-			if(each.getIdProduct().equals(product.getId())) {
-				return ProductionOrder.clone(each);
+			if(each.getProduct().equals(product)) {
+				return each;
 			}
 		}
 		return null;
@@ -336,16 +287,8 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 	}
 
 	public boolean isProductionPlanStateCancel() {
-		ProductionPlanState lastProductionPlanState = productionPlanStateService.getLastProductionPlanState(currentProductionPlan.getId());
-		if(lastProductionPlanState != null) {
-			if(productionPlanStateTypeService.getProductionPlanStateType("cancelado").getId().equals(lastProductionPlanState.getIdProductionPlanStateType())) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			return false;
-		}
+		ProductionPlanState lastProductionPlanState = currentProductionPlan.getStates().get(currentProductionPlan.getStates().size() - 1);
+		return lastProductionPlanState != null && productionPlanStateTypeRepository.findByName("cancelado").equals(lastProductionPlanState.getProductionPlanStateType());
 	}
 
 	public boolean isProductionOrderStateCancel(Product product) {

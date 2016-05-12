@@ -1,22 +1,23 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import ar.edu.utn.sigmaproject.service.ToolTypeRepository;
+import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
-import org.zkoss.zul.Button;
-import org.zkoss.zul.Grid;
-import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Textbox;
+import org.zkoss.zul.*;
 
 import ar.edu.utn.sigmaproject.domain.ToolType;
-import ar.edu.utn.sigmaproject.service.ToolTypeService;
-import ar.edu.utn.sigmaproject.service.impl.ToolTypeServiceImpl;
+import org.zkoss.zul.ext.Selectable;
 
 public class ToolController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
@@ -24,7 +25,11 @@ public class ToolController extends SelectorComposer<Component>{
 	@Wire
 	Textbox searchTextbox;
 	@Wire
+	Button searchButton;
+	@Wire
 	Listbox toolTypeListbox;
+	@Wire
+	Paging pager;
 	@Wire
 	Button newButton;
 	@Wire
@@ -47,23 +52,20 @@ public class ToolController extends SelectorComposer<Component>{
 	Textbox brandTextbox;
 
 	// services
-	private ToolTypeService toolTypeService = new ToolTypeServiceImpl();
+	@WireVariable
+	ToolTypeRepository toolTypeRepository;
 
 	// atributes
 	private ToolType currentToolType;
-
-	// list
-	private List<ToolType> toolTypeList;
-
-	// list models
-	private ListModelList<ToolType> toolTypeListModel;
+	SortingPagingHelper<ToolType> sortingPagingHelper;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		toolTypeList = toolTypeService.getToolTypeList();
-		toolTypeListModel = new ListModelList<ToolType>(toolTypeList);
-		toolTypeListbox.setModel(toolTypeListModel);
+		Map<Integer, String> sortProperties = new HashMap<>();
+		sortProperties.put(0, "name");
+		sortProperties.put(3, "brand");
+		sortingPagingHelper = new SortingPagingHelper<>(toolTypeRepository, toolTypeListbox, searchButton, searchTextbox, pager, sortProperties);
 		currentToolType = null;
 		refreshView();
 	}
@@ -90,17 +92,15 @@ public class ToolController extends SelectorComposer<Component>{
 		String details = detailsTextbox.getText();
 		String brand = brandTextbox.getText();
 		if(currentToolType == null) {// nuevo
-			currentToolType = new ToolType(null, name, description, details, brand);
-			currentToolType = toolTypeService.saveToolType(currentToolType);
+			currentToolType = new ToolType(name, description, details, brand);
 		} else {// actualizacion
 			currentToolType.setName(name);
 			currentToolType.setDescription(description);
 			currentToolType.setDetails(details);
 			currentToolType.setBrand(brand);
-			currentToolType = toolTypeService.updateToolType(currentToolType);
 		}
-		toolTypeList = toolTypeService.getToolTypeList();
-		toolTypeListModel = new ListModelList<ToolType>(toolTypeList);
+		currentToolType = toolTypeRepository.save(currentToolType);
+		sortingPagingHelper.reset();
 		currentToolType = null;
 		refreshView();
 	}
@@ -118,15 +118,15 @@ public class ToolController extends SelectorComposer<Component>{
 
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
-		toolTypeService.deleteToolType(currentToolType);
-		toolTypeListModel.remove(currentToolType);
+		toolTypeRepository.delete(currentToolType);
+		sortingPagingHelper.reset();
 		currentToolType = null;
 		refreshView();
 	}
 
 	@Listen("onSelect = #toolTypeListbox")
 	public void doListBoxSelect() {
-		if(toolTypeListModel.isSelectionEmpty()) {
+		if(toolTypeListbox.getSelectedItem() == null) {
 			//just in case for the no selection
 			currentToolType = null;
 		} else {
@@ -135,12 +135,12 @@ public class ToolController extends SelectorComposer<Component>{
 				refreshView();
 			}
 		}
-		toolTypeListModel.clearSelection();
+		toolTypeListbox.clearSelection();
 	}
 
 	private void refreshView() {
-		toolTypeListModel.clearSelection();
-		toolTypeListbox.setModel(toolTypeListModel);// se actualiza la lista
+		toolTypeListbox.clearSelection();
+		sortingPagingHelper.reset();;// se actualiza la lista
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		newButton.setDisabled(false);

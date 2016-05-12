@@ -1,100 +1,78 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.datatype.Duration;
 
+import ar.edu.utn.sigmaproject.domain.*;
+import ar.edu.utn.sigmaproject.domain.Process;
+import ar.edu.utn.sigmaproject.service.*;
+import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
+import ar.edu.utn.sigmaproject.util.SortingPagingHelperDelegate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.event.CheckEvent;
-import org.zkoss.zk.ui.event.ForwardEvent;
+import org.zkoss.zk.ui.event.*;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
-import org.zkoss.zul.Button;
-import org.zkoss.zul.Grid;
-import org.zkoss.zul.Include;
-import org.zkoss.zul.ListModel;
-import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Radio;
-import org.zkoss.zul.Radiogroup;
-import org.zkoss.zul.Textbox;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zul.*;
 
-import ar.edu.utn.sigmaproject.domain.Piece;
-import ar.edu.utn.sigmaproject.domain.Process;
-import ar.edu.utn.sigmaproject.domain.Product;
-import ar.edu.utn.sigmaproject.domain.ProductCategory;
-import ar.edu.utn.sigmaproject.service.MeasureUnitService;
-import ar.edu.utn.sigmaproject.service.PieceService;
-import ar.edu.utn.sigmaproject.service.ProcessService;
-import ar.edu.utn.sigmaproject.service.ProcessTypeService;
-import ar.edu.utn.sigmaproject.service.ProductService;
-import ar.edu.utn.sigmaproject.service.impl.MeasureUnitServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.PieceServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProcessServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProcessTypeServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
-
-public class ProductListController extends SelectorComposer<Component>{
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
+public class ProductListController extends SelectorComposer<Component> implements SortingPagingHelperDelegate<Product> {
 	private static final long serialVersionUID = 1L;
 
 	@Wire
 	Textbox searchTextbox;
-	//    @Wire
-	//    Listbox productListbox;
-	//    @Wire
-	//    Paging pager;
 	@Wire
-	Listbox pieceListbox;
-	@Wire
-	Listbox processListbox;
-	@Wire
-	Button newProductButton;
+	Button searchButton;
 	@Wire
 	Grid productGrid;
+	@Wire
+	Paging pager;
 	@Wire
 	Radiogroup productCategoryRadiogroup;
 
 	// services
-	private ProductService productService = new ProductServiceImpl();
-	private PieceService pieceService = new PieceServiceImpl();
-	private ProcessService processService = new ProcessServiceImpl();
-	private ProcessTypeService processTypeService = new ProcessTypeServiceImpl();
-	private MeasureUnitService measureUnitService = new MeasureUnitServiceImpl();
+	@WireVariable
+	ProductRepository productRepository;
+
+	@WireVariable
+	ProductCategoryRepository productCategoryRepository;
 
 	// atributes
-
-	// list
+	ProductCategory allProductCategory;
+	ProductCategory selectedProductCategory;
+	SortingPagingHelper<Product> sortingPagingHelper;
 
 	// list models
-	private ListModelList<Product> productListModel;
-	private ListModelList<Piece> pieceListModel;
-	private ListModelList<Process> processListModel;
+	private ListModel<ProductCategory> productCategoryListModel;
+
+	private static final int PRODUCT_CATEGORY_ALL_INDEX = 0;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		List<Product> productList = productService.getProductList();
-		productListModel = new ListModelList<Product>(productList);
-		productGrid.setModel(productListModel);
-		//        productListbox.setModel(productListModel);
-		List<Piece> pieceList = pieceService.getCompletePieceList();
-		pieceListModel = new ListModelList<Piece>(pieceList);
-		pieceListbox.setModel(pieceListModel);
-		List<Process> processList = processService.getCompleteProcessList();
-		processListModel = new ListModelList<Process>(processList);
-		processListbox.setModel(processListModel);
-	}
+		Map<Integer, String> sortProperties = new HashMap<>();
+		sortProperties.put(0, "name");
+		sortingPagingHelper = new SortingPagingHelper<>(productRepository, productGrid, searchButton, searchTextbox, pager, sortProperties, this);
 
-	//    @Listen("onSelect = #productListbox")
-	//    public void onProductSelect() {
-	//    	//Clients.showNotification("Usted hizo click en el Producto: " + ((Product) productListbox.getSelectedItem().getValue()).getName());
-	//        Executions.getCurrent().setAttribute("selected_product", ((Product) productListbox.getSelectedItem().getValue()));
-	//        Include include = (Include) Selectors.iterable(productListbox.getPage(), "#mainInclude").iterator().next();
-	//    	include.setSrc("/product_creation.zul");
-	//    }
+		List<ProductCategory> productCategoryList = productCategoryRepository.findAll();
+		productCategoryListModel = new ListModelList<>(productCategoryList);
+		allProductCategory = new ProductCategory("Todas");
+		((ListModelList)productCategoryListModel).add(PRODUCT_CATEGORY_ALL_INDEX, allProductCategory);
+		productCategoryRadiogroup.setModel(productCategoryListModel);
+		productCategoryRadiogroup.onInitRender(null);
+		productCategoryRadiogroup.setSelectedIndex(PRODUCT_CATEGORY_ALL_INDEX);
+	}
 
 	@Listen("onClick = #newProductButton")
 	public void goToNewProduct() {
@@ -103,31 +81,9 @@ public class ProductListController extends SelectorComposer<Component>{
 		include.setSrc("/product_creation.zul");
 	}
 
-	public String getProductName(int idProduct) {
-		return productService.getProduct(idProduct).getName();
-	}
-
-	public String getProductNameByPieceId(int idPiece) {
-		Piece aux = pieceService.getPiece(idPiece);
-		return productService.getProduct(aux.getIdProduct()).getName();
-	}
-
-	public String getPieceName(int idPiece) {
-		Piece aux = pieceService.getPiece(idPiece);
-		return aux.getName();
-	}
-
-	public String getProcessTypeName(int idProduct) {
-		return processTypeService.getProcessType(idProduct).getName();
-	}
-
-	public String getFormatedTime(Duration time) {
-		return String.format("Dias: %d Horas: %d Minutos: %d", time.getDays(), time.getHours(), time.getMinutes());
-	}
-
-	public String getMeasureUnitName(int idMeasureUnit) {
-		if(measureUnitService.getMeasureUnit(idMeasureUnit) != null) {
-			return measureUnitService.getMeasureUnit(idMeasureUnit).getName();
+	public String getMeasureUnitName(MeasureUnit measureUnit) {
+		if(measureUnit != null) {
+			return measureUnit.getName();
 		} else {
 			return "[Sin Unidad de Medida]";
 		}
@@ -141,26 +97,33 @@ public class ProductListController extends SelectorComposer<Component>{
 		include.setSrc("/product_creation.zul");
 	}
 
-	public ListModel<Piece> getProductPieces(int idProduct) {
-		return new ListModelList<Piece>(pieceService.getPieceList(idProduct));
-	}
-
-	public ListModel<Process> getPieceProcesses(int idPiece) {
-		return new ListModelList<Process>(processService.getProcessList(idPiece));
-	}
-
 	@Listen("onCheck = #productCategoryRadiogroup")
 	public void selectCategory(CheckEvent event) {
-		String selectedProductCategoryString = ((Radio) event.getTarget()).getLabel();
-		ProductCategory selectedProductCategory = null;
-		if(selectedProductCategoryString.equals("Todas")) {
-			productListModel = new ListModelList<Product>(productService.getProductList());
-		} else {
-			if(!selectedProductCategoryString.equals("Ninguna")) {
-				selectedProductCategory = ProductCategory.valueOf(selectedProductCategoryString);
+		if (productCategoryRadiogroup.getSelectedItem() != null) {
+			selectedProductCategory = productCategoryRadiogroup.getSelectedItem().getValue();
+			if (selectedProductCategory != allProductCategory) {
+				searchTextbox.setText("");
 			}
-			productListModel = new ListModelList<Product>(productService.getProductListByCategory(selectedProductCategory));
 		}
-		productGrid.setModel(productListModel);
+		sortingPagingHelper.reset();
+	}
+
+	@Override
+	public Page<Product> getPage(PageRequest pageRequest) {
+		Page<Product> page;
+		if (searchTextbox.getText().isEmpty()) {
+			if (selectedProductCategory == allProductCategory || selectedProductCategory == null) {
+				page = productRepository.findAll(pageRequest);
+			} else {
+				page = productRepository.findAllByCategory(selectedProductCategory, pageRequest);
+			}
+		} else {
+			page = productRepository.findAll(searchTextbox.getText(), pageRequest);
+			if (selectedProductCategory != allProductCategory) {
+				selectedProductCategory = allProductCategory;
+				productCategoryRadiogroup.setSelectedIndex(PRODUCT_CATEGORY_ALL_INDEX);
+			}
+		}
+		return page;
 	}
 }

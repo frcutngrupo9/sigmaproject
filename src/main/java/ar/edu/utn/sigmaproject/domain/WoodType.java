@@ -1,25 +1,36 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.io.Serializable;
 
+@Entity
 public class WoodType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	Integer id;
-	String name;
-	String details;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
 
-	public WoodType(Integer id, String name, String details) {
-		this.id = id;
+	String name = "";
+	String details = "";
+
+	public WoodType() {
+
+	}
+
+	public WoodType(String name, String details) {
 		this.name = name;
 		this.details = details;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

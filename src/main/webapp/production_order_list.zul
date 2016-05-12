@@ -1,3 +1,4 @@
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="win_production_order_list" apply="ar.edu.utn.sigmaproject.controller.ProductionOrderListController" width="95%" style="background:white">
     <panel title="Ordenes de Produccion" id="productionOrderCreationBlock" border="rounded">
         <panelchildren>

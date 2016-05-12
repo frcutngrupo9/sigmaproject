@@ -105,28 +105,30 @@ public class SidebarController extends SelectorComposer<Component> {
 		tree.addEventListener(Events.ON_CLICK, new EventListener<MouseEvent>() {
 			public void onEvent(MouseEvent event) throws Exception {
 				Treeitem treeitem = tree.getSelectedItem();
-				DefaultTreeNode<MenuTreeRow> treeNode = treeitem.<DefaultTreeNode<MenuTreeRow>>getValue();
-				MenuTreeRow row = treeNode.getData();
-				if (row.destination != null) {
-					//redirect current url to new location
-					if (row.destination.startsWith("http")) {
-						//open a new browser tab
-						Executions.getCurrent().sendRedirect(row.destination);
-					} else {
-						//use iterable to find the first include only
-						Include include = (Include) Selectors.iterable(tree.getPage(), "#mainInclude")
-								.iterator().next();
+				if (treeitem != null) {
+					DefaultTreeNode<MenuTreeRow> treeNode = treeitem.<DefaultTreeNode<MenuTreeRow>>getValue();
+					MenuTreeRow row = treeNode.getData();
+					if (row.destination != null) {
+						//redirect current url to new location
+						if (row.destination.startsWith("http")) {
+							//open a new browser tab
+							Executions.getCurrent().sendRedirect(row.destination);
+						} else {
+							//use iterable to find the first include only
+							Include include = (Include) Selectors.iterable(tree.getPage(), "#mainInclude")
+									.iterator().next();
 
-						// clear and set this destination as the first page
-						Stack<String> pages = SigmaDesktopInit.pagesStack();
-						pages.clear();
-						pages.push(row.destination);
+							// clear and set this destination as the first page
+							Stack<String> pages = SigmaDesktopInit.pagesStack();
+							pages.clear();
+							pages.push(row.destination);
 
-						include.setSrc(row.destination);
+							include.setSrc(row.destination);
+						}
 					}
-				}
-				if (!treeNode.isLeaf()) {
-					treeitem.setOpen(!treeitem.isOpen());
+					if (!treeNode.isLeaf()) {
+						treeitem.setOpen(!treeitem.isOpen());
+					}					
 				}
 			}
 

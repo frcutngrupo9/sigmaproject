@@ -2,26 +2,27 @@ package ar.edu.utn.sigmaproject.controller;
 
 import java.util.List;
 
+import ar.edu.utn.sigmaproject.domain.MeasureUnit;
+import ar.edu.utn.sigmaproject.service.MeasureUnitRepository;
+import ar.edu.utn.sigmaproject.service.PieceRepository;
+import ar.edu.utn.sigmaproject.service.ProductRepository;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventQueue;
 import org.zkoss.zk.ui.event.EventQueues;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.Piece;
-import ar.edu.utn.sigmaproject.service.MeasureUnitService;
-import ar.edu.utn.sigmaproject.service.PieceService;
-import ar.edu.utn.sigmaproject.service.ProductService;
-import ar.edu.utn.sigmaproject.service.impl.MeasureUnitServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.PieceServiceImpl;
-import ar.edu.utn.sigmaproject.service.impl.ProductServiceImpl;
 
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class PieceSelectionModalController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
 
@@ -33,9 +34,10 @@ public class PieceSelectionModalController extends SelectorComposer<Component>{
 	Listbox pieceListbox;
 
 	// services
-	private PieceService pieceService = new PieceServiceImpl();
-	private ProductService productService = new ProductServiceImpl();
-	private MeasureUnitService measureUnitService = new MeasureUnitServiceImpl();
+	@WireVariable
+	private PieceRepository pieceRepository;
+	private ProductRepository productRepository;
+	private MeasureUnitRepository measureUnitRepository;
 
 	// atributes
 
@@ -48,8 +50,8 @@ public class PieceSelectionModalController extends SelectorComposer<Component>{
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		pieceList = pieceService.getPieceList();
-		pieceListModel = new ListModelList<Piece>(pieceList);
+		pieceList = pieceRepository.findAll();
+		pieceListModel = new ListModelList<>(pieceList);
 		pieceListbox.setModel(pieceListModel);
 	}
 
@@ -66,13 +68,9 @@ public class PieceSelectionModalController extends SelectorComposer<Component>{
 		modalDialog.detach();
 	}
 
-	public String getProductName(int idProduct) {
-		return productService.getProduct(idProduct).getName();
-	}
-
-	public String getMeasureUnitName(int idMeasureUnit) {
-		if(measureUnitService.getMeasureUnit(idMeasureUnit) != null) {
-			return measureUnitService.getMeasureUnit(idMeasureUnit).getName();
+	public String getMeasureUnitName(MeasureUnit measureUnit) {
+		if (measureUnit != null) {
+			return measureUnit.getName();
 		} else {
 			return "[Sin Unidad de Medida]";
 		}

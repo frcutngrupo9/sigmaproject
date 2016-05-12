@@ -1,77 +1,89 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
+@Entity
 public class SupplyExistence implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	Integer idSupplyType;
-	Double stock;
-	Double stockMin;
-	Double stockRepo;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Integer id;
 
-	public SupplyExistence(Integer idSupplyType, Double stock, Double stockMin, Double stockRepo) {
-		this.idSupplyType = idSupplyType;
+	@ManyToOne
+	SupplyType supplyType;
+
+	BigDecimal stock = BigDecimal.ZERO;
+	BigDecimal stockMin = BigDecimal.ZERO;
+	BigDecimal stockRepo = BigDecimal.ZERO;
+
+	public SupplyExistence() {
+		
+	}
+
+	public SupplyExistence(SupplyType supplyType, BigDecimal stock, BigDecimal stockMin, BigDecimal stockRepo) {
+		this.supplyType = supplyType;
 		this.stock = stock;
 		this.stockMin = stockMin;
 		this.stockRepo = stockRepo;
 	}
 
-	public Integer getIdSupplyType() {
-		return idSupplyType;
+	public Integer getId() {
+		return id;
 	}
 
-	public void setIdSupplyType(Integer idSupplyType) {
-		this.idSupplyType = idSupplyType;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
-	public Double getStock() {
+	public SupplyType getSupplyType() {
+		return supplyType;
+	}
+
+	public void setSupplyType(SupplyType supplyType) {
+		this.supplyType = supplyType;
+	}
+
+	public BigDecimal getStock() {
 		return stock;
 	}
 
-	public void setStock(Double stock) {
+	public void setStock(BigDecimal stock) {
 		this.stock = stock;
 	}
 
-	public Double getStockMin() {
+	public BigDecimal getStockMin() {
 		return stockMin;
 	}
 
-	public void setStockMin(Double stockMin) {
+	public void setStockMin(BigDecimal stockMin) {
 		this.stockMin = stockMin;
 	}
 
-	public Double getStockRepo() {
+	public BigDecimal getStockRepo() {
 		return stockRepo;
 	}
 
-	public void setStockRepo(Double stockRepo) {
+	public void setStockRepo(BigDecimal stockRepo) {
 		this.stockRepo = stockRepo;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		SupplyExistence that = (SupplyExistence) o;
+
+		return id != null ? id.equals(that.id) : that.id == null;
+
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((idSupplyType == null) ? 0 : idSupplyType.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		SupplyExistence other = (SupplyExistence) obj;
-		if (idSupplyType == null) {
-			if (other.idSupplyType != null)
-				return false;
-		} else if (!idSupplyType.equals(other.idSupplyType))
-			return false;
-		return true;
+		return id != null ? id.hashCode() : 0;
 	}
 
 	public static SupplyExistence clone(SupplyExistence supplyExistence){

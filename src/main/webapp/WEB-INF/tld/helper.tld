@@ -1,0 +1,16 @@
+<taglib>
+    <function>
+        <name>getFormattedTime</name>
+        <function-class>ar.edu.utn.sigmaproject.util.RenderElHelper</function-class>
+        <function-signature>
+            java.lang.String getFormattedTime(javax.xml.datatype.Duration time)
+        </function-signature>
+    </function>
+    <function>
+        <name>listModel</name>
+        <function-class>ar.edu.utn.sigmaproject.util.RenderElHelper</function-class>
+        <function-signature>
+            org.zkoss.zul.ListModel listModel(java.util.List items)
+        </function-signature>
+    </function>
+</taglib>

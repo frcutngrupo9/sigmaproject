@@ -1,22 +1,21 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
+import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
-import org.zkoss.zul.Button;
-import org.zkoss.zul.Grid;
-import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Textbox;
-
+import org.zkoss.zul.*;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
-import ar.edu.utn.sigmaproject.service.SupplyTypeService;
-import ar.edu.utn.sigmaproject.service.impl.SupplyTypeServiceImpl;
 
 public class SupplyController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
@@ -24,7 +23,11 @@ public class SupplyController extends SelectorComposer<Component>{
 	@Wire
 	Textbox searchTextbox;
 	@Wire
+	Button searchButton;
+	@Wire
 	Listbox supplyTypeListbox;
+	@Wire
+	Paging pager;
 	@Wire
 	Button newButton;
 	@Wire
@@ -51,23 +54,22 @@ public class SupplyController extends SelectorComposer<Component>{
 	Button deleteButton;
 
 	// services
-	private SupplyTypeService supplyTypeService = new SupplyTypeServiceImpl();
+	@WireVariable
+	SupplyTypeRepository supplyTypeRepository;
 
 	// attributes
 	private SupplyType currentSupplyType;
-
-	// list
-	private List<SupplyType> supplyTypeList;
-
-	// list models
-	private ListModelList<SupplyType> supplyTypeListModel;
+	SortingPagingHelper<SupplyType> sortingPagingHelper;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception{
 		super.doAfterCompose(comp);
-		supplyTypeList = supplyTypeService.getSupplyTypeList();
-		supplyTypeListModel = new ListModelList<SupplyType>(supplyTypeList);
-		supplyTypeListbox.setModel(supplyTypeListModel);
+		Map<Integer, String> sortProperties = new HashMap<>();
+		sortProperties.put(0, "code");
+		sortProperties.put(1, "description");
+		sortProperties.put(3, "brand");
+		sortProperties.put(4, "presentation");
+		sortingPagingHelper = new SortingPagingHelper<>(supplyTypeRepository, supplyTypeListbox, searchButton, searchTextbox, pager, sortProperties);
 		currentSupplyType = null;
 
 		refreshView();
@@ -98,8 +100,7 @@ public class SupplyController extends SelectorComposer<Component>{
 		String measure = measureTextbox.getText();
 		if(currentSupplyType == null) {
 			// es un nuevo insumo
-			currentSupplyType = new SupplyType(null, code, description, details, brand, presentation, measure, 0.0, 0.0, 0.0);
-			currentSupplyType = supplyTypeService.saveSupplyType(currentSupplyType);
+			currentSupplyType = new SupplyType(code, description, details, brand, presentation, measure, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
 		} else {
 			// es una edicion
 			currentSupplyType.setCode(code);
@@ -108,10 +109,9 @@ public class SupplyController extends SelectorComposer<Component>{
 			currentSupplyType.setBrand(brand);
 			currentSupplyType.setPresentation(presentation);
 			currentSupplyType.setMeasure(measure);
-			currentSupplyType = supplyTypeService.updateSupplyType(currentSupplyType);
 		}
-		supplyTypeList = supplyTypeService.getSupplyTypeList();
-		supplyTypeListModel = new ListModelList<SupplyType>(supplyTypeList);
+		currentSupplyType = supplyTypeRepository.save(currentSupplyType);
+		sortingPagingHelper.reset();
 		currentSupplyType = null;
 		refreshView();
 	}
@@ -129,15 +129,15 @@ public class SupplyController extends SelectorComposer<Component>{
 
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
-		supplyTypeService.deleteSupplyType(currentSupplyType);
-		supplyTypeListModel.remove(currentSupplyType);
+		supplyTypeRepository.delete(currentSupplyType);
+		sortingPagingHelper.reset();
 		currentSupplyType = null;
 		refreshView();
 	}
 
 	@Listen("onSelect = #supplyTypeListbox")
 	public void doListBoxSelect() {
-		if(supplyTypeListModel.isSelectionEmpty()) {
+		if(supplyTypeListbox.getSelectedItem() == null) {
 			//just in case for the no selection
 			currentSupplyType = null;
 		} else {
@@ -146,12 +146,12 @@ public class SupplyController extends SelectorComposer<Component>{
 				refreshView();
 			}
 		}
-		supplyTypeListModel.clearSelection();
+		supplyTypeListbox.clearSelection();
 	}
 
 	private void refreshView() {
-		supplyTypeListModel.clearSelection();
-		supplyTypeListbox.setModel(supplyTypeListModel);// se actualiza la lista
+		supplyTypeListbox.clearSelection();
+		sortingPagingHelper.reset();// se actualiza la lista
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		newButton.setDisabled(false);

@@ -1,42 +1,62 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+
 import java.io.Serializable;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+
+@Entity
+@Indexed
 public class ProcessType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	Integer id;
-	Integer idMachineType;
-	String name;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
 
-	public ProcessType(Integer id, Integer idMachineType, String name) {
-		this.id = id;
-		this.idMachineType = idMachineType;
-		this.name = name;
+	@ManyToOne
+	MachineType machineType;
+
+	@Field
+	String name = "";
+
+	public ProcessType() {
+
 	}
 
-	public Integer getId() {
+	public ProcessType(String name, MachineType machineType) {
+		this.name = name;
+		this.machineType = machineType;
+	}
+
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
-
-	public Integer getIdMachineType() {
-		return idMachineType;
-	}
-
-	public void setIdMachineType(Integer idMachineType) {
-		this.idMachineType = idMachineType;
-	}
-
+	
 	public String getName() {
 		return name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public MachineType getMachineType() {
+		return machineType;
+	}
+
+	public void setMachineType(MachineType machineType) {
+		this.machineType = machineType;
 	}
 
 	@Override

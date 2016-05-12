@@ -3,42 +3,45 @@
     <panel title="Producto" id="productCreationBlock" border="rounded">
         <panelchildren>
             <vlayout>
-            	<hbox hflex="1">
-            		<image id="productImage"/>
-	                <grid id="productGrid" hflex="1">
-	                    <columns>
-	                        <column align="right" width="25%"/>
-	                        <column align="left"/>
-	                    </columns>
-	                    <rows>
-	                    	<row>
-	                            <label value="Codigo :"/>
-	                            <textbox id="productCodeTextbox" width="50%" placeholder="Codigo del Producto"/>
-	                        </row>
-	                        <row>
-	                            <label value="Nombre :"/>
-	                            <textbox id="productNameTextbox" width="50%" placeholder="Nombre del Producto"/>
-	                        </row>
-	                        <row>
-	                            <label value="Detalles :"/>
-	                            <textbox id="productDetailsTextbox" width="50%" rows="3" height="100px" />
-	                        </row>
-	                        <row>
-	                            <label value="Categoria :"/>
-				                <combobox id="productCategoryCombobox">
-			                        <template name="model">
-			                            <comboitem label="${each}" />
-			                        </template>
-			                    </combobox>
-	                        </row>
-	                        <row>
-	                            <label value="Precio :"/>
-	                            <doublebox id="productPriceDoublebox" width="50%" placeholder="Precio del Producto"/>
-	                        </row>
-	                    </rows>
-	                </grid>
+                <hbox hflex="1">
+                    <grid id="productGrid" hflex="1">
+                        <columns>
+                            <column align="right" width="25%"/>
+                            <column align="left"/>
+                        </columns>
+                        <rows>
+                            <row>
+                                <label value="Foto :"/>
+                                <image id="productImage" width="50%"/>
+                            </row>
+                            <row>
+                                <label value="Codigo :"/>
+                                <textbox id="productCodeTextbox" width="50%" placeholder="Codigo del Producto"/>
+                            </row>
+                            <row>
+                                <label value="Nombre :"/>
+                                <textbox id="productNameTextbox" width="50%" placeholder="Nombre del Producto"/>
+                            </row>
+                            <row>
+                                <label value="Detalles :"/>
+                                <textbox id="productDetailsTextbox" width="50%" rows="3" height="100px" />
+                            </row>
+                            <row>
+                                <label value="Categoria :"/>
+                                <combobox id="productCategoryCombobox">
+                                    <template name="model">
+                                        <comboitem label="${each.name}" />
+                                    </template>
+                                </combobox>
+                            </row>
+                            <row>
+                                <label value="Precio :"/>
+                                <doublebox id="productPriceDoublebox" width="50%" placeholder="Precio del Producto"/>
+                            </row>
+                        </rows>
+                    </grid>
                 </hbox>
-                <hlayout style="margin: 4px">
+                <hlayout>
                     <button id="saveProductButton" label="Guardar Producto"/>
                     <button id="resetProductButton" label="Reset Producto"/>
                     <button id="deleteProductButton" label="Eliminar Producto"/>
@@ -61,8 +64,8 @@
         			<template name="model">
             			<listitem>
                 			<listcell label="${each.name}"/>
-                			<listcell label="${each.units}"/>
-                			<listcell label="${win_product_creation$composer.quantityOfProcess(each.id)}"/>
+                            <listcell label="${each.units}"/>
+                			<listcell label="${each.processes.size()}"/>
             			</listitem>
         			</template>
     			</listbox>
@@ -155,27 +158,27 @@
             			<listheader label="Minutos" width="80px"/>
         			</listhead>
 					<template name="model">
-					            <listitem>
-					            	<custom-attributes process_checked="${win_product_creation$composer.isProcessCheck(each)}"/>
-					                <listcell>
-					                    <checkbox checked="${process_checked}" forward="onCheck=processListbox.onProcessCheck(${each})"/>
-					                </listcell>
-					                <listcell>
-					                    <label value="${each.name}"/>
-					                </listcell>
-					                <listcell>
-					                    <textbox visible="${process_checked}" value="${win_product_creation$composer.getProcessDetails(each)}"  forward="onChange=processListbox.onProcessDetailsChange(${each})" width="400px"/>
-					                </listcell>
-					                <listcell>
-					                    <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessDays(each)}" forward="onChange=processListbox.onProcessDaysChange(${each})" width="36px"/>
-					                </listcell>
-					                <listcell>
-					                    <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessHours(each)}" forward="onChange=processListbox.onProcessHoursChange(${each})" width="36px"/>
-					                </listcell>
-					                <listcell>
-					                    <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessMinutes(each)}" forward="onChange=processListbox.onProcessMinutesChange(${each})" width="36px"/>
-					                </listcell>
-					            </listitem>
+                        <listitem>
+                            <custom-attributes process_checked="${win_product_creation$composer.isProcessCheck(each)}"/>
+                            <listcell>
+                                <checkbox checked="${process_checked}" forward="onCheck=processListbox.onProcessCheck(${each})"/>
+                            </listcell>
+                            <listcell>
+                                <label value="${each.name}"/>
+                            </listcell>
+                            <listcell>
+                                <textbox visible="${process_checked}" value="${win_product_creation$composer.getProcessDetails(each)}"  forward="onChange=processListbox.onProcessDetailsChange(${each})" width="400px"/>
+                            </listcell>
+                            <listcell>
+                                <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessDays(each)}" forward="onChange=processListbox.onProcessDaysChange(${each})" width="36px"/>
+                            </listcell>
+                            <listcell>
+                                <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessHours(each)}" forward="onChange=processListbox.onProcessHoursChange(${each})" width="36px"/>
+                            </listcell>
+                            <listcell>
+                                <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessMinutes(each)}" forward="onChange=processListbox.onProcessMinutesChange(${each})" width="36px"/>
+                            </listcell>
+                        </listitem>
 					</template>
                 </listbox>
                 <hlayout>

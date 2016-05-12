@@ -3,23 +3,46 @@ package ar.edu.utn.sigmaproject.domain;
 import java.io.Serializable;
 import java.util.Date;
 
-public class User implements Serializable,Cloneable {
-	private static final long serialVersionUID = 1L;
-	String account;
-	String fullName;
-	String password;
-	String email;
-	Date birthday;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
-	public User(String account, String password, String fullName,String email) {
+@Entity
+public class User implements Serializable, Cloneable {
+	
+	private static final long serialVersionUID = 1L;
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
+	
+	String account = "";
+	String email = "";
+	String fullName = "";
+	String hash = "";
+
+	public User() {
+		
+	}
+
+	public User(String account, String hash, String fullName,String email) {
 		this.account = account;
-		this.password = password;
 		this.fullName = fullName;
+		this.hash = hash;
 		this.email = email;
+	}
+
+	public Long getId() {
+		return id;
 	}
 
 	public String getAccount() {
 		return account;
+	}
+
+	public void setAccount(String account) {
+		this.account = account;
 	}
 
 	public String getFullName() {
@@ -38,20 +61,12 @@ public class User implements Serializable,Cloneable {
 		this.email = email;
 	}
 
-	public Date getBirthday() {
-		return birthday;
+	public String getHash() {
+		return hash;
 	}
 
-	public void setBirthday(Date birthday) {
-		this.birthday = birthday;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
+	public void setHash(String hash) {
+		this.hash = hash;
 	}
 
 	@Override

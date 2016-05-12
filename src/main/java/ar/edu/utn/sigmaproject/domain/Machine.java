@@ -1,42 +1,75 @@
 package ar.edu.utn.sigmaproject.domain;
 
-import java.io.Serializable;
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.persistence.*;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
+@Entity
+@Indexed
 public class Machine implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	Integer id;
-	Integer idMachineType;
-	String code;
-	String name;
-	Integer year;
+	@Transient
+	final Logger logger = LoggerFactory.getLogger(Machine.class);
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@DocumentId
+	Long id;
+
+	@ManyToOne
+	MachineType machineType;
+
+	@Field
+	String code = "";
+
+	@Field
+	String name = "";
+	Integer year = Calendar.getInstance().get(Calendar.YEAR);
+
+	@Transient
 	Duration usedTime;
 
-	public Machine(Integer id, Integer idMachineType, String code, String name, Integer year, Duration usedTime) {
-		this.id = id;
-		this.idMachineType = idMachineType;
+	@Column
+	String usedTimeInternal;
+
+	public Machine() {
+
+	}
+
+	public Machine(MachineType machineType, String code, String name, Integer year, Duration usedTime) {
+		this.machineType = machineType;
 		this.code = code;
 		this.name = name;
 		this.year = year;
-		this.usedTime = usedTime;
+		this.setUsedTime(usedTime);
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public Integer getIdMachineType() {
-		return idMachineType;
+	public MachineType getMachineType() {
+		return machineType;
 	}
 
-	public void setIdMachineType(Integer idMachineType) {
-		this.idMachineType = idMachineType;
+	public void setMachineType(MachineType machineType) {
+		this.machineType = machineType;
 	}
 
 	public String getCode() {
@@ -64,11 +97,23 @@ public class Machine implements Serializable, Cloneable {
 	}
 
 	public Duration getUsedTime() {
+		if (this.usedTime == null && this.usedTimeInternal != null) {
+			try {
+				this.usedTime = DatatypeFactory.newInstance().newDuration(this.usedTimeInternal);
+			} catch (Exception e) {
+				logger.error("Error while trying to deserialize Duration representation(" + this.usedTimeInternal + "): " + e.toString());
+			}
+		}
 		return usedTime;
 	}
 
 	public void setUsedTime(Duration usedTime) {
 		this.usedTime = usedTime;
+		if (usedTime != null) {
+			this.usedTimeInternal = usedTime.toString();
+		} else {
+			this.usedTimeInternal = null;
+		}
 	}
 
 	@Override

@@ -1,29 +1,51 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.io.Serializable;
 
+@Entity
+@Indexed
 public class ToolType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	Integer id;
-	String name;
-	String description;
-	String details;
-	String brand;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
 
-	public ToolType(Integer id, String name, String description, String details, String brand) {
-		this.id = id;
+	@Field
+	String name = "";
+
+	@Field
+	String description = "";
+
+	@Field
+	String details = "";
+
+	@Field
+	String brand = "";
+
+	public ToolType() {
+
+	}
+
+	public ToolType(String name, String description, String details, String brand) {
 		this.name = name;
 		this.description = description;
 		this.details = details;
 		this.brand = brand;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

@@ -1,30 +1,38 @@
 package ar.edu.utn.sigmaproject.controller;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Grid;
-import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Paging;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Client;
-import ar.edu.utn.sigmaproject.service.ClientService;
-import ar.edu.utn.sigmaproject.service.impl.ClientServiceImpl;
+import ar.edu.utn.sigmaproject.service.ClientRepository;
+import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 
-public class ClientController extends SelectorComposer<Component>{
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
+public class ClientController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
 	@Wire
 	Textbox searchTextbox;
 	@Wire
+	Button searchButton;
+	@Wire
 	Listbox clientListbox;
+	@Wire
+	Paging pager;
 	@Wire
 	Button newButton;
 	@Wire
@@ -48,38 +56,30 @@ public class ClientController extends SelectorComposer<Component>{
 	@Wire
 	Textbox detailsTextbox;
 
-
 	// services
-	private ClientService clientService = new ClientServiceImpl();
+	@WireVariable
+	private ClientRepository clientRepository;
 
 	// atributes
+	private String query;
+
 	private Client currentClient;
 
-	// list
-	private List<Client> clientList;
-
-	// list models
-	private ListModelList<Client> clientListModel;
+	private SortingPagingHelper<Client> sortingPagingHelper;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		clientList = clientService.getClientList();
-		clientListModel = new ListModelList<Client>(clientList);
-		clientListbox.setModel(clientListModel);
-		currentClient = null;
+		Map<Integer, String> sortProperties = new HashMap<>();
+		sortProperties.put(0, "name");
+		sortingPagingHelper = new SortingPagingHelper<>(clientRepository, clientListbox, searchButton, searchTextbox, pager, sortProperties);
 		refreshView();
-	}
-
-	@Listen("onClick = #searchButton")
-	public void search() {
 	}
 
 	@Listen("onClick = #newButton")
 	public void newButtonClick() {
-		currentClient = null;
+		currentClient = new Client("", "", "", "", "");
 		refreshView();
-		clientGrid.setVisible(true);
 	}
 
 	@Listen("onClick = #saveButton")
@@ -88,26 +88,13 @@ public class ClientController extends SelectorComposer<Component>{
 			Clients.showNotification("Debe ingresar un nombre", nameTextbox);
 			return;
 		}
-		String name = nameTextbox.getText();
-		String phone = phoneTextbox.getText();
-		String email = emailTextbox.getText();
-		String address = addressTextbox.getText();
-		String details = detailsTextbox.getText();
-		if(currentClient == null) {// nuevo
-			currentClient = new Client(null, name, phone, email, address, details);
-			currentClient = clientService.saveClient(currentClient);
-		} else {// actualizacion
-			currentClient.setName(name);
-			currentClient.setPhone(phone);
-			currentClient.setEmail(email);
-			currentClient.setAddress(address);
-			currentClient.setDetails(details);
-			currentClient = clientService.updateClient(currentClient);
-		}
-		clientList = clientService.getClientList();
-		clientListModel = new ListModelList<Client>(clientList);
-		currentClient = null;
-		refreshView();
+		currentClient.setName(nameTextbox.getText());
+		currentClient.setPhone(phoneTextbox.getText());
+		currentClient.setEmail(emailTextbox.getText());
+		currentClient.setAddress(addressTextbox.getText());
+		currentClient.setDetails(detailsTextbox.getText());
+		currentClient = clientRepository.save(currentClient);
+		sortingPagingHelper.reloadCurrentPage();
 	}
 
 	@Listen("onClick = #cancelButton")
@@ -123,50 +110,52 @@ public class ClientController extends SelectorComposer<Component>{
 
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
-		clientService.deleteClient(currentClient);
-		clientListModel.remove(currentClient);
+		clientRepository.delete(currentClient);
 		currentClient = null;
 		refreshView();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Listen("onSelect = #clientListbox")
 	public void doListBoxSelect() {
-		if(clientListModel.isSelectionEmpty()) {
-			//just in case for the no selection
+		if (clientListbox.getSelectedItem() == null) {
+			// just in case for the no selection
 			currentClient = null;
-		} else {
-			if(currentClient == null) {// si no hay nada editandose
-				currentClient = clientListbox.getSelectedItem().getValue();
-				refreshView();
-			}
+		} else if (currentClient == null) {// si no hay nada editandose
+			currentClient = clientListbox.getSelectedItem().getValue();
+			refreshView();
 		}
-		clientListModel.clearSelection();
+		clientListbox.clearSelection();
 	}
 
 	private void refreshView() {
-		clientListModel.clearSelection();
-		clientListbox.setModel(clientListModel);// se actualiza la lista
-		saveButton.setDisabled(false);
-		cancelButton.setDisabled(false);
-		newButton.setDisabled(false);
-		if(currentClient == null) {// creando
+		if(currentClient == null) {// no se esta editando ni creando
 			clientGrid.setVisible(false);
 			nameTextbox.setValue(null);
 			phoneTextbox.setValue(null);
-			emailTextbox.setValue(null);
 			addressTextbox.setValue(null);
 			detailsTextbox.setValue(null);
+
+			saveButton.setDisabled(true);
+			cancelButton.setDisabled(true);
+			resetButton.setDisabled(true);
 			deleteButton.setDisabled(true);
-			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
-		} else {// editando
+		} else {// editando o creando
 			clientGrid.setVisible(true);
 			nameTextbox.setValue(currentClient.getName());
 			phoneTextbox.setValue(currentClient.getPhone());
 			emailTextbox.setValue(currentClient.getEmail());
 			addressTextbox.setValue(currentClient.getAddress());
 			detailsTextbox.setValue(currentClient.getDetails());
-			deleteButton.setDisabled(false);
+
+			saveButton.setDisabled(false);
+			cancelButton.setDisabled(false);
 			resetButton.setDisabled(false);
+			if(currentClient.getId() == null) {
+				deleteButton.setDisabled(true);
+			} else {
+				deleteButton.setDisabled(false);
+			}
 		}
 	}
 }

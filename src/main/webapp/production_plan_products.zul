@@ -1,7 +1,7 @@
 <zk>
     <grid id="productionOrderGrid" model="${arg.products}" sizedByContent="true" span="true">
         <columns>
-        	<column label="Producto" align="center" sort="auto(name)"/>
+        	<column label="Producto" align="center"/>
             <column label="Id Producto" align="center"/>
             <column label="Codigo" align="center"/>
             <column label="Unidades" align="center"/>

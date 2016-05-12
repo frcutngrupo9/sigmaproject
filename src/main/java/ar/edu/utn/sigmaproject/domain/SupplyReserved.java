@@ -1,77 +1,81 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
-public class SupplyReserved  implements Serializable, Cloneable {
+@Entity
+public class SupplyReserved implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	Integer id;
-	Integer idSupplyType;
-	Integer idSupplyRequirement;
-	Double stockReserved;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
 
-	public SupplyReserved(Integer id, Integer idSupplyType, Integer idSupplyRequirement, Double stockReserved) {
-		this.id = id;
-		this.idSupplyType = idSupplyType;
-		this.idSupplyRequirement = idSupplyRequirement;
+	@ManyToOne
+	SupplyType supplyType;
+
+	@ManyToOne
+	SupplyRequirement supplyRequirement;
+
+	BigDecimal stockReserved = BigDecimal.ZERO;
+
+	public SupplyReserved() {
+
+	}
+
+	public SupplyReserved(SupplyType supplyType, SupplyRequirement supplyRequirement, BigDecimal stockReserved) {
+		this.supplyType = supplyType;
+		this.supplyRequirement = supplyRequirement;
 		this.stockReserved = stockReserved;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public Integer getIdSupplyRequirement() {
-		return idSupplyRequirement;
+	public SupplyType getSupplyType() {
+		return supplyType;
 	}
 
-	public void setIdSupplyRequirement(Integer idSupplyRequirement) {
-		this.idSupplyRequirement = idSupplyRequirement;
+	public void setSupplyType(SupplyType supplyType) {
+		this.supplyType = supplyType;
 	}
 
-	public Integer getIdSupplyType() {
-		return idSupplyType;
+	public SupplyRequirement getSupplyRequirement() {
+		return supplyRequirement;
 	}
 
-	public void setIdSupplyType(Integer idSupplyType) {
-		this.idSupplyType = idSupplyType;
+	public void setSupplyRequirement(SupplyRequirement supplyRequirement) {
+		this.supplyRequirement = supplyRequirement;
 	}
 
-	public Double getStockReserved() {
+	public BigDecimal getStockReserved() {
 		return stockReserved;
 	}
 
-	public void setStockReserved(Double stock) {
-		this.stockReserved = stock;
+	public void setStockReserved(BigDecimal stockReserved) {
+		this.stockReserved = stockReserved;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		SupplyReserved that = (SupplyReserved) o;
+
+		return id.equals(that.id);
+
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((idSupplyType == null) ? 0 : idSupplyType.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		SupplyReserved other = (SupplyReserved) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
+		return id != null ? id.hashCode() : 0;
 	}
 
 	public static SupplyReserved clone(SupplyReserved supplyReserved){
