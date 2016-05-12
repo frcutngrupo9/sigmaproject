@@ -1,12 +1,16 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
+import ar.edu.utn.sigmaproject.domain.ToolType;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
+import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -15,14 +19,10 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
-import org.zkoss.zul.Button;
-import org.zkoss.zul.Grid;
-import org.zkoss.zul.Intbox;
-import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Textbox;
+import org.zkoss.zul.*;
 
 import ar.edu.utn.sigmaproject.domain.MachineType;
+import org.zkoss.zul.ext.Selectable;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class MachineController extends SelectorComposer<Component>{
@@ -31,7 +31,11 @@ public class MachineController extends SelectorComposer<Component>{
 	@Wire
 	Textbox searchTextbox;
 	@Wire
+	Button searchButton;
+	@Wire
 	Listbox machineTypeListbox;
+	@Wire
+	Paging pager;
 	@Wire
 	Button newButton;
 	@Wire
@@ -61,19 +65,14 @@ public class MachineController extends SelectorComposer<Component>{
 
 	// atributes
 	private MachineType currentMachineType;
-
-	// list
-	private List<MachineType> machineTypeList;
-
-	// list models
-	private ListModelList<MachineType> machineTypeListModel;
+	SortingPagingHelper<MachineType> sortingPagingHelper;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		machineTypeList = machineTypeRepository.findAll();
-		machineTypeListModel = new ListModelList<MachineType>(machineTypeList);
-		machineTypeListbox.setModel(machineTypeListModel);
+		Map<Integer, String> sortProperties = new HashMap<>();
+		sortProperties.put(0, "name");
+		sortingPagingHelper = new SortingPagingHelper<>(machineTypeRepository, machineTypeListbox, searchButton, searchTextbox, pager, sortProperties);
 		currentMachineType = null;
 		refreshView();
 	}
@@ -114,8 +113,7 @@ public class MachineController extends SelectorComposer<Component>{
 			currentMachineType.setDeteriorationTime(duration);
 		}
 		machineTypeRepository.save(currentMachineType);
-		machineTypeList = machineTypeRepository.findAll();
-		machineTypeListModel = new ListModelList<>(machineTypeList);
+		sortingPagingHelper.reset();
 		currentMachineType = null;
 		refreshView();
 	}
@@ -134,14 +132,15 @@ public class MachineController extends SelectorComposer<Component>{
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
 		machineTypeRepository.delete(currentMachineType);
-		machineTypeListModel.remove(currentMachineType);
+		sortingPagingHelper.reset();
 		currentMachineType = null;
 		refreshView();
 	}
 
 	@Listen("onSelect = #machineTypeListbox")
 	public void doListBoxSelect() {
-		if(machineTypeListModel.isSelectionEmpty()) {
+		Selectable model = (Selectable) machineTypeListbox.getModel();
+		if(model.isSelectionEmpty()) {
 			//just in case for the no selection
 			currentMachineType = null;
 		} else {
@@ -150,12 +149,15 @@ public class MachineController extends SelectorComposer<Component>{
 				refreshView();
 			}
 		}
-		machineTypeListModel.clearSelection();
+		model.clearSelection();
 	}
 
 	private void refreshView() {
-		machineTypeListModel.clearSelection();
-		machineTypeListbox.setModel(machineTypeListModel);// se actualiza la lista
+		Selectable model = (Selectable) machineTypeListbox.getModel();
+		if (model != null) {
+			model.clearSelection();
+		}
+		sortingPagingHelper.reset();// se actualiza la lista
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		newButton.setDisabled(false);

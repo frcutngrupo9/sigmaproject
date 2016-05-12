@@ -230,14 +230,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		refreshView();
 	}
 
-	public String getProcessTime(Process process) {
-		return getFormattedTime(process.getTime());
-	}
-
-	public String getFormattedTime(Duration time) {
-		return String.format("Dias: %d Horas: %d Minutos: %d", time.getDays(), time.getHours(), time.getMinutes());
-	}
-	
 	public ListModelList<Machine> getMachineListModel(ProductionOrderDetail productionOrderDetail) {
 		List<Machine> list = new ArrayList<Machine>();
 		MachineType machineType = productionOrderDetail.getProcess().getType().getMachineType();

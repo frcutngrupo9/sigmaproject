@@ -81,10 +81,6 @@ public class ProductListController extends SelectorComposer<Component> implement
 		include.setSrc("/product_creation.zul");
 	}
 
-	public String getFormattedTime(Duration time) {
-		return String.format("Dias: %d Horas: %d Minutos: %d", time.getDays(), time.getHours(), time.getMinutes());
-	}
-
 	public String getMeasureUnitName(MeasureUnit measureUnit) {
 		if(measureUnit != null) {
 			return measureUnit.getName();

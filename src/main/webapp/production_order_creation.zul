@@ -1,3 +1,4 @@
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="win_production_order_creation" apply="ar.edu.utn.sigmaproject.controller.ProductionOrderCreationController" width="95%" style="background:white">
     <panel title="Orden de Produccion" id="productionOrderCreationBlock" border="rounded">
         <panelchildren>
@@ -90,8 +91,8 @@
 			            	<label value="${win_production_order_creation$composer.getPieceByProcessId(each.idProcess).id}"/>
 			            	<label value="${win_production_order_creation$composer.getProcessType(each.idProcess).id}"/>
 			            	<label value="${win_production_order_creation$composer.getProcess(each.idProcess).details}"/>
-			            	<label value="${win_production_order_creation$composer.getProcessTime(each.idProcess)}"/>
-			            	<label value="${win_production_order_creation$composer.getFormattedTime(each.timeTotal)}"/>
+			            	<label value="${r:getFormattedTime(each.process.time)}"/>
+			            	<label value="${r:getFormattedTime(each.timeTotal)}"/>
 			            	<combobox inplace="true"
 			            		forward="onSelect=productionOrderDetailGrid.onEditProductionOrderDetailMachine(${each}), onCreate=productionOrderDetailGrid.onCreateMachineCombobox(${each})"
                         		model="${win_production_order_creation$composer.getMachineListModel(each)}" hflex="1" >

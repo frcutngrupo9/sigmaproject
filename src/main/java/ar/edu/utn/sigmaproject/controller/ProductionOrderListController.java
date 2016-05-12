@@ -154,7 +154,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 
 	public ListModel<ProductionOrderDetail> getProductionOrderDetailList(Product product) {// buscar todos los procesos del producto
 		List<ProductionOrderDetail> list = new ArrayList<>();
-		ProductionOrder aux = getProductionOrder(product);
+		ProductionOrder aux = productionOrderRepository.findByProductionPlanAndProduct(currentProductionPlan, product);
 		if(aux != null) {
 			list = aux.getDetails();
 		}
@@ -167,10 +167,6 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		} else {
 			return "no";
 		}
-	}
-
-	public String getFormattedTime(Duration time) {
-		return String.format("Dias: %d Horas: %d Minutos: %d", time.getDays(), time.getHours(), time.getMinutes());
 	}
 
 	public String getPercentComplete(Product product) {

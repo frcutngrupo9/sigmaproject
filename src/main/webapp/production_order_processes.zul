@@ -1,3 +1,4 @@
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <zk>
     <grid model="${arg.production_order_detail_list}" sizedByContent="true" span="true">
         <columns>
@@ -23,7 +24,7 @@
             	<label value="${win_production_order_list$composer.getPieceByProcessId(each.idProcess).id}"/>
             	<label value="${win_production_order_list$composer.getPieceByProcessId(each.idProcess).idProduct}"/>
             	<label value="${win_production_order_list$composer.getProcessByProcessId(each.idProcess).details}"/>
-            	<label value="${win_production_order_list$composer.getFormattedTime(each.timeTotal)}"/>
+            	<label value="${r:.getFormattedTime(each.timeTotal)}"/>
             	<label value="${win_production_order_list$composer.getMachineName(each)}"/>
             	<label value="${each.quantityPiece}"/>
             	<label value="${each.quantityFinished}"/>
