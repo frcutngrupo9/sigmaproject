@@ -23,10 +23,17 @@ public class Client implements Serializable, Cloneable {
 
     @Field
     String name = "";
+
+	@Field
     String phone = "";
 
+	@Field
     String email = "";
+
+	@Field
     String address = "";
+
+	@Field
     String details = "";
 
     public Client() {

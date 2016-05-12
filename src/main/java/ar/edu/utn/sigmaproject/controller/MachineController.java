@@ -22,7 +22,6 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.*;
 
 import ar.edu.utn.sigmaproject.domain.MachineType;
-import org.zkoss.zul.ext.Selectable;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class MachineController extends SelectorComposer<Component>{
@@ -139,8 +138,7 @@ public class MachineController extends SelectorComposer<Component>{
 
 	@Listen("onSelect = #machineTypeListbox")
 	public void doListBoxSelect() {
-		Selectable model = (Selectable) machineTypeListbox.getModel();
-		if(model.isSelectionEmpty()) {
+		if(machineTypeListbox.getSelectedItem() == null) {
 			//just in case for the no selection
 			currentMachineType = null;
 		} else {
@@ -149,14 +147,11 @@ public class MachineController extends SelectorComposer<Component>{
 				refreshView();
 			}
 		}
-		model.clearSelection();
+		machineTypeListbox.clearSelection();
 	}
 
 	private void refreshView() {
-		Selectable model = (Selectable) machineTypeListbox.getModel();
-		if (model != null) {
-			model.clearSelection();
-		}
+		machineTypeListbox.clearSelection();
 		sortingPagingHelper.reset();// se actualiza la lista
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);

@@ -126,8 +126,7 @@ public class ToolController extends SelectorComposer<Component>{
 
 	@Listen("onSelect = #toolTypeListbox")
 	public void doListBoxSelect() {
-		Selectable model = (Selectable) toolTypeListbox.getModel();
-		if(model.isSelectionEmpty()) {
+		if(toolTypeListbox.getSelectedItem() == null) {
 			//just in case for the no selection
 			currentToolType = null;
 		} else {
@@ -136,14 +135,11 @@ public class ToolController extends SelectorComposer<Component>{
 				refreshView();
 			}
 		}
-		model.clearSelection();
+		toolTypeListbox.clearSelection();
 	}
 
 	private void refreshView() {
-		Selectable model = (Selectable) toolTypeListbox.getModel();
-		if (model != null) {
-			model.clearSelection();
-		}
+		toolTypeListbox.clearSelection();
 		sortingPagingHelper.reset();;// se actualiza la lista
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);

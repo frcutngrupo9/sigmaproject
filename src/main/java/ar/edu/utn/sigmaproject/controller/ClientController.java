@@ -1,7 +1,6 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.zkoss.lang.Strings;
@@ -17,7 +16,6 @@ import org.zkoss.zul.Grid;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Paging;
 import org.zkoss.zul.Textbox;
-import org.zkoss.zul.ext.Selectable;
 
 import ar.edu.utn.sigmaproject.domain.Client;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
@@ -48,15 +46,15 @@ public class ClientController extends SelectorComposer<Component> {
 	@Wire
 	Button deleteButton;
 	@Wire
-	Textbox nameTextBox;
+	Textbox nameTextbox;
 	@Wire
-	Textbox phoneTextBox;
+	Textbox phoneTextbox;
 	@Wire
-	Textbox emailTextBox;
+	Textbox emailTextbox;
 	@Wire
-	Textbox addressTextBox;
+	Textbox addressTextbox;
 	@Wire
-	Textbox detailsTextBox;
+	Textbox detailsTextbox;
 
 	// services
 	@WireVariable
@@ -86,15 +84,15 @@ public class ClientController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
-		if(Strings.isBlank(nameTextBox.getText())){
-			Clients.showNotification("Debe ingresar un nombre", nameTextBox);
+		if(Strings.isBlank(nameTextbox.getText())){
+			Clients.showNotification("Debe ingresar un nombre", nameTextbox);
 			return;
 		}
-		currentClient.setName(nameTextBox.getText());
-		currentClient.setPhone(phoneTextBox.getText());
-		currentClient.setEmail(emailTextBox.getText());
-		currentClient.setAddress(addressTextBox.getText());
-		currentClient.setDetails(detailsTextBox.getText());
+		currentClient.setName(nameTextbox.getText());
+		currentClient.setPhone(phoneTextbox.getText());
+		currentClient.setEmail(emailTextbox.getText());
+		currentClient.setAddress(addressTextbox.getText());
+		currentClient.setDetails(detailsTextbox.getText());
 		currentClient = clientRepository.save(currentClient);
 		sortingPagingHelper.reloadCurrentPage();
 	}
@@ -127,16 +125,16 @@ public class ClientController extends SelectorComposer<Component> {
 			currentClient = clientListbox.getSelectedItem().getValue();
 			refreshView();
 		}
-		((Selectable<Client>) clientListbox.getListModel()).clearSelection();
+		clientListbox.clearSelection();
 	}
 
 	private void refreshView() {
 		if(currentClient == null) {// no se esta editando ni creando
 			clientGrid.setVisible(false);
-			nameTextBox.setValue(null);
-			phoneTextBox.setValue(null);
-			addressTextBox.setValue(null);
-			detailsTextBox.setValue(null);
+			nameTextbox.setValue(null);
+			phoneTextbox.setValue(null);
+			addressTextbox.setValue(null);
+			detailsTextbox.setValue(null);
 
 			saveButton.setDisabled(true);
 			cancelButton.setDisabled(true);
@@ -144,11 +142,11 @@ public class ClientController extends SelectorComposer<Component> {
 			deleteButton.setDisabled(true);
 		} else {// editando o creando
 			clientGrid.setVisible(true);
-			nameTextBox.setValue(currentClient.getName());
-			phoneTextBox.setValue(currentClient.getPhone());
-			emailTextBox.setValue(currentClient.getEmail());
-			addressTextBox.setValue(currentClient.getAddress());
-			detailsTextBox.setValue(currentClient.getDetails());
+			nameTextbox.setValue(currentClient.getName());
+			phoneTextbox.setValue(currentClient.getPhone());
+			emailTextbox.setValue(currentClient.getEmail());
+			addressTextbox.setValue(currentClient.getAddress());
+			detailsTextbox.setValue(currentClient.getDetails());
 
 			saveButton.setDisabled(false);
 			cancelButton.setDisabled(false);

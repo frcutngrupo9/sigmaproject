@@ -14,10 +14,8 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.*;
-import org.zkoss.zul.ext.Selectable;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -135,8 +133,7 @@ public class ProcessController extends SelectorComposer<Component>{
 
 	@Listen("onSelect = #processTypeListbox")
 	public void doListBoxSelect() {
-		Selectable model = (Selectable) processTypeListbox.getModel();
-		if (model.isSelectionEmpty()) {
+		if (processTypeListbox.getSelectedItem() == null) {
 			//just in case for the no selection
 			currentProcessType = null;
 		} else {
@@ -145,14 +142,11 @@ public class ProcessController extends SelectorComposer<Component>{
 				refreshView();
 			}
 		}
-		model.clearSelection();
+		processTypeListbox.clearSelection();
 	}
 
 	private void refreshView() {
-		Selectable model = (Selectable) processTypeListbox.getModel();
-		if (model != null) {
-			model.clearSelection();
-		}
+		processTypeListbox.clearSelection();
 		sortingPagingHelper.reset();;// se actualiza la lista
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
