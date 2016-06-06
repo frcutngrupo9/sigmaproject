@@ -1,12 +1,15 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.MeasureUnitType;
 import ar.edu.utn.sigmaproject.service.MeasureUnitRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitTypeRepository;
 import ar.edu.utn.sigmaproject.service.RawMaterialTypeRepository;
+import ar.edu.utn.sigmaproject.util.RepositoryHelper;
+
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -91,9 +94,12 @@ public class RawMaterialController extends SelectorComposer<Component>{
 		rawMaterialTypeListModel = new ListModelList<>(rawMaterialTypeList);
 		rawMaterialTypeListbox.setModel(rawMaterialTypeListModel);
 		currentRawMaterialType = null;
-
 		MeasureUnitType measureUnitType = measureUnitTypeRepository.findByName("Longitud");
-		measureUnitList = measureUnitType.getMeasureUnits();
+		if(measureUnitType == null) {
+			new RepositoryHelper().generateMeasureUnitTypeList(measureUnitRepository, measureUnitTypeRepository);
+			measureUnitType = measureUnitTypeRepository.findByName("Longitud");
+		}
+		measureUnitList = measureUnitRepository.findByType(measureUnitType);
 		lengthMeasureUnitListModel = new ListModelList<>(measureUnitList);
 		depthMeasureUnitListModel = new ListModelList<>(measureUnitList);
 		widthMeasureUnitListModel = new ListModelList<>(measureUnitList);
@@ -102,6 +108,8 @@ public class RawMaterialController extends SelectorComposer<Component>{
 		widthMeasureUnitSelectbox.setModel(widthMeasureUnitListModel);
 		refreshView();
 	}
+
+	
 
 	@Listen("onClick = #searchButton")
 	public void search() {

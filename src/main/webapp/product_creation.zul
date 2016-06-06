@@ -288,9 +288,9 @@
 	                                    <listitem>
 	                                        <listcell label="${each.id}"/>
 	                                        <listcell label="${each.name}"/>
-	                                        <listcell label="${each.length.doubleValue()} ${win_product_creation$composer.getMeasureUnitName(each.lengthIdMeasureUnit)}"/>
-							                <listcell label="${each.depth.doubleValue()} ${win_product_creation$composer.getMeasureUnitName(each.depthIdMeasureUnit)}"/>
-							                <listcell label="${each.width.doubleValue()} ${win_product_creation$composer.getMeasureUnitName(each.widthIdMeasureUnit)}"/>
+	                                        <listcell label="${each.length.doubleValue()} ${each.getLengthMeasureUnit().getShortName()}"/>
+							                <listcell label="${each.depth.doubleValue()} ${each.getDepthMeasureUnit().getShortName()}"/>
+							                <listcell label="${each.width.doubleValue()} ${each.getWidthMeasureUnit().getShortName()}"/>
 	                                    </listitem>
 	                                </template>
                                 </listbox>
