@@ -8,23 +8,9 @@
     <separator/>
     <grid id="productGrid" mold="paging" pageSize="7" span="true">
     	<auxhead>
-			<auxheader label="Productos" colspan="8"/>
+			<auxheader label="Productos" colspan="7"/>
 		</auxhead>
-		<auxhead sclass="category-center">
-            <auxheader label="Categoria" colspan="2" rowspan="1" />
-            <auxheader colspan="6" rowspan="1">
-				<hlayout width="100%">
-                	<radiogroup id="productCategoryRadiogroup">
-						<radio label="Todas" checked="true" width="90px" />
-						<template name="model">
-							<radio label="${each.name}" width="90px" />
-						</template>
-                	</radiogroup>
-				</hlayout>
-            </auxheader>
-        </auxhead>
         <columns>
-        	<column width="40px" />
             <column label="Id" width="50px" align="center"/>
             <column label="Codigo" align="center"/>
             <column label="Nombre" align="center"/>
@@ -35,10 +21,6 @@
         </columns>
         <template name="model">
             <row>
-            	<custom-attributes pieces="${each.pieces}"/>
-            	<detail open="false" fulfill="onOpen">
-            		<include src="/product_pieces.zul" pieces="${r:listModel(pieces)}"/>
-            	</detail>
                 <label value="${each.id}"/>
                 <label value="${each.code}"/>
                 <label value="${each.name}"/>

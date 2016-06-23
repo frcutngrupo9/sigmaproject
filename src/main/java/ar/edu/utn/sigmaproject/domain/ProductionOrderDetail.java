@@ -22,9 +22,6 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 	Long id;
 
 	@ManyToOne
-	ProductionOrder productionOrder;
-
-	@ManyToOne
 	Process process;
 
 	@ManyToOne
@@ -46,8 +43,7 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 
 	}
 
-	public ProductionOrderDetail(ProductionOrder productionOrder, Process process, Machine machine, Duration timeTotal, Integer quantityPiece) {
-		this.productionOrder = productionOrder;
+	public ProductionOrderDetail(Process process, Machine machine, Duration timeTotal, Integer quantityPiece) {
 		this.process = process;
 		this.machine = machine;
 		this.timeTotal = timeTotal;
@@ -61,14 +57,6 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public ProductionOrder getProductionOrder() {
-		return productionOrder;
-	}
-
-	public void setProductionOrder(ProductionOrder productionOrder) {
-		this.productionOrder = productionOrder;
 	}
 
 	public Process getProcess() {

@@ -1,14 +1,7 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
-
-import ar.edu.utn.sigmaproject.domain.MeasureUnitType;
-import ar.edu.utn.sigmaproject.service.MeasureUnitRepository;
-import ar.edu.utn.sigmaproject.service.MeasureUnitTypeRepository;
-import ar.edu.utn.sigmaproject.service.RawMaterialTypeRepository;
-import ar.edu.utn.sigmaproject.util.RepositoryHelper;
 
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
@@ -27,7 +20,12 @@ import org.zkoss.zul.Selectbox;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
+import ar.edu.utn.sigmaproject.domain.MeasureUnitType;
 import ar.edu.utn.sigmaproject.domain.RawMaterialType;
+import ar.edu.utn.sigmaproject.service.MeasureUnitRepository;
+import ar.edu.utn.sigmaproject.service.MeasureUnitTypeRepository;
+import ar.edu.utn.sigmaproject.service.RawMaterialTypeRepository;
+import ar.edu.utn.sigmaproject.util.RepositoryHelper;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class RawMaterialController extends SelectorComposer<Component>{
@@ -67,10 +65,8 @@ public class RawMaterialController extends SelectorComposer<Component>{
 	// services
 	@WireVariable
 	private RawMaterialTypeRepository rawMaterialTypeRepository;
-
 	@WireVariable
 	private MeasureUnitRepository measureUnitRepository;
-
 	@WireVariable
 	private MeasureUnitTypeRepository measureUnitTypeRepository;
 
@@ -109,7 +105,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
 		refreshView();
 	}
 
-	
+
 
 	@Listen("onClick = #searchButton")
 	public void search() {

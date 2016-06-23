@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,10 +20,7 @@ public class Piece implements Serializable, Cloneable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
 
-	@ManyToOne(optional = false)
-	Product product;
-
-	@OneToMany(mappedBy = "piece", cascade = CascadeType.ALL)
+	@OneToMany
 	List<Process> processes = new ArrayList<>();
 
 	String name = "";
@@ -52,8 +48,7 @@ public class Piece implements Serializable, Cloneable {
 
 	}
 
-	public Piece(Product product, String name, BigDecimal length, MeasureUnit lengthMeasureUnit, BigDecimal depth, MeasureUnit depthMeasureUnit, BigDecimal width, MeasureUnit widthMeasureUnit, String size, boolean isGroup, Integer units) {
-		this.product = product;
+	public Piece(String name, BigDecimal length, MeasureUnit lengthMeasureUnit, BigDecimal depth, MeasureUnit depthMeasureUnit, BigDecimal width, MeasureUnit widthMeasureUnit, String size, boolean isGroup, Integer units) {
 		this.name = name;
 		this.length = length;
 		this.lengthMeasureUnit = lengthMeasureUnit;
@@ -81,14 +76,6 @@ public class Piece implements Serializable, Cloneable {
 
 	public void setProcesses(List<Process> processes) {
 		this.processes = processes;
-	}
-
-	public Product getProduct() {
-		return product;
-	}
-
-	public void setProduct(Product product) {
-		this.product = product;
 	}
 
 	public String getName() {
@@ -203,7 +190,7 @@ public class Piece implements Serializable, Cloneable {
 			return false;
 		return true;
 	}
-	
+
 	public static Piece clone(Piece piece){
 		try {
 			return (Piece)piece.clone();

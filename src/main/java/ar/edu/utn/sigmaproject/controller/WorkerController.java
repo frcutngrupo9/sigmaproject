@@ -3,8 +3,6 @@ package ar.edu.utn.sigmaproject.controller;
 import java.util.Date;
 import java.util.List;
 
-import ar.edu.utn.sigmaproject.service.MachineRepository;
-import ar.edu.utn.sigmaproject.service.WorkerRepository;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -21,6 +19,7 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Worker;
+import ar.edu.utn.sigmaproject.service.WorkerRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class WorkerController extends SelectorComposer<Component> {
@@ -49,7 +48,7 @@ public class WorkerController extends SelectorComposer<Component> {
 
 	// services
 	@WireVariable
-	WorkerRepository workerRepository;
+	private WorkerRepository workerRepository;
 
 	// attributes
 	private Worker currentWorker;

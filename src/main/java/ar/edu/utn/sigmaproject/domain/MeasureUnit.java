@@ -11,7 +11,7 @@ import javax.persistence.ManyToOne;
 @Entity
 public class MeasureUnit implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;

@@ -18,17 +18,14 @@ public class Product implements Serializable, Cloneable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
 
-	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+	@OneToMany
 	List<Piece> pieces;
 
-	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+	@OneToMany
 	List<Supply> supplies;
 
-	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+	@OneToMany
 	List<RawMaterial> rawMaterials;
-
-	@OneToOne(mappedBy = "product")
-	ProductExistence productExistence;
 
 	@Lob
 	byte[] imageData = new byte[0];
@@ -37,6 +34,9 @@ public class Product implements Serializable, Cloneable {
 	String name = "";
 	String details = "";
 	String code = "";
+	Integer stock = 0;
+	Integer stockMin = 0;
+	Integer stockRepo = 0;
 
 	@ManyToOne
 	ProductCategory category;
@@ -52,8 +52,8 @@ public class Product implements Serializable, Cloneable {
 		this.name = name;
 		this.details = details;
 		this.category = category;
-        this.code = code;
-        this.price = price;
+		this.code = code;
+		this.price = price;
 	}
 
 	public Long getId() {
@@ -88,12 +88,28 @@ public class Product implements Serializable, Cloneable {
 		this.rawMaterials = rawMaterials;
 	}
 
-	public ProductExistence getProductExistence() {
-		return productExistence;
+	public Integer getStock() {
+		return stock;
 	}
 
-	public void setProductExistence(ProductExistence productExistence) {
-		this.productExistence = productExistence;
+	public void setStock(Integer stock) {
+		this.stock = stock;
+	}
+
+	public Integer getStockMin() {
+		return stockMin;
+	}
+
+	public void setStockMin(Integer stockMin) {
+		this.stockMin = stockMin;
+	}
+
+	public Integer getStockRepo() {
+		return stockRepo;
+	}
+
+	public void setStockRepo(Integer stockRepo) {
+		this.stockRepo = stockRepo;
 	}
 
 	public byte[] getImageData() {

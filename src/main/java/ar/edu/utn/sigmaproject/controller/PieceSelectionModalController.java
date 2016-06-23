@@ -2,10 +2,6 @@ package ar.edu.utn.sigmaproject.controller;
 
 import java.util.List;
 
-import ar.edu.utn.sigmaproject.domain.MeasureUnit;
-import ar.edu.utn.sigmaproject.service.MeasureUnitRepository;
-import ar.edu.utn.sigmaproject.service.PieceRepository;
-import ar.edu.utn.sigmaproject.service.ProductRepository;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventQueue;
@@ -20,7 +16,9 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Window;
 
+import ar.edu.utn.sigmaproject.domain.MeasureUnit;
 import ar.edu.utn.sigmaproject.domain.Piece;
+import ar.edu.utn.sigmaproject.service.PieceRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class PieceSelectionModalController extends SelectorComposer<Component>{
@@ -36,8 +34,6 @@ public class PieceSelectionModalController extends SelectorComposer<Component>{
 	// services
 	@WireVariable
 	private PieceRepository pieceRepository;
-	private ProductRepository productRepository;
-	private MeasureUnitRepository measureUnitRepository;
 
 	// atributes
 

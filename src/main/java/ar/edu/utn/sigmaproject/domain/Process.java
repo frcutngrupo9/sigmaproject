@@ -27,9 +27,6 @@ public class Process implements Serializable, Cloneable {
 	Long id;
 
 	@ManyToOne
-	Piece piece;
-
-	@ManyToOne
 	ProcessType type;
 
 	String details = "";
@@ -46,8 +43,7 @@ public class Process implements Serializable, Cloneable {
 
 	}
 
-	public Process(Piece piece, ProcessType processType, String details, Duration time) {
-		this.piece = piece;
+	public Process(ProcessType processType, String details, Duration time) {
 		this.type = processType;
 		this.details = details;
 		this.setTime(time);
@@ -60,14 +56,6 @@ public class Process implements Serializable, Cloneable {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public Piece getPiece() {
-		return piece;
-	}
-
-	public void setPiece(Piece piece) {
-		this.piece = piece;
 	}
 
 	public ProcessType getType() {
@@ -85,7 +73,7 @@ public class Process implements Serializable, Cloneable {
 	public void setDetails(String details) {
 		this.details = details;
 	}
-	
+
 	public Duration getTime() {
 		if (time == null && this.timeInternal != null) {
 			try {

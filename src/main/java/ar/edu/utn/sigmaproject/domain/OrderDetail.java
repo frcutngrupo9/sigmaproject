@@ -11,30 +11,26 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class OrderDetail  implements Serializable, Cloneable {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
 
-	@ManyToOne(optional = false)
-	Order order;
-
 	@ManyToOne
 	Product product;
-    Integer units = 0;
-    BigDecimal price = BigDecimal.ZERO;
+	Integer units = 0;
+	BigDecimal price = BigDecimal.ZERO;
 
 	public OrderDetail() {
 
 	}
 
-	public OrderDetail(Order order, Product product, Integer units, BigDecimal price) {
-		this.order = order;
+	public OrderDetail(Product product, Integer units, BigDecimal price) {
 		this.product = product;
-        this.units = units;
-        this.price = price;
-    }
+		this.units = units;
+		this.price = price;
+	}
 
 	public Long getId() {
 		return id;
@@ -42,14 +38,6 @@ public class OrderDetail  implements Serializable, Cloneable {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public Order getOrder() {
-		return order;
-	}
-
-	public void setOrder(Order order) {
-		this.order = order;
 	}
 
 	public Product getProduct() {
@@ -61,16 +49,16 @@ public class OrderDetail  implements Serializable, Cloneable {
 	}
 
 
-    public Integer getUnits() {
-        return units;
-    }
+	public Integer getUnits() {
+		return units;
+	}
 
 
-    public void setUnits(Integer units) {
-        this.units = units;
-    }
-    
-    public BigDecimal getPrice() {
+	public void setUnits(Integer units) {
+		this.units = units;
+	}
+
+	public BigDecimal getPrice() {
 		return price;
 	}
 

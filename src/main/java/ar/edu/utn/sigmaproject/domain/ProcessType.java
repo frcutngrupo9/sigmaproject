@@ -1,15 +1,18 @@
 package ar.edu.utn.sigmaproject.domain;
 
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 
 @Entity
 @Indexed
@@ -25,6 +28,9 @@ public class ProcessType implements Serializable, Cloneable {
 
 	@Field
 	String name = "";
+
+	@OneToMany
+	List<ProcessType> predecessorList = new ArrayList<>(); 
 
 	public ProcessType() {
 
@@ -42,7 +48,7 @@ public class ProcessType implements Serializable, Cloneable {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -57,6 +63,14 @@ public class ProcessType implements Serializable, Cloneable {
 
 	public void setMachineType(MachineType machineType) {
 		this.machineType = machineType;
+	}
+
+	public List<ProcessType> getPredecessorList() {
+		return predecessorList;
+	}
+
+	public void setPredecessorList(List<ProcessType> predecessorList) {
+		this.predecessorList = predecessorList;
 	}
 
 	@Override

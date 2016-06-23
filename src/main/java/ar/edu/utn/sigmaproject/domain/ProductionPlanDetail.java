@@ -17,17 +17,13 @@ public class ProductionPlanDetail implements Serializable, Cloneable {
 	Long id;
 
 	@ManyToOne
-	ProductionPlan productionPlan;
-
-	@ManyToOne
 	Order order;
 
 	public ProductionPlanDetail() {
 
 	}
 
-	public ProductionPlanDetail(ProductionPlan productionPlan, Order order) {
-		this.productionPlan = productionPlan;
+	public ProductionPlanDetail(Order order) {
 		this.order = order;
 	}
 
@@ -37,14 +33,6 @@ public class ProductionPlanDetail implements Serializable, Cloneable {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public ProductionPlan getProductionPlan() {
-		return productionPlan;
-	}
-
-	public void setProductionPlan(ProductionPlan productionPlan) {
-		this.productionPlan = productionPlan;
 	}
 
 	public Order getOrder() {

@@ -2,11 +2,8 @@ package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
-import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -14,8 +11,15 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
-import org.zkoss.zul.*;
+import org.zkoss.zul.Button;
+import org.zkoss.zul.Grid;
+import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Paging;
+import org.zkoss.zul.Textbox;
+
 import ar.edu.utn.sigmaproject.domain.SupplyType;
+import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
+import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 
 public class SupplyController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
@@ -55,11 +59,11 @@ public class SupplyController extends SelectorComposer<Component>{
 
 	// services
 	@WireVariable
-	SupplyTypeRepository supplyTypeRepository;
+	private SupplyTypeRepository supplyTypeRepository;
 
 	// attributes
 	private SupplyType currentSupplyType;
-	SortingPagingHelper<SupplyType> sortingPagingHelper;
+	private SortingPagingHelper<SupplyType> sortingPagingHelper;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception{

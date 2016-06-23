@@ -9,33 +9,33 @@ import javax.persistence.Id;
 
 @Entity
 public class MeasureUnitType implements Serializable, Cloneable {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
 
-    String name = "";
+	String name = "";
 
-    public MeasureUnitType() {
+	public MeasureUnitType() {
 
-    }
+	}
 
-    public MeasureUnitType(String name) {
-        this.name = name;
-    }
+	public MeasureUnitType(String name) {
+		this.name = name;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void setId(Long id) {
-    	this.id = id;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	public String getName() {
-        return name;
-    }
+		return name;
+	}
 
 	public void setName(String name) {
 		this.name = name;

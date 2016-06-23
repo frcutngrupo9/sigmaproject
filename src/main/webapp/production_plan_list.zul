@@ -7,10 +7,9 @@
     <separator/>
     <grid id="productionPlanGrid" mold="paging" pageSize="7" sizedByContent="true" span="true">
     	<auxhead>
-			<auxheader label="Planes de Produccion" colspan="10"/>
+			<auxheader label="Planes de Produccion" colspan="9"/>
 		</auxhead>
         <columns>
-        	<column width="40px" />
         	<column label="Id" align="center"/>
             <column label="Nombre" align="center"/>
             <column label="Fecha Creacion" align="center"/>
@@ -23,18 +22,12 @@
         </columns>
         <template name="model">
             <row>
-            	<!-- se usa custom-attributes para guardar los productos en la fila, 
-				 		para que se puedan acceder cuando se usa onOpen del detail -->
-            	<custom-attributes products="${win_production_plan_list$composer.getProductionPlanProducts(each)}" productionPlan="${each}"/>
-            	<detail open="false" fulfill="onOpen">
-            		<include src="/production_plan_products.zul" products="${products}" productionPlan="${productionPlan}"/>
-            	</detail>
             	<label value="${each.id}"/>
                 <label value="${each.name}"/>
                 <label value="${each.date}"/>
                 <label value="${each.details.size()}"/>
-                <label value="${win_production_plan_list$composer.getQuantityOfProduct(each.id)}"/>
-                <label value="${win_production_plan_list$composer.getProductionPlanStateName(each.id)}"/>
+                <label value="${win_production_plan_list$composer.getQuantityOfProduct(each)}"/>
+                <label value="${win_production_plan_list$composer.getProductionPlanStateName(each)}"/>
                 <button forward="onClick=productionPlanGrid.onEditProductionPlan(${each})"  image="/img/edit16x16.png"/>
                 <button forward="onClick=productionPlanGrid.onGenerateProductionOrder(${each})" label="Ordenes de Produccion" />
                 <button forward="onClick=productionPlanGrid.onOpenRequirementPlan(${each})" label="Requerimiento de Materiales" />

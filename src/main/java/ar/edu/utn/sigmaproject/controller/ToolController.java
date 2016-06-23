@@ -1,12 +1,8 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
-import ar.edu.utn.sigmaproject.service.ToolTypeRepository;
-import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -14,10 +10,15 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
-import org.zkoss.zul.*;
+import org.zkoss.zul.Button;
+import org.zkoss.zul.Grid;
+import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Paging;
+import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.ToolType;
-import org.zkoss.zul.ext.Selectable;
+import ar.edu.utn.sigmaproject.service.ToolTypeRepository;
+import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 
 public class ToolController extends SelectorComposer<Component>{
 	private static final long serialVersionUID = 1L;
@@ -53,11 +54,11 @@ public class ToolController extends SelectorComposer<Component>{
 
 	// services
 	@WireVariable
-	ToolTypeRepository toolTypeRepository;
+	private ToolTypeRepository toolTypeRepository;
 
 	// atributes
 	private ToolType currentToolType;
-	SortingPagingHelper<ToolType> sortingPagingHelper;
+	private SortingPagingHelper<ToolType> sortingPagingHelper;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {

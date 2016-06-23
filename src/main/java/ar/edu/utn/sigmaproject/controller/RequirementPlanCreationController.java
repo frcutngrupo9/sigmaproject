@@ -3,9 +3,6 @@ package ar.edu.utn.sigmaproject.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import ar.edu.utn.sigmaproject.service.ProductRepository;
-import ar.edu.utn.sigmaproject.service.RawMaterialRequirementRepository;
-import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
@@ -27,11 +24,12 @@ import ar.edu.utn.sigmaproject.domain.ProductTotal;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.RawMaterial;
 import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
-import ar.edu.utn.sigmaproject.domain.RawMaterialType;
 import ar.edu.utn.sigmaproject.domain.Supply;
 import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
 import ar.edu.utn.sigmaproject.domain.SupplyReserved;
-import ar.edu.utn.sigmaproject.domain.SupplyType;
+import ar.edu.utn.sigmaproject.service.ProductRepository;
+import ar.edu.utn.sigmaproject.service.RawMaterialRequirementRepository;
+import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class RequirementPlanCreationController extends SelectorComposer<Component> {
@@ -60,13 +58,11 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 
 	// services
 	@WireVariable
-	RawMaterialRequirementRepository rawMaterialRequirementRepository;
-
+	private RawMaterialRequirementRepository rawMaterialRequirementRepository;
 	@WireVariable
-	ProductRepository productRepository;
-
+	private ProductRepository productRepository;
 	@WireVariable
-	SupplyReservedRepository supplyReservedRepository;
+	private SupplyReservedRepository supplyReservedRepository;
 
 	// atributes
 	private ProductionPlan currentProductionPlan;
@@ -92,7 +88,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 				List<SupplyRequirement> auxSupplyRequirementList = new ArrayList<SupplyRequirement>();
 				List<ProductTotal> productTotalList = currentProductionPlan.getProductTotalList();
 				for (ProductTotal productTotal : productTotalList) {
-					for (Supply supply : productTotal.getSupplies()) {
+					for (Supply supply : productTotal.getProduct().getSupplies()) {
 						SupplyRequirement auxSupplyRequirement = null;
 						for (SupplyRequirement supplyRequirement : auxSupplyRequirementList) {// buecamos si el insumo no se encuentra agregado
 							if (supply.getSupplyType().equals(supplyRequirement.getSupplyType())) {
@@ -102,7 +98,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 						if (auxSupplyRequirement != null) {// el insumo si se encuentra agregado, sumamos sus cantidades
 							auxSupplyRequirement.setQuantity(auxSupplyRequirement.getQuantity().add(supply.getQuantity()));
 						} else {// el insumo no se encuentra, se lo agrega
-							auxSupplyRequirementList.add(new SupplyRequirement(currentProductionPlan, supply.getSupplyType(), supply.getQuantity()));
+							auxSupplyRequirementList.add(new SupplyRequirement(supply.getSupplyType(), supply.getQuantity()));
 						}
 					}
 				}
@@ -117,7 +113,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 				List<RawMaterialRequirement> auxRawMaterialRequirementList = new ArrayList<RawMaterialRequirement>();
 				List<ProductTotal> productTotalList = currentProductionPlan.getProductTotalList();
 				for(ProductTotal productTotal : productTotalList) {
-					Product product = productRepository.findOne(productTotal.getId());
+					Product product = productTotal.getProduct();
 					for(RawMaterial rawMaterial : product.getRawMaterials()) {
 						RawMaterialRequirement auxRawMaterialRequirement = null;
 						for(RawMaterialRequirement supplyRequirement : auxRawMaterialRequirementList) {// buecamos si la materia prima no se encuentra agregada
@@ -128,7 +124,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 						if(auxRawMaterialRequirement != null) {// la materia prima si se encuentra agregada, sumamos sus cantidades
 							auxRawMaterialRequirement.setQuantity(auxRawMaterialRequirement.getQuantity().add(rawMaterial.getQuantity()));
 						} else {// la materia prima no se encuentra, se la agrega
-							auxRawMaterialRequirementList.add(new RawMaterialRequirement(currentProductionPlan, rawMaterial.getRawMaterialType(), rawMaterial.getQuantity()));
+							auxRawMaterialRequirementList.add(new RawMaterialRequirement(rawMaterial.getRawMaterialType(), rawMaterial.getQuantity()));
 						}
 					}
 				}
@@ -157,6 +153,8 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	public String getSupplyStockReserved(SupplyRequirement supplyRequirement) {
 		// TODO: como es la verdadera relacion entre estas tres clases? un SupplyRequirement tiene un SupplyType,
 		// por que un SupplyReserved tiene tambien un SupplyType? La relacion es uno a uno entre SupplyRequirement y SupplyReserved?
+		// Respuesta: SupplyType tiene una lista de SupplyReserved, y cada SupplyReserved tiene un SupplyRequirement
+		// para saber para que plan se está reservando
 		SupplyReserved aux = supplyReservedRepository.findBySupplyTypeAndSupplyRequirement(supplyRequirement.getSupplyType(), supplyRequirement);
 		if(aux != null) {
 			return aux.getStockReserved() + "";

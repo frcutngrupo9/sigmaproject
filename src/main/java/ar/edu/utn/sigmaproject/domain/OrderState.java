@@ -19,9 +19,6 @@ public class OrderState implements Serializable, Cloneable {
 	Long id;
 
 	@ManyToOne(optional = false)
-	Order order;
-
-	@ManyToOne(optional = false)
 	OrderStateType type;
 
 	@Column(nullable = false)
@@ -31,8 +28,7 @@ public class OrderState implements Serializable, Cloneable {
 
 	}
 
-	public OrderState(Order order, OrderStateType orderStateType, Date date) {
-		this.order = order;
+	public OrderState(OrderStateType orderStateType, Date date) {
 		this.type = orderStateType;
 		this.date = date;
 	}
@@ -43,14 +39,6 @@ public class OrderState implements Serializable, Cloneable {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public Order getOrder() {
-		return order;
-	}
-
-	public void setOrder(Order order) {
-		this.order = order;
 	}
 
 	public OrderStateType getType() {
