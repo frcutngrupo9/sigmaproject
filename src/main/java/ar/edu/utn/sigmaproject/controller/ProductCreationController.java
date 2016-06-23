@@ -12,6 +12,8 @@ import javax.xml.datatype.Duration;
 import ar.edu.utn.sigmaproject.domain.*;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.service.*;
+import ar.edu.utn.sigmaproject.util.RepositoryHelper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -242,7 +244,12 @@ public class ProductCreationController extends SelectorComposer<Component>{
 
 		processList = new ArrayList<>();
 
-		List<MeasureUnit> measureUnitList = measureUnitTypeRepository.findByName("Longitud").getMeasureUnits();
+		MeasureUnitType measureUnitType = measureUnitTypeRepository.findByName("Longitud");
+		if(measureUnitType == null) {
+			new RepositoryHelper().generateMeasureUnitTypeList(measureUnitRepository, measureUnitTypeRepository);
+			measureUnitType = measureUnitTypeRepository.findByName("Longitud");
+		}
+		List<MeasureUnit> measureUnitList = measureUnitRepository.findByType(measureUnitType);
 		lengthMeasureUnitListModel = new ListModelList<>(measureUnitList);
 		depthMeasureUnitListModel = new ListModelList<>(measureUnitList);
 		widthMeasureUnitListModel = new ListModelList<>(measureUnitList);
