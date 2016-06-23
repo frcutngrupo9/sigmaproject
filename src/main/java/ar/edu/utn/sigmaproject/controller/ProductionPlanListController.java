@@ -2,12 +2,8 @@ package ar.edu.utn.sigmaproject.controller;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
-import ar.edu.utn.sigmaproject.service.WorkerRepository;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
@@ -23,15 +19,15 @@ import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
 
-import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductTotal;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
-import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
+import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
+import ar.edu.utn.sigmaproject.service.WorkerRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProductionPlanListController  extends SelectorComposer<Component>{
@@ -47,13 +43,10 @@ public class ProductionPlanListController  extends SelectorComposer<Component>{
 	// services
 	@WireVariable
 	private ProductionOrderRepository productionOrderRepository;
-	
 	@WireVariable
 	private ProductionPlanRepository productionPlanRepository;
-
 	@WireVariable
 	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
-
 	@WireVariable
 	private WorkerRepository workerRepository;
 
@@ -80,7 +73,7 @@ public class ProductionPlanListController  extends SelectorComposer<Component>{
 	}
 
 	public String getQuantityOfProduct(ProductionPlan productionPlan) {
-    	return this.getProductionPlanProducts(productionPlan).getSize() + "";
+		return this.getProductionPlanProducts(productionPlan).getSize() + "";
 	}
 
 	public String getProductionPlanStateName(ProductionPlan productionPlan) {
@@ -99,7 +92,7 @@ public class ProductionPlanListController  extends SelectorComposer<Component>{
 			if(aux.getState() == null) {
 				return "Generado";
 			} else {
-				return aux.getState().name();
+				return aux.getState().getName();
 			}
 		}
 
@@ -183,17 +176,7 @@ public class ProductionPlanListController  extends SelectorComposer<Component>{
 	}
 
 	public ListModel<ProductTotal> getProductionPlanProducts(ProductionPlan productionPlan) {
-		Map<Product, ProductTotal> productTotalByProductMap = new HashMap<>();
-		for (ProductionPlanDetail productionPlanDetail : productionPlan.getPlanDetails()) {
-			for (OrderDetail orderDetail : productionPlanDetail.getOrder().getDetails()) {
-				if (!productTotalByProductMap.containsKey(orderDetail.getProduct())) {
-					productTotalByProductMap.put(orderDetail.getProduct(), new ProductTotal(orderDetail.getProduct()));
-				}
-				ProductTotal productTotal = productTotalByProductMap.get(orderDetail.getProduct());
-				productTotal.setTotalUnits(productTotal.getTotalUnits() + orderDetail.getUnits()); // sumamos su cantidad con la existente
-			}
-		}
-		return new ListModelList<ProductTotal>(productTotalByProductMap.values());
+		return new ListModelList<ProductTotal>(productionPlan.getProductTotalList());
 	}
 
 	@Listen("onGenerateProductionOrder = #productionPlanGrid")

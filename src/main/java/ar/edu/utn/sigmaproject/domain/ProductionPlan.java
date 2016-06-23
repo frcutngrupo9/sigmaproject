@@ -3,7 +3,9 @@ package ar.edu.utn.sigmaproject.domain;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.*;
 
@@ -15,29 +17,26 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
 
-	@OneToMany(mappedBy = "productionPlan", cascade = CascadeType.ALL)
+	@OneToMany
 	@OrderColumn(name = "detail_index")
 	List<ProductionPlanDetail> planDetails = new ArrayList<>();
-
-	@OneToMany(mappedBy = "productionPlan", cascade = CascadeType.ALL)
-	@OrderBy("date")
-	List<ProductionPlanState> states = new ArrayList<>();
 
 	@ManyToOne
 	ProductionPlanStateType currentStateType;
 
-	@OneToMany(mappedBy = "productionPlan", cascade = CascadeType.ALL)
+	@OneToMany
 	List<RawMaterialRequirement> rawMaterialRequirements = new ArrayList<>();
 
-	@OneToMany(mappedBy = "productionPlan")
-	List<ProductionOrder> orders = new ArrayList<>();
-
-	@OneToMany(mappedBy = "productionPlan")
+	@OneToMany
 	List<SupplyRequirement> supplyRequirements = new ArrayList<>();
 
 	String name = "";
 	String details = "";
 	Date date;
+
+	public ProductionPlan() {
+
+	}
 
 	public ProductionPlan(String name, String details, Date date) {
 		this.name = name;
@@ -46,28 +45,30 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	}
 
 	public List<ProductTotal> getProductTotalList() {
-		List<ProductTotal> productTotalList = new ArrayList<>();// se empieza con una lista vacia
-		for (ProductionPlanDetail auxProductionPlanDetail : getPlanDetails()) {
-			for (OrderDetail auxOrderDetail : auxProductionPlanDetail.getOrder().getDetails()) {// por cada detalle del pedido, observamos si el producto ya esta en la lista, si lo esta sumamos su cantidad y, si no esta lo agregamos
-				Boolean is_in_list = false;
-				Integer order_detail_units = auxOrderDetail.getUnits();
-				for (ProductTotal productTotal : productTotalList) {
-					if (productTotal.getId().equals(auxOrderDetail.getProduct().getId())) {// si esta
-						is_in_list = true;
-						productTotal.setTotalUnits(productTotal.getTotalUnits() + order_detail_units);// sumamos su cantidad con la existente
-						break;
-					}
-				}
-				if (!is_in_list) {// no esta, por lo tanto agregamos el producto a la lista total
-					ProductTotal productTotal = new ProductTotal(auxOrderDetail.getProduct());
-					productTotal.setTotalUnits(order_detail_units);// el primer valor son el total de unidades del detalle de pedido
-					productTotalList.add(productTotal);
-				}
+		Map<Product, Integer> productTotalMap = new HashMap<Product, Integer>();
+		for(ProductionPlanDetail auxProductionPlanDetail : getPlanDetails()) {
+			for(OrderDetail auxOrderDetail : auxProductionPlanDetail.getOrder().getDetails()) {
+				Integer totalUnits = productTotalMap.get(auxOrderDetail.getProduct());
+				productTotalMap.put(auxOrderDetail.getProduct(), (totalUnits == null) ? auxOrderDetail.getUnits() : totalUnits + auxOrderDetail.getUnits());
 			}
-			// si es el primer loop del productionPlanDetailList entonces la lista productTotalList deberia estar llena solo con los productos
-			// del primer pedido, en el siguiente loop se sumaran los que ya estan y agregaran los nuevos
+		}
+		List<ProductTotal> productTotalList = new ArrayList<ProductTotal>();
+		for (Map.Entry<Product, Integer> entry : productTotalMap.entrySet()) {
+			Product product = entry.getKey();
+			Integer totalUnits = entry.getValue();
+			ProductTotal productTotal = new ProductTotal(product, totalUnits);
+			productTotalList.add(productTotal);
 		}
 		return productTotalList;// devuelve el productTotalList lleno con todos los productos sin repetir y con el total, que conforman el plan de produccion
+	}
+
+	public ProductTotal getProductTotal(Product product) {
+		for(ProductTotal productTotal : getProductTotalList()) {
+			if(productTotal.getProduct().equals(product)) {
+				return productTotal;
+			}
+		}
+		return null;
 	}
 
 	public Long getId() {
@@ -86,14 +87,6 @@ public class ProductionPlan  implements Serializable, Cloneable {
 		this.planDetails = planDetails;
 	}
 
-	public List<ProductionPlanState> getStates() {
-		return states;
-	}
-
-	public void setStates(List<ProductionPlanState> states) {
-		this.states = states;
-	}
-
 	public ProductionPlanStateType getCurrentStateType() {
 		return currentStateType;
 	}
@@ -108,14 +101,6 @@ public class ProductionPlan  implements Serializable, Cloneable {
 
 	public void setRawMaterialRequirements(List<RawMaterialRequirement> rawMaterialRequirements) {
 		this.rawMaterialRequirements = rawMaterialRequirements;
-	}
-
-	public List<ProductionOrder> getOrders() {
-		return orders;
-	}
-
-	public void setOrders(List<ProductionOrder> orders) {
-		this.orders = orders;
 	}
 
 	public List<SupplyRequirement> getSupplyRequirements() {

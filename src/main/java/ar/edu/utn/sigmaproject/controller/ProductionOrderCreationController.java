@@ -10,8 +10,12 @@ import javax.xml.datatype.Duration;
 import ar.edu.utn.sigmaproject.domain.*;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.service.MachineRepository;
+import ar.edu.utn.sigmaproject.service.PieceRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
 import ar.edu.utn.sigmaproject.service.WorkerRepository;
+import ar.edu.utn.sigmaproject.util.RepositoryHelper;
+
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
@@ -71,17 +75,19 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 	// services
 	@WireVariable
-	ProductionOrderRepository productionOrderRepository;
-
+	private ProductionOrderRepository productionOrderRepository;
 	@WireVariable
-	MachineRepository machineRepository;
-
+	private ProductionOrderStateRepository productionOrderStateRepository;
 	@WireVariable
-	WorkerRepository workerRepository;
+	private MachineRepository machineRepository;
+	@WireVariable
+	private WorkerRepository workerRepository;
+	@WireVariable
+	private PieceRepository pieceRepository;
 
 	// atributes
 	private ProductionOrder currentProductionOrder;
-	private ProductTotal currentProduct;
+	private Product currentProduct;
 	private ProductionPlan currentProductionPlan;
 
 	// list
@@ -97,26 +103,23 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	@Override
 	public void doAfterCompose(Component comp) throws Exception{
 		super.doAfterCompose(comp);
-		
-		currentProduct = (ProductTotal) Executions.getCurrent().getAttribute("selected_product");
+
+		currentProduct = (Product) Executions.getCurrent().getAttribute("selected_product");
 		currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
 		currentProductionOrder = productionOrderRepository.findByProductionPlanAndProduct(currentProductionPlan, currentProduct);
 
 		if(currentProductionOrder == null) {// es una nueva orden de produccion, se deben crear los detalles
-			List<Process> processList = new ArrayList<Process>();// lista donde se guardaran todos los procesos del producto
+			productionOrderDetailList = new ArrayList<>();
 			for(Piece piece : currentProduct.getPieces()) {
 				List<Process> auxProcessList = piece.getProcesses();
 				for(Process process : auxProcessList) {
-					processList.add(Process.clone(process));
+					// por cada proceso hay que crear un detalle de orden de produccion
+					Integer quantityPiece = currentProductionPlan.getProductTotal(currentProduct).getTotalUnits() * piece.getUnits();// cantidad total de la pieza
+					Duration timeTotal = process.getTime().multiply(quantityPiece);// cantidad total de tiempo del proceso
+					productionOrderDetailList.add(new ProductionOrderDetail(process, null, timeTotal, quantityPiece));
 				}
 			}
-			// por cada proceso hay que crear un detalle de orden de produccion
-			productionOrderDetailList = new ArrayList<>();
-			for(Process process : processList) {
-				Integer quantityPiece = currentProduct.getTotalUnits() * process.getPiece().getUnits();// cantidad total de la pieza
-				Duration timeTotal = process.getTime().multiply(quantityPiece);// cantidad total de tiempo del proceso
-				productionOrderDetailList.add(new ProductionOrderDetail(null, process, null, timeTotal, quantityPiece));
-			}
+
 		} else {// es una orden de produccion ya creada, se buscan sus detalles
 			productionOrderDetailList = currentProductionOrder.getDetails();
 		}
@@ -125,13 +128,18 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		workerList = workerRepository.findAll();
 		workerListModel = new ListModelList<>(workerList);
 		workerSelectbox.setModel(workerListModel);
-		
+
 		machineList = machineRepository.findAll();
-		
-		productionOrderStateListModel = new ListModelList<ProductionOrderState>(ProductionOrderState.values());
+
+		List<ProductionOrderState> productionOrderStateList = productionOrderStateRepository.findAll();
+		if(productionOrderStateList.isEmpty()) {
+			new RepositoryHelper().generateProductionOrderStates(productionOrderStateRepository);
+			productionOrderStateList = productionOrderStateRepository.findAll();
+		}
+		productionOrderStateListModel = new ListModelList<ProductionOrderState>(productionOrderStateList);
 		productionOrderStateCombobox.setModel(productionOrderStateListModel);
 	}
-	
+
 	@Listen("onAfterRender = #productionOrderStateCombobox")
 	public void productCategoryComboboxSelection() {// se hace refresh despues de q se renderizo el combobox para que se le pueda setear un valor seleccionado
 		refreshView();
@@ -146,7 +154,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		productionPlanNameTextbox.setText(currentProductionPlan.getName());
 		productionPlanDatebox.setValue(currentProductionPlan.getDate());
 		productNameTextbox.setText(currentProduct.getName());
-		productUnitsIntbox.setValue(currentProduct.getTotalUnits());
+		productUnitsIntbox.setValue(currentProductionPlan.getProductTotal(currentProduct).getTotalUnits());
 		ProductionPlanStateType lastProductionPlanStateType = currentProductionPlan.getCurrentStateType();
 		if(lastProductionPlanStateType != null) {
 			productionPlanStateTypeTextbox.setText(lastProductionPlanStateType.getName().toUpperCase());
@@ -160,7 +168,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			workerSelectbox.setSelectedIndex(-1);
 			productionOrderFinishedDatebox.setValue(null);
 			productionOrderStateCombobox.setDisabled(true);
-			productionOrderStateCombobox.setSelectedIndex(productionOrderStateListModel.indexOf(ProductionOrderState.Generada));
+			productionOrderStateCombobox.setSelectedIndex(-1);
 		} else {// edicion de orden de produccion
 			productionOrderNumberSpinner.setValue(currentProductionOrder.getNumber());
 			productionOrderDatebox.setValue(currentProductionOrder.getDate());
@@ -204,7 +212,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		ProductionOrderState productionOrderState = productionOrderStateCombobox.getSelectedItem().getValue();
 
 		if (currentProductionOrder == null) {// nueva orden de produccion
-			currentProductionOrder = new ProductionOrder(currentProductionPlan, currentProduct, productionOrderWorker, productionOrderNumber, currentProduct.getTotalUnits(), productionOrderDate, productionOrderDateFinished, productionOrderState);
+			currentProductionOrder = new ProductionOrder(currentProductionPlan, currentProduct, productionOrderWorker, productionOrderNumber, currentProductionPlan.getProductTotal(currentProduct).getTotalUnits(), productionOrderDate, productionOrderDateFinished, productionOrderState);
 		} else {// se edita
 			currentProductionOrder.setNumber(productionOrderNumber);
 			currentProductionOrder.setWorker(productionOrderWorker);
@@ -242,7 +250,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		}
 		return new ListModelList<>(list);
 	}
-	
+
 	@Listen("onCreateMachineCombobox = #productionOrderDetailGrid")
 	public void doCreateMachineCombobox(ForwardEvent evt) {// metodo utilizado para seleccionar el item del combobox luego de crearlo
 		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
@@ -258,7 +266,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		}
 		element.setSelectedIndex(value);
 	}
-	
+
 	@Listen("onEditProductionOrderDetailMachine = #productionOrderDetailGrid")
 	public void doEditProductionOrderDetailMachine(ForwardEvent evt) {
 		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro

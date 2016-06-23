@@ -61,10 +61,9 @@ public class ClientController extends SelectorComposer<Component> {
 	private ClientRepository clientRepository;
 
 	// atributes
+	@SuppressWarnings("unused")
 	private String query;
-
 	private Client currentClient;
-
 	private SortingPagingHelper<Client> sortingPagingHelper;
 
 	@Override
@@ -126,7 +125,6 @@ public class ClientController extends SelectorComposer<Component> {
 		refreshView();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Listen("onSelect = #clientListbox")
 	public void doListBoxSelect() {
 		if (clientListbox.getSelectedItem() == null) {

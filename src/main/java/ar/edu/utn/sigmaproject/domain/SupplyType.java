@@ -1,13 +1,15 @@
 package ar.edu.utn.sigmaproject.domain;
 
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 
 @Entity
 @Indexed
@@ -41,9 +43,9 @@ public class SupplyType implements Serializable, Cloneable {
 	BigDecimal stockRepo = BigDecimal.ZERO;
 
 	public SupplyType() {
-		
+
 	}
-	
+
 	public SupplyType(String code, String description, String details, String brand, String presentation, String measure, BigDecimal stock, BigDecimal stockMin, BigDecimal stockRepo) {
 		this.code = code;
 		this.description = description;

@@ -1,29 +1,29 @@
 package ar.edu.utn.sigmaproject.domain;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.Serializable;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Entity
-public class ProductCategory {
-//	Armario,
-//	Biblioteca,
-//	Comoda,
-//	Cajonera,
-//	Cama,
-//	Escritorio,
-//	Mesa,
-//	Silla,
-//	Sillon;
+public class ProductCategory implements Serializable, Cloneable {
+	//	Armario,
+	//	Biblioteca,
+	//	Comoda,
+	//	Cajonera,
+	//	Cama,
+	//	Escritorio,
+	//	Mesa,
+	//	Silla,
+	//	Sillon;
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
-
-	@OneToMany(mappedBy = "category")
-	List<Product> products = new ArrayList<>();
 
 	String name = "";
 
@@ -41,14 +41,6 @@ public class ProductCategory {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public List<Product> getProducts() {
-		return products;
-	}
-
-	public void setProducts(List<Product> products) {
-		this.products = products;
 	}
 
 	public String getName() {

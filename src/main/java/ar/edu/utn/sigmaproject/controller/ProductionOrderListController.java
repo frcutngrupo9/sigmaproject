@@ -5,12 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.datatype.Duration;
-
-import ar.edu.utn.sigmaproject.service.MachineRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
-import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
-import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
@@ -36,10 +30,12 @@ import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductTotal;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
-import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
-import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
-import ar.edu.utn.sigmaproject.domain.Worker;
+import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
+import ar.edu.utn.sigmaproject.service.MachineRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
+import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
+import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProductionOrderListController extends SelectorComposer<Component> {
@@ -56,16 +52,13 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 
 	// services
 	@WireVariable
-	MachineRepository machineRepository;
-	
+	private MachineRepository machineRepository;
 	@WireVariable
-	ProductionOrderRepository productionOrderRepository;
-
+	private ProductionOrderRepository productionOrderRepository;
 	@WireVariable
-	ProductionPlanRepository productionPlanRepository;
-
+	private ProductionPlanRepository productionPlanRepository;
 	@WireVariable
-	ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
+	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
 
 	// atributes
 	private ProductionPlan currentProductionPlan;
@@ -83,7 +76,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 
 		currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
 		if(currentProductionPlan == null) {throw new RuntimeException("ProductionPlan not found");}
-		productionOrderList = currentProductionPlan.getOrders();
+		productionOrderList = productionOrderRepository.findByProductionPlan(currentProductionPlan);
 		List<ProductTotal> productTotalList = currentProductionPlan.getProductTotalList();
 
 		productionOrderListModel = new ListModelList<ProductTotal>(productTotalList);
@@ -99,9 +92,9 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		if(currentProductionPlan != null) {
 			productionPlanNameTextbox.setText(currentProductionPlan.getName());
 			productionPlanDatebox.setValue(currentProductionPlan.getDate());
-			ProductionPlanState lastProductionPlanState = currentProductionPlan.getStates().get(currentProductionPlan.getStates().size() - 1);
+			ProductionPlanStateType lastProductionPlanState = currentProductionPlan.getCurrentStateType();
 			if(lastProductionPlanState != null) {
-				productionPlanStateTypeTextbox.setText(lastProductionPlanState.getProductionPlanStateType().getName().toUpperCase());
+				productionPlanStateTypeTextbox.setText(lastProductionPlanState.getName().toUpperCase());
 			} else {
 				productionPlanStateTypeTextbox.setText("[Sin Estado]");
 			}
@@ -109,10 +102,10 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 
 	}
 
-	public String getProductUnits(int idProduct) {
+	public String getProductUnits(Product product) {
 		int product_units = 0;
 		for(ProductTotal productTotal : productTotalList) {
-			if(productTotal.getId().equals(idProduct)) {
+			if(productTotal.getProduct().equals(product)) {
 				product_units = productTotal.getTotalUnits();
 			}
 		}
@@ -228,7 +221,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 			if(aux.getState() == null) {
 				return "Generado";
 			} else {
-				return aux.getState().name();
+				return aux.getState().getName();
 			}
 		}
 	}
@@ -287,8 +280,8 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 	}
 
 	public boolean isProductionPlanStateCancel() {
-		ProductionPlanState lastProductionPlanState = currentProductionPlan.getStates().get(currentProductionPlan.getStates().size() - 1);
-		return lastProductionPlanState != null && productionPlanStateTypeRepository.findByName("cancelado").equals(lastProductionPlanState.getProductionPlanStateType());
+		ProductionPlanStateType lastProductionPlanState = currentProductionPlan.getCurrentStateType();
+		return lastProductionPlanState != null && lastProductionPlanState.getName().equals("Cancelado");
 	}
 
 	public boolean isProductionOrderStateCancel(Product product) {
@@ -296,7 +289,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		if(aux == null) {
 			return false;
 		} else {
-			if(aux.getState()!=null && aux.getState().equals(ProductionOrderState.Cancelada)) {
+			if(aux.getState()!=null && aux.getState().getName().equals("Cancelada")) {
 				return true;
 			} else {
 				return false;

@@ -63,7 +63,6 @@ public class MachineStockController extends SelectorComposer<Component> {
 	// services
 	@WireVariable
 	private MachineTypeRepository machineTypeRepository;
-
 	@WireVariable
 	private MachineRepository machineRepository;
 
@@ -137,7 +136,7 @@ public class MachineStockController extends SelectorComposer<Component> {
 			resetButton.setDisabled(false);
 		}
 	}
-	
+
 	@Listen("onClick = #newButton")
 	public void newButtonClick() {
 		currentMachine = null;

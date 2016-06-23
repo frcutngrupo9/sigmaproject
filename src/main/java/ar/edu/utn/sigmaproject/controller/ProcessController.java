@@ -57,7 +57,7 @@ public class ProcessController extends SelectorComposer<Component>{
 
 	// attributes
 	private ProcessType currentProcessType;
-	SortingPagingHelper<ProcessType> sortingPagingHelper;
+	private SortingPagingHelper<ProcessType> sortingPagingHelper;
 
 	// list
 	private List<MachineType> machineTypeList;

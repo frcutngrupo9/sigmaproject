@@ -13,9 +13,6 @@ public class SupplyRequirement implements Serializable, Cloneable {
 	Long id;
 
 	@ManyToOne
-	ProductionPlan productionPlan;
-
-	@ManyToOne
 	SupplyType supplyType;
 
 	BigDecimal quantity = BigDecimal.ZERO;
@@ -26,8 +23,7 @@ public class SupplyRequirement implements Serializable, Cloneable {
 
 	}
 
-	public SupplyRequirement(ProductionPlan productionPlan, SupplyType supplyType, BigDecimal quantity) {
-		this.productionPlan = productionPlan;
+	public SupplyRequirement(SupplyType supplyType, BigDecimal quantity) {
 		this.supplyType = supplyType;
 		this.quantity = quantity;
 		isFulfilled = false;
@@ -39,14 +35,6 @@ public class SupplyRequirement implements Serializable, Cloneable {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public ProductionPlan getProductionPlan() {
-		return productionPlan;
-	}
-
-	public void setProductionPlan(ProductionPlan productionPlan) {
-		this.productionPlan = productionPlan;
 	}
 
 	public SupplyType getSupplyType() {

@@ -7,11 +7,10 @@
     <separator/>
     <grid id="orderGrid" mold="paging" pageSize="7">
     	<auxhead>
-			<auxheader label="Pedidos" colspan="10"/>
+			<auxheader label="Pedidos" colspan="9"/>
 		</auxhead>
         <columns>
-        	<column width="40px" />
-            <column label="Id" width="40px" align="center"/>
+        	<column label="Id" width="50px" align="center"/>
             <column label="Numero" align="center"/>
             <column label="Cliente" align="center"/>
             <column label="Fecha" align="center"/>
@@ -23,21 +22,15 @@
         </columns>
         <template name="model">
             <row>
-            	<!-- se usa custom-attributes para guardar los productos en la fila, 
-				 		para que se puedan acceder cuando se usa onOpen del detail -->
-            	<custom-attributes products="${win_order_list$composer.getOrderDetails(each.id)}"/>
-            	<detail open="false" fulfill="onOpen">
-            		<include src="/order_products.zul" products="${products}"/>
-            	</detail>
                 <label value="${each.id}"/>
                 <label value="${each.number}"/>
-                <label value="${win_order_list$composer.getClientName(each.idClient)}"/>
+                <label value="${each.getClient().getName()}"/>
                 <label value="${each.date}"/>
                 <label value="${each.details.size()}"/>
-                <label value="${win_order_list$composer.getStateName(each.id)}"/>
-                <label value="${win_order_list$composer.totalPrice(each.id)} $"/>
-                <button forward="onClick=orderGrid.onEditOrder(${each.id})"  image="/img/edit16x16.png"/>
-                <button disabled="${win_order_list$composer.isStateCancel(each.id)}" forward="onClick=orderGrid.onCancelOrder(${each.id})"  image="/img/delete16x16.png"/>
+                <label value="${each.getCurrentStateType().getName()}"/>
+                <label value="${win_order_list$composer.totalPrice(each)} $"/>
+                <button forward="onClick=orderGrid.onEditOrder(${each})"  image="/img/edit16x16.png"/>
+                <button disabled="${win_order_list$composer.isStateCancel(each)}" forward="onClick=orderGrid.onCancelOrder(${each})"  image="/img/delete16x16.png"/>
             </row>
         </template>
     </grid>

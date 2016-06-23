@@ -1,7 +1,6 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
@@ -17,14 +16,12 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
-import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
-import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
@@ -45,13 +42,10 @@ public class OrderListController extends SelectorComposer<Component>{
 	// services
 	@WireVariable
 	private OrderRepository orderRepository;
-
 	@WireVariable
 	private ClientRepository clientRepository;
-
 	@WireVariable
 	private ProductRepository productSRepository;
-
 	@WireVariable
 	private OrderStateTypeRepository orderStateTypeRepository;
 
@@ -90,12 +84,10 @@ public class OrderListController extends SelectorComposer<Component>{
 			public void onEvent(Event evt) throws InterruptedException {
 				if (evt.getName().equals("onOK")) {
 					Order order = (Order) ForwEvt.getData();
-					if (order.getStates().get(order.getStates().size() - 1).getType().getName().equals("cancelado")) {
+					if (order.getCurrentStateType().getName().equals("Cancelado")) {
 						alert("No se puede cancelar un Pedido ya cancelado.");
 					} else {
-						OrderStateType orderStateType = orderStateTypeRepository.findByName("cancelado");
-						OrderState aux = new OrderState(order, orderStateType, new Date());
-						order.getStates().add(aux);
+						OrderStateType orderStateType = orderStateTypeRepository.findByName("Cancelado");
 						order.setCurrentStateType(orderStateType);
 						orderRepository.save(order);// grabamos el estado del pedido
 						refreshList();
@@ -119,6 +111,10 @@ public class OrderListController extends SelectorComposer<Component>{
 		orderList = orderRepository.findAll();
 		orderListModel = new ListModelList<Order>(orderList);
 		orderGrid.setModel(orderListModel);
+	}
+
+	public boolean isStateCancel(Order order) {
+		return getStateName(order).equals("Cancelado");
 	}
 
 	public String getStateName(Order order) {

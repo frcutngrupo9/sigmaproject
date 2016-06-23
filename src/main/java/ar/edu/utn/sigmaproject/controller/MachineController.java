@@ -1,16 +1,12 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
-import ar.edu.utn.sigmaproject.domain.ToolType;
-import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
-import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -19,9 +15,16 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
-import org.zkoss.zul.*;
+import org.zkoss.zul.Button;
+import org.zkoss.zul.Grid;
+import org.zkoss.zul.Intbox;
+import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Paging;
+import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.MachineType;
+import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
+import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class MachineController extends SelectorComposer<Component>{

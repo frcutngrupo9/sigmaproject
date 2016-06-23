@@ -76,10 +76,9 @@ public class SupplyStockController extends SelectorComposer<Component> {
 
 	// services
 	@WireVariable
-	SupplyTypeRepository supplyTypeRepository;
-
+	private SupplyTypeRepository supplyTypeRepository;
 	@WireVariable
-	WorkerRepository workerRepository;
+	private WorkerRepository workerRepository;
 
 	// attributes
 	private SupplyType currentSupplyType;
@@ -178,7 +177,7 @@ public class SupplyStockController extends SelectorComposer<Component> {
 		currentSupplyType = null;
 		refreshView();
 	}
-	
+
 	@Listen("onClick = #stockIncreaseButton")
 	public void stockIncreaseButtonClick() {
 		stockModificationGrid.setVisible(true);
@@ -187,7 +186,7 @@ public class SupplyStockController extends SelectorComposer<Component> {
 		numberIntbox.setValue(null);
 		quantityDoublebox.setValue(null);
 	}
-	
+
 	@Listen("onClick = #stockDecreaseButton")
 	public void stockDecreaseButtonClick() {
 		stockModificationGrid.setVisible(true);
@@ -196,7 +195,7 @@ public class SupplyStockController extends SelectorComposer<Component> {
 		numberIntbox.setValue(null);
 		quantityDoublebox.setValue(null);
 	}
-	
+
 	@Listen("onClick = #saveNewStockButton")
 	public void saveNewStockButton() {
 		if(numberIntbox.getValue() <= 0) {
@@ -225,18 +224,18 @@ public class SupplyStockController extends SelectorComposer<Component> {
 				}
 			}
 			stockDoublebox.setValue(newStock.doubleValue());
-//			currentWood.setStock(newStock);
-//			currentWood = woodService.updateWood(currentWood);
-//			refreshView();
+			//			currentWood.setStock(newStock);
+			//			currentWood = woodService.updateWood(currentWood);
+			//			refreshView();
 		}
 		stockModificationGrid.setVisible(false);
 	}
-	
+
 	@Listen("onClick = #cancelNewStockButton")
 	public void cancelNewStockButtonClick() {
 		stockModificationGrid.setVisible(false);
 	}
-	
+
 	@Listen("onClick = #resetNewStockButton")
 	public void resetNewStockButtonClick() {
 		workerCombobox.setSelectedIndex(-1);
