@@ -24,7 +24,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 	@ManyToOne
 	Worker worker;
 
-	@OneToMany
+	@OneToMany(orphanRemoval = true)
 	@OrderColumn(name = "detail_index")
 	List<ProductionOrderDetail> details = new ArrayList<>();
 

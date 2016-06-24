@@ -19,11 +19,11 @@
 	        </listhead>
 	        <template name="model">
 	            <listitem>
-	            	<listcell label="${modalDialog$composer.getProductName(each.idProduct)}"/>
+	            	<listcell label="${modalDialog$composer.getProductName(each)}"/>
 	            	<listcell label="${each.name}"/>
-	                <listcell label="${each.length.doubleValue()} ${modalDialog$composer.getMeasureUnitName(each.lengthIdMeasureUnit)}"/>
-	                <listcell label="${each.width.doubleValue()} ${modalDialog$composer.getMeasureUnitName(each.widthIdMeasureUnit)}"/>
-	                <listcell label="${each.depth.doubleValue()} ${modalDialog$composer.getMeasureUnitName(each.depthIdMeasureUnit)}"/>
+	                <listcell label="${each.length.doubleValue()} ${each.lengthMeasureUnit.getShortName()}"/>
+	                <listcell label="${each.width.doubleValue()} ${each.widthMeasureUnit.getShortName()}"/>
+	                <listcell label="${each.depth.doubleValue()} ${each.depthMeasureUnit.getShortName()}"/>
 	                <listcell label="${each.size}"/>
 	                <listcell label="${each.units}"/>
 	            </listitem>

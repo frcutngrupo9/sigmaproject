@@ -17,17 +17,17 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
 
-	@OneToMany
+	@OneToMany(orphanRemoval = true)
 	@OrderColumn(name = "detail_index")
 	List<ProductionPlanDetail> planDetails = new ArrayList<>();
 
 	@ManyToOne
 	ProductionPlanStateType currentStateType;
 
-	@OneToMany
+	@OneToMany(orphanRemoval = true)
 	List<RawMaterialRequirement> rawMaterialRequirements = new ArrayList<>();
 
-	@OneToMany
+	@OneToMany(orphanRemoval = true)
 	List<SupplyRequirement> supplyRequirements = new ArrayList<>();
 
 	String name = "";
