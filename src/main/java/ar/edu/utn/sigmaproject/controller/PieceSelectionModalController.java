@@ -16,9 +16,10 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Window;
 
-import ar.edu.utn.sigmaproject.domain.MeasureUnit;
 import ar.edu.utn.sigmaproject.domain.Piece;
+import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.service.PieceRepository;
+import ar.edu.utn.sigmaproject.service.ProductRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class PieceSelectionModalController extends SelectorComposer<Component>{
@@ -34,6 +35,8 @@ public class PieceSelectionModalController extends SelectorComposer<Component>{
 	// services
 	@WireVariable
 	private PieceRepository pieceRepository;
+	@WireVariable
+	private ProductRepository productRepository;
 
 	// atributes
 
@@ -64,12 +67,13 @@ public class PieceSelectionModalController extends SelectorComposer<Component>{
 		modalDialog.detach();
 	}
 
-	public String getMeasureUnitName(MeasureUnit measureUnit) {
-		if (measureUnit != null) {
-			return measureUnit.getName();
-		} else {
-			return "[Sin Unidad de Medida]";
+	public String getProductName(Piece piece) {
+		for(Product aux : productRepository.findAll()) {
+			if(aux.getPieces().contains(piece)) {
+				return aux.getName();
+			}
 		}
+		return "";
 	}
 
 }

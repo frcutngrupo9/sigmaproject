@@ -20,10 +20,11 @@ public class Piece implements Serializable, Cloneable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
 
-	@OneToMany
+	@OneToMany(orphanRemoval = true)
 	List<Process> processes = new ArrayList<>();
 
 	String name = "";
+	
 	BigDecimal length = BigDecimal.ZERO;
 
 	@ManyToOne
@@ -35,6 +36,7 @@ public class Piece implements Serializable, Cloneable {
 	MeasureUnit depthMeasureUnit;
 
 	BigDecimal width = BigDecimal.ZERO;
+
 	@ManyToOne
 	MeasureUnit widthMeasureUnit;
 

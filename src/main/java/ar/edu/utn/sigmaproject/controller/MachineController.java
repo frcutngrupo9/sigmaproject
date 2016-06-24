@@ -27,7 +27,7 @@ import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
 import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class MachineController extends SelectorComposer<Component>{
+public class MachineController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
 	@Wire

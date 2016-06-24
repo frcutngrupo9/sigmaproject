@@ -1,0 +1,73 @@
+<window id="productSupplyWindow" apply="ar.edu.utn.sigmaproject.controller.ProductSupplyController" width="60%" position="center,center" closable="true" action="show: slideDown;hide: slideUp">
+	<caption label="Insumos de Producto" style="text-align:center; font-weight: bold;"/>
+	<panel border="rounded">
+        <panelchildren>
+            <vlayout>
+                <hlayout>
+                	<separator/>
+                    <label value="Insumo: "/>
+                    <bandbox id="supplyTypeBandbox" buttonVisible = "true" autodrop = "true">
+                        <bandpopup>
+                            <vbox>
+                                <hbox>
+                                    Buscar
+                                    <textbox />
+                                </hbox>
+                                <listbox id="supplyTypePopupListbox" width="500px">
+	                                <listhead>
+	                                    <listheader label="Id"/>
+	                                    <listheader label="Descripcion"/>
+	                                    <listheader label="Detalles"/>
+	                                    <listheader label="Medida"/>
+	                                </listhead>
+	                                <template name="model">
+	                                    <listitem>
+	                                        <listcell label="${each.id}"/>
+	                                        <listcell label="${each.description}"/>
+	                                        <listcell label="${each.details}"/>
+	                                        <listcell label="${each.measure}"/>
+	                                    </listitem>
+	                                </template>
+                                </listbox>
+                            </vbox>
+                        </bandpopup>
+                    </bandbox>
+                    <label value="Cantidad: "/>
+                    <doublebox id="supplyQuantityDoublebox" constraint="no negative" width="36px"/>
+                    <button id="saveSupplyButton" label="Grabar Insumo"/>
+                    <button id="resetSupplyButton" label="Reset Insumo"/>
+                    <button id="deleteSupplyButton" label="Eliminar Insumo"/>
+                    <button id="cancelSupplyButton" label="Cancelar Edicion"/>
+                </hlayout>
+                <separator/>
+                <listbox id="supplyListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
+                    <auxhead>
+                        <auxheader label="Insumos" colspan="6"/>
+                    </auxhead>
+                    <listhead>
+			            <listheader label="Descripcion"/>
+			            <listheader label="Detalles"/>
+			            <listheader label="Marca"/>
+			            <listheader label="Presentacion"/>
+			            <listheader label="Medida"/>
+			            <listheader label="Cantidad"/>
+                    </listhead>
+                    <template name="model">
+                        <listitem>
+			                <listcell label="${each.getSupplyType().description}"/>
+			                <listcell label="${each.getSupplyType().details}"/>
+			                <listcell label="${each.getSupplyType().brand}"/>
+			                <listcell label="${each.getSupplyType().presentation}"/>
+			                <listcell label="${each.getSupplyType().measure}"/>
+			                <listcell label="${each.quantity}"/>
+                        </listitem>
+                    </template>
+                </listbox>
+                <hlayout>
+                    <button id="acceptSupplyListButton" label="Aceptar"/>
+                    <button id="cancelSupplyListButton" label="Cancelar"/>
+                </hlayout>
+            </vlayout>
+        </panelchildren>
+    </panel>
+</window>

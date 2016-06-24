@@ -5,6 +5,7 @@ import org.hibernate.search.annotations.Indexed;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.*;
@@ -18,14 +19,14 @@ public class Product implements Serializable, Cloneable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
 
-	@OneToMany
-	List<Piece> pieces;
+	@OneToMany(orphanRemoval = true)
+	List<Piece> pieces = new ArrayList<>();
 
-	@OneToMany
-	List<Supply> supplies;
+	@OneToMany(orphanRemoval = true)
+	List<Supply> supplies = new ArrayList<>();
 
-	@OneToMany
-	List<RawMaterial> rawMaterials;
+	@OneToMany(orphanRemoval = true)
+	List<RawMaterial> rawMaterials = new ArrayList<>();
 
 	@Lob
 	byte[] imageData = new byte[0];

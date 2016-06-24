@@ -6,12 +6,14 @@ import java.util.List;
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
 import ar.edu.utn.sigmaproject.domain.MeasureUnitType;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
+import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.ProductCategory;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.service.MeasureUnitRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitTypeRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
+import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductCategoryRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
@@ -99,6 +101,31 @@ public class RepositoryHelper {
 		list.add(new ProductCategory("Silla"));
 		list.add(new ProductCategory("Sillon"));
 		for(ProductCategory each : list) {
+			repository.save(each);
+		}
+	}
+	
+	public void generateProcessType(ProcessTypeRepository repository) {
+		List<ProcessType> list = new ArrayList<ProcessType>();
+		list.add(new ProcessType("Trazar", null));
+		list.add(new ProcessType("Garlopear", null));
+		list.add(new ProcessType("Asentar", null));
+		list.add(new ProcessType("Cepillar", null));
+		list.add(new ProcessType("Cortar el Ancho", null));
+		list.add(new ProcessType("Cortar el Largo", null));
+		list.add(new ProcessType("Hacer Cortes Curvos", null));
+		list.add(new ProcessType("Hacer Escopladuras", null));
+		list.add(new ProcessType("Hacer Espigas", null));
+		list.add(new ProcessType("Hacer Molduras", null));
+		list.add(new ProcessType("Hacer Canales", null));
+		list.add(new ProcessType("Replanar", null));
+		list.add(new ProcessType("Masillar", null));
+		list.add(new ProcessType("Clavar", null));
+		list.add(new ProcessType("Lijar Cruzado", null));
+		list.add(new ProcessType("Lijar Derecho", null));
+		list.add(new ProcessType("Agregar Herrajes", null));
+		list.add(new ProcessType("Armar", null));
+		for(ProcessType each : list) {
 			repository.save(each);
 		}
 	}

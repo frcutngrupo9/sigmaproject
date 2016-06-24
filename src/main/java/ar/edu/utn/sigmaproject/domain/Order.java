@@ -24,7 +24,7 @@ public class Order implements Serializable, Cloneable {
 	@ManyToOne
 	Client client;
 
-	@OneToMany
+	@OneToMany(orphanRemoval = true)
 	@OrderColumn(name = "detail_index")
 	List<OrderDetail> details = new ArrayList<OrderDetail>();
 
