@@ -36,9 +36,9 @@
 		                <listitem>
 		                	<listcell label="${each.rawMaterialType.name}"/>
 		                    <listcell label="${each.quantity}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialTypeStock(each.rawMaterialType)}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialStockReserved(each)}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialStockMissing(each)}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialTypeStock(each.rawMaterialType).doubleValue()}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialStockReserved(each).doubleValue()}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialStockMissing(each).doubleValue()}"/>
 		                    <listcell>
 			                    <checkbox value="${each.isFulfilled()}" forward="onCheck=rawMaterialRequirementListbox.onFulfillRawMaterialRequirement(${each})"/>
 			                </listcell>
@@ -73,8 +73,8 @@
 		                	<listcell label="${each.supplyType.measure}"/>
 		                    <listcell label="${each.quantity}"/>
 		                    <listcell label="${each.supplyType.stock}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyStockReserved(each)}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyStockMissing(each)}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyStockReserved(each).doubleValue()}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyStockMissing(each).doubleValue()}"/>
 		                    <listcell>
 			                    <checkbox value="${each.isFulfilled()}" forward="onCheck=supplyRequirementListbox.onFulfillSupplyRequirement(${each})"/>
 			                </listcell>

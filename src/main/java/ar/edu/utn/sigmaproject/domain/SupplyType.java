@@ -130,11 +130,19 @@ public class SupplyType implements Serializable, Cloneable {
 	public void setSuppliesReserved(List<SupplyReserved> suppliesReserved) {
 		this.suppliesReserved = suppliesReserved;
 	}
+	
+	public BigDecimal getStockReserved() {
+		BigDecimal aux = BigDecimal.ZERO;
+		for(SupplyReserved each : suppliesReserved) {
+			aux = aux.add(each.getStockReserved());
+		}
+		return aux;
+	}
 
 	public BigDecimal getStock() {
 		return stock;
 	}
-
+	
 	public void setStock(BigDecimal stock) {
 		this.stock = stock;
 	}

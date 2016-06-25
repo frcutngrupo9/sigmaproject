@@ -97,6 +97,22 @@ public class Wood implements Serializable, Cloneable {
 	public void setStockRepo(BigDecimal stockRepo) {
 		this.stockRepo = stockRepo;
 	}
+	
+	public List<WoodReserved> getWoodsReserved() {
+		return woodsReserved;
+	}
+
+	public void setWoodsReserved(List<WoodReserved> woodsReserved) {
+		this.woodsReserved = woodsReserved;
+	}
+
+	public BigDecimal getStockReserved() {
+		BigDecimal aux = BigDecimal.ZERO;
+		for(WoodReserved each : woodsReserved) {
+			aux = aux.add(each.getStockReserved());
+		}
+		return aux;
+	}
 
 	@Override
 	public int hashCode() {

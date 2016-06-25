@@ -1,5 +1,6 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,9 +29,14 @@ import ar.edu.utn.sigmaproject.domain.RawMaterialType;
 import ar.edu.utn.sigmaproject.domain.Supply;
 import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
 import ar.edu.utn.sigmaproject.domain.SupplyReserved;
+import ar.edu.utn.sigmaproject.domain.Wood;
+import ar.edu.utn.sigmaproject.domain.WoodReserved;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
 import ar.edu.utn.sigmaproject.service.RawMaterialRequirementRepository;
+import ar.edu.utn.sigmaproject.service.SupplyRequirementRepository;
 import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
+import ar.edu.utn.sigmaproject.service.WoodRepository;
+import ar.edu.utn.sigmaproject.service.WoodReservedRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class RequirementPlanCreationController extends SelectorComposer<Component> {
@@ -59,9 +65,15 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 
 	// services
 	@WireVariable
+	private ProductRepository productRepository;
+	@WireVariable
+	private WoodRepository woodRepository;
+	@WireVariable
 	private RawMaterialRequirementRepository rawMaterialRequirementRepository;
 	@WireVariable
-	private ProductRepository productRepository;
+	private SupplyRequirementRepository supplyRequirementRepository;
+	@WireVariable
+	private WoodReservedRepository woodReservedRepository;
 	@WireVariable
 	private SupplyReservedRepository supplyReservedRepository;
 
@@ -91,7 +103,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 				for (ProductTotal productTotal : productTotalList) {
 					for (Supply supply : productTotal.getProduct().getSupplies()) {
 						SupplyRequirement auxSupplyRequirement = null;
-						for (SupplyRequirement supplyRequirement : auxSupplyRequirementList) {// buecamos si el insumo no se encuentra agregado
+						for (SupplyRequirement supplyRequirement : auxSupplyRequirementList) {// buscamos si el insumo no se encuentra agregado
 							if (supply.getSupplyType().equals(supplyRequirement.getSupplyType())) {
 								auxSupplyRequirement = supplyRequirement;
 							}
@@ -134,6 +146,8 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 				}
 			}
 
+			supplyRequirementRepository.save(supplyRequirementList);
+			rawMaterialRequirementRepository.save(rawMaterialRequirementList);
 			supplyRequirementListModel = new ListModelList<SupplyRequirement>(supplyRequirementList);
 			rawMaterialRequirementListModel = new ListModelList<RawMaterialRequirement>(rawMaterialRequirementList);
 		}
@@ -150,41 +164,44 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 			productionPlanDatebox.setValue(currentProductionPlan.getDate());
 		}
 	}
-
-	public String getSupplyStockReserved(SupplyRequirement supplyRequirement) {
+	
+	public BigDecimal getSupplyStockReserved(SupplyRequirement supplyRequirement) {
 		// TODO: como es la verdadera relacion entre estas tres clases? un SupplyRequirement tiene un SupplyType,
 		// por que un SupplyReserved tiene tambien un SupplyType? La relacion es uno a uno entre SupplyRequirement y SupplyReserved?
 		// Respuesta: SupplyType tiene una lista de SupplyReserved, y cada SupplyReserved tiene un SupplyRequirement
 		// para saber para que plan se está reservando. Por lo tanto SupplyReserved reserved no tiene SupplyType, solo lo tiene SupplyRequirement
-		SupplyReserved aux = supplyReservedRepository.findBySupplyTypeAndSupplyRequirement(supplyRequirement.getSupplyType(), supplyRequirement);
-		if(aux != null) {
-			return aux.getStockReserved() + "";
+		SupplyReserved supplyReserved = supplyReservedRepository.findBySupplyRequirement(supplyRequirement);
+		if(supplyReserved == null) {
+			return BigDecimal.ZERO;
 		} else {
-			return "0";
+			return supplyReserved.getStockReserved();
+		}
+	}
+	
+	public BigDecimal getSupplyStockMissing(SupplyRequirement supplyRequirement) {
+		return supplyRequirement.getQuantity().subtract(getSupplyStockReserved(supplyRequirement));
+	}
+
+	public BigDecimal getRawMaterialTypeStock(RawMaterialType rawMaterialType) {
+		List<Wood> woodList = woodRepository.findByRawMaterialType(rawMaterialType);
+		BigDecimal stock = BigDecimal.ZERO;
+		for(Wood each : woodList) {
+			stock = stock.add(each.getStock());
+		}
+		return stock;
+	}
+
+	public BigDecimal getRawMaterialStockReserved(RawMaterialRequirement rawMaterialRequirement) {
+		WoodReserved woodReserved = woodReservedRepository.findByRawMaterialRequirement(rawMaterialRequirement);
+		if(woodReserved == null) {
+			return BigDecimal.ZERO;
+		} else {
+			return woodReserved.getStockReserved();
 		}
 	}
 
-	public double getSupplyStockMissing(SupplyRequirement supplyRequirement) {
-		// TODO: como es la verdadera relacion entre estas tres clases? un SupplyRequirement tiene un SupplyType,
-		// por que un SupplyReserved tiene tambien un SupplyType? La relacion es uno a uno entre SupplyRequirement y SupplyReserved?
-		SupplyReserved aux = supplyReservedRepository.findBySupplyTypeAndSupplyRequirement(supplyRequirement.getSupplyType(), supplyRequirement);
-		if(aux != null) {
-			return supplyRequirement.getQuantity().subtract(aux.getStockReserved()).doubleValue();
-		} else {
-			return supplyRequirement.getQuantity().doubleValue();
-		}
-	}
-
-	public String getRawMaterialTypeStock(RawMaterialType rawMaterialType) {
-		return "0";
-	}
-
-	public String getRawMaterialStockReserved(RawMaterialRequirement rawMaterialRequirement) {
-		return "0";
-	}
-
-	public String getRawMaterialStockMissing(RawMaterialRequirement rawMaterialRequirement) {
-		return rawMaterialRequirement.getQuantity() + "";
+	public BigDecimal getRawMaterialStockMissing(RawMaterialRequirement rawMaterialRequirement) {
+		return rawMaterialRequirement.getQuantity().subtract(getRawMaterialStockReserved(rawMaterialRequirement));
 	}
 
 	@Listen("onFulfillSupplyRequirement = #supplyRequirementListbox")

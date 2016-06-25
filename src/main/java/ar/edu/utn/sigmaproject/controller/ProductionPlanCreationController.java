@@ -171,7 +171,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			Clients.showNotification("Ingresar al menos 1 pedido", addOrderButton);
 			return;
 		}
-		String productionPlanName = productionPlanNameTextbox.getText();
+		String productionPlanName = productionPlanNameTextbox.getText().toUpperCase();
 		Date production_plan_date = productionPlanDatebox.getValue();
 		ProductionPlanStateType productionPlanStateType;
 		if(productionPlanStateTypeSelectbox.getSelectedIndex() == -1) {

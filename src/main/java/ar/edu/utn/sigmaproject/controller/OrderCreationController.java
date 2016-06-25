@@ -128,6 +128,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		orderStateTypeList = orderStateTypeRepository.findAll();
 		if(orderStateTypeList.isEmpty()) {
 			new RepositoryHelper().generateOrderStateType(orderStateTypeRepository);
+			orderStateTypeList = orderStateTypeRepository.findAll();
 		}
 		orderStateTypeListModel = new ListModelList<OrderStateType>(orderStateTypeList);
 		orderStateTypeSelectbox.setModel(orderStateTypeListModel);

@@ -254,7 +254,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 				return;
 			}
 		}
-		String productName = productNameTextbox.getText();
+		String productName = productNameTextbox.getText().toUpperCase();
 		String productDetails = productDetailsTextbox.getText();
 		String productCode = productCodeTextbox.getText();
 		ProductCategory productCategory = productCategoryCombobox.getSelectedItem().getValue();
@@ -280,7 +280,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			}
 			eachPiece = pieceRepository.save(eachPiece);
 		}
-		productRepository.save(currentProduct);
+		currentProduct = productRepository.save(currentProduct);
 
 		// mostrar mensaje al user
 		Clients.showNotification("Producto guardado");
