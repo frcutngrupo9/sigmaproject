@@ -1,7 +1,5 @@
 package ar.edu.utn.sigmaproject.controller;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +21,6 @@ import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
-import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
@@ -34,8 +31,10 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
+import ar.edu.utn.sigmaproject.util.RepositoryHelper;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProductionOrderListController extends SelectorComposer<Component> {
@@ -59,16 +58,17 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 	private ProductionPlanRepository productionPlanRepository;
 	@WireVariable
 	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
+	@WireVariable
+	private ProductionOrderStateRepository productionOrderStateRepository;
 
 	// atributes
 	private ProductionPlan currentProductionPlan;
 
 	// list
 	private List<ProductionOrder> productionOrderList;
-	private List<ProductTotal> productTotalList;
 
 	// list models
-	private ListModelList<ProductTotal> productionOrderListModel;
+	private ListModelList<ProductionOrder> productionOrderListModel;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception{
@@ -76,10 +76,18 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 
 		currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
 		if(currentProductionPlan == null) {throw new RuntimeException("ProductionPlan not found");}
+		if(productionOrderStateRepository.findAll().isEmpty()) {
+			new RepositoryHelper().generateProductionOrderState(productionOrderStateRepository);
+		}
 		productionOrderList = productionOrderRepository.findByProductionPlan(currentProductionPlan);
-		List<ProductTotal> productTotalList = currentProductionPlan.getProductTotalList();
-
-		productionOrderListModel = new ListModelList<ProductTotal>(productTotalList);
+		if(productionOrderList.isEmpty()) {
+			List<ProductTotal> productTotalList = currentProductionPlan.getProductTotalList();
+			for(ProductTotal each : productTotalList) {
+				productionOrderList.add(new ProductionOrder(currentProductionPlan, each.getProduct(), null, null, each.getTotalUnits(), null, null, productionOrderStateRepository.findByName("Generada")));
+			}
+//			productionOrderList = productionOrderRepository.save(productionOrderList);
+		}
+		productionOrderListModel = new ListModelList<ProductionOrder>(productionOrderList);
 		productionOrderGrid.setModel(productionOrderListModel);
 
 		refreshView();
@@ -102,47 +110,25 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 
 	}
 
-	public String getProductUnits(Product product) {
-		int product_units = 0;
-		for(ProductTotal productTotal : productTotalList) {
-			if(productTotal.getProduct().equals(product)) {
-				product_units = productTotal.getTotalUnits();
-			}
-		}
-		return "" + product_units;
-	}
-
-	public String getWorkerName(Product product) {
-		ProductionOrder aux = getProductionOrder(product);
-		if(aux == null) {
+	public String getWorkerName(ProductionOrder productionOrder) {
+		if(productionOrder == null) {
 			return "";
 		} else {
-			if(aux.getWorker() != null) {
-				return aux.getWorker().getName();
+			if(productionOrder.getWorker() != null) {
+				return productionOrder.getWorker().getName();
 			} else {
 				return "[no asignado]";
 			}
 		}
-
 	}
 
 	@Listen("onEditProductionOrder = #productionOrderGrid")
 	public void doEditProductionOrder(ForwardEvent evt) {
-		ProductTotal product = (ProductTotal) evt.getData();
-		Executions.getCurrent().setAttribute("selected_product", product);
+		ProductionOrder productionOrder = (ProductionOrder) evt.getData();
+		Executions.getCurrent().setAttribute("selected_production_order", productionOrder);
 		Executions.getCurrent().setAttribute("selected_production_plan", currentProductionPlan);
 		Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/production_order_creation.zul");
-	}
-
-	public ListModel<Process> getProductionOrderProcesses(Product product) {// buscar todos los procesos del producto
-		List<Process> list = new ArrayList<>();
-		for(Piece piece : product.getPieces()) {
-			for(Process process : piece.getProcesses()) {
-				list.add(Process.clone(process));
-			}
-		}
-		return new ListModelList<>(list);
 	}
 
 	public ListModel<ProductionOrderDetail> getProductionOrderDetailList(Product product) {// buscar todos los procesos del producto
@@ -162,8 +148,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		}
 	}
 
-	public String getPercentComplete(Product product) {
-		ProductionOrder aux = getProductionOrder(product);
+	public String getPercentComplete(ProductionOrder aux) {
 		if(aux != null) {
 			List<ProductionOrderDetail> productionOrderDetailList = aux.getDetails();
 			int quantityFinished = 0;
@@ -204,76 +189,13 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		return name;
 	}
 
-	public ProductionOrder getProductionOrder(Product product) {
-		for(ProductionOrder each : productionOrderList) {
-			if(each.getProduct().equals(product)) {
-				return each;
-			}
-		}
-		return null;
-	}
 
-	public String getProductionOrderState(Product product) {
-		ProductionOrder aux = getProductionOrder(product);
-		if(aux == null) {
-			return "No Generado";
-		} else {
-			if(aux.getState() == null) {
-				return "Generado";
-			} else {
-				return aux.getState().getName();
-			}
+	public String getProductionOrderButtonLabel(ProductionOrder productionOrder) {
+		if(productionOrder.getState() == null) {
+			productionOrder.setState(productionOrderStateRepository.findByName("Generada"));
 		}
-	}
-
-	public String getProductionOrderId(Product product) {
-		ProductionOrder aux = getProductionOrder(product);
-		if(aux == null) {
-			return "";
-		} else {
-			return aux.getId() + "";
-		}
-	}
-
-	public String getProductionOrderNumber(Product product) {
-		ProductionOrder aux = getProductionOrder(product);
-		if(aux == null) {
-			return "";
-		} else {
-			return aux.getNumber() + "";
-		}
-	}
-
-	public String getProductionOrderDate(Product product) {
-		ProductionOrder aux = getProductionOrder(product);
-		if(aux == null) {
-			return "";
-		} else {
-			DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-			String productionOrderDate = df.format(aux.getDate());
-			return productionOrderDate;
-		}
-	}
-
-	public String getProductionOrderDateFinished(Product product) {
-		ProductionOrder aux = getProductionOrder(product);
-		if(aux == null) {
-			return "";
-		} else {
-			if(aux.getDateFinished() != null) {
-				DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-				String productionOrderDateFinished = df.format(aux.getDateFinished());
-				return productionOrderDateFinished;
-			} else {
-				return "No Finalizado";
-			}
-		}
-	}
-
-	public String getProductionOrderButtonLabel(Product product) {
-		ProductionOrder aux = getProductionOrder(product);
-		if(aux == null) {
-			return "Generar";
+		if(productionOrder.getState().getName().equals("Generada")) {
+			return "Iniciar";
 		} else {
 			return "Abrir";
 		}
@@ -284,8 +206,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		return lastProductionPlanState != null && lastProductionPlanState.getName().equals("Cancelado");
 	}
 
-	public boolean isProductionOrderStateCancel(Product product) {
-		ProductionOrder aux = getProductionOrder(product);
+	public boolean isProductionOrderStateCancel(ProductionOrder aux) {
 		if(aux == null) {
 			return false;
 		} else {

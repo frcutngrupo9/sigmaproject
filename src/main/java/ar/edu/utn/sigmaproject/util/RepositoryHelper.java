@@ -20,7 +20,7 @@ import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
 
 public class RepositoryHelper {
 
-	public void generateMeasureUnitTypeList(MeasureUnitRepository mUR, MeasureUnitTypeRepository mUTR) {
+	public void generateMeasureUnitType(MeasureUnitRepository mUR, MeasureUnitTypeRepository mUTR) {
 		List<MeasureUnitType> measureUnitTypeList = new ArrayList<MeasureUnitType>();
 		measureUnitTypeList.add(new MeasureUnitType("Longitud"));
 		measureUnitTypeList.add(new MeasureUnitType("Tiempo"));
@@ -53,7 +53,7 @@ public class RepositoryHelper {
 		}
 	}
 
-	public void generateProductionPlanStateTypes(ProductionPlanStateTypeRepository repository) {
+	public void generateProductionPlanStateType(ProductionPlanStateTypeRepository repository) {
 		List<ProductionPlanStateType> list = new ArrayList<ProductionPlanStateType>();
 		list.add(new ProductionPlanStateType("Iniciado", null));
 		list.add(new ProductionPlanStateType("Cancelado", null));
@@ -66,7 +66,7 @@ public class RepositoryHelper {
 		}
 	}
 
-	public void generateProductionOrderStates(ProductionOrderStateRepository repository) {
+	public void generateProductionOrderState(ProductionOrderStateRepository repository) {
 		List<ProductionOrderState> list = new ArrayList<ProductionOrderState>();
 		list.add(new ProductionOrderState("Generada"));
 		list.add(new ProductionOrderState("Iniciada"));

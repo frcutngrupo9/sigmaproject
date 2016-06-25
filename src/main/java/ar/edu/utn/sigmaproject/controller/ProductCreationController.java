@@ -193,7 +193,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 
 		MeasureUnitType measureUnitType = measureUnitTypeRepository.findByName("Longitud");
 		if(measureUnitType == null) {
-			new RepositoryHelper().generateMeasureUnitTypeList(measureUnitRepository, measureUnitTypeRepository);
+			new RepositoryHelper().generateMeasureUnitType(measureUnitRepository, measureUnitTypeRepository);
 			measureUnitType = measureUnitTypeRepository.findByName("Longitud");
 		}
 		List<MeasureUnit> measureUnitList = measureUnitRepository.findByType(measureUnitType);

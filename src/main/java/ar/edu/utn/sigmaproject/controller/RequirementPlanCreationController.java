@@ -118,11 +118,12 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 				if(auxSupplyRequirementList.isEmpty() != true) {
 					supplyRequirementList = auxSupplyRequirementList;
 				}
+				supplyRequirementList = supplyRequirementRepository.save(supplyRequirementList);
 			}
 
 			rawMaterialRequirementList = currentProductionPlan.getRawMaterialRequirements();
 			if (rawMaterialRequirementList.isEmpty()) {
-				// debemos generar las materias primas en caso de que no se hayan generado aun
+				// debemos generar lor requerimientos de materias primas en caso de que no se hayan generado aun
 				List<RawMaterialRequirement> auxRawMaterialRequirementList = new ArrayList<RawMaterialRequirement>();
 				List<ProductTotal> productTotalList = currentProductionPlan.getProductTotalList();
 				for(ProductTotal productTotal : productTotalList) {
@@ -144,10 +145,9 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 				if(auxRawMaterialRequirementList.isEmpty() != true) {
 					rawMaterialRequirementList = auxRawMaterialRequirementList;
 				}
+				rawMaterialRequirementList = rawMaterialRequirementRepository.save(rawMaterialRequirementList);
 			}
 
-			supplyRequirementRepository.save(supplyRequirementList);
-			rawMaterialRequirementRepository.save(rawMaterialRequirementList);
 			supplyRequirementListModel = new ListModelList<SupplyRequirement>(supplyRequirementList);
 			rawMaterialRequirementListModel = new ListModelList<RawMaterialRequirement>(rawMaterialRequirementList);
 		}

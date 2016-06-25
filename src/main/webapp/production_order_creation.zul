@@ -23,9 +23,9 @@
 							<label value="Unidades a Fabricar: "/>
 							<intbox id="productUnitsIntbox"/>
                             <label value="Plan de Produccion: "/>
-							<textbox id="productionPlanNameTextbox" width="100%"/>
+							<textbox id="productionPlanNameTextbox"/>
 							<label value="Estado Plan: "/>
-                            <textbox id="productionPlanStateTypeTextbox" width="100%"/>
+                            <textbox id="productionPlanStateTypeTextbox"/>
 							<label value="Fecha: "/>
 							<datebox id="productionPlanDatebox" format="dd-MM-yyyy"/>
                         </row>
@@ -39,7 +39,11 @@
                     <rows>
                     	<row>
                             <label value="Estado Orden de Produccion: "/>
-							<combobox id="productionOrderStateCombobox"/>
+							<combobox id="productionOrderStateCombobox">
+		                        <template name="model">
+		                        	<comboitem label="${each.name}" value="${each}">
+		                        </template>
+		                    </combobox>
                         </row>
                         <row>
                             <label value="Numero Orden de Produccion: "/>
@@ -49,7 +53,7 @@
                             <label value="Empleado Asignado: "/>
 							<selectbox id="workerSelectbox">
 			                    <template name="model">
-			                        <label value="${each.name}" />
+			                        <label value="${each.name}"/>
 			                    </template>
 			                </selectbox>
                         </row>

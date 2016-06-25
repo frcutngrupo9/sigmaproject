@@ -113,7 +113,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 
 		productionPlanStateTypeList = productionPlanStateTypeRepository.findAll();
 		if(productionPlanStateTypeList.isEmpty()) {
-			new RepositoryHelper().generateProductionPlanStateTypes(productionPlanStateTypeRepository);
+			new RepositoryHelper().generateProductionPlanStateType(productionPlanStateTypeRepository);
 			productionPlanStateTypeList = productionPlanStateTypeRepository.findAll();
 		}
 		productionPlanStateTypeListModel = new ListModelList<ProductionPlanStateType>(productionPlanStateTypeList);
