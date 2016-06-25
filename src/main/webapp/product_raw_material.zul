@@ -15,7 +15,6 @@
                                 </hbox>
                                 <listbox id="rawMaterialTypePopupListbox" width="500px">
 	                                <listhead>
-	                                    <listheader label="Id"/>
 	                                    <listheader label="Nombre"/>
 	                                    <listheader label="Largo (L)"/>
 							            <listheader label="Espesor (E)"/>
@@ -23,7 +22,6 @@
 	                                </listhead>
 	                                <template name="model">
 	                                    <listitem>
-	                                        <listcell label="${each.id}"/>
 	                                        <listcell label="${each.name}"/>
 	                                        <listcell label="${each.length.doubleValue()} ${each.getLengthMeasureUnit().getShortName()}"/>
 							                <listcell label="${each.depth.doubleValue()} ${each.getDepthMeasureUnit().getShortName()}"/>

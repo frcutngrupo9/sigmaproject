@@ -15,14 +15,12 @@
                                 </hbox>
                                 <listbox id="supplyTypePopupListbox" width="500px">
 	                                <listhead>
-	                                    <listheader label="Id"/>
 	                                    <listheader label="Descripcion"/>
 	                                    <listheader label="Detalles"/>
 	                                    <listheader label="Medida"/>
 	                                </listhead>
 	                                <template name="model">
 	                                    <listitem>
-	                                        <listcell label="${each.id}"/>
 	                                        <listcell label="${each.description}"/>
 	                                        <listcell label="${each.details}"/>
 	                                        <listcell label="${each.measure}"/>

@@ -8,10 +8,9 @@
     <separator/>
     <grid id="productGrid" mold="paging" pageSize="7" span="true">
     	<auxhead>
-			<auxheader label="Productos" colspan="7"/>
+			<auxheader label="Productos" colspan="6"/>
 		</auxhead>
         <columns>
-            <column label="Id" width="50px" align="center"/>
             <column label="Codigo" align="center"/>
             <column label="Nombre" align="center"/>
             <column label="Detalles" align="center"/>
@@ -21,7 +20,6 @@
         </columns>
         <template name="model">
             <row>
-                <label value="${each.id}"/>
                 <label value="${each.code}"/>
                 <label value="${each.name}"/>
                 <label value="${each.details}"/>

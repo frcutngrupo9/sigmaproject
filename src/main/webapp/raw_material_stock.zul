@@ -7,10 +7,9 @@
     <separator/>
     <listbox id="woodListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
     	<auxhead>
-			<auxheader label="Materia Prima" colspan="8"/>
+			<auxheader label="Materia Prima" colspan="7"/>
 		</auxhead>
         <listhead>
-        	<listheader label="Id" align="center"/>
         	<listheader label="Codigo"/>
             <listheader label="Nombre"/>
             <listheader label="Medidas"/>
@@ -21,7 +20,6 @@
         </listhead>
         <template name="model">
             <listitem>
-                <listcell label="${each.id}"/>
                 <listcell label="${each.code}"/>
                 <listcell label="${win_raw_material_stock$composer.getRawMaterialType(each).name}"/>
                 <listcell label="${win_raw_material_stock$composer.getMeasureFormated(each)}"/>

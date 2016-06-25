@@ -66,7 +66,6 @@
 						<auxheader label="Pedidos" colspan="5"/>
 					</auxhead>
         			<columns>
-            			<column label="Id"/>
             			<column label="Fecha"/>
             			<column label="Cliente"/>
            			 	<column label="Cantidad Productos"/>
@@ -74,7 +73,6 @@
         			</columns>
         			<template name="model">
             			<row>
-                			<label value="${each.getOrder().getId()}"/>
                 			<label value="${each.getOrder().getDate()}"/>
                 			<label value="${each.getOrder().getClient().getName()}"/>
                 			<label value="${each.getOrder().getDetails().size()}"/>

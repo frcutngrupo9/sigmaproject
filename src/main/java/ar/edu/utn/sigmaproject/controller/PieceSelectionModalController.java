@@ -68,10 +68,9 @@ public class PieceSelectionModalController extends SelectorComposer<Component>{
 	}
 
 	public String getProductName(Piece piece) {
-		for(Product aux : productRepository.findAll()) {
-			if(aux.getPieces().contains(piece)) {
-				return aux.getName();
-			}
+		Product aux = productRepository.findByPieces(piece);
+		if(aux != null) {
+			return aux.getName();
 		}
 		return "";
 	}

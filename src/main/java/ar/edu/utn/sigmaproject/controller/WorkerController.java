@@ -87,7 +87,7 @@ public class WorkerController extends SelectorComposer<Component> {
 			Clients.showNotification("Debe ingresar un nombre", nameTextbox);
 			return;
 		}
-		String name = nameTextbox.getText();
+		String name = nameTextbox.getText().toUpperCase();
 		Date dateEmployed = dateEmployedDatebox.getValue();
 		if(currentWorker == null) {
 			// es un nuevo insumo

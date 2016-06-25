@@ -6,7 +6,7 @@
         <separator/>
 	    <listbox id="pieceListbox" mold="paging" pageSize="10" sizedByContent="true" span="true">
 	    	<auxhead>
-				<auxheader label="Piezas" colspan="8"/>
+				<auxheader label="Piezas" colspan="7"/>
 			</auxhead>
 	        <listhead>
 	        	<listheader label="Producto"/>

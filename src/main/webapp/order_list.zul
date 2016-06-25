@@ -7,10 +7,9 @@
     <separator/>
     <grid id="orderGrid" mold="paging" pageSize="7">
     	<auxhead>
-			<auxheader label="Pedidos" colspan="9"/>
+			<auxheader label="Pedidos" colspan="8"/>
 		</auxhead>
         <columns>
-        	<column label="Id" width="50px" align="center"/>
             <column label="Numero" align="center"/>
             <column label="Cliente" align="center"/>
             <column label="Fecha" align="center"/>
@@ -22,7 +21,6 @@
         </columns>
         <template name="model">
             <row>
-                <label value="${each.id}"/>
                 <label value="${each.number}"/>
                 <label value="${each.getClient().getName()}"/>
                 <label value="${each.date}"/>

@@ -2,16 +2,12 @@
 <zk>
     <grid model="${arg.processes}" sizedByContent="true" span="true">
         <columns>
-        	<column label="Id Proceso" align="center"/>
-        	<column label="Id Tipo Proceso" align="center"/>
             <column label="Tipo Proceso" align="center"/>
             <column label="Detalles" align="center"/>
             <column label="Tiempo" align="center"/>
         </columns>
         <template name="model">
             <row>
-                <label value="${each.id}"/>
-                <label value="${each.type.id}"/>
                 <label value="${each.type.name}"/>
             	<label value="${each.details}"/>
             	<label value="${r:getFormattedTime(each.time)}"/>

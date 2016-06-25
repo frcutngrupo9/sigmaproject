@@ -206,6 +206,15 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		currentProduct = (Product) Executions.getCurrent().getAttribute("selected_product");
 		currentPiece = null;
 
+		// listener para cuando se modifique el producto al agregar materias primas o insumos
+		eq = EventQueues.lookup("Product Change Queue", EventQueues.DESKTOP, true);
+		eq.subscribe(new EventListener() {
+			public void onEvent(Event event) throws Exception {
+				Product value = (Product)event.getData();
+				currentProduct = value;
+			}
+		});
+
 		// agregamos un listener para cuando se seleccione una pieza en el modal de copia de otra pieza
 		eq = EventQueues.lookup("Piece Selection Queue", EventQueues.DESKTOP, true);
 		eq.subscribe(new EventListener() {
@@ -267,9 +276,9 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		currentProduct.setPieces(pieceList);
 		for(Piece eachPiece : currentProduct.getPieces()) {
 			for(Process eachProcess : eachPiece.getProcesses()) {
-				processRepository.save(eachProcess);
+				eachProcess = processRepository.save(eachProcess);
 			}
-			pieceRepository.save(eachPiece);
+			eachPiece = pieceRepository.save(eachPiece);
 		}
 		productRepository.save(currentProduct);
 
@@ -796,16 +805,14 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@Listen("onClick = #openRawMaterialListButton")
 	public void openRawMaterialListButtonClick() {
 		Executions.getCurrent().setAttribute("selected_product", currentProduct);
-		Window window = (Window)Executions.createComponents(
-				"/product_raw_material.zul", null, null);
+		Window window = (Window)Executions.createComponents("/product_raw_material.zul", null, null);
 		window.doModal();
 	}
 	
 	@Listen("onClick = #openSupplyListButton")
 	public void openSupplyListButtonClick() {
 		Executions.getCurrent().setAttribute("selected_product", currentProduct);
-		Window window = (Window)Executions.createComponents(
-				"/product_supply.zul", null, null);
+		Window window = (Window)Executions.createComponents("/product_supply.zul", null, null);
 		window.doModal();
 	}
 }

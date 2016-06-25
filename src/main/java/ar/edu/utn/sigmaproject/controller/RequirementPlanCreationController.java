@@ -24,6 +24,7 @@ import ar.edu.utn.sigmaproject.domain.ProductTotal;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.RawMaterial;
 import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
+import ar.edu.utn.sigmaproject.domain.RawMaterialType;
 import ar.edu.utn.sigmaproject.domain.Supply;
 import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
 import ar.edu.utn.sigmaproject.domain.SupplyReserved;
@@ -154,7 +155,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 		// TODO: como es la verdadera relacion entre estas tres clases? un SupplyRequirement tiene un SupplyType,
 		// por que un SupplyReserved tiene tambien un SupplyType? La relacion es uno a uno entre SupplyRequirement y SupplyReserved?
 		// Respuesta: SupplyType tiene una lista de SupplyReserved, y cada SupplyReserved tiene un SupplyRequirement
-		// para saber para que plan se está reservando
+		// para saber para que plan se está reservando. Por lo tanto SupplyReserved reserved no tiene SupplyType, solo lo tiene SupplyRequirement
 		SupplyReserved aux = supplyReservedRepository.findBySupplyTypeAndSupplyRequirement(supplyRequirement.getSupplyType(), supplyRequirement);
 		if(aux != null) {
 			return aux.getStockReserved() + "";
@@ -174,7 +175,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 		}
 	}
 
-	public String getRawMaterialStock(int idRawMaterialType) {
+	public String getRawMaterialTypeStock(RawMaterialType rawMaterialType) {
 		return "0";
 	}
 

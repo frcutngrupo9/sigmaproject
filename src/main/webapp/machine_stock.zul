@@ -5,9 +5,8 @@
         <button id="searchButton" label="Buscar"/>
     </hlayout>
     <separator/>
-    <listbox id="machineListbox"  mold="paging" pageSize="7">
+    <listbox id="machineListbox"  mold="paging" pageSize="6">
         <listhead>
-            <listheader label="Id" width="40px" align="center"/>
             <listheader label="Nombre"/>
             <listheader label="Codigo"/>
             <listheader label="Tipo Maquina"/>
@@ -16,7 +15,6 @@
         </listhead>
         <template name="model">
             <listitem>
-                <listcell label="${each.id}"/>
                 <listcell label="${each.name}"/>
                 <listcell label="${each.code}"/>
                 <listcell label="${win_machine_stock$composer.getMachineType(each).name}"/>

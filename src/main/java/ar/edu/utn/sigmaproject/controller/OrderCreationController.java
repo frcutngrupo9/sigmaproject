@@ -39,7 +39,7 @@ import ar.edu.utn.sigmaproject.service.ProductRepository;
 import ar.edu.utn.sigmaproject.util.RepositoryHelper;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class OrderCreationController extends SelectorComposer<Component>{
+public class OrderCreationController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
 	@Wire
@@ -175,18 +175,19 @@ public class OrderCreationController extends SelectorComposer<Component>{
 		if(currentOrder == null) { // es un pedido nuevo
 			// creamos el nuevo pedido
 			currentOrder = new Order(currentClient, order_number, order_date, order_need_date);
-			currentOrder.setDetails(orderDetailList);
 			currentOrder.setCurrentStateType(order_state_type);
 		} else { // se edita un pedido
 			currentOrder.setClient(currentClient);
 			currentOrder.setNeedDate(order_need_date);
 			currentOrder.setNumber(order_number);
-			currentOrder.setDetails(orderDetailList);
 			if (!currentOrder.getCurrentStateType().equals(order_state_type)) {
 				currentOrder.setCurrentStateType(order_state_type);
 			}
 		}
-		orderDetailRepository.save(orderDetailList);
+		for(OrderDetail each : orderDetailList) {
+			each = orderDetailRepository.save(each);
+		}
+		currentOrder.setDetails(orderDetailList);
 		orderRepository.save(currentOrder);
 		currentOrder = null;
 		currentOrderDetail = null;
@@ -259,7 +260,7 @@ public class OrderCreationController extends SelectorComposer<Component>{
 	private void refreshViewOrder() {
 		if (currentOrder == null) {// nuevo pedido
 			orderCaption.setLabel("Creacion de Pedido");
-			orderStateTypeListModel.addToSelection(orderStateTypeRepository.findByName("iniciado"));
+			orderStateTypeListModel.addToSelection(orderStateTypeRepository.findByName("Iniciado"));
 			orderStateTypeSelectbox.setModel(orderStateTypeListModel);
 			currentClient = null;
 			clientBandbox.setValue("");

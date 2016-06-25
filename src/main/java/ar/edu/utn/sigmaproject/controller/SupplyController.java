@@ -97,7 +97,7 @@ public class SupplyController extends SelectorComposer<Component>{
 			return;
 		}
 		String code = codeTextbox.getText();
-		String description = descriptionTextbox.getText();
+		String description = descriptionTextbox.getText().toUpperCase();
 		String details = detailsTextbox.getText();
 		String brand = brandTextbox.getText();
 		String presentation = presentationTextbox.getText();

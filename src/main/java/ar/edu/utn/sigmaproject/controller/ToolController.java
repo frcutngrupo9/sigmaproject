@@ -88,7 +88,7 @@ public class ToolController extends SelectorComposer<Component>{
 			Clients.showNotification("Debe ingresar un nombre", nameTextbox);
 			return;
 		}
-		String name = nameTextbox.getText();
+		String name = nameTextbox.getText().toUpperCase();
 		String description = descriptionTextbox.getText();
 		String details = detailsTextbox.getText();
 		String brand = brandTextbox.getText();

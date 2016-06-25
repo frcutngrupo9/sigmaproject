@@ -25,10 +25,10 @@
                 </grid>
     			<grid id="productionOrderGrid" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Listado Ordenes de Produccion" colspan="12"/>
+						<auxheader label="Listado Ordenes de Produccion" colspan="11"/>
 					</auxhead>
         			<columns>
-        				<column width="40px" align="center"/>
+        				<!-- <column width="40px" align="center"/> -->
         				<column label="Nombre Producto" align="center"/>
 		                <column label="Cantidad Producto" align="center"/>
         				<column label="Codigo Producto" align="center"/>
@@ -43,13 +43,15 @@
 		            </columns>
 		            <template name="model">
 		                <row>
+		                <!--
 		                	<custom-attributes production_order_detail_list="${win_production_order_list$composer.getProductionOrderDetailList(each)}"/>
 			            	<detail open="false" fulfill="onOpen" visible="${win_production_order_list$composer.getProductionOrder(each) != null}">
 			            		<include src="/production_order_processes.zul" production_order_detail_list="${production_order_detail_list}"/>
 			            	</detail>
-		                	<label value="${each.name}"/>
+			            -->
+		                	<label value="${each.product.name}"/>
 		                	<label value="${each.totalUnits}"/>
-		                	<label value="${each.code}"/>
+		                	<label value="${each.product.code}"/>
 		                    <label value="${win_production_order_list$composer.getProductionOrderState(each)}"/>
 		                    <label value="${win_production_order_list$composer.getProductionOrderId(each)}"/>
                     		<label value="${win_production_order_list$composer.getProductionOrderNumber(each)}"/>

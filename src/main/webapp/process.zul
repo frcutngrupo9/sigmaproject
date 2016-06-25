@@ -7,13 +7,11 @@
     <separator/>
     <listbox id="processTypeListbox">
         <listhead>
-            <listheader label="Id" width="40px"/>
             <listheader label="Nombre"/>
             <listheader label="Maquina Necesaria"/>
         </listhead>
         <template name="model">
             <listitem>
-                <listcell label="${each.id}"/>
                 <listcell label="${each.name}"/>
                 <listcell label="${empty each.machineType.name ? 'Ninguna' : each.machineType.name}"/>
             </listitem>

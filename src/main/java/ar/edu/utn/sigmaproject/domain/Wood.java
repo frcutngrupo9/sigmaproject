@@ -1,8 +1,11 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import javax.persistence.*;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Wood implements Serializable, Cloneable {
@@ -17,6 +20,9 @@ public class Wood implements Serializable, Cloneable {
 
 	@ManyToOne
 	WoodType woodType;
+	
+	@OneToMany(orphanRemoval = true)
+	List<WoodReserved> woodsReserved = new ArrayList<>();
 
 	String code = "";
 	BigDecimal stock = BigDecimal.ZERO;

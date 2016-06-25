@@ -182,19 +182,19 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		if(currentProductionPlan == null) { // es un plan nuevo
 			// creamos el nuevo plan
 			currentProductionPlan = new ProductionPlan(productionPlanName, null, production_plan_date);
-			currentProductionPlan.setPlanDetails(currentProductionPlanDetailList);
 			currentProductionPlan.setCurrentStateType(productionPlanStateType);
 		} else { // se edita un plan
 			currentProductionPlan.setName(productionPlanName);
 			currentProductionPlan.setDate(production_plan_date);
-			currentProductionPlan.setPlanDetails(currentProductionPlanDetailList);
 			if (!currentProductionPlan.getCurrentStateType().equals(productionPlanStateType)) {
 				currentProductionPlan.setCurrentStateType(productionPlanStateType);
 			}
 		}
+
 		for(ProductionPlanDetail each : currentProductionPlanDetailList) {
-			productionPlanDetailRepository.save(each);
+			each = productionPlanDetailRepository.save(each);
 		}
+		currentProductionPlan.setPlanDetails(currentProductionPlanDetailList);
 		productionPlanRepository.save(currentProductionPlan);
 		currentProductionPlan = null;
 		refreshViewProductionPlan();

@@ -2,11 +2,14 @@ package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -37,6 +40,9 @@ public class SupplyType implements Serializable, Cloneable {
 
 	@Field
 	String measure = "";
+	
+	@OneToMany(orphanRemoval = true)
+	List<SupplyReserved> suppliesReserved = new ArrayList<>();
 
 	BigDecimal stock = BigDecimal.ZERO;
 	BigDecimal stockMin = BigDecimal.ZERO;
@@ -115,6 +121,14 @@ public class SupplyType implements Serializable, Cloneable {
 
 	public void setMeasure(String measure) {
 		this.measure = measure;
+	}
+
+	public List<SupplyReserved> getSuppliesReserved() {
+		return suppliesReserved;
+	}
+
+	public void setSuppliesReserved(List<SupplyReserved> suppliesReserved) {
+		this.suppliesReserved = suppliesReserved;
 	}
 
 	public BigDecimal getStock() {
