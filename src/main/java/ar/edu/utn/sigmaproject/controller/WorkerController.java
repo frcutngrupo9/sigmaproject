@@ -1,8 +1,13 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import ar.edu.utn.sigmaproject.service.MachineRepository;
+import ar.edu.utn.sigmaproject.service.WorkerRepository;
+import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -11,12 +16,7 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
-import org.zkoss.zul.Button;
-import org.zkoss.zul.Datebox;
-import org.zkoss.zul.Grid;
-import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Textbox;
+import org.zkoss.zul.*;
 
 import ar.edu.utn.sigmaproject.domain.Worker;
 import ar.edu.utn.sigmaproject.service.WorkerRepository;
@@ -28,7 +28,11 @@ public class WorkerController extends SelectorComposer<Component> {
 	@Wire
 	Textbox searchTextbox;
 	@Wire
+	Button searchButton;
+	@Wire
 	Listbox workerListbox;
+	@Wire
+	Paging pager;
 	@Wire
 	Button newButton;
 	@Wire
@@ -52,19 +56,15 @@ public class WorkerController extends SelectorComposer<Component> {
 
 	// attributes
 	private Worker currentWorker;
-
-	// list
-	private List<Worker> workerList;
-
-	// list models
-	private ListModelList<Worker> workerListModel;
+	SortingPagingHelper<Worker> sortingPagingHelper;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception{
 		super.doAfterCompose(comp);
-		workerList = workerRepository.findAll();
-		workerListModel = new ListModelList<>(workerList);
-		workerListbox.setModel(workerListModel);
+		Map<Integer, String> sortProperties = new HashMap<>();
+		sortProperties.put(0, "name");
+		sortProperties.put(1, "dateEmployed");
+		sortingPagingHelper = new SortingPagingHelper<>(workerRepository, workerListbox, searchButton, searchTextbox, pager, sortProperties);
 		currentWorker = null;
 
 		refreshView();
@@ -98,8 +98,7 @@ public class WorkerController extends SelectorComposer<Component> {
 			currentWorker.setDateEmployed(dateEmployed);
 		}
 		currentWorker = workerRepository.save(currentWorker);
-		workerList = workerRepository.findAll();
-		workerListModel = new ListModelList<Worker>(workerList);
+		sortingPagingHelper.reset();
 		currentWorker = null;
 		refreshView();
 	}
@@ -118,14 +117,14 @@ public class WorkerController extends SelectorComposer<Component> {
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
 		workerRepository.delete(currentWorker);
-		workerListModel.remove(currentWorker);
+		sortingPagingHelper.reset();
 		currentWorker = null;
 		refreshView();
 	}
 
 	@Listen("onSelect = #workerListbox")
 	public void doListBoxSelect() {
-		if(workerListModel.isSelectionEmpty()) {
+		if(workerListbox.getSelectedItem() == null) {
 			//just in case for the no selection
 			currentWorker = null;
 		} else {
@@ -134,12 +133,12 @@ public class WorkerController extends SelectorComposer<Component> {
 				refreshView();
 			}
 		}
-		workerListModel.clearSelection();
+		workerListbox.clearSelection();
 	}
 
 	private void refreshView() {
-		workerListModel.clearSelection();
-		workerListbox.setModel(workerListModel);// se actualiza la lista
+		workerListbox.clearSelection();
+		sortingPagingHelper.reset();// se actualiza la lista
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		newButton.setDisabled(false);
