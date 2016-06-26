@@ -76,9 +76,6 @@ public class ProcessController extends SelectorComposer<Component>{
 		sortProperties.put(0, "id");
 		sortProperties.put(1, "name");
 		sortProperties.put(2, "machineType");
-		if(processTypeRepository.findAll().isEmpty()) {
-			new RepositoryHelper().generateProcessType(processTypeRepository);
-		}
 		sortingPagingHelper = new SortingPagingHelper<>(processTypeRepository, processTypeListbox, searchButton, searchTextbox, pager, sortProperties);
 		currentProcessType = null;
 		refreshView();

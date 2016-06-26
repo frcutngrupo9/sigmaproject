@@ -1,6 +1,7 @@
 package ar.edu.utn.sigmaproject.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
@@ -17,44 +18,85 @@ import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductCategoryRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+
+@Component
 public class RepositoryHelper {
 
-	public void generateMeasureUnitTypeList(MeasureUnitRepository mUR, MeasureUnitTypeRepository mUTR) {
-		List<MeasureUnitType> measureUnitTypeList = new ArrayList<MeasureUnitType>();
-		measureUnitTypeList.add(new MeasureUnitType("Longitud"));
-		measureUnitTypeList.add(new MeasureUnitType("Tiempo"));
-		measureUnitTypeList.add(new MeasureUnitType("Masa"));
-		measureUnitTypeList.add(new MeasureUnitType("Cantidad"));
-		for(MeasureUnitType aux : measureUnitTypeList) {
-			mUTR.save(aux);
-		}
-		// asumimos que como no estan creados los tipos de UM tampoco lo estan los UM
-		// por lo tanto creamos los UM
-		MeasureUnitType mUTLongitud = mUTR.findByName("Longitud");
-		MeasureUnitType mUTTiempo = mUTR.findByName("Tiempo");
-		MeasureUnitType mUTMasa = mUTR.findByName("Masa");
-		MeasureUnitType mUTCantidad = mUTR.findByName("Cantidad");
-		List<MeasureUnit> measureUnitList = new ArrayList<MeasureUnit>();
-		measureUnitList.add(new MeasureUnit("Metros", "M", mUTLongitud));
-		measureUnitList.add(new MeasureUnit("Centimetros", "Cm", mUTLongitud));
-		measureUnitList.add(new MeasureUnit("Milimetros", "Mm", mUTLongitud));
-		measureUnitList.add(new MeasureUnit("Pulgadas", "Pul", mUTLongitud));
-		measureUnitList.add(new MeasureUnit("Minutos", "Min", mUTTiempo));
-		measureUnitList.add(new MeasureUnit("Horas", "Hr", mUTTiempo));
-		measureUnitList.add(new MeasureUnit("Dias", "D", mUTTiempo));
-		measureUnitList.add(new MeasureUnit("Kilogramos", "Kg", mUTMasa));
-		measureUnitList.add(new MeasureUnit("Gramos", "Gr", mUTMasa));
-		measureUnitList.add(new MeasureUnit("Litros", "L", mUTMasa));
-		measureUnitList.add(new MeasureUnit("Mililitros", "Ml", mUTMasa));
-		measureUnitList.add(new MeasureUnit("Unidad", "Unid", mUTCantidad));
-		for(MeasureUnit aux : measureUnitList) {
-			mUR.save(aux);
+	@Autowired
+	private MeasureUnitRepository measureUnitRepository;
+
+	@Autowired
+	private MeasureUnitTypeRepository measureUnitTypeRepository;
+
+	@Autowired
+	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
+
+	@Autowired
+	private ProductionOrderStateRepository productionOrderStateRepository;
+
+	@Autowired
+	private OrderStateTypeRepository orderStateTypeRepository;
+
+	@Autowired
+	private ProductCategoryRepository productCategoryRepository;
+
+	@Autowired
+	private ProcessTypeRepository processTypeRepository;
+
+	@PostConstruct
+	public void afterConstruct() {
+		generateMeasureUnitTypeList();
+		generateProductionPlanStateTypes();
+		generateProductionOrderStates();
+		generateOrderStateType();
+		generateProductCategory();
+		generateProcessType();
+	}
+
+	private void generateMeasureUnitTypeList() {
+		addMeasureUnitsIfNeeded("Longitud", Arrays.asList(
+				Arrays.asList("Metros", "M"),
+				Arrays.asList("Centimetros", "Cm"),
+				Arrays.asList("Milimetros", "Mm"),
+				Arrays.asList("Pulgadas", "Pul")
+		));
+		addMeasureUnitsIfNeeded("Tiempo", Arrays.asList(
+				Arrays.asList("Minutos", "Min"),
+				Arrays.asList("Horas", "Hr"),
+				Arrays.asList("Dias", "D")
+		));
+		addMeasureUnitsIfNeeded("Masa", Arrays.asList(
+				Arrays.asList("Kilogramos", "Kg"),
+				Arrays.asList("Gramos", "Gr"),
+				Arrays.asList("Litros", "L"),
+				Arrays.asList("Mililitros", "Ml")
+		));
+		addMeasureUnitsIfNeeded("Cantidad", Arrays.asList(
+				Arrays.asList("Unidad", "Unid")
+		));
+	}
+
+	private void addMeasureUnitsIfNeeded(String measureUnitTypeName, List<List<String>> definitions) {
+		MeasureUnitType lengthMeasureUnitType = measureUnitTypeRepository.findFirstByName(measureUnitTypeName);
+		if (lengthMeasureUnitType == null) {
+			// asumimos que como no estan creados los tipos de UM tampoco lo estan los UM
+			// por lo tanto creamos los UM
+			MeasureUnitType measureUnitType = new MeasureUnitType(measureUnitTypeName);
+			measureUnitTypeRepository.save(measureUnitType);
+			List<MeasureUnit> measureUnitToInsert = new ArrayList<>();
+			for (List<String> definition : definitions) {
+				measureUnitToInsert.add(new MeasureUnit(definition.get(0), definition.get(1), measureUnitType));
+			}
+			measureUnitRepository.save(measureUnitToInsert);
 		}
 	}
 
-	public void generateProductionPlanStateTypes(ProductionPlanStateTypeRepository repository) {
-		List<ProductionPlanStateType> list = new ArrayList<ProductionPlanStateType>();
+	private void generateProductionPlanStateTypes() {
+		List<ProductionPlanStateType> list = new ArrayList<>();
 		list.add(new ProductionPlanStateType("Iniciado", null));
 		list.add(new ProductionPlanStateType("Cancelado", null));
 		list.add(new ProductionPlanStateType("Abastecido", null));
@@ -62,71 +104,71 @@ public class RepositoryHelper {
 		list.add(new ProductionPlanStateType("En Produccion", null));
 		list.add(new ProductionPlanStateType("Finalizado", null));
 		for(ProductionPlanStateType each : list) {
-			repository.save(each);
+			productionPlanStateTypeRepository.save(each);
 		}
 	}
 
-	public void generateProductionOrderStates(ProductionOrderStateRepository repository) {
-		List<ProductionOrderState> list = new ArrayList<ProductionOrderState>();
-		list.add(new ProductionOrderState("Generada"));
-		list.add(new ProductionOrderState("Iniciada"));
-		list.add(new ProductionOrderState("Finalizada"));
-		list.add(new ProductionOrderState("Cancelada"));
-		for(ProductionOrderState each : list) {
-			repository.save(each);
+	private void generateProductionOrderStates() {
+		if (productionOrderStateRepository.count() == 0) {
+			List<ProductionOrderState> list = new ArrayList<>();
+			list.add(new ProductionOrderState("Generada"));
+			list.add(new ProductionOrderState("Iniciada"));
+			list.add(new ProductionOrderState("Finalizada"));
+			list.add(new ProductionOrderState("Cancelada"));
+			productionOrderStateRepository.save(list);
 		}
 	}
 
-	public void generateOrderStateType(OrderStateTypeRepository repository) {
-		List<OrderStateType> list = new ArrayList<OrderStateType>();
-		list.add(new OrderStateType("Iniciado", null));
-		list.add(new OrderStateType("Cancelado", null));
-		list.add(new OrderStateType("Planificado", null));
-		list.add(new OrderStateType("En Produccion", null));
-		list.add(new OrderStateType("Finalizado", null));
-		for(OrderStateType each : list) {
-			repository.save(each);
+	private void generateOrderStateType() {
+		if (orderStateTypeRepository.count() == 0) {
+			List<OrderStateType> list = new ArrayList<>();
+			list.add(new OrderStateType("Iniciado", null));
+			list.add(new OrderStateType("Cancelado", null));
+			list.add(new OrderStateType("Planificado", null));
+			list.add(new OrderStateType("En Produccion", null));
+			list.add(new OrderStateType("Finalizado", null));
+			orderStateTypeRepository.save(list);
 		}
 	}
 
-	public void generateProductCategory(ProductCategoryRepository repository) {
-		List<ProductCategory> list = new ArrayList<ProductCategory>();
-		list.add(new ProductCategory("Armario"));
-		list.add(new ProductCategory("Biblioteca"));
-		list.add(new ProductCategory("Comoda"));
-		list.add(new ProductCategory("Cajonera"));
-		list.add(new ProductCategory("Cama"));
-		list.add(new ProductCategory("Escritorio"));
-		list.add(new ProductCategory("Mesa"));
-		list.add(new ProductCategory("Silla"));
-		list.add(new ProductCategory("Sillon"));
-		for(ProductCategory each : list) {
-			repository.save(each);
+	private void generateProductCategory() {
+		if (productCategoryRepository.count() == 0) {
+			List<ProductCategory> list = new ArrayList<>();
+			list.add(new ProductCategory("Armario"));
+			list.add(new ProductCategory("Biblioteca"));
+			list.add(new ProductCategory("Comoda"));
+			list.add(new ProductCategory("Cajonera"));
+			list.add(new ProductCategory("Cama"));
+			list.add(new ProductCategory("Escritorio"));
+			list.add(new ProductCategory("Mesa"));
+			list.add(new ProductCategory("Silla"));
+			list.add(new ProductCategory("Sillon"));
+			productCategoryRepository.save(list);
 		}
 	}
-	
-	public void generateProcessType(ProcessTypeRepository repository) {
-		List<ProcessType> list = new ArrayList<ProcessType>();
-		list.add(new ProcessType("Trazar", null));
-		list.add(new ProcessType("Garlopear", null));
-		list.add(new ProcessType("Asentar", null));
-		list.add(new ProcessType("Cepillar", null));
-		list.add(new ProcessType("Cortar el Ancho", null));
-		list.add(new ProcessType("Cortar el Largo", null));
-		list.add(new ProcessType("Hacer Cortes Curvos", null));
-		list.add(new ProcessType("Hacer Escopladuras", null));
-		list.add(new ProcessType("Hacer Espigas", null));
-		list.add(new ProcessType("Hacer Molduras", null));
-		list.add(new ProcessType("Hacer Canales", null));
-		list.add(new ProcessType("Replanar", null));
-		list.add(new ProcessType("Masillar", null));
-		list.add(new ProcessType("Clavar", null));
-		list.add(new ProcessType("Lijar Cruzado", null));
-		list.add(new ProcessType("Lijar Derecho", null));
-		list.add(new ProcessType("Agregar Herrajes", null));
-		list.add(new ProcessType("Armar", null));
-		for(ProcessType each : list) {
-			repository.save(each);
+
+	private void generateProcessType() {
+		if (processTypeRepository.count() == 0) {
+			List<ProcessType> list = new ArrayList<>();
+			list.add(new ProcessType("Trazar", null));
+			list.add(new ProcessType("Garlopear", null));
+			list.add(new ProcessType("Asentar", null));
+			list.add(new ProcessType("Cepillar", null));
+			list.add(new ProcessType("Cortar el Ancho", null));
+			list.add(new ProcessType("Cortar el Largo", null));
+			list.add(new ProcessType("Hacer Cortes Curvos", null));
+			list.add(new ProcessType("Hacer Escopladuras", null));
+			list.add(new ProcessType("Hacer Espigas", null));
+			list.add(new ProcessType("Hacer Molduras", null));
+			list.add(new ProcessType("Hacer Canales", null));
+			list.add(new ProcessType("Replanar", null));
+			list.add(new ProcessType("Masillar", null));
+			list.add(new ProcessType("Clavar", null));
+			list.add(new ProcessType("Lijar Cruzado", null));
+			list.add(new ProcessType("Lijar Derecho", null));
+			list.add(new ProcessType("Agregar Herrajes", null));
+			list.add(new ProcessType("Armar", null));
+			processTypeRepository.save(list);
 		}
 	}
 

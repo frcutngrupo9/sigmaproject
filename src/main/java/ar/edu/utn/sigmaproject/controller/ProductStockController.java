@@ -175,7 +175,7 @@ public class ProductStockController extends SelectorComposer<Component>{
 	// creacion de pedido de auto abastecimiento
 	//	@Listen("onClick = #newProvisionOrderButton")
 	//	public void newProvisionOrder() {
-	//		Client client = clientRepository.findByName("Auto Abastecimiento");// deberia ser el id del cliente auto abastecimiento
+	//		Client client = clientRepository.findFirstByName("Auto Abastecimiento");// deberia ser el id del cliente auto abastecimiento
 	//		Date order_date = new Date();
 	//		currentOrder = new Order(client, null, order_date, null);
 	//
@@ -197,7 +197,7 @@ public class ProductStockController extends SelectorComposer<Component>{
 	//	public void saveOrder() {
 	//		int order_number = orderNumberIntbox.intValue();
 	//		Date order_need_date = orderNeedDatebox.getValue();
-	//		OrderStateType orderStateType = orderStateTypeRepository.findByName("iniciado");
+	//		OrderStateType orderStateType = orderStateTypeRepository.findFirstByName("iniciado");
 	//		currentOrder.setNumber(order_number);
 	//		currentOrder.setNeedDate(order_need_date);
 	//		currentOrder.setCurrentStateType(orderStateType);
@@ -214,9 +214,9 @@ public class ProductStockController extends SelectorComposer<Component>{
 	//			orderDetailList = null;
 	//			newProvisionOrderButton.setDisabled(false);
 	//		} else {
-	//			OrderStateType orderStateTypeFinished = orderStateTypeRepository.findByName("finalizado");
-	//			OrderStateType orderStateTypeCanceleded = orderStateTypeRepository.findByName("cancelado");
-	//			List<Order> provisionOrderList = orderRepository.findByClient(clientRepository.findByName("Auto Abastecimiento"));// obtenemos la lista de los pedidos de autoabastecimiento
+	//			OrderStateType orderStateTypeFinished = orderStateTypeRepository.findFirstByName("finalizado");
+	//			OrderStateType orderStateTypeCanceleded = orderStateTypeRepository.findFirstByName("cancelado");
+	//			List<Order> provisionOrderList = orderRepository.findByClient(clientRepository.findFirstByName("Auto Abastecimiento"));// obtenemos la lista de los pedidos de autoabastecimiento
 	//			// creamos una lista donde guardaremos todos los detalles de los pedidos de autoabastecimiento sumando su cantidad si el producto se repite
 	//			List<OrderDetail> completeProvisionOrderDetailList = new ArrayList<OrderDetail>();
 	//			for(Order eachProvisionOrder:provisionOrderList) {

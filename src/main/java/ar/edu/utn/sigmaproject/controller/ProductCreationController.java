@@ -179,10 +179,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	public void doAfterCompose(Component comp) throws Exception{
 		super.doAfterCompose(comp);
 		processTypeList = processTypeRepository.findAll();
-		if(processTypeList.isEmpty()) {
-			new RepositoryHelper().generateProcessType(processTypeRepository);
-			processTypeList = processTypeRepository.findAll();
-		}
 		processTypeListModel = new ListModelList<>(processTypeList);
 		processListbox.setModel(processTypeListModel);
 		listboxProcessList = new ArrayList<>();// listbox que contiene los procesos de la pieza seleccionada o vacio si es una nueva pieza
@@ -191,11 +187,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		pieceListModel = new ListModelList<Piece>(pieceList);
 		pieceListbox.setModel(pieceListModel);
 
-		MeasureUnitType measureUnitType = measureUnitTypeRepository.findByName("Longitud");
-		if(measureUnitType == null) {
-			new RepositoryHelper().generateMeasureUnitTypeList(measureUnitRepository, measureUnitTypeRepository);
-			measureUnitType = measureUnitTypeRepository.findByName("Longitud");
-		}
+		MeasureUnitType measureUnitType = measureUnitTypeRepository.findFirstByName("Longitud");
 		List<MeasureUnit> measureUnitList = measureUnitRepository.findByType(measureUnitType);
 		lengthMeasureUnitListModel = new ListModelList<>(measureUnitList);
 		depthMeasureUnitListModel = new ListModelList<>(measureUnitList);
@@ -410,7 +402,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			pieceList = new ArrayList<Piece>();
 			pieceListModel = new ListModelList<Piece>(pieceList);
 			pieceListbox.setModel(pieceListModel);
-			// no se permite agregar insumos o matertias prima mientras el producto no esté guardado
+			// no se permite agregar insumos o matertias prima mientras el producto no estï¿½ guardado
 			openRawMaterialListButton.setDisabled(true);
 			openSupplyListButton.setDisabled(true);
 		} else {

@@ -8,6 +8,6 @@ import ar.edu.utn.sigmaproject.domain.MeasureUnitType;
 @Repository
 public interface MeasureUnitTypeRepository extends JpaRepository<MeasureUnitType, Long> {
 
-	MeasureUnitType findByName(String name);
+	MeasureUnitType findFirstByName(String name);
 	
 }

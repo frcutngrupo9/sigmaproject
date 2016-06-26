@@ -132,10 +132,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		machineList = machineRepository.findAll();
 
 		List<ProductionOrderState> productionOrderStateList = productionOrderStateRepository.findAll();
-		if(productionOrderStateList.isEmpty()) {
-			new RepositoryHelper().generateProductionOrderStates(productionOrderStateRepository);
-			productionOrderStateList = productionOrderStateRepository.findAll();
-		}
 		productionOrderStateListModel = new ListModelList<ProductionOrderState>(productionOrderStateList);
 		productionOrderStateCombobox.setModel(productionOrderStateListModel);
 	}

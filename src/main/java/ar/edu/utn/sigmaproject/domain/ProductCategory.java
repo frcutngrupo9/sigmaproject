@@ -2,10 +2,7 @@ package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class ProductCategory implements Serializable, Cloneable {
@@ -25,6 +22,7 @@ public class ProductCategory implements Serializable, Cloneable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
 
+	@Column(unique = true)
 	String name = "";
 
 	public ProductCategory() {

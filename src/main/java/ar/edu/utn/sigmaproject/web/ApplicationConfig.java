@@ -29,8 +29,8 @@ import org.springframework.transaction.aspectj.AnnotationTransactionAspect;
 @Configuration
 @EnableLoadTimeWeaving(aspectjWeaving = EnableLoadTimeWeaving.AspectJWeaving.ENABLED)
 @EnableTransactionManagement(mode = AdviceMode.ASPECTJ)
-@ComponentScan(value = { "ar.edu.utn.sigmaproject.controller", "ar.edu.utn.sigmaproject.service", "ar.edu.utn.sigmaproject.service.impl"})
 @EnableJpaRepositories(value = "ar.edu.utn.sigmaproject.service", repositoryBaseClass = SearchableRepositoryImpl.class)
+@ComponentScan(value = { "ar.edu.utn.sigmaproject.controller", "ar.edu.utn.sigmaproject.service", "ar.edu.utn.sigmaproject.service.impl", "ar.edu.utn.sigmaproject.util"})
 @PropertySource("classpath:db.properties")
 @ZkSpringConfig
 public class ApplicationConfig {

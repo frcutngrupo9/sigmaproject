@@ -67,10 +67,6 @@ public class ProductListController extends SelectorComposer<Component> implement
 		new SortingPagingHelper<>(productRepository, productGrid, searchButton, searchTextbox, pager, sortProperties, this);
 
 		List<ProductCategory> productCategoryList = productCategoryRepository.findAll();
-		if(productCategoryList.isEmpty()) {
-			new RepositoryHelper().generateProductCategory(productCategoryRepository);
-			productCategoryList = productCategoryRepository.findAll();
-		}
 		new ListModelList<>(productCategoryList);
 	}
 

@@ -90,11 +90,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
 		rawMaterialTypeListModel = new ListModelList<>(rawMaterialTypeList);
 		rawMaterialTypeListbox.setModel(rawMaterialTypeListModel);
 		currentRawMaterialType = null;
-		MeasureUnitType measureUnitType = measureUnitTypeRepository.findByName("Longitud");
-		if(measureUnitType == null) {
-			new RepositoryHelper().generateMeasureUnitTypeList(measureUnitRepository, measureUnitTypeRepository);
-			measureUnitType = measureUnitTypeRepository.findByName("Longitud");
-		}
+		MeasureUnitType measureUnitType = measureUnitTypeRepository.findFirstByName("Longitud");
 		measureUnitList = measureUnitRepository.findByType(measureUnitType);
 		lengthMeasureUnitListModel = new ListModelList<>(measureUnitList);
 		depthMeasureUnitListModel = new ListModelList<>(measureUnitList);
