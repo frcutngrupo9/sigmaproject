@@ -37,14 +37,13 @@ public class LoginController extends SelectorComposer<Component> {
 
 	//services
 	@WireVariable
-	PasswordEncoder passwordEncoder;
-
+	private PasswordEncoder passwordEncoder;
 	@WireVariable
-	UserRepository userRepository;
+	private UserRepository userRepository;
 
 	//attributes
-	User currentUser;
-	
+	private User currentUser;
+
 	@Listen("onClick=#login; onOK=#loginWin")
 	public void doLogin() {
 		String nm = account.getValue();

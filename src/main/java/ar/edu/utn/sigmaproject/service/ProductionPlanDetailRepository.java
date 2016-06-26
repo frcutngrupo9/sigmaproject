@@ -1,10 +1,11 @@
 package ar.edu.utn.sigmaproject.service;
 
-import ar.edu.utn.sigmaproject.domain.ProductExistence;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
+
 @Repository
-public interface ProductExistenceRepository extends JpaRepository<ProductExistence, Long> {
+public interface ProductionPlanDetailRepository extends JpaRepository<ProductionPlanDetail, Long> {
 
 }

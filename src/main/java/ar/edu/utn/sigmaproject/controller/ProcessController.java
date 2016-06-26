@@ -4,7 +4,9 @@ import ar.edu.utn.sigmaproject.domain.MachineType;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
+import ar.edu.utn.sigmaproject.util.RepositoryHelper;
 import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
+
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -51,13 +53,12 @@ public class ProcessController extends SelectorComposer<Component>{
 	// services
 	@WireVariable
 	private ProcessTypeRepository processTypeRepository;
-
 	@WireVariable
 	private MachineTypeRepository machineTypeRepository;
 
 	// attributes
 	private ProcessType currentProcessType;
-	SortingPagingHelper<ProcessType> sortingPagingHelper;
+	private SortingPagingHelper<ProcessType> sortingPagingHelper;
 
 	// list
 	private List<MachineType> machineTypeList;
@@ -75,6 +76,9 @@ public class ProcessController extends SelectorComposer<Component>{
 		sortProperties.put(0, "id");
 		sortProperties.put(1, "name");
 		sortProperties.put(2, "machineType");
+		if(processTypeRepository.findAll().isEmpty()) {
+			new RepositoryHelper().generateProcessType(processTypeRepository);
+		}
 		sortingPagingHelper = new SortingPagingHelper<>(processTypeRepository, processTypeListbox, searchButton, searchTextbox, pager, sortProperties);
 		currentProcessType = null;
 		refreshView();

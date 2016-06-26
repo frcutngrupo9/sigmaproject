@@ -1,0 +1,73 @@
+<window id="productRawMaterialWindow" apply="ar.edu.utn.sigmaproject.controller.ProductRawMaterialController" width="75%" position="center,center" closable="true" action="show: slideDown;hide: slideUp">
+	<caption label="Materias Prima de Producto" style="text-align:center; font-weight: bold;"/>
+	<panel border="rounded">
+        <panelchildren>
+            <vlayout>
+                <hlayout>
+                	<separator/>
+                    <label value="Materia Prima: "/>
+                    <bandbox id="rawMaterialTypeBandbox" buttonVisible = "true" autodrop = "true">
+                        <bandpopup>
+                            <vbox>
+                                <hbox>
+                                    Buscar
+                                    <textbox />
+                                </hbox>
+                                <listbox id="rawMaterialTypePopupListbox" width="500px">
+	                                <listhead>
+	                                    <listheader label="Id"/>
+	                                    <listheader label="Nombre"/>
+	                                    <listheader label="Largo (L)"/>
+							            <listheader label="Espesor (E)"/>
+							            <listheader label="Ancho (A)"/>
+	                                </listhead>
+	                                <template name="model">
+	                                    <listitem>
+	                                        <listcell label="${each.id}"/>
+	                                        <listcell label="${each.name}"/>
+	                                        <listcell label="${each.length.doubleValue()} ${each.getLengthMeasureUnit().getShortName()}"/>
+							                <listcell label="${each.depth.doubleValue()} ${each.getDepthMeasureUnit().getShortName()}"/>
+							                <listcell label="${each.width.doubleValue()} ${each.getWidthMeasureUnit().getShortName()}"/>
+	                                    </listitem>
+	                                </template>
+                                </listbox>
+                            </vbox>
+                        </bandpopup>
+                    </bandbox>
+                    <label value="Cantidad: "/>
+                    <doublebox id="rawMaterialQuantityDoublebox" constraint="no negative" width="36px"/>
+                    <button id="saveRawMaterialButton" label="Grabar Materia Prima"/>
+                    <button id="resetRawMaterialButton" label="Reset Materia Prima"/>
+                    <button id="deleteRawMaterialButton" label="Eliminar Materia Prima"/>
+                    <button id="cancelRawMaterialButton" label="Cancelar Edicion"/>
+                </hlayout>
+                <separator/>
+                <listbox id="rawMaterialListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
+                    <auxhead>
+                        <auxheader label="Materias Prima" colspan="5"/>
+                    </auxhead>
+                    <listhead>
+			            <listheader label="Nombre"/>
+			            <listheader label="Largo (L)"/>
+			            <listheader label="Espesor (E)"/>
+			            <listheader label="Ancho (A)"/>
+			            <listheader label="Cantidad"/>
+                    </listhead>
+                    <template name="model">
+                        <listitem>
+			                <listcell label="${each.getRawMaterialType().name}"/>
+			                <listcell label="${each.getRawMaterialType().length.doubleValue()} ${each.getRawMaterialType().getLengthMeasureUnit().getShortName()}"/>
+			                <listcell label="${each.getRawMaterialType().depth.doubleValue()} ${each.getRawMaterialType().getDepthMeasureUnit().getShortName()}"/>
+			                <listcell label="${each.getRawMaterialType().width.doubleValue()} ${each.getRawMaterialType().getWidthMeasureUnit().getShortName()}"/>
+			                <listcell label="${each.quantity}"/>
+                        </listitem>
+                    </template>
+                </listbox>
+                <hlayout>
+                	<button id="acceptRawMaterialListButton" label="Aceptar"/>
+                    <button id="cancelRawMaterialListButton" label="Cancelar"/>
+                </hlayout>
+            </vlayout>
+        </panelchildren>
+    </panel>
+</window>

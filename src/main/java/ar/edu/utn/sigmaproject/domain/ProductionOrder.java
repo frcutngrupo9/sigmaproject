@@ -1,6 +1,7 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import javax.persistence.*;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,7 +24,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 	@ManyToOne
 	Worker worker;
 
-	@OneToMany(mappedBy = "productionOrder")
+	@OneToMany(orphanRemoval = true)
 	@OrderColumn(name = "detail_index")
 	List<ProductionOrderDetail> details = new ArrayList<>();
 
@@ -68,20 +69,12 @@ public class ProductionOrder implements Serializable, Cloneable {
 		return product;
 	}
 
-	public void setProduct(Integer idProduct) {
-		this.product = product;
-	}
-
 	public Worker getWorker() {
 		return worker;
 	}
 
-	public void setWorker(Worker idWorker) {
+	public void setWorker(Worker worker) {
 		this.worker = worker;
-	}
-
-	public void setProduct(Product product) {
-		this.product = product;
 	}
 
 	public List<ProductionOrderDetail> getDetails() {

@@ -46,9 +46,9 @@
 				    							<template name="model">
 				    								<listitem>
 				    									<listcell label="${each.id}"/>
-				    									<listcell label="${win_production_plan_creation$composer.getClientNameByOrderId(each.id)}"/>
+				    									<listcell label="${each.getClient().getName()}"/>
 				    									<listcell label="${each.date}"/>
-				    									<listcell label="${win_production_plan_creation$composer.quantityOfDetail(each.id)}"/>
+				    									<listcell label="${each.getDetails().size()}"/>
 				    								</listitem>
 				    							</template>
 				    							</listbox>
@@ -63,10 +63,9 @@
                 </grid>
     			<grid id="productionPlanDetailGrid" mold="paging" pageSize="7">
     				<auxhead>
-						<auxheader label="Pedidos" colspan="6"/>
+						<auxheader label="Pedidos" colspan="5"/>
 					</auxhead>
         			<columns>
-        				<column width="40px" />
             			<column label="Id"/>
             			<column label="Fecha"/>
             			<column label="Cliente"/>
@@ -75,17 +74,11 @@
         			</columns>
         			<template name="model">
             			<row>
-	            			<!-- se usa custom-attributes para guardar los productos en la fila, 
-					 		para que se puedan acceder cuando se usa onOpen del detail -->
-			            	<custom-attributes details="${win_production_plan_creation$composer.getOrderDetailList(each.idOrder)}"/>
-			            	<detail open="false" fulfill="onOpen">
-			            		<include src="/production_plan_order_details.zul" details="${details}"/>
-			            	</detail>
-                			<label value="${each.idOrder}"/>
-                			<label value="${win_production_plan_creation$composer.getOrderDate(each.idOrder)}"/>
-                			<label value="${win_production_plan_creation$composer.getClientNameByOrderId(each.idOrder)}"/>
-                			<label value="${win_production_plan_creation$composer.quantityOfDetail(each.idOrder)}"/>
-                			<button forward="onClick=productionPlanDetailGrid.onRemoveOrder(${each.idOrder})" image="/img/delete16x16.png"/>
+                			<label value="${each.getOrder().getId()}"/>
+                			<label value="${each.getOrder().getDate()}"/>
+                			<label value="${each.getOrder().getClient().getName()}"/>
+                			<label value="${each.getOrder().getDetails().size()}"/>
+                			<button forward="onClick=productionPlanDetailGrid.onRemoveOrder(${each.getOrder()})" image="/img/delete16x16.png"/>
             			</row>
         			</template>
     			</grid>
@@ -95,28 +88,17 @@
 						<auxheader label="Productos" colspan="5"/>
 					</auxhead>
         			<listhead>
-        				<listheader label="Id"/>
         				<listheader label="Codigo"/>
             			<listheader label="Nombre Producto"/>
             			<listheader label="Detalles"/>
             			<listheader label="Cantidad de Producto"/>
-            			<!-- plan de produccion no deberia mostrar nada relacionado a los precios
-            			<listheader label="Precio Unitario"/>
-            			<listheader label="Precio Total"/>
-            			porque los precios pueden variar para un mismo producto de un pedido a otro
-            			y por lo tanto el precio unitario podria tener mas de 1 valor -->
         			</listhead>
         			<template name="model">
             			<listitem>
-            				<listcell label="${each.id}"/>
-                			<listcell label="${each.code}"/>
-                			<listcell label="${each.name}"/>
-                			<listcell label="${each.details}"/>
-                			<listcell label="${win_production_plan_creation$composer.getProductTotalUnits(each.id)}"/>
-                			<!-- no se muestran precios en plan de produccion (importan solo las cantidades para producir)
-                			<listcell label="${each.price.doubleValue()}"/>
-                			<listcell label="${win_production_plan_creation$composer.getProductTotalPrice(each.id).doubleValue()}"/>
-                			-->
+                			<listcell label="${each.getProduct().getCode()}"/>
+                			<listcell label="${each.getProduct().getName()}"/>
+                			<listcell label="${each.getProduct().getDetails()}"/>
+                			<listcell label="${each.getTotalUnits()}"/>
             			</listitem>
         			</template>
     			</listbox>
@@ -125,51 +107,6 @@
                     <button id="resetProductionPlanButton" label="Reset Plan de Produccion"/>
                     <button id="deleteProductionPlanButton" label="Eliminar Plan de Produccion"/>
                 </hlayout>
-                
-                <!-- Lo que sigue es p Debug -->
-                
-    			<listbox id="processListbox" mold="paging" pageSize="7" visible="false">
-    				<auxhead>
-						<auxheader label="Procesos" colspan="7"/>
-					</auxhead>
-        			<listhead>
-        				<listheader label="Nombre Producto"/>
-            			<listheader label="Nombre Pieza"/>
-            			<listheader label="Nombre Proceso"/>
-            			<listheader label="Cantidad Pieza por Producto"/>
-            			<listheader label="Cantidad Total Pieza"/>
-            			<listheader label="Tiempo Proceso por Pieza"/>
-            			<listheader label="Tiempo Total Proceso"/>
-        			</listhead>
-        			<template name="model">
-            			<listitem>
-                			<listcell label="${win_production_plan_creation$composer.getProductNameByPieceId(each.idPiece)}"/>
-                			<listcell label="${win_production_plan_creation$composer.getPieceName(each.idPiece)}"/>
-                			<listcell label="${win_production_plan_creation$composer.getProcessName(each.idProcessType)}"/>
-                			<listcell label="${win_production_plan_creation$composer.getPieceUnits(each.idPiece)}"/>
-                			<listcell label="${win_production_plan_creation$composer.getPieceTotalUnits(each.idPiece)}"/>
-                			<listcell label="${each.time}"/>
-                			<listcell label="${win_production_plan_creation$composer.getTotalTime(each.idPiece, each.idProcessType)}"/>
-            			</listitem>
-        			</template>
-    			</listbox>
-    			<listbox id="supplyListbox" mold="paging" pageSize="7" visible="false">
-    				<auxhead>
-						<auxheader label="Insumos" colspan="3"/>
-					</auxhead>
-        			<listhead>
-        				<listheader label="Nombre Producto"/>
-            			<listheader label="Nombre Insumo"/>
-            			<listheader label="Cantidad"/>
-        			</listhead>
-        			<template name="model">
-            			<listitem>
-                			<listcell label="${win_production_plan_creation$composer.getNameOfProduct(each.idProduct)}"/>
-                			<listcell label="${each.name}"/>
-                			<listcell label="nro"/>
-            			</listitem>
-        			</template>
-    			</listbox>
             </vlayout>
         </panelchildren>
     </panel>

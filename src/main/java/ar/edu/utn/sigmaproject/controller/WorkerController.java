@@ -19,6 +19,7 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.*;
 
 import ar.edu.utn.sigmaproject.domain.Worker;
+import ar.edu.utn.sigmaproject.service.WorkerRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class WorkerController extends SelectorComposer<Component> {
@@ -51,7 +52,7 @@ public class WorkerController extends SelectorComposer<Component> {
 
 	// services
 	@WireVariable
-	WorkerRepository workerRepository;
+	private WorkerRepository workerRepository;
 
 	// attributes
 	private Worker currentWorker;

@@ -11,7 +11,7 @@ public class WoodReserved implements Serializable, Cloneable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
-	
+
 	@ManyToOne
 	Wood wood;
 

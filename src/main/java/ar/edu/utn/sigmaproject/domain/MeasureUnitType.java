@@ -1,55 +1,41 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 
 @Entity
 public class MeasureUnitType implements Serializable, Cloneable {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
 
-    @OneToMany(mappedBy = "type")
-    List<MeasureUnit> measureUnits = new ArrayList<MeasureUnit>();
+	String name = "";
 
-    String name = "";
+	public MeasureUnitType() {
 
-    public MeasureUnitType() {
-
-    }
-
-    public MeasureUnitType(String name) {
-        this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-    	this.id = id;
-    }
-
-    public List<MeasureUnit> getMeasureUnits() {
-		return measureUnits;
 	}
 
-	public void setMeasureUnits(List<MeasureUnit> measureUnits) {
-		this.measureUnits = measureUnits;
+	public MeasureUnitType(String name) {
+		this.name = name;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getName() {
-        return name;
-    }
+		return name;
+	}
 
 	public void setName(String name) {
 		this.name = name;

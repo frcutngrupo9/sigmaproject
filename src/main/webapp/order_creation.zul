@@ -101,7 +101,7 @@
                     </listhead>
                     <template name="model">
                         <listitem>
-                            <listcell label="${win_order_creation$composer.getProductName(each.idProduct)}"/>
+                            <listcell label="${each.product.getName()}"/>
                             <listcell label="${each.units}"/>
                             <listcell label="${each.price.doubleValue()} $"/>
                             <listcell label="${win_order_creation$composer.getSubTotal(each.units, each.price).doubleValue()} $"/>

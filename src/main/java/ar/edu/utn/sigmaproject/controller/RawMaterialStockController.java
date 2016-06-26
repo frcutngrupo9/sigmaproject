@@ -82,16 +82,13 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 
 	// services
 	@WireVariable
-	RawMaterialTypeRepository rawMaterialTypeRepository;
-
+	private RawMaterialTypeRepository rawMaterialTypeRepository;
 	@WireVariable
-	WoodRepository woodRepository;
-
+	private WoodRepository woodRepository;
 	@WireVariable
-	WoodTypeRepository woodTypeRepository;
-
+	private WoodTypeRepository woodTypeRepository;
 	@WireVariable
-	WorkerRepository workerRepository;
+	private WorkerRepository workerRepository;
 
 	// attributes
 	private Wood currentWood;
@@ -211,7 +208,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 			return "[Sin Unidad de Medida]";
 		}
 	}
-	
+
 	@Listen("onClick = #newButton")
 	public void newButtonClick() {
 		currentWood = null;
@@ -271,7 +268,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		numberIntbox.setValue(null);
 		quantityDoublebox.setValue(null);
 	}
-	
+
 	@Listen("onClick = #saveNewStockButton")
 	public void saveNewStockButton() {
 		if(numberIntbox.getValue() <= 0) {
@@ -300,18 +297,18 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 				}
 			}
 			stockDoublebox.setValue(newStock.doubleValue());
-//			currentWood.setStock(newStock);
-//			currentWood = woodRepository.updateWood(currentWood);
-//			refreshView();
+			//			currentWood.setStock(newStock);
+			//			currentWood = woodRepository.updateWood(currentWood);
+			//			refreshView();
 		}
 		stockModificationGrid.setVisible(false);
 	}
-	
+
 	@Listen("onClick = #cancelNewStockButton")
 	public void cancelNewStockButtonClick() {
 		stockModificationGrid.setVisible(false);
 	}
-	
+
 	@Listen("onClick = #resetNewStockButton")
 	public void resetNewStockButtonClick() {
 		workerCombobox.setSelectedIndex(-1);
@@ -327,7 +324,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		numberIntbox.setValue(null);
 		quantityDoublebox.setValue(null);
 	}
-	
+
 	@Listen("onSelect = #rawMaterialTypeCombobox")
 	public void rawMaterialTypeComboboxSelect() {
 		if(rawMaterialTypeCombobox.getSelectedItem() == null) {

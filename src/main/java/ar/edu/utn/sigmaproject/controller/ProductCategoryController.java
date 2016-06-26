@@ -16,34 +16,28 @@ import java.util.List;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProductCategoryController extends SelectorComposer<Component> {
+	private static final long serialVersionUID = 1L;
 
 	@Wire
 	Textbox nameTextbox;
-
 	@Wire
 	Grid productCategoryGrid;
-
 	@Wire
 	Listbox productCategoryListbox;
-
 	@Wire
 	Button newButton;
-
 	@Wire
 	Button saveButton;
-
 	@Wire
 	Button cancelButton;
-
 	@Wire
 	Button resetButton;
-
 	@Wire
 	Button deleteButton;
 
 	// services
 	@WireVariable
-	ProductCategoryRepository productCategoryRepository;
+	private ProductCategoryRepository productCategoryRepository;
 
 	// attributes
 	private ProductCategory currentProductCategory;

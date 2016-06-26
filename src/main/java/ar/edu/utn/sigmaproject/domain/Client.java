@@ -14,47 +14,47 @@ import org.hibernate.search.annotations.Indexed;
 @Entity
 @Indexed
 public class Client implements Serializable, Cloneable {
-    private static final long serialVersionUID = 1L;
-    
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@DocumentId
 	Long id;
 
-    @Field
-    String name = "";
+	@Field
+	String name = "";
 
 	@Field
-    String phone = "";
+	String phone = "";
 
 	@Field
-    String email = "";
+	String email = "";
 
 	@Field
-    String address = "";
+	String address = "";
 
 	@Field
-    String details = "";
+	String details = "";
 
-    public Client() {
+	public Client() {
 
-    }
+	}
 
-    public Client(String name, String phone, String email, String address, String details) {
-        this.name = name;
-        this.phone = phone;
-        this.email = email;
-        this.address = address;
-        this.details = details;
-    }
+	public Client(String name, String phone, String email, String address, String details) {
+		this.name = name;
+		this.phone = phone;
+		this.email = email;
+		this.address = address;
+		this.details = details;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	public String getName() {
 		return name;

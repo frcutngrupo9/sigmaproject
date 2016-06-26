@@ -3,14 +3,15 @@ package ar.edu.utn.sigmaproject.controller;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
-import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
@@ -19,13 +20,11 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Caption;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Grid;
-import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Selectbox;
 import org.zkoss.zul.Textbox;
 
-import ar.edu.utn.sigmaproject.domain.Client;
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.Piece;
@@ -35,14 +34,15 @@ import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductTotal;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
-import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
+import ar.edu.utn.sigmaproject.service.ProductionPlanDetailRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
+import ar.edu.utn.sigmaproject.util.RepositoryHelper;
 
 public class ProductionPlanCreationController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
@@ -60,10 +60,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	@Wire
 	Button addOrderButton;
 	@Wire
-	Listbox processListbox;
-	@Wire
-	Listbox supplyListbox;
-	@Wire
 	Button resetProductionPlanButton;
 	@Wire
 	Button saveProductionPlanButton;
@@ -77,22 +73,18 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	Caption productionPlanCaption;
 
 	// services
-
 	@WireVariable
 	private OrderRepository orderRepository;
-
 	@WireVariable
 	private OrderStateTypeRepository orderStateTypeRepository;
-
 	@WireVariable
 	private ProductRepository productRepository;
-
 	@WireVariable
 	private ProductionPlanRepository productionPlanRepository;
-
+	@WireVariable
+	private ProductionPlanDetailRepository productionPlanDetailRepository;
 	@WireVariable
 	private ClientRepository clientService;
-
 	@WireVariable
 	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
 
@@ -104,14 +96,12 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 
 	// list models
 	private ListModelList<Order> orderPopupListModel;
-	private ListModelList<Process> processListModel;
 	private ListModelList<ProductionPlanDetail> productionPlanDetailListModel;
 	private ListModelList<ProductionPlanStateType> productionPlanStateTypeListModel;
 
 	// atributes
 	private Order currentOrder;
 	private ProductionPlan currentProductionPlan;
-	private ProductionPlanState currentProductionPlanState;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
@@ -122,11 +112,14 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
 
 		productionPlanStateTypeList = productionPlanStateTypeRepository.findAll();
+		if(productionPlanStateTypeList.isEmpty()) {
+			new RepositoryHelper().generateProductionPlanStateTypes(productionPlanStateTypeRepository);
+			productionPlanStateTypeList = productionPlanStateTypeRepository.findAll();
+		}
 		productionPlanStateTypeListModel = new ListModelList<ProductionPlanStateType>(productionPlanStateTypeList);
 		productionPlanStateTypeSelectbox.setModel(productionPlanStateTypeListModel);
 
 		refreshViewProductionPlan();
-		refreshProcessListBox();
 		refreshProductTotalListbox();
 	}
 
@@ -180,38 +173,41 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		}
 		String productionPlanName = productionPlanNameTextbox.getText();
 		Date production_plan_date = productionPlanDatebox.getValue();
-		ProductionPlanStateType productionPlanStateType = productionPlanStateTypeListModel.getElementAt(productionPlanStateTypeSelectbox.getSelectedIndex());
+		ProductionPlanStateType productionPlanStateType;
+		if(productionPlanStateTypeSelectbox.getSelectedIndex() == -1) {
+			productionPlanStateType = null;
+		} else {
+			productionPlanStateType = productionPlanStateTypeListModel.getElementAt(productionPlanStateTypeSelectbox.getSelectedIndex());
+		}
 		if(currentProductionPlan == null) { // es un plan nuevo
 			// creamos el nuevo plan
 			currentProductionPlan = new ProductionPlan(productionPlanName, null, production_plan_date);
 			currentProductionPlan.setPlanDetails(currentProductionPlanDetailList);
-			currentProductionPlan.getStates().add(new ProductionPlanState(currentProductionPlan, productionPlanStateType, new Date()));
 			currentProductionPlan.setCurrentStateType(productionPlanStateType);
 		} else { // se edita un plan
 			currentProductionPlan.setName(productionPlanName);
 			currentProductionPlan.setDate(production_plan_date);
 			currentProductionPlan.setPlanDetails(currentProductionPlanDetailList);
 			if (!currentProductionPlan.getCurrentStateType().equals(productionPlanStateType)) {
-				currentProductionPlan.getStates().add(new ProductionPlanState(currentProductionPlan, productionPlanStateType, new Date()));
 				currentProductionPlan.setCurrentStateType(productionPlanStateType);
 			}
 		}
+		for(ProductionPlanDetail each : currentProductionPlanDetailList) {
+			productionPlanDetailRepository.save(each);
+		}
 		productionPlanRepository.save(currentProductionPlan);
 		currentProductionPlan = null;
-		currentProductionPlanState = null;
 		refreshViewProductionPlan();
 		alert("Plan guardado.");
 	}
 
 	@Listen("onClick = #addOrderButton")
 	public void addOrder() {
-		// el detalle debe tener id de plan nulo ya que se lo agrega al guardar o actualizar el plan
-		currentProductionPlanDetailList.add(new ProductionPlanDetail(currentProductionPlan, currentOrder));
+		currentProductionPlanDetailList.add(new ProductionPlanDetail(currentOrder));
 		refreshProductionPlanDetailListGrid();
 		currentOrder = null;
 		refreshOrderPopupList();
 		refreshOrder();
-		refreshProcessListBox();
 		refreshProductTotalListbox();
 	}
 
@@ -246,7 +242,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		refreshOrder();
 		if (currentProductionPlan == null) {// nuevo plan de produccion
 			productionPlanCaption.setLabel("Creacion de Plan de Produccion");
-			productionPlanStateTypeListModel.addToSelection(productionPlanStateTypeRepository.findByName("iniciado"));
+			productionPlanStateTypeListModel.addToSelection(productionPlanStateTypeRepository.findByName("Iniciado"));
 			productionPlanStateTypeSelectbox.setModel(productionPlanStateTypeListModel);
 			productionPlanNameTextbox.setText("");
 			productionPlanDatebox.setValue(new Date());
@@ -277,64 +273,36 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		refreshProductTotalListbox();
 	}
 
-	private void refreshProcessListBox() {
-		List<Process> processList = new ArrayList<Process>();
-		for(ProductionPlanDetail auxProductionPlanDetail : currentProductionPlanDetailList) {
-			Order auxOrder = auxProductionPlanDetail.getOrder();
-			List<OrderDetail> auxOrderDetailList = auxOrder.getDetails();
-			for(OrderDetail auxOrderDetail : auxOrderDetailList) {
-				Product auxProduct = auxOrderDetail.getProduct();
-				List<Piece> auxPieceList = auxProduct.getPieces();
-				for(Piece auxPiece : auxPieceList) {
-					List<Process> auxProcessList = auxPiece.getProcesses();
-					for(Process auxProcess : auxProcessList) {
-						processList.add(auxProcess);
-					}
-				}
-			}
-		}
-		processListModel = new ListModelList<Process>(processList);
-		processListbox.setModel(processListModel);
-	}
-
 	private void refreshProductTotalList() {
-		productTotalList = new ArrayList<ProductTotal>();// se empieza con una lista vacia
+		Map<Product, Integer> productTotalMap = new HashMap<Product, Integer>();
 		for(ProductionPlanDetail auxProductionPlanDetail : currentProductionPlanDetailList) {
-			for(OrderDetail auxOrderDetail : auxProductionPlanDetail.getOrder().getDetails()) {// por cada detalle del pedido, observamos si el producto ya esta en la lista, si lo esta sumamos su cantidad y, si no esta lo agregamos
-				Boolean is_in_list = false;
-				Integer order_detail_units = auxOrderDetail.getUnits();
-				for(ProductTotal productTotal : productTotalList) {
-					if(productTotal.getId().equals(auxOrderDetail.getProduct().getId())) {// si esta
-						is_in_list = true;
-						productTotal.setTotalUnits(productTotal.getTotalUnits() + order_detail_units);// sumamos su cantidad con la existente
-						break;
-					}
-				}
-				if(is_in_list == false) {// no esta, por lo tanto agregamos el producto a la lista total
-					ProductTotal productTotal = new ProductTotal(auxOrderDetail.getProduct());
-					productTotal.setTotalUnits(order_detail_units);// el primer valor son el total de unidades del detalle de pedido
-					productTotalList.add(productTotal);
-				}
+			for(OrderDetail auxOrderDetail : auxProductionPlanDetail.getOrder().getDetails()) {
+				Integer totalUnits = productTotalMap.get(auxOrderDetail.getProduct());
+				productTotalMap.put(auxOrderDetail.getProduct(), (totalUnits == null) ? auxOrderDetail.getUnits() : totalUnits + auxOrderDetail.getUnits());
 			}
-			// si es el primer loop del productionPlanDetailList entonces la lista productTotalList deberia estar llena solo con los productos
-			// del primer pedido, en el siguiente loop se sumaran los que ya estan y agregaran los nuevos
 		}
-		// aqui deberia llegar con el productTotalList lleno con todos los productos sin repetir y con el total, que conforman el plan de produccion
+		productTotalList = new ArrayList<ProductTotal>();
+		for (Map.Entry<Product, Integer> entry : productTotalMap.entrySet()) {
+			Product product = entry.getKey();
+			Integer totalUnits = entry.getValue();
+			ProductTotal productTotal = new ProductTotal(product, totalUnits);
+			productTotalList.add(productTotal);
+		}
 	}
 
 	public int getProductTotalUnits(Product product) {
-		int product_total_units = 0;
+		int productTotalUnits = 0;
 		for(ProductTotal productTotal : productTotalList) {// buscamos el total de unidades
-			if(productTotal.getId().equals(product.getId())) {
-				product_total_units = productTotal.getTotalUnits();
+			if(productTotal.getProduct().equals(product)) {
+				productTotalUnits = productTotal.getTotalUnits();
 			}
 		}
-		return product_total_units;
+		return productTotalUnits;
 	}
 
 	public BigDecimal getProductTotalPrice(Product product) {
-		int product_total_units = getProductTotalUnits(product);
-		return getTotalPrice(product_total_units, product.getPrice());// esta funcion es incorrecta pq agarra el valor actual del producto cuando deberia ser el valor en el pedido
+		int productTotalUnits = getProductTotalUnits(product);
+		return getTotalPrice(productTotalUnits, product.getPrice());// esta funcion es incorrecta pq agarra el valor actual del producto cuando deberia ser el valor en el pedido
 	}
 
 	private BigDecimal getTotalPrice(int units, BigDecimal price) {
@@ -348,7 +316,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		int units = 0;
 		for(ProductionPlanDetail auxProductionPlanDetail : currentProductionPlanDetailList) {
 			for (OrderDetail auxOrderDetail : auxProductionPlanDetail.getOrder().getDetails()) {
-				if (auxOrderDetail.getProduct().equals(piece.getProduct())) {
+				if (auxOrderDetail.getProduct().equals(productRepository.findByPieces(piece))) {
 					units = auxOrderDetail.getUnits();
 				}
 			}
@@ -371,7 +339,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		int units = 0;
 		for (ProductionPlanDetail productionPlanDetail : currentProductionPlanDetailList) {
 			for (OrderDetail auxOrderDetail : productionPlanDetail.getOrder().getDetails()) {
-				if (auxOrderDetail.getProduct().equals(piece.getProduct())) {
+				if (auxOrderDetail.getProduct().equals(productRepository.findByPieces(piece))) {
 					units = auxOrderDetail.getUnits();
 				}
 			}

@@ -1,7 +1,6 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,20 +9,20 @@ import javax.persistence.Id;
 
 @Entity
 public class User implements Serializable, Cloneable {
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
-	
+
 	String account = "";
 	String email = "";
 	String fullName = "";
 	String hash = "";
 
 	public User() {
-		
+
 	}
 
 	public User(String account, String hash, String fullName,String email) {

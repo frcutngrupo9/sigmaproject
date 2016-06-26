@@ -13,9 +13,6 @@ public class RawMaterialRequirement implements Serializable, Cloneable {
 	Long id;
 
 	@ManyToOne
-	ProductionPlan productionPlan;
-
-	@ManyToOne
 	RawMaterialType rawMaterialType;
 
 	BigDecimal quantity = BigDecimal.ZERO;
@@ -26,8 +23,7 @@ public class RawMaterialRequirement implements Serializable, Cloneable {
 
 	}
 
-	public RawMaterialRequirement(ProductionPlan productionPlan, RawMaterialType rawMaterialType, BigDecimal quantity) {
-		this.productionPlan = productionPlan;
+	public RawMaterialRequirement(RawMaterialType rawMaterialType, BigDecimal quantity) {
 		this.rawMaterialType = rawMaterialType;
 		this.quantity = quantity;
 		isFulfilled = false;
@@ -39,14 +35,6 @@ public class RawMaterialRequirement implements Serializable, Cloneable {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public ProductionPlan getProductionPlan() {
-		return productionPlan;
-	}
-
-	public void setProductionPlan(ProductionPlan productionPlan) {
-		this.productionPlan = productionPlan;
 	}
 
 	public RawMaterialType getRawMaterialType() {

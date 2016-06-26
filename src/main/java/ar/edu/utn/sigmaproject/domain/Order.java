@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,63 +15,51 @@ import javax.persistence.OrderColumn;
 
 @Entity(name = "Orders")
 public class Order implements Serializable, Cloneable {
-    private static final long serialVersionUID = 1L;
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+	private static final long serialVersionUID = 1L;
 
-    @ManyToOne
-    Client client;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    @OrderColumn(name = "state_index")
-    List<OrderState> states = new ArrayList<OrderState>();
+	@ManyToOne
+	Client client;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    @OrderColumn(name = "detail_index")
-    List<OrderDetail> details = new ArrayList<OrderDetail>();
+	@OneToMany(orphanRemoval = true)
+	@OrderColumn(name = "detail_index")
+	List<OrderDetail> details = new ArrayList<OrderDetail>();
 
-    @ManyToOne(optional = false)
+	@ManyToOne(optional = false)
 	OrderStateType currentStateType;
 
-    Integer number = 0;
-    Date date = new Date();
-    Date needDate = new Date();
+	Integer number = 0;
+	Date date = new Date();
+	Date needDate = new Date();
 
 	public Order() {
 
 	}
 
 	public Order(Client client, Integer number, Date date, Date needDate) {
-        this.client = client;
-        this.number = number;
-        this.date = date;
-        this.needDate = needDate;
-    }
+		this.client = client;
+		this.number = number;
+		this.date = date;
+		this.needDate = needDate;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public Client getClient() {
+	public Client getClient() {
 		return client;
 	}
 
 	public void setClient(Client client) {
 		this.client = client;
-	}
-
-	public List<OrderState> getStates() {
-		return states;
-	}
-
-	public void setStates(List<OrderState> states) {
-		this.states = states;
 	}
 
 	public List<OrderDetail> getDetails() {
@@ -92,12 +79,12 @@ public class Order implements Serializable, Cloneable {
 	}
 
 	public Integer getNumber() {
-        return number;
-    }
-    
-    public void setNumber(Integer number) {
-        this.number = number;
-    }
+		return number;
+	}
+
+	public void setNumber(Integer number) {
+		this.number = number;
+	}
 
 	public Date getDate() {
 		return date;
