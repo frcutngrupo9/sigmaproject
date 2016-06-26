@@ -27,7 +27,7 @@ import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class ProductStockController extends SelectorComposer<Component>{
+public class ProductStockController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
 	@Wire
@@ -86,7 +86,7 @@ public class ProductStockController extends SelectorComposer<Component>{
 	private ListModelList<OrderDetail> orderDetailListModel;
 
 	@Override
-	public void doAfterCompose(Component comp) throws Exception{
+	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		productList = productRepository.findAll();
 		productListModel = new ListModelList<>(productList);
@@ -172,10 +172,10 @@ public class ProductStockController extends SelectorComposer<Component>{
 		refreshView();
 	}
 
-	// creacion de pedido de auto abastecimiento
+	// creacion de pedido de restock
 	//	@Listen("onClick = #newProvisionOrderButton")
 	//	public void newProvisionOrder() {
-	//		Client client = clientRepository.findByName("Auto Abastecimiento");// deberia ser el id del cliente auto abastecimiento
+	//		Client client = clientRepository.findByName("RESTOCK");
 	//		Date order_date = new Date();
 	//		currentOrder = new Order(client, null, order_date, null);
 	//

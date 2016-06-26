@@ -1,11 +1,8 @@
 package ar.edu.utn.sigmaproject.controller;
 
-import ar.edu.utn.sigmaproject.domain.MachineType;
-import ar.edu.utn.sigmaproject.domain.ProcessType;
-import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
-import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
-import ar.edu.utn.sigmaproject.util.RepositoryHelper;
-import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
@@ -15,14 +12,22 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
-import org.zkoss.zul.*;
+import org.zkoss.zul.Button;
+import org.zkoss.zul.Combobox;
+import org.zkoss.zul.Grid;
+import org.zkoss.zul.ListModelList;
+import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Paging;
+import org.zkoss.zul.Textbox;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import ar.edu.utn.sigmaproject.domain.MachineType;
+import ar.edu.utn.sigmaproject.domain.ProcessType;
+import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
+import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
+import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class ProcessController extends SelectorComposer<Component>{
+public class ProcessController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
 	@Wire
@@ -67,7 +72,7 @@ public class ProcessController extends SelectorComposer<Component>{
 	private ListModelList<MachineType> machineTypeListModel;
 
 	@Override
-	public void doAfterCompose(Component comp) throws Exception{
+	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		machineTypeList = machineTypeRepository.findAll();
 		machineTypeListModel = new ListModelList<>(machineTypeList);
@@ -76,9 +81,6 @@ public class ProcessController extends SelectorComposer<Component>{
 		sortProperties.put(0, "id");
 		sortProperties.put(1, "name");
 		sortProperties.put(2, "machineType");
-		if(processTypeRepository.findAll().isEmpty()) {
-			new RepositoryHelper().generateProcessType(processTypeRepository);
-		}
 		sortingPagingHelper = new SortingPagingHelper<>(processTypeRepository, processTypeListbox, searchButton, searchTextbox, pager, sortProperties);
 		currentProcessType = null;
 		refreshView();

@@ -19,7 +19,7 @@
 								<textbox id="account" width="200px" value="sigma"/>
 							</row>
 							<row>
-								Contraseña :
+								Password :
 								<textbox id="password" type="password"
 									width="200px" value="1234"/>
 							</row>
@@ -31,7 +31,7 @@
 				</vbox>
 				<popup id="enterPasswordPopup">
 					<vbox hflex="min" align="center">
-						Su usuario no tiene una contraseña definida. A continuación, defina su nueva contraseña.
+						Su usuario no tiene un password definido. A continuacion, defina su nuevo password.
 						<grid hflex="min">
 							<columns>
 								<column hflex="min" align="right"/>
@@ -39,12 +39,12 @@
 							</columns>
 							<rows>
 								<row>
-									Contraseña:
+									Password:
 									<textbox id="newPasswordTextbox" width="200px" value=""/>
 								</row>
 							</rows>
 						</grid>
-						<button id="setPasswordButton" label="Definir contraseña" />
+						<button id="setPasswordButton" label="Definir password" />
 					</vbox>
 				</popup>
 			</window>

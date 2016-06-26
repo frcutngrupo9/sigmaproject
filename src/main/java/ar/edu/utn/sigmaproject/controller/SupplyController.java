@@ -21,7 +21,7 @@ import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 
-public class SupplyController extends SelectorComposer<Component>{
+public class SupplyController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
 	@Wire
@@ -66,7 +66,7 @@ public class SupplyController extends SelectorComposer<Component>{
 	private SortingPagingHelper<SupplyType> sortingPagingHelper;
 
 	@Override
-	public void doAfterCompose(Component comp) throws Exception{
+	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		Map<Integer, String> sortProperties = new HashMap<>();
 		sortProperties.put(0, "code");
@@ -97,7 +97,7 @@ public class SupplyController extends SelectorComposer<Component>{
 			return;
 		}
 		String code = codeTextbox.getText();
-		String description = descriptionTextbox.getText();
+		String description = descriptionTextbox.getText().toUpperCase();
 		String details = detailsTextbox.getText();
 		String brand = brandTextbox.getText();
 		String presentation = presentationTextbox.getText();

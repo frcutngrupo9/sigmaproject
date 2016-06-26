@@ -3,7 +3,6 @@
     <grid model="${arg.pieces}" span="true">
         <columns>
         	<column width="40px" />
-        	<column label="Id Pieza" align="center"/>
             <column label="Pieza" align="center"/>
             <column label="Largo" align="center"/>
             <column label="Espesor" align="center"/>
@@ -17,7 +16,6 @@
             	<detail open="false" fulfill="onOpen">
             		<include src="/piece_processes.zul" processes="${r:listModel(processes)}"/>
             	</detail>
-                <label value="${each.id}"/>
             	<label value="${each.name}"/>
                 <label value="${each.length.doubleValue()} ${each.lengthMeasureUnit.name}"/>
                 <label value="${each.depth.doubleValue()} ${each.depthMeasureUnit.name}"/>

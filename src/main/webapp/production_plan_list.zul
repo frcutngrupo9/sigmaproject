@@ -7,10 +7,9 @@
     <separator/>
     <grid id="productionPlanGrid" mold="paging" pageSize="7" sizedByContent="true" span="true">
     	<auxhead>
-			<auxheader label="Planes de Produccion" colspan="9"/>
+			<auxheader label="Planes de Produccion" colspan="8"/>
 		</auxhead>
         <columns>
-        	<column label="Id" align="center"/>
             <column label="Nombre" align="center"/>
             <column label="Fecha Creacion" align="center"/>
             <column label="Cantidad Pedidos" align="center"/>
@@ -22,10 +21,9 @@
         </columns>
         <template name="model">
             <row>
-            	<label value="${each.id}"/>
                 <label value="${each.name}"/>
                 <label value="${each.date}"/>
-                <label value="${each.details.size()}"/>
+                <label value="${each.planDetails.size()}"/>
                 <label value="${win_production_plan_list$composer.getQuantityOfProduct(each)}"/>
                 <label value="${win_production_plan_list$composer.getProductionPlanStateName(each)}"/>
                 <button forward="onClick=productionPlanGrid.onEditProductionPlan(${each})"  image="/img/edit16x16.png"/>

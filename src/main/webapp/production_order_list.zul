@@ -1,5 +1,5 @@
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
-<window id="win_production_order_list" apply="ar.edu.utn.sigmaproject.controller.ProductionOrderListController" width="95%" style="background:white">
+<window id="win_production_order_list" apply="ar.edu.utn.sigmaproject.controller.ProductionOrderListController" width="100%" style="background:white">
     <panel title="Ordenes de Produccion" id="productionOrderCreationBlock" border="rounded">
         <panelchildren>
             <vlayout>
@@ -25,39 +25,39 @@
                 </grid>
     			<grid id="productionOrderGrid" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Listado Ordenes de Produccion" colspan="12"/>
+						<auxheader label="Listado Ordenes de Produccion" colspan="10"/>
 					</auxhead>
         			<columns>
-        				<column width="40px" align="center"/>
-        				<column label="Nombre Producto" align="center"/>
-		                <column label="Cantidad Producto" align="center"/>
-        				<column label="Codigo Producto" align="center"/>
-        				<column label="Estado Orden Prod" align="center"/>
-        				<column label="Id Orden" align="center"/>
+        				<!-- <column width="40px" align="center"/> -->
+        				<column label="Producto" align="center"/>
+		                <column label="Cantidad" align="center"/>
+        				<column label="Codigo" align="center"/>
+        				<column label="Estado Orden" align="center"/>
         				<column label="Numero" align="center"/>
 		                <column label="Empleado Asignado" align="center"/>
-		                <column label="Porcentaje Completado" align="center"/>
+		                <column label="Porcentaje Completo" align="center"/>
 		                <column label="Fecha Inicio" align="center"/>
 		                <column label="Fecha Finalizado" align="center"/>
 		                <column label="Accion" align="center"/>
 		            </columns>
 		            <template name="model">
 		                <row>
+		                <!--
 		                	<custom-attributes production_order_detail_list="${win_production_order_list$composer.getProductionOrderDetailList(each)}"/>
 			            	<detail open="false" fulfill="onOpen" visible="${win_production_order_list$composer.getProductionOrder(each) != null}">
 			            		<include src="/production_order_processes.zul" production_order_detail_list="${production_order_detail_list}"/>
 			            	</detail>
-		                	<label value="${each.name}"/>
-		                	<label value="${each.totalUnits}"/>
-		                	<label value="${each.code}"/>
-		                    <label value="${win_production_order_list$composer.getProductionOrderState(each)}"/>
-		                    <label value="${win_production_order_list$composer.getProductionOrderId(each)}"/>
-                    		<label value="${win_production_order_list$composer.getProductionOrderNumber(each)}"/>
+			            -->
+		                	<label value="${each.product.name}"/>
+		                	<label value="${each.units}"/>
+		                	<label value="${each.product.code}"/>
+		                    <label value="${each.state.name}"/>
+                    		<label value="${each.number}"/>
 		                    <label value="${win_production_order_list$composer.getWorkerName(each)}"/>
 		                    <label value="${win_production_order_list$composer.getPercentComplete(each)}"/>
-		                    <label value="${win_production_order_list$composer.getProductionOrderDate(each)}"/>
-		                    <label value="${win_production_order_list$composer.getProductionOrderDateFinished(each)}"/>
-		                    <button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})"  label="${win_production_order_list$composer.getProductionOrderButtonLabel(each)}" disabled="${win_production_order_list$composer.isProductionPlanStateCancel()}"/>
+		                    <label value="${each.date}"/>
+		                    <label value="${each.dateFinished}"/>
+		                    <button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})"  label="Abrir" disabled="${win_production_order_list$composer.isProductionPlanStateCancel()}"/>
 						</row>
 		            </template>
     			</grid>

@@ -7,9 +7,9 @@
     <separator/>
     <listbox id="machineTypeListbox">
         <listhead>
-            <listheader label="Nombre"/>
-            <listheader label="Detalles"/>
-            <listheader label="Tiempo de deterioro"/>
+            <listheader label="Nombre" align="center"/>
+            <listheader label="Detalles" align="center"/>
+            <listheader label="Tiempo de deterioro" align="center"/>
         </listhead>
         <template name="model">
             <listitem>

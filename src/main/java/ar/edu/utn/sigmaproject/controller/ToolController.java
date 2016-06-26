@@ -20,7 +20,7 @@ import ar.edu.utn.sigmaproject.domain.ToolType;
 import ar.edu.utn.sigmaproject.service.ToolTypeRepository;
 import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 
-public class ToolController extends SelectorComposer<Component>{
+public class ToolController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
 	@Wire
@@ -88,7 +88,7 @@ public class ToolController extends SelectorComposer<Component>{
 			Clients.showNotification("Debe ingresar un nombre", nameTextbox);
 			return;
 		}
-		String name = nameTextbox.getText();
+		String name = nameTextbox.getText().toUpperCase();
 		String description = descriptionTextbox.getText();
 		String details = detailsTextbox.getText();
 		String brand = brandTextbox.getText();

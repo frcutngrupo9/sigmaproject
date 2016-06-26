@@ -13,9 +13,6 @@ public class SupplyReserved implements Serializable, Cloneable {
 	Long id;
 
 	@ManyToOne
-	SupplyType supplyType;
-
-	@ManyToOne
 	SupplyRequirement supplyRequirement;
 
 	BigDecimal stockReserved = BigDecimal.ZERO;
@@ -24,8 +21,7 @@ public class SupplyReserved implements Serializable, Cloneable {
 
 	}
 
-	public SupplyReserved(SupplyType supplyType, SupplyRequirement supplyRequirement, BigDecimal stockReserved) {
-		this.supplyType = supplyType;
+	public SupplyReserved(SupplyRequirement supplyRequirement, BigDecimal stockReserved) {
 		this.supplyRequirement = supplyRequirement;
 		this.stockReserved = stockReserved;
 	}
@@ -36,14 +32,6 @@ public class SupplyReserved implements Serializable, Cloneable {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public SupplyType getSupplyType() {
-		return supplyType;
-	}
-
-	public void setSupplyType(SupplyType supplyType) {
-		this.supplyType = supplyType;
 	}
 
 	public SupplyRequirement getSupplyRequirement() {

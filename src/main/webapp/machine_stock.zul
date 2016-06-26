@@ -7,16 +7,14 @@
     <separator/>
     <listbox id="machineListbox">
         <listhead>
-            <listheader label="Id" width="40px" align="center"/>
-            <listheader label="Nombre"/>
-            <listheader label="Codigo"/>
-            <listheader label="Tipo Maquina"/>
-            <listheader label="Anio"/>
-            <listheader label="Tiempo de Uso"/>
+            <listheader label="Nombre" align="center"/>
+            <listheader label="Codigo" align="center"/>
+            <listheader label="Tipo Maquina" align="center"/>
+            <listheader label="Anio" align="center"/>
+            <listheader label="Tiempo de Uso" align="center"/>
         </listhead>
         <template name="model">
             <listitem>
-                <listcell label="${each.id}"/>
                 <listcell label="${each.name}"/>
                 <listcell label="${each.code}"/>
                 <listcell label="${each.machineType.name}"/>
@@ -39,12 +37,12 @@
             </columns>
             <rows>
             	<row>
-            		<label>Maquina:</label>
-	                <selectbox id="machineTypeSelectbox">
+            		<label>Tipo Maquina:</label>
+	                <combobox id="machineTypeCombobox" hflex="1" readonly="true">
                         <template name="model">
-                            <label value="${each.name}" />
+                            <comboitem label="${each.name}" value="${each}"/>
                         </template>
-                    </selectbox>
+                    </combobox>
             	</row>
             	<row>
                     <label>Codigo:</label>

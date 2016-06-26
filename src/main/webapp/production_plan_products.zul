@@ -2,7 +2,6 @@
     <grid id="productionOrderGrid" model="${arg.products}" sizedByContent="true" span="true">
         <columns>
         	<column label="Producto" align="center"/>
-            <column label="Id Producto" align="center"/>
             <column label="Codigo" align="center"/>
             <column label="Unidades" align="center"/>
             <column label="Estado Orden Prod" align="center"/>
@@ -15,7 +14,6 @@
         <template name="model">
             <row>
             	<label value="${each.name}" />
-                <label value="${each.id}" />
                 <label value="${each.code}" />
                 <label value="${each.totalUnits}" />
                 <label value="${win_production_plan_list$composer.getProductionOrderState(productionPlan, each)}" />

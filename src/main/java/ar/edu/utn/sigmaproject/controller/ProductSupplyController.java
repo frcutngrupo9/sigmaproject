@@ -7,6 +7,8 @@ import java.util.List;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventQueue;
+import org.zkoss.zk.ui.event.EventQueues;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -77,7 +79,7 @@ public class ProductSupplyController extends SelectorComposer<Component> {
 	private ListModelList<SupplyType> supplyTypePopupListModel;
 
 	@Override
-	public void doAfterCompose(Component comp) throws Exception{
+	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		
 		currentProduct = (Product) Executions.getCurrent().getAttribute("selected_product");
@@ -99,11 +101,13 @@ public class ProductSupplyController extends SelectorComposer<Component> {
 	public void acceptSupplyListButtonClick() {
 		if(currentProduct != null) {
 			for(Supply each : supplyList) {
-				supplyRepository.save(each);
+				each = supplyRepository.save(each);
 			}
 			currentProduct.setSupplies(supplyList);
-			productRepository.save(currentProduct);
+			currentProduct = productRepository.save(currentProduct);
 		}
+		EventQueue<Event> eq = EventQueues.lookup("Product Change Queue", EventQueues.DESKTOP, true);
+		eq.publish(new Event("onProductChange", null, currentProduct));
 		productSupplyWindow.detach();
 	}
 

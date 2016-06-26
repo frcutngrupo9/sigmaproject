@@ -96,7 +96,7 @@ public class MachineController extends SelectorComposer<Component> {
 			Clients.showNotification("Debe ingresar un nombre", nameTextbox);
 			return;
 		}
-		String name = nameTextbox.getText();
+		String name = nameTextbox.getText().toUpperCase();
 		String details = detailsTextbox.getText();
 		Integer years = deteriorationTimeIntboxYears.intValue();
 		Integer days = deteriorationTimeIntboxDays.intValue();

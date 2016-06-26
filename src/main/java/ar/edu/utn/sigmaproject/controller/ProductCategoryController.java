@@ -49,7 +49,7 @@ public class ProductCategoryController extends SelectorComposer<Component> {
 	private ListModelList<ProductCategory> productCategoryListModel;
 
 	@Override
-	public void doAfterCompose(Component comp) throws Exception{
+	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		productCategoryList = productCategoryRepository.findAll();
 		productCategoryListModel = new ListModelList<>(productCategoryList);

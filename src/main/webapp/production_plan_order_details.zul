@@ -1,17 +1,15 @@
 <zk>
     <grid model="${arg.details}">
         <columns>
-            <column label="Id Producto" align="center"/>
             <column label="Codigo" align="center"/>
             <column label="Producto" align="center"/>
             <column label="Unidades" align="center"/>
         </columns>
         <template name="model">
             <row>
-                <label value="${each.idProduct}" />
-                <label value="${win_production_plan_creation$composer.getProductCode(each.idProduct)}" />
-                <label value="${win_production_plan_creation$composer.getProductName(each.idProduct)}" />
-                <label value="${each.units}" />
+                <label value="${each.product.getCode()}"/>
+                <label value="${each.product.getName()}"/>
+                <label value="${each.units}"/>
             </row>
         </template>
     </grid>

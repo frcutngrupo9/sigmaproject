@@ -12,9 +12,6 @@ public class WoodReserved implements Serializable, Cloneable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
 
-	@ManyToOne
-	Wood wood;
-
 	@OneToOne
 	RawMaterialRequirement rawMaterialRequirement;
 
@@ -24,8 +21,7 @@ public class WoodReserved implements Serializable, Cloneable {
 
 	}
 
-	public WoodReserved(Wood wood, RawMaterialRequirement rawMaterialRequirement, BigDecimal stockReserved) {
-		this.wood = wood;
+	public WoodReserved(RawMaterialRequirement rawMaterialRequirement, BigDecimal stockReserved) {
 		this.rawMaterialRequirement = rawMaterialRequirement;
 		this.stockReserved = stockReserved;
 	}
@@ -36,14 +32,6 @@ public class WoodReserved implements Serializable, Cloneable {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public Wood getWood() {
-		return wood;
-	}
-
-	public void setWood(Wood wood) {
-		this.wood = wood;
 	}
 
 	public RawMaterialRequirement getRawMaterialRequirement() {

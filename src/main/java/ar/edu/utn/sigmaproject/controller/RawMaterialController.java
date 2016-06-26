@@ -25,10 +25,9 @@ import ar.edu.utn.sigmaproject.domain.RawMaterialType;
 import ar.edu.utn.sigmaproject.service.MeasureUnitRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitTypeRepository;
 import ar.edu.utn.sigmaproject.service.RawMaterialTypeRepository;
-import ar.edu.utn.sigmaproject.util.RepositoryHelper;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class RawMaterialController extends SelectorComposer<Component>{
+public class RawMaterialController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
 	@Wire
@@ -84,17 +83,13 @@ public class RawMaterialController extends SelectorComposer<Component>{
 	private ListModelList<MeasureUnit> widthMeasureUnitListModel;
 
 	@Override
-	public void doAfterCompose(Component comp) throws Exception{
+	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		rawMaterialTypeList = rawMaterialTypeRepository.findAll();
 		rawMaterialTypeListModel = new ListModelList<>(rawMaterialTypeList);
 		rawMaterialTypeListbox.setModel(rawMaterialTypeListModel);
 		currentRawMaterialType = null;
 		MeasureUnitType measureUnitType = measureUnitTypeRepository.findByName("Longitud");
-		if(measureUnitType == null) {
-			new RepositoryHelper().generateMeasureUnitTypeList(measureUnitRepository, measureUnitTypeRepository);
-			measureUnitType = measureUnitTypeRepository.findByName("Longitud");
-		}
 		measureUnitList = measureUnitRepository.findByType(measureUnitType);
 		lengthMeasureUnitListModel = new ListModelList<>(measureUnitList);
 		depthMeasureUnitListModel = new ListModelList<>(measureUnitList);
@@ -140,7 +135,7 @@ public class RawMaterialController extends SelectorComposer<Component>{
 			Clients.showNotification("Debe seleccionar una unidad de medida", widthMeasureUnitSelectbox);
 			return;
 		}
-		String name = nameTextbox.getText();
+		String name = nameTextbox.getText().toUpperCase();
 		BigDecimal length = BigDecimal.valueOf(lengthDoublebox.doubleValue());
 		MeasureUnit lengthMeasureUnit = lengthMeasureUnitListModel.getElementAt(lengthSelectedIndex);
 		BigDecimal depth = BigDecimal.valueOf(depthDoublebox.doubleValue());

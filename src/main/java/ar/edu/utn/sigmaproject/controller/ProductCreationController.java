@@ -51,6 +51,7 @@ import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductCategory;
+import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitTypeRepository;
 import ar.edu.utn.sigmaproject.service.PieceRepository;
@@ -58,7 +59,6 @@ import ar.edu.utn.sigmaproject.service.ProcessRepository;
 import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductCategoryRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
-import ar.edu.utn.sigmaproject.util.RepositoryHelper;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProductCreationController extends SelectorComposer<Component> {
@@ -147,6 +147,8 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@WireVariable
 	private ProcessTypeRepository processTypeRepository;
 	@WireVariable
+	private MachineTypeRepository machineTypeRepository;
+	@WireVariable
 	private ProductRepository productRepository;
 	@WireVariable
 	private PieceRepository pieceRepository;
@@ -176,13 +178,9 @@ public class ProductCreationController extends SelectorComposer<Component> {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public void doAfterCompose(Component comp) throws Exception{
+	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		processTypeList = processTypeRepository.findAll();
-		if(processTypeList.isEmpty()) {
-			new RepositoryHelper().generateProcessType(processTypeRepository);
-			processTypeList = processTypeRepository.findAll();
-		}
 		processTypeListModel = new ListModelList<>(processTypeList);
 		processListbox.setModel(processTypeListModel);
 		listboxProcessList = new ArrayList<>();// listbox que contiene los procesos de la pieza seleccionada o vacio si es una nueva pieza
@@ -192,10 +190,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		pieceListbox.setModel(pieceListModel);
 
 		MeasureUnitType measureUnitType = measureUnitTypeRepository.findByName("Longitud");
-		if(measureUnitType == null) {
-			new RepositoryHelper().generateMeasureUnitTypeList(measureUnitRepository, measureUnitTypeRepository);
-			measureUnitType = measureUnitTypeRepository.findByName("Longitud");
-		}
 		List<MeasureUnit> measureUnitList = measureUnitRepository.findByType(measureUnitType);
 		lengthMeasureUnitListModel = new ListModelList<>(measureUnitList);
 		depthMeasureUnitListModel = new ListModelList<>(measureUnitList);
@@ -205,6 +199,15 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		widthMeasureUnitSelectbox.setModel(widthMeasureUnitListModel);
 		currentProduct = (Product) Executions.getCurrent().getAttribute("selected_product");
 		currentPiece = null;
+
+		// listener para cuando se modifique el producto al agregar materias primas o insumos
+		eq = EventQueues.lookup("Product Change Queue", EventQueues.DESKTOP, true);
+		eq.subscribe(new EventListener() {
+			public void onEvent(Event event) throws Exception {
+				Product value = (Product)event.getData();
+				currentProduct = value;
+			}
+		});
 
 		// agregamos un listener para cuando se seleccione una pieza en el modal de copia de otra pieza
 		eq = EventQueues.lookup("Piece Selection Queue", EventQueues.DESKTOP, true);
@@ -245,7 +248,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 				return;
 			}
 		}
-		String productName = productNameTextbox.getText();
+		String productName = productNameTextbox.getText().toUpperCase();
 		String productDetails = productDetailsTextbox.getText();
 		String productCode = productCodeTextbox.getText();
 		ProductCategory productCategory = productCategoryCombobox.getSelectedItem().getValue();
@@ -267,11 +270,11 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		currentProduct.setPieces(pieceList);
 		for(Piece eachPiece : currentProduct.getPieces()) {
 			for(Process eachProcess : eachPiece.getProcesses()) {
-				processRepository.save(eachProcess);
+				eachProcess = processRepository.save(eachProcess);
 			}
-			pieceRepository.save(eachPiece);
+			eachPiece = pieceRepository.save(eachPiece);
 		}
-		productRepository.save(currentProduct);
+		currentProduct = productRepository.save(currentProduct);
 
 		// mostrar mensaje al user
 		Clients.showNotification("Producto guardado");
@@ -796,16 +799,14 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@Listen("onClick = #openRawMaterialListButton")
 	public void openRawMaterialListButtonClick() {
 		Executions.getCurrent().setAttribute("selected_product", currentProduct);
-		Window window = (Window)Executions.createComponents(
-				"/product_raw_material.zul", null, null);
+		Window window = (Window)Executions.createComponents("/product_raw_material.zul", null, null);
 		window.doModal();
 	}
 	
 	@Listen("onClick = #openSupplyListButton")
 	public void openSupplyListButtonClick() {
 		Executions.getCurrent().setAttribute("selected_product", currentProduct);
-		Window window = (Window)Executions.createComponents(
-				"/product_supply.zul", null, null);
+		Window window = (Window)Executions.createComponents("/product_supply.zul", null, null);
 		window.doModal();
 	}
 }
