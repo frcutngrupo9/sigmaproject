@@ -10,10 +10,10 @@
 			<auxheader label="Materia Prima" colspan="7"/>
 		</auxhead>
         <listhead>
-        	<listheader label="Codigo"/>
-            <listheader label="Nombre"/>
-            <listheader label="Medidas"/>
-            <listheader label="Madera"/>
+        	<listheader label="Codigo" align="center"/>
+            <listheader label="Nombre" align="center"/>
+            <listheader label="Medidas" align="center"/>
+            <listheader label="Madera" align="center"/>
             <listheader label="Stock Actual" align="center"/>
             <listheader label="Stock Minimo" align="center"/>
             <listheader label="Stock Reposicion" align="center"/>
@@ -48,7 +48,7 @@
 	            </row>
 	        	<row>
 	                <label>Materia Prima:</label>
-	                <combobox id="rawMaterialTypeCombobox">
+	                <combobox id="rawMaterialTypeCombobox" readonly="true">
                         <template name="model">
                             <comboitem label="${each.name}" value="${each}"/>
                         </template>
@@ -56,7 +56,7 @@
 	            </row>
 	            <row>
 	                <label>Madera:</label>
-	                <combobox id="woodTypeCombobox">
+	                <combobox id="woodTypeCombobox" readonly="true">
                         <template name="model">
                             <comboitem label="${each.name}" value="${each}"/>
                         </template>

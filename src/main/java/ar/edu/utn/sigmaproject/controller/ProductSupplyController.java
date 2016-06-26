@@ -79,7 +79,7 @@ public class ProductSupplyController extends SelectorComposer<Component> {
 	private ListModelList<SupplyType> supplyTypePopupListModel;
 
 	@Override
-	public void doAfterCompose(Component comp) throws Exception{
+	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		
 		currentProduct = (Product) Executions.getCurrent().getAttribute("selected_product");

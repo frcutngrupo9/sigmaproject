@@ -89,7 +89,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	private ListModelList<RawMaterialRequirement> rawMaterialRequirementListModel;
 
 	@Override
-	public void doAfterCompose(Component comp) throws Exception{
+	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 
 		currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");

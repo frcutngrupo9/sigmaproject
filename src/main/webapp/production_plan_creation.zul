@@ -11,11 +11,11 @@
                     <rows>
                     	<row>
                             <label value="Estado: "/>
-		                    <selectbox id="productionPlanStateTypeSelectbox" width="25%">
+		                    <combobox id="productionPlanStateTypeCombobox" width="25%" readonly="true">
 		                        <template name="model">
-		                            <label value="${each.name}" />
+		                            <comboitem label="${each.name}" value="${each}"/>
 		                        </template>
-		                    </selectbox>
+		                    </combobox>
                         </row>
                         <row>
                             <label value="Nombre Plan de Produccion: "/>
@@ -38,10 +38,10 @@
 				    							</hbox>
 				    							<listbox id="orderPopupListbox" width="200px">
 				    							<listhead>
-				    								<listheader label="Pedido"/>
-				    								<listheader label="Cliente"/>
-				    								<listheader label="Fecha"/>
-				    								<listheader label="Cantidad de Productos"/>
+				    								<listheader label="Pedido" align="center"/>
+				    								<listheader label="Cliente" align="center"/>
+				    								<listheader label="Fecha" align="center"/>
+				    								<listheader label="Cantidad de Productos" align="center"/>
 				    							</listhead>
 				    							<template name="model">
 				    								<listitem>
@@ -63,13 +63,13 @@
                 </grid>
     			<grid id="productionPlanDetailGrid" mold="paging" pageSize="7">
     				<auxhead>
-						<auxheader label="Pedidos" colspan="5"/>
+						<auxheader label="Pedidos" colspan="4"/>
 					</auxhead>
         			<columns>
-            			<column label="Fecha"/>
-            			<column label="Cliente"/>
-           			 	<column label="Cantidad Productos"/>
-           			 	<column label="Quitar" width="120px" />
+            			<column label="Fecha" align="center"/>
+            			<column label="Cliente" align="center"/>
+           			 	<column label="Cantidad Productos" align="center"/>
+           			 	<column label="Quitar" width="120px" align="center"/>
         			</columns>
         			<template name="model">
             			<row>
@@ -83,13 +83,13 @@
     			<separator/>
     			<listbox id="productTotalListbox" mold="paging" pageSize="7" visible="true">
     				<auxhead>
-						<auxheader label="Productos" colspan="5"/>
+						<auxheader label="Productos" colspan="4"/>
 					</auxhead>
         			<listhead>
-        				<listheader label="Codigo"/>
-            			<listheader label="Nombre Producto"/>
-            			<listheader label="Detalles"/>
-            			<listheader label="Cantidad de Producto"/>
+        				<listheader label="Codigo" align="center"/>
+            			<listheader label="Nombre Producto" align="center"/>
+            			<listheader label="Detalles" align="center"/>
+            			<listheader label="Cantidad de Producto" align="center"/>
         			</listhead>
         			<template name="model">
             			<listitem>

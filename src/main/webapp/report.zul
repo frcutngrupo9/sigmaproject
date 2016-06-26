@@ -1,0 +1,10 @@
+<window id="reportWindow" apply="ar.edu.utn.sigmaproject.controller.ReportController">
+	<caption label="Reportes" style="text-align:center; font-weight: bold;"/>
+	<panel border="rounded">
+        <panelchildren>
+            <vlayout>
+                <label id="informationLabel" value=""/>
+            </vlayout>
+        </panelchildren>
+    </panel>
+</window>

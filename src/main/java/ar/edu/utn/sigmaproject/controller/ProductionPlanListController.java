@@ -30,7 +30,7 @@ import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.WorkerRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class ProductionPlanListController  extends SelectorComposer<Component>{
+public class ProductionPlanListController  extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
 	@Wire

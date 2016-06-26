@@ -7,11 +7,11 @@
     <separator/>
     <listbox id="clientListbox">
         <listhead>
-            <listheader label="Nombre"/>
-            <listheader label="Telefono"/>
-            <listheader label="Email"/>
-            <listheader label="Direccion"/>
-            <listheader label="Detalles"/>
+            <listheader label="Nombre" align="center"/>
+            <listheader label="Telefono" align="center"/>
+            <listheader label="Email" align="center"/>
+            <listheader label="Direccion" align="center"/>
+            <listheader label="Detalles" align="center"/>
         </listhead>
         <template name="model">
             <listitem>

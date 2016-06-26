@@ -60,7 +60,7 @@ public class WorkerController extends SelectorComposer<Component> {
 	private ListModelList<Worker> workerListModel;
 
 	@Override
-	public void doAfterCompose(Component comp) throws Exception{
+	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		workerList = workerRepository.findAll();
 		workerListModel = new ListModelList<>(workerList);

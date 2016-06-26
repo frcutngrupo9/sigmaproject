@@ -15,10 +15,10 @@
                                 </hbox>
                                 <listbox id="rawMaterialTypePopupListbox" width="500px">
 	                                <listhead>
-	                                    <listheader label="Nombre"/>
-	                                    <listheader label="Largo (L)"/>
-							            <listheader label="Espesor (E)"/>
-							            <listheader label="Ancho (A)"/>
+	                                    <listheader label="Nombre" align="center"/>
+	                                    <listheader label="Largo (L)" align="center"/>
+							            <listheader label="Espesor (E)" align="center"/>
+							            <listheader label="Ancho (A)" align="center"/>
 	                                </listhead>
 	                                <template name="model">
 	                                    <listitem>
@@ -45,11 +45,11 @@
                         <auxheader label="Materias Prima" colspan="5"/>
                     </auxhead>
                     <listhead>
-			            <listheader label="Nombre"/>
-			            <listheader label="Largo (L)"/>
-			            <listheader label="Espesor (E)"/>
-			            <listheader label="Ancho (A)"/>
-			            <listheader label="Cantidad"/>
+			            <listheader label="Nombre" align="center"/>
+			            <listheader label="Largo (L)" align="center"/>
+			            <listheader label="Espesor (E)" align="center"/>
+			            <listheader label="Ancho (A)" align="center"/>
+			            <listheader label="Cantidad" align="center"/>
                     </listhead>
                     <template name="model">
                         <listitem>

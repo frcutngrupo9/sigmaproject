@@ -22,7 +22,7 @@ import ar.edu.utn.sigmaproject.service.PieceRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class PieceSelectionModalController extends SelectorComposer<Component>{
+public class PieceSelectionModalController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
 	@Wire

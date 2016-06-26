@@ -98,7 +98,7 @@ public class SidebarController extends SelectorComposer<Component> {
 												new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Herramientas", "/tool.zul")),
 												new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Procesos", "/process.zul")),
 												new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Empleados", "/worker.zul")),
-												new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Reportes"))
+												new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Reportes", "/report.zul"))
 				));
 		tree.setModel(new DefaultTreeModel<MenuTreeRow>(rootNode));
 		tree.addEventListener(Events.ON_CLICK, new EventListener<MouseEvent>() {

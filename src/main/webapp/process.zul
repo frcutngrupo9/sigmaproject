@@ -7,8 +7,8 @@
     <separator/>
     <listbox id="processTypeListbox">
         <listhead>
-            <listheader label="Nombre"/>
-            <listheader label="Maquina Necesaria"/>
+            <listheader label="Nombre" align="center"/>
+            <listheader label="Maquina Necesaria" align="center"/>
         </listhead>
         <template name="model">
             <listitem>

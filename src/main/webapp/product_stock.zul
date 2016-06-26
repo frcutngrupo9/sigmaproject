@@ -10,8 +10,8 @@
 			<auxheader label="Productos" colspan="5"/>
 		</auxhead>
         <listhead>
-            <listheader label="Codigo"/>
-            <listheader label="Descripcion"/>
+            <listheader label="Codigo" align="center"/>
+            <listheader label="Descripcion" align="center"/>
             <listheader label="Stock Actual" align="center"/>
             <listheader label="Stock Minimo" align="center"/>
             <listheader label="Stock Reposicion" align="center"/>
@@ -69,7 +69,7 @@
 	            </row>
 	        </rows>
     	</grid>
-    	<panel title="Pedido de Autoabastecimiento" id="orderCreationBlock" collapsible="true" visible="true" closable="false" border="rounded">
+    	<panel title="Pedido de Restock" id="orderCreationBlock" collapsible="true" visible="true" closable="false" border="rounded">
         	<panelchildren>
         		<separator/>
         		<hlayout>

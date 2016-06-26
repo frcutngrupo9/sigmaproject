@@ -29,7 +29,7 @@ import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class OrderListController extends SelectorComposer<Component>{
+public class OrderListController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
 	@Wire

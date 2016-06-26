@@ -17,6 +17,7 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Caption;
+import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Intbox;
@@ -24,7 +25,6 @@ import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
-import org.zkoss.zul.Selectbox;
 
 import ar.edu.utn.sigmaproject.domain.Client;
 import ar.edu.utn.sigmaproject.domain.Order;
@@ -36,7 +36,6 @@ import ar.edu.utn.sigmaproject.service.OrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
-import ar.edu.utn.sigmaproject.util.RepositoryHelper;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class OrderCreationController extends SelectorComposer<Component> {
@@ -77,7 +76,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	@Wire
 	Button resetOrderDetailButton;
 	@Wire
-	Selectbox orderStateTypeSelectbox;
+	Combobox orderStateTypeCombobox;
 	@Wire
 	Label orderTotalPriceLabel;
 	@Wire
@@ -126,12 +125,8 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		orderDetailListbox.setModel(orderDetailListModel);
 
 		orderStateTypeList = orderStateTypeRepository.findAll();
-		if(orderStateTypeList.isEmpty()) {
-			new RepositoryHelper().generateOrderStateType(orderStateTypeRepository);
-			orderStateTypeList = orderStateTypeRepository.findAll();
-		}
 		orderStateTypeListModel = new ListModelList<OrderStateType>(orderStateTypeList);
-		orderStateTypeSelectbox.setModel(orderStateTypeListModel);
+		orderStateTypeCombobox.setModel(orderStateTypeListModel);
 
 		currentOrder = (Order) Executions.getCurrent().getAttribute("selected_order");
 		currentOrderDetail = null;
@@ -148,7 +143,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #saveOrderButton")
 	public void saveOrder() {
-		// agregar comprobacion para ver si todavia no se guardo un detalle activo
+		// TODO agregar comprobacion para ver si todavia no se guardo un detalle activo
 		if(currentClient == null){
 			Clients.showNotification("Seleccionar Cliente", clientBandbox);
 			return;
@@ -167,8 +162,8 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		Date order_date = orderDatebox.getValue();
 		Date order_need_date = orderNeedDatebox.getValue();
 		OrderStateType order_state_type;
-		if(orderStateTypeSelectbox.getSelectedIndex() != -1) {
-			order_state_type = orderStateTypeListModel.getElementAt(orderStateTypeSelectbox.getSelectedIndex());
+		if(orderStateTypeCombobox.getSelectedIndex() != -1) {
+			order_state_type = orderStateTypeCombobox.getSelectedItem().getValue();
 		} else {
 			order_state_type = null;
 		}
@@ -262,7 +257,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		if (currentOrder == null) {// nuevo pedido
 			orderCaption.setLabel("Creacion de Pedido");
 			orderStateTypeListModel.addToSelection(orderStateTypeRepository.findByName("Iniciado"));
-			orderStateTypeSelectbox.setModel(orderStateTypeListModel);
+			orderStateTypeCombobox.setModel(orderStateTypeListModel);
 			currentClient = null;
 			clientBandbox.setValue("");
 			clientBandbox.close();
@@ -271,15 +266,15 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			orderNeedDatebox.setValue(null);
 			orderDetailList = new ArrayList<OrderDetail>();
 			deleteOrderButton.setDisabled(true);
-			orderStateTypeSelectbox.setDisabled(true);
+			orderStateTypeCombobox.setDisabled(true);
 		} else {// editar pedido
 			// TODO Gian: ver currentOrderState
 			orderCaption.setLabel("Edicion de Pedido");
 			if (currentOrder.getCurrentStateType() != null) {
 				orderStateTypeListModel.addToSelection(currentOrder.getCurrentStateType());
-				orderStateTypeSelectbox.setModel(orderStateTypeListModel);
+				orderStateTypeCombobox.setModel(orderStateTypeListModel);
 			} else {
-				orderStateTypeSelectbox.setSelectedIndex(-1);
+				orderStateTypeCombobox.setSelectedIndex(-1);
 			}
 			currentClient = currentOrder.getClient();
 			clientBandbox.setValue(currentClient.getName());
@@ -289,7 +284,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			orderNeedDatebox.setValue(currentOrder.getNeedDate());
 			orderDetailList = currentOrder.getDetails();
 			deleteOrderButton.setDisabled(false);
-			orderStateTypeSelectbox.setDisabled(false);
+			orderStateTypeCombobox.setDisabled(false);
 		}
 		orderDatebox.setDisabled(true);// nunca se debe poder modificar la fecha de creacion del pedido
 		currentOrderDetail = null;

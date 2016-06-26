@@ -61,16 +61,12 @@ public class ProductListController extends SelectorComposer<Component> implement
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-
+		
 		Map<Integer, String> sortProperties = new HashMap<>();
 		sortProperties.put(0, "name");
 		new SortingPagingHelper<>(productRepository, productGrid, searchButton, searchTextbox, pager, sortProperties, this);
 
 		List<ProductCategory> productCategoryList = productCategoryRepository.findAll();
-		if(productCategoryList.isEmpty()) {
-			new RepositoryHelper().generateProductCategory(productCategoryRepository);
-			productCategoryList = productCategoryRepository.findAll();
-		}
 		new ListModelList<>(productCategoryList);
 	}
 

@@ -80,7 +80,7 @@ public class ProductRawMaterialController extends SelectorComposer<Component> {
 	private ListModelList<RawMaterialType> rawMaterialTypePopupListModel;
 
 	@Override
-	public void doAfterCompose(Component comp) throws Exception{
+	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		
 		currentProduct = (Product) Executions.getCurrent().getAttribute("selected_product");

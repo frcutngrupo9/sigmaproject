@@ -6,8 +6,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
-import ar.edu.utn.sigmaproject.service.MachineRepository;
-import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -17,15 +15,17 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Selectbox;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
+import ar.edu.utn.sigmaproject.service.MachineRepository;
+import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class MachineStockController extends SelectorComposer<Component> {
@@ -38,7 +38,7 @@ public class MachineStockController extends SelectorComposer<Component> {
 	@Wire
 	Grid machineGrid;
 	@Wire
-	Selectbox machineTypeSelectbox;
+	Combobox machineTypeCombobox;
 	@Wire
 	Textbox nameTextbox;
 	@Wire
@@ -78,11 +78,11 @@ public class MachineStockController extends SelectorComposer<Component> {
 	private ListModelList<MachineType> machineTypeListModel;
 
 	@Override
-	public void doAfterCompose(Component comp) throws Exception{
+	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		machineTypeList = machineTypeRepository.findAll();
 		machineTypeListModel = new ListModelList<MachineType>(machineTypeList);
-		machineTypeSelectbox.setModel(machineTypeListModel);
+		machineTypeCombobox.setModel(machineTypeListModel);
 		machineList = machineRepository.findAll();
 		machineListModel = new ListModelList<Machine>(machineList);
 		machineListbox.setModel(machineListModel);
@@ -116,7 +116,7 @@ public class MachineStockController extends SelectorComposer<Component> {
 		newButton.setDisabled(false);
 		if(currentMachine == null) {// nuevo
 			machineGrid.setVisible(false);
-			machineTypeSelectbox.setSelectedIndex(-1);
+			machineTypeCombobox.setSelectedIndex(-1);
 			codeTextbox.setValue(null);
 			nameTextbox.setValue(null);
 			yearIntbox.setValue(null);
@@ -126,7 +126,8 @@ public class MachineStockController extends SelectorComposer<Component> {
 			resetButton.setDisabled(true);
 		}else {// editar
 			machineGrid.setVisible(true);
-			machineTypeSelectbox.setSelectedIndex(machineTypeListModel.indexOf(currentMachine.getMachineType()));
+			machineTypeListModel.addToSelection(currentMachine.getMachineType());
+			machineTypeCombobox.setModel(machineTypeListModel);
 			codeTextbox.setValue(currentMachine.getCode());
 			nameTextbox.setValue(currentMachine.getName());
 			yearIntbox.setValue(currentMachine.getYear());
@@ -146,8 +147,8 @@ public class MachineStockController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
-		if(machineTypeSelectbox.getSelectedIndex() == -1) {
-			Clients.showNotification("Debe seleccionar una Maquina", machineTypeSelectbox);
+		if(machineTypeCombobox.getSelectedIndex() == -1) {
+			Clients.showNotification("Debe seleccionar una Maquina", machineTypeCombobox);
 			return;
 		}
 		if(Strings.isBlank(nameTextbox.getValue())){
@@ -158,7 +159,7 @@ public class MachineStockController extends SelectorComposer<Component> {
 			Clients.showNotification("Ingrese el Codigo de la Maquina", codeTextbox);
 			return;
 		}
-		MachineType machineType = machineTypeListModel.getElementAt(machineTypeSelectbox.getSelectedIndex());
+		MachineType machineType = machineTypeListModel.getElementAt(machineTypeCombobox.getSelectedIndex());
 		String code = codeTextbox.getText();
 		String name = nameTextbox.getText();
 		Integer year = yearIntbox.getValue();

@@ -7,4 +7,6 @@ import ar.edu.utn.sigmaproject.domain.MachineType;
 @Repository
 public interface MachineTypeRepository extends SearchableRepository<MachineType, Long> {
 
+	MachineType findByName(String string);
+
 }

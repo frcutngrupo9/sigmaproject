@@ -15,9 +15,9 @@
                                 </hbox>
                                 <listbox id="supplyTypePopupListbox" width="500px">
 	                                <listhead>
-	                                    <listheader label="Descripcion"/>
-	                                    <listheader label="Detalles"/>
-	                                    <listheader label="Medida"/>
+	                                    <listheader label="Descripcion" align="center"/>
+	                                    <listheader label="Detalles" align="center"/>
+	                                    <listheader label="Medida" align="center"/>
 	                                </listhead>
 	                                <template name="model">
 	                                    <listitem>
@@ -43,12 +43,12 @@
                         <auxheader label="Insumos" colspan="6"/>
                     </auxhead>
                     <listhead>
-			            <listheader label="Descripcion"/>
-			            <listheader label="Detalles"/>
-			            <listheader label="Marca"/>
-			            <listheader label="Presentacion"/>
-			            <listheader label="Medida"/>
-			            <listheader label="Cantidad"/>
+			            <listheader label="Descripcion" align="center"/>
+			            <listheader label="Detalles" align="center"/>
+			            <listheader label="Marca" align="center"/>
+			            <listheader label="Presentacion" align="center"/>
+			            <listheader label="Medida" align="center"/>
+			            <listheader label="Cantidad" align="center"/>
                     </listhead>
                     <template name="model">
                         <listitem>

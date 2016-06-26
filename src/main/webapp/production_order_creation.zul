@@ -11,17 +11,9 @@
                         <column align="left"/>
                         <column align="right"/>
                         <column align="left"/>
-                        <column align="right"/>
-                        <column align="left"/>
-                        <column align="right"/>
-                        <column align="left"/>
                     </columns>
                     <rows>
                     	<row>
-                    		<label value="Producto a Fabricar: "/>
-							<textbox id="productNameTextbox" width="100%"/>
-							<label value="Unidades a Fabricar: "/>
-							<intbox id="productUnitsIntbox"/>
                             <label value="Plan de Produccion: "/>
 							<textbox id="productionPlanNameTextbox"/>
 							<label value="Estado Plan: "/>
@@ -39,9 +31,9 @@
                     <rows>
                     	<row>
                             <label value="Estado Orden de Produccion: "/>
-							<combobox id="productionOrderStateCombobox">
+							<combobox id="productionOrderStateCombobox" readonly="true">
 		                        <template name="model">
-		                        	<comboitem label="${each.name}" value="${each}">
+		                        	<comboitem label="${each.name}" value="${each}"/>
 		                        </template>
 		                    </combobox>
                         </row>
@@ -51,11 +43,11 @@
                         </row>
                         <row>
                             <label value="Empleado Asignado: "/>
-							<selectbox id="workerSelectbox">
+							<combobox id="workerCombobox" readonly="true">
 			                    <template name="model">
-			                        <label value="${each.name}"/>
+			                        <comboitem label="${each.name}" value="${each}"/>
 			                    </template>
-			                </selectbox>
+			                </combobox>
                         </row>
                         <row>
                             <label value="Fecha Inicio Orden de Produccion: "/>
@@ -67,6 +59,12 @@
                         </row>
                    </rows>
                 </grid>
+                <hlayout>
+					<label value="Producto a Fabricar: "/>
+					<textbox id="productNameTextbox"/>
+					<label value="Unidades a Fabricar: "/>
+					<intbox id="productUnitsIntbox"/>
+				</hlayout>
         		<grid id="productionOrderDetailGrid" sizedByContent="true" span="true">
     				<auxhead>
 						<auxheader label="Detalles Orden de Produccion" colspan="10"/>

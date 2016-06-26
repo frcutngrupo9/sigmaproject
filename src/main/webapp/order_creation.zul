@@ -11,11 +11,11 @@
                     <rows>
                     	<row>
                             <label value="Estado: "/>
-		                    <selectbox id="orderStateTypeSelectbox" width="25%">
+		                    <combobox id="orderStateTypeCombobox" width="25%" readonly="true">
 		                        <template name="model">
-		                            <label value="${each.name}" />
+		                            <comboitem label="${each.name}" value="${each}"/>
 		                        </template>
-		                    </selectbox>
+		                    </combobox>
                         </row>
                         <row>
                             <label value="Numero de Pedido: "/>
@@ -67,8 +67,8 @@
                                 </hbox>
                                 <listbox id="productPopupListbox" width="200px">
                                 <listhead>
-                                    <listheader label="Producto"/>
-                                    <listheader label="Descripcion"/>
+                                    <listheader label="Producto" align="center"/>
+                                    <listheader label="Descripcion" align="center"/>
                                 </listhead>
                                 <template name="model">
                                     <listitem>
@@ -94,10 +94,10 @@
                         <auxheader label="Productos" colspan="4"/>
                     </auxhead>
                     <listhead>
-                        <listheader label="Nombre Producto"/>
-                        <listheader label="Unidades"/>
-                        <listheader label="Monto Unitario"/>
-                        <listheader label="Subtotal"/>
+                        <listheader label="Nombre Producto" align="center"/>
+                        <listheader label="Unidades" align="center"/>
+                        <listheader label="Monto Unitario" align="center"/>
+                        <listheader label="Subtotal" align="center"/>
                     </listhead>
                     <template name="model">
                         <listitem>

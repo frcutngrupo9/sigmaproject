@@ -6,7 +6,7 @@
         <button id="searchButton" label="Buscar"/>
     </hlayout>
     <separator/>
-    <grid id="productGrid" mold="paging" pageSize="7" span="true">
+    <grid id="productGrid" span="true">
     	<auxhead>
 			<auxheader label="Productos" colspan="6"/>
 		</auxhead>

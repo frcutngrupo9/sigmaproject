@@ -34,7 +34,6 @@ import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
-import ar.edu.utn.sigmaproject.util.RepositoryHelper;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProductionOrderListController extends SelectorComposer<Component> {
@@ -71,21 +70,19 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 	private ListModelList<ProductionOrder> productionOrderListModel;
 
 	@Override
-	public void doAfterCompose(Component comp) throws Exception{
+	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 
 		currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
 		if(currentProductionPlan == null) {throw new RuntimeException("ProductionPlan not found");}
-		if(productionOrderStateRepository.findAll().isEmpty()) {
-			new RepositoryHelper().generateProductionOrderState(productionOrderStateRepository);
-		}
 		productionOrderList = productionOrderRepository.findByProductionPlan(currentProductionPlan);
 		if(productionOrderList.isEmpty()) {
 			List<ProductTotal> productTotalList = currentProductionPlan.getProductTotalList();
 			for(ProductTotal each : productTotalList) {
-				productionOrderList.add(new ProductionOrder(currentProductionPlan, each.getProduct(), null, null, each.getTotalUnits(), null, null, productionOrderStateRepository.findByName("Generada")));
+				ProductionOrder productionOrder = new ProductionOrder(currentProductionPlan, each.getProduct(), null, null, each.getTotalUnits(), null, null, productionOrderStateRepository.findByName("Generada"));
+				productionOrder = productionOrderRepository.save(productionOrder);
+				productionOrderList.add(productionOrder);
 			}
-//			productionOrderList = productionOrderRepository.save(productionOrderList);
 		}
 		productionOrderListModel = new ListModelList<ProductionOrder>(productionOrderList);
 		productionOrderGrid.setModel(productionOrderListModel);
@@ -187,18 +184,6 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 			name = machine.getName();
 		}
 		return name;
-	}
-
-
-	public String getProductionOrderButtonLabel(ProductionOrder productionOrder) {
-		if(productionOrder.getState() == null) {
-			productionOrder.setState(productionOrderStateRepository.findByName("Generada"));
-		}
-		if(productionOrder.getState().getName().equals("Generada")) {
-			return "Iniciar";
-		} else {
-			return "Abrir";
-		}
 	}
 
 	public boolean isProductionPlanStateCancel() {

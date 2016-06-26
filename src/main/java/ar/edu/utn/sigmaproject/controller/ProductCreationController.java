@@ -51,6 +51,7 @@ import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductCategory;
+import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitTypeRepository;
 import ar.edu.utn.sigmaproject.service.PieceRepository;
@@ -58,7 +59,6 @@ import ar.edu.utn.sigmaproject.service.ProcessRepository;
 import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductCategoryRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
-import ar.edu.utn.sigmaproject.util.RepositoryHelper;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProductCreationController extends SelectorComposer<Component> {
@@ -147,6 +147,8 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@WireVariable
 	private ProcessTypeRepository processTypeRepository;
 	@WireVariable
+	private MachineTypeRepository machineTypeRepository;
+	@WireVariable
 	private ProductRepository productRepository;
 	@WireVariable
 	private PieceRepository pieceRepository;
@@ -176,13 +178,9 @@ public class ProductCreationController extends SelectorComposer<Component> {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public void doAfterCompose(Component comp) throws Exception{
+	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		processTypeList = processTypeRepository.findAll();
-		if(processTypeList.isEmpty()) {
-			new RepositoryHelper().generateProcessType(processTypeRepository);
-			processTypeList = processTypeRepository.findAll();
-		}
 		processTypeListModel = new ListModelList<>(processTypeList);
 		processListbox.setModel(processTypeListModel);
 		listboxProcessList = new ArrayList<>();// listbox que contiene los procesos de la pieza seleccionada o vacio si es una nueva pieza
@@ -192,10 +190,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		pieceListbox.setModel(pieceListModel);
 
 		MeasureUnitType measureUnitType = measureUnitTypeRepository.findByName("Longitud");
-		if(measureUnitType == null) {
-			new RepositoryHelper().generateMeasureUnitType(measureUnitRepository, measureUnitTypeRepository);
-			measureUnitType = measureUnitTypeRepository.findByName("Longitud");
-		}
 		List<MeasureUnit> measureUnitList = measureUnitRepository.findByType(measureUnitType);
 		lengthMeasureUnitListModel = new ListModelList<>(measureUnitList);
 		depthMeasureUnitListModel = new ListModelList<>(measureUnitList);

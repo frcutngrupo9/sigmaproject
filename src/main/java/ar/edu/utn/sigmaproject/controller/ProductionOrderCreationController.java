@@ -7,16 +7,6 @@ import java.util.List;
 
 import javax.xml.datatype.Duration;
 
-import ar.edu.utn.sigmaproject.domain.*;
-import ar.edu.utn.sigmaproject.domain.Process;
-import ar.edu.utn.sigmaproject.service.MachineRepository;
-import ar.edu.utn.sigmaproject.service.PieceRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderDetailRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
-import ar.edu.utn.sigmaproject.service.WorkerRepository;
-import ar.edu.utn.sigmaproject.util.RepositoryHelper;
-
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
@@ -37,9 +27,26 @@ import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Selectbox;
 import org.zkoss.zul.Spinner;
 import org.zkoss.zul.Textbox;
+
+import ar.edu.utn.sigmaproject.domain.Machine;
+import ar.edu.utn.sigmaproject.domain.MachineType;
+import ar.edu.utn.sigmaproject.domain.Piece;
+import ar.edu.utn.sigmaproject.domain.Process;
+import ar.edu.utn.sigmaproject.domain.ProcessType;
+import ar.edu.utn.sigmaproject.domain.ProductionOrder;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
+import ar.edu.utn.sigmaproject.domain.ProductionPlan;
+import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
+import ar.edu.utn.sigmaproject.domain.Worker;
+import ar.edu.utn.sigmaproject.service.MachineRepository;
+import ar.edu.utn.sigmaproject.service.PieceRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderDetailRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
+import ar.edu.utn.sigmaproject.service.WorkerRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProductionOrderCreationController extends SelectorComposer<Component> {
@@ -60,7 +67,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	@Wire
 	Intbox productUnitsIntbox;
 	@Wire
-	Selectbox workerSelectbox;
+	Combobox workerCombobox;
 	@Wire
 	Datebox productionOrderDatebox;
 	@Wire
@@ -103,11 +110,13 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	private ListModelList<ProductionOrderState> productionOrderStateListModel;
 
 	@Override
-	public void doAfterCompose(Component comp) throws Exception{
+	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 
 		currentProductionOrder = (ProductionOrder) Executions.getCurrent().getAttribute("selected_production_order");
+		if(currentProductionOrder == null) {throw new RuntimeException("ProductionOrder not found");}
 		currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
+		if(currentProductionPlan == null) {throw new RuntimeException("ProductionPlan not found");}
 
 		productionOrderDetailList = currentProductionOrder.getDetails();
 		if(productionOrderDetailList.isEmpty()) {// es una nueva orden de produccion, se deben crear los detalles
@@ -126,15 +135,11 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 		workerList = workerRepository.findAll();
 		workerListModel = new ListModelList<>(workerList);
-		workerSelectbox.setModel(workerListModel);
+		workerCombobox.setModel(workerListModel);
 
 		machineList = machineRepository.findAll();
 
 		List<ProductionOrderState> productionOrderStateList = productionOrderStateRepository.findAll();
-		if(productionOrderStateList.isEmpty()) {
-			new RepositoryHelper().generateProductionOrderState(productionOrderStateRepository);
-			productionOrderStateList = productionOrderStateRepository.findAll();
-		}
 		productionOrderStateListModel = new ListModelList<ProductionOrderState>(productionOrderStateList);
 		productionOrderStateCombobox.setModel(productionOrderStateListModel);
 	}
@@ -156,32 +161,22 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		productUnitsIntbox.setValue(currentProductionPlan.getProductTotal(currentProductionOrder.getProduct()).getTotalUnits());
 		ProductionPlanStateType lastProductionPlanStateType = currentProductionPlan.getCurrentStateType();
 		if(lastProductionPlanStateType != null) {
-			productionPlanStateTypeTextbox.setText(lastProductionPlanStateType.getName().toUpperCase());
+			productionPlanStateTypeTextbox.setText(lastProductionPlanStateType.getName());
 		} else {
 			productionPlanStateTypeTextbox.setText("[Sin Estado]");
 		}
 		productionOrderDetailGrid.setModel(productionOrderDetailListModel);
-		if(currentProductionOrder.getState().getName().equals("Generada")) {// nueva orden de produccion
-			productionOrderNumberSpinner.setValue(null);
-			productionOrderDatebox.setValue(new Date());
-			workerSelectbox.setSelectedIndex(-1);
-			productionOrderFinishedDatebox.setValue(null);
-			productionOrderStateCombobox.setDisabled(true);
-			ProductionOrderState productionOrderState = productionOrderStateRepository.findByName("Iniciada");
-			productionOrderStateCombobox.setSelectedIndex(productionOrderStateListModel.indexOf(productionOrderState));
-		} else {// edicion de orden de produccion
-			productionOrderNumberSpinner.setValue(currentProductionOrder.getNumber());
-			productionOrderDatebox.setValue(currentProductionOrder.getDate());
-			if (currentProductionOrder.getWorker() != null) {
-				workerListModel.addToSelection(currentProductionOrder.getWorker());
-				workerSelectbox.setModel(workerListModel);
-			} else {
-				workerSelectbox.setSelectedIndex(-1);
-			}
-			productionOrderFinishedDatebox.setValue(currentProductionOrder.getDateFinished());
-			productionOrderStateCombobox.setDisabled(false);
-			productionOrderStateCombobox.setSelectedIndex(productionOrderStateListModel.indexOf(currentProductionOrder.getState()));
+		productionOrderNumberSpinner.setValue(currentProductionOrder.getNumber());
+		productionOrderDatebox.setValue(currentProductionOrder.getDate());
+		if (currentProductionOrder.getWorker() != null) {
+			workerListModel.addToSelection(currentProductionOrder.getWorker());
+			workerCombobox.setModel(workerListModel);
+		} else {
+			workerCombobox.setSelectedIndex(-1);
 		}
+		productionOrderFinishedDatebox.setValue(currentProductionOrder.getDateFinished());
+		productionOrderStateListModel.addToSelection(currentProductionOrder.getState());
+		productionOrderStateCombobox.setModel(productionOrderStateListModel);
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		resetButton.setDisabled(false);
@@ -189,24 +184,26 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
-		int selectedIndexWorker = workerSelectbox.getSelectedIndex();
+		int selectedIndexWorker = workerCombobox.getSelectedIndex();
 		if (selectedIndexWorker == -1) {// no hay un empleado seleccionado
-			Clients.showNotification("Debe seleccionar un Empleado", workerSelectbox);
+			Clients.showNotification("Debe seleccionar un Empleado", workerCombobox);
 			return;
 		}
-		for (ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
-			Process process = productionOrderDetail.getProcess();
-			ProcessType processType = process.getType();
-			MachineType machineType = processType.getMachineType();
-			if (machineType != null) {
-				if (productionOrderDetail.getMachine() == null) {
-					Clients.showNotification("Existen Procesos sin Maquina Asignada", productionOrderDetailGrid);
-					return;
+		if(!productionOrderStateCombobox.getSelectedItem().getValue().equals(productionOrderStateRepository.findByName("Generada"))) {
+			for (ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
+				Process process = productionOrderDetail.getProcess();
+				ProcessType processType = process.getType();
+				MachineType machineType = processType.getMachineType();
+				if (machineType != null) {
+					if (productionOrderDetail.getMachine() == null) {
+						Clients.showNotification("Existen Procesos sin Maquina Asignada", productionOrderDetailGrid);
+						return;
+					}
 				}
 			}
 		}
 		Integer productionOrderNumber = productionOrderNumberSpinner.getValue();
-		Worker productionOrderWorker = workerListModel.getElementAt(workerSelectbox.getSelectedIndex());
+		Worker productionOrderWorker = workerCombobox.getSelectedItem().getValue();
 		Date productionOrderDate = productionOrderDatebox.getValue();
 		Date productionOrderDateFinished = productionOrderFinishedDatebox.getValue();
 		ProductionOrderState productionOrderState = productionOrderStateCombobox.getSelectedItem().getValue();
@@ -235,11 +232,11 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	public void resetButtonClick() {
 		refreshView();
 	}
-	
+
 	public String getPieceNameByProcess(Process process) {
 		return pieceRepository.findByProcesses(process).getName();
 	}
-	
+
 	public String getMachineTypeNameByProcess(Process process) {
 		if(process.getType().getMachineType() != null) {
 			return process.getType().getMachineType().getName();
