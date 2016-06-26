@@ -1,5 +1,8 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -8,6 +11,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
+@Indexed
 public class Worker  implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
@@ -15,6 +19,7 @@ public class Worker  implements Serializable, Cloneable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
 
+	@Field
 	String name = "";
 
 	Date dateEmployed = new Date();

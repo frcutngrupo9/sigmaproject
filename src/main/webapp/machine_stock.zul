@@ -5,7 +5,7 @@
         <button id="searchButton" label="Buscar"/>
     </hlayout>
     <separator/>
-    <listbox id="machineListbox"  mold="paging" pageSize="6">
+    <listbox id="machineListbox">
         <listhead>
             <listheader label="Nombre" align="center"/>
             <listheader label="Codigo" align="center"/>
@@ -17,12 +17,13 @@
             <listitem>
                 <listcell label="${each.name}"/>
                 <listcell label="${each.code}"/>
-                <listcell label="${win_machine_stock$composer.getMachineType(each).name}"/>
+                <listcell label="${each.machineType.name}"/>
                 <listcell label="${each.year}"/>
-                <listcell label="${win_machine_stock$composer.getDurationFormated(each)}"/>
+                <listcell label="${win_machine_stock$composer.getDurationFormatted(each)}"/>
             </listitem>
         </template>
     </listbox>
+    <paging id="pager" pageSize="10" sclass="sigma-paging"/>
     <vlayout>
         <separator/>
         <hbox>
