@@ -74,9 +74,11 @@ public class MachineStockController extends SelectorComposer<Component> {
 	SortingPagingHelper<Machine> sortingPagingHelper;
 
 	// list
+	private List<Machine> machineList;
 	private List<MachineType> machineTypeList;
 
 	// list models
+	private ListModelList<Machine> machineListModel;
 	private ListModelList<MachineType> machineTypeListModel;
 
 	@Override
