@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface WoodTypeRepository extends SearchableRepository<WoodType, Long> {
 
-	WoodType findByName(String string);
+	WoodType findFirstByName(String string);
 
 }

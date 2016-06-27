@@ -237,7 +237,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		refreshOrder();
 		if (currentProductionPlan == null) {// nuevo plan de produccion
 			productionPlanCaption.setLabel("Creacion de Plan de Produccion");
-			productionPlanStateTypeListModel.addToSelection(productionPlanStateTypeRepository.findByName("Iniciado"));
+			productionPlanStateTypeListModel.addToSelection(productionPlanStateTypeRepository.findFirstByName("Iniciado"));
 			productionPlanStateTypeCombobox.setModel(productionPlanStateTypeListModel);
 			productionPlanNameTextbox.setText("");
 			productionPlanDatebox.setValue(new Date());

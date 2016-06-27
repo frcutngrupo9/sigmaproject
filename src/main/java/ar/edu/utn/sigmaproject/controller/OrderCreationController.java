@@ -256,7 +256,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	private void refreshViewOrder() {
 		if (currentOrder == null) {// nuevo pedido
 			orderCaption.setLabel("Creacion de Pedido");
-			orderStateTypeListModel.addToSelection(orderStateTypeRepository.findByName("Iniciado"));
+			orderStateTypeListModel.addToSelection(orderStateTypeRepository.findFirstByName("Iniciado"));
 			orderStateTypeCombobox.setModel(orderStateTypeListModel);
 			currentClient = null;
 			clientBandbox.setValue("");
