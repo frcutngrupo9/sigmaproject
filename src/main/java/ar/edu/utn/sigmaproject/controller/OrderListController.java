@@ -87,7 +87,7 @@ public class OrderListController extends SelectorComposer<Component> {
 					if (order.getCurrentStateType().getName().equals("Cancelado")) {
 						alert("No se puede cancelar un Pedido ya cancelado.");
 					} else {
-						OrderStateType orderStateType = orderStateTypeRepository.findByName("Cancelado");
+						OrderStateType orderStateType = orderStateTypeRepository.findFirstByName("Cancelado");
 						order.setCurrentStateType(orderStateType);
 						orderRepository.save(order);// grabamos el estado del pedido
 						refreshList();

@@ -216,8 +216,8 @@ public class RawMaterialController extends SelectorComposer<Component> {
 			depthDoublebox.setValue(null);
 			widthDoublebox.setValue(null);
 			// arrancamos con seleccion de metros x pulgada x pulgada
-			MeasureUnit lengthMeasureUnit = measureUnitRepository.findByName("Metros");
-			MeasureUnit inchesMeasureUnit = measureUnitRepository.findByName("Pulgadas");
+			MeasureUnit lengthMeasureUnit = measureUnitRepository.findFirstByName("Metros");
+			MeasureUnit inchesMeasureUnit = measureUnitRepository.findFirstByName("Pulgadas");
 			lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(lengthMeasureUnit));
 			depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(inchesMeasureUnit));
 			widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(inchesMeasureUnit));
