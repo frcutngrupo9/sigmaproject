@@ -28,7 +28,6 @@ import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductCategory;
 import ar.edu.utn.sigmaproject.service.ProductCategoryRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
-import ar.edu.utn.sigmaproject.util.RepositoryHelper;
 import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 import ar.edu.utn.sigmaproject.util.SortingPagingHelperDelegate;
 
@@ -61,7 +60,7 @@ public class ProductListController extends SelectorComposer<Component> implement
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		
+
 		Map<Integer, String> sortProperties = new HashMap<>();
 		sortProperties.put(0, "name");
 		new SortingPagingHelper<>(productRepository, productGrid, searchButton, searchTextbox, pager, sortProperties, this);

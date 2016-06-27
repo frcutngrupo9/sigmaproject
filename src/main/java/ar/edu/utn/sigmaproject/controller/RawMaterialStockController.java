@@ -153,7 +153,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		if(currentWood == null) {// nuevo
 			woodCreationGrid.setVisible(false);
 			codeTextbox.setValue("");
-			woodTypeListModel.addToSelection(woodTypeRepository.findByName("Pino"));
+			woodTypeListModel.addToSelection(woodTypeRepository.findFirstByName("Pino"));
 			woodTypeCombobox.setModel(woodTypeListModel);
 			rawMaterialTypeCombobox.setSelectedIndex(-1);
 			nameTextbox.setValue("(seleccionar Materia Prima)");
