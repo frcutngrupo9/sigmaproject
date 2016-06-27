@@ -465,8 +465,8 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			pieceNameTextbox.setText("");
 			pieceGroupCheckbox.setChecked(false);
 			// seleccionamos metros y pulgadas como valores predeterminados de las dimensiones de las piezas
-			MeasureUnit meters = measureUnitRepository.findByName("Metros");
-			MeasureUnit inch = measureUnitRepository.findByName("Pulgadas");
+			MeasureUnit meters = measureUnitRepository.findFirstByName("Metros");
+			MeasureUnit inch = measureUnitRepository.findFirstByName("Pulgadas");
 			lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(meters));
 			depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(inch));
 			widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(inch));
