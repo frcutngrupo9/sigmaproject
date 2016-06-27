@@ -1,7 +1,6 @@
 <zk>
     <grid model="${arg.products}" sizedByContent="true" span="true">
         <columns>
-            <column label="Id Producto" align="center"/>
             <column label="Codigo" align="center"/>
             <column label="Producto" align="center"/>
             <column label="Unidades" align="center"/>
@@ -10,9 +9,8 @@
         </columns>
         <template name="model">
             <row>
-                <label value="${each.idProduct}" />
-                <label value="${win_order_list$composer.getProductCode(each.idProduct)}" />
-                <label value="${win_order_list$composer.getProductName(each.idProduct)}" />
+                <label value="${each.product.code}" />
+                <label value="${each.product.name}" />
                 <label value="${each.units}" />
                 <label value="${each.price.doubleValue()} $" />
                 <label value="${win_order_list$composer.getSubTotal(each.units, each.price).doubleValue()} $" />

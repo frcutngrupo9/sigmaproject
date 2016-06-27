@@ -34,11 +34,11 @@
 		            </listhead>
 		            <template name="model">
 		                <listitem>
-		                	<listcell label="${win_requirement_plan_creation$composer.getRawMaterialType(each.idRawMaterialType).name}"/>
+		                	<listcell label="${each.rawMaterialType.name}"/>
 		                    <listcell label="${each.quantity}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialStock(each.idRawMaterialType)}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialStockReserved(each)}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialStockMissing(each)}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialTypeStock(each.rawMaterialType).doubleValue()}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialStockReserved(each).doubleValue()}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialStockMissing(each).doubleValue()}"/>
 		                    <listcell>
 			                    <checkbox value="${each.isFulfilled()}" forward="onCheck=rawMaterialRequirementListbox.onFulfillRawMaterialRequirement(${each})"/>
 			                </listcell>
@@ -67,14 +67,14 @@
 		            </listhead>
 		            <template name="model">
 		                <listitem>
-		                	<listcell label="${win_requirement_plan_creation$composer.getSupplyType(each.idSupplyType).description}"/>
-		                	<listcell label="${win_requirement_plan_creation$composer.getSupplyType(each.idSupplyType).code}"/>
-		                	<listcell label="${win_requirement_plan_creation$composer.getSupplyType(each.idSupplyType).details}"/>
-		                	<listcell label="${win_requirement_plan_creation$composer.getSupplyType(each.idSupplyType).measure}"/>
+		                	<listcell label="${each.supplyType.description}"/>
+		                	<listcell label="${each.supplyType.code}"/>
+		                	<listcell label="${each.supplyType.details}"/>
+		                	<listcell label="${each.supplyType.measure}"/>
 		                    <listcell label="${each.quantity}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyType(each.idSupplyType).stock}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyStockReserved(each)}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyStockMissing(each)}"/>
+		                    <listcell label="${each.supplyType.stock}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyStockReserved(each).doubleValue()}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyStockMissing(each).doubleValue()}"/>
 		                    <listcell>
 			                    <checkbox value="${each.isFulfilled()}" forward="onCheck=supplyRequirementListbox.onFulfillSupplyRequirement(${each})"/>
 			                </listcell>

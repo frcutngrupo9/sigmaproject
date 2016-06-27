@@ -7,20 +7,18 @@
     <separator/>
     <listbox id="supplyTypeListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
     	<auxhead>
-			<auxheader label="Insumos" colspan="7"/>
+			<auxheader label="Insumos" colspan="6"/>
 		</auxhead>
         <listhead>
-        	<listheader label="Id" align="center"/>
-            <listheader label="Codigo"/>
-            <listheader label="Descripcion"/>
-            <listheader label="Medidas"/>
+            <listheader label="Codigo" align="center"/>
+            <listheader label="Descripcion" align="center"/>
+            <listheader label="Medidas" align="center"/>
             <listheader label="Stock Actual" align="center"/>
             <listheader label="Stock Minimo" align="center"/>
             <listheader label="Stock Reposicion" align="center"/>
         </listhead>
         <template name="model">
             <listitem>
-                <listcell label="${each.id}"/>
                 <listcell label="${each.code}"/>
                 <listcell label="${each.description}"/>
                 <listcell label="${each.measure}"/>
@@ -100,7 +98,7 @@
 	            </row>
 	            <row>
 	                <label>Empleado Responsable:</label>
-	                <combobox id="workerCombobox" hflex="1">
+	                <combobox id="workerCombobox" hflex="1" readonly="true">
                         <template name="model">
                             <comboitem label="${each.name}" value="${each}" />
                         </template>

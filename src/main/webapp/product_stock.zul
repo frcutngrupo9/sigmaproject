@@ -7,19 +7,17 @@
     <separator/>
     <listbox id="productListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
     	<auxhead>
-			<auxheader label="Productos" colspan="6"/>
+			<auxheader label="Productos" colspan="5"/>
 		</auxhead>
         <listhead>
-        	<listheader label="Id" align="center"/>
-            <listheader label="Codigo"/>
-            <listheader label="Descripcion"/>
+            <listheader label="Codigo" align="center"/>
+            <listheader label="Descripcion" align="center"/>
             <listheader label="Stock Actual" align="center"/>
             <listheader label="Stock Minimo" align="center"/>
             <listheader label="Stock Reposicion" align="center"/>
         </listhead>
         <template name="model">
             <listitem>
-                <listcell label="${each.id}"/>
                 <listcell label="${each.code}"/>
                 <listcell label="${each.name}"/>
                 <listcell label="${each.stock}"/>
@@ -71,7 +69,7 @@
 	            </row>
 	        </rows>
     	</grid>
-    	<panel title="Pedido de Autoabastecimiento" id="orderCreationBlock" collapsible="true" visible="true" closable="false" border="rounded">
+    	<panel title="Pedido de Restock" id="orderCreationBlock" collapsible="true" visible="true" closable="false" border="rounded">
         	<panelchildren>
         		<separator/>
         		<hlayout>

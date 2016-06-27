@@ -88,7 +88,7 @@ public class ClientController extends SelectorComposer<Component> {
 			Clients.showNotification("Debe ingresar un nombre", nameTextbox);
 			return;
 		}
-		String name = nameTextbox.getText();
+		String name = nameTextbox.getText().toUpperCase();
 		String phone = phoneTextbox.getText();
 		String email = emailTextbox.getText();
 		String address = addressTextbox.getText();

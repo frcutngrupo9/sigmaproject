@@ -7,8 +7,8 @@
     <separator/>
     <listbox id="productCategoryListbox" mold="paging" pageSize="7">
         <listhead>
-            <listheader label="Nombre"/>
-            <listheader label="Fecha Ingreso"/>
+            <listheader label="Nombre" align="center"/>
+            <listheader label="Fecha Ingreso" align="center"/>
         </listhead>
         <template name="model">
             <listitem>

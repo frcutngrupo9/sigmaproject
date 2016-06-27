@@ -6,16 +6,16 @@
         <separator/>
 	    <listbox id="pieceListbox" mold="paging" pageSize="10" sizedByContent="true" span="true">
 	    	<auxhead>
-				<auxheader label="Piezas" colspan="8"/>
+				<auxheader label="Piezas" colspan="7"/>
 			</auxhead>
 	        <listhead>
-	        	<listheader label="Producto"/>
-	        	<listheader label="Pieza"/>
-	            <listheader label="Longitud"/>
-	            <listheader label="Espesor"/>
-	            <listheader label="Ancho"/>
-	            <listheader label="Otras Medidas"/>
-	            <listheader label="Unidades"/>
+	        	<listheader label="Producto" align="center"/>
+	        	<listheader label="Pieza" align="center"/>
+	            <listheader label="Longitud" align="center"/>
+	            <listheader label="Espesor" align="center"/>
+	            <listheader label="Ancho" align="center"/>
+	            <listheader label="Otras Medidas" align="center"/>
+	            <listheader label="Unidades" align="center"/>
 	        </listhead>
 	        <template name="model">
 	            <listitem>

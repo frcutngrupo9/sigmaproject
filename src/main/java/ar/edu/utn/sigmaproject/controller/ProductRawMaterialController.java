@@ -7,6 +7,8 @@ import java.util.List;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventQueue;
+import org.zkoss.zk.ui.event.EventQueues;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -78,7 +80,7 @@ public class ProductRawMaterialController extends SelectorComposer<Component> {
 	private ListModelList<RawMaterialType> rawMaterialTypePopupListModel;
 
 	@Override
-	public void doAfterCompose(Component comp) throws Exception{
+	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		
 		currentProduct = (Product) Executions.getCurrent().getAttribute("selected_product");
@@ -100,11 +102,13 @@ public class ProductRawMaterialController extends SelectorComposer<Component> {
 	public void acceptRawMaterialListButtonClick() {
 		if(currentProduct != null) {
 			for(RawMaterial each : rawMaterialList) {
-				rawMaterialRepository.save(each);
+				each = rawMaterialRepository.save(each);
 			}
 			currentProduct.setRawMaterials(rawMaterialList);
-			productRepository.save(currentProduct);
+			currentProduct = productRepository.save(currentProduct);
 		}
+		EventQueue<Event> eq = EventQueues.lookup("Product Change Queue", EventQueues.DESKTOP, true);
+		eq.publish(new Event("onProductChange", null, currentProduct));
 		productRawMaterialWindow.detach();
 	}
 

@@ -18,11 +18,11 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Caption;
+import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Selectbox;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Order;
@@ -42,7 +42,6 @@ import ar.edu.utn.sigmaproject.service.ProductRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanDetailRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
-import ar.edu.utn.sigmaproject.util.RepositoryHelper;
 
 public class ProductionPlanCreationController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
@@ -68,7 +67,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	@Wire
 	Listbox productTotalListbox;
 	@Wire
-	Selectbox productionPlanStateTypeSelectbox;
+	Combobox productionPlanStateTypeCombobox;
 	@Wire
 	Caption productionPlanCaption;
 
@@ -113,7 +112,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 
 		productionPlanStateTypeList = productionPlanStateTypeRepository.findAll();
 		productionPlanStateTypeListModel = new ListModelList<ProductionPlanStateType>(productionPlanStateTypeList);
-		productionPlanStateTypeSelectbox.setModel(productionPlanStateTypeListModel);
+		productionPlanStateTypeCombobox.setModel(productionPlanStateTypeListModel);
 
 		refreshViewProductionPlan();
 		refreshProductTotalListbox();
@@ -167,30 +166,30 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			Clients.showNotification("Ingresar al menos 1 pedido", addOrderButton);
 			return;
 		}
-		String productionPlanName = productionPlanNameTextbox.getText();
+		String productionPlanName = productionPlanNameTextbox.getText().toUpperCase();
 		Date production_plan_date = productionPlanDatebox.getValue();
 		ProductionPlanStateType productionPlanStateType;
-		if(productionPlanStateTypeSelectbox.getSelectedIndex() == -1) {
+		if(productionPlanStateTypeCombobox.getSelectedIndex() == -1) {
 			productionPlanStateType = null;
 		} else {
-			productionPlanStateType = productionPlanStateTypeListModel.getElementAt(productionPlanStateTypeSelectbox.getSelectedIndex());
+			productionPlanStateType = productionPlanStateTypeCombobox.getSelectedItem().getValue();
 		}
 		if(currentProductionPlan == null) { // es un plan nuevo
 			// creamos el nuevo plan
 			currentProductionPlan = new ProductionPlan(productionPlanName, null, production_plan_date);
-			currentProductionPlan.setPlanDetails(currentProductionPlanDetailList);
 			currentProductionPlan.setCurrentStateType(productionPlanStateType);
 		} else { // se edita un plan
 			currentProductionPlan.setName(productionPlanName);
 			currentProductionPlan.setDate(production_plan_date);
-			currentProductionPlan.setPlanDetails(currentProductionPlanDetailList);
 			if (!currentProductionPlan.getCurrentStateType().equals(productionPlanStateType)) {
 				currentProductionPlan.setCurrentStateType(productionPlanStateType);
 			}
 		}
+
 		for(ProductionPlanDetail each : currentProductionPlanDetailList) {
-			productionPlanDetailRepository.save(each);
+			each = productionPlanDetailRepository.save(each);
 		}
+		currentProductionPlan.setPlanDetails(currentProductionPlanDetailList);
 		productionPlanRepository.save(currentProductionPlan);
 		currentProductionPlan = null;
 		refreshViewProductionPlan();
@@ -239,19 +238,19 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		if (currentProductionPlan == null) {// nuevo plan de produccion
 			productionPlanCaption.setLabel("Creacion de Plan de Produccion");
 			productionPlanStateTypeListModel.addToSelection(productionPlanStateTypeRepository.findByName("Iniciado"));
-			productionPlanStateTypeSelectbox.setModel(productionPlanStateTypeListModel);
+			productionPlanStateTypeCombobox.setModel(productionPlanStateTypeListModel);
 			productionPlanNameTextbox.setText("");
 			productionPlanDatebox.setValue(new Date());
 			currentProductionPlanDetailList = new ArrayList<ProductionPlanDetail>();
 			deleteProductionPlanButton.setDisabled(true);
-			productionPlanStateTypeSelectbox.setDisabled(true);
+			productionPlanStateTypeCombobox.setDisabled(true);
 		} else {// se edita plan de produccion
 			productionPlanCaption.setLabel("Edicion de Plan de Produccion");
 			if (currentProductionPlan.getCurrentStateType() != null) {
 				productionPlanStateTypeListModel.addToSelection(currentProductionPlan.getCurrentStateType());
-				productionPlanStateTypeSelectbox.setModel(productionPlanStateTypeListModel);
+				productionPlanStateTypeCombobox.setModel(productionPlanStateTypeListModel);
 			} else {
-				productionPlanStateTypeSelectbox.setSelectedIndex(-1);
+				productionPlanStateTypeCombobox.setSelectedIndex(-1);
 			}
 			if(currentProductionPlan.getName() != null) {
 				productionPlanNameTextbox.setText(currentProductionPlan.getName());
@@ -261,7 +260,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			productionPlanDatebox.setValue(currentProductionPlan.getDate());
 			currentProductionPlanDetailList = currentProductionPlan.getPlanDetails();
 			deleteProductionPlanButton.setDisabled(false);
-			productionPlanStateTypeSelectbox.setDisabled(false);
+			productionPlanStateTypeCombobox.setDisabled(false);
 		}
 		productionPlanDatebox.setDisabled(true);// nunca se debe poder modificar
 		refreshOrderPopupList();

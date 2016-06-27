@@ -7,10 +7,10 @@
     <separator/>
     <listbox id="toolTypeListbox">
         <listhead>
-            <listheader label="Nombre"/>
-            <listheader label="Descripcion"/>
-            <listheader label="Detalles"/>
-            <listheader label="Marca"/>
+            <listheader label="Nombre" align="center"/>
+            <listheader label="Descripcion" align="center"/>
+            <listheader label="Detalles" align="center"/>
+            <listheader label="Marca" align="center"/>
         </listhead>
         <template name="model">
             <listitem>

@@ -7,8 +7,8 @@
     <separator/>
     <listbox id="workerListbox">
         <listhead>
-            <listheader label="Nombre"/>
-            <listheader label="Fecha Ingreso"/>
+            <listheader label="Nombre" align="center"/>
+            <listheader label="Fecha Ingreso" align="center"/>
         </listhead>
         <template name="model">
             <listitem>
@@ -36,7 +36,7 @@
 	            </row>
 	            <row>
 	                <label>Fecha Ingreso:</label>
-	                <datebox id="dateEmployedDatebox" cols="12" format="dd-MM-yyyy"/>
+	                <datebox id="dateEmployedDatebox" cols="12" format="dd-MM-yyyy" constraint="no future"/>
 	            </row>
 	            <row>
 	                <cell colspan="2" style="text-align:center">

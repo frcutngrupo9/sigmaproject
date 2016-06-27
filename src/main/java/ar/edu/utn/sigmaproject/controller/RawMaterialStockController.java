@@ -106,7 +106,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	private ListModelList<Worker> workerListModel;
 
 	@Override
-	public void doAfterCompose(Component comp) throws Exception{
+	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		rawMaterialTypeList = rawMaterialTypeRepository.findAll();
 		rawMaterialTypeListModel = new ListModelList<>(rawMaterialTypeList);
@@ -153,7 +153,8 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		if(currentWood == null) {// nuevo
 			woodCreationGrid.setVisible(false);
 			codeTextbox.setValue("");
-			woodTypeCombobox.setSelectedIndex(-1);
+			woodTypeListModel.addToSelection(woodTypeRepository.findByName("Pino"));
+			woodTypeCombobox.setModel(woodTypeListModel);
 			rawMaterialTypeCombobox.setSelectedIndex(-1);
 			nameTextbox.setValue("(seleccionar Materia Prima)");
 			measureTextbox.setValue("(seleccionar Materia Prima)");

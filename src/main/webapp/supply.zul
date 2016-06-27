@@ -7,12 +7,12 @@
     <separator/>
     <listbox id="supplyTypeListbox">
         <listhead>
-            <listheader label="Codigo"/>
-            <listheader label="Descripcion"/>
-            <listheader label="Detalles"/>
-            <listheader label="Marca"/>
-            <listheader label="Presentacion"/>
-            <listheader label="Medida"/>
+            <listheader label="Codigo" align="center"/>
+            <listheader label="Descripcion" align="center"/>
+            <listheader label="Detalles" align="center"/>
+            <listheader label="Marca" align="center"/>
+            <listheader label="Presentacion" align="center"/>
+            <listheader label="Medida" align="center"/>
         </listhead>
         <template name="model">
             <listitem>

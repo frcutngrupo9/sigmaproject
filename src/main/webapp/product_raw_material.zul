@@ -15,15 +15,13 @@
                                 </hbox>
                                 <listbox id="rawMaterialTypePopupListbox" width="500px">
 	                                <listhead>
-	                                    <listheader label="Id"/>
-	                                    <listheader label="Nombre"/>
-	                                    <listheader label="Largo (L)"/>
-							            <listheader label="Espesor (E)"/>
-							            <listheader label="Ancho (A)"/>
+	                                    <listheader label="Nombre" align="center"/>
+	                                    <listheader label="Largo (L)" align="center"/>
+							            <listheader label="Espesor (E)" align="center"/>
+							            <listheader label="Ancho (A)" align="center"/>
 	                                </listhead>
 	                                <template name="model">
 	                                    <listitem>
-	                                        <listcell label="${each.id}"/>
 	                                        <listcell label="${each.name}"/>
 	                                        <listcell label="${each.length.doubleValue()} ${each.getLengthMeasureUnit().getShortName()}"/>
 							                <listcell label="${each.depth.doubleValue()} ${each.getDepthMeasureUnit().getShortName()}"/>
@@ -47,11 +45,11 @@
                         <auxheader label="Materias Prima" colspan="5"/>
                     </auxhead>
                     <listhead>
-			            <listheader label="Nombre"/>
-			            <listheader label="Largo (L)"/>
-			            <listheader label="Espesor (E)"/>
-			            <listheader label="Ancho (A)"/>
-			            <listheader label="Cantidad"/>
+			            <listheader label="Nombre" align="center"/>
+			            <listheader label="Largo (L)" align="center"/>
+			            <listheader label="Espesor (E)" align="center"/>
+			            <listheader label="Ancho (A)" align="center"/>
+			            <listheader label="Cantidad" align="center"/>
                     </listhead>
                     <template name="model">
                         <listitem>

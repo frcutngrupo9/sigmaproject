@@ -59,7 +59,7 @@ public class WorkerController extends SelectorComposer<Component> {
 	SortingPagingHelper<Worker> sortingPagingHelper;
 
 	@Override
-	public void doAfterCompose(Component comp) throws Exception{
+	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		Map<Integer, String> sortProperties = new HashMap<>();
 		sortProperties.put(0, "name");
@@ -87,7 +87,7 @@ public class WorkerController extends SelectorComposer<Component> {
 			Clients.showNotification("Debe ingresar un nombre", nameTextbox);
 			return;
 		}
-		String name = nameTextbox.getText();
+		String name = nameTextbox.getText().toUpperCase();
 		Date dateEmployed = dateEmployedDatebox.getValue();
 		if(currentWorker == null) {
 			// es un nuevo insumo

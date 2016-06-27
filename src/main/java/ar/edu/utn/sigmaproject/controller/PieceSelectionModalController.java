@@ -22,7 +22,7 @@ import ar.edu.utn.sigmaproject.service.PieceRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class PieceSelectionModalController extends SelectorComposer<Component>{
+public class PieceSelectionModalController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
 	@Wire
@@ -68,10 +68,9 @@ public class PieceSelectionModalController extends SelectorComposer<Component>{
 	}
 
 	public String getProductName(Piece piece) {
-		for(Product aux : productRepository.findAll()) {
-			if(aux.getPieces().contains(piece)) {
-				return aux.getName();
-			}
+		Product aux = productRepository.findByPieces(piece);
+		if(aux != null) {
+			return aux.getName();
 		}
 		return "";
 	}

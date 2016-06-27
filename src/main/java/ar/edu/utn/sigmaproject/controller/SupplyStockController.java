@@ -92,7 +92,7 @@ public class SupplyStockController extends SelectorComposer<Component> {
 	private ListModelList<Worker> workerListModel;
 
 	@Override
-	public void doAfterCompose(Component comp) throws Exception{
+	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		supplyTypeList = supplyTypeRepository.findAll();
 		supplyTypeListModel = new ListModelList<SupplyType>(supplyTypeList);
