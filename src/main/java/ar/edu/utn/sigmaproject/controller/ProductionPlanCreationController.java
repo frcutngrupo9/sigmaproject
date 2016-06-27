@@ -135,7 +135,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	}
 
 	private void refreshOrderPopupList() {// el popup se actualiza en base a los detalles
-		orderPopupList = orderRepository.findByCurrentStateType(orderStateTypeRepository.findByName("iniciado"));// se buscan los pedidos que no estan asignados a un plan y no estan cancelados (estan en estado iniciado)
+		orderPopupList = orderRepository.findByCurrentStateType(orderStateTypeRepository.findFirstByName("Iniciado"));// se buscan los pedidos que no estan asignados a un plan y no estan cancelados (estan en estado iniciado)
 		for(ProductionPlanDetail productionPlanDetail : currentProductionPlanDetailList) {// no debe contener los pedidos que ya estan en el detalle
 			Order aux = productionPlanDetail.getOrder();
 			orderPopupList.remove(aux);// sacamos los pedidos que estan en la currentProductionPlanDetailList del popup
