@@ -59,12 +59,12 @@
                         </row>
                    </rows>
                 </grid>
-                <hlayout>
+                <hbox>
 					<label value="Producto a Fabricar: "/>
 					<textbox id="productNameTextbox"/>
 					<label value="Unidades a Fabricar: "/>
 					<intbox id="productUnitsIntbox"/>
-				</hlayout>
+				</hbox>
         		<grid id="productionOrderDetailGrid" sizedByContent="true" span="true">
     				<auxhead>
 						<auxheader label="Detalles Orden de Produccion" colspan="10"/>

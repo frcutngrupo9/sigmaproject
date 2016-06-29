@@ -112,7 +112,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-
 		currentProductionOrder = (ProductionOrder) Executions.getCurrent().getAttribute("selected_production_order");
 		if(currentProductionOrder == null) {throw new RuntimeException("ProductionOrder not found");}
 		currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
@@ -124,7 +123,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 				List<Process> auxProcessList = piece.getProcesses();
 				for(Process process : auxProcessList) {
 					// por cada proceso hay que crear un detalle de orden de produccion
-					Integer quantityPiece = currentProductionPlan.getProductTotal(currentProductionOrder.getProduct()).getTotalUnits() * piece.getUnits();// cantidad total de la pieza
+					Integer quantityPiece = currentProductionOrder.getUnits() * piece.getUnits();// cantidad total de la pieza
 					Duration timeTotal = process.getTime().multiply(quantityPiece);// cantidad total de tiempo del proceso
 					productionOrderDetailList.add(new ProductionOrderDetail(process, null, timeTotal, quantityPiece));
 				}
@@ -142,10 +141,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		List<ProductionOrderState> productionOrderStateList = productionOrderStateRepository.findAll();
 		productionOrderStateListModel = new ListModelList<ProductionOrderState>(productionOrderStateList);
 		productionOrderStateCombobox.setModel(productionOrderStateListModel);
-	}
-
-	@Listen("onAfterRender = #productionOrderStateCombobox")
-	public void productionOrderStateComboboxAfterRender() {// se hace refresh despues de q se renderizo el combobox para que se le pueda setear un valor seleccionado
 		refreshView();
 	}
 
@@ -157,15 +152,14 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		productionPlanStateTypeTextbox.setDisabled(true);
 		productionPlanNameTextbox.setText(currentProductionPlan.getName());
 		productionPlanDatebox.setValue(currentProductionPlan.getDate());
-		productNameTextbox.setText(currentProductionOrder.getProduct().getName());
-		productUnitsIntbox.setValue(currentProductionPlan.getProductTotal(currentProductionOrder.getProduct()).getTotalUnits());
 		ProductionPlanStateType lastProductionPlanStateType = currentProductionPlan.getCurrentStateType();
 		if(lastProductionPlanStateType != null) {
 			productionPlanStateTypeTextbox.setText(lastProductionPlanStateType.getName());
 		} else {
 			productionPlanStateTypeTextbox.setText("[Sin Estado]");
 		}
-		productionOrderDetailGrid.setModel(productionOrderDetailListModel);
+		productNameTextbox.setText(currentProductionOrder.getProduct().getName());
+		productUnitsIntbox.setValue(currentProductionOrder.getUnits());
 		productionOrderNumberSpinner.setValue(currentProductionOrder.getNumber());
 		productionOrderDatebox.setValue(currentProductionOrder.getDate());
 		if (currentProductionOrder.getWorker() != null) {
@@ -175,6 +169,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			workerCombobox.setSelectedIndex(-1);
 		}
 		productionOrderFinishedDatebox.setValue(currentProductionOrder.getDateFinished());
+		productionOrderDetailGrid.setModel(productionOrderDetailListModel);
 		productionOrderStateListModel.addToSelection(currentProductionOrder.getState());
 		productionOrderStateCombobox.setModel(productionOrderStateListModel);
 		saveButton.setDisabled(false);
