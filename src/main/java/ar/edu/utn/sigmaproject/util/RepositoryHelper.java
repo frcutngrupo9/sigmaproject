@@ -96,15 +96,15 @@ public class RepositoryHelper {
 	}
 
 	private void generateProductionPlanStateTypes() {
-		List<ProductionPlanStateType> list = new ArrayList<>();
-		list.add(new ProductionPlanStateType("Iniciado", null));
-		list.add(new ProductionPlanStateType("Cancelado", null));
-		list.add(new ProductionPlanStateType("Abastecido", null));
-		list.add(new ProductionPlanStateType("Lanzado", null));
-		list.add(new ProductionPlanStateType("En Produccion", null));
-		list.add(new ProductionPlanStateType("Finalizado", null));
-		for(ProductionPlanStateType each : list) {
-			productionPlanStateTypeRepository.save(each);
+		if (productionPlanStateTypeRepository.count() == 0) {
+			List<ProductionPlanStateType> list = new ArrayList<>();
+			list.add(new ProductionPlanStateType("Iniciado", null));
+			list.add(new ProductionPlanStateType("Cancelado", null));
+			list.add(new ProductionPlanStateType("Abastecido", null));
+			list.add(new ProductionPlanStateType("Lanzado", null));
+			list.add(new ProductionPlanStateType("En Produccion", null));
+			list.add(new ProductionPlanStateType("Finalizado", null));
+			productionPlanStateTypeRepository.save(list);
 		}
 	}
 
