@@ -167,16 +167,16 @@
                                 <label value="${each.name}"/>
                             </listcell>
                             <listcell>
-                                <textbox visible="${process_checked}" value="${win_product_creation$composer.getProcessDetails(each)}"  forward="onChange=processListbox.onProcessDetailsChange(${each})" width="400px"/>
+                                <textbox visible="${process_checked}" value="${win_product_creation$composer.getProcessDetails(each)}"  forward="onChanging=processListbox.onProcessDetailsChange(${each})" width="400px"/>
                             </listcell>
                             <listcell>
-                                <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessDays(each)}" forward="onChange=processListbox.onProcessDaysChange(${each})" width="36px"/>
+                                <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessDays(each)}" forward="onChanging=processListbox.onProcessDaysChange(${each})" width="36px"/>
                             </listcell>
                             <listcell>
-                                <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessHours(each)}" forward="onChange=processListbox.onProcessHoursChange(${each})" width="36px"/>
+                                <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessHours(each)}" forward="onChanging=processListbox.onProcessHoursChange(${each})" width="36px"/>
                             </listcell>
                             <listcell>
-                                <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessMinutes(each)}" forward="onChange=processListbox.onProcessMinutesChange(${each})" width="36px"/>
+                                <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessMinutes(each)}" forward="onChanging=processListbox.onProcessMinutesChange(${each})" width="36px"/>
                             </listcell>
                         </listitem>
 					</template>
