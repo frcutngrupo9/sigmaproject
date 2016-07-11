@@ -618,7 +618,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		origin.setValue(inputEvent.getValue());
 		Process process = getProcessFromListbox(data);
 		process.setDetails(origin.getText());
-//		refreshViewProcess();
 	}
 
 	@Listen("onProcessDaysChange = #processListbox")
@@ -635,7 +634,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			System.out.println("Error en convertir a duracion: " + e.toString());
 		}
 		process.setTime(duration);
-//		refreshViewProcess();
 	}
 
 	@Listen("onProcessHoursChange = #processListbox")
@@ -652,7 +650,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			System.out.println("Error en convertir a duracion: " + e.toString());
 		}
 		process.setTime(duration);
-//		refreshViewProcess();
 	}
 
 	@Listen("onProcessMinutesChange = #processListbox")
@@ -669,7 +666,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			System.out.println("Error en convertir a duracion: " + e.toString());
 		}
 		process.setTime(duration);
-//		refreshViewProcess();
 	}
 
 	private void deletePiece(Piece piece) {
