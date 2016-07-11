@@ -22,6 +22,7 @@ import org.zkoss.zk.ui.event.EventQueue;
 import org.zkoss.zk.ui.event.EventQueues;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.event.ForwardEvent;
+import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.event.MouseEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -613,15 +614,18 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	public void doProcessDetailsChange(ForwardEvent evt) {
 		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
 		Textbox origin = (Textbox)evt.getOrigin().getTarget();
+		InputEvent inputEvent = (InputEvent) evt.getOrigin();
+		origin.setValue(inputEvent.getValue());
 		Process process = getProcessFromListbox(data);
 		process.setDetails(origin.getText());
-		refreshViewProcess();
 	}
 
 	@Listen("onProcessDaysChange = #processListbox")
 	public void doProcessDaysChange(ForwardEvent evt) {
 		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
 		Intbox origin = (Intbox)evt.getOrigin().getTarget();
+		InputEvent inputEvent = (InputEvent) evt.getOrigin();
+		origin.setValue(Integer.valueOf(inputEvent.getValue()));
 		Process process = getProcessFromListbox(data);
 		Duration duration = null;
 		try {
@@ -630,13 +634,14 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			System.out.println("Error en convertir a duracion: " + e.toString());
 		}
 		process.setTime(duration);
-		refreshViewProcess();
 	}
 
 	@Listen("onProcessHoursChange = #processListbox")
 	public void doProcessHoursChange(ForwardEvent evt) {
 		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
 		Intbox origin = (Intbox)evt.getOrigin().getTarget();
+		InputEvent inputEvent = (InputEvent) evt.getOrigin();
+		origin.setValue(Integer.valueOf(inputEvent.getValue()));
 		Process process = getProcessFromListbox(data);
 		Duration duration = null;
 		try {
@@ -645,13 +650,14 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			System.out.println("Error en convertir a duracion: " + e.toString());
 		}
 		process.setTime(duration);
-		refreshViewProcess();
 	}
 
 	@Listen("onProcessMinutesChange = #processListbox")
 	public void doProcessMinutesChange(ForwardEvent evt) {
 		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
 		Intbox origin = (Intbox)evt.getOrigin().getTarget();
+		InputEvent inputEvent = (InputEvent) evt.getOrigin();
+		origin.setValue(Integer.valueOf(inputEvent.getValue()));
 		Process process = getProcessFromListbox(data);
 		Duration duration = null;
 		try {
@@ -660,7 +666,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			System.out.println("Error en convertir a duracion: " + e.toString());
 		}
 		process.setTime(duration);
-		refreshViewProcess();
 	}
 
 	private void deletePiece(Piece piece) {
