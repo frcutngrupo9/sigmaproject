@@ -27,6 +27,7 @@ import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
+import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
@@ -188,6 +189,10 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 
 		for(ProductionPlanDetail each : currentProductionPlanDetailList) {
 			each = productionPlanDetailRepository.save(each);
+			OrderStateType stateType = orderStateTypeRepository.findFirstByName("Planificado");
+			Order order = each.getOrder();
+			order.setCurrentStateType(stateType);
+			orderRepository.save(order);
 		}
 		currentProductionPlan.setPlanDetails(currentProductionPlanDetailList);
 		productionPlanRepository.save(currentProductionPlan);

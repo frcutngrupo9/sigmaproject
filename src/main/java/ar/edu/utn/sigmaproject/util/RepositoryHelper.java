@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import ar.edu.utn.sigmaproject.domain.MachineType;
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
 import ar.edu.utn.sigmaproject.domain.MeasureUnitType;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
@@ -11,6 +12,7 @@ import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.ProductCategory;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
+import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitTypeRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
@@ -18,6 +20,7 @@ import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductCategoryRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -46,6 +49,9 @@ public class RepositoryHelper {
 
 	@Autowired
 	private ProcessTypeRepository processTypeRepository;
+	
+	@Autowired
+	private MachineTypeRepository machineTypeRepository;
 
 	@PostConstruct
 	public void afterConstruct() {
@@ -83,8 +89,6 @@ public class RepositoryHelper {
 	private void addMeasureUnitsIfNeeded(String measureUnitTypeName, List<List<String>> definitions) {
 		MeasureUnitType lengthMeasureUnitType = measureUnitTypeRepository.findFirstByName(measureUnitTypeName);
 		if (lengthMeasureUnitType == null) {
-			// asumimos que como no estan creados los tipos de UM tampoco lo estan los UM
-			// por lo tanto creamos los UM
 			MeasureUnitType measureUnitType = new MeasureUnitType(measureUnitTypeName);
 			measureUnitTypeRepository.save(measureUnitType);
 			List<MeasureUnit> measureUnitToInsert = new ArrayList<>();
@@ -127,6 +131,7 @@ public class RepositoryHelper {
 			list.add(new OrderStateType("Planificado", null));
 			list.add(new OrderStateType("En Produccion", null));
 			list.add(new OrderStateType("Finalizado", null));
+			list.add(new OrderStateType("Entregado", null));
 			orderStateTypeRepository.save(list);
 		}
 	}
@@ -146,26 +151,40 @@ public class RepositoryHelper {
 			productCategoryRepository.save(list);
 		}
 	}
+	
+	private void generateMachineType() {
+		List<MachineType> list = new ArrayList<>();
+		list.add(new MachineType("Garlopa", "", null));
+		list.add(new MachineType("Cepilladora", "", null));
+		list.add(new MachineType("Escuadradora", "", null));
+		list.add(new MachineType("Escopladora", "", null));
+		list.add(new MachineType("Tupí", "", null));
+		list.add(new MachineType("Sierra Sin Fin", "", null));
+		list.add(new MachineType("Lijadora", "", null));
+		machineTypeRepository.save(list);
+	}
+
 
 	private void generateProcessType() {
 		if (processTypeRepository.count() == 0) {
+			generateMachineType();
 			List<ProcessType> list = new ArrayList<>();
 			list.add(new ProcessType("Trazar", null));
-			list.add(new ProcessType("Garlopear", null));
-			list.add(new ProcessType("Asentar", null));
-			list.add(new ProcessType("Cepillar", null));
-			list.add(new ProcessType("Cortar el Ancho", null));
-			list.add(new ProcessType("Cortar el Largo", null));
-			list.add(new ProcessType("Hacer Cortes Curvos", null));
-			list.add(new ProcessType("Hacer Escopladuras", null));
-			list.add(new ProcessType("Hacer Espigas", null));
-			list.add(new ProcessType("Hacer Molduras", null));
-			list.add(new ProcessType("Hacer Canales", null));
+			list.add(new ProcessType("Garlopear", machineTypeRepository.findFirstByName("Garlopa")));
+			list.add(new ProcessType("Asentar", machineTypeRepository.findFirstByName("Garlopa")));
+			list.add(new ProcessType("Cepillar", machineTypeRepository.findFirstByName("Cepilladora")));
+			list.add(new ProcessType("Cortar el Ancho", machineTypeRepository.findFirstByName("Escuadradora")));
+			list.add(new ProcessType("Cortar el Largo", machineTypeRepository.findFirstByName("Escuadradora")));
+			list.add(new ProcessType("Hacer Cortes Curvos", machineTypeRepository.findFirstByName("Sierra Sin Fin")));
+			list.add(new ProcessType("Hacer Escopladuras", machineTypeRepository.findFirstByName("Escopladora")));
+			list.add(new ProcessType("Hacer Espigas", machineTypeRepository.findFirstByName("Tupí")));
+			list.add(new ProcessType("Hacer Molduras", machineTypeRepository.findFirstByName("Tupí")));
+			list.add(new ProcessType("Hacer Canales", machineTypeRepository.findFirstByName("Tupí")));
 			list.add(new ProcessType("Replanar", null));
 			list.add(new ProcessType("Masillar", null));
 			list.add(new ProcessType("Clavar", null));
-			list.add(new ProcessType("Lijar Cruzado", null));
-			list.add(new ProcessType("Lijar Derecho", null));
+			list.add(new ProcessType("Lijar Cruzado", machineTypeRepository.findFirstByName("Lijadora")));
+			list.add(new ProcessType("Lijar Derecho", machineTypeRepository.findFirstByName("Lijadora")));
 			list.add(new ProcessType("Agregar Herrajes", null));
 			list.add(new ProcessType("Armar", null));
 			processTypeRepository.save(list);

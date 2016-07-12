@@ -79,7 +79,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		if(productionOrderList.isEmpty()) {
 			List<ProductTotal> productTotalList = currentProductionPlan.getProductTotalList();
 			for(ProductTotal each : productTotalList) {
-				ProductionOrder productionOrder = new ProductionOrder(currentProductionPlan, each.getProduct(), null, null, each.getTotalUnits(), null, null, productionOrderStateRepository.findByName("Generada"));
+				ProductionOrder productionOrder = new ProductionOrder(currentProductionPlan, each.getProduct(), null, null, each.getTotalUnits(), null, null, productionOrderStateRepository.findFirstByName("Generada"));
 				productionOrder = productionOrderRepository.save(productionOrder);
 				productionOrderList.add(productionOrder);
 			}

@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProductCategoryRepository extends SearchableRepository<ProductCategory, Long> {
 
-	ProductCategory findByName(String string);
+	ProductCategory findFirstByName(String string);
 
 }

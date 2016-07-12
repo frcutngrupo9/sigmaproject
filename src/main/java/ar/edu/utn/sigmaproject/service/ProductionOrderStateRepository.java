@@ -8,6 +8,6 @@ import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
 @Repository
 public interface ProductionOrderStateRepository extends JpaRepository<ProductionOrderState, Long> {
 
-	ProductionOrderState findByName(String string);
+	ProductionOrderState findFirstByName(String string);
 
 }
