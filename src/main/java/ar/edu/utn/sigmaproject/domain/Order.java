@@ -86,12 +86,6 @@ public class Order implements Serializable, Cloneable {
 		}
 		return null;
 	}
-
-	public void setCurrentStateType(OrderStateType orderStateType) {
-		if(!getCurrentStateType().equals(orderStateType)) {
-			states.add(new OrderState(orderStateType, new Date()));
-		}
-	}
 	
 	public void setState(OrderState state) {
 		states.add(state);

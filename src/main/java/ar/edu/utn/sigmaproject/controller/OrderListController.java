@@ -1,6 +1,7 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
@@ -22,6 +23,7 @@ import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
+import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
@@ -88,7 +90,7 @@ public class OrderListController extends SelectorComposer<Component> {
 						alert("No se puede cancelar un Pedido ya cancelado.");
 					} else {
 						OrderStateType orderStateType = orderStateTypeRepository.findFirstByName("Cancelado");
-						order.setCurrentStateType(orderStateType);
+						order.setState(new OrderState(orderStateType, new Date()));
 						orderRepository.save(order);// grabamos el estado del pedido
 						refreshList();
 						alert("Pedido cancelado.");

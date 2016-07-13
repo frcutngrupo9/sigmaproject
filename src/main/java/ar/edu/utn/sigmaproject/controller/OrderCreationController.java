@@ -29,11 +29,13 @@ import org.zkoss.zul.Messagebox;
 import ar.edu.utn.sigmaproject.domain.Client;
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
+import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
+import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
 
@@ -91,6 +93,8 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	private OrderRepository orderRepository;
 	@WireVariable
 	private OrderDetailRepository orderDetailRepository;
+	@WireVariable
+	private OrderStateRepository orderStateRepository;
 	@WireVariable
 	private OrderStateTypeRepository orderStateTypeRepository;
 
@@ -161,32 +165,29 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		int order_number = orderNumberIntbox.intValue();
 		Date order_date = orderDatebox.getValue();
 		Date order_need_date = orderNeedDatebox.getValue();
-		OrderStateType order_state_type;
+		OrderStateType orderStateType;
 		if(orderStateTypeCombobox.getSelectedIndex() != -1) {
-			order_state_type = orderStateTypeCombobox.getSelectedItem().getValue();
+			orderStateType = orderStateTypeCombobox.getSelectedItem().getValue();
 		} else {
-			order_state_type = null;
+			orderStateType = null;
 		}
 
 		if(currentOrder == null) { // es un pedido nuevo
 			// creamos el nuevo pedido
 			currentOrder = new Order(currentClient, order_number, order_date, order_need_date);
-			currentOrder.setCurrentStateType(order_state_type);
 		} else { // se edita un pedido
 			currentOrder.setClient(currentClient);
 			currentOrder.setNeedDate(order_need_date);
 			currentOrder.setNumber(order_number);
-			if (!currentOrder.getCurrentStateType().equals(order_state_type)) {
-				currentOrder.setCurrentStateType(order_state_type);
-			}
 		}
 		for(OrderDetail each : orderDetailList) {
 			each = orderDetailRepository.save(each);
 		}
 		currentOrder.setDetails(orderDetailList);
-		orderRepository.save(currentOrder);
-		currentOrder = null;
-		currentOrderDetail = null;
+		OrderState orderState = new OrderState(orderStateType, new Date());
+		orderState = orderStateRepository.save(orderState);
+		currentOrder.setState(orderState);
+		currentOrder = orderRepository.save(currentOrder);
 		refreshViewOrder();
 		alert("Pedido guardado.");
 	}
@@ -270,9 +271,20 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		} else {// editar pedido
 			// TODO Gian: ver currentOrderState
 			orderCaption.setLabel("Edicion de Pedido");
-			if (currentOrder.getCurrentStateType() != null) {
-				orderStateTypeListModel.addToSelection(currentOrder.getCurrentStateType());
+			OrderStateType orderCurrentStateType = currentOrder.getCurrentStateType();
+			if (orderCurrentStateType != null) {
+				orderStateTypeListModel.addToSelection(orderCurrentStateType);
 				orderStateTypeCombobox.setModel(orderStateTypeListModel);
+				// solo se puede grabar si esta en estado Iniciado o Cancelado
+				OrderStateType stateTypeIniciado = orderStateTypeRepository.findFirstByName("Iniciado");
+				OrderStateType stateTypeCancelado = orderStateTypeRepository.findFirstByName("Cancelado");
+				if(!orderCurrentStateType.equals(stateTypeIniciado) && !orderCurrentStateType.equals(stateTypeCancelado)) {
+					saveOrderButton.setDisabled(true);
+					deleteOrderButton.setDisabled(true);
+				} else {
+					saveOrderButton.setDisabled(false);
+					deleteOrderButton.setDisabled(false);
+				}
 			} else {
 				orderStateTypeCombobox.setSelectedIndex(-1);
 			}
@@ -283,7 +295,6 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			orderDatebox.setValue(currentOrder.getDate());
 			orderNeedDatebox.setValue(currentOrder.getNeedDate());
 			orderDetailList = currentOrder.getDetails();
-			deleteOrderButton.setDisabled(false);
 			orderStateTypeCombobox.setDisabled(false);
 		}
 		orderDatebox.setDisabled(true);// nunca se debe poder modificar la fecha de creacion del pedido
