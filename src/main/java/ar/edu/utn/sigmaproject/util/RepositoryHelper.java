@@ -20,6 +20,7 @@ import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductCategory;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
+import ar.edu.utn.sigmaproject.domain.RawMaterialType;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.domain.WoodType;
 import ar.edu.utn.sigmaproject.domain.Worker;
@@ -33,6 +34,7 @@ import ar.edu.utn.sigmaproject.service.ProductCategoryRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
+import ar.edu.utn.sigmaproject.service.RawMaterialTypeRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 import ar.edu.utn.sigmaproject.service.WoodTypeRepository;
 import ar.edu.utn.sigmaproject.service.WorkerRepository;
@@ -77,6 +79,9 @@ public class RepositoryHelper {
 	private WorkerRepository workerRepository;
 
 	@Autowired
+	private RawMaterialTypeRepository rawMaterialTypeRepository;
+
+	@Autowired
 	private SupplyTypeRepository supplyTypeRepository;
 
 	@PostConstruct
@@ -90,6 +95,7 @@ public class RepositoryHelper {
 		generateWoodType();
 		generateClient();
 		generateWorker();
+		generateRawMaterialType();
 		generateSupplyType();
 	}
 
@@ -288,11 +294,46 @@ public class RepositoryHelper {
 		}
 	}
 
+	private void generateRawMaterialType() {
+		if (rawMaterialTypeRepository.count() == 0) {
+			generateMeasureUnitTypeList();
+			//  las tablas vienen en distintos largos, 2,40mts, 3,00mts, 3,60mts y 4,20mts. el ancho x espesor las que usan ellos (en pulgadas) 1x3, 1x4, 1x5, 1x6, 1x8, 1,5x6, 2x4, 2x6, 3x3, 3x6, 4x4
+			MeasureUnit pulgadas = measureUnitRepository.findFirstByName("Pulgadas");
+			MeasureUnit metros = measureUnitRepository.findFirstByName("Metros");
+			List<List<String>> definitions = Arrays.asList(
+					Arrays.asList("1", "3"),
+					Arrays.asList("1", "4"),
+					Arrays.asList("1", "5"),
+					Arrays.asList("1", "6"),
+					Arrays.asList("1", "8"),
+					Arrays.asList("1.5", "6"),
+					Arrays.asList("2", "4"),
+					Arrays.asList("2", "6"),
+					Arrays.asList("3", "3"),
+					Arrays.asList("3", "6"),
+					Arrays.asList("4", "4")
+					);
+			List<RawMaterialType> list = new ArrayList<>();
+			for (List<String> definition : definitions) {
+				String espesor = definition.get(0);
+				String ancho = definition.get(1);
+				list.add( new RawMaterialType("Tabla " + espesor + "x" + ancho + " x 2,40mts", new BigDecimal("2.40"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas));
+				list.add( new RawMaterialType("Tabla " + espesor + "x" + ancho + " x 3,00mts", new BigDecimal("3.00"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas));
+				list.add( new RawMaterialType("Tabla " + espesor + "x" + ancho + " x 3,60mts", new BigDecimal("3.60"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas));
+				list.add( new RawMaterialType("Tabla " + espesor + "x" + ancho + " x 4,20mts", new BigDecimal("4.20"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas));
+			}
+
+			rawMaterialTypeRepository.save(list);
+		}
+	}
+	
 	private void generateSupplyType() {
 		if (supplyTypeRepository.count() == 0) {
 			List<SupplyType> list = new ArrayList<>();
-			list.add( new SupplyType("1", "INSUMO 1", "", "", "", "", new BigDecimal("100"), new BigDecimal("10"), new BigDecimal("30")));
-			list.add( new SupplyType("2", "INSUMO 2", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("30")));
+			list.add( new SupplyType("15", "TORNILLO 8PUL", "CABEZA ALLEN", "", "CAJA DE 100", "8PUL", new BigDecimal("3"), new BigDecimal("1"), new BigDecimal("2")));
+			list.add( new SupplyType("16", "TORNILLO 10PUL", "CABEZA HEXAGONAL", "", "CAJA DE 100", "10PUL", new BigDecimal("3"), new BigDecimal("1"), new BigDecimal("2")));
+			list.add( new SupplyType("26", "ARANDELA", "", "", "CAJA DE 300", "", new BigDecimal("3"), new BigDecimal("1"), new BigDecimal("2")));
+			list.add( new SupplyType("34", "TUERCA HEXAGONAL", "", "", "CAJA DE 200", "", new BigDecimal("3"), new BigDecimal("1"), new BigDecimal("2")));
 			supplyTypeRepository.save(list);
 		}
 	}
