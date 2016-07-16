@@ -23,7 +23,7 @@
             <listitem>
                 <listcell label="${each.code}"/>
                 <listcell label="${each.rawMaterialType.name}"/>
-                <listcell label="${r:getFormattedTime(each.rawMaterialType)}"/>
+                <listcell label="${r:getFormattedMeasure(each.rawMaterialType)}"/>
                 <listcell label="${each.woodType.name}"/>
                 <listcell label="${each.stock}"/>
                 <listcell label="${each.stockMin}"/>
