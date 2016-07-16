@@ -36,7 +36,7 @@
 				    								Buscar
 				    								<textbox />
 				    							</hbox>
-				    							<listbox id="orderPopupListbox" width="200px">
+				    							<listbox id="orderPopupListbox" width="300px">
 				    							<listhead>
 				    								<listheader label="Pedido" align="center"/>
 				    								<listheader label="Cliente" align="center"/>
@@ -81,7 +81,7 @@
         			</template>
     			</grid>
     			<separator/>
-    			<listbox id="productTotalListbox" mold="paging" pageSize="7" visible="true">
+    			<listbox id="productTotalListbox" mold="paging" pageSize="7" visible="true" sizedByContent="true" span="true">
     				<auxhead>
 						<auxheader label="Productos" colspan="4"/>
 					</auxhead>

@@ -135,7 +135,7 @@ public class RawMaterialController extends SelectorComposer<Component> {
 			Clients.showNotification("Debe seleccionar una unidad de medida", widthMeasureUnitSelectbox);
 			return;
 		}
-		String name = nameTextbox.getText().toUpperCase();
+		String name = nameTextbox.getText();
 		BigDecimal length = BigDecimal.valueOf(lengthDoublebox.doubleValue());
 		MeasureUnit lengthMeasureUnit = lengthMeasureUnitListModel.getElementAt(lengthSelectedIndex);
 		BigDecimal depth = BigDecimal.valueOf(depthDoublebox.doubleValue());

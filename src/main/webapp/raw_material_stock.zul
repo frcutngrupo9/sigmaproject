@@ -1,3 +1,4 @@
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="win_raw_material_stock" title="Stock de Materia Prima" closable="false" apply="ar.edu.utn.sigmaproject.controller.RawMaterialStockController" sclass="sigma-content">
     <hlayout>
         <label>Buscar:</label>
@@ -21,9 +22,9 @@
         <template name="model">
             <listitem>
                 <listcell label="${each.code}"/>
-                <listcell label="${win_raw_material_stock$composer.getRawMaterialType(each).name}"/>
-                <listcell label="${win_raw_material_stock$composer.getMeasureFormated(each)}"/>
-                <listcell label="${win_raw_material_stock$composer.getWoodType(each).name}"/>
+                <listcell label="${each.rawMaterialType.name}"/>
+                <listcell label="${r:getFormattedTime(each.rawMaterialType)}"/>
+                <listcell label="${each.woodType.name}"/>
                 <listcell label="${each.stock}"/>
                 <listcell label="${each.stockMin}"/>
                 <listcell label="${each.stockRepo}"/>
