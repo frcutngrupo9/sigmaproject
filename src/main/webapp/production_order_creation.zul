@@ -59,9 +59,9 @@
                         </row>
                    </rows>
                 </grid>
-                <hbox>
+                <hbox pack="center" align="center">
 					<label value="Producto a Fabricar: "/>
-					<textbox id="productNameTextbox"/>
+					<textbox id="productNameTextbox" width="40%"/>
 					<label value="Unidades a Fabricar: "/>
 					<intbox id="productUnitsIntbox"/>
 				</hbox>
@@ -91,7 +91,7 @@
 			            	<label value="${r:getFormattedTime(each.timeTotal)}"/>
 			            	<combobox inplace="true"
 			            		forward="onSelect=productionOrderDetailGrid.onEditProductionOrderDetailMachine(${each}), onCreate=productionOrderDetailGrid.onCreateMachineCombobox(${each})"
-                        		model="${win_production_order_creation$composer.getMachineListModel(each)}" hflex="1" >
+                        		model="${win_production_order_creation$composer.getMachineListModel(each)}" hflex="1" readonly="true">
 		                        <template name="model">
 		                            <comboitem label="${each.name}" />
 		                        </template>

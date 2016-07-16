@@ -184,7 +184,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			Clients.showNotification("Debe seleccionar un Empleado", workerCombobox);
 			return;
 		}
-		if(!productionOrderStateCombobox.getSelectedItem().getValue().equals(productionOrderStateRepository.findByName("Generada"))) {
+		if(!productionOrderStateCombobox.getSelectedItem().getValue().equals(productionOrderStateRepository.findFirstByName("Generada"))) {
 			for (ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
 				Process process = productionOrderDetail.getProcess();
 				ProcessType processType = process.getType();

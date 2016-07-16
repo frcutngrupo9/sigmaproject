@@ -85,6 +85,8 @@
 		            </template>
     			</listbox>
     			<separator/>
+    			<button id="returnButton" label="Volver"/>
+    			<separator/>
 				<grid id="supplyReservationGrid" width="400px" sclass="sigma-form" visible="false">
 			        <columns>
 		                <column hflex="min" align="right"/>

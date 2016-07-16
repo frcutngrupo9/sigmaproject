@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 import javax.persistence.*;
 import javax.xml.datatype.DatatypeFactory;
@@ -38,6 +39,7 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 	BigDecimal quantityFinished = BigDecimal.ZERO;
 
 	boolean isFinished;
+	Date dateFinished;
 
 	public ProductionOrderDetail() {
 
@@ -49,6 +51,7 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 		this.timeTotal = timeTotal;
 		this.quantityPiece = quantityPiece;
 		isFinished = false;
+		dateFinished = null;
 	}
 
 	public Long getId() {
@@ -117,6 +120,14 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 
 	public void setFinished(boolean isFinished) {
 		this.isFinished = isFinished;
+	}
+
+	public Date getDateFinished() {
+		return dateFinished;
+	}
+
+	public void setDateFinished(Date dateFinished) {
+		this.dateFinished = dateFinished;
 	}
 
 	@Override

@@ -8,14 +8,17 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
+import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Grid;
+import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
@@ -62,6 +65,8 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	Doublebox stockReservedDoublebox;
 	@Wire
 	Doublebox stockMissingDoublebox;
+	@Wire
+	Button returnButton;
 
 	// services
 	@WireVariable
@@ -215,6 +220,12 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	public void doSupplyRequirementReservation(ForwardEvent evt) {
 		SupplyRequirement data = (SupplyRequirement) evt.getData();// obtenemos el objeto pasado por parametro
 		openSupplyReservationGrid(data);
+	}
+	
+	@Listen("onClick = #returnButton")
+	public void returnButtonClick() {
+		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/production_plan_list.zul");
 	}
 
 	private void openSupplyReservationGrid(SupplyRequirement supplyRequirement) {

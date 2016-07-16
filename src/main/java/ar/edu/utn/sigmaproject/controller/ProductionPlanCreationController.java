@@ -27,6 +27,8 @@ import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
+import ar.edu.utn.sigmaproject.domain.OrderState;
+import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
@@ -37,6 +39,7 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
+import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanDetailRepository;
@@ -74,6 +77,8 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	// services
 	@WireVariable
 	private OrderRepository orderRepository;
+	@WireVariable
+	private OrderStateRepository orderStateRepository;
 	@WireVariable
 	private OrderStateTypeRepository orderStateTypeRepository;
 	@WireVariable
@@ -135,13 +140,20 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	}
 
 	private void refreshOrderPopupList() {// el popup se actualiza en base a los detalles
-		orderPopupList = orderRepository.findByCurrentStateType(orderStateTypeRepository.findFirstByName("Iniciado"));// se buscan los pedidos que no estan asignados a un plan y no estan cancelados (estan en estado iniciado)
-		for(ProductionPlanDetail productionPlanDetail : currentProductionPlanDetailList) {// no debe contener los pedidos que ya estan en el detalle
-			Order aux = productionPlanDetail.getOrder();
-			orderPopupList.remove(aux);// sacamos los pedidos que estan en la currentProductionPlanDetailList del popup
+		List<Order> orderList = orderRepository.findAll();
+		orderPopupList = new ArrayList<>();
+		// se buscan los pedidos que no estan asignados a un plan y no estan cancelados (estan en estado iniciado)
+		OrderStateType orderStateTypeInitiated = orderStateTypeRepository.findFirstByName("Iniciado");
+		for(Order each : orderList) {
+			if(each.getCurrentStateType().equals(orderStateTypeInitiated)) {
+				orderPopupList.add(each);
+			}
 		}
-		// agregamos el pedido que se elimin� y al ser de un plan que se esta editando, no aparece en la lista
-		// [aca deberia agregarse a la lista los pedidos que esten en el ProductionPlanDetailList serializado pero no esten en el currentProductionPlanDetailList (solo si se esta editando un plan)]
+		for(ProductionPlanDetail productionPlanDetail : currentProductionPlanDetailList) {
+			// no debe contener los pedidos que ya estan en el detalle
+			Order aux = productionPlanDetail.getOrder();
+			orderPopupList.remove(aux);
+		}
 		orderPopupListModel = new ListModelList<Order>(orderPopupList);
 		orderPopupListbox.setModel(orderPopupListModel);
 	}
@@ -167,7 +179,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			return;
 		}
 		String productionPlanName = productionPlanNameTextbox.getText().toUpperCase();
-		Date production_plan_date = productionPlanDatebox.getValue();
+		Date productionPlanDate = productionPlanDatebox.getValue();
 		ProductionPlanStateType productionPlanStateType;
 		if(productionPlanStateTypeCombobox.getSelectedIndex() == -1) {
 			productionPlanStateType = null;
@@ -176,11 +188,11 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		}
 		if(currentProductionPlan == null) { // es un plan nuevo
 			// creamos el nuevo plan
-			currentProductionPlan = new ProductionPlan(productionPlanName, null, production_plan_date);
+			currentProductionPlan = new ProductionPlan(productionPlanName, null, productionPlanDate);
 			currentProductionPlan.setCurrentStateType(productionPlanStateType);
 		} else { // se edita un plan
 			currentProductionPlan.setName(productionPlanName);
-			currentProductionPlan.setDate(production_plan_date);
+			currentProductionPlan.setDate(productionPlanDate);
 			if (!currentProductionPlan.getCurrentStateType().equals(productionPlanStateType)) {
 				currentProductionPlan.setCurrentStateType(productionPlanStateType);
 			}
@@ -188,6 +200,12 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 
 		for(ProductionPlanDetail each : currentProductionPlanDetailList) {
 			each = productionPlanDetailRepository.save(each);
+			OrderStateType orderStateType = orderStateTypeRepository.findFirstByName("Planificado");
+			Order order = each.getOrder();
+			OrderState state = new OrderState(orderStateType, new Date());
+			state = orderStateRepository.save(state);
+			order.setState(state);
+			orderRepository.save(order);
 		}
 		currentProductionPlan.setPlanDetails(currentProductionPlanDetailList);
 		productionPlanRepository.save(currentProductionPlan);

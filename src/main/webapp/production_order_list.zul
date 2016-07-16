@@ -29,11 +29,11 @@
 					</auxhead>
         			<columns>
         				<!-- <column width="40px" align="center"/> -->
+        				<column label="Numero" align="center"/>
         				<column label="Producto" align="center"/>
-		                <column label="Cantidad" align="center"/>
+		                <column label="Unidades" align="center"/>
         				<column label="Codigo" align="center"/>
         				<column label="Estado Orden" align="center"/>
-        				<column label="Numero" align="center"/>
 		                <column label="Empleado Asignado" align="center"/>
 		                <column label="Porcentaje Completo" align="center"/>
 		                <column label="Fecha Inicio" align="center"/>
@@ -48,11 +48,11 @@
 			            		<include src="/production_order_processes.zul" production_order_detail_list="${production_order_detail_list}"/>
 			            	</detail>
 			            -->
+			            	<label value="${each.number}"/>
 		                	<label value="${each.product.name}"/>
 		                	<label value="${each.units}"/>
 		                	<label value="${each.product.code}"/>
 		                    <label value="${each.state.name}"/>
-                    		<label value="${each.number}"/>
 		                    <label value="${win_production_order_list$composer.getWorkerName(each)}"/>
 		                    <label value="${win_production_order_list$composer.getPercentComplete(each)}"/>
 		                    <label value="${each.date}"/>
