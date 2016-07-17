@@ -2,6 +2,7 @@ package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
@@ -22,6 +23,7 @@ import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductTotal;
@@ -53,18 +55,6 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	Listbox rawMaterialRequirementListbox;
 	@Wire
 	Listbox supplyRequirementListbox;
-	@Wire
-	Grid supplyReservationGrid;
-	@Wire
-	Textbox codeTextbox;
-	@Wire
-	Textbox descriptionTextbox;
-	@Wire
-	Doublebox stockDoublebox;
-	@Wire
-	Doublebox stockReservedDoublebox;
-	@Wire
-	Doublebox stockMissingDoublebox;
 	@Wire
 	Button returnButton;
 
@@ -219,26 +209,15 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	@Listen("onClickReservation = #supplyRequirementListbox")
 	public void doSupplyRequirementReservation(ForwardEvent evt) {
 		SupplyRequirement data = (SupplyRequirement) evt.getData();// obtenemos el objeto pasado por parametro
-		openSupplyReservationGrid(data);
+		final HashMap<String, SupplyRequirement> map = new HashMap<String, SupplyRequirement>();
+		map.put("selected_supply_requirement", data);
+		Window window = (Window)Executions.createComponents("/supply_reservation.zul", null, map);
+		window.doModal();
 	}
 	
 	@Listen("onClick = #returnButton")
 	public void returnButtonClick() {
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/production_plan_list.zul");
-	}
-
-	private void openSupplyReservationGrid(SupplyRequirement supplyRequirement) {
-		supplyReservationGrid.setVisible(true);
-		codeTextbox.setDisabled(true);
-		descriptionTextbox.setDisabled(true);
-		stockDoublebox.setDisabled(true);
-		stockReservedDoublebox.setDisabled(false);
-		stockMissingDoublebox.setDisabled(true);
-		codeTextbox.setText(supplyRequirement.getSupplyType().getCode());
-		descriptionTextbox.setText(supplyRequirement.getSupplyType().getDescription());
-		stockDoublebox.setValue(supplyRequirement.getSupplyType().getStock().doubleValue());
-		stockReservedDoublebox.setValue(0.0);
-		stockMissingDoublebox.setValue(supplyRequirement.getQuantity().doubleValue());
 	}
 }

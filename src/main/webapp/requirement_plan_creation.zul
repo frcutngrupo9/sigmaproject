@@ -86,44 +86,6 @@
     			</listbox>
     			<separator/>
     			<button id="returnButton" label="Volver"/>
-    			<separator/>
-				<grid id="supplyReservationGrid" width="400px" sclass="sigma-form" visible="false">
-			        <columns>
-		                <column hflex="min" align="right"/>
-		                <column />
-		            </columns>
-			        <rows>
-			            <row>
-			                <label>Codigo:</label>
-			                <textbox id="codeTextbox" value="" hflex="1"/>
-			            </row>
-			            <row>
-			                <label>Descripcion:</label>
-			                <textbox id="descriptionTextbox" value="" hflex="1"/>
-			            </row>
-			            <row>
-			                <label>Stock Actual:</label>
-			                <doublebox id="stockDoublebox" hflex="1"/>
-			            </row>
-			            <row>
-			                <label>Cantidad a Reservar:</label>
-			                <doublebox id="stockReservedDoublebox" hflex="1"/>
-			            </row>
-			            <row>
-			                <label>Cantidad Faltante:</label>
-			                <doublebox id="stockMissingDoublebox" hflex="1"/>
-			            </row>
-			            <row>
-			                <cell colspan="2" style="text-align:center">
-			                    <hlayout>
-			                        <button id="saveButton" label="Guardar"/>
-			                        <button id="cancelButton" label="Cancelar"/>
-			                        <button id="resetButton" label="Reset"/>
-			                    </hlayout>
-			                </cell>
-			            </row>
-			        </rows>
-		    	</grid>
             </vlayout>
         </panelchildren>
     </panel>

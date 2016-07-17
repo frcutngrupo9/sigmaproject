@@ -1,0 +1,42 @@
+<window id="supplyReservationWindow" apply="ar.edu.utn.sigmaproject.controller.SupplyReservationController" width="400px" position="center,center" closable="true" action="show: slideDown;hide: slideUp">
+	<caption label="Reserva de Insumos" style="text-align:center; font-weight: bold;"/>
+	<panel border="rounded">
+        <panelchildren>
+            <vlayout>
+                <grid id="supplyReservationGrid" sclass="sigma-form">
+			        <columns>
+		                <column hflex="min" align="right"/>
+		                <column />
+		            </columns>
+			        <rows>
+			            <row>
+			                <label>Codigo:</label>
+			                <textbox id="codeTextbox" value="" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Descripcion:</label>
+			                <textbox id="descriptionTextbox" value="" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Stock Actual:</label>
+			                <doublebox id="stockDoublebox" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Cantidad a Reservar:</label>
+			                <doublebox id="stockReservedDoublebox" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Cantidad Faltante:</label>
+			                <doublebox id="stockMissingDoublebox" hflex="1"/>
+			            </row>
+			        </rows>
+		    	</grid>
+                <hbox hflex="1" align="center" pack="center">
+                	<button id="saveButton" label="Guardar"/>
+                	<button id="cancelButton" label="Cancelar"/>
+			        <button id="resetButton" label="Reset"/>
+                </hbox>
+            </vlayout>
+        </panelchildren>
+    </panel>
+</window>

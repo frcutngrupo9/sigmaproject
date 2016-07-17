@@ -1,0 +1,16 @@
+<window id="productRawMaterialWindow" apply="ar.edu.utn.sigmaproject.controller.ProductRawMaterialController" width="75%" position="center,center" closable="true" action="show: slideDown;hide: slideUp">
+	<caption label="Materias Prima de Producto" style="text-align:center; font-weight: bold;"/>
+	<panel border="rounded">
+        <panelchildren>
+            <vlayout>
+                <hlayout>
+                </hlayout>
+                <separator/>
+                <hlayout>
+                	<button id="acceptRawMaterialListButton" label="Aceptar"/>
+                    <button id="cancelRawMaterialListButton" label="Cancelar"/>
+                </hlayout>
+            </vlayout>
+        </panelchildren>
+    </panel>
+</window>

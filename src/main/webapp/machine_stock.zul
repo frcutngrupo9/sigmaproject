@@ -8,7 +8,6 @@
     <listbox id="machineListbox">
         <listhead>
             <listheader label="Nombre" align="center"/>
-            <listheader label="Codigo" align="center"/>
             <listheader label="Tipo Maquina" align="center"/>
             <listheader label="Anio" align="center"/>
             <listheader label="Tiempo de Uso" align="center"/>
@@ -16,7 +15,6 @@
         <template name="model">
             <listitem>
                 <listcell label="${each.name}"/>
-                <listcell label="${each.code}"/>
                 <listcell label="${each.machineType.name}"/>
                 <listcell label="${each.year}"/>
                 <listcell label="${win_machine_stock$composer.getDurationFormatted(each)}"/>
@@ -44,10 +42,6 @@
                         </template>
                     </combobox>
             	</row>
-            	<row>
-                    <label>Codigo:</label>
-                    <textbox id="codeTextbox" hflex="1"/>
-                </row>
                 <row>
                     <label>Nombre:</label>
                     <textbox id="nameTextbox" hflex="1"/>

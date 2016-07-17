@@ -36,9 +36,6 @@ public class Machine implements Serializable, Cloneable {
 	MachineType machineType;
 
 	@Field
-	String code = "";
-
-	@Field
 	String name = "";
 
 	@Field
@@ -54,9 +51,8 @@ public class Machine implements Serializable, Cloneable {
 
 	}
 
-	public Machine(MachineType machineType, String code, String name, Integer year, Duration usedTime) {
+	public Machine(MachineType machineType, String name, Integer year, Duration usedTime) {
 		this.machineType = machineType;
-		this.code = code;
 		this.name = name;
 		this.year = year;
 		this.setUsedTime(usedTime);
@@ -76,14 +72,6 @@ public class Machine implements Serializable, Cloneable {
 
 	public void setMachineType(MachineType machineType) {
 		this.machineType = machineType;
-	}
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
 	}
 
 	public String getName() {

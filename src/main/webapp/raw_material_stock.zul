@@ -11,20 +11,18 @@
 			<auxheader label="Materia Prima" colspan="7"/>
 		</auxhead>
         <listhead>
-        	<listheader label="Codigo" align="center"/>
+        	<listheader label="Madera" align="center"/>
             <listheader label="Nombre" align="center"/>
             <listheader label="Medidas" align="center"/>
-            <listheader label="Madera" align="center"/>
             <listheader label="Stock Actual" align="center"/>
             <listheader label="Stock Minimo" align="center"/>
             <listheader label="Stock Reposicion" align="center"/>
         </listhead>
         <template name="model">
             <listitem>
-                <listcell label="${each.code}"/>
+            	<listcell label="${each.woodType.name}"/>
                 <listcell label="${each.rawMaterialType.name}"/>
                 <listcell label="${r:getFormattedMeasure(each.rawMaterialType)}"/>
-                <listcell label="${each.woodType.name}"/>
                 <listcell label="${each.stock}"/>
                 <listcell label="${each.stockMin}"/>
                 <listcell label="${each.stockRepo}"/>
@@ -44,8 +42,12 @@
             </columns>
 	        <rows>
 	        	<row>
-	                <label>Codigo:</label>
-	                <textbox id="codeTextbox" value="" hflex="1"/>
+	                <label>Madera:</label>
+	                <combobox id="woodTypeCombobox" readonly="true">
+                        <template name="model">
+                            <comboitem label="${each.name}" value="${each}"/>
+                        </template>
+                    </combobox>
 	            </row>
 	        	<row>
 	                <label>Materia Prima:</label>
@@ -54,22 +56,6 @@
                             <comboitem label="${each.name}" value="${each}"/>
                         </template>
                     </combobox>
-	            </row>
-	            <row>
-	                <label>Madera:</label>
-	                <combobox id="woodTypeCombobox" readonly="true">
-                        <template name="model">
-                            <comboitem label="${each.name}" value="${each}"/>
-                        </template>
-                    </combobox>
-	            </row>
-	            <row>
-	                <label>Nombre Materia Prima:</label>
-	                <textbox id="nameTextbox" value="" hflex="1"/>
-	            </row>
-	            <row>
-	                <label>Medidas:</label>
-	                <textbox id="measureTextbox" value="" hflex="1"/>
 	            </row>
 	            <row>
 	                <label>Stock Actual:</label>

@@ -12,6 +12,7 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zul.Button;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
@@ -47,6 +48,8 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 	Grid productionOrderGrid;
 	@Wire
 	Textbox productionPlanStateTypeTextbox;
+	@Wire
+	Button returnButton;
 
 	// services
 	@WireVariable
@@ -201,5 +204,11 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 				return false;
 			}
 		}
+	}
+	
+	@Listen("onClick = #returnButton")
+	public void returnButtonClick() {
+		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/production_plan_list.zul");
 	}
 }
