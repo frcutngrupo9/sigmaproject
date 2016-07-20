@@ -8,6 +8,6 @@ import ar.edu.utn.sigmaproject.domain.WoodReserved;
 @Repository
 public interface WoodReservedRepository extends SearchableRepository<WoodReserved, Long> {
 
-	WoodReserved findByRawMaterialRequirement(RawMaterialRequirement rawMaterialRequirement);
+	WoodReserved findFirstByRawMaterialRequirement(RawMaterialRequirement rawMaterialRequirement);
 
 }

@@ -316,7 +316,7 @@ public class RepositoryHelper {
 					Arrays.asList("1", "5"),
 					Arrays.asList("1", "6"),
 					Arrays.asList("1", "8"),
-					Arrays.asList("1,5", "6"),
+					Arrays.asList("1.5", "6"),
 					Arrays.asList("2", "4"),
 					Arrays.asList("2", "6"),
 					Arrays.asList("3", "3"),
@@ -327,10 +327,10 @@ public class RepositoryHelper {
 			for (List<String> definition : definitions) {
 				String espesor = definition.get(0);
 				String ancho = definition.get(1);
-				list.add(new RawMaterialType("Tabla " + espesor + "x" + ancho + " x 2,40mts", new BigDecimal("2,40"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas));
-				list.add(new RawMaterialType("Tabla " + espesor + "x" + ancho + " x 3,00mts", new BigDecimal("3,00"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas));
-				list.add(new RawMaterialType("Tabla " + espesor + "x" + ancho + " x 3,60mts", new BigDecimal("3,60"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas));
-				list.add(new RawMaterialType("Tabla " + espesor + "x" + ancho + " x 4,20mts", new BigDecimal("4,20"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas));
+				list.add(new RawMaterialType("Tabla " + espesor + "x" + ancho + " x 2.40mts", new BigDecimal("2.40"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas));
+				list.add(new RawMaterialType("Tabla " + espesor + "x" + ancho + " x 3.00mts", new BigDecimal("3.00"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas));
+				list.add(new RawMaterialType("Tabla " + espesor + "x" + ancho + " x 3.60mts", new BigDecimal("3.60"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas));
+				list.add(new RawMaterialType("Tabla " + espesor + "x" + ancho + " x 4.20mts", new BigDecimal("4.20"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas));
 			}
 			rawMaterialTypeRepository.save(list);
 		}

@@ -143,8 +143,13 @@ public class MachineStockController extends SelectorComposer<Component> {
 			machineTypeCombobox.setModel(machineTypeListModel);
 			nameTextbox.setValue(currentMachine.getName());
 			yearIntbox.setValue(currentMachine.getYear());
-			usedTimeIntboxHours.setValue(currentMachine.getUsedTime().getHours());
-			usedTimeIntboxMinutes.setValue(currentMachine.getUsedTime().getMinutes());
+			if(currentMachine.getUsedTime() != null) {
+				usedTimeIntboxHours.setValue(currentMachine.getUsedTime().getHours());
+				usedTimeIntboxMinutes.setValue(currentMachine.getUsedTime().getMinutes());
+			} else {
+				usedTimeIntboxHours.setValue(null);
+				usedTimeIntboxMinutes.setValue(null);
+			}
 			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
 		}

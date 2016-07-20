@@ -84,7 +84,6 @@
 						</listitem>
 		            </template>
     			</listbox>
-    			<separator/>
     			<button id="returnButton" label="Volver"/>
             </vlayout>
         </panelchildren>

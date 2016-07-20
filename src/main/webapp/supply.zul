@@ -1,78 +1,82 @@
 <window id="win_supply" title="Insumos" closable="false" apply="ar.edu.utn.sigmaproject.controller.SupplyController" sclass="sigma-content">
-    <hlayout>
-        <label>Buscar:</label>
-        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
-        <button id="searchButton" label="Buscar"/>
-    </hlayout>
-    <separator/>
-    <listbox id="supplyTypeListbox">
-        <listhead>
-            <listheader label="Codigo" align="center"/>
-            <listheader label="Descripcion" align="center"/>
-            <listheader label="Detalles" align="center"/>
-            <listheader label="Marca" align="center"/>
-            <listheader label="Presentacion" align="center"/>
-            <listheader label="Medida" align="center"/>
-        </listhead>
-        <template name="model">
-            <listitem>
-                <listcell label="${each.code}"/>
-                <listcell label="${each.description}"/>
-                <listcell label="${each.details}"/>
-                <listcell label="${each.brand}"/>
-                <listcell label="${each.presentation}"/>
-                <listcell label="${each.measure}"/>
-            </listitem>
-        </template>
-    </listbox>
-	<paging id="pager" pageSize="10" sclass="sigma-paging"/>
-    <vlayout>
-        <separator/>
-        <hbox>
-            <button id="newButton" label="Nuevo"/>
-        </hbox>
-        <separator/>
-		<grid id="supplyTypeGrid" width="400px" sclass="sigma-form" visible="false">
-	        <columns>
-                <column hflex="min" align="right"/>
-                <column />
-            </columns>
-	        <rows>
-	            <row>
-	                <label>Codigo:</label>
-	                <textbox id="codeTextbox" value="" hflex="1"/>
-	            </row>
-	            <row>
-	                <label>Descripcion:</label>
-	                <textbox id="descriptionTextbox" value="" hflex="1"/>
-	            </row>
-	            <row>
-	                <label>Detalles:</label>
-	                <textbox id="detailsTextbox" value="" hflex="1"/>
-	            </row>
-	            <row>
-	                <label>Marca:</label>
-	                <textbox id="brandTextbox" value="" hflex="1"/>
-	            </row>
-	            <row>
-	                <label>Presentacion:</label>
-	                <textbox id="presentationTextbox" value="" hflex="1"/>
-	            </row>
-	            <row>
-	                <label>Medida:</label>
-	                <textbox id="measureTextbox" value="" hflex="1"/>
-	            </row>
-	            <row>
-	                <cell colspan="2" style="text-align:center">
-	                    <hlayout>
-	                        <button id="saveButton" label="Guardar"/>
-	                        <button id="cancelButton" label="Cancelar"/>
-	                        <button id="resetButton" label="Reset"/>
-	                        <button id="deleteButton" label="Eliminar"/>
-	                    </hlayout>
-	                </cell>
-	            </row>
-	        </rows>
-    	</grid>
-    </vlayout>
+	<panel border="none">
+        <panelchildren>
+		    <hlayout>
+		        <label>Buscar:</label>
+		        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
+		        <button id="searchButton" label="Buscar"/>
+		    </hlayout>
+		    <separator/>
+		    <listbox id="supplyTypeListbox" sizedByContent="true" span="true">
+		        <listhead>
+		            <listheader label="Codigo" align="center"/>
+		            <listheader label="Descripcion" align="center"/>
+		            <listheader label="Detalles" align="center"/>
+		            <listheader label="Marca" align="center"/>
+		            <listheader label="Presentacion" align="center"/>
+		            <listheader label="Medida" align="center"/>
+		        </listhead>
+		        <template name="model">
+		            <listitem>
+		                <listcell label="${each.code}"/>
+		                <listcell label="${each.description}"/>
+		                <listcell label="${each.details}"/>
+		                <listcell label="${each.brand}"/>
+		                <listcell label="${each.presentation}"/>
+		                <listcell label="${each.measure}"/>
+		            </listitem>
+		        </template>
+		    </listbox>
+			<paging id="pager" pageSize="10" sclass="sigma-paging"/>
+		    <vlayout>
+		        <separator/>
+		        <hbox>
+		            <button id="newButton" label="Nuevo"/>
+		        </hbox>
+		        <separator/>
+				<grid id="supplyTypeGrid" width="400px" sclass="sigma-form" visible="false">
+			        <columns>
+		                <column hflex="min" align="right"/>
+		                <column />
+		            </columns>
+			        <rows>
+			            <row>
+			                <label>Codigo:</label>
+			                <textbox id="codeTextbox" value="" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Descripcion:</label>
+			                <textbox id="descriptionTextbox" value="" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Detalles:</label>
+			                <textbox id="detailsTextbox" value="" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Marca:</label>
+			                <textbox id="brandTextbox" value="" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Presentacion:</label>
+			                <textbox id="presentationTextbox" value="" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Medida:</label>
+			                <textbox id="measureTextbox" value="" hflex="1"/>
+			            </row>
+			            <row>
+			                <cell colspan="2" style="text-align:center">
+			                    <hlayout>
+			                        <button id="saveButton" label="Guardar"/>
+			                        <button id="cancelButton" label="Cancelar"/>
+			                        <button id="resetButton" label="Reset"/>
+			                        <button id="deleteButton" label="Eliminar"/>
+			                    </hlayout>
+			                </cell>
+			            </row>
+			        </rows>
+		    	</grid>
+		    </vlayout>
+        </panelchildren>
+    </panel>
 </window>

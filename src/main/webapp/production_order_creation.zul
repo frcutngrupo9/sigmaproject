@@ -59,27 +59,27 @@
                         </row>
                    </rows>
                 </grid>
-                <hbox pack="center" align="center">
-					<label value="Producto a Fabricar: "/>
-					<textbox id="productNameTextbox" width="40%"/>
+                <hbox hflex="1" pack="center">
+					<label value="Producto a Fabricar: " width="50%"/>
+					<textbox id="productNameTextbox"/>
 					<label value="Unidades a Fabricar: "/>
 					<intbox id="productUnitsIntbox"/>
 				</hbox>
-        		<grid id="productionOrderDetailGrid" sizedByContent="true" span="true">
+        		<grid id="productionOrderDetailGrid" hflex="1" sizedByContent="true" span="true">
     				<auxhead>
 						<auxheader label="Detalles Orden de Produccion" colspan="10"/>
 					</auxhead>
         			<columns>
-			            <column label="Proceso" align="center"/>
+			            <column label="Proceso" align="center" sort="auto(process.type.name)"/>
 			            <column label="Pieza" align="center"/>
 			            <column label="Maquina Necesaria" align="center"/>
 			            <column label="Detalles" align="center"/>
 			            <column label="Tiempo" align="center"/>
 			            <column label="Tiempo Total" align="center"/>
 			            <column label="Maquina Asignada" align="center"/>
-			            <column label="Cantidad Pieza" align="center"/>
-			            <column label="Cantidad Finalizada" align="center"/>
-			            <column label="Esta Finalizado?" align="center"/>
+			            <column label="Cant Pieza" align="center"/>
+			            <column label="Cant Finalizada" align="center"/>
+			            <column label="Finalizado?" align="center"/>
 		            </columns>
 		            <template name="model">
 		                <row>
@@ -89,13 +89,16 @@
 			            	<label value="${each.process.details}"/>
 			            	<label value="${r:getFormattedTime(each.process.time)}"/>
 			            	<label value="${r:getFormattedTime(each.timeTotal)}"/>
-			            	<combobox inplace="true"
-			            		forward="onSelect=productionOrderDetailGrid.onEditProductionOrderDetailMachine(${each}), onCreate=productionOrderDetailGrid.onCreateMachineCombobox(${each})"
-                        		model="${win_production_order_creation$composer.getMachineListModel(each)}" hflex="1" readonly="true">
-		                        <template name="model">
-		                            <comboitem label="${each.name}" />
-		                        </template>
-		                    </combobox>
+			            	<cell>
+				            	<combobox inplace="true" if="${win_production_order_creation$composer.isMachineNecessary(each.process)}"
+				            		forward="onSelect=productionOrderDetailGrid.onEditProductionOrderDetailMachine(${each}), onCreate=productionOrderDetailGrid.onCreateMachineCombobox(${each})"
+	                        		model="${win_production_order_creation$composer.getMachineListModel(each)}" hflex="1" readonly="true">
+			                        <template name="model">
+			                            <comboitem label="${each.name}" />
+			                        </template>
+			                    </combobox>
+			                    <label value="NO" if="${!win_production_order_creation$composer.isMachineNecessary(each.process)}"/>
+		                    </cell>
 			            	<label value="${each.quantityPiece}"/>
 			            	<doublebox inplace="true" value="${each.quantityFinished}" forward="onChange=productionOrderDetailGrid.onEditProductionOrderDetailQuantityFinished(${each})"/>
 			            	<checkbox checked="${each.isFinished()}" forward="onCheck=productionOrderDetailGrid.onEditProductionOrderDetailIsFinished(${each})"/>

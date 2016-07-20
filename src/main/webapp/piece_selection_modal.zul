@@ -2,34 +2,38 @@
     apply="ar.edu.utn.sigmaproject.controller.PieceSelectionModalController"
     position="center,center" closable="true"
     action="show: slideDown;hide: slideUp">
-    <vlayout>
-        <separator/>
-	    <listbox id="pieceListbox" mold="paging" pageSize="10" sizedByContent="true" span="true">
-	    	<auxhead>
-				<auxheader label="Piezas" colspan="7"/>
-			</auxhead>
-	        <listhead>
-	        	<listheader label="Producto" align="center"/>
-	        	<listheader label="Pieza" align="center"/>
-	            <listheader label="Longitud" align="center"/>
-	            <listheader label="Espesor" align="center"/>
-	            <listheader label="Ancho" align="center"/>
-	            <listheader label="Otras Medidas" align="center"/>
-	            <listheader label="Unidades" align="center"/>
-	        </listhead>
-	        <template name="model">
-	            <listitem>
-	            	<listcell label="${modalDialog$composer.getProductName(each)}"/>
-	            	<listcell label="${each.name}"/>
-	                <listcell label="${each.length.doubleValue()} ${each.lengthMeasureUnit.getShortName()}"/>
-	                <listcell label="${each.width.doubleValue()} ${each.widthMeasureUnit.getShortName()}"/>
-	                <listcell label="${each.depth.doubleValue()} ${each.depthMeasureUnit.getShortName()}"/>
-	                <listcell label="${each.size}"/>
-	                <listcell label="${each.units}"/>
-	            </listitem>
-	        </template>
-	    </listbox>
-	    <separator/>
-        <button id="closeButton" hflex="1" label="Cerrar"/>
-    </vlayout>
+	<panel border="rounded">
+        <panelchildren>
+			<vlayout>
+		        <separator/>
+			    <listbox id="pieceListbox" mold="paging" pageSize="10" sizedByContent="true" span="true">
+			    	<auxhead>
+						<auxheader label="Piezas" colspan="7"/>
+					</auxhead>
+			        <listhead>
+			        	<listheader label="Producto" align="center"/>
+			        	<listheader label="Pieza" align="center"/>
+			            <listheader label="Longitud" align="center"/>
+			            <listheader label="Espesor" align="center"/>
+			            <listheader label="Ancho" align="center"/>
+			            <listheader label="Otras Medidas" align="center"/>
+			            <listheader label="Unidades" align="center"/>
+			        </listhead>
+			        <template name="model">
+			            <listitem>
+			            	<listcell label="${modalDialog$composer.getProductName(each)}"/>
+			            	<listcell label="${each.name}"/>
+			                <listcell label="${each.length.doubleValue()} ${each.lengthMeasureUnit.getShortName()}"/>
+			                <listcell label="${each.width.doubleValue()} ${each.widthMeasureUnit.getShortName()}"/>
+			                <listcell label="${each.depth.doubleValue()} ${each.depthMeasureUnit.getShortName()}"/>
+			                <listcell label="${each.size}"/>
+			                <listcell label="${each.units}"/>
+			            </listitem>
+			        </template>
+			    </listbox>
+			    <separator/>
+		        <button id="closeButton" hflex="1" label="Cerrar"/>
+		    </vlayout>
+        </panelchildren>
+    </panel>
 </window>

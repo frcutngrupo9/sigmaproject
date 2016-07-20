@@ -17,8 +17,6 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Datebox;
-import org.zkoss.zul.Doublebox;
-import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
@@ -37,6 +35,7 @@ import ar.edu.utn.sigmaproject.domain.SupplyReserved;
 import ar.edu.utn.sigmaproject.domain.Wood;
 import ar.edu.utn.sigmaproject.domain.WoodReserved;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
+import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.RawMaterialRequirementRepository;
 import ar.edu.utn.sigmaproject.service.SupplyRequirementRepository;
 import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
@@ -61,6 +60,8 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	// services
 	@WireVariable
 	private ProductRepository productRepository;
+	@WireVariable
+	private ProductionPlanRepository productionPlanRepository;
 	@WireVariable
 	private WoodRepository woodRepository;
 	@WireVariable
@@ -114,6 +115,8 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 					supplyRequirementList = auxSupplyRequirementList;
 				}
 				supplyRequirementList = supplyRequirementRepository.save(supplyRequirementList);
+				currentProductionPlan.setSupplyRequirements(supplyRequirementList);
+				currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
 			}
 
 			rawMaterialRequirementList = currentProductionPlan.getRawMaterialRequirements();
@@ -141,6 +144,8 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 					rawMaterialRequirementList = auxRawMaterialRequirementList;
 				}
 				rawMaterialRequirementList = rawMaterialRequirementRepository.save(rawMaterialRequirementList);
+				currentProductionPlan.setRawMaterialRequirements(rawMaterialRequirementList);
+				currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
 			}
 
 			supplyRequirementListModel = new ListModelList<SupplyRequirement>(supplyRequirementList);
@@ -187,7 +192,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	}
 
 	public BigDecimal getRawMaterialStockReserved(RawMaterialRequirement rawMaterialRequirement) {
-		WoodReserved woodReserved = woodReservedRepository.findByRawMaterialRequirement(rawMaterialRequirement);
+		WoodReserved woodReserved = woodReservedRepository.findFirstByRawMaterialRequirement(rawMaterialRequirement);
 		if(woodReserved == null) {
 			return BigDecimal.ZERO;
 		} else {
@@ -213,6 +218,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 		map.put("selected_supply_requirement", data);
 		Window window = (Window)Executions.createComponents("/supply_reservation.zul", null, map);
 		window.doModal();
+		refreshView();
 	}
 	
 	@Listen("onClick = #returnButton")

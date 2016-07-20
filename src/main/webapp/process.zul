@@ -1,59 +1,63 @@
 <window id="win_process" title="Procesos" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProcessController" sclass="sigma-content">
-    <hlayout>
-        <label>Buscar:</label>
-        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
-        <button id="searchButton" label="Buscar"/>
-    </hlayout>
-    <separator/>
-    <listbox id="processTypeListbox">
-        <listhead>
-            <listheader label="Nombre" align="center"/>
-            <listheader label="Maquina Necesaria" align="center"/>
-        </listhead>
-        <template name="model">
-            <listitem>
-                <listcell label="${each.name}"/>
-                <listcell label="${empty each.machineType.name ? 'Ninguna' : each.machineType.name}"/>
-            </listitem>
-        </template>
-    </listbox>
-    <paging id="pager" pageSize="10" sclass="sigma-paging"/>
-    <separator/>
-    <vlayout>
-        <separator/>
-        <hbox>
-            <button id="newButton" label="Nuevo"/>
-        </hbox>
-        <separator/>
-		<grid id="processTypeGrid" width="400px" sclass="sigma-form" visible="false">
-	        <columns>
-                <column hflex="min" align="right"/>
-                <column />
-            </columns>
-	        <rows>
-	            <row>
-	                <label>Nombre:</label>
-	                <textbox id="nameTextbox" hflex="1"/>
-	            </row>
-	            <row>
-	                <label>Maquina Necesaria:</label>
-	                <combobox id="machineTypeCombobox">
-                        <template name="model">
-                            <comboitem label="${each.name}" />
-                        </template>
-                    </combobox>
-	            </row>
-	            <row>
-	                <cell colspan="2" style="text-align:center">
-	                    <hlayout>
-	                        <button id="saveButton" label="Guardar"/>
-	                        <button id="cancelButton" label="Cancelar"/>
-	                        <button id="resetButton" label="Reset"/>
-	                        <button id="deleteButton" label="Eliminar"/>
-	                    </hlayout>
-	                </cell>
-	            </row>
-	        </rows>
-    	</grid>
-    </vlayout>
+	<panel border="none">
+        <panelchildren>
+		    <hlayout>
+		        <label>Buscar:</label>
+		        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
+		        <button id="searchButton" label="Buscar"/>
+		    </hlayout>
+		    <separator/>
+		    <listbox id="processTypeListbox">
+		        <listhead>
+		            <listheader label="Nombre" align="center"/>
+		            <listheader label="Maquina Necesaria" align="center"/>
+		        </listhead>
+		        <template name="model">
+		            <listitem>
+		                <listcell label="${each.name}"/>
+		                <listcell label="${empty each.machineType.name ? 'Ninguna' : each.machineType.name}"/>
+		            </listitem>
+		        </template>
+		    </listbox>
+		    <paging id="pager" pageSize="10" sclass="sigma-paging"/>
+		    <separator/>
+		    <vlayout>
+		        <separator/>
+		        <hbox>
+		            <button id="newButton" label="Nuevo"/>
+		        </hbox>
+		        <separator/>
+				<grid id="processTypeGrid" width="400px" sclass="sigma-form" visible="false">
+			        <columns>
+		                <column hflex="min" align="right"/>
+		                <column />
+		            </columns>
+			        <rows>
+			            <row>
+			                <label>Nombre:</label>
+			                <textbox id="nameTextbox" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Maquina Necesaria:</label>
+			                <combobox id="machineTypeCombobox">
+		                        <template name="model">
+		                            <comboitem label="${each.name}" />
+		                        </template>
+		                    </combobox>
+			            </row>
+			            <row>
+			                <cell colspan="2" style="text-align:center">
+			                    <hlayout>
+			                        <button id="saveButton" label="Guardar"/>
+			                        <button id="cancelButton" label="Cancelar"/>
+			                        <button id="resetButton" label="Reset"/>
+			                        <button id="deleteButton" label="Eliminar"/>
+			                    </hlayout>
+			                </cell>
+			            </row>
+			        </rows>
+		    	</grid>
+		    </vlayout>
+        </panelchildren>
+    </panel>
 </window>

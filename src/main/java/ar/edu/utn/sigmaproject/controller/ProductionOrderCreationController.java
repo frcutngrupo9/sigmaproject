@@ -236,7 +236,14 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		if(process.getType().getMachineType() != null) {
 			return process.getType().getMachineType().getName();
 		}
-		return "";
+		return "NO";
+	}
+	
+	public boolean isMachineNecessary(Process process) {
+		if(process.getType().getMachineType() != null) {
+			return true;
+		}
+		return false;
 	}
 
 	public ListModelList<Machine> getMachineListModel(ProductionOrderDetail productionOrderDetail) {
@@ -272,7 +279,16 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	public void doEditProductionOrderDetailMachine(ForwardEvent evt) {
 		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
 		Combobox element = (Combobox) evt.getOrigin().getTarget();// obtenemos el elemento web
-		data.setMachine((Machine)element.getSelectedItem().getValue());// cargamos al objeto el valor actualizado del elemento web
+		Machine machine = (Machine)element.getSelectedItem().getValue();
+		data.setMachine(machine);// cargamos al objeto el valor actualizado del elemento web
+		// asigna la misma maquina a todos los detalles que necesitan ese tipo de maquina
+//		for(ProductionOrderDetail each : productionOrderDetailList) {
+//			if(!data.equals(each)) {// no modifica el mismo detalle
+//				if(each.getProcess().getType().getMachineType().equals(machine.getMachineType())) {
+//					each.setMachine(machine);
+//				}
+//			}
+//		}//TODO
 	}
 
 	@Listen("onEditProductionOrderDetailQuantityFinished = #productionOrderDetailGrid")
