@@ -112,7 +112,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 					}
 				}
 				if(auxSupplyRequirementList.isEmpty() != true) {
-					supplyRequirementList = auxSupplyRequirementList;
+					supplyRequirementList.addAll(auxSupplyRequirementList);
 				}
 				supplyRequirementList = supplyRequirementRepository.save(supplyRequirementList);
 				currentProductionPlan.setSupplyRequirements(supplyRequirementList);

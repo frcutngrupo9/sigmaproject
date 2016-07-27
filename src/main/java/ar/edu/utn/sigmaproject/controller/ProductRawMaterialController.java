@@ -1,7 +1,6 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
@@ -24,11 +23,8 @@ import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
-import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.RawMaterial;
 import ar.edu.utn.sigmaproject.domain.RawMaterialType;
-import ar.edu.utn.sigmaproject.service.ProductRepository;
-import ar.edu.utn.sigmaproject.service.RawMaterialRepository;
 import ar.edu.utn.sigmaproject.service.RawMaterialTypeRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -60,14 +56,9 @@ public class ProductRawMaterialController extends SelectorComposer<Component> {
 
 	// services
 	@WireVariable
-	private ProductRepository productRepository;
-	@WireVariable
-	private RawMaterialRepository rawMaterialRepository;
-	@WireVariable
 	private RawMaterialTypeRepository rawMaterialTypeRepository;
 
 	// attributes
-	private Product currentProduct;
 	private RawMaterial currentRawMaterial;
 	private RawMaterialType currentRawMaterialType;
 
@@ -79,17 +70,12 @@ public class ProductRawMaterialController extends SelectorComposer<Component> {
 	private ListModelList<RawMaterial> rawMaterialListModel;
 	private ListModelList<RawMaterialType> rawMaterialTypePopupListModel;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		
-		currentProduct = (Product) Executions.getCurrent().getAttribute("selected_product");
-		if(currentProduct == null) {
-			alert("Product null");
-			rawMaterialList = new ArrayList<>();
-		} else {
-			rawMaterialList = currentProduct.getRawMaterials();
-		}
+		rawMaterialList = (List<RawMaterial>) Executions.getCurrent().getAttribute("rawMaterialList");
 		
 		currentRawMaterial = null;
 		currentRawMaterialType = null;
@@ -100,15 +86,8 @@ public class ProductRawMaterialController extends SelectorComposer<Component> {
 	
 	@Listen("onClick = #acceptRawMaterialListButton")
 	public void acceptRawMaterialListButtonClick() {
-		if(currentProduct != null) {
-			for(RawMaterial each : rawMaterialList) {
-				each = rawMaterialRepository.save(each);
-			}
-			currentProduct.setRawMaterials(rawMaterialList);
-			currentProduct = productRepository.save(currentProduct);
-		}
 		EventQueue<Event> eq = EventQueues.lookup("Product Change Queue", EventQueues.DESKTOP, true);
-		eq.publish(new Event("onProductChange", null, currentProduct));
+		eq.publish(new Event("onRawMaterialChange", null, rawMaterialList));
 		productRawMaterialWindow.detach();
 	}
 
