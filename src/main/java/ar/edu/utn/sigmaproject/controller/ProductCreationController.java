@@ -202,7 +202,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		lengthMeasureUnitSelectbox.setModel(lengthMeasureUnitListModel);
 		depthMeasureUnitSelectbox.setModel(depthMeasureUnitListModel);
 		widthMeasureUnitSelectbox.setModel(widthMeasureUnitListModel);
-		
+
 		currentProduct = (Product) Executions.getCurrent().getAttribute("selected_product");
 		currentPiece = null;
 
@@ -278,18 +278,16 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		}
 		currentProduct.setPieces(pieceList);
 		for(Piece eachPiece : currentProduct.getPieces()) {
-			for(Process eachProcess : eachPiece.getProcesses()) {
-				eachProcess = processRepository.save(eachProcess);
-			}
+			processRepository.save(eachPiece.getProcesses());
 			eachPiece = pieceRepository.save(eachPiece);
 		}
 		supplyRepository.save(supplyList);
 		currentProduct.setSupplies(supplyList);
 		rawMaterialRepository.save(rawMaterialList);
 		currentProduct.setRawMaterials(rawMaterialList);
-		
+
 		currentProduct = productRepository.save(currentProduct);
-		
+
 		// mostrar mensaje al user
 		Clients.showNotification("Producto guardado");
 
@@ -429,9 +427,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			pieceListbox.setModel(pieceListModel);
 			supplyList = new ArrayList<>();
 			rawMaterialList = new ArrayList<>();
-			// no se permite agregar insumos o materias prima mientras el producto no est� guardado
-			openRawMaterialListButton.setDisabled(true);
-			openSupplyListButton.setDisabled(true);
 		} else {
 			productCaption.setLabel("Edicion de Producto");
 			deleteProductButton.setDisabled(false);
@@ -466,8 +461,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			pieceListbox.setModel(pieceListModel);
 			supplyList = new ArrayList<>(currentProduct.getSupplies());
 			rawMaterialList = new ArrayList<>(currentProduct.getRawMaterials());
-			openRawMaterialListButton.setDisabled(false);
-			openSupplyListButton.setDisabled(false);
 		}
 	}
 
@@ -708,7 +701,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		if(pieceListModel.isSelectionEmpty()) {
 			//just in case for the no selection
 			currentPiece = null;
-		}else {
+		} else {
 			if(currentPiece == null) {// si no hay nada editandose
 				currentPiece = pieceListbox.getSelectedItem().getValue();
 				refreshViewPiece();
@@ -753,7 +746,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 					}
 				}
 			});
-
 		}
 	}
 
@@ -770,7 +762,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		pieceCreationBlock.setVisible(true);
 		processCreationBlock.setVisible(true);
 	}
-	
+
 	@Listen("onClick = #pieceCopyButton")
 	public void doPieceCopyButtonClick() {
 		newPieceButtonClick();
@@ -817,14 +809,14 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		}
 		refreshViewProcess();
 	}
-	
+
 	@Listen("onClick = #openRawMaterialListButton")
 	public void openRawMaterialListButtonClick() {
 		Executions.getCurrent().setAttribute("rawMaterialList", rawMaterialList);
 		Window window = (Window)Executions.createComponents("/product_raw_material.zul", null, null);
 		window.doModal();
 	}
-	
+
 	@Listen("onClick = #openSupplyListButton")
 	public void openSupplyListButtonClick() {
 		Executions.getCurrent().setAttribute("supplyList", supplyList);
