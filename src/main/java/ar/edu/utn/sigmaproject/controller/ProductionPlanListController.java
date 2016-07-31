@@ -89,10 +89,10 @@ public class ProductionPlanListController  extends SelectorComposer<Component> {
 		if(aux == null) {
 			return "No Generado";
 		} else {
-			if(aux.getState() == null) {
+			if(aux.getCurrentStateType() == null) {
 				return "Generado";
 			} else {
-				return aux.getState().getName();
+				return aux.getCurrentStateType().getName();
 			}
 		}
 

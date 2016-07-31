@@ -26,10 +26,10 @@ public class Order implements Serializable, Cloneable {
 
 	@OneToMany(orphanRemoval = true)
 	@OrderColumn(name = "detail_index")
-	List<OrderDetail> details = new ArrayList<OrderDetail>();
+	List<OrderDetail> details = new ArrayList<>();
 
 	@OneToMany(orphanRemoval = true)
-	List<OrderState> states = new ArrayList<OrderState>();
+	List<OrderState> states = new ArrayList<>();
 
 	Integer number = 0;
 	Date date = new Date();

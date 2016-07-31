@@ -19,7 +19,7 @@ import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductCategory;
-import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderStateType;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.domain.RawMaterialType;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
@@ -35,7 +35,7 @@ import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductCategoryRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.RawMaterialTypeRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
@@ -56,7 +56,7 @@ public class RepositoryHelper {
 	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
 
 	@Autowired
-	private ProductionOrderStateRepository productionOrderStateRepository;
+	private ProductionOrderStateTypeRepository productionOrderStateTypeRepository;
 
 	@Autowired
 	private OrderStateTypeRepository orderStateTypeRepository;
@@ -98,7 +98,7 @@ public class RepositoryHelper {
 	public void afterConstruct() {
 		generateMeasureUnitTypeList();
 		generateProductionPlanStateTypes();
-		generateProductionOrderStates();
+		generateProductionOrderStateTypes();
 		generateOrderStateType();
 		generateProduct();
 		generateProcessType();
@@ -158,14 +158,14 @@ public class RepositoryHelper {
 		}
 	}
 
-	private void generateProductionOrderStates() {
-		if (productionOrderStateRepository.count() == 0) {
-			List<ProductionOrderState> list = new ArrayList<>();
-			list.add(new ProductionOrderState("Generada"));
-			list.add(new ProductionOrderState("Iniciada"));
-			list.add(new ProductionOrderState("Finalizada"));
-			list.add(new ProductionOrderState("Cancelada"));
-			productionOrderStateRepository.save(list);
+	private void generateProductionOrderStateTypes() {
+		if (productionOrderStateTypeRepository.count() == 0) {
+			List<ProductionOrderStateType> list = new ArrayList<>();
+			list.add(new ProductionOrderStateType("Generada"));
+			list.add(new ProductionOrderStateType("Iniciada"));
+			list.add(new ProductionOrderStateType("Finalizada"));
+			list.add(new ProductionOrderStateType("Cancelada"));
+			productionOrderStateTypeRepository.save(list);
 		}
 	}
 
@@ -339,11 +339,16 @@ public class RepositoryHelper {
 	private void generateSupplyType() {
 		if (supplyTypeRepository.count() == 0) {
 			List<SupplyType> list = new ArrayList<>();
-			list.add(new SupplyType("15", "Tornillo Autoperforante Hexagonal Punta Mecha 14x4".toUpperCase(), "", "", "", "14x4", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-			list.add(new SupplyType("16", "Tornillo Fix Autoperforante 3x35".toUpperCase(), "", "", "", "3x35", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-			list.add(new SupplyType("26", "Arandela Plana Zincada 5/16".toUpperCase(), "", "", "", "5/16", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-			list.add(new SupplyType("27", "Arandela Plana Zincada 1/4".toUpperCase(), "", "", "", "1/4", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-			list.add(new SupplyType("34", "Tuerca Zincada Alta 7/16".toUpperCase(), "", "", "", "7/16", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+			list.add(new SupplyType("1", "INSUMO 1", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+			list.add(new SupplyType("2", "INSUMO 2", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+			list.add(new SupplyType("3", "INSUMO 3", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+			list.add(new SupplyType("4", "INSUMO 4", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+			list.add(new SupplyType("5", "INSUMO 5", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+//			list.add(new SupplyType("15", "Tornillo Autoperforante Hexagonal Punta Mecha 14x4".toUpperCase(), "", "", "", "14x4", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+//			list.add(new SupplyType("16", "Tornillo Fix Autoperforante 3x35".toUpperCase(), "", "", "", "3x35", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+//			list.add(new SupplyType("26", "Arandela Plana Zincada 5/16".toUpperCase(), "", "", "", "5/16", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+//			list.add(new SupplyType("27", "Arandela Plana Zincada 1/4".toUpperCase(), "", "", "", "1/4", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+//			list.add(new SupplyType("34", "Tuerca Zincada Alta 7/16".toUpperCase(), "", "", "", "7/16", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
 			supplyTypeRepository.save(list);
 		}
 	}

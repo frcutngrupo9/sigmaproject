@@ -25,7 +25,6 @@ import ar.edu.utn.sigmaproject.domain.MachineType;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
-import ar.edu.utn.sigmaproject.domain.ProductTotal;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
@@ -33,6 +32,7 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
 
@@ -62,6 +62,8 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
 	@WireVariable
 	private ProductionOrderStateRepository productionOrderStateRepository;
+	@WireVariable
+	private ProductionOrderStateTypeRepository productionOrderStateTypeRepository;
 
 	// atributes
 	private ProductionPlan currentProductionPlan;
@@ -75,21 +77,11 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-
 		currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
 		if(currentProductionPlan == null) {throw new RuntimeException("ProductionPlan not found");}
 		productionOrderList = productionOrderRepository.findByProductionPlan(currentProductionPlan);
-		if(productionOrderList.isEmpty()) {
-			List<ProductTotal> productTotalList = currentProductionPlan.getProductTotalList();
-			for(ProductTotal each : productTotalList) {
-				ProductionOrder productionOrder = new ProductionOrder(currentProductionPlan, each.getProduct(), null, null, each.getTotalUnits(), null, null, productionOrderStateRepository.findFirstByName("Generada"));
-				productionOrder = productionOrderRepository.save(productionOrder);
-				productionOrderList.add(productionOrder);
-			}
-		}
 		productionOrderListModel = new ListModelList<ProductionOrder>(productionOrderList);
 		productionOrderGrid.setModel(productionOrderListModel);
-
 		refreshView();
 	}
 
@@ -198,14 +190,14 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		if(aux == null) {
 			return false;
 		} else {
-			if(aux.getState()!=null && aux.getState().getName().equals("Cancelada")) {
+			if(aux.getCurrentStateType()!=null && aux.getCurrentStateType().getName().equals("Cancelada")) {
 				return true;
 			} else {
 				return false;
 			}
 		}
 	}
-	
+
 	@Listen("onClick = #returnButton")
 	public void returnButtonClick() {
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();

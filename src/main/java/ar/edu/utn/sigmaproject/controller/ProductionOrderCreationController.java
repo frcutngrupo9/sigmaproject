@@ -38,6 +38,7 @@ import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderStateType;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.domain.Worker;
@@ -46,6 +47,7 @@ import ar.edu.utn.sigmaproject.service.PieceRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.WorkerRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -79,7 +81,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	@Wire
 	Button resetButton;
 	@Wire
-	Combobox productionOrderStateCombobox;
+	Combobox productionOrderStateTypeCombobox;
 
 	// services
 	@WireVariable
@@ -88,6 +90,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	private ProductionOrderDetailRepository productionOrderDetailRepository;
 	@WireVariable
 	private ProductionOrderStateRepository productionOrderStateRepository;
+	@WireVariable
+	private ProductionOrderStateTypeRepository productionOrderStateTypeRepository;
 	@WireVariable
 	private MachineRepository machineRepository;
 	@WireVariable
@@ -107,7 +111,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	// list models
 	private ListModelList<ProductionOrderDetail> productionOrderDetailListModel;
 	private ListModelList<Worker> workerListModel;
-	private ListModelList<ProductionOrderState> productionOrderStateListModel;
+	private ListModelList<ProductionOrderStateType> productionOrderStateTypeListModel;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
@@ -138,9 +142,9 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 		machineList = machineRepository.findAll();
 
-		List<ProductionOrderState> productionOrderStateList = productionOrderStateRepository.findAll();
-		productionOrderStateListModel = new ListModelList<ProductionOrderState>(productionOrderStateList);
-		productionOrderStateCombobox.setModel(productionOrderStateListModel);
+		List<ProductionOrderStateType> productionOrderStateTypeList = productionOrderStateTypeRepository.findAll();
+		productionOrderStateTypeListModel = new ListModelList<ProductionOrderStateType>(productionOrderStateTypeList);
+		productionOrderStateTypeCombobox.setModel(productionOrderStateTypeListModel);
 		refreshView();
 	}
 
@@ -170,8 +174,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		}
 		productionOrderFinishedDatebox.setValue(currentProductionOrder.getDateFinished());
 		productionOrderDetailGrid.setModel(productionOrderDetailListModel);
-		productionOrderStateListModel.addToSelection(currentProductionOrder.getState());
-		productionOrderStateCombobox.setModel(productionOrderStateListModel);
+		productionOrderStateTypeListModel.addToSelection(currentProductionOrder.getCurrentStateType());
+		productionOrderStateTypeCombobox.setModel(productionOrderStateTypeListModel);
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		resetButton.setDisabled(false);
@@ -184,7 +188,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			Clients.showNotification("Debe seleccionar un Empleado", workerCombobox);
 			return;
 		}
-		if(!productionOrderStateCombobox.getSelectedItem().getValue().equals(productionOrderStateRepository.findFirstByName("Generada"))) {
+		if(!productionOrderStateTypeCombobox.getSelectedItem().getValue().equals(productionOrderStateTypeRepository.findFirstByName("Generada"))) {
 			for (ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
 				Process process = productionOrderDetail.getProcess();
 				ProcessType processType = process.getType();
@@ -201,15 +205,13 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		Worker productionOrderWorker = workerCombobox.getSelectedItem().getValue();
 		Date productionOrderDate = productionOrderDatebox.getValue();
 		Date productionOrderDateFinished = productionOrderFinishedDatebox.getValue();
-		ProductionOrderState productionOrderState = productionOrderStateCombobox.getSelectedItem().getValue();
+		ProductionOrderState productionOrderState = productionOrderStateTypeCombobox.getSelectedItem().getValue();
 		currentProductionOrder.setNumber(productionOrderNumber);
 		currentProductionOrder.setWorker(productionOrderWorker);
 		currentProductionOrder.setDate(productionOrderDate);
 		currentProductionOrder.setDateFinished(productionOrderDateFinished);
 		currentProductionOrder.setState(productionOrderState);
-		for (ProductionOrderDetail each : productionOrderDetailList) {
-			each = productionOrderDetailRepository.save(each);
-		}
+		productionOrderDetailList = productionOrderDetailRepository.save(productionOrderDetailList);
 		currentProductionOrder.setDetails(productionOrderDetailList);
 		currentProductionOrder = productionOrderRepository.save(currentProductionOrder);
 		alert("Orden de Produccion Guardada.");
@@ -238,7 +240,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		}
 		return "NO";
 	}
-	
+
 	public boolean isMachineNecessary(Process process) {
 		if(process.getType().getMachineType() != null) {
 			return true;
@@ -282,13 +284,13 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		Machine machine = (Machine)element.getSelectedItem().getValue();
 		data.setMachine(machine);// cargamos al objeto el valor actualizado del elemento web
 		// asigna la misma maquina a todos los detalles que necesitan ese tipo de maquina
-//		for(ProductionOrderDetail each : productionOrderDetailList) {
-//			if(!data.equals(each)) {// no modifica el mismo detalle
-//				if(each.getProcess().getType().getMachineType().equals(machine.getMachineType())) {
-//					each.setMachine(machine);
-//				}
-//			}
-//		}//TODO
+		//		for(ProductionOrderDetail each : productionOrderDetailList) {
+		//			if(!data.equals(each)) {// no modifica el mismo detalle
+		//				if(each.getProcess().getType().getMachineType().equals(machine.getMachineType())) {
+		//					each.setMachine(machine);
+		//				}
+		//			}
+		//		}//TODO
 	}
 
 	@Listen("onEditProductionOrderDetailQuantityFinished = #productionOrderDetailGrid")

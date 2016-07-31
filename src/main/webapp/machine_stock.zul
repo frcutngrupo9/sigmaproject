@@ -11,7 +11,7 @@
 		        <listhead>
 		            <listheader label="Nombre" align="center"/>
 		            <listheader label="Tipo Maquina" align="center"/>
-		            <listheader label="Anio" align="center"/>
+		            <listheader label="Modelo" align="center"/>
 		            <listheader label="Tiempo de Uso" align="center"/>
 		        </listhead>
 		        <template name="model">
