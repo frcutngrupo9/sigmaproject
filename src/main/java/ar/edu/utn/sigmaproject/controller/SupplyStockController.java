@@ -3,8 +3,6 @@ package ar.edu.utn.sigmaproject.controller;
 import java.math.BigDecimal;
 import java.util.List;
 
-import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
-import ar.edu.utn.sigmaproject.service.WorkerRepository;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -22,8 +20,15 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
+import ar.edu.utn.sigmaproject.domain.ProductionPlan;
+import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
+import ar.edu.utn.sigmaproject.domain.SupplyReserved;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.domain.Worker;
+import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
+import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
+import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
+import ar.edu.utn.sigmaproject.service.WorkerRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SupplyStockController extends SelectorComposer<Component> {
@@ -33,6 +38,8 @@ public class SupplyStockController extends SelectorComposer<Component> {
 	Textbox searchTextbox;
 	@Wire
 	Listbox supplyTypeListbox;
+	@Wire
+	Listbox supplyReservedListbox;
 	@Wire
 	Grid supplyTypeExistenceGrid;
 	@Wire
@@ -78,25 +85,34 @@ public class SupplyStockController extends SelectorComposer<Component> {
 	@WireVariable
 	private SupplyTypeRepository supplyTypeRepository;
 	@WireVariable
+	private SupplyReservedRepository supplyReservedRepository;
+	@WireVariable
 	private WorkerRepository workerRepository;
+	@WireVariable
+	private ProductionPlanRepository productionPlanRepository;
 
 	// attributes
 	private SupplyType currentSupplyType;
 
 	// list
 	private List<SupplyType> supplyTypeList;
+	private List<SupplyReserved> supplyReservedList;
 	private List<Worker> workerList;
 
 	// list models
 	private ListModelList<SupplyType> supplyTypeListModel;
+	private ListModelList<SupplyReserved> supplyReservedListModel;
 	private ListModelList<Worker> workerListModel;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		supplyTypeList = supplyTypeRepository.findAll();
-		supplyTypeListModel = new ListModelList<SupplyType>(supplyTypeList);
+		supplyTypeListModel = new ListModelList<>(supplyTypeList);
 		supplyTypeListbox.setModel(supplyTypeListModel);
+		supplyReservedList = supplyReservedRepository.findAll();
+		supplyReservedListModel = new ListModelList<>(supplyReservedList);
+		supplyReservedListbox.setModel(supplyReservedListModel);
 		currentSupplyType = null;
 		workerList = workerRepository.findAll();
 		workerListModel = new ListModelList<Worker>(workerList);
@@ -224,9 +240,6 @@ public class SupplyStockController extends SelectorComposer<Component> {
 				}
 			}
 			stockDoublebox.setValue(newStock.doubleValue());
-			//			currentWood.setStock(newStock);
-			//			currentWood = woodService.updateWood(currentWood);
-			//			refreshView();
 		}
 		stockModificationGrid.setVisible(false);
 	}
@@ -241,5 +254,41 @@ public class SupplyStockController extends SelectorComposer<Component> {
 		workerCombobox.setSelectedIndex(-1);
 		numberIntbox.setValue(null);
 		quantityDoublebox.setValue(null);
+	}
+	
+	public String getProductionPlanName(SupplyReserved supplyReserved) {
+		if(supplyReserved == null) {
+			return "";
+		} else {
+			SupplyRequirement supplyRequirement = supplyReserved.getSupplyRequirement();
+			if(supplyRequirement != null) {
+				ProductionPlan productionPlan = productionPlanRepository.findBySupplyRequirements(supplyRequirement);
+				if(productionPlan != null) {
+					return productionPlan.getName();
+				} else {
+					return "";
+				}
+			} else {
+				return "";
+			}
+		}
+	}
+	
+	public BigDecimal getSupplyStockReserved(SupplyType supplyType) {
+		List<SupplyReserved> supplyReservedTotal = supplyReservedRepository.findBySupplyRequirementSupplyType(supplyType);
+		BigDecimal stockReservedTotal = BigDecimal.ZERO;
+		for(SupplyReserved each : supplyReservedTotal) {
+			if(!each.isWithdrawn()) {// suma todas las reservas del insumo que aun no han sido retiradas
+				stockReservedTotal = stockReservedTotal.add(each.getStockReserved());
+			}
+		}
+		return stockReservedTotal;
+	}
+
+	public BigDecimal getSupplyStockAvailable(SupplyType supplyType) {
+		// devuelve la diferencia entre el stock total y el total reservado
+		BigDecimal stockTotal = supplyType.getStock();
+		BigDecimal stockReservedTotal = getSupplyStockReserved(supplyType);
+		return stockTotal.subtract(stockReservedTotal);
 	}
 }

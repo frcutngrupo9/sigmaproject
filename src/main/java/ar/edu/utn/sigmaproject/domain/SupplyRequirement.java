@@ -17,8 +17,6 @@ public class SupplyRequirement implements Serializable, Cloneable {
 
 	BigDecimal quantity = BigDecimal.ZERO;
 
-	boolean isFulfilled;
-
 	public SupplyRequirement() {
 
 	}
@@ -26,7 +24,6 @@ public class SupplyRequirement implements Serializable, Cloneable {
 	public SupplyRequirement(SupplyType supplyType, BigDecimal quantity) {
 		this.supplyType = supplyType;
 		this.quantity = quantity;
-		isFulfilled = false;
 	}
 
 	public Long getId() {
@@ -51,14 +48,6 @@ public class SupplyRequirement implements Serializable, Cloneable {
 
 	public void setQuantity(BigDecimal quantity) {
 		this.quantity = quantity;
-	}
-
-	public boolean isFulfilled() {
-		return isFulfilled;
-	}
-
-	public void setFulfilled(boolean isFulfilled) {
-		this.isFulfilled = isFulfilled;
 	}
 
 	@Override

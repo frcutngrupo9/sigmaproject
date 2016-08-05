@@ -32,7 +32,7 @@
                     </bandbox>
                     <label value="Cantidad: "/>
                     <doublebox id="supplyQuantityDoublebox" constraint="no negative" width="36px"/>
-                    <button id="saveSupplyButton" label="Grabar Insumo"/>
+                    <button id="saveSupplyButton" label="Agregar Insumo"/>
                     <button id="resetSupplyButton" label="Reset Insumo"/>
                     <button id="deleteSupplyButton" label="Eliminar Insumo"/>
                     <button id="cancelSupplyButton" label="Cancelar Edicion"/>

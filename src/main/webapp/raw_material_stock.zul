@@ -1,142 +1,152 @@
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="win_raw_material_stock" title="Stock de Materia Prima" closable="false" apply="ar.edu.utn.sigmaproject.controller.RawMaterialStockController" sclass="sigma-content">
-    <hlayout>
-        <label>Buscar:</label>
-        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
-        <button id="searchButton" label="Buscar"/>
-    </hlayout>
-    <separator/>
-    <listbox id="woodListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
-    	<auxhead>
-			<auxheader label="Materia Prima" colspan="7"/>
-		</auxhead>
-        <listhead>
-        	<listheader label="Codigo" align="center"/>
-            <listheader label="Nombre" align="center"/>
-            <listheader label="Medidas" align="center"/>
-            <listheader label="Madera" align="center"/>
-            <listheader label="Stock Actual" align="center"/>
-            <listheader label="Stock Minimo" align="center"/>
-            <listheader label="Stock Reposicion" align="center"/>
-        </listhead>
-        <template name="model">
-            <listitem>
-                <listcell label="${each.code}"/>
-                <listcell label="${each.rawMaterialType.name}"/>
-                <listcell label="${r:getFormattedMeasure(each.rawMaterialType)}"/>
-                <listcell label="${each.woodType.name}"/>
-                <listcell label="${each.stock}"/>
-                <listcell label="${each.stockMin}"/>
-                <listcell label="${each.stockRepo}"/>
-            </listitem>
-        </template>
-    </listbox>
-    <vlayout>
-    	<separator/>
-        <hbox>
-            <button id="newButton" label="Nueva Materia Prima en Stock"/>
-        </hbox>
-        <separator/>
-		<grid id="woodCreationGrid" width="45%" sclass="sigma-form" visible="false">
-	        <columns>
-                <column hflex="min" align="right"/>
-                <column />
-            </columns>
-	        <rows>
-	        	<row>
-	                <label>Codigo:</label>
-	                <textbox id="codeTextbox" value="" hflex="1"/>
-	            </row>
-	        	<row>
-	                <label>Materia Prima:</label>
-	                <combobox id="rawMaterialTypeCombobox" readonly="true">
-                        <template name="model">
-                            <comboitem label="${each.name}" value="${each}"/>
-                        </template>
-                    </combobox>
-	            </row>
-	            <row>
-	                <label>Madera:</label>
-	                <combobox id="woodTypeCombobox" readonly="true">
-                        <template name="model">
-                            <comboitem label="${each.name}" value="${each}"/>
-                        </template>
-                    </combobox>
-	            </row>
-	            <row>
-	                <label>Nombre Materia Prima:</label>
-	                <textbox id="nameTextbox" value="" hflex="1"/>
-	            </row>
-	            <row>
-	                <label>Medidas:</label>
-	                <textbox id="measureTextbox" value="" hflex="1"/>
-	            </row>
-	            <row>
-	                <label>Stock Actual:</label>
-	                <cell colspan="1" style="text-align:center">
-	                	<hbox>
-		                	<doublebox id="stockDoublebox" value="0" width="100px"/>
-		                	<button id="stockIncreaseButton" label="Registro Ingreso"/>
-		                	<button id="stockDecreaseButton" label="Registro Egreso"/>
-	                	</hbox>
-	                </cell>
-	            </row>
-	            <row>
-	                <label>Stock Minimo:</label>
-	                <doublebox id="stockMinDoublebox" value="0" width="100px"/>
-	            </row>
-	            <row>
-	                <label>Stock Reposicion:</label>
-	                <doublebox id="stockRepoDoublebox" value="0" width="100px"/>
-	            </row>
-	            <row>
-	                <cell colspan="2" style="text-align:center">
-	                    <hlayout>
-	                        <button id="saveButton" label="Guardar"/>
-	                        <button id="cancelButton" label="Cancelar"/>
-	                        <button id="resetButton" label="Reset"/>
-	                    </hlayout>
-	                </cell>
-	            </row>
-	        </rows>
-    	</grid>
-    	<grid id="stockModificationGrid" width="400px" visible="false">
-    		<columns>
-                <column hflex="min" align="right"/>
-                <column />
-            </columns>
-	        <rows>
-	        	<row>
-	                <cell colspan="2" style="text-align:center">
-	                    <label id="stockModificationLabel">Ingreso/Egreso Stock</label>
-	                </cell>
-	            </row>
-	        	<row>
-	                <label>Cantidad:</label>
-	                <doublebox id="quantityDoublebox" hflex="1"/>
-	            </row>
-	            <row>
-	                <label>Nro Remito:</label>
-	                <intbox id="numberIntbox" hflex="1"/>
-	            </row>
-	            <row>
-	                <label>Empleado Responsable:</label>
-	                <combobox id="workerCombobox" hflex="1">
-                        <template name="model">
-                            <comboitem label="${each.name}" value="${each}" />
-                        </template>
-                    </combobox>
-	            </row>
-	            <row>
-	                <cell colspan="2" style="text-align:center">
-	                    <hlayout>
-	                        <button id="saveNewStockButton" label="Guardar"/>
-	                        <button id="cancelNewStockButton" label="Cancelar"/>
-	                        <button id="resetNewStockButton" label="Reset"/>
-	                    </hlayout>
-	                </cell>
-	            </row>
-	        </rows>
-		</grid>
-    </vlayout>
+	<panel border="none">
+        <panelchildren>
+		    <hlayout>
+		        <label>Buscar:</label>
+		        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
+		        <button id="searchButton" label="Buscar"/>
+		    </hlayout>
+		    <separator/>
+		    <listbox id="woodListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
+		    	<auxhead>
+					<auxheader label="Materia Prima" colspan="7"/>
+				</auxhead>
+		        <listhead>
+		        	<listheader label="Madera" align="center"/>
+		            <listheader label="Nombre" align="center"/>
+		            <listheader label="Medidas" align="center"/>
+		            <listheader label="Stock Actual" align="center"/>
+		            <listheader label="Stock Minimo" align="center"/>
+		            <listheader label="Stock Reposicion" align="center"/>
+		        </listhead>
+		        <template name="model">
+		            <listitem>
+		            	<listcell label="${each.woodType.name}"/>
+		                <listcell label="${each.rawMaterialType.name}"/>
+		                <listcell label="${r:getFormattedMeasure(each.rawMaterialType)}"/>
+		                <listcell label="${each.stock}"/>
+		                <listcell label="${each.stockMin}"/>
+		                <listcell label="${each.stockRepo}"/>
+		            </listitem>
+		        </template>
+		    </listbox>
+		    <vlayout>
+		    	<separator/>
+		        <hbox>
+		            <button id="newButton" label="Nueva Materia Prima en Stock"/>
+		        </hbox>
+		        <separator/>
+				<grid id="woodCreationGrid" width="45%" sclass="sigma-form" visible="false">
+			        <columns>
+		                <column hflex="min" align="right"/>
+		                <column />
+		            </columns>
+			        <rows>
+			        	<row>
+			                <label>Madera:</label>
+			                <combobox id="woodTypeCombobox" readonly="true">
+		                        <template name="model">
+		                            <comboitem label="${each.name}" value="${each}"/>
+		                        </template>
+		                    </combobox>
+			            </row>
+			        	<row>
+			                <label>Materia Prima:</label>
+			                <combobox id="rawMaterialTypeCombobox" readonly="true">
+		                        <template name="model">
+		                            <comboitem label="${each.name}" value="${each}"/>
+		                        </template>
+		                    </combobox>
+			            </row>
+			            <row>
+			                <label>Stock Actual:</label>
+			                <cell colspan="1" style="text-align:center">
+			                	<hbox>
+				                	<doublebox id="stockDoublebox" value="0" width="100px"/>
+				                	<button id="stockIncreaseButton" label="Registrar Ingreso"/>
+				                	<button id="stockDecreaseButton" label="Registrar Egreso"/>
+			                	</hbox>
+			                </cell>
+			            </row>
+			            <row>
+			                <label>Stock Minimo:</label>
+			                <doublebox id="stockMinDoublebox" value="0" width="100px"/>
+			            </row>
+			            <row>
+			                <label>Stock Reposicion:</label>
+			                <doublebox id="stockRepoDoublebox" value="0" width="100px"/>
+			            </row>
+			            <row>
+			                <cell colspan="2" style="text-align:center">
+			                    <hlayout>
+			                        <button id="saveButton" label="Guardar"/>
+			                        <button id="cancelButton" label="Cancelar"/>
+			                        <button id="resetButton" label="Reset"/>
+			                    </hlayout>
+			                </cell>
+			            </row>
+			        </rows>
+		    	</grid>
+		    	<grid id="stockModificationGrid" width="400px" visible="false">
+		    		<columns>
+		                <column hflex="min" align="right"/>
+		                <column />
+		            </columns>
+			        <rows>
+			        	<row>
+			                <cell colspan="2" style="text-align:center">
+			                    <label id="stockModificationLabel">Ingreso/Egreso Stock</label>
+			                </cell>
+			            </row>
+			        	<row>
+			                <label>Cantidad:</label>
+			                <doublebox id="quantityDoublebox" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Nro Remito:</label>
+			                <intbox id="numberIntbox" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Empleado Responsable:</label>
+			                <combobox id="workerCombobox" hflex="1">
+		                        <template name="model">
+		                            <comboitem label="${each.name}" value="${each}" />
+		                        </template>
+		                    </combobox>
+			            </row>
+			            <row>
+			                <cell colspan="2" style="text-align:center">
+			                    <hlayout>
+			                        <button id="saveNewStockButton" label="Guardar"/>
+			                        <button id="cancelNewStockButton" label="Cancelar"/>
+			                        <button id="resetNewStockButton" label="Reset"/>
+			                    </hlayout>
+			                </cell>
+			            </row>
+			        </rows>
+				</grid>
+		    </vlayout>
+		    <separator/>
+		    <listbox id="woodReservedListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
+		    	<auxhead>
+					<auxheader label="Reservas" colspan="4"/>
+				</auxhead>
+		        <listhead>
+		            <listheader label="Plan de Produccion" align="center"/>
+		            <listheader label="Madera" align="center"/>
+		            <listheader label="Materia Prima" align="center"/>
+		            <listheader label="Cantidad Reservada" align="center"/>
+		        </listhead>
+		        <template name="model">
+		            <listitem>
+		                <listcell label="${win_raw_material_stock$composer.getProductionPlanName(each)}"/>
+		                <listcell label="${win_raw_material_stock$composer.getWood(each).woodType.name}"/>
+		                <listcell label="${each.rawMaterialRequirement.rawMaterialType.name}"/>
+		                <listcell label="${each.stockReserved}"/>
+		            </listitem>
+		        </template>
+		    </listbox>
+        </panelchildren>
+    </panel>
 </window>

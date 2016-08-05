@@ -22,10 +22,6 @@
 							<textbox id="productionPlanNameTextbox" width="25%"/>
                         </row>
                         <row>
-                            <label value="Fecha Creacion: "/>
-							<datebox id="productionPlanDatebox" cols="12" format="dd-MM-yyyy" width="25%"/>
-                        </row>
-                        <row>
                             <label value="Seleccionar Pedido: "/>
                             <cell style="text-align:left">
 	                    		<hlayout>

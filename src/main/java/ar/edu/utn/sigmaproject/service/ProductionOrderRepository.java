@@ -15,6 +15,6 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
 
 	ProductionOrder findByProductionPlanAndProduct(ProductionPlan productionPlan, Product product);
 
-	List<ProductionOrder> findByProductionPlan(ProductionPlan currentProductionPlan);
+	List<ProductionOrder> findByProductionPlan(ProductionPlan productionPlan);
 
 }

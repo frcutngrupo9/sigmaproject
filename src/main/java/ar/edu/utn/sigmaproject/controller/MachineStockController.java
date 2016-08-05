@@ -50,8 +50,6 @@ public class MachineStockController extends SelectorComposer<Component> {
 	@Wire
 	Textbox nameTextbox;
 	@Wire
-	Textbox codeTextbox;
-	@Wire
 	Intbox yearIntbox;
 	@Wire
 	Intbox usedTimeIntboxHours;
@@ -133,7 +131,6 @@ public class MachineStockController extends SelectorComposer<Component> {
 		if(currentMachine == null) {// nuevo
 			machineGrid.setVisible(false);
 			machineTypeCombobox.setSelectedIndex(-1);
-			codeTextbox.setValue(null);
 			nameTextbox.setValue(null);
 			yearIntbox.setValue(null);
 			usedTimeIntboxHours.setValue(null);
@@ -144,11 +141,15 @@ public class MachineStockController extends SelectorComposer<Component> {
 			machineGrid.setVisible(true);
 			machineTypeListModel.addToSelection(currentMachine.getMachineType());
 			machineTypeCombobox.setModel(machineTypeListModel);
-			codeTextbox.setValue(currentMachine.getCode());
 			nameTextbox.setValue(currentMachine.getName());
 			yearIntbox.setValue(currentMachine.getYear());
-			usedTimeIntboxHours.setValue(currentMachine.getUsedTime().getHours());
-			usedTimeIntboxMinutes.setValue(currentMachine.getUsedTime().getMinutes());
+			if(currentMachine.getUsedTime() != null) {
+				usedTimeIntboxHours.setValue(currentMachine.getUsedTime().getHours());
+				usedTimeIntboxMinutes.setValue(currentMachine.getUsedTime().getMinutes());
+			} else {
+				usedTimeIntboxHours.setValue(null);
+				usedTimeIntboxMinutes.setValue(null);
+			}
 			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
 		}
@@ -171,12 +172,7 @@ public class MachineStockController extends SelectorComposer<Component> {
 			Clients.showNotification("Ingrese el Nombre de la Maquina", nameTextbox);
 			return;
 		}
-		if(Strings.isBlank(codeTextbox.getValue())){
-			Clients.showNotification("Ingrese el Codigo de la Maquina", codeTextbox);
-			return;
-		}
 		MachineType machineType = machineTypeListModel.getElementAt(machineTypeCombobox.getSelectedIndex());
-		String code = codeTextbox.getText();
 		String name = nameTextbox.getText();
 		Integer year = yearIntbox.getValue();
 		Integer usedTimeHours = usedTimeIntboxHours.getValue();
@@ -190,10 +186,9 @@ public class MachineStockController extends SelectorComposer<Component> {
 			System.out.println("Error en convertir a duracion: " + e.toString());
 		}
 		if(currentMachine == null) {// nuevo
-			currentMachine = new Machine(machineType, code, name, year, usedTime);
+			currentMachine = new Machine(machineType, name, year, usedTime);
 		} else {// edicion
 			currentMachine.setMachineType(machineType);
-			currentMachine.setCode(code);
 			currentMachine.setName(name);
 			currentMachine.setYear(year);
 			currentMachine.setUsedTime(usedTime);
@@ -217,8 +212,12 @@ public class MachineStockController extends SelectorComposer<Component> {
 
 	public String getDurationFormatted(Machine machine) {
 		Duration duration = machine.getUsedTime();
-		String hours = duration.getHours() + " (Horas)";
-		String Minutes = duration.getMinutes() + " (Minutos)";
+		String hours = "0 (Horas)";
+		String Minutes = "0 (Minutos)";
+		if(duration != null) {
+			hours = duration.getHours() + " (Horas)";
+			Minutes = duration.getMinutes() + " (Minutos)";
+		}
 		return hours + ":" + Minutes;
 	}
 }

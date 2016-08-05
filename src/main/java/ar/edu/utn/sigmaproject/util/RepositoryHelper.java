@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import ar.edu.utn.sigmaproject.domain.Client;
+import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
 import ar.edu.utn.sigmaproject.domain.MeasureUnitType;
@@ -18,13 +19,15 @@ import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductCategory;
-import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderStateType;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.domain.RawMaterialType;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
+import ar.edu.utn.sigmaproject.domain.Wood;
 import ar.edu.utn.sigmaproject.domain.WoodType;
 import ar.edu.utn.sigmaproject.domain.Worker;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
+import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitTypeRepository;
@@ -32,10 +35,11 @@ import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductCategoryRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.RawMaterialTypeRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
+import ar.edu.utn.sigmaproject.service.WoodRepository;
 import ar.edu.utn.sigmaproject.service.WoodTypeRepository;
 import ar.edu.utn.sigmaproject.service.WorkerRepository;
 
@@ -52,7 +56,7 @@ public class RepositoryHelper {
 	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
 
 	@Autowired
-	private ProductionOrderStateRepository productionOrderStateRepository;
+	private ProductionOrderStateTypeRepository productionOrderStateTypeRepository;
 
 	@Autowired
 	private OrderStateTypeRepository orderStateTypeRepository;
@@ -83,20 +87,26 @@ public class RepositoryHelper {
 
 	@Autowired
 	private SupplyTypeRepository supplyTypeRepository;
+	
+	@Autowired
+	private WoodRepository woodRepository;
+	
+	@Autowired
+	private MachineRepository machineRepository;
 
 	@PostConstruct
 	public void afterConstruct() {
 		generateMeasureUnitTypeList();
 		generateProductionPlanStateTypes();
-		generateProductionOrderStates();
+		generateProductionOrderStateTypes();
 		generateOrderStateType();
 		generateProduct();
 		generateProcessType();
-		generateWoodType();
+		generateWood();
 		generateClient();
 		generateWorker();
-		generateRawMaterialType();
 		generateSupplyType();
+		generateMachine();
 	}
 
 	private void generateMeasureUnitTypeList() {
@@ -148,14 +158,14 @@ public class RepositoryHelper {
 		}
 	}
 
-	private void generateProductionOrderStates() {
-		if (productionOrderStateRepository.count() == 0) {
-			List<ProductionOrderState> list = new ArrayList<>();
-			list.add(new ProductionOrderState("Generada"));
-			list.add(new ProductionOrderState("Iniciada"));
-			list.add(new ProductionOrderState("Finalizada"));
-			list.add(new ProductionOrderState("Cancelada"));
-			productionOrderStateRepository.save(list);
+	private void generateProductionOrderStateTypes() {
+		if (productionOrderStateTypeRepository.count() == 0) {
+			List<ProductionOrderStateType> list = new ArrayList<>();
+			list.add(new ProductionOrderStateType("Generada"));
+			list.add(new ProductionOrderStateType("Iniciada"));
+			list.add(new ProductionOrderStateType("Finalizada"));
+			list.add(new ProductionOrderStateType("Cancelada"));
+			productionOrderStateTypeRepository.save(list);
 		}
 	}
 
@@ -273,12 +283,12 @@ public class RepositoryHelper {
 	private void generateClient() {
 		if (clientRepository.count() == 0) {
 			List<Client> list = new ArrayList<>();
-			list.add( new Client("RESTOCK", "", "", "", "RESERVADO RESTOCK"));
-			list.add( new Client("CLIENTE 1", "03514704411", "EMAIL1@MAILSERVER.COM", "DIRECCION 1", "DETALLES 1"));
-			list.add( new Client("CLIENTE 2", "03514704412", "EMAIL2@MAILSERVER.COM", "DIRECCION 2", "DETALLES 2"));
-			list.add( new Client("CLIENTE 3", "03514704413", "EMAIL3@MAILSERVER.COM", "DIRECCION 3", "DETALLES 3"));
-			list.add( new Client("CLIENTE 4", "03514704414", "EMAIL4@MAILSERVER.COM", "DIRECCION 4", "DETALLES 4"));
-			list.add( new Client("CLIENTE 5", "03514704415", "EMAIL5@MAILSERVER.COM", "DIRECCION 5", "DETALLES 5"));
+			list.add(new Client("RESTOCK", "", "", "", "RESERVADO RESTOCK"));
+			list.add(new Client("CLIENTE 1", "03514704411", "EMAIL1@MAILSERVER.COM", "DIRECCION 1", "DETALLES 1"));
+			list.add(new Client("CLIENTE 2", "03514704412", "EMAIL2@MAILSERVER.COM", "DIRECCION 2", "DETALLES 2"));
+			list.add(new Client("CLIENTE 3", "03514704413", "EMAIL3@MAILSERVER.COM", "DIRECCION 3", "DETALLES 3"));
+			list.add(new Client("CLIENTE 4", "03514704414", "EMAIL4@MAILSERVER.COM", "DIRECCION 4", "DETALLES 4"));
+			list.add(new Client("CLIENTE 5", "03514704415", "EMAIL5@MAILSERVER.COM", "DIRECCION 5", "DETALLES 5"));
 			clientRepository.save(list);
 		}
 	}
@@ -286,10 +296,10 @@ public class RepositoryHelper {
 	private void generateWorker() {
 		if (workerRepository.count() == 0) {
 			List<Worker> list = new ArrayList<>();
-			list.add( new Worker("EMPLEADO 1", null));
-			list.add( new Worker("EMPLEADO 2", null));
-			list.add( new Worker("EMPLEADO 3", null));
-			list.add( new Worker("EMPLEADO 4", null));
+			list.add(new Worker("EMPLEADO 1", null));
+			list.add(new Worker("EMPLEADO 2", null));
+			list.add(new Worker("EMPLEADO 3", null));
+			list.add(new Worker("EMPLEADO 4", null));
 			workerRepository.save(list);
 		}
 	}
@@ -306,7 +316,7 @@ public class RepositoryHelper {
 					Arrays.asList("1", "5"),
 					Arrays.asList("1", "6"),
 					Arrays.asList("1", "8"),
-					Arrays.asList("1,5", "6"),
+					Arrays.asList("1.5", "6"),
 					Arrays.asList("2", "4"),
 					Arrays.asList("2", "6"),
 					Arrays.asList("3", "3"),
@@ -317,12 +327,11 @@ public class RepositoryHelper {
 			for (List<String> definition : definitions) {
 				String espesor = definition.get(0);
 				String ancho = definition.get(1);
-				list.add( new RawMaterialType("Tabla " + espesor + "x" + ancho + " x 2,40mts", new BigDecimal("2,40"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas));
-				list.add( new RawMaterialType("Tabla " + espesor + "x" + ancho + " x 3,00mts", new BigDecimal("3,00"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas));
-				list.add( new RawMaterialType("Tabla " + espesor + "x" + ancho + " x 3,60mts", new BigDecimal("3,60"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas));
-				list.add( new RawMaterialType("Tabla " + espesor + "x" + ancho + " x 4,20mts", new BigDecimal("4,20"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas));
+				list.add(new RawMaterialType("Tabla " + espesor + "x" + ancho + " x 2.40mts", new BigDecimal("2.40"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas));
+				list.add(new RawMaterialType("Tabla " + espesor + "x" + ancho + " x 3.00mts", new BigDecimal("3.00"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas));
+				list.add(new RawMaterialType("Tabla " + espesor + "x" + ancho + " x 3.60mts", new BigDecimal("3.60"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas));
+				list.add(new RawMaterialType("Tabla " + espesor + "x" + ancho + " x 4.20mts", new BigDecimal("4.20"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas));
 			}
-
 			rawMaterialTypeRepository.save(list);
 		}
 	}
@@ -330,13 +339,46 @@ public class RepositoryHelper {
 	private void generateSupplyType() {
 		if (supplyTypeRepository.count() == 0) {
 			List<SupplyType> list = new ArrayList<>();
-			list.add( new SupplyType("15", "Tornillo Autoperforante Hexagonal Punta Mecha 14x4".toUpperCase(), "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-			list.add( new SupplyType("16", "Tornillo Fix Autoperforante 3x35".toUpperCase(), "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-			list.add( new SupplyType("26", "Arandela Plana Zincada 5/16".toUpperCase(), "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-			list.add( new SupplyType("27", "Arandela Plana Zincada 1/4".toUpperCase(), "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-			list.add( new SupplyType("34", "Tuerca Zincada Alta 7/16".toUpperCase(), "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+			list.add(new SupplyType("1", "INSUMO 1", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+			list.add(new SupplyType("2", "INSUMO 2", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+			list.add(new SupplyType("3", "INSUMO 3", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+			list.add(new SupplyType("4", "INSUMO 4", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+			list.add(new SupplyType("5", "INSUMO 5", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+//			list.add(new SupplyType("15", "Tornillo Autoperforante Hexagonal Punta Mecha 14x4".toUpperCase(), "", "", "", "14x4", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+//			list.add(new SupplyType("16", "Tornillo Fix Autoperforante 3x35".toUpperCase(), "", "", "", "3x35", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+//			list.add(new SupplyType("26", "Arandela Plana Zincada 5/16".toUpperCase(), "", "", "", "5/16", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+//			list.add(new SupplyType("27", "Arandela Plana Zincada 1/4".toUpperCase(), "", "", "", "1/4", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+//			list.add(new SupplyType("34", "Tuerca Zincada Alta 7/16".toUpperCase(), "", "", "", "7/16", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
 			supplyTypeRepository.save(list);
 		}
 	}
-
+	
+	private void generateWood() {
+		if (woodRepository.count() == 0) {
+			List<Wood> list = new ArrayList<>();
+			generateWoodType();
+			WoodType woodType = woodTypeRepository.findFirstByName("Pino");
+			generateRawMaterialType();
+			List<RawMaterialType> listRawMaterialType = rawMaterialTypeRepository.findAll();
+			for(RawMaterialType each : listRawMaterialType) {
+				list.add(new Wood(each, woodType, new BigDecimal("50"), new BigDecimal("10"), new BigDecimal("20")));
+			}
+			woodRepository.save(list);
+		}
+	}
+	
+	private void generateMachine() {
+		if (machineRepository.count() == 0) {
+			List<Machine> list = new ArrayList<>();
+			generateMachineType();
+			List<MachineType> listMachineType = machineTypeRepository.findAll();
+			for(MachineType each : listMachineType) {
+				list.add(new Machine(each, each.getName().toUpperCase() + " 1", null, null));
+				list.add(new Machine(each, each.getName().toUpperCase() + " 2", null, null));
+				list.add(new Machine(each, each.getName().toUpperCase() + " 3", null, null));
+			}
+			machineRepository.save(list);
+		}
+	}
+	
 }

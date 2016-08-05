@@ -61,6 +61,7 @@
 						</row>
 		            </template>
     			</grid>
+    			<button id="returnButton" label="Volver"/>
             </vlayout>
         </panelchildren>
     </panel>

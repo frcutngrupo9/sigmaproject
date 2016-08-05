@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.transaction.annotation.Transactional;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
@@ -19,7 +20,6 @@ import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Caption;
 import org.zkoss.zul.Combobox;
-import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
@@ -34,17 +34,30 @@ import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductTotal;
+import ar.edu.utn.sigmaproject.domain.ProductionOrder;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
+import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
+import ar.edu.utn.sigmaproject.domain.RawMaterial;
+import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
+import ar.edu.utn.sigmaproject.domain.Supply;
+import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanDetailRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
+import ar.edu.utn.sigmaproject.service.ProductionPlanStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
+import ar.edu.utn.sigmaproject.service.RawMaterialRequirementRepository;
+import ar.edu.utn.sigmaproject.service.SupplyRequirementRepository;
 
 public class ProductionPlanCreationController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
@@ -57,8 +70,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	Bandbox orderBandbox;
 	@Wire
 	Textbox productionPlanNameTextbox;
-	@Wire
-	Datebox productionPlanDatebox;
 	@Wire
 	Button addOrderButton;
 	@Wire
@@ -90,7 +101,19 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	@WireVariable
 	private ClientRepository clientService;
 	@WireVariable
+	private ProductionPlanStateRepository productionPlanStateRepository;
+	@WireVariable
 	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
+	@WireVariable
+	private SupplyRequirementRepository supplyRequirementRepository;
+	@WireVariable
+	private RawMaterialRequirementRepository rawMaterialRequirementRepository;
+	@WireVariable
+	private ProductionOrderRepository productionOrderRepository;
+	@WireVariable
+	private ProductionOrderStateRepository productionOrderStateRepository;
+	@WireVariable
+	private ProductionOrderStateTypeRepository productionOrderStateTypeRepository;
 
 	// list
 	private List<Order> orderPopupList;
@@ -172,6 +195,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		}
 	}
 
+	@Transactional
 	@Listen("onClick = #saveProductionPlanButton")
 	public void saveProductionPlan() {
 		if(currentProductionPlanDetailList.size() == 0) {
@@ -179,39 +203,106 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			return;
 		}
 		String productionPlanName = productionPlanNameTextbox.getText().toUpperCase();
-		Date productionPlanDate = productionPlanDatebox.getValue();
 		ProductionPlanStateType productionPlanStateType;
 		if(productionPlanStateTypeCombobox.getSelectedIndex() == -1) {
 			productionPlanStateType = null;
 		} else {
 			productionPlanStateType = productionPlanStateTypeCombobox.getSelectedItem().getValue();
 		}
+		boolean isNewProductionPlan = false;
+		currentProductionPlanDetailList = productionPlanDetailRepository.save(currentProductionPlanDetailList);
 		if(currentProductionPlan == null) { // es un plan nuevo
 			// creamos el nuevo plan
-			currentProductionPlan = new ProductionPlan(productionPlanName, null, productionPlanDate);
-			currentProductionPlan.setCurrentStateType(productionPlanStateType);
+			currentProductionPlan = new ProductionPlan(productionPlanName, currentProductionPlanDetailList);
+			ProductionPlanState productionPlanState = new ProductionPlanState(productionPlanStateType, new Date());
+			productionPlanState = productionPlanStateRepository.save(productionPlanState);
+			currentProductionPlan.setState(productionPlanState);
+			// cambia el estado de los pedidos
+			for(ProductionPlanDetail each : currentProductionPlanDetailList) {
+				OrderStateType orderStateType = orderStateTypeRepository.findFirstByName("Planificado");
+				Order order = each.getOrder();
+				OrderState state = new OrderState(orderStateType, new Date());
+				state = orderStateRepository.save(state);
+				order.setState(state);
+				orderRepository.save(order);
+			}
+			isNewProductionPlan = true;
 		} else { // se edita un plan
 			currentProductionPlan.setName(productionPlanName);
-			currentProductionPlan.setDate(productionPlanDate);
+			currentProductionPlan.setPlanDetails(currentProductionPlanDetailList);
 			if (!currentProductionPlan.getCurrentStateType().equals(productionPlanStateType)) {
-				currentProductionPlan.setCurrentStateType(productionPlanStateType);
+				// si el estado ha cambiado
+				ProductionPlanState productionPlanState = new ProductionPlanState(productionPlanStateType, new Date());
+				productionPlanState = productionPlanStateRepository.save(productionPlanState);
+				currentProductionPlan.setState(productionPlanState);
 			}
 		}
 
-		for(ProductionPlanDetail each : currentProductionPlanDetailList) {
-			each = productionPlanDetailRepository.save(each);
-			OrderStateType orderStateType = orderStateTypeRepository.findFirstByName("Planificado");
-			Order order = each.getOrder();
-			OrderState state = new OrderState(orderStateType, new Date());
-			state = orderStateRepository.save(state);
-			order.setState(state);
-			orderRepository.save(order);
+		currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
+		if(isNewProductionPlan) {
+			// crea los requerimientos
+			List<SupplyRequirement> supplyRequirementList = createSupplyRequirements(currentProductionPlan);
+			supplyRequirementList = supplyRequirementRepository.save(supplyRequirementList);
+			currentProductionPlan.getSupplyRequirements().addAll(supplyRequirementList);
+			List<RawMaterialRequirement> rawMaterialRequirementList = createRawMaterialRequirements(currentProductionPlan);
+			rawMaterialRequirementList = rawMaterialRequirementRepository.save(rawMaterialRequirementList);
+			currentProductionPlan.getRawMaterialRequirements().addAll(rawMaterialRequirementList);
+			// crea ordenes de produccion
+			for(ProductTotal each : currentProductionPlan.getProductTotalList()) {
+				ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateTypeRepository.findFirstByName("Generada"), new Date());
+				productionOrderState = productionOrderStateRepository.save(productionOrderState);
+				ProductionOrder productionOrder = new ProductionOrder(currentProductionPlan, each.getProduct(), null, null, each.getTotalUnits(), null, null, productionOrderState);
+				productionOrder = productionOrderRepository.save(productionOrder);
+			}
+			currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
 		}
-		currentProductionPlan.setPlanDetails(currentProductionPlanDetailList);
-		productionPlanRepository.save(currentProductionPlan);
-		currentProductionPlan = null;
 		refreshViewProductionPlan();
 		alert("Plan guardado.");
+	}
+
+	private List<SupplyRequirement> createSupplyRequirements(ProductionPlan productionPlan) {
+		// busca los requerimientos
+		List<SupplyRequirement> list = new ArrayList<>();
+		List<ProductTotal> productTotalList = productionPlan.getProductTotalList();
+		for (ProductTotal productTotal : productTotalList) {
+			for (Supply supply : productTotal.getProduct().getSupplies()) {
+				SupplyRequirement auxSupplyRequirement = null;
+				for (SupplyRequirement supplyRequirement : list) {// busca si el insumo no se encuentra agregado
+					if (supply.getSupplyType().equals(supplyRequirement.getSupplyType())) {
+						auxSupplyRequirement = supplyRequirement;
+					}
+				}
+				if (auxSupplyRequirement != null) {// el insumo si se encuentra agregado, suma sus cantidades
+					auxSupplyRequirement.setQuantity(auxSupplyRequirement.getQuantity().add(supply.getQuantity()));
+				} else {// el insumo no se encuentra, se lo agrega
+					list.add(new SupplyRequirement(supply.getSupplyType(), supply.getQuantity()));
+				}
+			}
+		}
+		return list;
+	}
+
+	private List<RawMaterialRequirement> createRawMaterialRequirements(ProductionPlan productionPlan) {
+		// busca requerimientos de materias primas
+		List<RawMaterialRequirement> list = new ArrayList<RawMaterialRequirement>();
+		List<ProductTotal> productTotalList = productionPlan.getProductTotalList();
+		for(ProductTotal productTotal : productTotalList) {
+			Product product = productTotal.getProduct();
+			for(RawMaterial rawMaterial : product.getRawMaterials()) {
+				RawMaterialRequirement auxRawMaterialRequirement = null;
+				for(RawMaterialRequirement supplyRequirement : list) {// buscamos si la materia prima no se encuentra agregada
+					if(rawMaterial.getRawMaterialType().equals(supplyRequirement.getRawMaterialType())) {
+						auxRawMaterialRequirement = supplyRequirement;
+					}
+				}
+				if(auxRawMaterialRequirement != null) {// la materia prima si se encuentra agregada, sumamos sus cantidades
+					auxRawMaterialRequirement.setQuantity(auxRawMaterialRequirement.getQuantity().add(rawMaterial.getQuantity()));
+				} else {// la materia prima no se encuentra, se la agrega
+					list.add(new RawMaterialRequirement(rawMaterial.getRawMaterialType(), rawMaterial.getQuantity()));
+				}
+			}
+		}
+		return list;
 	}
 
 	@Listen("onClick = #addOrderButton")
@@ -258,7 +349,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			productionPlanStateTypeListModel.addToSelection(productionPlanStateTypeRepository.findFirstByName("Iniciado"));
 			productionPlanStateTypeCombobox.setModel(productionPlanStateTypeListModel);
 			productionPlanNameTextbox.setText("");
-			productionPlanDatebox.setValue(new Date());
 			currentProductionPlanDetailList = new ArrayList<ProductionPlanDetail>();
 			deleteProductionPlanButton.setDisabled(true);
 			productionPlanStateTypeCombobox.setDisabled(true);
@@ -275,12 +365,10 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			} else {
 				productionPlanNameTextbox.setText("");
 			}
-			productionPlanDatebox.setValue(currentProductionPlan.getDate());
 			currentProductionPlanDetailList = currentProductionPlan.getPlanDetails();
 			deleteProductionPlanButton.setDisabled(false);
 			productionPlanStateTypeCombobox.setDisabled(false);
 		}
-		productionPlanDatebox.setDisabled(true);// nunca se debe poder modificar
 		refreshOrderPopupList();
 		refreshProductionPlanDetailListGrid();
 		refreshProductTotalListbox();

@@ -28,7 +28,7 @@
 		                            <vbox>
 		                                <hbox>
 		                                    Buscar
-		                                    <textbox />
+		                                    <textbox/>
 		                                </hbox>
 		                                <listbox id="clientPopupListbox" width="200px">
 		                                <listhead>
@@ -63,7 +63,7 @@
                             <vbox>
                                 <hbox>
                                     Buscar
-                                    <textbox />
+                                    <textbox id="productNameFilterTextbox"/>
                                 </hbox>
                                 <listbox id="productPopupListbox" width="200px">
                                 <listhead>

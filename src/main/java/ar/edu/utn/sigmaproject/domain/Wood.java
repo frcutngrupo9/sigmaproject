@@ -20,11 +20,10 @@ public class Wood implements Serializable, Cloneable {
 
 	@ManyToOne
 	WoodType woodType;
-	
+
 	@OneToMany(orphanRemoval = true)
 	List<WoodReserved> woodsReserved = new ArrayList<>();
 
-	String code = "";
 	BigDecimal stock = BigDecimal.ZERO;
 	BigDecimal stockMin = BigDecimal.ZERO;
 	BigDecimal stockRepo = BigDecimal.ZERO;
@@ -33,10 +32,9 @@ public class Wood implements Serializable, Cloneable {
 
 	}
 
-	public Wood(RawMaterialType rawMaterialType, WoodType woodType, String code, BigDecimal stock, BigDecimal stockMin, BigDecimal stockRepo) {
+	public Wood(RawMaterialType rawMaterialType, WoodType woodType, BigDecimal stock, BigDecimal stockMin, BigDecimal stockRepo) {
 		this.rawMaterialType = rawMaterialType;
 		this.woodType = woodType;
-		this.code = code;
 		this.stock = stock;
 		this.stockMin = stockMin;
 		this.stockRepo = stockRepo;
@@ -66,14 +64,6 @@ public class Wood implements Serializable, Cloneable {
 		this.woodType = woodType;
 	}
 
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
 	public BigDecimal getStock() {
 		return stock;
 	}
@@ -97,7 +87,7 @@ public class Wood implements Serializable, Cloneable {
 	public void setStockRepo(BigDecimal stockRepo) {
 		this.stockRepo = stockRepo;
 	}
-	
+
 	public List<WoodReserved> getWoodsReserved() {
 		return woodsReserved;
 	}
@@ -109,7 +99,9 @@ public class Wood implements Serializable, Cloneable {
 	public BigDecimal getStockReserved() {
 		BigDecimal aux = BigDecimal.ZERO;
 		for(WoodReserved each : woodsReserved) {
-			aux = aux.add(each.getStockReserved());
+			if(!each.isWithdrawn()) {
+				aux = aux.add(each.getStockReserved());
+			}
 		}
 		return aux;
 	}

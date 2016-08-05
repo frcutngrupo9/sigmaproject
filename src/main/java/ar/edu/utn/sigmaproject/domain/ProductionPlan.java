@@ -21,8 +21,8 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	@OrderColumn(name = "detail_index")
 	List<ProductionPlanDetail> planDetails = new ArrayList<>();
 
-	@ManyToOne
-	ProductionPlanStateType currentStateType;
+	@OneToMany(orphanRemoval = true)
+	List<ProductionPlanState> states = new ArrayList<>();
 
 	@OneToMany(orphanRemoval = true)
 	List<RawMaterialRequirement> rawMaterialRequirements = new ArrayList<>();
@@ -31,17 +31,16 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	List<SupplyRequirement> supplyRequirements = new ArrayList<>();
 
 	String name = "";
-	String details = "";
 	Date date;
 
 	public ProductionPlan() {
 
 	}
 
-	public ProductionPlan(String name, String details, Date date) {
+	public ProductionPlan(String name, List<ProductionPlanDetail> planDetails) {
 		this.name = name;
-		this.details = details;
-		this.date = date;
+		this.date = new Date();
+		this.planDetails.addAll(planDetails);
 	}
 
 	public List<ProductTotal> getProductTotalList() {
@@ -88,11 +87,40 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	}
 
 	public ProductionPlanStateType getCurrentStateType() {
-		return currentStateType;
+		ProductionPlanState result = getCurrentState();
+		if(result != null) {
+			return result.getProductionPlanStateType();
+		}
+		return null;
 	}
 
-	public void setCurrentStateType(ProductionPlanStateType currentStateType) {
-		this.currentStateType = currentStateType;
+	public ProductionPlanState getCurrentState() {
+		ProductionPlanState result = null;
+		for(ProductionPlanState each : states) {// busca el objeto con la fecha mas reciente
+			if(result != null) {
+				if(result.getDate().before(each.getDate())) {
+					result = each;
+				}
+			} else {
+				result = each;
+			}
+		}
+		if(result != null) {
+			return result;
+		}
+		return null;
+	}
+
+	public void setState(ProductionPlanState state) {
+		states.add(state);
+	}
+
+	public List<ProductionPlanState> getStates() {
+		return states;
+	}
+
+	public void setStates(List<ProductionPlanState> states) {
+		this.states = states;
 	}
 
 	public List<RawMaterialRequirement> getRawMaterialRequirements() {
@@ -117,14 +145,6 @@ public class ProductionPlan  implements Serializable, Cloneable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getDetails() {
-		return details;
-	}
-
-	public void setDetails(String details) {
-		this.details = details;
 	}
 
 	public Date getDate() {
