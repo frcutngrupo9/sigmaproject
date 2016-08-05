@@ -20,7 +20,7 @@ public class Wood implements Serializable, Cloneable {
 
 	@ManyToOne
 	WoodType woodType;
-	
+
 	@OneToMany(orphanRemoval = true)
 	List<WoodReserved> woodsReserved = new ArrayList<>();
 
@@ -87,7 +87,7 @@ public class Wood implements Serializable, Cloneable {
 	public void setStockRepo(BigDecimal stockRepo) {
 		this.stockRepo = stockRepo;
 	}
-	
+
 	public List<WoodReserved> getWoodsReserved() {
 		return woodsReserved;
 	}
@@ -99,7 +99,9 @@ public class Wood implements Serializable, Cloneable {
 	public BigDecimal getStockReserved() {
 		BigDecimal aux = BigDecimal.ZERO;
 		for(WoodReserved each : woodsReserved) {
-			aux = aux.add(each.getStockReserved());
+			if(!each.isWithdrawn()) {
+				aux = aux.add(each.getStockReserved());
+			}
 		}
 		return aux;
 	}

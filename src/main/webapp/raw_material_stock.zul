@@ -127,6 +127,26 @@
 			        </rows>
 				</grid>
 		    </vlayout>
+		    <separator/>
+		    <listbox id="woodReservedListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
+		    	<auxhead>
+					<auxheader label="Reservas" colspan="4"/>
+				</auxhead>
+		        <listhead>
+		            <listheader label="Plan de Produccion" align="center"/>
+		            <listheader label="Madera" align="center"/>
+		            <listheader label="Materia Prima" align="center"/>
+		            <listheader label="Cantidad Reservada" align="center"/>
+		        </listhead>
+		        <template name="model">
+		            <listitem>
+		                <listcell label="${win_raw_material_stock$composer.getProductionPlanName(each)}"/>
+		                <listcell label="${win_raw_material_stock$composer.getWood(each).woodType.name}"/>
+		                <listcell label="${each.rawMaterialRequirement.rawMaterialType.name}"/>
+		                <listcell label="${each.stockReserved}"/>
+		            </listitem>
+		        </template>
+		    </listbox>
         </panelchildren>
     </panel>
 </window>

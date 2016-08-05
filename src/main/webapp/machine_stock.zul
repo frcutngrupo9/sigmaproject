@@ -49,7 +49,7 @@
 		                    <textbox id="nameTextbox" hflex="1"/>
 		                </row>
 		                <row>
-		                    <label>Anio:</label>
+		                    <label>Modelo:</label>
 		                    <intbox id="yearIntbox" hflex="1"/>
 		                </row>
 		                <row>

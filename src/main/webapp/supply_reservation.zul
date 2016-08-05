@@ -9,21 +9,29 @@
 		                <column />
 		            </columns>
 			        <rows>
+			        	<row>
+			                <label>Descripcion:</label>
+			                <textbox id="descriptionTextbox" value="" hflex="1"/>
+			            </row>
 			            <row>
 			                <label>Codigo:</label>
 			                <textbox id="codeTextbox" value="" hflex="1"/>
-			            </row>
-			            <row>
-			                <label>Descripcion:</label>
-			                <textbox id="descriptionTextbox" value="" hflex="1"/>
 			            </row>
 			            <row>
 			                <label>Stock Actual:</label>
 			                <doublebox id="stockDoublebox" hflex="1"/>
 			            </row>
 			            <row>
+			                <label>Stock Disponible:</label>
+			                <doublebox id="stockAvailableDoublebox" hflex="1"/>
+			            </row>
+			            <row>
 			                <label>Cantidad a Reservar:</label>
 			                <doublebox id="stockReservedDoublebox" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Cantidad Necesaria:</label>
+			                <doublebox id="quantityDoublebox" hflex="1"/>
 			            </row>
 			            <row>
 			                <label>Cantidad Faltante:</label>

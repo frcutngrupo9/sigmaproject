@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.transaction.annotation.Transactional;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
@@ -194,6 +195,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		}
 	}
 
+	@Transactional
 	@Listen("onClick = #saveProductionPlanButton")
 	public void saveProductionPlan() {
 		if(currentProductionPlanDetailList.size() == 0) {
@@ -207,7 +209,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		} else {
 			productionPlanStateType = productionPlanStateTypeCombobox.getSelectedItem().getValue();
 		}
-		
+		boolean isNewProductionPlan = false;
 		currentProductionPlanDetailList = productionPlanDetailRepository.save(currentProductionPlanDetailList);
 		if(currentProductionPlan == null) { // es un plan nuevo
 			// creamos el nuevo plan
@@ -224,21 +226,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				order.setState(state);
 				orderRepository.save(order);
 			}
-			// crea los requerimientos
-			List<SupplyRequirement> supplyRequirementList = createSupplyRequirements(currentProductionPlan);
-			supplyRequirementList = supplyRequirementRepository.save(supplyRequirementList);
-			currentProductionPlan.setSupplyRequirements(supplyRequirementList);
-			List<RawMaterialRequirement> rawMaterialRequirementList = createRawMaterialRequirements(currentProductionPlan);
-			rawMaterialRequirementList = rawMaterialRequirementRepository.save(rawMaterialRequirementList);
-			currentProductionPlan.setRawMaterialRequirements(rawMaterialRequirementList);
-			// crea ordenes de produccion
-			for(ProductTotal each : currentProductionPlan.getProductTotalList()) {
-				ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateTypeRepository.findFirstByName("Generada"), new Date());
-				productionOrderState = productionOrderStateRepository.save(productionOrderState);
-				ProductionOrder productionOrder = new ProductionOrder(currentProductionPlan, each.getProduct(), null, null, each.getTotalUnits(), null, null, productionOrderState);
-				productionOrder = productionOrderRepository.save(productionOrder);
-			}
-			
+			isNewProductionPlan = true;
 		} else { // se edita un plan
 			currentProductionPlan.setName(productionPlanName);
 			currentProductionPlan.setPlanDetails(currentProductionPlanDetailList);
@@ -251,10 +239,27 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		}
 
 		currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
+		if(isNewProductionPlan) {
+			// crea los requerimientos
+			List<SupplyRequirement> supplyRequirementList = createSupplyRequirements(currentProductionPlan);
+			supplyRequirementList = supplyRequirementRepository.save(supplyRequirementList);
+			currentProductionPlan.getSupplyRequirements().addAll(supplyRequirementList);
+			List<RawMaterialRequirement> rawMaterialRequirementList = createRawMaterialRequirements(currentProductionPlan);
+			rawMaterialRequirementList = rawMaterialRequirementRepository.save(rawMaterialRequirementList);
+			currentProductionPlan.getRawMaterialRequirements().addAll(rawMaterialRequirementList);
+			// crea ordenes de produccion
+			for(ProductTotal each : currentProductionPlan.getProductTotalList()) {
+				ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateTypeRepository.findFirstByName("Generada"), new Date());
+				productionOrderState = productionOrderStateRepository.save(productionOrderState);
+				ProductionOrder productionOrder = new ProductionOrder(currentProductionPlan, each.getProduct(), null, null, each.getTotalUnits(), null, null, productionOrderState);
+				productionOrder = productionOrderRepository.save(productionOrder);
+			}
+			currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
+		}
 		refreshViewProductionPlan();
 		alert("Plan guardado.");
 	}
-	
+
 	private List<SupplyRequirement> createSupplyRequirements(ProductionPlan productionPlan) {
 		// busca los requerimientos
 		List<SupplyRequirement> list = new ArrayList<>();

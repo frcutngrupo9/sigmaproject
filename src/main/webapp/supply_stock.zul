@@ -16,8 +16,8 @@
 		            <listheader label="Descripcion" align="center"/>
 		            <listheader label="Medidas" align="center"/>
 		            <listheader label="Stock Total" align="center"/>
-		            <listheader label="Stock Reservado" align="center"/>
 		            <listheader label="Stock Disponible" align="center"/>
+		            <listheader label="Stock Reservado" align="center"/>
 		            <listheader label="Stock Minimo" align="center"/>
 		            <listheader label="Stock Reposicion" align="center"/>
 		        </listhead>
@@ -27,8 +27,8 @@
 		                <listcell label="${each.description}"/>
 		                <listcell label="${each.measure}"/>
 		                <listcell label="${each.stock}"/>
-		                <listcell label="[impl pend]"/>
-		                <listcell label="[impl pend]"/>
+		                <listcell label="${win_supply_stock$composer.getSupplyStockAvailable(each)}"/>
+		                <listcell label="${win_supply_stock$composer.getSupplyStockReserved(each)}"/>
 		                <listcell label="${each.stockMin}"/>
 		                <listcell label="${each.stockRepo}"/>
 		            </listitem>
@@ -131,11 +131,11 @@
 		            <listheader label="Plan de Produccion" align="center"/>
 		            <listheader label="Codigo" align="center"/>
 		            <listheader label="Descripcion" align="center"/>
-		            <listheader label="Stock Reservado" align="center"/>
+		            <listheader label="Cantidad Reservada" align="center"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
-		                <listcell label="${win_production_order_list$composer.getProductionPlanName(each)}"/>
+		                <listcell label="${win_supply_stock$composer.getProductionPlanName(each)}"/>
 		                <listcell label="${each.supplyRequirement.supplyType.code}"/>
 		                <listcell label="${each.supplyRequirement.supplyType.description}"/>
 		                <listcell label="${each.stockReserved}"/>

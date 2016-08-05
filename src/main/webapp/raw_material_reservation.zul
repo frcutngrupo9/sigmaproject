@@ -1,15 +1,68 @@
-<window id="productRawMaterialWindow" apply="ar.edu.utn.sigmaproject.controller.ProductRawMaterialController" width="75%" position="center,center" closable="true" action="show: slideDown;hide: slideUp">
-	<caption label="Materias Prima de Producto" style="text-align:center; font-weight: bold;"/>
+<window id="rawMaterialReservationWindow" apply="ar.edu.utn.sigmaproject.controller.RawMaterialReservationController" width="75%" position="center,center" closable="true" action="show: slideDown;hide: slideUp">
+	<caption label="Reserva de Materias Prima" style="text-align:center; font-weight: bold;"/>
 	<panel border="rounded">
         <panelchildren>
             <vlayout>
-                <hlayout>
-                </hlayout>
-                <separator/>
-                <hlayout>
-                	<button id="acceptRawMaterialListButton" label="Aceptar"/>
-                    <button id="cancelRawMaterialListButton" label="Cancelar"/>
-                </hlayout>
+            	<listbox id="woodListbox" sizedByContent="true" span="true">
+    				<auxhead>
+						<auxheader label="Materias Primas Disponibles" colspan="7"/>
+					</auxhead>
+        			<listhead>
+        				<listheader label="Madera"/>
+		                <listheader label="Materia Prima"/>
+		                <listheader label="Stock Actual"/>
+		                <listheader label="Cantidad Reservada"/>
+		                <listheader label="Cantidad Disponible"/>
+		            </listhead>
+		            <template name="model">
+		                <listitem>
+		                	<listcell label="${each.woodType.name}"/>
+		                    <listcell label="${each.rawMaterialType.name}"/>
+		                    <listcell label="${each.stock}"/>
+		                    <listcell label="${each.getStockReserved()}"/>
+		                    <listcell label="${each.stock - each.getStockReserved()}"/>
+						</listitem>
+		            </template>
+    			</listbox>
+                <grid id="rawMaterialReservationGrid" sclass="sigma-form">
+			        <columns>
+		                <column hflex="min" align="right"/>
+		                <column/>
+		                <column hflex="min" align="right"/>
+		                <column/>
+		                <column hflex="min" align="right"/>
+		                <column/>
+		            </columns>
+			        <rows>
+			            <row>
+			                <label>Madera:</label>
+			                <textbox id="woodTypeTextbox" value="" hflex="1"/>
+			                <label>Materia Prima:</label>
+			                <textbox id="descriptionTextbox" value="" hflex="1"/>
+			                <label>Stock Actual:</label>
+			                <doublebox id="stockDoublebox" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Stock Disponible:</label>
+			                <doublebox id="stockAvailableDoublebox" hflex="1"/>
+			                <label>Cantidad Necesaria:</label>
+			                <doublebox id="quantityDoublebox" hflex="1"/>
+			                <label>Cantidad Faltante:</label>
+			                <doublebox id="stockMissingDoublebox" hflex="1"/>
+			            </row>
+			            <row>
+			            	<cell colspan="2" />
+			            	<label>Cantidad a Reservar:</label>
+			            	<doublebox id="stockReservedDoublebox" hflex="1"/>
+			            	<cell colspan="2" />
+			            </row>
+			        </rows>
+		    	</grid>
+                <hbox hflex="1" align="center" pack="center">
+                	<button id="saveButton" label="Guardar"/>
+                	<button id="cancelButton" label="Cancelar"/>
+			        <button id="resetButton" label="Reset"/>
+                </hbox>
             </vlayout>
         </panelchildren>
     </panel>

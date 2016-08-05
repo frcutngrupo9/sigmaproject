@@ -4,10 +4,13 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import ar.edu.utn.sigmaproject.domain.*;
+import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.RawMaterialTypeRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
+import ar.edu.utn.sigmaproject.service.WoodReservedRepository;
 import ar.edu.utn.sigmaproject.service.WoodTypeRepository;
 import ar.edu.utn.sigmaproject.service.WorkerRepository;
+
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -73,6 +76,8 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	Button cancelNewStockButton;
 	@Wire
 	Button resetNewStockButton;
+	@Wire
+	Listbox woodReservedListbox;
 
 	// services
 	@WireVariable
@@ -80,9 +85,13 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	@WireVariable
 	private WoodRepository woodRepository;
 	@WireVariable
+	private WoodReservedRepository woodReservedRepository;
+	@WireVariable
 	private WoodTypeRepository woodTypeRepository;
 	@WireVariable
 	private WorkerRepository workerRepository;
+	@WireVariable
+	private ProductionPlanRepository productionPlanRepository;
 
 	// attributes
 	private Wood currentWood;
@@ -91,12 +100,14 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	private List<RawMaterialType> rawMaterialTypeList;
 	private List<Wood> woodList;
 	private List<WoodType> woodTypeList;
+	private List<WoodReserved> woodReservedList;
 	private List<Worker> workerList;
 
 	// list models
 	private ListModelList<RawMaterialType> rawMaterialTypeListModel;
 	private ListModelList<Wood> woodListModel;
 	private ListModelList<WoodType> woodTypeListModel;
+	private ListModelList<WoodReserved> woodReservedListModel;
 	private ListModelList<Worker> workerListModel;
 
 	@Override
@@ -111,6 +122,9 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		woodList = woodRepository.findAll();
 		woodListModel = new ListModelList<>(woodList);
 		woodListbox.setModel(woodListModel);
+		woodReservedList = woodReservedRepository.findAll();
+		woodReservedListModel = new ListModelList<>(woodReservedList);
+		woodReservedListbox.setModel(woodReservedListModel);
 		currentWood = null;
 		workerList = workerRepository.findAll();
 		workerListModel = new ListModelList<>(workerList);
@@ -298,5 +312,27 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		workerCombobox.setSelectedIndex(-1);
 		numberIntbox.setValue(null);
 		quantityDoublebox.setValue(null);
+	}
+	
+	public String getProductionPlanName(WoodReserved woodReserved) {
+		if(woodReserved == null) {
+			return "";
+		} else {
+			RawMaterialRequirement rawMaterialRequirement = woodReserved.getRawMaterialRequirement();
+			if(rawMaterialRequirement != null) {
+				ProductionPlan productionPlan = productionPlanRepository.findByRawMaterialRequirements(rawMaterialRequirement);
+				if(productionPlan != null) {
+					return productionPlan.getName();
+				} else {
+					return "";
+				}
+			} else {
+				return "";
+			}
+		}
+	}
+	
+	public Wood getWood(WoodReserved woodReserved) {
+		return woodRepository.findFirstByWoodsReserved(woodReserved);
 	}
 }

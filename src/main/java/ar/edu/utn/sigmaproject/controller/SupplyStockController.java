@@ -3,11 +3,6 @@ package ar.edu.utn.sigmaproject.controller;
 import java.math.BigDecimal;
 import java.util.List;
 
-import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
-import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
-import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
-import ar.edu.utn.sigmaproject.service.WorkerRepository;
-
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -25,12 +20,15 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
-import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
 import ar.edu.utn.sigmaproject.domain.SupplyReserved;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.domain.Worker;
+import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
+import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
+import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
+import ar.edu.utn.sigmaproject.service.WorkerRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SupplyStockController extends SelectorComposer<Component> {
@@ -274,5 +272,23 @@ public class SupplyStockController extends SelectorComposer<Component> {
 				return "";
 			}
 		}
+	}
+	
+	public BigDecimal getSupplyStockReserved(SupplyType supplyType) {
+		List<SupplyReserved> supplyReservedTotal = supplyReservedRepository.findBySupplyRequirementSupplyType(supplyType);
+		BigDecimal stockReservedTotal = BigDecimal.ZERO;
+		for(SupplyReserved each : supplyReservedTotal) {
+			if(!each.isWithdrawn()) {// suma todas las reservas del insumo que aun no han sido retiradas
+				stockReservedTotal = stockReservedTotal.add(each.getStockReserved());
+			}
+		}
+		return stockReservedTotal;
+	}
+
+	public BigDecimal getSupplyStockAvailable(SupplyType supplyType) {
+		// devuelve la diferencia entre el stock total y el total reservado
+		BigDecimal stockTotal = supplyType.getStock();
+		BigDecimal stockReservedTotal = getSupplyStockReserved(supplyType);
+		return stockTotal.subtract(stockReservedTotal);
 	}
 }
