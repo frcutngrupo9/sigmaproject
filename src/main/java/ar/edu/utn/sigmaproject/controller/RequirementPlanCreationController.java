@@ -1,6 +1,7 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,6 +27,8 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
+import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
+import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.RawMaterialType;
 import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
@@ -35,6 +38,8 @@ import ar.edu.utn.sigmaproject.domain.Wood;
 import ar.edu.utn.sigmaproject.domain.WoodReserved;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
+import ar.edu.utn.sigmaproject.service.ProductionPlanStateRepository;
+import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.RawMaterialRequirementRepository;
 import ar.edu.utn.sigmaproject.service.SupplyRequirementRepository;
 import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
@@ -51,6 +56,8 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	@Wire
 	Datebox productionPlanDatebox;
 	@Wire
+	Textbox productionPlanStateTextbox;
+	@Wire
 	Listbox rawMaterialRequirementListbox;
 	@Wire
 	Listbox supplyRequirementListbox;
@@ -62,6 +69,10 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	private ProductRepository productRepository;
 	@WireVariable
 	private ProductionPlanRepository productionPlanRepository;
+	@WireVariable
+	private ProductionPlanStateRepository productionPlanStateRepository;
+	@WireVariable
+	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
 	@WireVariable
 	private WoodRepository woodRepository;
 	@WireVariable
@@ -110,20 +121,57 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 				} else {
 					rawMaterialRequirementListbox.setModel(rawMaterialRequirementListModel);
 				}
+				// actualiza el estado del plan si es que esta abastecido
+				updateProductionPlanState();
 			}
 		});
 
 		refreshView();
 	}
 
+	protected void updateProductionPlanState() {
+		// recorre todos los requerimientos para ver si estan todos abastecidos
+		boolean isCompleted = true;
+		for(SupplyRequirement each : supplyRequirementList) {
+			if(!isSupplyRequirementFulfilled(each)) {
+				isCompleted = false;
+			}
+		}
+		for(RawMaterialRequirement each : rawMaterialRequirementList) {
+			if(!isRawMaterialRequirementFulfilled(each)) {
+				isCompleted = false;
+			}
+		}
+		if(isCompleted) {
+			ProductionPlanStateType productionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Abastecido");
+			ProductionPlanState productionPlanState = new ProductionPlanState(productionPlanStateType, new Date());
+			productionPlanState = productionPlanStateRepository.save(productionPlanState);
+			currentProductionPlan.setState(productionPlanState);
+			currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
+			refreshView();
+		} else {
+			ProductionPlanStateType productionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Iniciado");
+			if(!currentProductionPlan.getCurrentStateType().equals(productionPlanStateType)) {
+				// si dejo de estar abastecido
+				ProductionPlanState productionPlanState = new ProductionPlanState(productionPlanStateType, new Date());
+				productionPlanState = productionPlanStateRepository.save(productionPlanState);
+				currentProductionPlan.setState(productionPlanState);
+				currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
+				refreshView();
+			}
+		}
+	}
+
 	private void refreshView() {
 		productionPlanNameTextbox.setDisabled(true);
 		productionPlanDatebox.setDisabled(true);
+		productionPlanStateTextbox.setDisabled(true);
 		supplyRequirementListbox.setModel(supplyRequirementListModel);
 		rawMaterialRequirementListbox.setModel(rawMaterialRequirementListModel);
 		if(currentProductionPlan != null) {
 			productionPlanNameTextbox.setText(currentProductionPlan.getName());
 			productionPlanDatebox.setValue(currentProductionPlan.getDate());
+			productionPlanStateTextbox.setText(currentProductionPlan.getCurrentStateType().getName());
 		}
 	}
 

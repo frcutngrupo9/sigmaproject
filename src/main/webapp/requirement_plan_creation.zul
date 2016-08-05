@@ -16,6 +16,10 @@
                             <label value="Fecha Plan de Produccion: "/>
 							<datebox id="productionPlanDatebox" cols="12" format="dd-MM-yyyy" width="25%"/>
                         </row>
+                        <row>
+                            <label value="Estado Plan de Produccion: "/>
+							<textbox id="productionPlanStateTextbox" width="25%"/>
+                        </row>
                     </rows>
                 </grid>
                 <separator/>
