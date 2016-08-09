@@ -73,16 +73,16 @@ public class ProductSupplyController extends SelectorComposer<Component> {
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		
+
 		supplyList = (List<Supply>) Executions.getCurrent().getAttribute("supplyList");
-		
+
 		currentSupply = null;
 		currentSupplyType = null;
-		
+
 		refreshSupplyTypePopup();
 		refreshViewSupply();
 	}
-	
+
 	@Listen("onClick = #acceptSupplyListButton")
 	public void acceptSupplyListButtonClick() {
 		EventQueue<Event> eq = EventQueues.lookup("Product Change Queue", EventQueues.DESKTOP, true);
@@ -94,7 +94,7 @@ public class ProductSupplyController extends SelectorComposer<Component> {
 	public void cancelSupplyListButtonClick() {
 		productSupplyWindow.detach();
 	}
-	
+
 	private void refreshViewSupply() {
 		supplyListModel = new ListModelList<Supply>(supplyList);
 		supplyListbox.setModel(supplyListModel);
@@ -130,6 +130,12 @@ public class ProductSupplyController extends SelectorComposer<Component> {
 		currentSupplyType = supplyTypePopupListbox.getSelectedItem().getValue();
 		supplyTypeBandbox.setValue(currentSupplyType.getDescription());
 		supplyTypeBandbox.close();
+		supplyQuantityDoublebox.setFocus(true);
+	}
+
+	@Listen("onOK = #supplyQuantityDoublebox")
+	public void supplyQuantityDoubleboxOnOK() {
+		saveSupply();
 	}
 
 	@Listen("onSelect = #supplyListbox")

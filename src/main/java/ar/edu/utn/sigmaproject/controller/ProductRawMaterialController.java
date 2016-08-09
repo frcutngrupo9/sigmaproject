@@ -74,16 +74,16 @@ public class ProductRawMaterialController extends SelectorComposer<Component> {
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		
+
 		rawMaterialList = (List<RawMaterial>) Executions.getCurrent().getAttribute("rawMaterialList");
-		
+
 		currentRawMaterial = null;
 		currentRawMaterialType = null;
-		
+
 		refreshViewRawMaterial();
 		refreshRawMaterialTypePopup();
 	}
-	
+
 	@Listen("onClick = #acceptRawMaterialListButton")
 	public void acceptRawMaterialListButtonClick() {
 		EventQueue<Event> eq = EventQueues.lookup("Product Change Queue", EventQueues.DESKTOP, true);
@@ -95,7 +95,7 @@ public class ProductRawMaterialController extends SelectorComposer<Component> {
 	public void cancelRawMaterialListButtonClick() {
 		productRawMaterialWindow.detach();
 	}
-	
+
 	private void refreshViewRawMaterial() {
 		rawMaterialListModel = new ListModelList<>(rawMaterialList);
 		rawMaterialListbox.setModel(rawMaterialListModel);
@@ -133,6 +133,12 @@ public class ProductRawMaterialController extends SelectorComposer<Component> {
 		currentRawMaterialType = (RawMaterialType) rawMaterialTypePopupListbox.getSelectedItem().getValue();
 		rawMaterialTypeBandbox.setValue(currentRawMaterialType.getName());
 		rawMaterialTypeBandbox.close();
+		rawMaterialQuantityDoublebox.setFocus(true);
+	}
+
+	@Listen("onOK = #rawMaterialQuantityDoublebox")
+	public void rawMaterialQuantityDoubleboxOnOK() {
+		saveRawMaterial();
 	}
 
 	@Listen("onSelect = #rawMaterialListbox")
@@ -200,7 +206,7 @@ public class ProductRawMaterialController extends SelectorComposer<Component> {
 		currentRawMaterial = null;
 		refreshViewRawMaterial();
 	}
-	
+
 	public String getMeasureUnitName(MeasureUnit measureUnit) {
 		if (measureUnit != null) {
 			return measureUnit.getName();

@@ -71,7 +71,7 @@
 			            </row>
 			        </rows>
 		    	</grid>
-		    	<panel title="Pedido de Restock" id="orderCreationBlock" collapsible="true" visible="true" closable="false" border="rounded">
+		    	<panel title="Pedido de Restock" id="orderCreationBlock" collapsible="true" visible="false" closable="false">
 		        	<panelchildren>
 		        		<separator/>
 		        		<hlayout>

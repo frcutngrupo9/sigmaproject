@@ -23,9 +23,6 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
-import ar.edu.utn.sigmaproject.domain.RawMaterialType;
-import ar.edu.utn.sigmaproject.domain.SupplyReserved;
-import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.domain.Wood;
 import ar.edu.utn.sigmaproject.domain.WoodReserved;
 import ar.edu.utn.sigmaproject.service.RawMaterialTypeRepository;
@@ -195,5 +192,10 @@ public class RawMaterialReservationController extends SelectorComposer<Component
 			stockReservedTotal = stockReservedTotal.subtract(currentWoodReserved.getStockReserved());
 		}
 		return stockTotal.subtract(stockReservedTotal);
+	}
+
+	@Listen("onOK = #stockReservedDoublebox")
+	public void stockReservedDoubleboxOnOK() {
+		saveButtonClick();
 	}
 }
