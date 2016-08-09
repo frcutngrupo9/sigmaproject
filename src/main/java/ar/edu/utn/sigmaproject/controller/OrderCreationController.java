@@ -216,6 +216,13 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		if(product_price != null) {
 			productPriceDoublebox.setValue(currentProduct.getPrice().doubleValue());
 		}
+		productUnitsIntbox.setFocus(true);
+	}
+	
+	@Listen("onOK = #productUnitsIntbox")
+	public void productUnitsIntboxOnOK() {
+		// se ejecuta al presionar la tecla enter dentro del Intbox
+		saveOrderDetail();
 	}
 
 	@Listen("onClick = #saveOrderDetailButton")

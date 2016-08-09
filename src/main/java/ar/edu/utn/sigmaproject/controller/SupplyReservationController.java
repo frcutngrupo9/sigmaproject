@@ -153,4 +153,9 @@ public class SupplyReservationController extends SelectorComposer<Component> {
 		}
 		return stockTotal.subtract(stockReservedTotal);
 	}
+	
+	@Listen("onOK = #stockReservedDoublebox")
+	public void stockReservedDoubleboxOnOK() {
+		saveButtonClick();
+	}
 }
