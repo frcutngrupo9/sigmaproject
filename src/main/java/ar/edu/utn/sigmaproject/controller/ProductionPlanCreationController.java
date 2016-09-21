@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.datatype.Duration;
+
 import org.springframework.transaction.annotation.Transactional;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
@@ -35,7 +37,10 @@ import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductTotal;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderRawMaterial;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderSupply;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
@@ -49,9 +54,12 @@ import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderDetailRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderRawMaterialRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderSupplyRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanDetailRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateRepository;
@@ -111,9 +119,15 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	@WireVariable
 	private ProductionOrderRepository productionOrderRepository;
 	@WireVariable
+	private ProductionOrderDetailRepository productionOrderDetailRepository;
+	@WireVariable
 	private ProductionOrderStateRepository productionOrderStateRepository;
 	@WireVariable
 	private ProductionOrderStateTypeRepository productionOrderStateTypeRepository;
+	@WireVariable
+	private ProductionOrderSupplyRepository productionOrderSupplyRepository;
+	@WireVariable
+	private ProductionOrderRawMaterialRepository productionOrderRawMaterialRepository;
 
 	// list
 	private List<Order> orderPopupList;
@@ -252,12 +266,58 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateTypeRepository.findFirstByName("Generada"), new Date());
 				productionOrderState = productionOrderStateRepository.save(productionOrderState);
 				ProductionOrder productionOrder = new ProductionOrder(currentProductionPlan, each.getProduct(), null, null, each.getTotalUnits(), null, null, productionOrderState);
+				//  agrega los detalles
+				List<ProductionOrderDetail> details = createProductionOrderDetailList(productionOrder);
+				details = productionOrderDetailRepository.save(details);
+				productionOrder.setDetails(details);
+				// agrega los materiales a las ordenes de produccion
+				List<ProductionOrderSupply> productionOrderSupplyList = createProductionOrderSupplyList(productionOrder);
+				List<ProductionOrderRawMaterial> productionOrderRawMaterialList = createProductionOrderRawMaterialList(productionOrder);
+				productionOrderSupplyList = productionOrderSupplyRepository.save(productionOrderSupplyList);
+				productionOrderRawMaterialList = productionOrderRawMaterialRepository.save(productionOrderRawMaterialList);
+				productionOrder.setProductionOrderSupplies(productionOrderSupplyList);
+				productionOrder.setProductionOrderRawMaterials(productionOrderRawMaterialList);
+				
 				productionOrder = productionOrderRepository.save(productionOrder);
 			}
 			currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
 		}
 		refreshViewProductionPlan();
 		alert("Plan guardado.");
+	}
+	
+	private List<ProductionOrderDetail> createProductionOrderDetailList(ProductionOrder productionOrder) {
+		List<ProductionOrderDetail> details = new ArrayList<>();
+		for(Piece piece : productionOrder.getProduct().getPieces()) {
+			List<Process> auxProcessList = piece.getProcesses();
+			for(Process process : auxProcessList) {
+				// por cada proceso hay que crear un detalle
+				Integer quantityPiece = productionOrder.getUnits() * piece.getUnits();// cantidad total de la pieza
+				Duration timeTotal = process.getTime().multiply(quantityPiece);// cantidad total de tiempo del proceso
+				details.add(new ProductionOrderDetail(process, null, timeTotal, quantityPiece));
+			}
+		}
+		return details;
+	}
+	
+	private List<ProductionOrderSupply> createProductionOrderSupplyList(ProductionOrder productionOrder) {
+		List<ProductionOrderSupply> list = new ArrayList<>();
+		for(Supply each : productionOrder.getProduct().getSupplies()) {
+			BigDecimal totalQuantity = each.getQuantity().multiply(new BigDecimal(productionOrder.getUnits()));
+			ProductionOrderSupply productionOrderSupply = new ProductionOrderSupply(each.getSupplyType(), totalQuantity);
+			list.add(productionOrderSupply);
+		}
+		return list;
+	}
+	
+	private List<ProductionOrderRawMaterial> createProductionOrderRawMaterialList(ProductionOrder productionOrder) {
+		List<ProductionOrderRawMaterial> list = new ArrayList<>();
+		for(RawMaterial each : productionOrder.getProduct().getRawMaterials()) {
+			BigDecimal totalQuantity = each.getQuantity().multiply(new BigDecimal(productionOrder.getUnits()));
+			ProductionOrderRawMaterial productionOrderRawMaterial = new ProductionOrderRawMaterial(each.getRawMaterialType(), totalQuantity);
+			list.add(productionOrderRawMaterial);
+		}
+		return list;
 	}
 
 	private List<SupplyRequirement> createSupplyRequirements(ProductionPlan productionPlan) {
@@ -273,9 +333,9 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 					}
 				}
 				if (auxSupplyRequirement != null) {// el insumo si se encuentra agregado, suma sus cantidades
-					auxSupplyRequirement.setQuantity(auxSupplyRequirement.getQuantity().add(supply.getQuantity()));
+					auxSupplyRequirement.setQuantity(auxSupplyRequirement.getQuantity().add(supply.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
 				} else {// el insumo no se encuentra, se lo agrega
-					list.add(new SupplyRequirement(supply.getSupplyType(), supply.getQuantity()));
+					list.add(new SupplyRequirement(supply.getSupplyType(), supply.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
 				}
 			}
 		}
@@ -296,9 +356,9 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 					}
 				}
 				if(auxRawMaterialRequirement != null) {// la materia prima si se encuentra agregada, sumamos sus cantidades
-					auxRawMaterialRequirement.setQuantity(auxRawMaterialRequirement.getQuantity().add(rawMaterial.getQuantity()));
+					auxRawMaterialRequirement.setQuantity(auxRawMaterialRequirement.getQuantity().add(rawMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
 				} else {// la materia prima no se encuentra, se la agrega
-					list.add(new RawMaterialRequirement(rawMaterial.getRawMaterialType(), rawMaterial.getQuantity()));
+					list.add(new RawMaterialRequirement(rawMaterial.getRawMaterialType(), rawMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
 				}
 			}
 		}
@@ -346,7 +406,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		refreshOrder();
 		if (currentProductionPlan == null) {// nuevo plan de produccion
 			productionPlanCaption.setLabel("Creacion de Plan de Produccion");
-			productionPlanStateTypeListModel.addToSelection(productionPlanStateTypeRepository.findFirstByName("Iniciado"));
+			productionPlanStateTypeListModel.addToSelection(productionPlanStateTypeRepository.findFirstByName("Planificado"));
 			productionPlanStateTypeCombobox.setModel(productionPlanStateTypeListModel);
 			productionPlanNameTextbox.setText("");
 			currentProductionPlanDetailList = new ArrayList<ProductionPlanDetail>();

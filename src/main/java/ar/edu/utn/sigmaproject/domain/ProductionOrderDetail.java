@@ -48,7 +48,7 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 	public ProductionOrderDetail(Process process, Machine machine, Duration timeTotal, Integer quantityPiece) {
 		this.process = process;
 		this.machine = machine;
-		this.timeTotal = timeTotal;
+		this.setTimeTotal(timeTotal);
 		this.quantityPiece = quantityPiece;
 		isFinished = false;
 		dateFinished = null;

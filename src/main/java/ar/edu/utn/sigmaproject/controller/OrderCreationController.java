@@ -218,7 +218,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		}
 		productUnitsIntbox.setFocus(true);
 	}
-	
+
 	@Listen("onOK = #productUnitsIntbox")
 	public void productUnitsIntboxOnOK() {
 		// se ejecuta al presionar la tecla enter dentro del Intbox
@@ -324,6 +324,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		}
 		return lastValue + 1;
 	}
+
 	private void refreshViewOrderDetail() {
 		if (currentOrderDetail == null) {
 			// borramos el text del producto  seleccionado
@@ -426,7 +427,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			});
 		}
 	}
-	
+
 	private void filterProducts() {
 		List<Product> someProducts = new ArrayList<>();
 		String nameFilter = productNameFilterTextbox.getValue().toLowerCase();
@@ -438,7 +439,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		productPopupListModel = new ListModelList<Product>(someProducts);
 		productPopupListbox.setModel(productPopupListModel);
 	}
-	
+
 	@Listen("onChanging = #productNameFilterTextbox")
 	public void changeFilter(InputEvent event) {
 		Textbox target = (Textbox)event.getTarget();

@@ -7,6 +7,13 @@
         </function-signature>
     </function>
     <function>
+        <name>getFormattedProcessTime</name>
+        <function-class>ar.edu.utn.sigmaproject.util.RenderElHelper</function-class>
+        <function-signature>
+            java.lang.String getFormattedProcessTime(javax.xml.datatype.Duration time)
+        </function-signature>
+    </function>
+    <function>
         <name>getFormattedMeasure</name>
         <function-class>ar.edu.utn.sigmaproject.util.RenderElHelper</function-class>
         <function-signature>

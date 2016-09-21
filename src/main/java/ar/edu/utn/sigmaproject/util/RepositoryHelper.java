@@ -148,12 +148,12 @@ public class RepositoryHelper {
 	private void generateProductionPlanStateTypes() {
 		if (productionPlanStateTypeRepository.count() == 0) {
 			List<ProductionPlanStateType> list = new ArrayList<>();
-			list.add(new ProductionPlanStateType("Iniciado", null));
-			list.add(new ProductionPlanStateType("Cancelado", null));
+			list.add(new ProductionPlanStateType("Planificado", null));
 			list.add(new ProductionPlanStateType("Abastecido", null));
-			list.add(new ProductionPlanStateType("Lanzado", null));
-			list.add(new ProductionPlanStateType("En Produccion", null));
+			list.add(new ProductionPlanStateType("En Ejecucion", null));
 			list.add(new ProductionPlanStateType("Finalizado", null));
+			list.add(new ProductionPlanStateType("Cancelado", null));
+			list.add(new ProductionPlanStateType("Suspendido", null));
 			productionPlanStateTypeRepository.save(list);
 		}
 	}
@@ -255,27 +255,19 @@ public class RepositoryHelper {
 		if (productRepository.count() == 0) {
 			generateProductCategory();
 			List<Product> list = new ArrayList<>();
-			list.add(new Product("1", "Mesa patas 4x4 rectas de 1.20x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("840")));
 			list.add(new Product("7", "Mesa patas Reina Ana de 1.40x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1045")));
 			list.add(new Product("26", "Dressoir patas rectas de 0.90x0.45mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Comoda"), new BigDecimal("483")));
 			list.add(new Product("29", "Banqueta alta  con respaldo de 0.30mts de diámetro".toUpperCase(), "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("226")));
-			list.add(new Product("30", "Banqueta alta con respaldo omega".toUpperCase(), "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("294")));
-			list.add(new Product("31", "Silla de campo resp. c/ tablero o varillas".toUpperCase(), "", productCategoryRepository.findFirstByName("Silla"), new BigDecimal("252")));
 			list.add(new Product("32", "Silla Omega respaldo inclinado patas rectas".toUpperCase(), "", productCategoryRepository.findFirstByName("Silla"), new BigDecimal("231")));
-			list.add(new Product("34", "Cama Omega de 1.40mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("704")));
 			list.add(new Product("37", "Cama Monterrey c/curva patas 4x4 de 080cm".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("1050")));
 			list.add(new Product("40", "Respaldo para Somier Monterrey X o Curvo de 1.50mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Respaldo"), new BigDecimal("1029")));
 			list.add(new Product("43", "Marco de espejo".toUpperCase(), "", productCategoryRepository.findFirstByName("Marco"), new BigDecimal("189")));
 			list.add(new Product("44", "Sillon Hamaca grande".toUpperCase(), "", productCategoryRepository.findFirstByName("Sillon"), new BigDecimal("504")));
-			list.add(new Product("45", "Dresoir de 3 cajones con estante".toUpperCase(), "", productCategoryRepository.findFirstByName("Comoda"), new BigDecimal("536")));
-			list.add(new Product("47", "Mesa de lámpara con 1 cajon".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("284")));
 			list.add(new Product("51", "Chiffonier de 1,45x0,70x0,40 mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cajonera"), new BigDecimal("1245")));
 			list.add(new Product("53", "Mesa de luz de 0,70x0,50x0,40 mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("473")));
-			list.add(new Product("56", "Biblioteca de 0,60 mts con estantes".toUpperCase(), "", productCategoryRepository.findFirstByName("Biblioteca"), new BigDecimal("756")));
 			list.add(new Product("57", "Biblioteca de 0,60 mts con 4 cajones y estantes".toUpperCase(), "", productCategoryRepository.findFirstByName("Biblioteca"), new BigDecimal("1024")));
 			list.add(new Product("59", "Sillon Romano de dos cuerpos".toUpperCase(), "", productCategoryRepository.findFirstByName("Sillon"), new BigDecimal("483")));
 			list.add(new Product("60", "Banquito recto o redondo chico".toUpperCase(), "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("153")));
-			list.add(new Product("61", "Sillon punta de cama Reina Ana 1,00 mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Sillon"), new BigDecimal("380")));
 			productRepository.save(list);
 		}
 	}

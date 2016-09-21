@@ -52,7 +52,7 @@
 		                	<label value="${each.product.name}"/>
 		                	<label value="${each.units}"/>
 		                	<label value="${each.product.code}"/>
-		                    <label value="${each.state.name}"/>
+		                    <label value="${each.getCurrentStateType().name}"/>
 		                    <label value="${win_production_order_list$composer.getWorkerName(each)}"/>
 		                    <label value="${win_production_order_list$composer.getPercentComplete(each)}"/>
 		                    <label value="${each.date}"/>
