@@ -150,7 +150,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 			currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
 			refreshView();
 		} else {
-			ProductionPlanStateType productionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Iniciado");
+			ProductionPlanStateType productionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Planificado");
 			if(!currentProductionPlan.getCurrentStateType().equals(productionPlanStateType)) {
 				// si dejo de estar abastecido
 				ProductionPlanState productionPlanState = new ProductionPlanState(productionPlanStateType, new Date());
@@ -179,7 +179,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 		// TODO: como es la verdadera relacion entre estas tres clases? un SupplyRequirement tiene un SupplyType,
 		// por que un SupplyReserved tiene tambien un SupplyType? La relacion es uno a uno entre SupplyRequirement y SupplyReserved?
 		// Respuesta: SupplyType tiene una lista de SupplyReserved, y cada SupplyReserved tiene un SupplyRequirement para saber para que plan se está reservando.
-		//  Por lo tanto SupplyReserved reserved no tiene SupplyType, solo lo tiene SupplyRequirement
+		// SupplyReserved no tiene SupplyType, solo lo tiene SupplyRequirement
 		SupplyReserved supplyReserved = supplyReservedRepository.findBySupplyRequirement(supplyRequirement);
 		if(supplyReserved == null) {
 			return BigDecimal.ZERO;

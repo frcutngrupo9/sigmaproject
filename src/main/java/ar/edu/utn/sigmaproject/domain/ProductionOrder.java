@@ -1,12 +1,17 @@
 package ar.edu.utn.sigmaproject.domain;
 
-import javax.persistence.*;
-import javax.xml.datatype.Duration;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
 
 @Entity
 public class ProductionOrder implements Serializable, Cloneable {
@@ -36,6 +41,14 @@ public class ProductionOrder implements Serializable, Cloneable {
 	Integer units = 0;
 	Date date = new Date();
 	Date dateFinished = new Date();
+	Date realDate = new Date();
+	Date realDateFinished = new Date();
+	
+	@OneToMany(orphanRemoval = true)
+	List<ProductionOrderSupply> productionOrderSupplies = new ArrayList<>();
+	
+	@OneToMany(orphanRemoval = true)
+	List<ProductionOrderRawMaterial> productionOrderRawMaterials = new ArrayList<>();
 
 	public ProductionOrder() {
 
@@ -129,6 +142,39 @@ public class ProductionOrder implements Serializable, Cloneable {
 	public void setDateFinished(Date dateFinished) {
 		this.dateFinished = dateFinished;
 	}
+	
+	public Date getRealDate() {
+		return realDate;
+	}
+
+	public void setRealDate(Date realDate) {
+		this.realDate = realDate;
+	}
+
+	public Date getRealDateFinished() {
+		return realDateFinished;
+	}
+
+	public void setRealDateFinished(Date realDateFinished) {
+		this.realDateFinished = realDateFinished;
+	}
+
+	public List<ProductionOrderSupply> getProductionOrderSupplies() {
+		return productionOrderSupplies;
+	}
+
+	public void setProductionOrderSupplies(List<ProductionOrderSupply> productionOrderSupplyList) {
+		this.productionOrderSupplies = productionOrderSupplyList;
+	}
+
+	public List<ProductionOrderRawMaterial> getProductionOrderRawMaterials() {
+		return productionOrderRawMaterials;
+	}
+
+	public void setProductionOrderRawMaterials(List<ProductionOrderRawMaterial> productionOrderRawMaterialList) {
+		this.productionOrderRawMaterials = productionOrderRawMaterialList;
+	}
+
 	public ProductionOrderStateType getCurrentStateType() {
 		ProductionOrderState result = getCurrentState();
 		if(result != null) {
