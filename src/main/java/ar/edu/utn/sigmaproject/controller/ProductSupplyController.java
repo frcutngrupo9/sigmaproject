@@ -1,7 +1,6 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
@@ -23,11 +22,8 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Window;
 
-import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.Supply;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
-import ar.edu.utn.sigmaproject.service.ProductRepository;
-import ar.edu.utn.sigmaproject.service.SupplyRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -59,14 +55,9 @@ public class ProductSupplyController extends SelectorComposer<Component> {
 
 	// services
 	@WireVariable
-	private ProductRepository productRepository;
-	@WireVariable
-	private SupplyRepository supplyRepository;
-	@WireVariable
 	private SupplyTypeRepository supplyTypeRepository;
 
 	// attributes
-	private Product currentProduct;
 	private Supply currentSupply;
 	private SupplyType currentSupplyType;
 
@@ -78,36 +69,24 @@ public class ProductSupplyController extends SelectorComposer<Component> {
 	private ListModelList<Supply> supplyListModel;
 	private ListModelList<SupplyType> supplyTypePopupListModel;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		
-		currentProduct = (Product) Executions.getCurrent().getAttribute("selected_product");
-		if(currentProduct == null) {
-			alert("Product null");
-			supplyList = new ArrayList<>();
-		} else {
-			supplyList = currentProduct.getSupplies();
-		}
-		
+
+		supplyList = (List<Supply>) Executions.getCurrent().getAttribute("supplyList");
+
 		currentSupply = null;
 		currentSupplyType = null;
-		
+
 		refreshSupplyTypePopup();
 		refreshViewSupply();
 	}
-	
+
 	@Listen("onClick = #acceptSupplyListButton")
 	public void acceptSupplyListButtonClick() {
-		if(currentProduct != null) {
-			for(Supply each : supplyList) {
-				each = supplyRepository.save(each);
-			}
-			currentProduct.setSupplies(supplyList);
-			currentProduct = productRepository.save(currentProduct);
-		}
 		EventQueue<Event> eq = EventQueues.lookup("Product Change Queue", EventQueues.DESKTOP, true);
-		eq.publish(new Event("onProductChange", null, currentProduct));
+		eq.publish(new Event("onSupplyChange", null, supplyList));
 		productSupplyWindow.detach();
 	}
 
@@ -115,7 +94,7 @@ public class ProductSupplyController extends SelectorComposer<Component> {
 	public void cancelSupplyListButtonClick() {
 		productSupplyWindow.detach();
 	}
-	
+
 	private void refreshViewSupply() {
 		supplyListModel = new ListModelList<Supply>(supplyList);
 		supplyListbox.setModel(supplyListModel);
@@ -151,6 +130,12 @@ public class ProductSupplyController extends SelectorComposer<Component> {
 		currentSupplyType = supplyTypePopupListbox.getSelectedItem().getValue();
 		supplyTypeBandbox.setValue(currentSupplyType.getDescription());
 		supplyTypeBandbox.close();
+		supplyQuantityDoublebox.setFocus(true);
+	}
+
+	@Listen("onOK = #supplyQuantityDoublebox")
+	public void supplyQuantityDoubleboxOnOK() {
+		saveSupply();
 	}
 
 	@Listen("onSelect = #supplyListbox")

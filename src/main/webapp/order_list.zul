@@ -1,38 +1,41 @@
 <window id="win_order_list" title="Lista de Pedidos" closable="false" apply="ar.edu.utn.sigmaproject.controller.OrderListController" sclass="sigma-content">
-    <hlayout>
-        <label>Buscar:</label>
-        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
-        <button id="searchButton" label="Buscar"/>
-    </hlayout>
-    <separator/>
-    <grid id="orderGrid" mold="paging" pageSize="7">
-    	<auxhead>
-			<auxheader label="Pedidos" colspan="8"/>
-		</auxhead>
-        <columns>
-            <column label="Numero" align="center"/>
-            <column label="Cliente" align="center"/>
-            <column label="Fecha" align="center"/>
-            <column label="Cantidad Productos" align="center"/>
-            <column label="Estado" align="center"/>
-            <column label="Monto Total" align="center"/>
-            <column label="Editar" width="120px" align="center"/>
-            <column label="Cancelar" width="120px" align="center"/>
-        </columns>
-        <template name="model">
-            <row>
-                <label value="${each.number}"/>
-                <label value="${each.getClient().getName()}"/>
-                <label value="${each.date}"/>
-                <label value="${each.details.size()}"/>
-                <label value="${each.getCurrentStateType().getName()}"/>
-                <label value="${win_order_list$composer.totalPrice(each)} $"/>
-                <button forward="onClick=orderGrid.onEditOrder(${each})"  image="/img/edit16x16.png"/>
-                <button disabled="${win_order_list$composer.isStateCancel(each)}" forward="onClick=orderGrid.onCancelOrder(${each})"  image="/img/delete16x16.png"/>
-            </row>
-        </template>
-    </grid>
-    <separator/>
-    <button id="newOrderButton" label="Nuevo Pedido"/>
-    <separator/>
+	<panel border="none">
+        <panelchildren>
+		    <hlayout>
+		        <label>Buscar:</label>
+		        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
+		        <button id="searchButton" label="Buscar"/>
+		    </hlayout>
+		    <separator/>
+		    <grid id="orderGrid" mold="paging" pageSize="7">
+		    	<auxhead>
+					<auxheader label="Pedidos" colspan="8"/>
+				</auxhead>
+		        <columns>
+		            <column label="Numero" align="center"/>
+		            <column label="Cliente" align="center"/>
+		            <column label="Fecha" align="center"/>
+		            <column label="Cantidad Productos" align="center"/>
+		            <column label="Estado" align="center"/>
+		            <column label="Monto Total" align="center"/>
+		            <column label="Editar" width="120px" align="center"/>
+		            <column label="Cancelar" width="120px" align="center"/>
+		        </columns>
+		        <template name="model">
+		            <row>
+		                <label value="${each.number}"/>
+		                <label value="${each.getClient().getName()}"/>
+		                <label value="${each.date}"/>
+		                <label value="${each.details.size()}"/>
+		                <label value="${each.getCurrentStateType().getName()}"/>
+		                <label value="${win_order_list$composer.totalPrice(each)} $"/>
+		                <button forward="onClick=orderGrid.onEditOrder(${each})"  image="/img/edit16x16.png"/>
+		                <button disabled="${win_order_list$composer.isStateCancel(each)}" forward="onClick=orderGrid.onCancelOrder(${each})"  image="/img/delete16x16.png"/>
+		            </row>
+		        </template>
+		    </grid>
+		    <separator/>
+		    <button id="newOrderButton" label="Nuevo Pedido"/>
+        </panelchildren>
+    </panel>
 </window>

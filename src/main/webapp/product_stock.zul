@@ -1,119 +1,123 @@
 <window id="win_product_stock" title="Stock de Productos" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductStockController" sclass="sigma-content">
-    <hlayout>
-        <label>Buscar:</label>
-        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
-        <button id="searchButton" label="Buscar"/>
-    </hlayout>
-    <separator/>
-    <listbox id="productListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
-    	<auxhead>
-			<auxheader label="Productos" colspan="5"/>
-		</auxhead>
-        <listhead>
-            <listheader label="Codigo" align="center"/>
-            <listheader label="Descripcion" align="center"/>
-            <listheader label="Stock Actual" align="center"/>
-            <listheader label="Stock Minimo" align="center"/>
-            <listheader label="Stock Reposicion" align="center"/>
-        </listhead>
-        <template name="model">
-            <listitem>
-                <listcell label="${each.code}"/>
-                <listcell label="${each.name}"/>
-                <listcell label="${each.stock}"/>
-                <listcell label="${each.stockMin}"/>
-                <listcell label="${each.stockRepo}"/>
-            </listitem>
-        </template>
-    </listbox>
-    <vlayout>
-        <separator/>
-        <hbox>
-            <button id="newProvisionOrderButton" label="Nuevo Pedido Para Productos con bajo stock"/>
-        </hbox>
-        <separator/>
-		<grid id="productExistenceGrid" width="400px" sclass="sigma-form" visible="false">
-	        <columns>
-                <column hflex="min" align="right"/>
-                <column />
-            </columns>
-	        <rows>
-	            <row>
-	                <label>Codigo:</label>
-	                <textbox id="codeTextbox" value="" hflex="1"/>
-	            </row>
-	            <row>
-	                <label>Descripcion:</label>
-	                <textbox id="nameTextbox" value="" hflex="1"/>
-	            </row>
-	            <row>
-	                <label>Stock Actual:</label>
-	                <intbox id="stockIntbox" value="0" width="150px" hflex="1"/>
-	            </row>
-	            <row>
-	                <label>Stock Minimo:</label>
-	                <intbox id="stockMinIntbox" value="0" width="150px" hflex="1"/>
-	            </row>
-	            <row>
-	                <label>Stock Reposicion:</label>
-	                <intbox id="stockRepoIntbox" value="0" width="150px" hflex="1"/>
-	            </row>
-	            <row>
-	                <cell colspan="2" style="text-align:center">
-	                    <hlayout>
-	                        <button id="saveButton" label="Guardar"/>
-	                        <button id="cancelButton" label="Cancelar"/>
-	                        <button id="resetButton" label="Reset"/>
-	                    </hlayout>
-	                </cell>
-	            </row>
-	        </rows>
-    	</grid>
-    	<panel title="Pedido de Restock" id="orderCreationBlock" collapsible="true" visible="true" closable="false" border="rounded">
-        	<panelchildren>
-        		<separator/>
-        		<hlayout>
-        			<separator/>
-                    <label value="Numero: "/>
-                    <intbox id="orderNumberIntbox" constraint="no negative"/>
-                    <separator/>
-                    <separator/>
-                    <label value="Fecha de necesidad: "/>
-                    <datebox id="orderNeedDatebox" cols="12" format="dd-MM-yyyy"/>
-                </hlayout>
-                <separator/>
-                <hlayout>
-        			<separator/>
-			    	<listbox id="orderDetailListbox" mold="paging" pageSize="7">
-			            <auxhead>
-			                <auxheader label="Productos" colspan="3"/>
-			            </auxhead>
-			            <listhead>
-			            	<listheader label="Codigo Producto"/>
-			                <listheader label="Nombre Producto"/>
-			                <listheader label="Unidades"/>
-			            </listhead>
-			            <template name="model">
-			                <listitem>
-			                	<listcell label="${win_product_stock$composer.getProductCode(each.idProduct)}"/>
-			                    <listcell label="${win_product_stock$composer.getProductName(each.idProduct)}"/>
-			                    <listcell>
-		                        	<spinner inplace="true" value="${each.units}" forward="onChange=orderDetailListbox.onEditOrderDetailUnits(${each})" constraint="no negative: No puede ser valor negativo." width="98%"/>
-	                    		</listcell>
-							</listitem>
-			            </template>
-			        </listbox>
-			        <separator/>
-		        </hlayout>
+	<panel border="none">
+        <panelchildren>
+		    <hlayout>
+		        <label>Buscar:</label>
+		        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
+		        <button id="searchButton" label="Buscar"/>
+		    </hlayout>
+		    <separator/>
+		    <listbox id="productListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
+		    	<auxhead>
+					<auxheader label="Productos" colspan="5"/>
+				</auxhead>
+		        <listhead>
+		            <listheader label="Codigo" align="center"/>
+		            <listheader label="Descripcion" align="center"/>
+		            <listheader label="Stock Actual" align="center"/>
+		            <listheader label="Stock Minimo" align="center"/>
+		            <listheader label="Stock Reposicion" align="center"/>
+		        </listhead>
+		        <template name="model">
+		            <listitem>
+		                <listcell label="${each.code}"/>
+		                <listcell label="${each.name}"/>
+		                <listcell label="${each.stock}"/>
+		                <listcell label="${each.stockMin}"/>
+		                <listcell label="${each.stockRepo}"/>
+		            </listitem>
+		        </template>
+		    </listbox>
+		    <vlayout>
 		        <separator/>
-		        <hlayout>
-		        	<separator/>
-		            <button id="saveOrderButton" label="Guardar"/>
-		            <button id="resetOrderButton" label="Reset"/>
-		            <button id="cancelOrderButton" label="Cancelar"/>
-		        </hlayout>
+		        <hbox>
+		            <button id="newProvisionOrderButton" label="Nuevo Pedido Para Productos con bajo stock"/>
+		        </hbox>
 		        <separator/>
-	        </panelchildren>
-	    </panel>
-    </vlayout>
+				<grid id="productExistenceGrid" width="400px" sclass="sigma-form" visible="false">
+			        <columns>
+		                <column hflex="min" align="right"/>
+		                <column />
+		            </columns>
+			        <rows>
+			            <row>
+			                <label>Codigo:</label>
+			                <textbox id="codeTextbox" value="" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Descripcion:</label>
+			                <textbox id="nameTextbox" value="" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Stock Actual:</label>
+			                <intbox id="stockIntbox" value="0" width="150px" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Stock Minimo:</label>
+			                <intbox id="stockMinIntbox" value="0" width="150px" hflex="1"/>
+			            </row>
+			            <row>
+			                <label>Stock Reposicion:</label>
+			                <intbox id="stockRepoIntbox" value="0" width="150px" hflex="1"/>
+			            </row>
+			            <row>
+			                <cell colspan="2" style="text-align:center">
+			                    <hlayout>
+			                        <button id="saveButton" label="Guardar"/>
+			                        <button id="cancelButton" label="Cancelar"/>
+			                        <button id="resetButton" label="Reset"/>
+			                    </hlayout>
+			                </cell>
+			            </row>
+			        </rows>
+		    	</grid>
+		    	<panel title="Pedido de Restock" id="orderCreationBlock" collapsible="true" visible="false" closable="false">
+		        	<panelchildren>
+		        		<separator/>
+		        		<hlayout>
+		        			<separator/>
+		                    <label value="Numero: "/>
+		                    <intbox id="orderNumberIntbox" constraint="no negative"/>
+		                    <separator/>
+		                    <separator/>
+		                    <label value="Fecha de necesidad: "/>
+		                    <datebox id="orderNeedDatebox" cols="12" format="dd-MM-yyyy"/>
+		                </hlayout>
+		                <separator/>
+		                <hlayout>
+		        			<separator/>
+					    	<listbox id="orderDetailListbox" mold="paging" pageSize="7">
+					            <auxhead>
+					                <auxheader label="Productos" colspan="3"/>
+					            </auxhead>
+					            <listhead>
+					            	<listheader label="Codigo Producto"/>
+					                <listheader label="Nombre Producto"/>
+					                <listheader label="Unidades"/>
+					            </listhead>
+					            <template name="model">
+					                <listitem>
+					                	<listcell label="${win_product_stock$composer.getProductCode(each.idProduct)}"/>
+					                    <listcell label="${win_product_stock$composer.getProductName(each.idProduct)}"/>
+					                    <listcell>
+				                        	<spinner inplace="true" value="${each.units}" forward="onChange=orderDetailListbox.onEditOrderDetailUnits(${each})" constraint="no negative: No puede ser valor negativo." width="98%"/>
+			                    		</listcell>
+									</listitem>
+					            </template>
+					        </listbox>
+					        <separator/>
+				        </hlayout>
+				        <separator/>
+				        <hlayout>
+				        	<separator/>
+				            <button id="saveOrderButton" label="Guardar"/>
+				            <button id="resetOrderButton" label="Reset"/>
+				            <button id="cancelOrderButton" label="Cancelar"/>
+				        </hlayout>
+				        <separator/>
+			        </panelchildren>
+			    </panel>
+		    </vlayout>
+        </panelchildren>
+    </panel>
 </window>

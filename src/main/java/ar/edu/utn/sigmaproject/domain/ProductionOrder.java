@@ -1,11 +1,17 @@
 package ar.edu.utn.sigmaproject.domain;
 
-import javax.persistence.*;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
 
 @Entity
 public class ProductionOrder implements Serializable, Cloneable {
@@ -25,6 +31,9 @@ public class ProductionOrder implements Serializable, Cloneable {
 	Worker worker;
 
 	@OneToMany(orphanRemoval = true)
+	List<ProductionOrderState> states = new ArrayList<>();
+
+	@OneToMany(orphanRemoval = true)
 	@OrderColumn(name = "detail_index")
 	List<ProductionOrderDetail> details = new ArrayList<>();
 
@@ -32,7 +41,14 @@ public class ProductionOrder implements Serializable, Cloneable {
 	Integer units = 0;
 	Date date = new Date();
 	Date dateFinished = new Date();
-	ProductionOrderState state;
+	Date realDate = new Date();
+	Date realDateFinished = new Date();
+	
+	@OneToMany(orphanRemoval = true)
+	List<ProductionOrderSupply> productionOrderSupplies = new ArrayList<>();
+	
+	@OneToMany(orphanRemoval = true)
+	List<ProductionOrderRawMaterial> productionOrderRawMaterials = new ArrayList<>();
 
 	public ProductionOrder() {
 
@@ -46,7 +62,17 @@ public class ProductionOrder implements Serializable, Cloneable {
 		this.units = units;
 		this.date = date;
 		this.dateFinished = dateFinished;
-		this.state = state;
+		this.states.add(state);
+		// se crean los detalles
+		//		for(Piece piece : this.product.getPieces()) {
+		//			List<Process> auxProcessList = piece.getProcesses();
+		//			for(Process process : auxProcessList) {
+		//				// por cada proceso hay que crear un detalle de orden de produccion
+		//				Integer quantityPiece = this.units * piece.getUnits();// cantidad total de la pieza
+		//				Duration timeTotal = process.getTime().multiply(quantityPiece);// cantidad total de tiempo del proceso
+		//				this.details.add(new ProductionOrderDetail(process, null, timeTotal, quantityPiece));
+		//			}
+		//		}
 	}
 
 	public Long getId() {
@@ -116,13 +142,74 @@ public class ProductionOrder implements Serializable, Cloneable {
 	public void setDateFinished(Date dateFinished) {
 		this.dateFinished = dateFinished;
 	}
+	
+	public Date getRealDate() {
+		return realDate;
+	}
 
-	public ProductionOrderState getState() {
-		return state;
+	public void setRealDate(Date realDate) {
+		this.realDate = realDate;
+	}
+
+	public Date getRealDateFinished() {
+		return realDateFinished;
+	}
+
+	public void setRealDateFinished(Date realDateFinished) {
+		this.realDateFinished = realDateFinished;
+	}
+
+	public List<ProductionOrderSupply> getProductionOrderSupplies() {
+		return productionOrderSupplies;
+	}
+
+	public void setProductionOrderSupplies(List<ProductionOrderSupply> productionOrderSupplyList) {
+		this.productionOrderSupplies = productionOrderSupplyList;
+	}
+
+	public List<ProductionOrderRawMaterial> getProductionOrderRawMaterials() {
+		return productionOrderRawMaterials;
+	}
+
+	public void setProductionOrderRawMaterials(List<ProductionOrderRawMaterial> productionOrderRawMaterialList) {
+		this.productionOrderRawMaterials = productionOrderRawMaterialList;
+	}
+
+	public ProductionOrderStateType getCurrentStateType() {
+		ProductionOrderState result = getCurrentState();
+		if(result != null) {
+			return result.getProductionOrderStateType();
+		}
+		return null;
+	}
+
+	public ProductionOrderState getCurrentState() {
+		ProductionOrderState result = null;
+		for(ProductionOrderState each : states) {// busca el objeto con la fecha mas reciente
+			if(result != null) {
+				if(result.getDate().before(each.getDate())) {
+					result = each;
+				}
+			} else {
+				result = each;
+			}
+		}
+		if(result != null) {
+			return result;
+		}
+		return null;
 	}
 
 	public void setState(ProductionOrderState state) {
-		this.state = state;
+		states.add(state);
+	}
+
+	public List<ProductionOrderState> getStates() {
+		return states;
+	}
+
+	public void setStates(List<ProductionOrderState> states) {
+		this.states = states;
 	}
 
 	@Override
@@ -135,18 +222,23 @@ public class ProductionOrder implements Serializable, Cloneable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (!(obj instanceof ProductionOrder)) {
 			return false;
+		}
 		ProductionOrder other = (ProductionOrder) obj;
 		if (id == null) {
-			if (other.id != null)
+			if (other.id != null) {
 				return false;
-		} else if (!id.equals(other.id))
+			}
+		} else if (!id.equals(other.id)) {
 			return false;
+		}
 		return true;
 	}
 

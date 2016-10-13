@@ -16,17 +16,22 @@
                             <label value="Fecha Plan de Produccion: "/>
 							<datebox id="productionPlanDatebox" cols="12" format="dd-MM-yyyy" width="25%"/>
                         </row>
+                        <row>
+                            <label value="Estado Plan de Produccion: "/>
+							<textbox id="productionPlanStateTextbox" width="25%"/>
+                        </row>
                     </rows>
                 </grid>
                 <separator/>
     			<listbox id="rawMaterialRequirementListbox" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Requerimiento de Materias Primas" colspan="7"/>
+						<auxheader label="Requerimiento de Materias Primas" colspan="8"/>
 					</auxhead>
         			<listhead>
         				<listheader label="Materia Prima"/>
 		                <listheader label="Cantidad Necesaria"/>
 		                <listheader label="Stock Actual"/>
+		                <listheader label="Cantidad Disponible"/>
 		                <listheader label="Cantidad Reservada"/>
 		                <listheader label="Cantidad Faltante"/>
 		                <listheader label="Esta Abastecido?"/>
@@ -36,14 +41,15 @@
 		                <listitem>
 		                	<listcell label="${each.rawMaterialType.name}"/>
 		                    <listcell label="${each.quantity}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialTypeStockAvailable(each.rawMaterialType).doubleValue()}"/>
 		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialTypeStock(each.rawMaterialType).doubleValue()}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialStockReserved(each).doubleValue()}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialStockMissing(each).doubleValue()}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialRequirementStockReserved(each).doubleValue()}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialRequirementStockMissing(each).doubleValue()}"/>
 		                    <listcell>
-			                    <checkbox value="${each.isFulfilled()}" forward="onCheck=rawMaterialRequirementListbox.onFulfillRawMaterialRequirement(${each})"/>
+			                    <checkbox checked="${win_requirement_plan_creation$composer.isRawMaterialRequirementFulfilled(each)}" disabled="true"/>
 			                </listcell>
 			                <listcell>
-			                    <button label="Reservar"/>
+			                    <button label="Reservar" forward="onClick=rawMaterialRequirementListbox.onClickReservation(${each})"/>
 			                </listcell>
 						</listitem>
 		            </template>
@@ -51,7 +57,7 @@
     			<separator/>
     			<listbox id="supplyRequirementListbox" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Requerimiento de Insumos" colspan="10"/>
+						<auxheader label="Requerimiento de Insumos" colspan="11"/>
 					</auxhead>
         			<listhead>
         				<listheader label="Insumo"/>
@@ -60,6 +66,7 @@
 			            <listheader label="Medida"/>
 			            <listheader label="Cantidad Necesaria"/>
 		                <listheader label="Stock Actual"/>
+		                <listheader label="Cantidad Disponible"/>
 		                <listheader label="Cantidad Reservada"/>
 		                <listheader label="Cantidad Faltante"/>
 		                <listheader label="Esta Abastecido?"/>
@@ -73,10 +80,11 @@
 		                	<listcell label="${each.supplyType.measure}"/>
 		                    <listcell label="${each.quantity}"/>
 		                    <listcell label="${each.supplyType.stock}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyStockAvailable(each).doubleValue()}"/>
 		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyStockReserved(each).doubleValue()}"/>
 		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyStockMissing(each).doubleValue()}"/>
 		                    <listcell>
-			                    <checkbox value="${each.isFulfilled()}" forward="onCheck=supplyRequirementListbox.onFulfillSupplyRequirement(${each})"/>
+			                    <checkbox checked="${win_requirement_plan_creation$composer.isSupplyRequirementFulfilled(each)}" disabled="true"/>
 			                </listcell>
 			                <listcell>
 			                    <button label="Reservar" forward="onClick=supplyRequirementListbox.onClickReservation(${each})"/>
@@ -84,44 +92,7 @@
 						</listitem>
 		            </template>
     			</listbox>
-    			<separator/>
-				<grid id="supplyReservationGrid" width="400px" sclass="sigma-form" visible="false">
-			        <columns>
-		                <column hflex="min" align="right"/>
-		                <column />
-		            </columns>
-			        <rows>
-			            <row>
-			                <label>Codigo:</label>
-			                <textbox id="codeTextbox" value="" hflex="1"/>
-			            </row>
-			            <row>
-			                <label>Descripcion:</label>
-			                <textbox id="descriptionTextbox" value="" hflex="1"/>
-			            </row>
-			            <row>
-			                <label>Stock Actual:</label>
-			                <doublebox id="stockDoublebox" hflex="1"/>
-			            </row>
-			            <row>
-			                <label>Cantidad a Reservar:</label>
-			                <doublebox id="stockReservedDoublebox" hflex="1"/>
-			            </row>
-			            <row>
-			                <label>Cantidad Faltante:</label>
-			                <doublebox id="stockMissingDoublebox" hflex="1"/>
-			            </row>
-			            <row>
-			                <cell colspan="2" style="text-align:center">
-			                    <hlayout>
-			                        <button id="saveButton" label="Guardar"/>
-			                        <button id="cancelButton" label="Cancelar"/>
-			                        <button id="resetButton" label="Reset"/>
-			                    </hlayout>
-			                </cell>
-			            </row>
-			        </rows>
-		    	</grid>
+    			<button id="returnButton" label="Volver"/>
             </vlayout>
         </panelchildren>
     </panel>

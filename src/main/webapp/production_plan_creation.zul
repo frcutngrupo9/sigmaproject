@@ -22,10 +22,6 @@
 							<textbox id="productionPlanNameTextbox" width="25%"/>
                         </row>
                         <row>
-                            <label value="Fecha Creacion: "/>
-							<datebox id="productionPlanDatebox" cols="12" format="dd-MM-yyyy" width="25%"/>
-                        </row>
-                        <row>
                             <label value="Seleccionar Pedido: "/>
                             <cell style="text-align:left">
 	                    		<hlayout>
@@ -36,7 +32,7 @@
 				    								Buscar
 				    								<textbox />
 				    							</hbox>
-				    							<listbox id="orderPopupListbox" width="200px">
+				    							<listbox id="orderPopupListbox" width="300px">
 				    							<listhead>
 				    								<listheader label="Pedido" align="center"/>
 				    								<listheader label="Cliente" align="center"/>
@@ -81,7 +77,7 @@
         			</template>
     			</grid>
     			<separator/>
-    			<listbox id="productTotalListbox" mold="paging" pageSize="7" visible="true">
+    			<listbox id="productTotalListbox" mold="paging" pageSize="7" visible="true" sizedByContent="true" span="true">
     				<auxhead>
 						<auxheader label="Productos" colspan="4"/>
 					</auxhead>

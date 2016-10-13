@@ -28,7 +28,7 @@
 		                            <vbox>
 		                                <hbox>
 		                                    Buscar
-		                                    <textbox />
+		                                    <textbox/>
 		                                </hbox>
 		                                <listbox id="clientPopupListbox" width="200px">
 		                                <listhead>
@@ -52,7 +52,7 @@
                         </row>
                         <row>
                             <label value="Fecha Necesidad: "/>
-                    		<datebox id="orderNeedDatebox" cols="12" format="dd-MM-yyyy" width="25%"/>
+                    		<datebox id="orderNeedDatebox" cols="12" format="dd-MM-yyyy" width="25%" constraint="no past"/>
                         </row>
                    </rows>
                 </grid>
@@ -63,17 +63,15 @@
                             <vbox>
                                 <hbox>
                                     Buscar
-                                    <textbox />
+                                    <textbox id="productNameFilterTextbox"/>
                                 </hbox>
                                 <listbox id="productPopupListbox" width="200px">
                                 <listhead>
                                     <listheader label="Producto" align="center"/>
-                                    <listheader label="Descripcion" align="center"/>
                                 </listhead>
                                 <template name="model">
                                     <listitem>
                                         <listcell label="${each.name}"/>
-                                        <listcell label="${each.details}"/>
                                     </listitem>
                                 </template>
                                 </listbox>
@@ -89,7 +87,7 @@
                     <button id="deleteOrderDetailButton" label="Eliminar Detalle"/>
                     <button id="cancelOrderDetailButton" label="Cancelar Edicion"/>
                 </hbox>
-                <listbox id="orderDetailListbox" mold="paging" pageSize="7">
+                <listbox id="orderDetailListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
                     <auxhead>
                         <auxheader label="Productos" colspan="4"/>
                     </auxhead>

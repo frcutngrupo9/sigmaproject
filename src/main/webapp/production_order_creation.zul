@@ -31,7 +31,7 @@
                     <rows>
                     	<row>
                             <label value="Estado Orden de Produccion: "/>
-							<combobox id="productionOrderStateCombobox" readonly="true">
+							<combobox id="productionOrderStateTypeCombobox" readonly="true">
 		                        <template name="model">
 		                        	<comboitem label="${each.name}" value="${each}"/>
 		                        </template>
@@ -57,29 +57,40 @@
                             <label value="Fecha Fin Orden de Produccion: "/>
 							<datebox id="productionOrderFinishedDatebox" cols="12" format="dd-MM-yyyy"/>
                         </row>
+                        <row>
+                            <label value="Fecha Inicio Real: "/>
+							<datebox id="productionOrderRealDatebox" cols="12" format="dd-MM-yyyy"/>
+                        </row>
+                        <row>
+                            <label value="Fecha Fin Real: "/>
+							<datebox id="productionOrderRealFinishedDatebox" cols="12" format="dd-MM-yyyy"/>
+                        </row>
                    </rows>
                 </grid>
-                <hbox>
-					<label value="Producto a Fabricar: "/>
+                <hbox hflex="1" pack="center">
+					<label value="Producto a Fabricar: " width="50%"/>
 					<textbox id="productNameTextbox"/>
 					<label value="Unidades a Fabricar: "/>
 					<intbox id="productUnitsIntbox"/>
+				</hbox>
+				<hbox hflex="1" pack="center" if="false">
+					<button id="generateDetailsButton" label="Actualizar Detalles"/>
 				</hbox>
         		<grid id="productionOrderDetailGrid" sizedByContent="true" span="true">
     				<auxhead>
 						<auxheader label="Detalles Orden de Produccion" colspan="10"/>
 					</auxhead>
         			<columns>
-			            <column label="Proceso" align="center"/>
+			            <column label="Proceso" align="center" sort="auto(process.type.name)"/>
 			            <column label="Pieza" align="center"/>
 			            <column label="Maquina Necesaria" align="center"/>
 			            <column label="Detalles" align="center"/>
 			            <column label="Tiempo" align="center"/>
 			            <column label="Tiempo Total" align="center"/>
 			            <column label="Maquina Asignada" align="center"/>
-			            <column label="Cantidad Pieza" align="center"/>
-			            <column label="Cantidad Finalizada" align="center"/>
-			            <column label="Esta Finalizado?" align="center"/>
+			            <column label="Cant Pieza" align="center"/>
+			            <column label="Cant Finalizada" align="center"/>
+			            <column label="Finalizado?" align="center"/>
 		            </columns>
 		            <template name="model">
 		                <row>
@@ -87,25 +98,70 @@
 			            	<label value="${win_production_order_creation$composer.getPieceNameByProcess(each.process)}"/>
 			            	<label value="${win_production_order_creation$composer.getMachineTypeNameByProcess(each.process)}"/>
 			            	<label value="${each.process.details}"/>
-			            	<label value="${r:getFormattedTime(each.process.time)}"/>
-			            	<label value="${r:getFormattedTime(each.timeTotal)}"/>
-			            	<combobox inplace="true"
-			            		forward="onSelect=productionOrderDetailGrid.onEditProductionOrderDetailMachine(${each}), onCreate=productionOrderDetailGrid.onCreateMachineCombobox(${each})"
-                        		model="${win_production_order_creation$composer.getMachineListModel(each)}" hflex="1" >
-		                        <template name="model">
-		                            <comboitem label="${each.name}" />
-		                        </template>
-		                    </combobox>
+			            	<label value="${r:getFormattedProcessTime(each.process.time)}"/>
+			            	<label value="${r:getFormattedProcessTime(each.getTimeTotal())}"/>
+			            	<cell>
+				            	<combobox visible="true" inplace="true" hflex="1" if="${win_production_order_creation$composer.isMachineNecessary(each.process)}"
+				            		forward="onSelect=productionOrderDetailGrid.onEditProductionOrderDetailMachine(${each}), onCreate=productionOrderDetailGrid.onCreateMachineCombobox(${each})"
+	                        		model="${win_production_order_creation$composer.getMachineListModel(each)}" readonly="false">
+			                        <template name="model">
+			                            <comboitem label="${each.name}" />
+			                        </template>
+			                    </combobox>
+			                    <label value="NO REQUIERE" if="${!win_production_order_creation$composer.isMachineNecessary(each.process)}"/>
+		                    </cell>
 			            	<label value="${each.quantityPiece}"/>
-			            	<doublebox inplace="true" value="${each.quantityFinished}" forward="onChange=productionOrderDetailGrid.onEditProductionOrderDetailQuantityFinished(${each})"/>
+			            	<doublebox inplace="true" value="${each.quantityFinished}" forward="onChanging=productionOrderDetailGrid.onEditProductionOrderDetailQuantityFinished(${each})"/>
 			            	<checkbox checked="${each.isFinished()}" forward="onCheck=productionOrderDetailGrid.onEditProductionOrderDetailIsFinished(${each})"/>
 						</row>
 		            </template>
     			</grid>
+    			<separator/>
+			    <listbox id="productionOrderSupplyListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
+			    	<auxhead>
+						<auxheader label="Insumos" colspan="4"/>
+					</auxhead>
+			        <listhead>
+			            <listheader label="Codigo" align="center"/>
+			            <listheader label="Descripcion" align="center"/>
+			            <listheader label="Cantidad Reservada" align="center"/>
+			            <listheader label="Cantidad Utilizada" align="center"/>
+			        </listhead>
+			        <template name="model">
+			            <listitem>
+			                <listcell label="${each.supplyType.code}"/>
+			                <listcell label="${each.supplyType.description}"/>
+			                <listcell label="${each.quantity}"/>
+			                <listcell>
+			                	<doublebox inplace="true" value="${each.quantityUsed}" forward="onChanging=productionOrderSupplyListbox.onEditUsedSupply(${each})"/>
+			                </listcell>
+			            </listitem>
+			        </template>
+			    </listbox>
+			    <separator/>
+			    <listbox id="productionOrderRawMaterialListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
+			    	<auxhead>
+						<auxheader label="Materias Primas" colspan="3"/>
+					</auxhead>
+			        <listhead>
+			            <listheader label="Materia Prima" align="center"/>
+			            <listheader label="Cantidad Reservada" align="center"/>
+			            <listheader label="Cantidad Utilizada" align="center"/>
+			        </listhead>
+			        <template name="model">
+			            <listitem>
+			                <listcell label="${each.rawMaterialType.name}"/>
+			                <listcell label="${each.quantity}"/>
+			                <listcell>
+			                	<doublebox inplace="true" value="${each.quantityUsed}" forward="onChanging=productionOrderRawMaterialListbox.onEditUsedRawMaterial(${each})"/>
+			                </listcell>
+			            </listitem>
+			        </template>
+			    </listbox>
     			<hlayout>
 				    <button id="saveButton" label="Guardar"/>
 				    <button id="resetButton" label="Reset"/>
-				    <button id="cancelButton" label="Cancelar"/>
+				    <button id="cancelButton" label="Volver"/>
 			    </hlayout>
 			</vlayout>
         </panelchildren>

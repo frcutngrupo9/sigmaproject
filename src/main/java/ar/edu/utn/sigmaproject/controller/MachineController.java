@@ -162,18 +162,22 @@ public class MachineController extends SelectorComposer<Component> {
 		if(currentMachineType == null) {// creando
 			machineTypeGrid.setVisible(false);
 			nameTextbox.setValue(null);
-			deteriorationTimeIntboxYears.setValue(null);
-			deteriorationTimeIntboxDays.setValue(null);
-			deteriorationTimeIntboxHours.setValue(null);
+
 			detailsTextbox.setValue(null);
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
 		} else {// editando
 			machineTypeGrid.setVisible(true);
 			nameTextbox.setValue(currentMachineType.getName());
-			deteriorationTimeIntboxYears.setValue(currentMachineType.getDeteriorationTime().getYears());
-			deteriorationTimeIntboxDays.setValue(currentMachineType.getDeteriorationTime().getDays());
-			deteriorationTimeIntboxHours.setValue(currentMachineType.getDeteriorationTime().getHours());
+			if(currentMachineType.getDeteriorationTime() == null) {
+				deteriorationTimeIntboxYears.setValue(null);
+				deteriorationTimeIntboxDays.setValue(null);
+				deteriorationTimeIntboxHours.setValue(null);
+			} else {
+				deteriorationTimeIntboxYears.setValue(currentMachineType.getDeteriorationTime().getYears());
+				deteriorationTimeIntboxDays.setValue(currentMachineType.getDeteriorationTime().getDays());
+				deteriorationTimeIntboxHours.setValue(currentMachineType.getDeteriorationTime().getHours());
+			}
 			detailsTextbox.setValue(currentMachineType.getDetails());
 			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
@@ -181,6 +185,10 @@ public class MachineController extends SelectorComposer<Component> {
 	}
 
 	public String getFormattedTime(Duration time) {
-		return String.format("A�os: %d Horas: %d Minutos: %d", time.getYears(), time.getHours(), time.getMinutes());
+		if(time != null) {
+			return String.format("A�os: %d Horas: %d Minutos: %d", time.getYears(), time.getHours(), time.getMinutes());
+		} else {
+			return "";
+		}
 	}
 }

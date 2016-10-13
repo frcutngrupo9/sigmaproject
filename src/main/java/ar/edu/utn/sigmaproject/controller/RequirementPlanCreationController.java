@@ -1,40 +1,49 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.EventQueue;
+import org.zkoss.zk.ui.event.EventQueues;
 import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
+import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
-import org.zkoss.zul.Checkbox;
+import org.zkoss.zul.Button;
 import org.zkoss.zul.Datebox;
-import org.zkoss.zul.Doublebox;
-import org.zkoss.zul.Grid;
+import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Window;
 
-import ar.edu.utn.sigmaproject.domain.Product;
-import ar.edu.utn.sigmaproject.domain.ProductTotal;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
-import ar.edu.utn.sigmaproject.domain.RawMaterial;
+import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
+import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.RawMaterialType;
-import ar.edu.utn.sigmaproject.domain.Supply;
 import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
 import ar.edu.utn.sigmaproject.domain.SupplyReserved;
+import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.domain.Wood;
 import ar.edu.utn.sigmaproject.domain.WoodReserved;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
+import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
+import ar.edu.utn.sigmaproject.service.ProductionPlanStateRepository;
+import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.RawMaterialRequirementRepository;
 import ar.edu.utn.sigmaproject.service.SupplyRequirementRepository;
 import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
+import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
 import ar.edu.utn.sigmaproject.service.WoodReservedRepository;
 
@@ -47,25 +56,23 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	@Wire
 	Datebox productionPlanDatebox;
 	@Wire
+	Textbox productionPlanStateTextbox;
+	@Wire
 	Listbox rawMaterialRequirementListbox;
 	@Wire
 	Listbox supplyRequirementListbox;
 	@Wire
-	Grid supplyReservationGrid;
-	@Wire
-	Textbox codeTextbox;
-	@Wire
-	Textbox descriptionTextbox;
-	@Wire
-	Doublebox stockDoublebox;
-	@Wire
-	Doublebox stockReservedDoublebox;
-	@Wire
-	Doublebox stockMissingDoublebox;
+	Button returnButton;
 
 	// services
 	@WireVariable
 	private ProductRepository productRepository;
+	@WireVariable
+	private ProductionPlanRepository productionPlanRepository;
+	@WireVariable
+	private ProductionPlanStateRepository productionPlanStateRepository;
+	@WireVariable
+	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
 	@WireVariable
 	private WoodRepository woodRepository;
 	@WireVariable
@@ -76,9 +83,13 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	private WoodReservedRepository woodReservedRepository;
 	@WireVariable
 	private SupplyReservedRepository supplyReservedRepository;
+	@WireVariable
+	private SupplyTypeRepository supplyTypeRepository;
 
 	// atributes
 	private ProductionPlan currentProductionPlan;
+	@SuppressWarnings("rawtypes")
+	private EventQueue eq;
 
 	// list
 	private List<SupplyRequirement> supplyRequirementList;
@@ -88,88 +99,87 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	private ListModelList<SupplyRequirement> supplyRequirementListModel;
 	private ListModelList<RawMaterialRequirement> rawMaterialRequirementListModel;
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 
 		currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
+		if(currentProductionPlan == null) {throw new RuntimeException("ProductionPlan not found");}
 
-		if(currentProductionPlan != null) {
-			supplyRequirementList = currentProductionPlan.getSupplyRequirements();
-			if(supplyRequirementList.isEmpty()) {
-				// debemos generar los requerimientos en caso de que no se hayan generado aun
-				List<SupplyRequirement> auxSupplyRequirementList = new ArrayList<SupplyRequirement>();
-				List<ProductTotal> productTotalList = currentProductionPlan.getProductTotalList();
-				for (ProductTotal productTotal : productTotalList) {
-					for (Supply supply : productTotal.getProduct().getSupplies()) {
-						SupplyRequirement auxSupplyRequirement = null;
-						for (SupplyRequirement supplyRequirement : auxSupplyRequirementList) {// buscamos si el insumo no se encuentra agregado
-							if (supply.getSupplyType().equals(supplyRequirement.getSupplyType())) {
-								auxSupplyRequirement = supplyRequirement;
-							}
-						}
-						if (auxSupplyRequirement != null) {// el insumo si se encuentra agregado, sumamos sus cantidades
-							auxSupplyRequirement.setQuantity(auxSupplyRequirement.getQuantity().add(supply.getQuantity()));
-						} else {// el insumo no se encuentra, se lo agrega
-							auxSupplyRequirementList.add(new SupplyRequirement(supply.getSupplyType(), supply.getQuantity()));
-						}
-					}
+		supplyRequirementList = currentProductionPlan.getSupplyRequirements();
+		supplyRequirementListModel = new ListModelList<>(supplyRequirementList);
+		rawMaterialRequirementList = currentProductionPlan.getRawMaterialRequirements();
+		rawMaterialRequirementListModel = new ListModelList<>(rawMaterialRequirementList);
+
+		// listener para cuando se modifique alguna reserva
+		eq = EventQueues.lookup("Requirement Reservation Queue", EventQueues.DESKTOP, true);
+		eq.subscribe(new EventListener() {
+			public void onEvent(Event event) throws Exception {
+				if(event.getName().equals("onSupplyReservation")) {
+					supplyRequirementListbox.setModel(supplyRequirementListModel);
+				} else {
+					rawMaterialRequirementListbox.setModel(rawMaterialRequirementListModel);
 				}
-				if(auxSupplyRequirementList.isEmpty() != true) {
-					supplyRequirementList = auxSupplyRequirementList;
-				}
-				supplyRequirementList = supplyRequirementRepository.save(supplyRequirementList);
+				// actualiza el estado del plan si es que esta abastecido
+				updateProductionPlanState();
 			}
+		});
 
-			rawMaterialRequirementList = currentProductionPlan.getRawMaterialRequirements();
-			if (rawMaterialRequirementList.isEmpty()) {
-				// debemos generar lor requerimientos de materias primas en caso de que no se hayan generado aun
-				List<RawMaterialRequirement> auxRawMaterialRequirementList = new ArrayList<RawMaterialRequirement>();
-				List<ProductTotal> productTotalList = currentProductionPlan.getProductTotalList();
-				for(ProductTotal productTotal : productTotalList) {
-					Product product = productTotal.getProduct();
-					for(RawMaterial rawMaterial : product.getRawMaterials()) {
-						RawMaterialRequirement auxRawMaterialRequirement = null;
-						for(RawMaterialRequirement supplyRequirement : auxRawMaterialRequirementList) {// buecamos si la materia prima no se encuentra agregada
-							if(rawMaterial.getRawMaterialType().equals(supplyRequirement.getRawMaterialType())) {
-								auxRawMaterialRequirement = supplyRequirement;
-							}
-						}
-						if(auxRawMaterialRequirement != null) {// la materia prima si se encuentra agregada, sumamos sus cantidades
-							auxRawMaterialRequirement.setQuantity(auxRawMaterialRequirement.getQuantity().add(rawMaterial.getQuantity()));
-						} else {// la materia prima no se encuentra, se la agrega
-							auxRawMaterialRequirementList.add(new RawMaterialRequirement(rawMaterial.getRawMaterialType(), rawMaterial.getQuantity()));
-						}
-					}
-				}
-				if(auxRawMaterialRequirementList.isEmpty() != true) {
-					rawMaterialRequirementList = auxRawMaterialRequirementList;
-				}
-				rawMaterialRequirementList = rawMaterialRequirementRepository.save(rawMaterialRequirementList);
-			}
-
-			supplyRequirementListModel = new ListModelList<SupplyRequirement>(supplyRequirementList);
-			rawMaterialRequirementListModel = new ListModelList<RawMaterialRequirement>(rawMaterialRequirementList);
-		}
 		refreshView();
+	}
+
+	protected void updateProductionPlanState() {
+		// recorre todos los requerimientos para ver si estan todos abastecidos
+		boolean isCompleted = true;
+		for(SupplyRequirement each : supplyRequirementList) {
+			if(!isSupplyRequirementFulfilled(each)) {
+				isCompleted = false;
+			}
+		}
+		for(RawMaterialRequirement each : rawMaterialRequirementList) {
+			if(!isRawMaterialRequirementFulfilled(each)) {
+				isCompleted = false;
+			}
+		}
+		if(isCompleted) {
+			ProductionPlanStateType productionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Abastecido");
+			ProductionPlanState productionPlanState = new ProductionPlanState(productionPlanStateType, new Date());
+			productionPlanState = productionPlanStateRepository.save(productionPlanState);
+			currentProductionPlan.setState(productionPlanState);
+			currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
+			refreshView();
+		} else {
+			ProductionPlanStateType productionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Planificado");
+			if(!currentProductionPlan.getCurrentStateType().equals(productionPlanStateType)) {
+				// si dejo de estar abastecido
+				ProductionPlanState productionPlanState = new ProductionPlanState(productionPlanStateType, new Date());
+				productionPlanState = productionPlanStateRepository.save(productionPlanState);
+				currentProductionPlan.setState(productionPlanState);
+				currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
+				refreshView();
+			}
+		}
 	}
 
 	private void refreshView() {
 		productionPlanNameTextbox.setDisabled(true);
 		productionPlanDatebox.setDisabled(true);
+		productionPlanStateTextbox.setDisabled(true);
 		supplyRequirementListbox.setModel(supplyRequirementListModel);
 		rawMaterialRequirementListbox.setModel(rawMaterialRequirementListModel);
 		if(currentProductionPlan != null) {
 			productionPlanNameTextbox.setText(currentProductionPlan.getName());
 			productionPlanDatebox.setValue(currentProductionPlan.getDate());
+			productionPlanStateTextbox.setText(currentProductionPlan.getCurrentStateType().getName());
 		}
 	}
-	
+
 	public BigDecimal getSupplyStockReserved(SupplyRequirement supplyRequirement) {
 		// TODO: como es la verdadera relacion entre estas tres clases? un SupplyRequirement tiene un SupplyType,
 		// por que un SupplyReserved tiene tambien un SupplyType? La relacion es uno a uno entre SupplyRequirement y SupplyReserved?
-		// Respuesta: SupplyType tiene una lista de SupplyReserved, y cada SupplyReserved tiene un SupplyRequirement
-		// para saber para que plan se está reservando. Por lo tanto SupplyReserved reserved no tiene SupplyType, solo lo tiene SupplyRequirement
+		// Respuesta: SupplyType tiene una lista de SupplyReserved, y cada SupplyReserved tiene un SupplyRequirement para saber para que plan se está reservando.
+		// SupplyReserved no tiene SupplyType, solo lo tiene SupplyRequirement
 		SupplyReserved supplyReserved = supplyReservedRepository.findBySupplyRequirement(supplyRequirement);
 		if(supplyReserved == null) {
 			return BigDecimal.ZERO;
@@ -177,7 +187,15 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 			return supplyReserved.getStockReserved();
 		}
 	}
-	
+
+	public BigDecimal getSupplyStockAvailable(SupplyRequirement supplyRequirement) {
+		// devuelve la resta entre el stock total y el total reservado
+		SupplyType supplyType = supplyRequirement.getSupplyType();
+		BigDecimal stockTotal = supplyType.getStock();
+		BigDecimal stockReserved = supplyType.getStockReserved();
+		return stockTotal.subtract(stockReserved);
+	}
+
 	public BigDecimal getSupplyStockMissing(SupplyRequirement supplyRequirement) {
 		return supplyRequirement.getQuantity().subtract(getSupplyStockReserved(supplyRequirement));
 	}
@@ -190,44 +208,89 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 		}
 		return stock;
 	}
+	
+	public BigDecimal getRawMaterialTypeStockAvailable(RawMaterialType rawMaterialType) {
+		// devuelve la resta entre el stock total y el total reservado
+		BigDecimal stockTotal = getRawMaterialTypeStock(rawMaterialType);
+		BigDecimal stockReservedTotal = getRawMaterialTypeStockReserved(rawMaterialType);
+		return stockTotal.subtract(stockReservedTotal);
+	}
+	
+	public BigDecimal getRawMaterialTypeStockReserved(RawMaterialType rawMaterialType) {
+		// busca la cantidad de reserva total de la materia prima, sin importar el tipo de madera
+		List<Wood> woodList = woodRepository.findByRawMaterialType(rawMaterialType);
+		BigDecimal stockReserved = BigDecimal.ZERO;
+		for(Wood each : woodList) {
+			for(WoodReserved eachReserved : each.getWoodsReserved()) {
+				if(!eachReserved.isWithdrawn()) {
+					stockReserved = stockReserved.add(eachReserved.getStockReserved());
+				}
+			}
+		}
+		return stockReserved;
+	}
+	
+	public BigDecimal getRawMaterialTypeStockMissing(RawMaterialType rawMaterialType) {
+		return getRawMaterialTypeStock(rawMaterialType).subtract(getRawMaterialTypeStockReserved(rawMaterialType));
+	}
 
-	public BigDecimal getRawMaterialStockReserved(RawMaterialRequirement rawMaterialRequirement) {
-		WoodReserved woodReserved = woodReservedRepository.findByRawMaterialRequirement(rawMaterialRequirement);
-		if(woodReserved == null) {
+	public BigDecimal getRawMaterialRequirementStockReserved(RawMaterialRequirement rawMaterialRequirement) {
+		// busca todos los woodReserved, ya que puede haber, para el mismo requirement, un wood reserved de cada tipo de madera
+		List<WoodReserved> woodReserved = woodReservedRepository.findByRawMaterialRequirement(rawMaterialRequirement);
+		if(woodReserved.isEmpty()) {
 			return BigDecimal.ZERO;
 		} else {
-			return woodReserved.getStockReserved();
+			BigDecimal stockReserved = BigDecimal.ZERO;
+			for(WoodReserved each : woodReserved) {
+				stockReserved = stockReserved.add(each.getStockReserved());
+			}
+			return stockReserved;
 		}
 	}
 
-	public BigDecimal getRawMaterialStockMissing(RawMaterialRequirement rawMaterialRequirement) {
-		return rawMaterialRequirement.getQuantity().subtract(getRawMaterialStockReserved(rawMaterialRequirement));
+	public BigDecimal getRawMaterialRequirementStockMissing(RawMaterialRequirement rawMaterialRequirement) {
+		return rawMaterialRequirement.getQuantity().subtract(getRawMaterialRequirementStockReserved(rawMaterialRequirement));
 	}
-
-	@Listen("onFulfillSupplyRequirement = #supplyRequirementListbox")
-	public void doFulfillSupplyRequirement(ForwardEvent evt) {
-		SupplyRequirement data = (SupplyRequirement) evt.getData();// obtenemos el objeto pasado por parametro
-		Checkbox element = (Checkbox) evt.getOrigin().getTarget();// obtenemos el elemento web
-		data.setFulfilled(element.isChecked());// cargamos al objeto el valor actualizado del elemento web
+	
+	@Listen("onClickReservation = #rawMaterialRequirementListbox")
+	public void doRawMaterialRequirementReservation(ForwardEvent evt) {
+		RawMaterialRequirement data = (RawMaterialRequirement) evt.getData();// obtenemos el objeto pasado por parametro
+		final HashMap<String, RawMaterialRequirement> map = new HashMap<String, RawMaterialRequirement>();
+		map.put("selected_raw_material_requirement", data);
+		Window window = (Window)Executions.createComponents("/raw_material_reservation.zul", null, map);
+		window.doModal();
 	}
 
 	@Listen("onClickReservation = #supplyRequirementListbox")
 	public void doSupplyRequirementReservation(ForwardEvent evt) {
 		SupplyRequirement data = (SupplyRequirement) evt.getData();// obtenemos el objeto pasado por parametro
-		openSupplyReservationGrid(data);
+		final HashMap<String, SupplyRequirement> map = new HashMap<String, SupplyRequirement>();
+		map.put("selected_supply_requirement", data);
+		Window window = (Window)Executions.createComponents("/supply_reservation.zul", null, map);
+		window.doModal();
 	}
 
-	private void openSupplyReservationGrid(SupplyRequirement supplyRequirement) {
-		supplyReservationGrid.setVisible(true);
-		codeTextbox.setDisabled(true);
-		descriptionTextbox.setDisabled(true);
-		stockDoublebox.setDisabled(true);
-		stockReservedDoublebox.setDisabled(false);
-		stockMissingDoublebox.setDisabled(true);
-		codeTextbox.setText(supplyRequirement.getSupplyType().getCode());
-		descriptionTextbox.setText(supplyRequirement.getSupplyType().getDescription());
-		stockDoublebox.setValue(supplyRequirement.getSupplyType().getStock().doubleValue());
-		stockReservedDoublebox.setValue(0.0);
-		stockMissingDoublebox.setValue(supplyRequirement.getQuantity().doubleValue());
+	@Listen("onClick = #returnButton")
+	public void returnButtonClick() {
+		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/production_plan_list.zul");
+	}
+
+	public boolean isRawMaterialRequirementFulfilled(RawMaterialRequirement supplyRequirement) {
+		// si ya se ha reservado la cantidad necesaria
+		boolean value = false;
+		if(getRawMaterialRequirementStockMissing(supplyRequirement).doubleValue() == 0) {
+			value = true;
+		}
+		return value;
+	}
+	
+	public boolean isSupplyRequirementFulfilled(SupplyRequirement supplyRequirement) {
+		// si ya se ha reservado la cantidad necesaria
+		boolean value = false;
+		if(getSupplyStockMissing(supplyRequirement).doubleValue() == 0) {
+			value = true;
+		}
+		return value;
 	}
 }

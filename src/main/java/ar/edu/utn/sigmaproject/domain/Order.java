@@ -26,10 +26,10 @@ public class Order implements Serializable, Cloneable {
 
 	@OneToMany(orphanRemoval = true)
 	@OrderColumn(name = "detail_index")
-	List<OrderDetail> details = new ArrayList<OrderDetail>();
+	List<OrderDetail> details = new ArrayList<>();
 
-	@ManyToOne(optional = false)
-	OrderStateType currentStateType;
+	@OneToMany(orphanRemoval = true)
+	List<OrderState> states = new ArrayList<>();
 
 	Integer number = 0;
 	Date date = new Date();
@@ -71,11 +71,32 @@ public class Order implements Serializable, Cloneable {
 	}
 
 	public OrderStateType getCurrentStateType() {
-		return currentStateType;
+		OrderState result = null;
+		for(OrderState each : states) {// busca el objeto con la fecha mas reciente
+			if(result != null) {
+				if(result.getDate().before(each.getDate())) {
+					result = each;
+				}
+			} else {
+				result = each;
+			}
+		}
+		if(result != null) {
+			return result.getType();
+		}
+		return null;
+	}
+	
+	public void setState(OrderState state) {
+		states.add(state);
 	}
 
-	public void setCurrentStateType(OrderStateType currentStateType) {
-		this.currentStateType = currentStateType;
+	public List<OrderState> getStates() {
+		return states;
+	}
+
+	public void setStates(List<OrderState> states) {
+		this.states = states;
 	}
 
 	public Integer getNumber() {

@@ -34,7 +34,7 @@
                     </bandbox>
                     <label value="Cantidad: "/>
                     <doublebox id="rawMaterialQuantityDoublebox" constraint="no negative" width="36px"/>
-                    <button id="saveRawMaterialButton" label="Grabar Materia Prima"/>
+                    <button id="saveRawMaterialButton" label="Agregar Materia Prima"/>
                     <button id="resetRawMaterialButton" label="Reset Materia Prima"/>
                     <button id="deleteRawMaterialButton" label="Eliminar Materia Prima"/>
                     <button id="cancelRawMaterialButton" label="Cancelar Edicion"/>

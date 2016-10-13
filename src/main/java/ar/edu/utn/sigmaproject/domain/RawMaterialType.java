@@ -108,6 +108,13 @@ public class RawMaterialType implements Serializable, Cloneable {
 	public void setWidthMeasureUnit(MeasureUnit widthMeasureUnit) {
 		this.widthMeasureUnit = widthMeasureUnit;
 	}
+	
+	public String getFormattedMeasure() {
+		String lengthText = "(L) " + length.doubleValue() + " " + lengthMeasureUnit.getShortName();
+		String depthText = "(E) " + depth.doubleValue() + " " + depthMeasureUnit.getShortName();
+		String widthText = "(A) " + width.doubleValue() + " " + widthMeasureUnit.getShortName();
+		return lengthText + " x " + depthText + " x " + widthText;
+	}
 
 	@Override
 	public int hashCode() {
