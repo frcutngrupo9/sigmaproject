@@ -153,9 +153,8 @@
             			<listheader width="30px"/>
             			<listheader label="Proceso"/>
             			<listheader label="Detalles" width="450px"/>
-            			<listheader label="Dias" width="80px"/>
-            			<listheader label="Horas" width="80px"/>
-            			<listheader label="Minutos" width="80px"/>
+            			<listheader label="Horas" width="100px"/>
+            			<listheader label="Minutos" width="100px"/>
         			</listhead>
 					<template name="model">
                         <listitem>
@@ -170,13 +169,10 @@
                                 <textbox visible="${process_checked}" value="${win_product_creation$composer.getProcessDetails(each)}"  forward="onChanging=processListbox.onProcessDetailsChange(${each})" width="400px"/>
                             </listcell>
                             <listcell>
-                                <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessDays(each)}" forward="onChanging=processListbox.onProcessDaysChange(${each})" width="36px"/>
+                                <spinner constraint="no empty,min 0" visible="${process_checked}" forward="onChanging=processListbox.onProcessHoursChange(${each})" value="${win_product_creation$composer.getProcessHours(each)}" width="70px"/>
                             </listcell>
                             <listcell>
-                                <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessHours(each)}" forward="onChanging=processListbox.onProcessHoursChange(${each})" width="36px"/>
-                            </listcell>
-                            <listcell>
-                                <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessMinutes(each)}" forward="onChanging=processListbox.onProcessMinutesChange(${each})" width="36px"/>
+                                <spinner constraint="no empty,min 0 max 59" visible="${process_checked}" forward="onChanging=processListbox.onProcessMinutesChange(${each})" value="${win_product_creation$composer.getProcessMinutes(each)}" width="70px"/>
                             </listcell>
                         </listitem>
 					</template>

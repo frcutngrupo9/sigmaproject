@@ -42,6 +42,7 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Selectbox;
+import org.zkoss.zul.Spinner;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
@@ -359,11 +360,10 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		// comprobamos que no existan checkbox activados que no posean valores de duracion
 		for(int i = 1; i < processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
 			Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
-			Intbox intboxDays = (Intbox)processListbox.getChildren().get(i).getChildren().get(3).getChildren().get(0);
-			Intbox intboxHours = (Intbox)processListbox.getChildren().get(i).getChildren().get(4).getChildren().get(0);
-			Intbox intboxMinutes = (Intbox)processListbox.getChildren().get(i).getChildren().get(5).getChildren().get(0);
-			if(chkbox.isChecked() && intboxDays.intValue() == 0 && intboxHours.intValue() == 0 && intboxMinutes.intValue() == 0) {
-				Clients.showNotification("Ingrese el Tiempo para el Proceso", intboxMinutes);
+			Spinner hoursSpinner = (Spinner)processListbox.getChildren().get(i).getChildren().get(3).getChildren().get(0);
+			Spinner minutesSpinner = (Spinner)processListbox.getChildren().get(i).getChildren().get(4).getChildren().get(0);
+			if(chkbox.isChecked() && hoursSpinner.intValue() == 0 && minutesSpinner.intValue() == 0) {
+				Clients.showNotification("Ingrese el Tiempo para el Proceso", minutesSpinner);
 				return;
 			}
 		}
@@ -538,15 +538,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		}
 	}
 
-	public Integer getProcessDays(ProcessType processType) {
-		Process aux = getProcessFromListbox(processType);
-		if(aux == null) {
-			return 0;
-		} else {
-			return aux.getTime().getDays();
-		}
-	}
-
 	public Integer getProcessHours(ProcessType processType) {
 		Process aux = getProcessFromListbox(processType);
 		if(aux == null) {
@@ -630,32 +621,16 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		process.setDetails(origin.getText());
 	}
 
-	@Listen("onProcessDaysChange = #processListbox")
-	public void doProcessDaysChange(ForwardEvent evt) {
-		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
-		Intbox origin = (Intbox)evt.getOrigin().getTarget();
-		InputEvent inputEvent = (InputEvent) evt.getOrigin();
-		origin.setValue(Integer.valueOf(inputEvent.getValue()));
-		Process process = getProcessFromListbox(data);
-		Duration duration = null;
-		try {
-			duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, origin.intValue(), process.getTime().getHours(), process.getTime().getMinutes(), 0);
-		} catch (DatatypeConfigurationException e) {
-			System.out.println("Error en convertir a duracion: " + e.toString());
-		}
-		process.setTime(duration);
-	}
-
 	@Listen("onProcessHoursChange = #processListbox")
 	public void doProcessHoursChange(ForwardEvent evt) {
 		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
-		Intbox origin = (Intbox)evt.getOrigin().getTarget();
+		Spinner origin = (Spinner)evt.getOrigin().getTarget();
 		InputEvent inputEvent = (InputEvent) evt.getOrigin();
 		origin.setValue(Integer.valueOf(inputEvent.getValue()));
 		Process process = getProcessFromListbox(data);
 		Duration duration = null;
 		try {
-			duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, process.getTime().getDays(), origin.intValue(), process.getTime().getMinutes(), 0);
+			duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, 0, origin.intValue(), process.getTime().getMinutes(), 0);
 		} catch (DatatypeConfigurationException e) {
 			System.out.println("Error en convertir a duracion: " + e.toString());
 		}
@@ -665,13 +640,13 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@Listen("onProcessMinutesChange = #processListbox")
 	public void doProcessMinutesChange(ForwardEvent evt) {
 		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
-		Intbox origin = (Intbox)evt.getOrigin().getTarget();
+		Spinner origin = (Spinner)evt.getOrigin().getTarget();
 		InputEvent inputEvent = (InputEvent) evt.getOrigin();
 		origin.setValue(Integer.valueOf(inputEvent.getValue()));
 		Process process = getProcessFromListbox(data);
 		Duration duration = null;
 		try {
-			duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, process.getTime().getDays(), process.getTime().getHours(), origin.intValue(), 0);
+			duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, 0, process.getTime().getHours(), origin.intValue(), 0);
 		} catch (DatatypeConfigurationException e) {
 			System.out.println("Error en convertir a duracion: " + e.toString());
 		}
