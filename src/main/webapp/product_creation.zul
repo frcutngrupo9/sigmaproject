@@ -1,3 +1,4 @@
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="win_product_creation" apply="ar.edu.utn.sigmaproject.controller.ProductCreationController" width="95%" style="background:white">
 	<caption id="productCaption" label="Creacion/Edicion Producto"/>
     <panel title="Producto" id="productCreationBlock" border="rounded">
@@ -54,18 +55,20 @@
                 </hlayout>
     			<listbox id="pieceListbox" style="margin: 4px">
     				<auxhead>
-						<auxheader label="Piezas" colspan="3"/>
+						<auxheader label="Piezas" colspan="4"/>
 					</auxhead>
         			<listhead>
             			<listheader label="Nombre Pieza" align="center"/>
             			<listheader label="Unidades por Producto" align="center"/>
             			<listheader label="Cantidad de Procesos" align="center"/>
+            			<listheader label="Tiempo Total" align="center"/>
         			</listhead>
         			<template name="model">
             			<listitem>
                 			<listcell label="${each.name}"/>
                             <listcell label="${each.units}"/>
                 			<listcell label="${each.processes.size()}"/>
+                			<listcell label="${r:getFormattedTime(each.getDurationTotal())}"/>
             			</listitem>
         			</template>
     			</listbox>

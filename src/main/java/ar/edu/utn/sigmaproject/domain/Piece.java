@@ -11,6 +11,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.Duration;
 
 @Entity
 public class Piece implements Serializable, Cloneable {
@@ -62,6 +65,19 @@ public class Piece implements Serializable, Cloneable {
 		this.isGroup = isGroup;
 		this.units = units;
 		isClone = false;
+	}
+	
+	public Duration getDurationTotal() {
+		Duration durationTotal = null;
+		for(Process each : processes) {
+			if(durationTotal == null) {
+				durationTotal = each.getTime();
+			} else {
+				durationTotal = durationTotal.add(each.getTime());
+			}
+			
+		}
+		return durationTotal;
 	}
 
 	public Long getId() {

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.*;
+import javax.xml.datatype.Duration;
 
 @Entity
 @Indexed
@@ -55,6 +56,19 @@ public class Product implements Serializable, Cloneable {
 		this.category = category;
 		this.code = code;
 		this.price = price;
+	}
+	
+	public Duration getDurationTotal() {
+		Duration durationTotal = null;
+		for(Piece each : pieces) {
+			if(durationTotal == null) {
+				durationTotal = each.getDurationTotal();
+			} else {
+				durationTotal = durationTotal.add(each.getDurationTotal());
+			}
+			
+		}
+		return durationTotal;
 	}
 
 	public Long getId() {

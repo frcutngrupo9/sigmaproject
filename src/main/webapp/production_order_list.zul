@@ -25,7 +25,7 @@
                 </grid>
     			<grid id="productionOrderGrid" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Listado Ordenes de Produccion" colspan="10"/>
+						<auxheader label="Listado Ordenes de Produccion" colspan="14"/>
 					</auxhead>
         			<columns>
         				<!-- <column width="40px" align="center"/> -->
@@ -36,8 +36,12 @@
         				<column label="Estado Orden" align="center"/>
 		                <column label="Empleado Asignado" align="center"/>
 		                <column label="Porcentaje Completo" align="center"/>
+		                <column label="Tiempo Unidad" align="center"/>
+		                <column label="Tiempo Total" align="center"/>
 		                <column label="Fecha Inicio" align="center"/>
-		                <column label="Fecha Finalizado" align="center"/>
+		                <column label="Fecha Fin" align="center"/>
+		                <column label="Fecha Inicio Real" align="center"/>
+		                <column label="Fecha Fin Real" align="center"/>
 		                <column label="Accion" align="center"/>
 		            </columns>
 		            <template name="model">
@@ -55,8 +59,12 @@
 		                    <label value="${each.getCurrentStateType().name}"/>
 		                    <label value="${win_production_order_list$composer.getWorkerName(each)}"/>
 		                    <label value="${win_production_order_list$composer.getPercentComplete(each)}"/>
+		                    <label value="${r:getFormattedTime(each.product.getDurationTotal())}"/>
+		                    <label value="${r:getFormattedTime(each.product.getDurationTotal().multiply(each.units))}"/>
 		                    <label value="${each.date}"/>
 		                    <label value="${each.dateFinished}"/>
+		                    <label value="${each.realDate}"/>
+		                    <label value="${each.realDateFinished}"/>
 		                    <button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})"  label="Abrir" disabled="${win_production_order_list$composer.isProductionPlanStateCancel()}"/>
 						</row>
 		            </template>

@@ -192,6 +192,8 @@ public class RepositoryHelper {
 			list.add(new MachineType("Tupí", "", null));
 			list.add(new MachineType("Sierra Sin Fin", "", null));
 			list.add(new MachineType("Lijadora", "", null));
+			list.add(new MachineType("Caladora", "", null));
+			list.add(new MachineType("Taladro", "", null));
 			machineTypeRepository.save(list);
 		}
 	}
