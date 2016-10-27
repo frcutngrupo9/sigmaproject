@@ -25,10 +25,18 @@
                 </grid>
         		<grid hflex="1" sclass="sigma-form">
                     <columns>
-                        <column align="right" width="30%"/>
+                        <column align="right"/>
+                        <column align="left"/>
+                        <column align="right"/>
                         <column align="left"/>
                     </columns>
                     <rows>
+                    	<row>
+                            <label value="Numero Orden de Produccion: "/>
+							<spinner id="productionOrderNumberSpinner"/>
+			                <label value=""/>
+			                <label value=""/>
+                        </row>
                     	<row>
                             <label value="Estado Orden de Produccion: "/>
 							<combobox id="productionOrderStateTypeCombobox" readonly="true">
@@ -36,10 +44,8 @@
 		                        	<comboitem label="${each.name}" value="${each}"/>
 		                        </template>
 		                    </combobox>
-                        </row>
-                        <row>
-                            <label value="Numero Orden de Produccion: "/>
-							<spinner id="productionOrderNumberSpinner"/>
+		                    <label value=""/>
+			                <label value=""/>
                         </row>
                         <row>
                             <label value="Empleado Asignado: "/>
@@ -48,28 +54,26 @@
 			                        <comboitem label="${each.name}" value="${each}"/>
 			                    </template>
 			                </combobox>
+			                <label value=""/>
+			                <label value=""/>
                         </row>
                         <row>
                             <label value="Fecha Inicio Orden de Produccion: "/>
 							<datebox id="productionOrderDatebox" cols="12" format="dd-MM-yyyy"/>
+							<label value="Fecha Inicio Real: "/>
+							<datebox id="productionOrderRealDatebox" cols="12" format="dd-MM-yyyy"/>
                         </row>
                         <row>
                             <label value="Fecha Fin Orden de Produccion: "/>
 							<datebox id="productionOrderFinishedDatebox" cols="12" format="dd-MM-yyyy"/>
-                        </row>
-                        <row>
-                            <label value="Fecha Inicio Real: "/>
-							<datebox id="productionOrderRealDatebox" cols="12" format="dd-MM-yyyy"/>
-                        </row>
-                        <row>
                             <label value="Fecha Fin Real: "/>
 							<datebox id="productionOrderRealFinishedDatebox" cols="12" format="dd-MM-yyyy"/>
                         </row>
                    </rows>
                 </grid>
                 <hbox hflex="1" pack="center">
-					<label value="Producto a Fabricar: " width="50%"/>
-					<textbox id="productNameTextbox"/>
+					<label value="Producto a Fabricar: "/>
+					<textbox id="productNameTextbox" width="290px"/>
 					<label value="Unidades a Fabricar: "/>
 					<intbox id="productUnitsIntbox"/>
 				</hbox>

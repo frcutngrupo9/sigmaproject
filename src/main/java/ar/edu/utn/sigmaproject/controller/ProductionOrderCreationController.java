@@ -20,7 +20,6 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
-import org.zkoss.zul.Cell;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Comboitem;
@@ -47,10 +46,7 @@ import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderStateType;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderSupply;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
-import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
-import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
-import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
 import ar.edu.utn.sigmaproject.domain.Worker;
 import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.PieceRepository;
@@ -158,6 +154,10 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		if(currentProductionPlan == null) {throw new RuntimeException("ProductionPlan not found");}
 
 		productionOrderDetailList = currentProductionOrder.getDetails();
+		List<ProductionOrderDetail> details = getProductionOrderDetailList(currentProductionOrder);
+		if(details.size() != productionOrderDetailList.size()) {
+			productionOrderDetailList = details;
+		}
 		workerList = workerRepository.findAll();
 		workerListModel = new ListModelList<>(workerList);
 		workerCombobox.setModel(workerListModel);
@@ -229,20 +229,26 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 	@Listen("onClick = #generateDetailsButton")
 	public void generateDetailListClick() {
-		List<ProductionOrderDetail> details = new ArrayList<>();
-		for(Piece piece : currentProductionOrder.getProduct().getPieces()) {
-			List<Process> auxProcessList = piece.getProcesses();
-			for(Process process : auxProcessList) {
-				// por cada proceso hay que crear un detalle
-				Integer quantityPiece = currentProductionOrder.getUnits() * piece.getUnits();// cantidad total de la pieza
-				Duration timeTotal = process.getTime().multiply(quantityPiece);// cantidad total de tiempo del proceso
-				details.add(new ProductionOrderDetail(process, null, timeTotal, quantityPiece));
-			}
-		}
+		List<ProductionOrderDetail> details = getProductionOrderDetailList(currentProductionOrder);
 		if(details.size() != productionOrderDetailList.size()) {
 			productionOrderDetailList = details;
 			refreshView();
 		}
+	}
+	
+	private List<ProductionOrderDetail> getProductionOrderDetailList(ProductionOrder productionOrder) {
+		List<ProductionOrderDetail> productionOrderDetailList = new ArrayList<>();
+		for(Piece piece : productionOrder.getProduct().getPieces()) {
+			List<Process> auxProcessList = piece.getProcesses();
+			for(Process process : auxProcessList) {
+				// por cada proceso hay que crear un detalle
+				//TODO verificar si el tiempo de proceso es por todas las piezas iguales de un producto o individual
+				Integer quantityPiece = productionOrder.getUnits() * piece.getUnits();// cantidad total de la pieza
+				Duration timeTotal = process.getTime().multiply(productionOrder.getUnits());// cantidad total de tiempo del proceso
+				productionOrderDetailList.add(new ProductionOrderDetail(process, null, timeTotal, quantityPiece));
+			}
+		}
+		return productionOrderDetailList;
 	}
 
 	@Transactional
@@ -492,5 +498,24 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		} else {
 			data.setQuantityUsed(value);
 		}
+	}
+	
+	public Date getFinishDate(Date startDate, Duration time) {
+		if(time != null) {
+			int hours = time.getHours();
+			int minutes = time.getMinutes();
+			while(minutes >= 60) {
+				minutes -= 60;
+				hours += 1;
+			}
+			long dayInMilis = 24*60*60*1000;
+			int days = 0;
+			while(hours >= 8) {
+				hours -= 8;
+				days += 1;
+			}
+			return new Date(startDate.getTime() + dayInMilis * days);
+		}
+		return null;
 	}
 }

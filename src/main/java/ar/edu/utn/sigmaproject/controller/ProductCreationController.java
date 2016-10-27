@@ -123,8 +123,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@Wire
 	Intbox pieceUnitsByProductIntbox;
 	@Wire
-	Button createProcessButton;
-	@Wire
 	Button cancelPieceButton;
 	@Wire
 	Component processCreationBlock;
@@ -336,8 +334,8 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		refreshViewPiece();
 	}
 
-	@Listen("onClick = #createProcessButton")
-	public void createNewProcess() {
+	@Listen("onClick = #finishProcessButton")
+	public void finishPiece() {
 		if(Strings.isBlank(pieceNameTextbox.getValue())) {
 			Clients.showNotification("Ingrese el Nombre de la Pieza", pieceNameTextbox);
 			return;
@@ -346,17 +344,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			Clients.showNotification("La cantidad debe ser mayor a 0.", pieceUnitsByProductIntbox);
 			return;
 		}
-		processCreationBlock.setVisible(true);
-	}
-
-	@Listen("onClick = #cancelProcessButton")
-	public void cancelProcess() {
-		pieceCreationBlock.setVisible(true);
-		processCreationBlock.setVisible(false);
-	}
-
-	@Listen("onClick = #finishProcessButton")
-	public void finishPiece() {
 		// comprobamos que no existan checkbox activados que no posean valores de duracion
 		for(int i = 1; i < processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
 			Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);

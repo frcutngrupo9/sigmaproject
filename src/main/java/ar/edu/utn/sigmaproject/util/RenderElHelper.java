@@ -12,15 +12,18 @@ import java.util.List;
 public class RenderElHelper {
 
 	public static String getFormattedTime(Duration time) {
-		int hours = time.getHours();
-		int minutes = time.getMinutes();
-		while(minutes >= 60) {
-			minutes -= 60;
-			hours += 1;
+		if(time != null) {
+			int hours = time.getHours();
+			int minutes = time.getMinutes();
+			while(minutes >= 60) {
+				minutes -= 60;
+				hours += 1;
+			}
+			return String.format("%d Hrs, %d Min", hours, minutes);
 		}
-		return String.format("%d Horas, %d Minutos", hours, minutes);
+		return "";
 	}
-	
+
 	public static String getFormattedProcessTime(Duration time) {
 		if(time != null) {
 			int hours = time.getHours();

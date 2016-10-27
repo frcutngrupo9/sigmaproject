@@ -140,10 +140,6 @@
                         </row>
                     </rows>
                 </grid>
-                <hlayout>
-                    <button id="createProcessButton" label="Continuar"/>
-                    <button id="cancelPieceButton" label="Cancelar"/>
-                </hlayout>
             </vlayout>
         </panelchildren>
     </panel>
@@ -181,7 +177,7 @@
 					</template>
                 </listbox>
                 <hlayout>
-                    <button id="cancelProcessButton" label="Volver"/>
+                	<button id="cancelPieceButton" label="Cancelar"/>
                     <button id="finishProcessButton" label="Guardar Pieza"/>
                     <button id="resetPieceButton" label="Reset Pieza"/>
                     <button id="deletePieceButton" label="Eliminar Pieza"/>

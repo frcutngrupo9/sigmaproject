@@ -39,10 +39,10 @@ public class ProductionOrder implements Serializable, Cloneable {
 
 	Integer number = 0;
 	Integer units = 0;
-	Date date = new Date();
-	Date dateFinished = new Date();
-	Date realDate = new Date();
-	Date realDateFinished = new Date();
+	Date date = null;
+	Date dateFinished = null;
+	Date realDate = null;
+	Date realDateFinished = null;
 	
 	@OneToMany(orphanRemoval = true)
 	List<ProductionOrderSupply> productionOrderSupplies = new ArrayList<>();

@@ -29,20 +29,20 @@
 					</auxhead>
         			<columns>
         				<!-- <column width="40px" align="center"/> -->
-        				<column label="Numero" align="center"/>
+        				<column label="Accion" align="center"/>
+        				<column label="Nro" align="center"/>
         				<column label="Producto" align="center"/>
-		                <column label="Unidades" align="center"/>
-        				<column label="Codigo" align="center"/>
+		                <column label="Unids" align="center"/>
+        				<column label="Cod" align="center"/>
         				<column label="Estado Orden" align="center"/>
 		                <column label="Empleado Asignado" align="center"/>
-		                <column label="Porcentaje Completo" align="center"/>
-		                <column label="Tiempo Unidad" align="center"/>
-		                <column label="Tiempo Total" align="center"/>
+		                <column label="% Completo" align="center"/>
+		                <column label="Tiempo Unid" align="center"/>
+		                <column label="Tiempo Tot" align="center"/>
 		                <column label="Fecha Inicio" align="center"/>
 		                <column label="Fecha Fin" align="center"/>
 		                <column label="Fecha Inicio Real" align="center"/>
 		                <column label="Fecha Fin Real" align="center"/>
-		                <column label="Accion" align="center"/>
 		            </columns>
 		            <template name="model">
 		                <row>
@@ -52,6 +52,7 @@
 			            		<include src="/production_order_processes.zul" production_order_detail_list="${production_order_detail_list}"/>
 			            	</detail>
 			            -->
+			            	<button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})"  label="Abrir" disabled="${win_production_order_list$composer.isProductionPlanStateCancel()}"/>
 			            	<label value="${each.number}"/>
 		                	<label value="${each.product.name}"/>
 		                	<label value="${each.units}"/>
@@ -65,7 +66,6 @@
 		                    <label value="${each.dateFinished}"/>
 		                    <label value="${each.realDate}"/>
 		                    <label value="${each.realDateFinished}"/>
-		                    <button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})"  label="Abrir" disabled="${win_production_order_list$composer.isProductionPlanStateCancel()}"/>
 						</row>
 		            </template>
     			</grid>
