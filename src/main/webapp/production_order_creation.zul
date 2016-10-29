@@ -39,7 +39,7 @@
                         </row>
                     	<row>
                             <label value="Estado Orden de Produccion: "/>
-							<combobox id="productionOrderStateTypeCombobox" readonly="true">
+							<combobox id="productionOrderStateTypeCombobox" readonly="true" disabled="true">
 		                        <template name="model">
 		                        	<comboitem label="${each.name}" value="${each}"/>
 		                        </template>

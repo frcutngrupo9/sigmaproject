@@ -56,6 +56,7 @@ import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderSupplyRepository;
+import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
 import ar.edu.utn.sigmaproject.service.WoodReservedRepository;
 import ar.edu.utn.sigmaproject.service.WorkerRepository;
@@ -126,6 +127,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	private ProductionOrderSupplyRepository productionOrderSupplyRepository;
 	@WireVariable
 	private ProductionOrderRawMaterialRepository productionOrderRawMaterialRepository;
+	@WireVariable
+	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
 
 	// atributes
 	private ProductionOrder currentProductionOrder;
@@ -165,14 +168,14 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		List<ProductionOrderStateType> productionOrderStateTypeList = productionOrderStateTypeRepository.findAll();
 		productionOrderStateTypeListModel = new ListModelList<ProductionOrderStateType>(productionOrderStateTypeList);
 		productionOrderStateTypeCombobox.setModel(productionOrderStateTypeListModel);
-		
+
 		productionOrderSupplyList = currentProductionOrder.getProductionOrderSupplies();
 		productionOrderRawMaterialList = currentProductionOrder.getProductionOrderRawMaterials();
 		productionOrderSupplyListModel = new ListModelList<ProductionOrderSupply>(productionOrderSupplyList);
 		productionOrderRawMaterialListModel = new ListModelList<ProductionOrderRawMaterial>(productionOrderRawMaterialList);
 		productionOrderSupplyListbox.setModel(productionOrderSupplyListModel);
 		productionOrderRawMaterialListbox.setModel(productionOrderRawMaterialListModel);
-		
+
 		refreshView();
 	}
 
@@ -215,7 +218,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		cancelButton.setDisabled(false);
 		resetButton.setDisabled(false);
 	}
-	
+
 	private Integer getNewProductionOrderNumber() {
 		Integer lastValue = 0;
 		List<ProductionOrder> list = productionOrderRepository.findByProductionPlan(currentProductionPlan);
@@ -235,7 +238,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			refreshView();
 		}
 	}
-	
+
 	private List<ProductionOrderDetail> getProductionOrderDetailList(ProductionOrder productionOrder) {
 		List<ProductionOrderDetail> productionOrderDetailList = new ArrayList<>();
 		for(Piece piece : productionOrder.getProduct().getPieces()) {
@@ -254,24 +257,43 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	@Transactional
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
+		// primero se verifica si se inicia la orden, (la cantidad finalizada de todos los procesos era 0 y ahora no)
+		boolean isStarting = false;
+		if(currentProductionOrder.getCurrentStateType().equals(productionOrderStateTypeRepository.findFirstByName("Generada"))) {
+			for (ProductionOrderDetail each : productionOrderDetailList) {
+				if(each.isFinished()==true || each.getQuantityFinished().compareTo(BigDecimal.ZERO)!=0) {
+					isStarting = true;// se esta iniciando
+				}
+			}
+		}
+		// comprueba que el estado del plan de produccion sea abastecido
+		if(isStarting == true) {
+			ProductionPlanStateType productionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Abastecido");
+			if(!productionPlanStateType.equals(currentProductionPlan.getCurrentStateType())) {//si el plan no esta abastecido
+				Clients.showNotification("No se puede iniciar la Orden hasta que el plan no este Abastecido");
+				return;
+			}
+		}
+
+
 		int selectedIndexWorker = workerCombobox.getSelectedIndex();
 		if (selectedIndexWorker == -1) {// no hay un empleado seleccionado
 			Clients.showNotification("Debe seleccionar un Empleado", workerCombobox);
 			return;
 		}
-		if(!productionOrderStateTypeCombobox.getSelectedItem().getValue().equals(productionOrderStateTypeRepository.findFirstByName("Generada"))) {
-			for (ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
-				Process process = productionOrderDetail.getProcess();
-				ProcessType processType = process.getType();
-				MachineType machineType = processType.getMachineType();
-				if (machineType != null) {
-					if (productionOrderDetail.getMachine() == null) {
-						Clients.showNotification("Existen Procesos sin Maquina Asignada", productionOrderDetailGrid);
-						return;
-					}
+		//if(!productionOrderStateTypeCombobox.getSelectedItem().getValue().equals(productionOrderStateTypeRepository.findFirstByName("Generada"))) {
+		for (ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
+			Process process = productionOrderDetail.getProcess();
+			ProcessType processType = process.getType();
+			MachineType machineType = processType.getMachineType();
+			if (machineType != null) {
+				if (productionOrderDetail.getMachine() == null) {
+					Clients.showNotification("Existen Procesos sin Maquina Asignada", productionOrderDetailGrid);
+					return;
 				}
 			}
 		}
+		//}
 		Integer productionOrderNumber = productionOrderNumberSpinner.getValue();
 		Worker productionOrderWorker = workerCombobox.getSelectedItem().getValue();
 		Date productionOrderDate = productionOrderDatebox.getValue();
@@ -285,20 +307,20 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		currentProductionOrder.setRealDate(productionOrderRealDate);
 		currentProductionOrder.setRealDateFinished(productionOrderRealDateFinished);
 		// el estado de la orden debe cambiar automaticamente en base a las modificaciones que se le hagan y no se deberia poder cambiar manualmente excepto en el caso de la cancelacion
-//		ProductionOrderStateType ProductionOrderStateType = productionOrderStateTypeCombobox.getSelectedItem().getValue();
-//		ProductionOrderState productionOrderState = new ProductionOrderState(ProductionOrderStateType, new Date());
-//		productionOrderState = productionOrderStateRepository.save(productionOrderState);
-//		currentProductionOrder.setState(productionOrderState);
+		//		ProductionOrderStateType ProductionOrderStateType = productionOrderStateTypeCombobox.getSelectedItem().getValue();
+		//		ProductionOrderState productionOrderState = new ProductionOrderState(ProductionOrderStateType, new Date());
+		//		productionOrderState = productionOrderStateRepository.save(productionOrderState);
+		//		currentProductionOrder.setState(productionOrderState);
 		productionOrderDetailList = productionOrderDetailRepository.save(productionOrderDetailList);
 		currentProductionOrder.setDetails(productionOrderDetailList);
-		
+
 		productionOrderSupplyList = productionOrderSupplyRepository.save(productionOrderSupplyList);
 		productionOrderRawMaterialList = productionOrderRawMaterialRepository.save(productionOrderRawMaterialList);
 		currentProductionOrder.setProductionOrderSupplies(productionOrderSupplyList);
 		currentProductionOrder.setProductionOrderRawMaterials(productionOrderRawMaterialList);
-		
+
 		currentProductionOrder = productionOrderRepository.save(currentProductionOrder);
-		
+
 		alert("Orden de Produccion Guardada.");
 		//cancelButtonClick();
 		refreshView();
@@ -407,7 +429,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			}
 		}
 	}
-	
+
 	protected void updateProductionOrderState() {
 		// recorre todos los procesos para ver si estan todos finalizados
 		boolean isFinished = true;
@@ -459,7 +481,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		Checkbox element = (Checkbox) evt.getOrigin().getTarget();// obtenemos el elemento web
 		data.setFinished(element.isChecked());// cargamos al objeto el valor
 	}
-	
+
 	@Listen("onEditUsedSupply = #productionOrderSupplyListbox")
 	public void doEditUsedSupply(ForwardEvent evt) {
 		ProductionOrderSupply data = (ProductionOrderSupply) evt.getData();// obtenemos el objeto pasado por parametro
@@ -479,7 +501,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			data.setQuantityUsed(value);
 		}
 	}
-	
+
 	@Listen("onEditUsedRawMaterial = #productionOrderRawMaterialListbox")
 	public void doEditUsedRawMaterial(ForwardEvent evt) {
 		ProductionOrderRawMaterial data = (ProductionOrderRawMaterial) evt.getData();// obtenemos el objeto pasado por parametro
@@ -499,7 +521,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			data.setQuantityUsed(value);
 		}
 	}
-	
+
 	public Date getFinishDate(Date startDate, Duration time) {
 		if(time != null) {
 			int hours = time.getHours();
