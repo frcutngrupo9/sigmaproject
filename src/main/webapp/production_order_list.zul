@@ -18,18 +18,29 @@
 							<textbox id="productionPlanNameTextbox" width="100%"/>
 							<label value="Estado: "/>
                             <textbox id="productionPlanStateTypeTextbox" width="180px"/>
-							<label value="Fecha: "/>
-							<datebox id="productionPlanDatebox" cols="12" format="dd-MM-yyyy"/>
+							<label value="Fecha Creacion: "/>
+							<datebox id="productionPlanCreationDatebox" cols="12" format="dd-MM-yyyy"/>
                         </row>
                    </rows>
                 </grid>
+                <hbox hflex="1" pack="left">
+					<label value="Fecha Inicio Plan: "/>
+					<datebox id="productionPlanStartDatebox" format="M/d/yy HH:mm" width="150px"/>
+					<label value="Fecha Fin Plan: "/>
+					<datebox id="productionPlanFinishDatebox" format="M/d/yy HH:mm" width="150px"/>
+					<label value="Fecha Real Inicio Plan: "/>
+					<datebox id="productionPlanStartRealDatebox" format="M/d/yy HH:mm" width="150px"/>
+					<label value="Fecha Real Fin Plan: "/>
+					<datebox id="productionPlanFinishRealDatebox" format="M/d/yy HH:mm" width="150px"/>
+				</hbox>
     			<grid id="productionOrderGrid" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Listado Ordenes de Produccion" colspan="14"/>
+						<auxheader label="Listado Ordenes de Produccion" colspan="15"/>
 					</auxhead>
         			<columns>
         				<!-- <column width="40px" align="center"/> -->
         				<column label="Accion" align="center"/>
+        				<column label="Secuencia" align="center"/>
         				<column label="Nro" align="center"/>
         				<column label="Producto" align="center"/>
 		                <column label="Unids" align="center"/>
@@ -53,7 +64,8 @@
 			            	</detail>
 			            -->
 			            	<button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})"  label="Abrir" disabled="${win_production_order_list$composer.isProductionPlanStateCancel()}"/>
-			            	<label value="${each.number}"/>
+			            	<spinner value="${each.sequence}" forward="onChanging=productionOrderGrid.onEditProductionOrderSequence(${each})" width="70px"/>
+		                	<label value="${each.number}"/>
 		                	<label value="${each.product.name}"/>
 		                	<label value="${each.units}"/>
 		                	<label value="${each.product.code}"/>
@@ -61,15 +73,19 @@
 		                    <label value="${win_production_order_list$composer.getWorkerName(each)}"/>
 		                    <label value="${win_production_order_list$composer.getPercentComplete(each)}"/>
 		                    <label value="${r:getFormattedTime(each.product.getDurationTotal())}"/>
-		                    <label value="${r:getFormattedTime(each.product.getDurationTotal().multiply(each.units))}"/>
-		                    <label value="${each.date}"/>
-		                    <label value="${each.dateFinished}"/>
-		                    <label value="${each.realDate}"/>
-		                    <label value="${each.realDateFinished}"/>
+		                    <label value="${r:getFormattedTime(each.getDurationTotal())}"/>
+		                    <label value="${each.dateStart}"/>
+		                    <label value="${each.dateFinish}"/>
+		                    <label value="${each.dateStartReal}"/>
+		                    <label value="${each.dateFinishReal}"/>
 						</row>
 		            </template>
     			</grid>
-    			<button id="returnButton" label="Volver"/>
+    			<hbox hflex="1" pack="left">
+	    			<button id="saveButton" label="Guardar"/>
+	    			<button id="resetButton" label="Reset"/>
+	    			<button id="returnButton" label="Volver"/>
+				</hbox>
             </vlayout>
         </panelchildren>
     </panel>

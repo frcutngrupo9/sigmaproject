@@ -54,7 +54,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	@Wire
 	Textbox productionPlanNameTextbox;
 	@Wire
-	Datebox productionPlanDatebox;
+	Datebox productionPlanCreationDatebox;
 	@Wire
 	Textbox productionPlanStateTextbox;
 	@Wire
@@ -164,13 +164,13 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 
 	private void refreshView() {
 		productionPlanNameTextbox.setDisabled(true);
-		productionPlanDatebox.setDisabled(true);
+		productionPlanCreationDatebox.setDisabled(true);
 		productionPlanStateTextbox.setDisabled(true);
 		supplyRequirementListbox.setModel(supplyRequirementListModel);
 		rawMaterialRequirementListbox.setModel(rawMaterialRequirementListModel);
 		if(currentProductionPlan != null) {
 			productionPlanNameTextbox.setText(currentProductionPlan.getName());
-			productionPlanDatebox.setValue(currentProductionPlan.getDate());
+			productionPlanCreationDatebox.setValue(currentProductionPlan.getDateCreation());
 			productionPlanStateTextbox.setText(currentProductionPlan.getCurrentStateType().getName());
 		}
 	}

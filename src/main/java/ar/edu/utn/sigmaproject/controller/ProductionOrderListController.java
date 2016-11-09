@@ -1,6 +1,7 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
@@ -43,13 +44,25 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 	@Wire
 	Textbox productionPlanNameTextbox;
 	@Wire
-	Datebox productionPlanDatebox;
+	Datebox productionPlanCreationDatebox;
 	@Wire
 	Grid productionOrderGrid;
 	@Wire
 	Textbox productionPlanStateTypeTextbox;
 	@Wire
 	Button returnButton;
+	@Wire
+	Datebox productionPlanStartDatebox;
+	@Wire
+	Datebox productionPlanFinishDatebox;
+	@Wire
+	Datebox productionPlanStartRealDatebox;
+	@Wire
+	Datebox productionPlanFinishRealDatebox;
+	@Wire
+	Button saveButton;
+	@Wire
+	Button resetButton;
 
 	// services
 	@WireVariable
@@ -82,24 +95,29 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		productionOrderList = productionOrderRepository.findByProductionPlan(currentProductionPlan);
 		productionOrderListModel = new ListModelList<ProductionOrder>(productionOrderList);
 		productionOrderGrid.setModel(productionOrderListModel);
+		
+		productionPlanNameTextbox.setDisabled(true);
+		productionPlanCreationDatebox.setDisabled(true);
+		productionPlanStateTypeTextbox.setDisabled(true);
+		productionPlanFinishDatebox.setDisabled(true);
+		productionPlanStartRealDatebox.setDisabled(true);
+		productionPlanFinishRealDatebox.setDisabled(true);
+		
 		refreshView();
 	}
 
 	private void refreshView() {
-		productionPlanNameTextbox.setDisabled(true);
-		productionPlanDatebox.setDisabled(true);
-		productionPlanStateTypeTextbox.setDisabled(true);
 		if(currentProductionPlan != null) {
 			productionPlanNameTextbox.setText(currentProductionPlan.getName());
-			productionPlanDatebox.setValue(currentProductionPlan.getDate());
+			productionPlanCreationDatebox.setValue(currentProductionPlan.getDateCreation());
 			ProductionPlanStateType lastProductionPlanState = currentProductionPlan.getCurrentStateType();
 			if(lastProductionPlanState != null) {
 				productionPlanStateTypeTextbox.setText(lastProductionPlanState.getName().toUpperCase());
 			} else {
 				productionPlanStateTypeTextbox.setText("[Sin Estado]");
 			}
+			productionPlanStartDatebox.setValue(currentProductionPlan.getDateStart());
 		}
-
 	}
 
 	public String getWorkerName(ProductionOrder productionOrder) {
@@ -202,5 +220,11 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 	public void returnButtonClick() {
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/production_plan_list.zul");
+	}
+	
+	@Listen("onChange = #productionPlanStartDatebox")
+	public void productionPlanStartDateboxChange() {
+		//TODO selecciona el primer valor de secuencia y le asigna como fecha de inicio el valor seleccionado, y calcula las demas fechas de los restantes ordenes y se las asigna
+		//productionPlanStartDatebox.getValue()
 	}
 }

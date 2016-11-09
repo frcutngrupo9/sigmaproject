@@ -262,10 +262,12 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			rawMaterialRequirementList = rawMaterialRequirementRepository.save(rawMaterialRequirementList);
 			currentProductionPlan.getRawMaterialRequirements().addAll(rawMaterialRequirementList);
 			// crea ordenes de produccion
+			int sequence = 0;
 			for(ProductTotal each : currentProductionPlan.getProductTotalList()) {
 				ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateTypeRepository.findFirstByName("Generada"), new Date());
 				productionOrderState = productionOrderStateRepository.save(productionOrderState);
-				ProductionOrder productionOrder = new ProductionOrder(currentProductionPlan, each.getProduct(), null, null, each.getTotalUnits(), null, null, productionOrderState);
+				sequence += 1;
+				ProductionOrder productionOrder = new ProductionOrder(sequence, currentProductionPlan, each.getProduct(), each.getTotalUnits(), productionOrderState);
 				//  agrega los detalles
 				List<ProductionOrderDetail> details = createProductionOrderDetailList(productionOrder);
 				details = productionOrderDetailRepository.save(details);
@@ -277,7 +279,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				productionOrderRawMaterialList = productionOrderRawMaterialRepository.save(productionOrderRawMaterialList);
 				productionOrder.setProductionOrderSupplies(productionOrderSupplyList);
 				productionOrder.setProductionOrderRawMaterials(productionOrderRawMaterialList);
-				
+
 				productionOrder = productionOrderRepository.save(productionOrder);
 			}
 			currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
@@ -285,21 +287,22 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		refreshViewProductionPlan();
 		alert("Plan guardado.");
 	}
-	
+
 	private List<ProductionOrderDetail> createProductionOrderDetailList(ProductionOrder productionOrder) {
 		List<ProductionOrderDetail> details = new ArrayList<>();
 		for(Piece piece : productionOrder.getProduct().getPieces()) {
 			List<Process> auxProcessList = piece.getProcesses();
 			for(Process process : auxProcessList) {
 				// por cada proceso hay que crear un detalle
-				Integer quantityPiece = productionOrder.getUnits() * piece.getUnits();// cantidad total de la pieza
-				Duration timeTotal = process.getTime().multiply(quantityPiece);// cantidad total de tiempo del proceso
+				Integer units = productionOrder.getUnits();
+				Integer quantityPiece = units * piece.getUnits();// cantidad total de la pieza
+				Duration timeTotal = process.getTime().multiply(units);// tiempo del proceso de las piezas del producto por las unidades del producto
 				details.add(new ProductionOrderDetail(process, null, timeTotal, quantityPiece));
 			}
 		}
 		return details;
 	}
-	
+
 	private List<ProductionOrderSupply> createProductionOrderSupplyList(ProductionOrder productionOrder) {
 		List<ProductionOrderSupply> list = new ArrayList<>();
 		for(Supply each : productionOrder.getProduct().getSupplies()) {
@@ -309,7 +312,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		}
 		return list;
 	}
-	
+
 	private List<ProductionOrderRawMaterial> createProductionOrderRawMaterialList(ProductionOrder productionOrder) {
 		List<ProductionOrderRawMaterial> list = new ArrayList<>();
 		for(RawMaterial each : productionOrder.getProduct().getRawMaterials()) {

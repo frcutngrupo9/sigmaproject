@@ -1,7 +1,6 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
+import javax.xml.datatype.Duration;
 
 @Entity
 public class ProductionOrder implements Serializable, Cloneable {
@@ -38,16 +38,17 @@ public class ProductionOrder implements Serializable, Cloneable {
 	@OrderColumn(name = "detail_index")
 	List<ProductionOrderDetail> details = new ArrayList<>();
 
+	Integer sequence = 0;
 	Integer number = 0;
 	Integer units = 0;
-	Date date = null;
-	Date dateFinished = null;
-	Date realDate = null;
-	Date realDateFinished = null;
-	
+	Date dateStart = null;
+	Date dateFinish = null;
+	Date dateStartReal = null;
+	Date dateFinishReal = null;
+
 	@OneToMany(orphanRemoval = true)
 	List<ProductionOrderSupply> productionOrderSupplies = new ArrayList<>();
-	
+
 	@OneToMany(orphanRemoval = true)
 	List<ProductionOrderRawMaterial> productionOrderRawMaterials = new ArrayList<>();
 
@@ -55,25 +56,12 @@ public class ProductionOrder implements Serializable, Cloneable {
 
 	}
 
-	public ProductionOrder(ProductionPlan productionPlan, Product product, Worker worker, Integer number, Integer units, Date date, Date dateFinished, ProductionOrderState state) {
+	public ProductionOrder(Integer sequence, ProductionPlan productionPlan, Product product, Integer units, ProductionOrderState state) {
+		this.sequence = sequence;
 		this.productionPlan = productionPlan;
 		this.product = product;
-		this.worker = worker;
-		this.number = number;
 		this.units = units;
-		this.date = date;
-		this.dateFinished = dateFinished;
 		this.states.add(state);
-		// se crean los detalles
-		//		for(Piece piece : this.product.getPieces()) {
-		//			List<Process> auxProcessList = piece.getProcesses();
-		//			for(Process process : auxProcessList) {
-		//				// por cada proceso hay que crear un detalle de orden de produccion
-		//				Integer quantityPiece = this.units * piece.getUnits();// cantidad total de la pieza
-		//				Duration timeTotal = process.getTime().multiply(quantityPiece);// cantidad total de tiempo del proceso
-		//				this.details.add(new ProductionOrderDetail(process, null, timeTotal, quantityPiece));
-		//			}
-		//		}
 	}
 
 	public Long getId() {
@@ -128,36 +116,36 @@ public class ProductionOrder implements Serializable, Cloneable {
 		this.units = units;
 	}
 
-	public Date getDate() {
-		return date;
+	public Date getDateStart() {
+		return dateStart;
 	}
 
-	public void setDate(Date date) {
-		this.date = date;
+	public void setDateStart(Date dateStart) {
+		this.dateStart = dateStart;
 	}
 
-	public Date getDateFinished() {
-		return dateFinished;
+	public Date getDateFinish() {
+		return dateFinish;
 	}
 
-	public void setDateFinished(Date dateFinished) {
-		this.dateFinished = dateFinished;
-	}
-	
-	public Date getRealDate() {
-		return realDate;
+	public void setDateFinish(Date dateFinish) {
+		this.dateFinish = dateFinish;
 	}
 
-	public void setRealDate(Date realDate) {
-		this.realDate = realDate;
+	public Date getDateStartReal() {
+		return dateStartReal;
 	}
 
-	public Date getRealDateFinished() {
-		return realDateFinished;
+	public void setDateStartReal(Date dateStartReal) {
+		this.dateStartReal = dateStartReal;
 	}
 
-	public void setRealDateFinished(Date realDateFinished) {
-		this.realDateFinished = realDateFinished;
+	public Date getDateFinishReal() {
+		return dateFinishReal;
+	}
+
+	public void setDateFinishReal(Date dateFinishReal) {
+		this.dateFinishReal = dateFinishReal;
 	}
 
 	public List<ProductionOrderSupply> getProductionOrderSupplies() {
@@ -213,6 +201,21 @@ public class ProductionOrder implements Serializable, Cloneable {
 		this.states = states;
 	}
 
+	public Integer getSequence() {
+		return sequence;
+	}
+
+	public void setSequence(Integer sequence) {
+		this.sequence = sequence;
+	}
+
+	public Duration getDurationTotal() {
+		if(product.getDurationTotal() != null) {
+			return product.getDurationTotal().multiply(units);
+		}
+		return null;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -243,7 +246,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 		return true;
 	}
 
-	public static ProductionOrder clone(ProductionOrder order){
+	public static ProductionOrder clone(ProductionOrder order) {
 		try {
 			return (ProductionOrder)order.clone();
 		} catch (CloneNotSupportedException e) {

@@ -31,7 +31,8 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	List<SupplyRequirement> supplyRequirements = new ArrayList<>();
 
 	String name = "";
-	Date date;
+	Date dateCreation = null;
+	Date dateStart = null;
 
 	public ProductionPlan() {
 
@@ -39,7 +40,7 @@ public class ProductionPlan  implements Serializable, Cloneable {
 
 	public ProductionPlan(String name, List<ProductionPlanDetail> planDetails) {
 		this.name = name;
-		this.date = new Date();
+		this.dateCreation = new Date();
 		this.planDetails.addAll(planDetails);
 	}
 
@@ -147,12 +148,20 @@ public class ProductionPlan  implements Serializable, Cloneable {
 		this.name = name;
 	}
 
-	public Date getDate() {
-		return date;
+	public Date getDateCreation() {
+		return dateCreation;
 	}
 
-	public void setDate(Date date) {
-		this.date = date;
+	public void setDateCreation(Date dateCreation) {
+		this.dateCreation = dateCreation;
+	}
+
+	public Date getDateStart() {
+		return dateStart;
+	}
+
+	public void setDateStart(Date dateStart) {
+		this.dateStart = dateStart;
 	}
 
 	@Override

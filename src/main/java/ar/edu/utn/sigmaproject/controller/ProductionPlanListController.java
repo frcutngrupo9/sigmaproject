@@ -1,7 +1,5 @@
 package ar.edu.utn.sigmaproject.controller;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
@@ -138,33 +136,6 @@ public class ProductionPlanListController  extends SelectorComposer<Component> {
 			return percentComplete + " %";
 		} else {
 			return "";
-		}
-	}
-
-	public String getProductionOrderDate(ProductionPlan productionPlan, Product product) {
-		ProductionOrder aux = productionOrderRepository.findByProductionPlanAndProduct(productionPlan, product);
-		if(aux == null) {
-			return "";
-		} else {
-			DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-			String productionOrderDate = df.format(aux.getDate());
-			return productionOrderDate;
-		}
-	}
-
-	public String getProductionOrderDateFinished(ProductionPlan productionPlan, Product product) {
-		ProductionOrder aux = productionOrderRepository.findByProductionPlanAndProduct(productionPlan, product);
-		if(aux == null) {
-			return "";
-		} else {
-			if(aux.getDateFinished() != null) {
-				DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-				String productionOrderDateFinished = df.format(aux.getDateFinished());
-				return productionOrderDateFinished;
-			} else {
-				return "No Finalizado";
-			}
-
 		}
 	}
 

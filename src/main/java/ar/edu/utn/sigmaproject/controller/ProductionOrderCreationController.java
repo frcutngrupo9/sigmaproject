@@ -72,7 +72,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	@Wire
 	Textbox productNameTextbox;
 	@Wire
-	Datebox productionPlanDatebox;
+	Datebox productionPlanCreationDatebox;
 	@Wire
 	Grid productionOrderDetailGrid;
 	@Wire
@@ -82,13 +82,13 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	@Wire
 	Combobox workerCombobox;
 	@Wire
-	Datebox productionOrderDatebox;
+	Datebox productionOrderStartDatebox;
 	@Wire
-	Datebox productionOrderFinishedDatebox;
+	Datebox productionOrderFinishDatebox;
 	@Wire
-	Datebox productionOrderRealDatebox;
+	Datebox productionOrderRealStartDatebox;
 	@Wire
-	Datebox productionOrderRealFinishedDatebox;
+	Datebox productionOrderRealFinishDatebox;
 	@Wire
 	Button saveButton;
 	@Wire
@@ -182,11 +182,11 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	private void refreshView() {
 		productionPlanNameTextbox.setDisabled(true);
 		productNameTextbox.setDisabled(true);
-		productionPlanDatebox.setDisabled(true);
+		productionPlanCreationDatebox.setDisabled(true);
 		productUnitsIntbox.setDisabled(true);
 		productionPlanStateTypeTextbox.setDisabled(true);
 		productionPlanNameTextbox.setText(currentProductionPlan.getName());
-		productionPlanDatebox.setValue(currentProductionPlan.getDate());
+		productionPlanCreationDatebox.setValue(currentProductionPlan.getDateCreation());
 		ProductionPlanStateType lastProductionPlanStateType = currentProductionPlan.getCurrentStateType();
 		if(lastProductionPlanStateType != null) {
 			productionPlanStateTypeTextbox.setText(lastProductionPlanStateType.getName());
@@ -200,16 +200,16 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		} else {
 			productionOrderNumberSpinner.setValue(getNewProductionOrderNumber());
 		}
-		productionOrderDatebox.setValue(currentProductionOrder.getDate());
 		if (currentProductionOrder.getWorker() != null) {
 			workerListModel.addToSelection(currentProductionOrder.getWorker());
 			workerCombobox.setModel(workerListModel);
 		} else {
 			workerCombobox.setSelectedIndex(-1);
 		}
-		productionOrderFinishedDatebox.setValue(currentProductionOrder.getDateFinished());
-		productionOrderRealDatebox.setValue(currentProductionOrder.getRealDate());
-		productionOrderRealFinishedDatebox.setValue(currentProductionOrder.getRealDateFinished());
+		productionOrderStartDatebox.setValue(currentProductionOrder.getDateStart());
+		productionOrderFinishDatebox.setValue(currentProductionOrder.getDateFinish());
+		productionOrderRealStartDatebox.setValue(currentProductionOrder.getDateStartReal());
+		productionOrderRealFinishDatebox.setValue(currentProductionOrder.getDateFinishReal());
 		productionOrderDetailListModel = new ListModelList<ProductionOrderDetail>(productionOrderDetailList);
 		productionOrderDetailGrid.setModel(productionOrderDetailListModel);
 		productionOrderStateTypeListModel.addToSelection(currentProductionOrder.getCurrentStateType());
@@ -268,8 +268,11 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		}
 		// comprueba que el estado del plan de produccion sea abastecido
 		if(isStarting == true) {
-			ProductionPlanStateType productionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Abastecido");
-			if(!productionPlanStateType.equals(currentProductionPlan.getCurrentStateType())) {//si el plan no esta abastecido
+			ProductionPlanStateType productionPlanStateTypeAbastecido = productionPlanStateTypeRepository.findFirstByName("Abastecido");
+			ProductionPlanStateType productionPlanStateTypeEnEjecucion = productionPlanStateTypeRepository.findFirstByName("En Ejecucion");
+			boolean distintoAbastecido = !productionPlanStateTypeAbastecido.equals(currentProductionPlan.getCurrentStateType());
+			boolean distintoEnEjecucion = !productionPlanStateTypeEnEjecucion.equals(currentProductionPlan.getCurrentStateType());
+			if(distintoAbastecido || distintoEnEjecucion) {//si el plan no esta abastecido o en ejecucion
 				Clients.showNotification("No se puede iniciar la Orden hasta que el plan no este Abastecido");
 				return;
 			}
@@ -296,16 +299,16 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		//}
 		Integer productionOrderNumber = productionOrderNumberSpinner.getValue();
 		Worker productionOrderWorker = workerCombobox.getSelectedItem().getValue();
-		Date productionOrderDate = productionOrderDatebox.getValue();
-		Date productionOrderDateFinished = productionOrderFinishedDatebox.getValue();
-		Date productionOrderRealDate = productionOrderRealDatebox.getValue();
-		Date productionOrderRealDateFinished = productionOrderRealFinishedDatebox.getValue();
+		Date productionOrderDateStart = productionOrderStartDatebox.getValue();
+		Date productionOrderDateFinish = productionOrderFinishDatebox.getValue();
+		Date productionOrderRealDateStart = productionOrderRealStartDatebox.getValue();
+		Date productionOrderRealDateFinish = productionOrderRealFinishDatebox.getValue();
 		currentProductionOrder.setNumber(productionOrderNumber);
 		currentProductionOrder.setWorker(productionOrderWorker);
-		currentProductionOrder.setDate(productionOrderDate);
-		currentProductionOrder.setDateFinished(productionOrderDateFinished);
-		currentProductionOrder.setRealDate(productionOrderRealDate);
-		currentProductionOrder.setRealDateFinished(productionOrderRealDateFinished);
+		currentProductionOrder.setDateStart(productionOrderDateStart);
+		currentProductionOrder.setDateFinish(productionOrderDateFinish);
+		currentProductionOrder.setDateStartReal(productionOrderRealDateStart);
+		currentProductionOrder.setDateFinishReal(productionOrderRealDateFinish);
 		// el estado de la orden debe cambiar automaticamente en base a las modificaciones que se le hagan y no se deberia poder cambiar manualmente excepto en el caso de la cancelacion
 		//		ProductionOrderStateType ProductionOrderStateType = productionOrderStateTypeCombobox.getSelectedItem().getValue();
 		//		ProductionOrderState productionOrderState = new ProductionOrderState(ProductionOrderStateType, new Date());
@@ -539,5 +542,11 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			return new Date(startDate.getTime() + dayInMilis * days);
 		}
 		return null;
+	}
+
+	@Listen("onChange = #productionOrderStartDatebox")
+	public void productionOrderStartDateboxOnChange() {
+		Date finishDate = getFinishDate(productionOrderStartDatebox.getValue(), currentProductionOrder.getDurationTotal());
+		productionOrderFinishDatebox.setValue(finishDate);
 	}
 }

@@ -19,7 +19,7 @@
 							<label value="Estado Plan: "/>
                             <textbox id="productionPlanStateTypeTextbox"/>
 							<label value="Fecha: "/>
-							<datebox id="productionPlanDatebox" format="dd-MM-yyyy"/>
+							<datebox id="productionPlanCreationDatebox" format="dd-MM-yyyy"/>
                         </row>
                    </rows>
                 </grid>
@@ -59,15 +59,15 @@
                         </row>
                         <row>
                             <label value="Fecha Inicio Orden de Produccion: "/>
-							<datebox id="productionOrderDatebox" cols="12" format="dd-MM-yyyy"/>
+							<datebox id="productionOrderStartDatebox" cols="12" format="dd-MM-yyyy"/>
 							<label value="Fecha Inicio Real: "/>
-							<datebox id="productionOrderRealDatebox" cols="12" format="dd-MM-yyyy"/>
+							<datebox id="productionOrderRealStartDatebox" cols="12" format="dd-MM-yyyy"/>
                         </row>
                         <row>
                             <label value="Fecha Fin Orden de Produccion: "/>
-							<datebox id="productionOrderFinishedDatebox" cols="12" format="dd-MM-yyyy"/>
+							<datebox id="productionOrderFinishDatebox" cols="12" format="dd-MM-yyyy"/>
                             <label value="Fecha Fin Real: "/>
-							<datebox id="productionOrderRealFinishedDatebox" cols="12" format="dd-MM-yyyy"/>
+							<datebox id="productionOrderRealFinishDatebox" cols="12" format="dd-MM-yyyy"/>
                         </row>
                    </rows>
                 </grid>
@@ -89,7 +89,7 @@
 			            <column label="Pieza" align="center"/>
 			            <column label="Maquina Necesaria" align="center"/>
 			            <column label="Detalles" align="center"/>
-			            <column label="Tiempo" align="center"/>
+			            <column label="Tiempo x Prod" align="center"/>
 			            <column label="Tiempo Total" align="center"/>
 			            <column label="Maquina Asignada" align="center"/>
 			            <column label="Cant Pieza" align="center"/>
