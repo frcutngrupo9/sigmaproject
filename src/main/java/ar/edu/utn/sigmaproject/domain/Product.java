@@ -182,33 +182,4 @@ public class Product implements Serializable, Cloneable {
 	public void setClone(boolean isClone) {
 		this.isClone = isClone;
 	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Product other = (Product) obj;
-		return id != null && other.id != null && id.equals(other.id);
-	}
-
-	public static Product clone(Product product){
-		try {
-			return (Product)product.clone();
-		} catch (CloneNotSupportedException e) {
-			//not possible
-		}
-		return null;
-	}
 }

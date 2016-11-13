@@ -1,12 +1,17 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+
+import javax.xml.datatype.Duration;
 
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
+import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -19,6 +24,7 @@ import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
+import org.zkoss.zul.Spinner;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Machine;
@@ -224,7 +230,63 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 	
 	@Listen("onChange = #productionPlanStartDatebox")
 	public void productionPlanStartDateboxChange() {
+		System.out.println("se cambio la fecha del plan de produccion");
 		//TODO selecciona el primer valor de secuencia y le asigna como fecha de inicio el valor seleccionado, y calcula las demas fechas de los restantes ordenes y se las asigna
-		//productionPlanStartDatebox.getValue()
+		Date productionPlanStartDate = productionPlanStartDatebox.getValue();
+		Date productionOrderFinishDate = null;
+		//se ordena la lista por secuencia y se recorre en base a ese nro
+		Object[] productionOrderArray = productionOrderList.toArray();
+		Comparator<ProductionOrder> comp = new Comparator<ProductionOrder>() {
+		    @Override
+		    public int compare(ProductionOrder a, ProductionOrder b) {
+		    	return a.getSequence().compareTo(b.getSequence());
+		    }
+		};
+		Collections.sort(productionOrderList, comp);
+		for(ProductionOrder productionOrder : productionOrderList) {
+			System.out.println("Orden: " + productionOrder.getId() + ", " + productionOrder.getProduct().getName() + ", Secuencia: " + productionOrder.getSequence());
+			/*
+			Date productionOrderStartDate;
+			if(productionOrderFinishDate == null) {// si es la primera fecha en asignarse
+				productionOrderStartDate = productionPlanStartDate;
+			} else {
+				productionOrderStartDate = productionOrderFinishDate;
+			}
+			productionOrderFinishDate = getFinishDate(productionOrderStartDate, productionOrder.getDurationTotal());
+			productionOrder.setDateStart(productionOrderStartDate);
+			productionOrder.setDateFinish(productionOrderFinishDate);
+			*/
+		}
+		productionOrderListModel = new ListModelList<ProductionOrder>(productionOrderList);
+		productionOrderGrid.setModel(productionOrderListModel);
+	}
+	
+	public Date getFinishDate(Date startDate, Duration time) {
+		if(time != null) {
+			int hours = time.getHours();
+			int minutes = time.getMinutes();
+			while(minutes >= 60) {
+				minutes -= 60;
+				hours += 1;
+			}
+			long dayInMilis = 24*60*60*1000;
+			int days = 0;
+			while(hours >= 8) {
+				hours -= 8;
+				days += 1;
+			}
+			return new Date(startDate.getTime() + dayInMilis * days);
+		}
+		return null;
+	}
+	
+	@Listen("onEditProductionOrderSequence = #productionOrderGrid")
+	public void doEditProductionOrderSequence(ForwardEvent evt) {
+		ProductionOrder data = (ProductionOrder) evt.getData();// obtiene el objeto pasado por parametro
+		Spinner origin = (Spinner)evt.getOrigin().getTarget();
+		InputEvent inputEvent = (InputEvent) evt.getOrigin();
+		origin.setValue(Integer.valueOf(inputEvent.getValue()));
+		Integer sequence = (Integer)origin.intValue();
+		data.setSequence(sequence);// carga al objeto el valor actualizado del elemento web
 	}
 }

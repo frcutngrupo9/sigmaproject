@@ -28,9 +28,9 @@
 					<datebox id="productionPlanStartDatebox" format="M/d/yy HH:mm" width="150px"/>
 					<label value="Fecha Fin Plan: "/>
 					<datebox id="productionPlanFinishDatebox" format="M/d/yy HH:mm" width="150px"/>
-					<label value="Fecha Real Inicio Plan: "/>
+					<label value="Fecha Real Inicio: "/>
 					<datebox id="productionPlanStartRealDatebox" format="M/d/yy HH:mm" width="150px"/>
-					<label value="Fecha Real Fin Plan: "/>
+					<label value="Fecha Real Fin: "/>
 					<datebox id="productionPlanFinishRealDatebox" format="M/d/yy HH:mm" width="150px"/>
 				</hbox>
     			<grid id="productionOrderGrid" sizedByContent="true" span="true">

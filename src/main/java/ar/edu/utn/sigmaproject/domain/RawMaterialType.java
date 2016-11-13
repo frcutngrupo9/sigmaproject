@@ -115,38 +115,4 @@ public class RawMaterialType implements Serializable, Cloneable {
 		String widthText = "(A) " + width.doubleValue() + " " + widthMeasureUnit.getShortName();
 		return lengthText + " x " + depthText + " x " + widthText;
 	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		RawMaterialType other = (RawMaterialType) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
-
-	public static RawMaterialType clone(RawMaterialType rawMaterialType){
-		try {
-			return (RawMaterialType)rawMaterialType.clone();
-		} catch (CloneNotSupportedException e) {
-			//not possible
-		}
-		return null;
-	}
 }

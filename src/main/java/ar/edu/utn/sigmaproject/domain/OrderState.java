@@ -56,28 +56,4 @@ public class OrderState implements Serializable, Cloneable {
 	public void setDate(Date date) {
 		this.date = date;
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		OrderState other = (OrderState) obj;
-		if (id != null && other.id != null) {
-			return id.equals(other.id);
-		}
-		return false;
-	}
-
-	public static OrderState clone(OrderState orderState) {
-		try {
-			return (OrderState) orderState.clone();
-		} catch (CloneNotSupportedException e) {
-			// not possible
-		}
-		return null;
-	}
 }

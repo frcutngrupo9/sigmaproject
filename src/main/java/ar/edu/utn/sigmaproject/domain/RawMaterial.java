@@ -59,30 +59,4 @@ public class RawMaterial  implements Serializable, Cloneable {
 	public void setClone(boolean isClone) {
 		this.isClone = isClone;
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		RawMaterial other = (RawMaterial) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
-
-	public static RawMaterial clone(RawMaterial rawMaterial) {
-		try {
-			return (RawMaterial) rawMaterial.clone();
-		} catch (CloneNotSupportedException e) {
-			// not possible
-		}
-		return null;
-	}
 }

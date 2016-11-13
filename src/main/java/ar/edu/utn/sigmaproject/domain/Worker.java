@@ -56,38 +56,4 @@ public class Worker  implements Serializable, Cloneable {
 	public void setDateEmployed(Date dateEmployed) {
 		this.dateEmployed = dateEmployed;
 	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Worker other = (Worker) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
-
-	public static Worker clone(Worker measureUnitType){
-		try {
-			return (Worker)measureUnitType.clone();
-		} catch (CloneNotSupportedException e) {
-			//not possible
-		}
-		return null;
-	}
 }

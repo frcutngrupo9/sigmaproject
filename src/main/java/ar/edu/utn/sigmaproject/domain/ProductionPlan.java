@@ -163,38 +163,4 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	public void setDateStart(Date dateStart) {
 		this.dateStart = dateStart;
 	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ProductionPlan other = (ProductionPlan) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
-
-	public static ProductionPlan clone(ProductionPlan productionPlan){
-		try {
-			return (ProductionPlan)productionPlan.clone();
-		} catch (CloneNotSupportedException e) {
-			//not possible
-		}
-		return null;
-	}
 }

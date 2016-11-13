@@ -284,7 +284,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			orderCaption.setLabel("Edicion de Pedido");
 			OrderStateType orderCurrentStateType = currentOrder.getCurrentStateType();
 			if (orderCurrentStateType != null) {
-				orderStateTypeListModel.addToSelection(orderCurrentStateType);
+				orderStateTypeListModel.addToSelection(orderStateTypeRepository.findOne(orderCurrentStateType.getId()));
 				orderStateTypeCombobox.setModel(orderStateTypeListModel);
 				// solo se puede grabar si esta en estado Iniciado o Cancelado
 				OrderStateType stateTypeIniciado = orderStateTypeRepository.findFirstByName("Iniciado");
