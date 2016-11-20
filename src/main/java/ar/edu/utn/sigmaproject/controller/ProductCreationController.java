@@ -58,6 +58,7 @@ import ar.edu.utn.sigmaproject.domain.Supply;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitTypeRepository;
+import ar.edu.utn.sigmaproject.service.OrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.PieceRepository;
 import ar.edu.utn.sigmaproject.service.ProcessRepository;
 import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
@@ -164,6 +165,8 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	private SupplyRepository supplyRepository;
 	@WireVariable
 	private RawMaterialRepository rawMaterialRepository;
+	@WireVariable
+	private OrderDetailRepository orderDetailRepository;
 
 	// attributes
 	private Product currentProduct;
@@ -242,24 +245,23 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			Clients.showNotification("Ingresar Nombre Producto", productNameTextbox);
 			return;
 		}
+		ProductCategory productCategory = null;
 		if (productCategoryCombobox.getSelectedIndex() == -1) {
 			String manuallyEnteredCategoryName = productCategoryCombobox.getValue();
 			if (manuallyEnteredCategoryName.trim().length() > 0) {
 				ProductCategory newProductCategory = new ProductCategory(manuallyEnteredCategoryName);
-				newProductCategory = productCategoryRepository.save(newProductCategory);
-				productCategoryListModel = new ListModelList<>(productCategoryRepository.findAll());
-				productCategoryCombobox.setModel(productCategoryListModel);
-				productCategoryCombobox.onInitRender(new MouseEvent(Events.ON_CLICK, productCategoryCombobox));
-				productCategoryCombobox.setSelectedIndex(productCategoryListModel.indexOf(newProductCategory));
+				productCategory = productCategoryRepository.save(newProductCategory);
 			} else {
 				Clients.showNotification("Seleccionar Categoria Producto", productCategoryCombobox);
 				return;
 			}
 		}
+		if(productCategory == null) {
+			productCategory = productCategoryCombobox.getSelectedItem().getValue();
+		}
 		String productName = productNameTextbox.getText().toUpperCase();
 		String productDetails = productDetailsTextbox.getText();
 		String productCode = productCodeTextbox.getText();
-		ProductCategory productCategory = productCategoryCombobox.getSelectedItem().getValue();
 		BigDecimal productPrice = new BigDecimal(productPriceDoublebox.doubleValue());
 		org.zkoss.image.Image image = productImage.getContent();
 
@@ -419,7 +421,8 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			deleteProductButton.setDisabled(false);
 			productNameTextbox.setText(currentProduct.getName());
 			productDetailsTextbox.setText(currentProduct.getDetails());
-			productCategoryCombobox.setSelectedIndex(productCategoryListModel.indexOf(currentProduct.getCategory()));
+			productCategoryListModel = new ListModelList<>(productCategoryRepository.findAll());
+			productCategoryCombobox.setSelectedIndex(productCategoryListModel.indexOf(productCategoryRepository.findOne(currentProduct.getCategory().getId())));
 			productCodeTextbox.setText(currentProduct.getCode());
 			BigDecimal product_price = currentProduct.getPrice();
 			if(product_price != null) {
@@ -676,6 +679,10 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@Listen("onClick = #deleteProductButton")
 	public void deleteProduct() {
 		if(currentProduct != null) {
+			if(orderDetailRepository.findFirstByProduct(currentProduct) != null) {
+				Messagebox.show("No se puede eliminar, el producto se encuentra agregado en 1 o mas pedidos.", "Informacion", Messagebox.OK, Messagebox.ERROR);
+				return;
+			}
 			Messagebox.show("Esta seguro que quiere eliminar el producto?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 				public void onEvent(Event evt) throws InterruptedException {
 					if (evt.getName().equals("onOK")) {

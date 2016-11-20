@@ -1,6 +1,7 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -26,6 +27,7 @@ import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Spinner;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Timebox;
 
 import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
@@ -69,6 +71,8 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 	Button saveButton;
 	@Wire
 	Button resetButton;
+	@Wire
+	Timebox productionPlanStartTimebox;
 
 	// services
 	@WireVariable
@@ -101,14 +105,14 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		productionOrderList = productionOrderRepository.findByProductionPlan(currentProductionPlan);
 		productionOrderListModel = new ListModelList<ProductionOrder>(productionOrderList);
 		productionOrderGrid.setModel(productionOrderListModel);
-		
+
 		productionPlanNameTextbox.setDisabled(true);
 		productionPlanCreationDatebox.setDisabled(true);
 		productionPlanStateTypeTextbox.setDisabled(true);
 		productionPlanFinishDatebox.setDisabled(true);
 		productionPlanStartRealDatebox.setDisabled(true);
 		productionPlanFinishRealDatebox.setDisabled(true);
-		
+
 		refreshView();
 	}
 
@@ -121,6 +125,17 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 				productionPlanStateTypeTextbox.setText(lastProductionPlanState.getName().toUpperCase());
 			} else {
 				productionPlanStateTypeTextbox.setText("[Sin Estado]");
+			}
+			if(currentProductionPlan.getDateStart() == null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(new Date());
+				cal.set(Calendar.HOUR_OF_DAY, 9);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				productionPlanStartTimebox.setValue(cal.getTime());
+			} else {
+				productionPlanStartTimebox.setValue(currentProductionPlan.getDateStart());
 			}
 			productionPlanStartDatebox.setValue(currentProductionPlan.getDateStart());
 		}
@@ -227,57 +242,10 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/production_plan_list.zul");
 	}
-	
+
 	@Listen("onChange = #productionPlanStartDatebox")
 	public void productionPlanStartDateboxChange() {
-		System.out.println("se cambio la fecha del plan de produccion");
-		//TODO selecciona el primer valor de secuencia y le asigna como fecha de inicio el valor seleccionado, y calcula las demas fechas de los restantes ordenes y se las asigna
-		Date productionPlanStartDate = productionPlanStartDatebox.getValue();
-		Date productionOrderFinishDate = null;
-		//se ordena la lista por secuencia y se recorre en base a ese nro
-		Object[] productionOrderArray = productionOrderList.toArray();
-		Comparator<ProductionOrder> comp = new Comparator<ProductionOrder>() {
-		    @Override
-		    public int compare(ProductionOrder a, ProductionOrder b) {
-		    	return a.getSequence().compareTo(b.getSequence());
-		    }
-		};
-		Collections.sort(productionOrderList, comp);
-		for(ProductionOrder productionOrder : productionOrderList) {
-			System.out.println("Orden: " + productionOrder.getId() + ", " + productionOrder.getProduct().getName() + ", Secuencia: " + productionOrder.getSequence());
-			/*
-			Date productionOrderStartDate;
-			if(productionOrderFinishDate == null) {// si es la primera fecha en asignarse
-				productionOrderStartDate = productionPlanStartDate;
-			} else {
-				productionOrderStartDate = productionOrderFinishDate;
-			}
-			productionOrderFinishDate = getFinishDate(productionOrderStartDate, productionOrder.getDurationTotal());
-			productionOrder.setDateStart(productionOrderStartDate);
-			productionOrder.setDateFinish(productionOrderFinishDate);
-			*/
-		}
-		productionOrderListModel = new ListModelList<ProductionOrder>(productionOrderList);
-		productionOrderGrid.setModel(productionOrderListModel);
-	}
-	
-	public Date getFinishDate(Date startDate, Duration time) {
-		if(time != null) {
-			int hours = time.getHours();
-			int minutes = time.getMinutes();
-			while(minutes >= 60) {
-				minutes -= 60;
-				hours += 1;
-			}
-			long dayInMilis = 24*60*60*1000;
-			int days = 0;
-			while(hours >= 8) {
-				hours -= 8;
-				days += 1;
-			}
-			return new Date(startDate.getTime() + dayInMilis * days);
-		}
-		return null;
+		sortProductionOrderListBySequenceAndUpdateDates();
 	}
 	
 	@Listen("onEditProductionOrderSequence = #productionOrderGrid")
@@ -288,5 +256,120 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		origin.setValue(Integer.valueOf(inputEvent.getValue()));
 		Integer sequence = (Integer)origin.intValue();
 		data.setSequence(sequence);// carga al objeto el valor actualizado del elemento web
+		sortProductionOrderListBySequenceAndUpdateDates();
+	}
+
+	private void sortProductionOrderListBySequenceAndUpdateDates() {
+		//se ordena la lista por secuencia
+		Comparator<ProductionOrder> comp = new Comparator<ProductionOrder>() {
+			@Override
+			public int compare(ProductionOrder a, ProductionOrder b) {
+				return a.getSequence().compareTo(b.getSequence());
+			}
+		};
+		Collections.sort(productionOrderList, comp);
+		// selecciona el primer valor de secuencia y le asigna como fecha de inicio el valor seleccionado, y calcula las demas fechas de los restantes ordenes y se las asigna
+		Date productionPlanStartDate = productionPlanStartDatebox.getValue();
+		if(productionPlanStartDate != null) {
+			// setea la hora de inicio seleccionada en el timebox
+			Calendar calStartDate = Calendar.getInstance();
+			calStartDate.setTime(productionPlanStartDate);
+			Calendar calTimebox = Calendar.getInstance();
+			calTimebox.setTime(productionPlanStartTimebox.getValue());
+			calStartDate.set(Calendar.HOUR_OF_DAY, calTimebox.get(Calendar.HOUR_OF_DAY));
+			calStartDate.set(Calendar.MINUTE, calTimebox.get(Calendar.MINUTE));
+			productionPlanStartDate = calStartDate.getTime();
+			// calcula todas las fechas y las agrega a las ordenes de produccion
+			Date productionOrderFinishDate = null;
+			for(ProductionOrder productionOrder : productionOrderList) {
+				Date productionOrderStartDate;
+				if(productionOrderFinishDate == null) {// si es la primera fecha en asignarse
+					productionOrderStartDate = productionPlanStartDate;
+				} else {
+					productionOrderStartDate = productionOrderFinishDate;
+				}
+				productionOrderFinishDate = getFinishDate(productionOrderStartDate, productionOrder.getDurationTotal());
+				productionOrder.setDateStart(productionOrderStartDate);
+				productionOrder.setDateFinish(productionOrderFinishDate);
+			}
+			// se guarda la ultima fecha como el fin de plan de produccion
+			productionPlanFinishDatebox.setValue(productionOrderFinishDate);
+		}
+		productionOrderListModel = new ListModelList<ProductionOrder>(productionOrderList);
+		productionOrderGrid.setModel(productionOrderListModel);
+	}
+
+	public Date getFinishDate(Date startDate, Duration time) {
+		int firstHourOfDay = 9;// horario en el que se empieza a trabajar
+		int firstMinuteOfDay = 0;
+		int lastHourOfDay = 18;// horario en el que se termina de trabajar
+		int lastMinuteOfDay = 0;
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(startDate);
+		// primero se comprueba que la fecha de inicio se encuentre dentro del horario
+		if(cal.get(Calendar.HOUR_OF_DAY) < firstHourOfDay ||
+				cal.get(Calendar.HOUR_OF_DAY) >= lastHourOfDay) {
+			return null;
+		} else {// si esta dentro del horario en horas pero no en minutos
+			if(firstMinuteOfDay!=0 || lastMinuteOfDay!=0) {//si estan configurados minutos en el horario
+				//solo es valido si la hora es igual a la de comienzo o igual al previo al final
+				if(cal.get(Calendar.HOUR_OF_DAY) == firstHourOfDay) {
+					if(cal.get(Calendar.MINUTE) < firstMinuteOfDay) {
+						return null;
+					}
+				}
+				if(cal.get(Calendar.HOUR_OF_DAY) == lastHourOfDay-1) {
+					if(cal.get(Calendar.MINUTE) >= lastMinuteOfDay) {
+						return null;
+					}
+				}
+			}
+		}
+
+		if(time != null) {
+			int hours = time.getHours();
+			int minutes = time.getMinutes();// puede ser que los minutos sean mayor que 60, ya que se realizaron multiplicaciones sobre time
+			while(minutes >= 60) {// se vuelven los minutos a menos de 60
+				minutes -= 60;
+				hours += 1;
+			}
+			while(hours > 0) {
+				hours -= 1;
+				cal.add(Calendar.HOUR_OF_DAY, 1);// agrega horas
+				// si luego de agregar 1 hora, el tiempo supera el horario de finalizacion
+				// se resta hasta el horario de finalizacion y ese tiempo se suma al dia siguiente
+				if(cal.get(Calendar.HOUR_OF_DAY) >= lastHourOfDay) {// caso supere el horario de finalizacion
+					if(cal.get(Calendar.MINUTE) > 0) {
+						// se agregan los minutos que superan al horario de finalizacion
+						minutes += cal.get(Calendar.MINUTE);
+						while(minutes >= 60) {
+							minutes -= 60;
+							hours += 1;
+						}
+					}
+					// agrega 1 dia y resetea el horario
+					cal.add(Calendar.DAY_OF_MONTH, 1);
+					cal.set(Calendar.HOUR_OF_DAY, firstHourOfDay);
+					cal.set(Calendar.MINUTE, firstMinuteOfDay);
+					cal.set(Calendar.SECOND, 0);
+					cal.set(Calendar.MILLISECOND, 0);
+				}
+			}
+			// agrega los minutos
+			if(minutes > 0) {
+				cal.add(Calendar.MINUTE, minutes);
+				// puede ser que al agregar los minutos se supere el horario de finalizacion
+				if(cal.get(Calendar.HOUR_OF_DAY) >= lastHourOfDay) {// caso supere el horario de finalizacion
+					cal.add(Calendar.DAY_OF_MONTH, 1);// agrega 1 dia
+					cal.set(Calendar.HOUR_OF_DAY, firstHourOfDay);
+					cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));// los minutos que superaron el horario de finalizacion se agregan al horario de inicio
+					cal.set(Calendar.SECOND, 0);
+					cal.set(Calendar.MILLISECOND, 0);
+
+				}
+			}
+			return cal.getTime();
+		}
+		return startDate;// si el tiempo es null se devuelve la misma fecha de inicio
 	}
 }

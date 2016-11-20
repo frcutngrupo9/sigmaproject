@@ -19,19 +19,20 @@
 							<label value="Estado: "/>
                             <textbox id="productionPlanStateTypeTextbox" width="180px"/>
 							<label value="Fecha Creacion: "/>
-							<datebox id="productionPlanCreationDatebox" cols="12" format="dd-MM-yyyy"/>
+							<datebox id="productionPlanCreationDatebox" buttonVisible="false" format="dd/MM/yyyy" width="110px"/>
                         </row>
                    </rows>
                 </grid>
-                <hbox hflex="1" pack="left">
+                <hbox hflex="1" pack="center">
 					<label value="Fecha Inicio Plan: "/>
-					<datebox id="productionPlanStartDatebox" format="M/d/yy HH:mm" width="150px"/>
+					<datebox id="productionPlanStartDatebox" format="d/M/yyyy" width="110px"/>
+					<timebox id="productionPlanStartTimebox" format="HH:mm" width="70px"/>
 					<label value="Fecha Fin Plan: "/>
-					<datebox id="productionPlanFinishDatebox" format="M/d/yy HH:mm" width="150px"/>
+					<datebox id="productionPlanFinishDatebox" buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
 					<label value="Fecha Real Inicio: "/>
-					<datebox id="productionPlanStartRealDatebox" format="M/d/yy HH:mm" width="150px"/>
+					<datebox id="productionPlanStartRealDatebox" buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
 					<label value="Fecha Real Fin: "/>
-					<datebox id="productionPlanFinishRealDatebox" format="M/d/yy HH:mm" width="150px"/>
+					<datebox id="productionPlanFinishRealDatebox" buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
 				</hbox>
     			<grid id="productionOrderGrid" sizedByContent="true" span="true">
     				<auxhead>
@@ -41,6 +42,8 @@
         				<!-- <column width="40px" align="center"/> -->
         				<column label="Accion" align="center"/>
         				<column label="Secuencia" align="center"/>
+        				<column label="Fecha Inicio" align="center"/>
+		                <column label="Fecha Fin" align="center"/>
         				<column label="Nro" align="center"/>
         				<column label="Producto" align="center"/>
 		                <column label="Unids" align="center"/>
@@ -48,10 +51,8 @@
         				<column label="Estado Orden" align="center"/>
 		                <column label="Empleado Asignado" align="center"/>
 		                <column label="% Completo" align="center"/>
-		                <column label="Tiempo Unid" align="center"/>
-		                <column label="Tiempo Tot" align="center"/>
-		                <column label="Fecha Inicio" align="center"/>
-		                <column label="Fecha Fin" align="center"/>
+		                <column label="Tiempo Total" align="center"/>
+		                <column label="T. Unidad" align="center"/>
 		                <column label="Fecha Inicio Real" align="center"/>
 		                <column label="Fecha Fin Real" align="center"/>
 		            </columns>
@@ -65,17 +66,17 @@
 			            -->
 			            	<button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})"  label="Abrir" disabled="${win_production_order_list$composer.isProductionPlanStateCancel()}"/>
 			            	<spinner value="${each.sequence}" forward="onChanging=productionOrderGrid.onEditProductionOrderSequence(${each})" width="70px"/>
-		                	<label value="${each.number}"/>
+		                	<datebox buttonVisible="false" format="dd/MM/yyyy HH:mm" value="${each.dateStart}" disabled="true" width="110px"/>
+		                    <datebox buttonVisible="false" format="dd/MM/yyyy HH:mm" value="${each.dateFinish}" disabled="true" width="110px"/>
+		                    <label value="${each.number}"/>
 		                	<label value="${each.product.name}"/>
 		                	<label value="${each.units}"/>
 		                	<label value="${each.product.code}"/>
 		                    <label value="${each.getCurrentStateType().name}"/>
 		                    <label value="${win_production_order_list$composer.getWorkerName(each)}"/>
 		                    <label value="${win_production_order_list$composer.getPercentComplete(each)}"/>
-		                    <label value="${r:getFormattedTime(each.product.getDurationTotal())}"/>
 		                    <label value="${r:getFormattedTime(each.getDurationTotal())}"/>
-		                    <label value="${each.dateStart}"/>
-		                    <label value="${each.dateFinish}"/>
+		                    <label value="${r:getFormattedTime(each.product.getDurationTotal())}"/>
 		                    <label value="${each.dateStartReal}"/>
 		                    <label value="${each.dateFinishReal}"/>
 						</row>

@@ -104,6 +104,7 @@
                     <button id="saveProductionPlanButton" label="Guardar Plan de Produccion"/>
                     <button id="resetProductionPlanButton" label="Reset Plan de Produccion"/>
                     <button id="deleteProductionPlanButton" label="Eliminar Plan de Produccion"/>
+                    <button id="returnButton" label="Volver a Listado"/>
                 </hlayout>
             </vlayout>
         </panelchildren>

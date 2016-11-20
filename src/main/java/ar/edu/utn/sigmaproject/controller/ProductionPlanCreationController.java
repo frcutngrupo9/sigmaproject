@@ -14,6 +14,7 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
+import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
@@ -23,6 +24,7 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Caption;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Grid;
+import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
@@ -92,6 +94,8 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	Combobox productionPlanStateTypeCombobox;
 	@Wire
 	Caption productionPlanCaption;
+	@Wire
+	Button returnButton;
 
 	// services
 	@WireVariable
@@ -512,6 +516,12 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			total = process.getTime().getMinutes() * units;
 		}
 		return total + "";
+	}
+	
+	@Listen("onClick = #returnButton")
+	public void returnButtonClick() {
+		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/production_plan_list.zul");
 	}
 
 }
