@@ -11,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.xml.datatype.Duration;
 
 @Entity
 public class Piece implements Serializable, Cloneable {
@@ -24,7 +25,7 @@ public class Piece implements Serializable, Cloneable {
 	List<Process> processes = new ArrayList<>();
 
 	String name = "";
-	
+
 	BigDecimal length = BigDecimal.ZERO;
 
 	@ManyToOne
@@ -62,6 +63,19 @@ public class Piece implements Serializable, Cloneable {
 		this.isGroup = isGroup;
 		this.units = units;
 		isClone = false;
+	}
+
+	public Duration getDurationTotal() {
+		Duration durationTotal = null;
+		for(Process each : processes) {
+			if(durationTotal == null) {
+				durationTotal = each.getTime();
+			} else {
+				durationTotal = durationTotal.add(each.getTime());
+			}
+
+		}
+		return durationTotal;
 	}
 
 	public Long getId() {
@@ -166,39 +180,5 @@ public class Piece implements Serializable, Cloneable {
 
 	public void setClone(boolean isClone) {
 		this.isClone = isClone;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Piece other = (Piece) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
-
-	public static Piece clone(Piece piece){
-		try {
-			return (Piece)piece.clone();
-		} catch (CloneNotSupportedException e) {
-			//not possible
-		}
-		return null;
 	}
 }

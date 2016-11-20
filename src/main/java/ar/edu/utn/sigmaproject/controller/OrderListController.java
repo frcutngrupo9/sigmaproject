@@ -27,6 +27,7 @@ import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
+import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
 
@@ -44,6 +45,8 @@ public class OrderListController extends SelectorComposer<Component> {
 	// services
 	@WireVariable
 	private OrderRepository orderRepository;
+	@WireVariable
+	private OrderStateRepository orderStateRepository;
 	@WireVariable
 	private ClientRepository clientRepository;
 	@WireVariable
@@ -90,7 +93,9 @@ public class OrderListController extends SelectorComposer<Component> {
 						alert("No se puede cancelar un Pedido ya cancelado.");
 					} else {
 						OrderStateType orderStateType = orderStateTypeRepository.findFirstByName("Cancelado");
-						order.setState(new OrderState(orderStateType, new Date()));
+						OrderState orderState = new OrderState(orderStateType, new Date());
+						orderState = orderStateRepository.save(orderState);
+						order.setState(orderState);
 						orderRepository.save(order);// grabamos el estado del pedido
 						refreshList();
 						alert("Pedido cancelado.");

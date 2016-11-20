@@ -129,28 +129,4 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 	public void setDateFinished(Date dateFinished) {
 		this.dateFinished = dateFinished;
 	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-
-		ProductionOrderDetail that = (ProductionOrderDetail) o;
-
-		return id != null ? id.equals(that.id) : that.id == null;
-	}
-
-	@Override
-	public int hashCode() {
-		return id != null ? id.hashCode() : 0;
-	}
-
-	public static ProductionOrderDetail clone(ProductionOrderDetail other) {
-		try {
-			return (ProductionOrderDetail) other.clone();
-		} catch (CloneNotSupportedException e) {
-			// not possible
-		}
-		return null;
-	}
 }

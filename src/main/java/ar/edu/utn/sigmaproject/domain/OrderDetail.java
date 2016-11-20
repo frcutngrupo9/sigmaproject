@@ -65,29 +65,4 @@ public class OrderDetail  implements Serializable, Cloneable {
 	public void setPrice(BigDecimal price) {
 		this.price = price;
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		OrderDetail other = (OrderDetail) obj;
-		if (id != null && other.id != null) {
-			return id.equals(other.id);
-		}
-		return false;
-	}
-
-	public static OrderDetail clone(OrderDetail orderDetail) {
-		try {
-			return (OrderDetail) orderDetail.clone();
-		} catch (CloneNotSupportedException e) {
-			// not possible
-		}
-		return null;
-	}
-
 }

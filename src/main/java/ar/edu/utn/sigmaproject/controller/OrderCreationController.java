@@ -10,6 +10,7 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
+import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
@@ -21,6 +22,7 @@ import org.zkoss.zul.Caption;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Doublebox;
+import org.zkoss.zul.Include;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
@@ -87,6 +89,8 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	Caption orderCaption;
 	@Wire
 	Textbox productNameFilterTextbox;
+	@Wire
+	Button returnButton;
 
 	// services
 	@WireVariable
@@ -284,7 +288,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			orderCaption.setLabel("Edicion de Pedido");
 			OrderStateType orderCurrentStateType = currentOrder.getCurrentStateType();
 			if (orderCurrentStateType != null) {
-				orderStateTypeListModel.addToSelection(orderCurrentStateType);
+				orderStateTypeListModel.addToSelection(orderStateTypeRepository.findOne(orderCurrentStateType.getId()));
 				orderStateTypeCombobox.setModel(orderStateTypeListModel);
 				// solo se puede grabar si esta en estado Iniciado o Cancelado
 				OrderStateType stateTypeIniciado = orderStateTypeRepository.findFirstByName("Iniciado");
@@ -445,6 +449,12 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		Textbox target = (Textbox)event.getTarget();
 		target.setText(event.getValue());
 		filterProducts();
+	}
+	
+	@Listen("onClick = #returnButton")
+	public void returnButtonClick() {
+		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/order_list.zul");
 	}
 
 }

@@ -13,8 +13,8 @@
 							<textbox id="productionPlanNameTextbox" width="25%"/>
                         </row>
                         <row>
-                            <label value="Fecha Plan de Produccion: "/>
-							<datebox id="productionPlanDatebox" cols="12" format="dd-MM-yyyy" width="25%"/>
+                            <label value="Fecha Creacion Plan de Produccion: "/>
+							<datebox id="productionPlanCreationDatebox" cols="12" format="dd-MM-yyyy" width="25%"/>
                         </row>
                         <row>
                             <label value="Estado Plan de Produccion: "/>

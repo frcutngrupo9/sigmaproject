@@ -1,3 +1,4 @@
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="win_product_creation" apply="ar.edu.utn.sigmaproject.controller.ProductCreationController" width="95%" style="background:white">
 	<caption id="productCaption" label="Creacion/Edicion Producto"/>
     <panel title="Producto" id="productCreationBlock" border="rounded">
@@ -54,18 +55,20 @@
                 </hlayout>
     			<listbox id="pieceListbox" style="margin: 4px">
     				<auxhead>
-						<auxheader label="Piezas" colspan="3"/>
+						<auxheader label="Piezas" colspan="4"/>
 					</auxhead>
         			<listhead>
             			<listheader label="Nombre Pieza" align="center"/>
             			<listheader label="Unidades por Producto" align="center"/>
             			<listheader label="Cantidad de Procesos" align="center"/>
+            			<listheader label="Tiempo Total" align="center"/>
         			</listhead>
         			<template name="model">
             			<listitem>
                 			<listcell label="${each.name}"/>
                             <listcell label="${each.units}"/>
                 			<listcell label="${each.processes.size()}"/>
+                			<listcell label="${r:getFormattedTime(each.getDurationTotal())}"/>
             			</listitem>
         			</template>
     			</listbox>
@@ -137,10 +140,6 @@
                         </row>
                     </rows>
                 </grid>
-                <hlayout>
-                    <button id="createProcessButton" label="Continuar"/>
-                    <button id="cancelPieceButton" label="Cancelar"/>
-                </hlayout>
             </vlayout>
         </panelchildren>
     </panel>
@@ -153,9 +152,8 @@
             			<listheader width="30px"/>
             			<listheader label="Proceso"/>
             			<listheader label="Detalles" width="450px"/>
-            			<listheader label="Dias" width="80px"/>
-            			<listheader label="Horas" width="80px"/>
-            			<listheader label="Minutos" width="80px"/>
+            			<listheader label="Horas" width="100px"/>
+            			<listheader label="Minutos" width="100px"/>
         			</listhead>
 					<template name="model">
                         <listitem>
@@ -170,19 +168,16 @@
                                 <textbox visible="${process_checked}" value="${win_product_creation$composer.getProcessDetails(each)}"  forward="onChanging=processListbox.onProcessDetailsChange(${each})" width="400px"/>
                             </listcell>
                             <listcell>
-                                <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessDays(each)}" forward="onChanging=processListbox.onProcessDaysChange(${each})" width="36px"/>
+                                <spinner constraint="no empty,min 0" visible="${process_checked}" forward="onChanging=processListbox.onProcessHoursChange(${each})" value="${win_product_creation$composer.getProcessHours(each)}" width="70px"/>
                             </listcell>
                             <listcell>
-                                <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessHours(each)}" forward="onChanging=processListbox.onProcessHoursChange(${each})" width="36px"/>
-                            </listcell>
-                            <listcell>
-                                <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessMinutes(each)}" forward="onChanging=processListbox.onProcessMinutesChange(${each})" width="36px"/>
+                                <spinner constraint="no empty,min 0 max 59" visible="${process_checked}" forward="onChanging=processListbox.onProcessMinutesChange(${each})" value="${win_product_creation$composer.getProcessMinutes(each)}" width="70px"/>
                             </listcell>
                         </listitem>
 					</template>
                 </listbox>
                 <hlayout>
-                    <button id="cancelProcessButton" label="Volver"/>
+                	<button id="cancelPieceButton" label="Cancelar"/>
                     <button id="finishProcessButton" label="Guardar Pieza"/>
                     <button id="resetPieceButton" label="Reset Pieza"/>
                     <button id="deletePieceButton" label="Eliminar Pieza"/>

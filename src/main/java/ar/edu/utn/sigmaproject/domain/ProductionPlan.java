@@ -31,7 +31,8 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	List<SupplyRequirement> supplyRequirements = new ArrayList<>();
 
 	String name = "";
-	Date date;
+	Date dateCreation = null;
+	Date dateStart = null;
 
 	public ProductionPlan() {
 
@@ -39,7 +40,7 @@ public class ProductionPlan  implements Serializable, Cloneable {
 
 	public ProductionPlan(String name, List<ProductionPlanDetail> planDetails) {
 		this.name = name;
-		this.date = new Date();
+		this.dateCreation = new Date();
 		this.planDetails.addAll(planDetails);
 	}
 
@@ -147,45 +148,19 @@ public class ProductionPlan  implements Serializable, Cloneable {
 		this.name = name;
 	}
 
-	public Date getDate() {
-		return date;
+	public Date getDateCreation() {
+		return dateCreation;
 	}
 
-	public void setDate(Date date) {
-		this.date = date;
+	public void setDateCreation(Date dateCreation) {
+		this.dateCreation = dateCreation;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
+	public Date getDateStart() {
+		return dateStart;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ProductionPlan other = (ProductionPlan) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
-
-	public static ProductionPlan clone(ProductionPlan productionPlan){
-		try {
-			return (ProductionPlan)productionPlan.clone();
-		} catch (CloneNotSupportedException e) {
-			//not possible
-		}
-		return null;
+	public void setDateStart(Date dateStart) {
+		this.dateStart = dateStart;
 	}
 }
