@@ -281,12 +281,12 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 
 	@Listen("onChange = #productionPlanStartDatebox")
 	public void productionPlanStartDateboxChange() {
-		sortProductionOrderListBySequenceAndUpdateDates();
+		sortProductionOrderListBySequenceAndRefreshDates();
 	}
 
 	@Listen("onChange = #productionPlanStartTimebox")
 	public void productionPlanStartTimeboxChange() {
-		sortProductionOrderListBySequenceAndUpdateDates();
+		sortProductionOrderListBySequenceAndRefreshDates();
 	}
 
 	@Listen("onEditProductionOrderSequence = #productionOrderGrid")
@@ -297,29 +297,60 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		origin.setValue(Integer.valueOf(inputEvent.getValue()));
 		Integer sequence = (Integer)origin.intValue();
 		data.setSequence(sequence);// carga al objeto el valor actualizado del elemento web
-		sortProductionOrderListBySequenceAndUpdateDates();
+		sortProductionOrderListBySequenceAndRefreshDates();
 	}
 
-	private void sortProductionOrderListBySequenceAndUpdateDates() {
+	private void sortProductionOrderListBySequenceAndRefreshDates() {
 		//se ordena la lista por secuencia
 		sortProductionOrderListBySequence();
 		// selecciona el primer valor de secuencia y le asigna como fecha de inicio el valor seleccionado, y calcula las demas fechas de los restantes ordenes y se las asigna
 		Date productionPlanStartDate = getTimeboxDate();
 		if(productionPlanStartDate != null) {
+			int sequence = 0;
+			Date previousStartDate = null;
 			// calcula todas las fechas y las agrega a las ordenes de produccion
 			Date productionOrderFinishDate = null;
 			for(ProductionOrder productionOrder : productionOrderList) {
-				Date productionOrderStartDate;
-				if(productionOrderFinishDate == null) {// si es la primera fecha en asignarse
-					productionOrderStartDate = productionPlanStartDate;
+				// las ordenes el mismo nro de secuencia, inician al mismo tiempo
+				if(sequence == 0) {
+					// si es la primera vez que ingresa
+					sequence = productionOrder.getSequence();
+					Date productionOrderStartDate;
+					if(productionOrderFinishDate == null) {// si es la primera fecha en asignarse
+						productionOrderStartDate = productionPlanStartDate;
+					} else {
+						productionOrderStartDate = productionOrderFinishDate;// el inicio es al finalizar la ultima
+					}
+					productionOrderFinishDate = getFinishDate(productionOrderStartDate, productionOrder.getDurationTotal());
+					productionOrder.setDateStart(productionOrderStartDate);
+					productionOrder.setDateFinish(productionOrderFinishDate);
+					previousStartDate = productionOrderStartDate;
 				} else {
-					productionOrderStartDate = productionOrderFinishDate;
+					// si el valor de secuencia anterior es igual al actual se inician al mismo tiempo y se guarda el que finalice mas tarde para usarlo como inicio del proximo
+					if(sequence == productionOrder.getSequence()) {
+						productionOrder.setDateStart(previousStartDate);
+						Date currentFinishDate = getFinishDate(previousStartDate, productionOrder.getDurationTotal());
+						productionOrder.setDateFinish(currentFinishDate);
+						if(currentFinishDate.after(productionOrderFinishDate)) {// si la actual orden finaliza despues q la que anterior, la reemplaza
+							productionOrderFinishDate = currentFinishDate;
+						}
+					} else {
+						Date productionOrderStartDate;
+						if(productionOrderFinishDate == null) {// si es la primera fecha en asignarse
+							productionOrderStartDate = productionPlanStartDate;
+						} else {
+							productionOrderStartDate = productionOrderFinishDate;// el inicio es al finalizar la ultima
+						}
+						productionOrderFinishDate = getFinishDate(productionOrderStartDate, productionOrder.getDurationTotal());
+						productionOrder.setDateStart(productionOrderStartDate);
+						productionOrder.setDateFinish(productionOrderFinishDate);
+						previousStartDate = productionOrderStartDate;
+					}
 				}
-				productionOrderFinishDate = getFinishDate(productionOrderStartDate, productionOrder.getDurationTotal());
-				productionOrder.setDateStart(productionOrderStartDate);
-				productionOrder.setDateFinish(productionOrderFinishDate);
+				
+				
 			}
-			// se guarda la ultima fecha como el fin de plan de produccion
+			// se usa la ultima fecha como el fin de plan de produccion
 			productionPlanFinishDatebox.setValue(productionOrderFinishDate);
 		} else {
 			// se ponen en null los dates de las ordenes de prod
