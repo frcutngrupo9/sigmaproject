@@ -52,7 +52,7 @@
                         </row>
                         <row>
                             <label value="Fecha Necesidad: "/>
-                    		<datebox id="orderNeedDatebox" cols="12" format="dd-MM-yyyy" width="25%" constraint="no past"/>
+                    		<datebox id="orderNeedDatebox" cols="12" format="dd-MM-yyyy" width="25%"/>
                         </row>
                    </rows>
                 </grid>
