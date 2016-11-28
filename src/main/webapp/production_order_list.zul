@@ -65,7 +65,7 @@
 			            	</detail>
 			            -->
 			            	<button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})"  label="Abrir" disabled="${win_production_order_list$composer.isProductionPlanStateCancel()}"/>
-			            	<spinner value="${each.sequence}" forward="onChanging=productionOrderGrid.onEditProductionOrderSequence(${each})" width="70px"/>
+			            	<spinner value="${each.sequence}" constraint="no empty,min 1" forward="onChanging=productionOrderGrid.onEditProductionOrderSequence(${each})" width="60px"/>
 		                	<datebox buttonVisible="false" format="dd/MM/yyyy HH:mm" value="${each.dateStart}" disabled="true" width="110px"/>
 		                    <datebox buttonVisible="false" format="dd/MM/yyyy HH:mm" value="${each.dateFinish}" disabled="true" width="110px"/>
 		                    <label value="${each.number}"/>
