@@ -409,8 +409,8 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		Map<Product, Integer> productTotalMap = new HashMap<Product, Integer>();
 		for(ProductionPlanDetail auxProductionPlanDetail : productionPlanDetailList) {
 			for(OrderDetail auxOrderDetail : auxProductionPlanDetail.getOrder().getDetails()) {
-				Integer totalUnits = productTotalMap.get(auxOrderDetail.getProduct());
-				productTotalMap.put(auxOrderDetail.getProduct(), (totalUnits == null) ? auxOrderDetail.getUnits() : totalUnits + auxOrderDetail.getUnits());
+				Integer totalUnits = productTotalMap.get(productRepository.findOne(auxOrderDetail.getProduct().getId()));
+				productTotalMap.put(productRepository.findOne(auxOrderDetail.getProduct().getId()), (totalUnits == null) ? auxOrderDetail.getUnits() : totalUnits + auxOrderDetail.getUnits());
 			}
 		}
 		List<ProductTotal> list = new ArrayList<ProductTotal>();
@@ -448,7 +448,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			} else {
 				productionPlanNameTextbox.setText("");
 			}
-			System.out.println("pasa algo bitch");
 			productionPlanDetailList = currentProductionPlan.getPlanDetails();
 			deleteProductionPlanButton.setDisabled(false);
 			productionPlanStateTypeCombobox.setDisabled(false);
