@@ -257,7 +257,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	private void refreshProductPopup() {// el popup se actualiza en base a los detalles del pedido
 		productPopupList = productRepository.findAll();
 		for(OrderDetail orderDetail : orderDetailList) {
-			productPopupList.remove(orderDetail.getProduct());// sacamos todos los productos del popup
+			productPopupList.remove(productRepository.findOne(orderDetail.getProduct().getId()));// sacamos todos los productos del popup
 		}
 		productPopupListModel = new ListModelList<Product>(productPopupList);
 		productPopupListbox.setModel(productPopupListModel);

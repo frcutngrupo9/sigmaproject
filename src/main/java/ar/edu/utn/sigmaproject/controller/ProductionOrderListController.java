@@ -314,7 +314,6 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 				// las ordenes el mismo nro de secuencia, inician al mismo tiempo
 				if(sequence == 0) {
 					// si es la primera vez que ingresa
-					sequence = productionOrder.getSequence();
 					Date productionOrderStartDate;
 					if(productionOrderFinishDate == null) {// si es la primera fecha en asignarse
 						productionOrderStartDate = productionPlanStartDate;
@@ -347,8 +346,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 						previousStartDate = productionOrderStartDate;
 					}
 				}
-				
-				
+				sequence = productionOrder.getSequence();
 			}
 			// se usa la ultima fecha como el fin de plan de produccion
 			productionPlanFinishDatebox.setValue(productionOrderFinishDate);

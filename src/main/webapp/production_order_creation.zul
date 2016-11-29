@@ -89,7 +89,7 @@
 			            <column label="Pieza" align="center"/>
 			            <column label="Maquina Necesaria" align="center"/>
 			            <column label="Detalles" align="center"/>
-			            <column label="Tiempo x Prod" align="center"/>
+			            <column label="Tiempo x Producto" align="center"/>
 			            <column label="Tiempo Total" align="center"/>
 			            <column label="Maquina Asignada" align="center"/>
 			            <column label="Cant Pieza" align="center"/>
@@ -105,9 +105,9 @@
 			            	<label value="${r:getFormattedProcessTime(each.process.time)}"/>
 			            	<label value="${r:getFormattedProcessTime(each.getTimeTotal())}"/>
 			            	<cell>
-				            	<combobox visible="true" inplace="true" hflex="1" if="${win_production_order_creation$composer.isMachineNecessary(each.process)}"
-				            		forward="onSelect=productionOrderDetailGrid.onEditProductionOrderDetailMachine(${each}), onCreate=productionOrderDetailGrid.onCreateMachineCombobox(${each})"
-	                        		model="${win_production_order_creation$composer.getMachineListModel(each)}" readonly="false">
+				            	<combobox visible="true" hflex="1" if="${win_production_order_creation$composer.isMachineNecessary(each.process)}"
+				            		forward="onSelect=productionOrderDetailGrid.onEditProductionOrderDetailMachine(${each}), onAfterRender=productionOrderDetailGrid.onCreateMachineCombobox(${each})"
+	                        		model="${win_production_order_creation$composer.getMachineListModel(each)}" readonly="true">
 			                        <template name="model">
 			                            <comboitem label="${each.name}" />
 			                        </template>

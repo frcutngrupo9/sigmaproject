@@ -122,7 +122,7 @@ public class ProductRawMaterialController extends SelectorComposer<Component> {
 		rawMaterialTypePopupListbox.clearSelection();
 		rawMaterialTypePopupList = rawMaterialTypeRepository.findAll();
 		for(RawMaterial rawMaterial : rawMaterialList) {
-			rawMaterialTypePopupList.remove(rawMaterial.getRawMaterialType());// sacamos del popup
+			rawMaterialTypePopupList.remove(rawMaterialTypeRepository.findOne(rawMaterial.getRawMaterialType().getId()));// sacamos del popup
 		}
 		rawMaterialTypePopupListModel = new ListModelList<>(rawMaterialTypePopupList);
 		rawMaterialTypePopupListbox.setModel(rawMaterialTypePopupListModel);
