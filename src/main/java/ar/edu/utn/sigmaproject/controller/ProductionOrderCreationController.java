@@ -160,10 +160,10 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		if(currentProductionPlan == null) {throw new RuntimeException("ProductionPlan not found");}
 
 		productionOrderDetailList = currentProductionOrder.getDetails();
-		List<ProductionOrderDetail> details = getProductionOrderDetailList(currentProductionOrder);
-		if(details.size() != productionOrderDetailList.size()) {
-			productionOrderDetailList = details;
-		}
+		//List<ProductionOrderDetail> details = getProductionOrderDetailList(currentProductionOrder);// genera los detalles para para ver si no se edito el producto y que posea una cantidad mas grande de procesos.
+		//if(details.size() != productionOrderDetailList.size()) {
+		//	productionOrderDetailList = details;
+		//}
 
 		machineList = machineRepository.findAll();
 		List<ProductionOrderStateType> productionOrderStateTypeList = productionOrderStateTypeRepository.findAll();
@@ -211,13 +211,17 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		productionOrderFinishDatebox.setValue(currentProductionOrder.getDateFinish());
 		productionOrderRealStartDatebox.setValue(currentProductionOrder.getDateStartReal());
 		productionOrderRealFinishDatebox.setValue(currentProductionOrder.getDateFinishReal());
-		productionOrderDetailListModel = new ListModelList<ProductionOrderDetail>(productionOrderDetailList);
-		productionOrderDetailGrid.setModel(productionOrderDetailListModel);
+		refreshProductionOrderDetailGridView();
 		productionOrderStateTypeListModel.addToSelection(productionOrderStateTypeRepository.findOne(currentProductionOrder.getCurrentStateType().getId()));
 		productionOrderStateTypeCombobox.setModel(productionOrderStateTypeListModel);
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		resetButton.setDisabled(false);
+	}
+
+	private void refreshProductionOrderDetailGridView() {
+		productionOrderDetailListModel = new ListModelList<ProductionOrderDetail>(productionOrderDetailList);
+		productionOrderDetailGrid.setModel(productionOrderDetailListModel);
 	}
 
 	private Integer getNewProductionOrderNumber() {
@@ -399,16 +403,24 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	public void doEditProductionOrderDetailMachine(ForwardEvent evt) {
 		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
 		Combobox element = (Combobox) evt.getOrigin().getTarget();// obtenemos el elemento web
-		Machine machine = (Machine)element.getSelectedItem().getValue();
-		data.setMachine(machine);// cargamos al objeto el valor actualizado del elemento web
+		Machine machineSelected = (Machine)element.getSelectedItem().getValue();
+		data.setMachine(machineSelected);// cargamos al objeto el valor actualizado del elemento web
 		// asigna la misma maquina a todos los detalles que necesitan ese tipo de maquina
-		//		for(ProductionOrderDetail each : productionOrderDetailList) {
-		//			if(!data.equals(each)) {// no modifica el mismo detalle
-		//				if(each.getProcess().getType().getMachineType().equals(machine.getMachineType())) {
-		//					each.setMachine(machine);
-		//				}
-		//			}
-		//		}//TODO
+		for(ProductionOrderDetail each : productionOrderDetailList) {
+			if(!data.equals(each)) {// no modifica el mismo detalle
+				if(each.getProcess().getType().getMachineType() != null) {// comprueba si se necesita una maquina para el detalle
+					// si el detalle ya posee una maquina asignada, se la deja igual
+					if(each.getMachine() == null) {
+						MachineType machineTypeSelected = machineTypeRepository.findOne(machineSelected.getMachineType().getId());
+						MachineType machineTypeEach = machineTypeRepository.findOne(each.getProcess().getType().getMachineType().getId());
+						if(machineTypeEach.equals(machineTypeSelected)) {
+							each.setMachine(machineSelected);
+						}
+					}
+				}
+			}
+		}
+		refreshProductionOrderDetailGridView();
 	}
 
 	@Listen("onEditProductionOrderDetailQuantityFinished = #productionOrderDetailGrid")
@@ -532,28 +544,9 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		}
 	}
 
-	public Date getFinishDate(Date startDate, Duration time) {
-		if(time != null) {
-			int hours = time.getHours();
-			int minutes = time.getMinutes();
-			while(minutes >= 60) {
-				minutes -= 60;
-				hours += 1;
-			}
-			long dayInMilis = 24*60*60*1000;
-			int days = 0;
-			while(hours >= 8) {
-				hours -= 8;
-				days += 1;
-			}
-			return new Date(startDate.getTime() + dayInMilis * days);
-		}
-		return null;
-	}
-
 	@Listen("onChange = #productionOrderStartDatebox")
 	public void productionOrderStartDateboxOnChange() {
-		Date finishDate = getFinishDate(productionOrderStartDatebox.getValue(), currentProductionOrder.getDurationTotal());
-		productionOrderFinishDatebox.setValue(finishDate);
+		//Date finishDate = getFinishDate(productionOrderStartDatebox.getValue(), currentProductionOrder.getDurationTotal());
+		//productionOrderFinishDatebox.setValue(finishDate);
 	}
 }
