@@ -53,6 +53,8 @@ public class SupplyReservationController extends SelectorComposer<Component> {
 	Button cancelButton;
 	@Wire
 	Button resetButton;
+	@Wire
+	Button completeButton;
 
 	// services
 	@WireVariable
@@ -110,6 +112,11 @@ public class SupplyReservationController extends SelectorComposer<Component> {
 	@Listen("onClick = #resetButton")
 	public void resetButtonClick() {
 		refreshView();
+	}
+	
+	@Listen("onClick = #completeButton")
+	public void completeButtonClick() {
+		stockReservedDoublebox.setValue(quantityDoublebox.getValue());
 	}
 
 	@Listen("onClick = #saveButton")

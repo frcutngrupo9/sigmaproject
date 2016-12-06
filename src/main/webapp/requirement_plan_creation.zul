@@ -29,9 +29,9 @@
 					</auxhead>
         			<listhead>
         				<listheader label="Materia Prima"/>
-		                <listheader label="Cantidad Necesaria"/>
-		                <listheader label="Stock Actual"/>
+		                <listheader label="Stock Total"/>
 		                <listheader label="Cantidad Disponible"/>
+		                <listheader label="Cantidad Necesaria"/>
 		                <listheader label="Cantidad Reservada"/>
 		                <listheader label="Cantidad Faltante"/>
 		                <listheader label="Esta Abastecido?"/>
@@ -40,9 +40,9 @@
 		            <template name="model">
 		                <listitem>
 		                	<listcell label="${each.rawMaterialType.name}"/>
-		                    <listcell label="${each.quantity}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialTypeStockAvailable(each.rawMaterialType).doubleValue()}"/>
 		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialTypeStock(each.rawMaterialType).doubleValue()}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialTypeStockAvailable(each.rawMaterialType).doubleValue()}"/>
+		                    <listcell label="${each.quantity}"/>
 		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialRequirementStockReserved(each).doubleValue()}"/>
 		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialRequirementStockMissing(each).doubleValue()}"/>
 		                    <listcell>
@@ -65,7 +65,7 @@
 			            <listheader label="Detalles"/>
 			            <listheader label="Medida"/>
 			            <listheader label="Cantidad Necesaria"/>
-		                <listheader label="Stock Actual"/>
+		                <listheader label="Stock Total"/>
 		                <listheader label="Cantidad Disponible"/>
 		                <listheader label="Cantidad Reservada"/>
 		                <listheader label="Cantidad Faltante"/>

@@ -135,13 +135,18 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 		for(SupplyRequirement each : supplyRequirementList) {
 			if(!isSupplyRequirementFulfilled(each)) {
 				isCompleted = false;
+				break;
 			}
 		}
-		for(RawMaterialRequirement each : rawMaterialRequirementList) {
-			if(!isRawMaterialRequirementFulfilled(each)) {
-				isCompleted = false;
+		if(isCompleted) {// si no cambio el valor a false en el anterior loop for
+			for(RawMaterialRequirement each : rawMaterialRequirementList) {
+				if(!isRawMaterialRequirementFulfilled(each)) {
+					isCompleted = false;
+					break;
+				}
 			}
 		}
+		
 		if(isCompleted) {
 			ProductionPlanStateType productionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Abastecido");
 			ProductionPlanState productionPlanState = new ProductionPlanState(productionPlanStateType, new Date());
@@ -151,7 +156,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 			refreshView();
 		} else {
 			ProductionPlanStateType productionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Planificado");
-			if(!currentProductionPlan.getCurrentStateType().equals(productionPlanStateType)) {
+			if(!productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId()).equals(productionPlanStateType)) {
 				// si dejo de estar abastecido
 				ProductionPlanState productionPlanState = new ProductionPlanState(productionPlanStateType, new Date());
 				productionPlanState = productionPlanStateRepository.save(productionPlanState);

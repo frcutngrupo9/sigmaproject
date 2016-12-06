@@ -262,27 +262,48 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	@Transactional
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
-		// primero se verifica si se inicia la orden, (la cantidad finalizada de todos los procesos era 0 y ahora no)
-		boolean isStarting = false;
-		if(currentProductionOrder.getCurrentStateType().equals(productionOrderStateTypeRepository.findFirstByName("Generada"))) {
-			for (ProductionOrderDetail each : productionOrderDetailList) {
-				if(each.isFinished()==true || each.getQuantityFinished().compareTo(BigDecimal.ZERO)!=0) {
-					isStarting = true;// se esta iniciando
-				}
+		ProductionOrderStateType lastStateType = productionOrderStateTypeRepository.findOne(currentProductionOrder.getCurrentStateType().getId());
+		
+		if(lastStateType.equals(productionOrderStateTypeRepository.findFirstByName("Cancelada"))) {
+			alert("No se puede modificar una Orden de Produccion Cancelada.");
+			return;
+		}
+		
+		if(lastStateType.equals(productionOrderStateTypeRepository.findFirstByName("Finalizada"))) {
+			alert("No se puede modificar una Orden de Produccion Finalizada.");
+			return;
+		}
+		
+		boolean hasStartedAlready = false;
+		if(lastStateType.equals(productionOrderStateTypeRepository.findFirstByName("Iniciada"))) {
+			hasStartedAlready = true;// verifica que la ultima vez se haya guardado como iniciada
+		}
+		boolean progressDone = false;// si se realizo algun progreso de la produccion, es falso si toda la produccion esta en cero de avance
+		for (ProductionOrderDetail each : productionOrderDetailList) {
+			if(each.isFinished()==true || each.getQuantityFinished().compareTo(BigDecimal.ZERO)!=0) {
+				progressDone = true;
+				break;
+			}
+		}
+		// primero se verifica si se esta iniciando la orden, (la cantidad finalizada de todos los procesos era 0 y ahora no)
+		boolean isStartingNow = false;
+		if(lastStateType.equals(productionOrderStateTypeRepository.findFirstByName("Generada"))) {
+			// si aun no se inicio (generada) pero si se realizaron avances
+			if(progressDone == true) {
+				isStartingNow = true;// se esta iniciando
 			}
 		}
 		// comprueba que el estado del plan de produccion sea abastecido
-		if(isStarting == true) {
+		if(isStartingNow == true) {
 			ProductionPlanStateType productionPlanStateTypeAbastecido = productionPlanStateTypeRepository.findFirstByName("Abastecido");
 			ProductionPlanStateType productionPlanStateTypeEnEjecucion = productionPlanStateTypeRepository.findFirstByName("En Ejecucion");
-			boolean distintoAbastecido = !productionPlanStateTypeAbastecido.equals(currentProductionPlan.getCurrentStateType());
-			boolean distintoEnEjecucion = !productionPlanStateTypeEnEjecucion.equals(currentProductionPlan.getCurrentStateType());
+			boolean distintoAbastecido = !productionPlanStateTypeAbastecido.equals(productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId()));
+			boolean distintoEnEjecucion = !productionPlanStateTypeEnEjecucion.equals(productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId()));
 			if(distintoAbastecido || distintoEnEjecucion) {//si el plan no esta abastecido o en ejecucion
 				Clients.showNotification("No se puede iniciar la Orden hasta que el plan no este Abastecido");
 				return;
 			}
 		}
-
 
 		int selectedIndexWorker = workerCombobox.getSelectedIndex();
 		if (selectedIndexWorker == -1) {// no hay un empleado seleccionado
@@ -314,11 +335,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		currentProductionOrder.setDateFinish(productionOrderDateFinish);
 		currentProductionOrder.setDateStartReal(productionOrderRealDateStart);
 		currentProductionOrder.setDateFinishReal(productionOrderRealDateFinish);
-		// el estado de la orden debe cambiar automaticamente en base a las modificaciones que se le hagan y no se deberia poder cambiar manualmente excepto en el caso de la cancelacion
-		//		ProductionOrderStateType ProductionOrderStateType = productionOrderStateTypeCombobox.getSelectedItem().getValue();
-		//		ProductionOrderState productionOrderState = new ProductionOrderState(ProductionOrderStateType, new Date());
-		//		productionOrderState = productionOrderStateRepository.save(productionOrderState);
-		//		currentProductionOrder.setState(productionOrderState);
 		productionOrderDetailList = productionOrderDetailRepository.save(productionOrderDetailList);
 		currentProductionOrder.setDetails(productionOrderDetailList);
 
@@ -327,6 +343,26 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		currentProductionOrder.setProductionOrderSupplies(productionOrderSupplyList);
 		currentProductionOrder.setProductionOrderRawMaterials(productionOrderRawMaterialList);
 
+		// el estado de la orden debe cambiar automaticamente en base a las modificaciones que se le hagan y no se deberia poder cambiar manualmente excepto en el caso de la cancelacion
+		//		ProductionOrderStateType ProductionOrderStateType = productionOrderStateTypeCombobox.getSelectedItem().getValue();
+		//		ProductionOrderState productionOrderState = new ProductionOrderState(ProductionOrderStateType, new Date());
+		//		productionOrderState = productionOrderStateRepository.save(productionOrderState);
+		//		currentProductionOrder.setState(productionOrderState);
+		// selecciona el estado actual
+		ProductionOrderStateType productionOrderStateType = null;
+		if(isStartingNow == true) {
+			productionOrderStateType = productionOrderStateTypeRepository.findFirstByName("Iniciada");
+		} else {
+			if(hasStartedAlready && !progressDone) {// si inicio la orden pero no se realizaron avances, se vuelve a no iniciada
+				productionOrderStateType = productionOrderStateTypeRepository.findFirstByName("Generada");
+			}
+		}
+		if(productionOrderStateType != null) {
+			ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateType, new Date());
+			productionOrderState = productionOrderStateRepository.save(productionOrderState);
+			currentProductionOrder.setState(productionOrderState);
+		}
+		
 		currentProductionOrder = productionOrderRepository.save(currentProductionOrder);
 
 		alert("Orden de Produccion Guardada.");

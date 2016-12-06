@@ -335,4 +335,22 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	public Wood getWood(WoodReserved woodReserved) {
 		return woodRepository.findFirstByWoodsReserved(woodReserved);
 	}
+	/*
+	public BigDecimal getRawMaterialStockReserved(Wood supplyType) {
+		List<SupplyReserved> supplyReservedTotal = supplyReservedRepository.findBySupplyRequirementSupplyType(supplyType);
+		BigDecimal stockReservedTotal = BigDecimal.ZERO;
+		for(SupplyReserved each : supplyReservedTotal) {
+			if(!each.isWithdrawn()) {// suma todas las reservas del insumo que aun no han sido retiradas
+				stockReservedTotal = stockReservedTotal.add(each.getStockReserved());
+			}
+		}
+		return stockReservedTotal;
+	}
+
+	public BigDecimal getRawMaterialStockAvailable(Wood supplyType) {
+		// devuelve la diferencia entre el stock total y el total reservado
+		BigDecimal stockTotal = supplyType.getStock();
+		BigDecimal stockReservedTotal = getRawMaterialStockReserved(supplyType);
+		return stockTotal.subtract(stockReservedTotal);
+	}*/
 }
