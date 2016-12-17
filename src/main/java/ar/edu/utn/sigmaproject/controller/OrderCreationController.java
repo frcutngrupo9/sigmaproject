@@ -293,7 +293,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 				// solo se puede grabar si esta en estado Iniciado o Cancelado
 				OrderStateType stateTypeIniciado = orderStateTypeRepository.findFirstByName("Iniciado");
 				OrderStateType stateTypeCancelado = orderStateTypeRepository.findFirstByName("Cancelado");
-				if(!orderCurrentStateType.equals(stateTypeIniciado) && !orderCurrentStateType.equals(stateTypeCancelado)) {
+				if(!orderStateTypeRepository.findOne(orderCurrentStateType.getId()).equals(stateTypeIniciado) && !orderStateTypeRepository.findOne(orderCurrentStateType.getId()).equals(stateTypeCancelado)) {
 					saveOrderButton.setDisabled(true);
 					deleteOrderButton.setDisabled(true);
 				} else {

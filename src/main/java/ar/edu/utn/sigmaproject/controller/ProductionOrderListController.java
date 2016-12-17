@@ -143,6 +143,8 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 			}
 			productionPlanStartDatebox.setValue(currentProductionPlan.getDateStart());
 			productionPlanFinishDatebox.setValue(getProductionPlanFinishDate());
+			productionPlanStartRealDatebox.setValue(getProductionPlanStartRealDate());
+			productionPlanFinishRealDatebox.setValue(getProductionPlanFinishRealDate());
 		}
 	}
 
@@ -156,6 +158,42 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 				} else {
 					if(each.getDateFinish().after(date)) {
 						date = each.getDateFinish();
+					}
+				}
+			}
+		}
+		return date;
+	}
+
+	// busca la primera fecha de inicio real de ordenes de produccion
+	public Date getProductionPlanStartRealDate() {
+		Date date = null;
+		for(ProductionOrder each : productionOrderList) {
+			Date startRealDate = each.getDateStartReal();
+			if(startRealDate != null) {
+				if(date == null) {
+					date = startRealDate;
+				} else {
+					if(startRealDate.before(date)) {
+						date = startRealDate;
+					}
+				}
+			}
+		}
+		return date;
+	}
+
+	// busca la ultima fecha de finalizacion real de ordenes de produccion
+	public Date getProductionPlanFinishRealDate() {
+		Date date = null;
+		for(ProductionOrder each : productionOrderList) {
+			Date finishRealDate = each.getDateFinishReal();
+			if(finishRealDate != null) {
+				if(date == null) {
+					date = finishRealDate;
+				} else {
+					if(finishRealDate.after(date)) {
+						date = finishRealDate;
 					}
 				}
 			}
