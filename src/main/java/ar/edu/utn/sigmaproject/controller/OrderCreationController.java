@@ -273,7 +273,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	private void refreshViewOrder() {
 		if (currentOrder == null) {// nuevo pedido
 			orderCaption.setLabel("Creacion de Pedido");
-			orderStateTypeListModel.addToSelection(orderStateTypeRepository.findFirstByName("Iniciado"));
+			orderStateTypeListModel.addToSelection(orderStateTypeRepository.findFirstByName("Creado"));
 			orderStateTypeCombobox.setModel(orderStateTypeListModel);
 			currentClient = null;
 			clientBandbox.setValue("");
@@ -290,10 +290,10 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			if (orderCurrentStateType != null) {
 				orderStateTypeListModel.addToSelection(orderStateTypeRepository.findOne(orderCurrentStateType.getId()));
 				orderStateTypeCombobox.setModel(orderStateTypeListModel);
-				// solo se puede grabar si esta en estado Iniciado o Cancelado
-				OrderStateType stateTypeIniciado = orderStateTypeRepository.findFirstByName("Iniciado");
+				// solo se puede grabar si esta en estado Creado o Cancelado
+				OrderStateType stateTypeCreado = orderStateTypeRepository.findFirstByName("Creado");
 				OrderStateType stateTypeCancelado = orderStateTypeRepository.findFirstByName("Cancelado");
-				if(!orderStateTypeRepository.findOne(orderCurrentStateType.getId()).equals(stateTypeIniciado) && !orderStateTypeRepository.findOne(orderCurrentStateType.getId()).equals(stateTypeCancelado)) {
+				if(!orderStateTypeRepository.findOne(orderCurrentStateType.getId()).equals(stateTypeCreado) && !orderStateTypeRepository.findOne(orderCurrentStateType.getId()).equals(stateTypeCancelado)) {
 					saveOrderButton.setDisabled(true);
 					deleteOrderButton.setDisabled(true);
 				} else {
@@ -450,7 +450,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		target.setText(event.getValue());
 		filterProducts();
 	}
-	
+
 	@Listen("onClick = #returnButton")
 	public void returnButtonClick() {
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();

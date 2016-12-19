@@ -183,7 +183,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		List<Order> orderList = orderRepository.findAll();
 		orderPopupList = new ArrayList<>();
 		// se buscan los pedidos que no estan asignados a un plan y no estan cancelados (estan en estado iniciado)
-		OrderStateType orderStateTypeInitiated = orderStateTypeRepository.findFirstByName("Iniciado");
+		OrderStateType orderStateTypeInitiated = orderStateTypeRepository.findFirstByName("Creado");
 		for(Order each : orderList) {
 			if(each.getCurrentStateType().equals(orderStateTypeInitiated)) {
 				orderPopupList.add(each);
@@ -267,7 +267,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			// crea ordenes de produccion
 			int sequence = 0;
 			for(ProductTotal each : currentProductionPlan.getProductTotalList()) {
-				ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateTypeRepository.findFirstByName("Generada"), new Date());
+				ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateTypeRepository.findFirstByName("No Iniciada"), new Date());
 				productionOrderState = productionOrderStateRepository.save(productionOrderState);
 				sequence += 1;
 				ProductionOrder productionOrder = new ProductionOrder(sequence, currentProductionPlan, each.getProduct(), each.getTotalUnits(), productionOrderState);
@@ -404,7 +404,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		ListModelList<ProductTotal> productTotalListModel = new ListModelList<ProductTotal>(productTotalList);
 		productTotalListbox.setModel(productTotalListModel);
 	}
-	
+
 	private List<ProductTotal> getProductTotalList() {
 		Map<Product, Integer> productTotalMap = new HashMap<Product, Integer>();
 		for(ProductionPlanDetail auxProductionPlanDetail : productionPlanDetailList) {
@@ -456,7 +456,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		refreshProductionPlanDetailListGrid();
 		refreshProductTotalListbox();
 	}
-	
+
 	public int getProductTotalUnits(Product product) {
 		int productTotalUnits = 0;
 		for(ProductTotal productTotal : productTotalList) {// buscamos el total de unidades
@@ -516,7 +516,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		}
 		return total + "";
 	}
-	
+
 	@Listen("onClick = #returnButton")
 	public void returnButtonClick() {
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
