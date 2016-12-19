@@ -183,17 +183,20 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		return date;
 	}
 
-	// busca la ultima fecha de finalizacion real de ordenes de produccion
+	// busca la ultima fecha de finalizacion real de ordenes de produccion en caso de que esten todas finalizadas
 	public Date getProductionPlanFinishRealDate() {
+		ProductionPlanStateType currentProductionPlanStateType = currentProductionPlan.getCurrentStateType();
 		Date date = null;
-		for(ProductionOrder each : productionOrderList) {
-			Date finishRealDate = each.getDateFinishReal();
-			if(finishRealDate != null) {
-				if(date == null) {
-					date = finishRealDate;
-				} else {
-					if(finishRealDate.after(date)) {
+		if(productionPlanStateTypeRepository.findOne(currentProductionPlanStateType.getId()).equals(productionPlanStateTypeRepository.findFirstByName("Finalizado"))) {// si esta finalizado el plan
+			for(ProductionOrder each : productionOrderList) {
+				Date finishRealDate = each.getDateFinishReal();
+				if(finishRealDate != null) {
+					if(date == null) {
 						date = finishRealDate;
+					} else {
+						if(finishRealDate.after(date)) {
+							date = finishRealDate;
+						}
 					}
 				}
 			}

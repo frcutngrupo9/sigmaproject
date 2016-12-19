@@ -281,11 +281,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			return;
 		}
 		
-		if(lastStateType.equals(productionOrderStateTypeRepository.findFirstByName("Finalizada"))) {
-			alert("No se puede modificar una Orden de Produccion Finalizada.");
-			return;
-		}
-		
 		ProductionOrderStateType newStateType = getProductionOrderStateType();
 		// primero se verifica si se esta iniciando la orden, (la cantidad finalizada de todos los procesos era 0 y ahora no)
 		boolean isStartingNow = false;
@@ -348,6 +343,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 				currentProductionOrder.setDateFinishReal(null);
 			} else if(newStateType.equals(productionOrderStateTypeRepository.findFirstByName("Iniciada"))) {
 				currentProductionOrder.setDateStartReal(new Date());
+				currentProductionOrder.setDateFinishReal(null);
 			} else if(newStateType.equals(productionOrderStateTypeRepository.findFirstByName("Finalizada"))) {
 				currentProductionOrder.setDateFinishReal(new Date());
 				if(currentProductionOrder.getDateStartReal() == null) {
@@ -420,7 +416,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		boolean notStarted = true;// no inicio ningun proceso
 		for (ProductionOrderDetail each : productionOrderDetailList) {
 			if(each.isFinished()==true || each.getQuantityFinished().compareTo(BigDecimal.ZERO)!=0) {
-				// si inicio algun proceso
+				// si inicio o finalizo algun proceso
 				notStarted = false;
 			}
 			if(each.isFinished()!=true) {
@@ -544,15 +540,19 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		Row fila = (Row)element.getParent();
 		Checkbox chkbox = (Checkbox)fila.getChildren().get(fila.getChildren().size()-1);
 		if(value.compareTo(quantityPiece) > 0) {
+			// si el valor ingresado supera la cantidad, se lo modifica y se agrega la cantidad
 			element.setValue(quantityPiece.doubleValue());
 			data.setQuantityFinished(quantityPiece);
 			chkbox.setChecked(true);
-		} else {
+			data.setFinished(true);
+		} else {// si el valor ingresado es igual o menos a la cantidad
 			data.setQuantityFinished(value);
 			if(value.compareTo(quantityPiece) == 0) {
 				chkbox.setChecked(true);
+				data.setFinished(true);
 			} else {
 				chkbox.setChecked(false);
+				data.setFinished(false);
 			}
 		}
 	}
