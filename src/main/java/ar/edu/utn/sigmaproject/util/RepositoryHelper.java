@@ -87,10 +87,10 @@ public class RepositoryHelper {
 
 	@Autowired
 	private SupplyTypeRepository supplyTypeRepository;
-	
+
 	@Autowired
 	private WoodRepository woodRepository;
-	
+
 	@Autowired
 	private MachineRepository machineRepository;
 
@@ -161,7 +161,7 @@ public class RepositoryHelper {
 	private void generateProductionOrderStateTypes() {
 		if (productionOrderStateTypeRepository.count() == 0) {
 			List<ProductionOrderStateType> list = new ArrayList<>();
-			list.add(new ProductionOrderStateType("Generada"));
+			list.add(new ProductionOrderStateType("No Iniciada"));
 			list.add(new ProductionOrderStateType("Iniciada"));
 			list.add(new ProductionOrderStateType("Finalizada"));
 			list.add(new ProductionOrderStateType("Cancelada"));
@@ -172,7 +172,7 @@ public class RepositoryHelper {
 	private void generateOrderStateType() {
 		if (orderStateTypeRepository.count() == 0) {
 			List<OrderStateType> list = new ArrayList<>();
-			list.add(new OrderStateType("Iniciado", null));
+			list.add(new OrderStateType("Creado", null));
 			list.add(new OrderStateType("Cancelado", null));
 			list.add(new OrderStateType("Planificado", null));
 			list.add(new OrderStateType("En Produccion", null));
@@ -257,7 +257,6 @@ public class RepositoryHelper {
 		if (productRepository.count() == 0) {
 			generateProductCategory();
 			List<Product> list = new ArrayList<>();
-			list.add(new Product("7", "Mesa patas Reina Ana de 1.40x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1045")));
 			list.add(new Product("26", "Dressoir patas rectas de 0.90x0.45mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Comoda"), new BigDecimal("483")));
 			list.add(new Product("29", "Banqueta alta  con respaldo de 0.30mts de diámetro".toUpperCase(), "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("226")));
 			list.add(new Product("32", "Silla Omega respaldo inclinado patas rectas".toUpperCase(), "", productCategoryRepository.findFirstByName("Silla"), new BigDecimal("231")));
@@ -268,8 +267,6 @@ public class RepositoryHelper {
 			list.add(new Product("51", "Chiffonier de 1,45x0,70x0,40 mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cajonera"), new BigDecimal("1245")));
 			list.add(new Product("53", "Mesa de luz de 0,70x0,50x0,40 mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("473")));
 			list.add(new Product("57", "Biblioteca de 0,60 mts con 4 cajones y estantes".toUpperCase(), "", productCategoryRepository.findFirstByName("Biblioteca"), new BigDecimal("1024")));
-			list.add(new Product("59", "Sillon Romano de dos cuerpos".toUpperCase(), "", productCategoryRepository.findFirstByName("Sillon"), new BigDecimal("483")));
-			list.add(new Product("60", "Banquito recto o redondo chico".toUpperCase(), "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("153")));
 			productRepository.save(list);
 		}
 	}
@@ -329,7 +326,7 @@ public class RepositoryHelper {
 			rawMaterialTypeRepository.save(list);
 		}
 	}
-	
+
 	private void generateSupplyType() {
 		if (supplyTypeRepository.count() == 0) {
 			List<SupplyType> list = new ArrayList<>();
@@ -338,15 +335,15 @@ public class RepositoryHelper {
 			list.add(new SupplyType("3", "INSUMO 3", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
 			list.add(new SupplyType("4", "INSUMO 4", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
 			list.add(new SupplyType("5", "INSUMO 5", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-//			list.add(new SupplyType("15", "Tornillo Autoperforante Hexagonal Punta Mecha 14x4".toUpperCase(), "", "", "", "14x4", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-//			list.add(new SupplyType("16", "Tornillo Fix Autoperforante 3x35".toUpperCase(), "", "", "", "3x35", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-//			list.add(new SupplyType("26", "Arandela Plana Zincada 5/16".toUpperCase(), "", "", "", "5/16", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-//			list.add(new SupplyType("27", "Arandela Plana Zincada 1/4".toUpperCase(), "", "", "", "1/4", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-//			list.add(new SupplyType("34", "Tuerca Zincada Alta 7/16".toUpperCase(), "", "", "", "7/16", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+			//			list.add(new SupplyType("15", "Tornillo Autoperforante Hexagonal Punta Mecha 14x4".toUpperCase(), "", "", "", "14x4", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+			//			list.add(new SupplyType("16", "Tornillo Fix Autoperforante 3x35".toUpperCase(), "", "", "", "3x35", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+			//			list.add(new SupplyType("26", "Arandela Plana Zincada 5/16".toUpperCase(), "", "", "", "5/16", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+			//			list.add(new SupplyType("27", "Arandela Plana Zincada 1/4".toUpperCase(), "", "", "", "1/4", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+			//			list.add(new SupplyType("34", "Tuerca Zincada Alta 7/16".toUpperCase(), "", "", "", "7/16", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
 			supplyTypeRepository.save(list);
 		}
 	}
-	
+
 	private void generateWood() {
 		if (woodRepository.count() == 0) {
 			List<Wood> list = new ArrayList<>();
@@ -360,7 +357,7 @@ public class RepositoryHelper {
 			woodRepository.save(list);
 		}
 	}
-	
+
 	private void generateMachine() {
 		if (machineRepository.count() == 0) {
 			List<Machine> list = new ArrayList<>();
@@ -374,5 +371,5 @@ public class RepositoryHelper {
 			machineRepository.save(list);
 		}
 	}
-	
+
 }

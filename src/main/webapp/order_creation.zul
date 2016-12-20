@@ -65,7 +65,7 @@
                                     Buscar
                                     <textbox id="productNameFilterTextbox"/>
                                 </hbox>
-                                <listbox id="productPopupListbox" width="200px">
+                                <listbox id="productPopupListbox" width="420px">
                                 <listhead>
                                     <listheader label="Producto" align="center"/>
                                 </listhead>

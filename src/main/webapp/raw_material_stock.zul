@@ -17,6 +17,7 @@
 		            <listheader label="Nombre" align="center"/>
 		            <listheader label="Medidas" align="center"/>
 		            <listheader label="Stock Actual" align="center"/>
+		            <listheader label="Stock Reservado" align="center"/>
 		            <listheader label="Stock Minimo" align="center"/>
 		            <listheader label="Stock Reposicion" align="center"/>
 		        </listhead>
@@ -26,6 +27,7 @@
 		                <listcell label="${each.rawMaterialType.name}"/>
 		                <listcell label="${r:getFormattedMeasure(each.rawMaterialType)}"/>
 		                <listcell label="${each.stock}"/>
+		                <listcell label="(impl pend)"/>
 		                <listcell label="${each.stockMin}"/>
 		                <listcell label="${each.stockRepo}"/>
 		            </listitem>

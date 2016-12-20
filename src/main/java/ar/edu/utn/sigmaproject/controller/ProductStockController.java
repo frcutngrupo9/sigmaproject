@@ -197,7 +197,7 @@ public class ProductStockController extends SelectorComposer<Component> {
 	//	public void saveOrder() {
 	//		int order_number = orderNumberIntbox.intValue();
 	//		Date order_need_date = orderNeedDatebox.getValue();
-	//		OrderStateType orderStateType = orderStateTypeRepository.findFirstByName("Iniciado");
+	//		OrderStateType orderStateType = orderStateTypeRepository.findFirstByName("Creado");
 	//		currentOrder.setNumber(order_number);
 	//		currentOrder.setNeedDate(order_need_date);
 	//		currentOrder.setCurrentStateType(orderStateType);

@@ -25,6 +25,7 @@ import org.zkoss.zul.Window;
 import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.Wood;
 import ar.edu.utn.sigmaproject.domain.WoodReserved;
+import ar.edu.utn.sigmaproject.service.RawMaterialRequirementRepository;
 import ar.edu.utn.sigmaproject.service.RawMaterialTypeRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
 import ar.edu.utn.sigmaproject.service.WoodReservedRepository;
@@ -59,10 +60,14 @@ public class RawMaterialReservationController extends SelectorComposer<Component
 	Button cancelButton;
 	@Wire
 	Button resetButton;
+	@Wire
+	Button completeButton;
 
 	// services
 	@WireVariable
 	private RawMaterialTypeRepository rawMaterialTypeRepository;
+	@WireVariable
+	private RawMaterialRequirementRepository rawMaterialRequirementRepository;
 	@WireVariable
 	private WoodRepository woodRepository;
 	@WireVariable
@@ -96,7 +101,7 @@ public class RawMaterialReservationController extends SelectorComposer<Component
 		}
 		if(currentWood != null) {// verifica si no hay una reserva para el requerimiento
 			for(WoodReserved each : currentWood.getWoodsReserved()) {
-				if(each.getRawMaterialRequirement().equals(currentRawMaterialRequirement)) {
+				if(rawMaterialRequirementRepository.findOne(each.getRawMaterialRequirement().getId()).equals(rawMaterialRequirementRepository.findOne(currentRawMaterialRequirement.getId()))) {
 					currentWoodReserved = each;
 				}
 			}
@@ -147,6 +152,11 @@ public class RawMaterialReservationController extends SelectorComposer<Component
 	@Listen("onClick = #resetButton")
 	public void resetButtonClick() {
 		refreshView();
+	}
+	
+	@Listen("onClick = #completeButton")
+	public void completeButtonClick() {
+		stockReservedDoublebox.setValue(quantityDoublebox.getValue());
 	}
 
 	@Listen("onClick = #saveButton")

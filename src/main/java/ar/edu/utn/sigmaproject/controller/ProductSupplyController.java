@@ -119,7 +119,7 @@ public class ProductSupplyController extends SelectorComposer<Component> {
 		supplyTypePopupListbox.clearSelection();
 		supplyTypePopupList = supplyTypeRepository.findAll();
 		for(Supply supply : supplyList) {
-			supplyTypePopupList.remove(supply.getSupplyType());// sacamos del popup
+			supplyTypePopupList.remove(supplyTypeRepository.findOne(supply.getSupplyType().getId()));// sacamos del popup
 		}
 		supplyTypePopupListModel = new ListModelList<SupplyType>(supplyTypePopupList);
 		supplyTypePopupListbox.setModel(supplyTypePopupListModel);

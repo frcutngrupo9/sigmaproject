@@ -126,7 +126,10 @@ public class Order implements Serializable, Cloneable {
 	}
 	
 	public String getFormattedNeedDate() {
-		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		return dateFormat.format(needDate);
+		if(needDate != null) {
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			return dateFormat.format(needDate);
+		}
+		return "";
 	}
 }

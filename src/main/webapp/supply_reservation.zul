@@ -27,7 +27,10 @@
 			            </row>
 			            <row>
 			                <label>Cantidad a Reservar:</label>
-			                <doublebox id="stockReservedDoublebox" hflex="1"/>
+			                <cell hflex="1">
+			                <doublebox id="stockReservedDoublebox"/>
+			                <button id="completeButton" label="Completar"/>
+			                </cell>
 			            </row>
 			            <row>
 			                <label>Cantidad Necesaria:</label>

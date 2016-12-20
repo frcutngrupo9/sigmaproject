@@ -29,22 +29,22 @@
 					</auxhead>
         			<listhead>
         				<listheader label="Materia Prima"/>
-		                <listheader label="Cantidad Necesaria"/>
-		                <listheader label="Stock Actual"/>
+		                <listheader label="Stock Total"/>
 		                <listheader label="Cantidad Disponible"/>
-		                <listheader label="Cantidad Reservada"/>
+		                <listheader label="Cantidad Necesaria"/>
 		                <listheader label="Cantidad Faltante"/>
+		                <listheader label="Cantidad Reservada"/>
 		                <listheader label="Esta Abastecido?"/>
 		                <listheader label="Generar Reserva"/>
 		            </listhead>
 		            <template name="model">
 		                <listitem>
 		                	<listcell label="${each.rawMaterialType.name}"/>
-		                    <listcell label="${each.quantity}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialTypeStockAvailable(each.rawMaterialType).doubleValue()}"/>
 		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialTypeStock(each.rawMaterialType).doubleValue()}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialRequirementStockReserved(each).doubleValue()}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialTypeStockAvailable(each.rawMaterialType).doubleValue()}"/>
+		                    <listcell label="${each.quantity}"/>
 		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialRequirementStockMissing(each).doubleValue()}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialRequirementStockReserved(each).doubleValue()}"/>
 		                    <listcell>
 			                    <checkbox checked="${win_requirement_plan_creation$composer.isRawMaterialRequirementFulfilled(each)}" disabled="true"/>
 			                </listcell>
@@ -65,10 +65,10 @@
 			            <listheader label="Detalles"/>
 			            <listheader label="Medida"/>
 			            <listheader label="Cantidad Necesaria"/>
-		                <listheader label="Stock Actual"/>
+		                <listheader label="Stock Total"/>
 		                <listheader label="Cantidad Disponible"/>
-		                <listheader label="Cantidad Reservada"/>
 		                <listheader label="Cantidad Faltante"/>
+		                <listheader label="Cantidad Reservada"/>
 		                <listheader label="Esta Abastecido?"/>
 		                <listheader label="Generar Reserva"/>
 		            </listhead>
@@ -81,8 +81,8 @@
 		                    <listcell label="${each.quantity}"/>
 		                    <listcell label="${each.supplyType.stock}"/>
 		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyStockAvailable(each).doubleValue()}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyStockReserved(each).doubleValue()}"/>
 		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyStockMissing(each).doubleValue()}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyStockReserved(each).doubleValue()}"/>
 		                    <listcell>
 			                    <checkbox checked="${win_requirement_plan_creation$composer.isSupplyRequirementFulfilled(each)}" disabled="true"/>
 			                </listcell>

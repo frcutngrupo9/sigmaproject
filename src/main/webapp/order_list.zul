@@ -9,12 +9,13 @@
 		    <separator/>
 		    <grid id="orderGrid" mold="paging" pageSize="7">
 		    	<auxhead>
-					<auxheader label="Pedidos" colspan="8"/>
+					<auxheader label="Pedidos" colspan="9"/>
 				</auxhead>
 		        <columns>
 		            <column label="Numero" align="center"/>
 		            <column label="Cliente" align="center"/>
-		            <column label="Fecha" align="center"/>
+		            <column label="Fecha Creacion" align="center"/>
+		            <column label="Fecha Necesidad" align="center"/>
 		            <column label="Cantidad Productos" align="center"/>
 		            <column label="Estado" align="center"/>
 		            <column label="Monto Total" align="center"/>
@@ -26,6 +27,7 @@
 		                <label value="${each.number}"/>
 		                <label value="${each.getClient().getName()}"/>
 		                <label value="${each.date}"/>
+		                <label value="${each.getFormattedNeedDate()}"/>
 		                <label value="${each.details.size()}"/>
 		                <label value="${each.getCurrentStateType().getName()}"/>
 		                <label value="${win_order_list$composer.totalPrice(each)} $"/>
