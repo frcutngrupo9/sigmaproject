@@ -44,33 +44,6 @@ public class ProductionPlan  implements Serializable, Cloneable {
 		this.planDetails.addAll(planDetails);
 	}
 
-	public List<ProductTotal> getProductTotalList() {
-		Map<Product, Integer> productTotalMap = new HashMap<Product, Integer>();
-		for(ProductionPlanDetail auxProductionPlanDetail : getPlanDetails()) {
-			for(OrderDetail auxOrderDetail : auxProductionPlanDetail.getOrder().getDetails()) {
-				Integer totalUnits = productTotalMap.get(auxOrderDetail.getProduct());
-				productTotalMap.put(auxOrderDetail.getProduct(), (totalUnits == null) ? auxOrderDetail.getUnits() : totalUnits + auxOrderDetail.getUnits());
-			}
-		}
-		List<ProductTotal> productTotalList = new ArrayList<ProductTotal>();
-		for (Map.Entry<Product, Integer> entry : productTotalMap.entrySet()) {
-			Product product = entry.getKey();
-			Integer totalUnits = entry.getValue();
-			ProductTotal productTotal = new ProductTotal(product, totalUnits);
-			productTotalList.add(productTotal);
-		}
-		return productTotalList;// devuelve el productTotalList lleno con todos los productos sin repetir y con el total, que conforman el plan de produccion
-	}
-
-	public ProductTotal getProductTotal(Product product) {
-		for(ProductTotal productTotal : getProductTotalList()) {
-			if(productTotal.getProduct().equals(product)) {
-				return productTotal;
-			}
-		}
-		return null;
-	}
-
 	public Long getId() {
 		return id;
 	}

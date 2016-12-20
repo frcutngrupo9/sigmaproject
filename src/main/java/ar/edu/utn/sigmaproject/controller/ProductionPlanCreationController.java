@@ -266,7 +266,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			currentProductionPlan.getRawMaterialRequirements().addAll(rawMaterialRequirementList);
 			// crea ordenes de produccion
 			int sequence = 0;
-			for(ProductTotal each : currentProductionPlan.getProductTotalList()) {
+			for(ProductTotal each : getProductTotalList()) {
 				ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateTypeRepository.findFirstByName("No Iniciada"), new Date());
 				productionOrderState = productionOrderStateRepository.save(productionOrderState);
 				sequence += 1;
@@ -329,7 +329,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	private List<SupplyRequirement> createSupplyRequirements(ProductionPlan productionPlan) {
 		// busca los requerimientos
 		List<SupplyRequirement> list = new ArrayList<>();
-		List<ProductTotal> productTotalList = productionPlan.getProductTotalList();
+		List<ProductTotal> productTotalList = getProductTotalList();
 		for (ProductTotal productTotal : productTotalList) {
 			for (Supply supply : productTotal.getProduct().getSupplies()) {
 				SupplyRequirement auxSupplyRequirement = null;
@@ -351,7 +351,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	private List<RawMaterialRequirement> createRawMaterialRequirements(ProductionPlan productionPlan) {
 		// busca requerimientos de materias primas
 		List<RawMaterialRequirement> list = new ArrayList<RawMaterialRequirement>();
-		List<ProductTotal> productTotalList = productionPlan.getProductTotalList();
+		List<ProductTotal> productTotalList = getProductTotalList();
 		for(ProductTotal productTotal : productTotalList) {
 			Product product = productTotal.getProduct();
 			for(RawMaterial rawMaterial : product.getRawMaterials()) {

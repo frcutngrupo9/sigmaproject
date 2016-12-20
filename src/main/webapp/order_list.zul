@@ -9,12 +9,12 @@
 		    <separator/>
 		    <grid id="orderGrid" mold="paging" pageSize="7">
 		    	<auxhead>
-					<auxheader label="Pedidos" colspan="8"/>
+					<auxheader label="Pedidos" colspan="9"/>
 				</auxhead>
 		        <columns>
 		            <column label="Numero" align="center"/>
 		            <column label="Cliente" align="center"/>
-		            <column label="Fecha" align="center"/>
+		            <column label="Fecha Creacion" align="center"/>
 		            <column label="Fecha Necesidad" align="center"/>
 		            <column label="Cantidad Productos" align="center"/>
 		            <column label="Estado" align="center"/>

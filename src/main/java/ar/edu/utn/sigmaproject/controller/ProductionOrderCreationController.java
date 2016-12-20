@@ -36,6 +36,9 @@ import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
+import ar.edu.utn.sigmaproject.domain.Order;
+import ar.edu.utn.sigmaproject.domain.OrderState;
+import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
@@ -46,6 +49,7 @@ import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderStateType;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderSupply;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
+import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
@@ -55,6 +59,9 @@ import ar.edu.utn.sigmaproject.domain.WoodReserved;
 import ar.edu.utn.sigmaproject.domain.Worker;
 import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
+import ar.edu.utn.sigmaproject.service.OrderRepository;
+import ar.edu.utn.sigmaproject.service.OrderStateRepository;
+import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.PieceRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRawMaterialRepository;
@@ -143,6 +150,12 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	private ProductionPlanStateRepository productionPlanStateRepository;
 	@WireVariable
 	private ProductionPlanRepository productionPlanRepository;
+	@WireVariable
+	private OrderStateTypeRepository orderStateTypeRepository;
+	@WireVariable
+	private OrderStateRepository orderStateRepository;
+	@WireVariable
+	private OrderRepository orderRepository;
 
 	// atributes
 	private ProductionOrder currentProductionOrder;
@@ -388,12 +401,16 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			}
 		}
 
+		OrderStateType orderStateType = null;
 		if(allFinish) {
 			newProductionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Finalizado");
+			orderStateType = orderStateTypeRepository.findFirstByName("Finalizado");
 		} else if(allNotStarted) {// ninguno iniciado, se busca el estado del plan en base a sus requerimientos
 			newProductionPlanStateType = getProductionPlanStateType();
+			orderStateType = orderStateTypeRepository.findFirstByName("Planificado");
 		} else {
 			newProductionPlanStateType = productionPlanStateTypeRepository.findFirstByName("En Ejecucion");
+			orderStateType = orderStateTypeRepository.findFirstByName("En Produccion");
 		}
 
 		//si el estado actual es igual al nuevo no se realiza el guardado
@@ -402,6 +419,18 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			productionPlanState = productionPlanStateRepository.save(productionPlanState);
 			currentProductionPlan.setState(productionPlanState);
 			currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
+
+			// se cambia el estado de todos los pedidos en base al estado del plan
+			if(orderStateType != null) {
+				List<ProductionPlanDetail> productionPlanDetailList = currentProductionPlan.getPlanDetails();
+				for(ProductionPlanDetail each : productionPlanDetailList) {
+					Order order = each.getOrder();
+					OrderState state = new OrderState(orderStateType, new Date());
+					state = orderStateRepository.save(state);
+					order.setState(state);
+					orderRepository.save(order);
+				}
+			}
 		}
 
 	}
