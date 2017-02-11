@@ -3,6 +3,7 @@ package ar.edu.utn.sigmaproject.controller;
 import ar.edu.utn.sigmaproject.domain.Item;
 import ar.edu.utn.sigmaproject.domain.StockMovement;
 import ar.edu.utn.sigmaproject.domain.StockMovementDetail;
+import ar.edu.utn.sigmaproject.domain.StockMovementType;
 import ar.edu.utn.sigmaproject.service.SearchableRepository;
 import ar.edu.utn.sigmaproject.service.StockMovementRepository;
 import org.springframework.data.domain.Page;
@@ -27,10 +28,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public abstract class StockMovementCreationController<T extends Item> extends SelectorComposer<Component> {
+public abstract class StockMovementCreationController extends SelectorComposer<Component> {
 
 	@WireVariable
-	private StockMovementRepository<T> stockMovementRepository;
+	private StockMovementRepository stockMovementRepository;
 
 	@Wire("#included #stockMovementCaption")
 	private Caption stockMovementCaption;
@@ -59,20 +60,22 @@ public abstract class StockMovementCreationController<T extends Item> extends Se
 	@Wire("#included #returnButton")
 	private Button returnButton;
 
-	protected StockMovement<T> currentStockMovement;
+	protected StockMovement currentStockMovement;
 
-	private StockMovementDetail<T> selectedDetail;
+	private StockMovementDetail selectedDetail;
 
-	protected abstract SearchableRepository<T, Long> getItemRepository();
+	protected abstract SearchableRepository<? extends Item, Long> getItemRepository();
+	protected abstract StockMovementType getStockMovementType();
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		currentStockMovement = (StockMovement<T>) Executions.getCurrent().getAttribute("selected_stock_movement");
+		currentStockMovement = (StockMovement) Executions.getCurrent().getAttribute("selected_stock_movement");
 		if (currentStockMovement == null) {
-			currentStockMovement = new StockMovement<>();
+			currentStockMovement = new StockMovement();
+			currentStockMovement.setType(getStockMovementType());
 			currentStockMovement.setDate(new Date());
-			selectedDetail = new StockMovementDetail<>();
+			selectedDetail = new StockMovementDetail();
 		}
 		setupInterface();
 	}
@@ -91,7 +94,7 @@ public abstract class StockMovementCreationController<T extends Item> extends Se
 		if (selectedDetail.getStockMovement() == null) {
 			currentStockMovement.getDetails().add(selectedDetail);
 			selectedDetail.setStockMovement(currentStockMovement);
-			for (StockMovementDetail<T> detail : currentStockMovement.getDetails()) {
+			for (StockMovementDetail detail : currentStockMovement.getDetails()) {
 				if (detail.getItem().equals(selectedDetail.getItem()) && detail != selectedDetail) {
 					selectedDetail = detail;
 					break;
@@ -101,7 +104,7 @@ public abstract class StockMovementCreationController<T extends Item> extends Se
 		} else {
 			selectedDetail.setQuantity(BigDecimal.valueOf(itemQuantityIntbox.getValue()));
 		}
-		selectedDetail = new StockMovementDetail<>();
+		selectedDetail = new StockMovementDetail();
 		clearFilteredItems();
 		refreshSelectedDetail();
 		refreshDetailsList();
@@ -118,7 +121,7 @@ public abstract class StockMovementCreationController<T extends Item> extends Se
 			Clients.showNotification("Por favor, ingrese al menos un detalle", detailEditHbox);
 			return;
 		}
-		List<StockMovementDetail<T>> invalidDetails = new ArrayList<>();
+		List<StockMovementDetail> invalidDetails = new ArrayList<>();
 		if (updateItemsStock(invalidDetails)) {
 			stockMovementRepository.save(currentStockMovement);
 			setupInterface();
@@ -136,7 +139,7 @@ public abstract class StockMovementCreationController<T extends Item> extends Se
 	 * Tries to update the stock of the stock movement's details
 	 * @return true if successful, false if there was at least one invalid detail
 	 */
-	protected abstract boolean updateItemsStock(List<StockMovementDetail<T>> invalidDetails);
+	protected abstract boolean updateItemsStock(List<StockMovementDetail> invalidDetails);
 
 	public abstract void doReturn();
 
@@ -163,10 +166,10 @@ public abstract class StockMovementCreationController<T extends Item> extends Se
 
 	@Listen("onRemoveDetail = #included #stockMovementListbox")
 	public void doRemoveDetail(ForwardEvent evt) {
-		StockMovementDetail<T> stockMovementDetail = (StockMovementDetail<T>) evt.getData();
+		StockMovementDetail stockMovementDetail = (StockMovementDetail) evt.getData();
 		currentStockMovement.getDetails().remove(stockMovementDetail);
 		if (stockMovementDetail == selectedDetail) {
-			selectedDetail = new StockMovementDetail<>();
+			selectedDetail = new StockMovementDetail();
 			clearFilteredItems();
 			refreshSelectedDetail();
 		}
@@ -187,7 +190,7 @@ public abstract class StockMovementCreationController<T extends Item> extends Se
 	public void onItemSelect(SelectEvent event) {
 		Iterator iterator = event.getSelectedObjects().iterator();
 		if (iterator.hasNext()) {
-			T item = (T)iterator.next();
+			Item item = (Item)iterator.next();
 			selectedDetail.setItem(item);
 		}
 	}
@@ -220,7 +223,7 @@ public abstract class StockMovementCreationController<T extends Item> extends Se
 	}
 
 	protected void filterItems(String searchString) {
-		Page<T> items;
+		Page items;
 		if (searchString != null && searchString.length() > 0) {
 			items = getItemRepository().findAll(searchString, new PageRequest(0, Integer.MAX_VALUE));
 		} else {

@@ -1,9 +1,6 @@
 package ar.edu.utn.sigmaproject.controller;
 
-import ar.edu.utn.sigmaproject.domain.StockMovementDetail;
-import ar.edu.utn.sigmaproject.domain.Supply;
-import ar.edu.utn.sigmaproject.domain.SupplyType;
-import ar.edu.utn.sigmaproject.domain.Wood;
+import ar.edu.utn.sigmaproject.domain.*;
 import ar.edu.utn.sigmaproject.service.SearchableRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
@@ -17,13 +14,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class StockMovementWoodCreationController extends StockMovementCreationController<Wood> {
+public class StockMovementWoodCreationController extends StockMovementCreationController {
 
 	@WireVariable
 	private WoodRepository woodRepository;
 
 	@Override
-	protected boolean updateItemsStock(List<StockMovementDetail<Wood>> invalidDetails) {
+	protected boolean updateItemsStock(List<StockMovementDetail> invalidDetails) {
 		Set<Wood> woodsToSave = new HashSet<>();
 		for (StockMovementDetail stockMovementDetail : currentStockMovement.getDetails()) {
 			Wood wood = (Wood) stockMovementDetail.getItem();
@@ -51,8 +48,14 @@ public class StockMovementWoodCreationController extends StockMovementCreationCo
 		include.setSrc("/stock_movement_list_wood.zul");
 	}
 
-	protected SearchableRepository<Wood, Long> getItemRepository() {
+	@Override
+	protected SearchableRepository<? extends Item, Long> getItemRepository() {
 		return woodRepository;
+	}
+
+	@Override
+	protected StockMovementType getStockMovementType() {
+		return StockMovementType.Wood;
 	}
 
 }

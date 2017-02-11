@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-public class StockMovement<T extends Item> implements Serializable {
+public class StockMovement implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -20,8 +20,12 @@ public class StockMovement<T extends Item> implements Serializable {
 	// default is "in"
 	private Short sign = 1;
 
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, updatable = false)
+	private StockMovementType type;
+
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "stockMovement", targetEntity = StockMovementDetail.class)
-	private List<StockMovementDetail<T>> details = new ArrayList<>();
+	private List<StockMovementDetail> details = new ArrayList<>();
 
 	public Long getId() {
 		return id;
@@ -47,11 +51,19 @@ public class StockMovement<T extends Item> implements Serializable {
 		this.sign = sign;
 	}
 
-	public List<StockMovementDetail<T>> getDetails() {
+	public StockMovementType getType() {
+		return type;
+	}
+
+	public void setType(StockMovementType type) {
+		this.type = type;
+	}
+
+	public List<StockMovementDetail> getDetails() {
 		return details;
 	}
 
-	public void setDetails(List<StockMovementDetail<T>> details) {
+	public void setDetails(List<StockMovementDetail> details) {
 		this.details = details;
 	}
 }

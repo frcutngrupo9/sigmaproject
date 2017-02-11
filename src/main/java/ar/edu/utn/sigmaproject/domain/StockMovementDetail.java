@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Entity
-public class StockMovementDetail<T extends Item> implements Serializable {
+public class StockMovementDetail implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -14,14 +14,14 @@ public class StockMovementDetail<T extends Item> implements Serializable {
 	private Long id;
 
 	@ManyToOne(targetEntity = StockMovement.class)
-	private StockMovement<T> stockMovement = null;
+	private StockMovement stockMovement = null;
 
 	private String description = "";
 
 	private BigDecimal quantity = BigDecimal.ZERO;
 
-	@ManyToOne(targetEntity = Item.class, optional = false)
-	private T item;
+	@ManyToOne(optional = false)
+	private Item item;
 
 	public Long getId() {
 		return id;
@@ -31,11 +31,11 @@ public class StockMovementDetail<T extends Item> implements Serializable {
 		this.id = id;
 	}
 
-	public StockMovement<T> getStockMovement() {
+	public StockMovement getStockMovement() {
 		return stockMovement;
 	}
 
-	public void setStockMovement(StockMovement<T> stockMovement) {
+	public void setStockMovement(StockMovement stockMovement) {
 		this.stockMovement = stockMovement;
 	}
 
@@ -55,11 +55,11 @@ public class StockMovementDetail<T extends Item> implements Serializable {
 		this.quantity = quantity;
 	}
 
-	public T getItem() {
+	public Item getItem() {
 		return item;
 	}
 
-	public void setItem(T item) {
+	public void setItem(Item item) {
 		this.item = item;
 	}
 }

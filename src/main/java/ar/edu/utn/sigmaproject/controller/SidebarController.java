@@ -91,7 +91,6 @@ public class SidebarController extends SelectorComposer<Component> {
 				new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Maquinas", "/machine_stock.zul"))
 			)),
 			new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Comprobantes de Stock"), Arrays.asList(
-				new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Productos", "/product_stock.zul")),
 				new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Materia Prima", "/stock_movement_list_wood.zul")),
 				new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Insumos", "/stock_movement_list_supply.zul"))
 			)),

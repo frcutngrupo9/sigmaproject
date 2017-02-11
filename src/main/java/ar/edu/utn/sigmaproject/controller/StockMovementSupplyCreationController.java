@@ -1,8 +1,6 @@
 package ar.edu.utn.sigmaproject.controller;
 
-import ar.edu.utn.sigmaproject.domain.StockMovementDetail;
-import ar.edu.utn.sigmaproject.domain.Supply;
-import ar.edu.utn.sigmaproject.domain.SupplyType;
+import ar.edu.utn.sigmaproject.domain.*;
 import ar.edu.utn.sigmaproject.service.SearchableRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 import org.zkoss.zk.ui.select.Selectors;
@@ -15,13 +13,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class StockMovementSupplyCreationController extends StockMovementCreationController<SupplyType> {
+public class StockMovementSupplyCreationController extends StockMovementCreationController {
 
 	@WireVariable
 	private SupplyTypeRepository supplyTypeRepository;
 
 	@Override
-	protected boolean updateItemsStock(List<StockMovementDetail<SupplyType>> invalidDetails) {
+	protected boolean updateItemsStock(List<StockMovementDetail> invalidDetails) {
 		Set<SupplyType> supplyTypesToSave = new HashSet<>();
 		for (StockMovementDetail stockMovementDetail : currentStockMovement.getDetails()) {
 			SupplyType supplyType = (SupplyType) stockMovementDetail.getItem();
@@ -49,8 +47,14 @@ public class StockMovementSupplyCreationController extends StockMovementCreation
 		include.setSrc("/stock_movement_list_supply.zul");
 	}
 
-	protected SearchableRepository<SupplyType, Long> getItemRepository() {
+	@Override
+	protected SearchableRepository<? extends Item, Long> getItemRepository() {
 		return supplyTypeRepository;
+	}
+
+	@Override
+	protected StockMovementType getStockMovementType() {
+		return StockMovementType.Supply;
 	}
 
 }

@@ -1,7 +1,7 @@
 package ar.edu.utn.sigmaproject.controller;
 
-import ar.edu.utn.sigmaproject.domain.Item;
 import ar.edu.utn.sigmaproject.domain.StockMovement;
+import ar.edu.utn.sigmaproject.domain.StockMovementType;
 import ar.edu.utn.sigmaproject.service.StockMovementRepository;
 import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 import ar.edu.utn.sigmaproject.util.SortingPagingHelperDelegate;
@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public abstract class StockMovementListController<T extends Item> extends SelectorComposer<Component> implements SortingPagingHelperDelegate<StockMovement<T>> {
+public abstract class StockMovementListController extends SelectorComposer<Component> implements SortingPagingHelperDelegate<StockMovement> {
 
 	@Wire("#included #stockMovementGrid")
 	Grid stockMovementGrid;
@@ -33,7 +33,10 @@ public abstract class StockMovementListController<T extends Item> extends Select
 	Paging pager;
 
 	@WireVariable
-	private StockMovementRepository<T> stockMovementRepository;
+	private StockMovementRepository stockMovementRepository;
+
+	protected abstract String getCreationSrc();
+	protected abstract StockMovementType getType();
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
@@ -45,8 +48,8 @@ public abstract class StockMovementListController<T extends Item> extends Select
 	}
 
 	@Override
-	public Page<StockMovement<T>> getPage(PageRequest pageRequest) {
-		return stockMovementRepository.findAll(pageRequest);
+	public Page<StockMovement> getPage(PageRequest pageRequest) {
+		return stockMovementRepository.findAllByType(getType(), pageRequest);
 	}
 
 	@Listen("onClick = #included #stockMovementButton")
@@ -64,5 +67,4 @@ public abstract class StockMovementListController<T extends Item> extends Select
 		include.setSrc(getCreationSrc());
 	}
 
-	protected abstract String getCreationSrc();
 }

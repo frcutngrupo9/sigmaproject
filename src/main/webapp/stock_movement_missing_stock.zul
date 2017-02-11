@@ -19,7 +19,7 @@
             </template>
         </grid>
         <hbox width="100%" pack="center">
-            <button id="closeButton" label="Close" />
+            <button id="closeButton" label="Cerrar" />
         </hbox>
     </vlayout>
 </window>
