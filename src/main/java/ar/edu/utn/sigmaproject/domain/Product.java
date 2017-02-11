@@ -1,5 +1,6 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
@@ -13,12 +14,9 @@ import javax.xml.datatype.Duration;
 
 @Entity
 @Indexed
-public class Product implements Serializable, Cloneable {
+@Analyzer(definition = "edge_ngram")
+public class Product extends Item implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
 
 	@OneToMany(orphanRemoval = true)
 	List<Piece> pieces = new ArrayList<>();
@@ -34,8 +32,13 @@ public class Product implements Serializable, Cloneable {
 
 	@Field
 	String name = "";
+
+	@Field
 	String details = "";
+
+	@Field
 	String code = "";
+
 	Integer stock = 0;
 	Integer stockMin = 0;
 	Integer stockRepo = 0;
@@ -71,12 +74,9 @@ public class Product implements Serializable, Cloneable {
 		return durationTotal;
 	}
 
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
+	@Override
+	public String getDescription() {
+		return getName();
 	}
 
 	public List<Piece> getPieces() {

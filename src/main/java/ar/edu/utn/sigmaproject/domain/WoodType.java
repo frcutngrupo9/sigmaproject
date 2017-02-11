@@ -1,11 +1,17 @@
 package ar.edu.utn.sigmaproject.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import java.io.Serializable;
+import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.ContainedIn;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
+
+@Indexed
+@Analyzer(definition = "edge_ngram")
 @Entity
 public class WoodType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
@@ -14,8 +20,15 @@ public class WoodType implements Serializable, Cloneable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
 
+	@Field
 	String name = "";
+
+	@Field
 	String details = "";
+
+	@ContainedIn
+	@OneToMany(mappedBy = "woodType")
+	Set<Wood> woods = new HashSet<>();
 
 	public WoodType() {
 

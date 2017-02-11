@@ -1,0 +1,25 @@
+<window id="missingStockWin" title="Stock insuficiente" width="500px" border="normal"
+        apply="ar.edu.utn.sigmaproject.controller.InvalidStockController">
+    <vlayout>
+        <label value="No se puede emitir el comprobante debido a que algunos detalles hacen referencia a items sin stock suficiente"/>
+        <grid model="${arg.invalidDetails}">
+            <columns>
+                <column label="Descripción" align="center" />
+                <column label="Egreso ingresado" align="center" />
+                <column label="Stock actual" align="center" />
+                <column label="Diferencia" align="center" />
+            </columns>
+            <template name="model">
+                <row>
+                    <label value="${each.description}" />
+                    <label value="${each.quantity}" />
+                    <label value="${each.item.stock}" />
+                    <label value="${each.item.stock - each.quantity}" />
+                </row>
+            </template>
+        </grid>
+        <hbox width="100%" pack="center">
+            <button id="closeButton" label="Close" />
+        </hbox>
+    </vlayout>
+</window>

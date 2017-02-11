@@ -6,11 +6,13 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
 @Entity
 @Indexed
+@Analyzer(definition = "edge_ngram")
 public class ProcessType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 

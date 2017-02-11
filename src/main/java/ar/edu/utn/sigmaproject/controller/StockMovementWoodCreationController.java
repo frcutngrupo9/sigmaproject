@@ -1,0 +1,58 @@
+package ar.edu.utn.sigmaproject.controller;
+
+import ar.edu.utn.sigmaproject.domain.StockMovementDetail;
+import ar.edu.utn.sigmaproject.domain.Supply;
+import ar.edu.utn.sigmaproject.domain.SupplyType;
+import ar.edu.utn.sigmaproject.domain.Wood;
+import ar.edu.utn.sigmaproject.service.SearchableRepository;
+import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
+import ar.edu.utn.sigmaproject.service.WoodRepository;
+import org.zkoss.zk.ui.select.Selectors;
+import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zul.Include;
+
+import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+public class StockMovementWoodCreationController extends StockMovementCreationController<Wood> {
+
+	@WireVariable
+	private WoodRepository woodRepository;
+
+	@Override
+	protected boolean updateItemsStock(List<StockMovementDetail<Wood>> invalidDetails) {
+		Set<Wood> woodsToSave = new HashSet<>();
+		for (StockMovementDetail stockMovementDetail : currentStockMovement.getDetails()) {
+			Wood wood = (Wood) stockMovementDetail.getItem();
+			BigDecimal stock = wood.getStock();
+			stock = stock.add(stockMovementDetail.getQuantity().multiply(BigDecimal.valueOf(currentStockMovement.getSign())));
+			if (stock.compareTo(BigDecimal.ZERO) >= 0) {
+				wood.setStock(stock);
+				woodsToSave.add(wood);
+			} else {
+				invalidDetails.add(stockMovementDetail);
+			}
+		}
+		if (invalidDetails.size() == 0) {
+			woodRepository.save(woodsToSave);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	@Listen("onClick = #included #returnButton")
+	public void doReturn() {
+		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/stock_movement_list_wood.zul");
+	}
+
+	protected SearchableRepository<Wood, Long> getItemRepository() {
+		return woodRepository;
+	}
+
+}

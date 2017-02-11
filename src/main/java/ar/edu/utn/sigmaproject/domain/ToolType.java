@@ -1,5 +1,6 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
@@ -11,6 +12,7 @@ import java.io.Serializable;
 
 @Entity
 @Indexed
+@Analyzer(definition = "edge_ngram")
 public class ToolType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
