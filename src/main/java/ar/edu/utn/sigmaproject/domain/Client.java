@@ -7,12 +7,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
-@Entity
 @Indexed
+@Analyzer(definition = "edge_ngram")
+@Entity
 public class Client implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 

@@ -1,0 +1,25 @@
+<panel border="none">
+    <panelchildren>
+        <grid id="stockMovementGrid" sizedByContent="true" span="true">
+            <auxhead>
+                <auxheader label="Comprobantes de Stock de Insumos" colspan="3"/>
+            </auxhead>
+            <columns>
+                <column label="Fecha" align="center"/>
+                <column label="Tipo" align="center"/>
+                <column label=""/>
+            </columns>
+            <template name="model">
+                <row>
+                    <label value="${each.date}"/>
+                    <label value="${each.sign == 1 ? 'Ingreso' : 'Egreso'}"/>
+                    <button forward="onClick=stockMovementGrid.onSelectStoveMovement(${each})"  image="/img/Search16x16.png"/>
+                </row>
+            </template>
+        </grid>
+        <paging id="pager" pageSize="10" sclass="sigma-paging"/>
+        <separator/>
+        <button id="stockMovementButton" label="Crear Nuevo Comprobante de Stock"/>
+        <separator/>
+    </panelchildren>
+</panel>

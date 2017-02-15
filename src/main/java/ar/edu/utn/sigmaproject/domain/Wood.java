@@ -1,5 +1,9 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
+
 import javax.persistence.*;
 
 import java.io.Serializable;
@@ -7,17 +11,17 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+@Indexed
+@Analyzer(definition = "edge_ngram")
 @Entity
-public class Wood implements Serializable, Cloneable {
+public class Wood extends Item implements Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
-
+	@IndexedEmbedded
 	@ManyToOne
 	RawMaterialType rawMaterialType;
 
+	@IndexedEmbedded
 	@ManyToOne
 	WoodType woodType;
 
@@ -40,12 +44,9 @@ public class Wood implements Serializable, Cloneable {
 		this.stockRepo = stockRepo;
 	}
 
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
+	@Override
+	public String getDescription() {
+		return getRawMaterialType().getFormattedMeasure() + "(" + getWoodType().getName() + ")";
 	}
 
 	public RawMaterialType getRawMaterialType() {

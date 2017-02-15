@@ -6,7 +6,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.persistence.EntityManager;
 
+import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.jpa.Search;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -94,8 +97,11 @@ public class RepositoryHelper {
 	@Autowired
 	private MachineRepository machineRepository;
 
+	@Autowired
+	private EntityManager entityManager;
+
 	@PostConstruct
-	public void afterConstruct() {
+	public void afterConstruct() throws InterruptedException {
 		generateMeasureUnitTypeList();
 		generateProductionPlanStateTypes();
 		generateProductionOrderStateTypes();
@@ -107,6 +113,7 @@ public class RepositoryHelper {
 		generateWorker();
 		generateSupplyType();
 		generateMachine();
+		hibernateSearchReIndex();
 	}
 
 	private void generateMeasureUnitTypeList() {
@@ -189,7 +196,7 @@ public class RepositoryHelper {
 			list.add(new MachineType("Cepilladora", "", null));
 			list.add(new MachineType("Escuadradora", "", null));
 			list.add(new MachineType("Escopladora", "", null));
-			list.add(new MachineType("Tupí", "", null));
+			list.add(new MachineType("Tupï¿½", "", null));
 			list.add(new MachineType("Sierra Sin Fin", "", null));
 			list.add(new MachineType("Lijadora", "", null));
 			list.add(new MachineType("Caladora", "", null));
@@ -211,9 +218,9 @@ public class RepositoryHelper {
 			list.add(new ProcessType("Cortar el Largo", machineTypeRepository.findFirstByName("Escuadradora")));
 			list.add(new ProcessType("Hacer Cortes Curvos", machineTypeRepository.findFirstByName("Sierra Sin Fin")));
 			list.add(new ProcessType("Hacer Escopladuras", machineTypeRepository.findFirstByName("Escopladora")));
-			list.add(new ProcessType("Hacer Espigas", machineTypeRepository.findFirstByName("Tupí")));
-			list.add(new ProcessType("Hacer Molduras", machineTypeRepository.findFirstByName("Tupí")));
-			list.add(new ProcessType("Hacer Canales", machineTypeRepository.findFirstByName("Tupí")));
+			list.add(new ProcessType("Hacer Espigas", machineTypeRepository.findFirstByName("Tupï¿½")));
+			list.add(new ProcessType("Hacer Molduras", machineTypeRepository.findFirstByName("Tupï¿½")));
+			list.add(new ProcessType("Hacer Canales", machineTypeRepository.findFirstByName("Tupï¿½")));
 			list.add(new ProcessType("Replanar", null));
 			list.add(new ProcessType("Masillar", null));
 			list.add(new ProcessType("Clavar", null));
@@ -230,7 +237,7 @@ public class RepositoryHelper {
 			List<WoodType> list = new ArrayList<>();
 			list.add(new WoodType("Pino", "Semi-pesada, semi-dura."));
 			list.add(new WoodType("Caoba", "Tradicional, dura y compacta."));
-			list.add(new WoodType("Nogal", "Dura, homogénea."));
+			list.add(new WoodType("Nogal", "Dura, homogï¿½nea."));
 			list.add(new WoodType("Roble", "Resistente, duradera y compacta."));
 			woodTypeRepository.save(list);
 		}
@@ -258,7 +265,7 @@ public class RepositoryHelper {
 			generateProductCategory();
 			List<Product> list = new ArrayList<>();
 			list.add(new Product("26", "Dressoir patas rectas de 0.90x0.45mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Comoda"), new BigDecimal("483")));
-			list.add(new Product("29", "Banqueta alta  con respaldo de 0.30mts de diámetro".toUpperCase(), "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("226")));
+			list.add(new Product("29", "Banqueta alta  con respaldo de 0.30mts de diï¿½metro".toUpperCase(), "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("226")));
 			list.add(new Product("32", "Silla Omega respaldo inclinado patas rectas".toUpperCase(), "", productCategoryRepository.findFirstByName("Silla"), new BigDecimal("231")));
 			list.add(new Product("37", "Cama Monterrey c/curva patas 4x4 de 080cm".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("1050")));
 			list.add(new Product("40", "Respaldo para Somier Monterrey X o Curvo de 1.50mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Respaldo"), new BigDecimal("1029")));
@@ -370,6 +377,11 @@ public class RepositoryHelper {
 			}
 			machineRepository.save(list);
 		}
+	}
+
+	private void hibernateSearchReIndex() throws InterruptedException {
+		FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
+		fullTextEntityManager.createIndexer().startAndWait();
 	}
 
 }
