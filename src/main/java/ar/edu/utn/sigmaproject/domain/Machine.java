@@ -13,6 +13,7 @@ import javax.persistence.Transient;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
+import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 @Entity
 @Indexed
+@Analyzer(definition = "edge_ngram")
 public class Machine implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 

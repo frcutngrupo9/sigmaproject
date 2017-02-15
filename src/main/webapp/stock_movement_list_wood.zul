@@ -1,0 +1,3 @@
+<window id="win_stock_movement_list" title="Comprobantes de Stock de Maderas" closable="false" apply="ar.edu.utn.sigmaproject.controller.StockMovementWoodListController" sclass="sigma-content">
+    <include id="included" src="stock_movement_list.zul"/>
+</window>

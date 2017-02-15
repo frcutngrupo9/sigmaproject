@@ -1,0 +1,57 @@
+<panel id="stockMovementSupplyCreationBlock" border="none">
+    <panelchildren>
+        <vlayout>
+            <radiogroup id="typeRadiogroup"/>
+            <grid hflex="1" sclass="sigma-form">
+                <columns>
+                    <column align="right" width="30%"/>
+                    <column align="left"/>
+                </columns>
+                <rows>
+                    <row>
+                        <label value="Fecha: "/>
+                        <datebox id="datebox" width="30%" format="dd/MM/yyyy" constraint="no future"/>
+                    </row>
+                    <row>
+                        <label value="Tipo: "/>
+                        <radio id="in" label="Ingreso" radiogroup="typeRadiogroup"/>
+                        <radio id="out" label="Egreso" radiogroup="typeRadiogroup"/>
+                    </row>
+                </rows>
+            </grid>
+            <hbox id="detailEditHbox" hflex="1" style="margin: 4px">
+                <label value="Seleccionar: "/>
+                <combobox id="itemCombobox" buttonVisible="false" autodrop="true" autocomplete="false"/>
+                <label value="Cantidad: "/>
+                <intbox id="itemQuantityIntbox" constraint="no negative,no zero" width="36px"/>
+                <button id="saveStockMovementDetailButton" label="Grabar Detalle"/>
+                <button id="clearStockMovementDetailButton" label="Limpiar Detalle"/>
+                <button id="cancelStockMovementDetailButton" label="Cancelar Edicion"/>
+            </hbox>
+            <listbox id="stockMovementListbox" mold="paging" pageSize="7">
+                <auxhead>
+                    <auxheader label="Detalles" colspan="3"/>
+                </auxhead>
+                <listhead sizable="true">
+                    <listheader label="Producto"/>
+                    <listheader label="Cantidad" width="200px"/>
+                    <listheader label="" width="120px"/>
+                </listhead>
+                <template name="model">
+                    <listitem disabled="${each.stockMovement.id != null}">
+                        <listcell label="${each.description}"/>
+                        <listcell label="${each.quantity}"/>
+                        <listcell>
+                            <button forward="onClick=stockMovementListbox.onRemoveDetail(${each})" image="/img/delete16x16.png" disabled="${each.stockMovement.id != null}"/>
+                        </listcell>
+                    </listitem>
+                </template>
+            </listbox>
+            <separator/>
+            <hlayout>
+                <button id="saveStockMovementButton" label="Emitir"/>
+                <button id="returnButton" label="Volver a Listado"/>
+            </hlayout>
+        </vlayout>
+    </panelchildren>
+</panel>

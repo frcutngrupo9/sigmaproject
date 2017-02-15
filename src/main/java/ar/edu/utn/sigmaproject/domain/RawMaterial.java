@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Entity
-public class RawMaterial  implements Serializable, Cloneable {
+public class RawMaterial implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id

@@ -11,17 +11,19 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
+import org.apache.lucene.analysis.core.KeywordTokenizerFactory;
+import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
+import org.apache.lucene.analysis.ngram.EdgeNGramFilterFactory;
+import org.apache.lucene.analysis.ngram.EdgeNGramTokenizerFactory;
+import org.apache.lucene.analysis.standard.StandardFilterFactory;
+import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
+import org.hibernate.search.annotations.*;
 
-@Entity
 @Indexed
-public class SupplyType implements Serializable, Cloneable {
+@Analyzer(definition = "edge_ngram")
+@Entity
+public class SupplyType extends Item implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
 
 	@Field
 	String code = "";
@@ -65,14 +67,6 @@ public class SupplyType implements Serializable, Cloneable {
 		this.stock = stock;
 		this.stockMin = stockMin;
 		this.stockRepo = stockRepo;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public String getCode() {

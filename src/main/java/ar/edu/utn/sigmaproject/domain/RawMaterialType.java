@@ -1,15 +1,24 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import ar.edu.utn.sigmaproject.domain.indexbridge.RawMaterialTypeFieldsClassBridge;
+import org.hibernate.search.annotations.*;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
+@Indexed
+@ClassBridge(
+		name = "measure",
+		store = Store.YES,
+		analyzer = @Analyzer(definition = "edge_ngram"),
+		impl = RawMaterialTypeFieldsClassBridge.class)
 @Entity
+@Analyzer(definition = "edge_ngram")
 public class RawMaterialType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
@@ -26,7 +35,13 @@ public class RawMaterialType implements Serializable, Cloneable {
 	@ManyToOne
 	MeasureUnit widthMeasureUnit;
 
+	@ContainedIn
+	@OneToMany(mappedBy = "rawMaterialType")
+	Set<Wood> woods = new HashSet<>();
+
+	@Field
 	String name = "";
+
 	BigDecimal length = BigDecimal.ZERO;
 	BigDecimal depth = BigDecimal.ZERO;
 	BigDecimal width = BigDecimal.ZERO;
@@ -108,7 +123,15 @@ public class RawMaterialType implements Serializable, Cloneable {
 	public void setWidthMeasureUnit(MeasureUnit widthMeasureUnit) {
 		this.widthMeasureUnit = widthMeasureUnit;
 	}
-	
+
+	public Set<Wood> getWoods() {
+		return woods;
+	}
+
+	public void setWoods(Set<Wood> woods) {
+		this.woods = woods;
+	}
+
 	public String getFormattedMeasure() {
 		String lengthText = "(L) " + length.doubleValue() + " " + lengthMeasureUnit.getShortName();
 		String depthText = "(E) " + depth.doubleValue() + " " + depthMeasureUnit.getShortName();
