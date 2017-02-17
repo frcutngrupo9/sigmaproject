@@ -30,6 +30,7 @@ import org.zkoss.zul.Include;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Row;
 import org.zkoss.zul.Spinner;
 import org.zkoss.zul.Textbox;
@@ -191,17 +192,12 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 		machineList = machineRepository.findAll();
 
-		productionOrderSupplyList = currentProductionOrder.getProductionOrderSupplies();
-		productionOrderRawMaterialList = currentProductionOrder.getProductionOrderRawMaterials();
-		productionOrderSupplyListModel = new ListModelList<ProductionOrderSupply>(productionOrderSupplyList);
-		productionOrderRawMaterialListModel = new ListModelList<ProductionOrderRawMaterial>(productionOrderRawMaterialList);
-		productionOrderSupplyListbox.setModel(productionOrderSupplyListModel);
-		productionOrderRawMaterialListbox.setModel(productionOrderRawMaterialListModel);
-
 		refreshView();
 	}
 
 	private void refreshView() {
+		productionOrderStartDatebox.setDisabled(true);
+		productionOrderFinishDatebox.setDisabled(true);
 		productionOrderRealStartDatebox.setDisabled(true);
 		productionOrderRealFinishDatebox.setDisabled(true);
 		productionPlanNameTextbox.setDisabled(true);
@@ -235,6 +231,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		productionOrderRealStartDatebox.setValue(currentProductionOrder.getDateStartReal());
 		productionOrderRealFinishDatebox.setValue(currentProductionOrder.getDateFinishReal());
 		refreshProductionOrderDetailGridView();
+		refreshProductionOrderOrderSupplyAndRawMaterialListbox();
 		List<ProductionOrderStateType> productionOrderStateTypeList = productionOrderStateTypeRepository.findAll();
 		productionOrderStateTypeListModel = new ListModelList<ProductionOrderStateType>(productionOrderStateTypeList);
 		productionOrderStateTypeListModel.addToSelection(productionOrderStateTypeRepository.findOne(currentProductionOrder.getCurrentStateType().getId()));
@@ -247,6 +244,15 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	private void refreshProductionOrderDetailGridView() {
 		productionOrderDetailListModel = new ListModelList<ProductionOrderDetail>(productionOrderDetailList);
 		productionOrderDetailGrid.setModel(productionOrderDetailListModel);
+	}
+
+	private void refreshProductionOrderOrderSupplyAndRawMaterialListbox() {
+		productionOrderSupplyList = currentProductionOrder.getProductionOrderSupplies();
+		productionOrderRawMaterialList = currentProductionOrder.getProductionOrderRawMaterials();
+		productionOrderSupplyListModel = new ListModelList<ProductionOrderSupply>(productionOrderSupplyList);
+		productionOrderRawMaterialListModel = new ListModelList<ProductionOrderRawMaterial>(productionOrderRawMaterialList);
+		productionOrderSupplyListbox.setModel(productionOrderSupplyListModel);
+		productionOrderRawMaterialListbox.setModel(productionOrderRawMaterialListModel);
 	}
 
 	private Integer getNewProductionOrderNumber() {
@@ -301,13 +307,32 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			isStartingNow = true;// se esta iniciando
 		}
 		// comprueba que el estado del plan de produccion sea abastecido
+		ProductionPlanStateType productionPlanStateTypeAbastecido = productionPlanStateTypeRepository.findFirstByName("Abastecido");
+		ProductionPlanStateType productionPlanStateTypeEnEjecucion = productionPlanStateTypeRepository.findFirstByName("En Ejecucion");
+		boolean distintoAbastecido = !productionPlanStateTypeAbastecido.equals(productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId()));
+		boolean distintoEnEjecucion = !productionPlanStateTypeEnEjecucion.equals(productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId()));
 		if(isStartingNow == true) {
-			ProductionPlanStateType productionPlanStateTypeAbastecido = productionPlanStateTypeRepository.findFirstByName("Abastecido");
-			ProductionPlanStateType productionPlanStateTypeEnEjecucion = productionPlanStateTypeRepository.findFirstByName("En Ejecucion");
-			boolean distintoAbastecido = !productionPlanStateTypeAbastecido.equals(productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId()));
-			boolean distintoEnEjecucion = !productionPlanStateTypeEnEjecucion.equals(productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId()));
 			if(distintoAbastecido && distintoEnEjecucion) {//si el plan no esta abastecido o en ejecucion
 				Clients.showNotification("No se puede iniciar la Orden hasta que el plan no este Abastecido");
+				return;
+			}
+		}
+
+		// si el plan no esta abastecido o en ejecucion, no se pueden modificar los valores de cantidad de materias primas e insumos utilizados
+		if(distintoAbastecido && distintoEnEjecucion) {
+			boolean isUsedRawMaterialOrUsedSuppliesChanged = false;
+			for (ProductionOrderSupply productionOrderSupply : productionOrderSupplyList) {
+				if(productionOrderSupply.getQuantityUsed().compareTo(BigDecimal.ZERO) != 0) {
+					isUsedRawMaterialOrUsedSuppliesChanged = true;
+				}
+			}
+			for (ProductionOrderRawMaterial productionOrderRawMaterial : productionOrderRawMaterialList) {
+				if(productionOrderRawMaterial.getQuantityUsed().compareTo(BigDecimal.ZERO) != 0) {
+					isUsedRawMaterialOrUsedSuppliesChanged = true;
+				}
+			}
+			if(isUsedRawMaterialOrUsedSuppliesChanged) {
+				Clients.showNotification("No se puede modificar los valores de cantidad de materias primas e insumos utilizados hasta que el plan no este Abastecido");
 				return;
 			}
 		}
@@ -631,6 +656,26 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		} else {
 			data.setQuantityUsed(value);
 		}
+	}
+
+	@Listen("onCompleteUsedSupply = #productionOrderSupplyListbox")
+	public void doCompleteUsedSupply(ForwardEvent evt) {
+		ProductionOrderSupply data = (ProductionOrderSupply) evt.getData();// obtenemos el objeto pasado por parametro
+		Button element = (Button) evt.getOrigin().getTarget();
+		Listcell listcell = (Listcell)element.getParent();
+		Doublebox doublebox = (Doublebox)listcell.getChildren().get(listcell.getChildren().size()-2);
+		doublebox.setValue(data.getQuantity().doubleValue());
+		data.setQuantityUsed(data.getQuantity());
+	}
+
+	@Listen("onCompleteUsedRawMaterial = #productionOrderRawMaterialListbox")
+	public void doCompleteUsedRawMaterial(ForwardEvent evt) {
+		ProductionOrderRawMaterial data = (ProductionOrderRawMaterial) evt.getData();// obtenemos el objeto pasado por parametro
+		Button element = (Button) evt.getOrigin().getTarget();
+		Listcell listcell = (Listcell)element.getParent();
+		Doublebox doublebox = (Doublebox)listcell.getChildren().get(listcell.getChildren().size()-2);
+		doublebox.setValue(data.getQuantity().doubleValue());
+		data.setQuantityUsed(data.getQuantity());
 	}
 
 	@Listen("onChange = #productionOrderStartDatebox")

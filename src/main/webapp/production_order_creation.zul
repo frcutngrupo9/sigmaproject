@@ -123,13 +123,14 @@
     			<separator/>
 			    <listbox id="productionOrderSupplyListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
 			    	<auxhead>
-						<auxheader label="Insumos" colspan="4"/>
+						<auxheader label="Insumos" colspan="5"/>
 					</auxhead>
 			        <listhead>
 			            <listheader label="Codigo" align="center"/>
 			            <listheader label="Descripcion" align="center"/>
 			            <listheader label="Cantidad Reservada" align="center"/>
 			            <listheader label="Cantidad Utilizada" align="center"/>
+			            <listheader label="Observaciones" align="center"/>
 			        </listhead>
 			        <template name="model">
 			            <listitem>
@@ -138,6 +139,10 @@
 			                <listcell label="${each.quantity}"/>
 			                <listcell>
 			                	<doublebox inplace="true" value="${each.quantityUsed}" forward="onChanging=productionOrderSupplyListbox.onEditUsedSupply(${each})"/>
+			                	<button label="Completar" forward="onClick=productionOrderSupplyListbox.onCompleteUsedSupply(${each})"/>
+			                </listcell>
+			                <listcell>
+			                	<textbox hflex="1"/>
 			                </listcell>
 			            </listitem>
 			        </template>
@@ -145,12 +150,13 @@
 			    <separator/>
 			    <listbox id="productionOrderRawMaterialListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
 			    	<auxhead>
-						<auxheader label="Materias Primas" colspan="3"/>
+						<auxheader label="Materias Primas" colspan="4"/>
 					</auxhead>
 			        <listhead>
 			            <listheader label="Materia Prima" align="center"/>
 			            <listheader label="Cantidad Reservada" align="center"/>
 			            <listheader label="Cantidad Utilizada" align="center"/>
+			            <listheader label="Observaciones" align="center"/>
 			        </listhead>
 			        <template name="model">
 			            <listitem>
@@ -158,6 +164,10 @@
 			                <listcell label="${each.quantity}"/>
 			                <listcell>
 			                	<doublebox inplace="true" value="${each.quantityUsed}" forward="onChanging=productionOrderRawMaterialListbox.onEditUsedRawMaterial(${each})"/>
+			                	<button label="Completar" forward="onClick=productionOrderRawMaterialListbox.onCompleteUsedRawMaterial(${each})"/>
+			                </listcell>
+			                <listcell>
+			                	<textbox hflex="1"/>
 			                </listcell>
 			            </listitem>
 			        </template>
