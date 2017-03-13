@@ -155,7 +155,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 			currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
 			refreshView();
 		} else {
-			ProductionPlanStateType productionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Planificado");
+			ProductionPlanStateType productionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Registrado");
 			if(!productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId()).equals(productionPlanStateType)) {
 				// si dejo de estar abastecido
 				ProductionPlanState productionPlanState = new ProductionPlanState(productionPlanStateType, new Date());

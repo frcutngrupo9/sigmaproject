@@ -1,0 +1,51 @@
+<window id="reportProductionOrderWindow" apply="ar.edu.utn.sigmaproject.controller.ReportProductionOrderController">
+	<caption label="Reportes" style="text-align:center; font-weight: bold;"/>
+	<panel border="none">
+        <panelchildren>
+            <vlayout>
+            	<grid hflex="1" sclass="sigma-form">
+                    <columns>
+                        <column align="right"/>
+                        <column align="left"/>
+                    </columns>
+                    <rows>
+                    	<row>
+                            <label value="Plan de Produccion: "/>
+							<textbox id="productionPlanNameTextbox" width="50%"/>
+                        </row>
+                   </rows>
+                </grid>
+    			<grid id="reportProductionOrderGrid" sizedByContent="true" span="true">
+    				<auxhead>
+						<auxheader label="Ordenes de Produccion" colspan="8"/>
+					</auxhead>
+        			<columns>
+        				<column label="Nro" align="center"/>
+        				<column label="Producto" align="center"/>
+		                <column label="Unids" align="center"/>
+		                <column label="Fecha Inicio" align="center"/>
+		                <column label="Fecha Inicio Real" align="center"/>
+		                <column label="Fecha Fin" align="center"/>
+		                <column label="Fecha Fin Real" align="center"/>
+		                <column label="Informacion" align="center"/>
+		            </columns>
+		            <template name="model">
+		                <row>
+		                    <label value="${each.number}"/>
+		                	<label value="${each.product.name}"/>
+		                	<label value="${each.units}"/>
+		                	<label value="${each.dateStart}"/>
+		                    <label value="${each.dateStartReal}"/>
+		                    <label value="${each.dateFinish}"/>
+		                    <label value="${each.dateFinishReal}"/>
+		                    <label value=""/>
+						</row>
+		            </template>
+    			</grid>
+    			<hbox hflex="1" pack="left">
+	    			<button id="returnButton" label="Volver"/>
+				</hbox>
+            </vlayout>
+        </panelchildren>
+    </panel>
+</window>

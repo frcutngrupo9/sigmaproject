@@ -1,0 +1,126 @@
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
+<window id="win_production_order_creation" apply="ar.edu.utn.sigmaproject.controller.ProductionOrderCreationController" width="95%" style="background:white">
+    <panel title="Orden de Produccion" id="productionOrderCreationBlock" border="rounded">
+        <panelchildren>
+        	<vlayout>
+        		<hbox hflex="1" pack="center">
+        			<label value="Plan de Produccion: "/>
+        			<textbox id="productionPlanNameTextbox"/>
+        			<label value="Estado Plan: "/>
+        			<textbox id="productionPlanStateTypeTextbox"/>
+				</hbox>
+                <hbox hflex="1" pack="center">
+					<label value="Producto: "/>
+					<textbox id="productNameTextbox" width="290px"/>
+					<label value="Cantidad: "/>
+					<intbox id="productUnitsIntbox"/>
+					<label value="Empleado Asignado: "/>
+					<textbox id="workerNameTextbox" width="200px"/>
+				</hbox>
+				<hbox hflex="1" pack="center">
+					<label value="Fecha Inicio Estimada: "/>
+					<datebox buttonVisible="false" disabled="true" id="productionOrderStartDatebox" cols="12" format="dd-MM-yyyy"/>
+					<label value="Fecha Finalizacion Estimada: "/>
+					<datebox buttonVisible="false" disabled="true" id="productionOrderFinishDatebox" cols="12" format="dd-MM-yyyy"/>
+				</hbox>
+				<hbox hflex="1" pack="center">
+					<label value="Fecha Inicio Real: "/>
+					<datebox id="productionOrderRealStartDatebox" cols="12" format="dd-MM-yyyy"/>
+					<label value="Fecha Finalizacion Real: "/>
+					<datebox id="productionOrderRealFinishDatebox" cols="12" format="dd-MM-yyyy"/>
+				</hbox>
+        		<grid id="productionOrderDetailGrid" sizedByContent="true" span="true">
+    				<auxhead>
+						<auxheader label="Detalle de Tareas a Realizar" colspan="10"/>
+					</auxhead>
+        			<columns>
+        				<column label="Realizado" align="center"/>
+			            <column label="Proceso" align="left" sort="auto(process.type.name)"/>
+			            <column label="Inicio: " align="left"/>
+			            <column label="Fin: " align="left"/>
+			            <column label="Pieza" align="center"/>
+			            <column label="Duracion" align="center"/>
+			            <column label="Maquina" align="center"/>
+			            <column label="Cant Pieza" align="center"/>
+			            <column label="Cant Finalizada" align="center"/>
+			            
+		            </columns>
+		            <template name="model">
+		                <row>
+		                	<checkbox disabled="${!win_production_order_creation$composer.isStartAndEditionAllowed()}" checked="${each.isFinished()}" forward="onCheck=productionOrderDetailGrid.onEditProductionOrderDetailIsFinished(${each})"/>
+			            	<label value="${each.process.type.name}"/>
+			            	<datebox buttonVisible="false" disabled="true" cols="12" format="dd/MM/yyyy HH:mm"/> value="${each.dateStart}"/>
+			            	<datebox buttonVisible="false" disabled="true" cols="12" format="dd/MM/yyyy HH:mm"/> value="${each.dateFinish}"/>
+			            	<label value="${win_production_order_creation$composer.getPieceNameByProcess(each.process)}"/>
+			            	<label value="${r:getFormattedProcessTime(each.getTimeTotal())}"/>
+			            	<cell>
+			                    <label value="each.getMachine().getName()" if="${win_production_order_creation$composer.isMachineNecessary(each.process)}"/>
+			                    <label value="NO REQUIERE MAQUINA" if="${!win_production_order_creation$composer.isMachineNecessary(each.process)}"/>
+		                    </cell>
+			            	<label value="${each.quantityPiece}"/>
+			            	<doublebox disabled="${!win_production_order_creation$composer.isStartAndEditionAllowed()}" inplace="true" value="${each.quantityFinished}" forward="onChanging=productionOrderDetailGrid.onEditProductionOrderDetailQuantityFinished(${each})"/>
+			            	
+						</row>
+		            </template>
+    			</grid>
+    			<separator/>
+			    <listbox id="productionOrderSupplyListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
+			    	<auxhead>
+						<auxheader label="Insumos" colspan="5"/>
+					</auxhead>
+			        <listhead>
+			            <listheader label="Codigo" align="center"/>
+			            <listheader label="Descripcion" align="center"/>
+			            <listheader label="Cantidad" align="center"/>
+			            <listheader label="Cantidad Utilizada" align="center"/>
+			            <listheader label="Observaciones" align="center"/>
+			        </listhead>
+			        <template name="model">
+			            <listitem>
+			                <listcell label="${each.supplyType.code}"/>
+			                <listcell label="${each.supplyType.description}"/>
+			                <listcell label="${each.quantity}"/>
+			                <listcell>
+			                	<doublebox disabled="${!win_production_order_creation$composer.isStartAndEditionAllowed()}" inplace="true" value="${each.quantityUsed}" forward="onChanging=productionOrderSupplyListbox.onEditUsedSupply(${each})"/>
+			                	<button disabled="${!win_production_order_creation$composer.isStartAndEditionAllowed()}" label="Completar" forward="onClick=productionOrderSupplyListbox.onCompleteUsedSupply(${each})"/>
+			                </listcell>
+			                <listcell>
+			                	<textbox disabled="${!win_production_order_creation$composer.isStartAndEditionAllowed()}" hflex="1"/>
+			                </listcell>
+			            </listitem>
+			        </template>
+			    </listbox>
+			    <separator/>
+			    <listbox id="productionOrderRawMaterialListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
+			    	<auxhead>
+						<auxheader label="Materias Primas" colspan="4"/>
+					</auxhead>
+			        <listhead>
+			            <listheader label="Materia Prima" align="center"/>
+			            <listheader label="Cantidad" align="center"/>
+			            <listheader label="Cantidad Utilizada" align="center"/>
+			            <listheader label="Observaciones" align="center"/>
+			        </listhead>
+			        <template name="model">
+			            <listitem>
+			                <listcell label="${each.rawMaterialType.name}"/>
+			                <listcell label="${each.quantity}"/>
+			                <listcell>
+			                	<doublebox disabled="${!win_production_order_creation$composer.isStartAndEditionAllowed()}" inplace="true" value="${each.quantityUsed}" forward="onChanging=productionOrderRawMaterialListbox.onEditUsedRawMaterial(${each})"/>
+			                	<button disabled="${!win_production_order_creation$composer.isStartAndEditionAllowed()}" label="Completar" forward="onClick=productionOrderRawMaterialListbox.onCompleteUsedRawMaterial(${each})"/>
+			                </listcell>
+			                <listcell>
+			                	<textbox disabled="${!win_production_order_creation$composer.isStartAndEditionAllowed()}" hflex="1"/>
+			                </listcell>
+			            </listitem>
+			        </template>
+			    </listbox>
+    			<hlayout>
+				    <button id="saveButton" label="Guardar"/>
+				    <button id="resetButton" label="Reset"/>
+				    <button id="cancelButton" label="Volver"/>
+			    </hlayout>
+			</vlayout>
+        </panelchildren>
+    </panel>
+</window>

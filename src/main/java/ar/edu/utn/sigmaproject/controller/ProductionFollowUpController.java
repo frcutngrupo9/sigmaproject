@@ -77,8 +77,9 @@ import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
 import ar.edu.utn.sigmaproject.service.WoodReservedRepository;
 import ar.edu.utn.sigmaproject.service.WorkerRepository;
 
+
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class ProductionOrderCreationController extends SelectorComposer<Component> {
+public class ProductionFollowUpController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
 	@Wire
@@ -92,11 +93,9 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	@Wire
 	Grid productionOrderDetailGrid;
 	@Wire
-	Spinner productionOrderNumberSpinner;
-	@Wire
 	Intbox productUnitsIntbox;
 	@Wire
-	Combobox workerCombobox;
+	Textbox workerNameTextbox;
 	@Wire
 	Datebox productionOrderStartDatebox;
 	@Wire
@@ -171,7 +170,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 	// list models
 	private ListModelList<ProductionOrderDetail> productionOrderDetailListModel;
-	private ListModelList<Worker> workerListModel;
 	private ListModelList<ProductionOrderStateType> productionOrderStateTypeListModel;
 	private ListModelList<ProductionOrderSupply> productionOrderSupplyListModel;
 	private ListModelList<ProductionOrderRawMaterial> productionOrderRawMaterialListModel;
@@ -185,10 +183,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		if(currentProductionPlan == null) {throw new RuntimeException("ProductionPlan not found");}
 
 		productionOrderDetailList = currentProductionOrder.getDetails();
-		//List<ProductionOrderDetail> details = getProductionOrderDetailList(currentProductionOrder);// genera los detalles para para ver si no se edito el producto y que posea una cantidad mas grande de procesos.
-		//if(details.size() != productionOrderDetailList.size()) {
-		//	productionOrderDetailList = details;
-		//}
 
 		machineList = machineRepository.findAll();
 
@@ -215,17 +209,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		}
 		productNameTextbox.setText(currentProductionOrder.getProduct().getName());
 		productUnitsIntbox.setValue(currentProductionOrder.getUnits());
-		if(currentProductionOrder.getNumber()!=null && currentProductionOrder.getNumber()!=0) {
-			productionOrderNumberSpinner.setValue(currentProductionOrder.getNumber());
-		} else {
-			productionOrderNumberSpinner.setValue(getNewProductionOrderNumber());
-		}
 		workerList = workerRepository.findAll();
-		workerListModel = new ListModelList<>(workerList);
-		if (currentProductionOrder.getWorker() != null) {
-			workerListModel.addToSelection(workerRepository.findOne(currentProductionOrder.getWorker().getId()));
-		}
-		workerCombobox.setModel(workerListModel);
+		workerNameTextbox.setText(currentProductionOrder.getWorker().getName());
 		productionOrderStartDatebox.setValue(currentProductionOrder.getDateStart());
 		productionOrderFinishDatebox.setValue(currentProductionOrder.getDateFinish());
 		productionOrderRealStartDatebox.setValue(currentProductionOrder.getDateStartReal());
@@ -299,35 +284,11 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			alert("No se puede modificar una Orden de Produccion Cancelada.");
 			return;
 		}
-
+		
 		ProductionOrderStateType newStateType = getProductionOrderStateType();
-
-		int selectedIndexWorker = workerCombobox.getSelectedIndex();
-		if (selectedIndexWorker == -1) {// no hay un empleado seleccionado
-			Clients.showNotification("Debe seleccionar un Empleado");
-			return;
-		}
-		for (ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
-			Process process = productionOrderDetail.getProcess();
-			ProcessType processType = process.getType();
-			MachineType machineType = processType.getMachineType();
-			if (machineType != null) {
-				if (productionOrderDetail.getMachine() == null) {
-					Clients.showNotification("Existen Procesos sin Maquina Asignada", productionOrderDetailGrid);
-					return;
-				}
-			}
-		}
-		Integer productionOrderNumber = productionOrderNumberSpinner.getValue();
-		Worker productionOrderWorker = workerCombobox.getSelectedItem().getValue();
-		Date productionOrderDateStart = productionOrderStartDatebox.getValue();
-		Date productionOrderDateFinish = productionOrderFinishDatebox.getValue();
+		
 		//Date productionOrderRealDateStart = productionOrderRealStartDatebox.getValue();
 		//Date productionOrderRealDateFinish = productionOrderRealFinishDatebox.getValue();
-		currentProductionOrder.setNumber(productionOrderNumber);
-		currentProductionOrder.setWorker(productionOrderWorker);
-		currentProductionOrder.setDateStart(productionOrderDateStart);
-		currentProductionOrder.setDateFinish(productionOrderDateFinish);
 		//currentProductionOrder.setDateStartReal(productionOrderRealDateStart);
 		//currentProductionOrder.setDateFinishReal(productionOrderRealDateFinish);
 		productionOrderDetailList = productionOrderDetailRepository.save(productionOrderDetailList);
@@ -365,7 +326,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 		updateProductionPlanState();
 
-		alert("Orden de Produccion Guardada.");
+		alert("Avance de Produccion Guardada.");
 		//cancelButtonClick();
 		refreshView();
 	}
@@ -425,12 +386,10 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 	}
 
-	//"Registrado""Abastecido""Lanzado""En Ejecucion""Finalizado""Cancelado""Suspendido"
 
 	private ProductionOrderStateType getProductionOrderStateType() {
 		// devuelve el estado actual de la orden de produccion
 		// "No iniciada" si no inicio, "Iniciada" o "Finalizada" si finalizaron todos los detalles
-		// "Registrada" si no inicio y tampoco se le asignaron todas las maquinas, empleados y fechas
 		ProductionOrderStateType productionOrderStateType = null;
 		boolean finished = true;// si se finalizo todos los procesos
 		boolean notStarted = true;// no inicio ningun proceso
@@ -747,5 +706,4 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		}
 		return false;
 	}
-
 }

@@ -267,7 +267,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			// crea ordenes de produccion
 			int sequence = 0;
 			for(ProductTotal each : getProductTotalList()) {
-				ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateTypeRepository.findFirstByName("No Iniciada"), new Date());
+				ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateTypeRepository.findFirstByName("Registrada"), new Date());
 				productionOrderState = productionOrderStateRepository.save(productionOrderState);
 				sequence += 1;
 				ProductionOrder productionOrder = new ProductionOrder(sequence, currentProductionPlan, each.getProduct(), each.getTotalUnits(), productionOrderState);
@@ -428,7 +428,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		refreshOrder();
 		if (currentProductionPlan == null) {// nuevo plan de produccion
 			productionPlanCaption.setLabel("Creacion de Plan de Produccion");
-			productionPlanStateTypeListModel.addToSelection(productionPlanStateTypeRepository.findFirstByName("Planificado"));
+			productionPlanStateTypeListModel.addToSelection(productionPlanStateTypeRepository.findFirstByName("Registrado"));
 			productionPlanStateTypeCombobox.setModel(productionPlanStateTypeListModel);
 			productionPlanNameTextbox.setText("");
 			productionPlanDetailList = new ArrayList<ProductionPlanDetail>();

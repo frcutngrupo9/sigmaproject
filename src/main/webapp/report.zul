@@ -3,7 +3,28 @@
 	<panel border="none">
         <panelchildren>
             <vlayout>
-                <label id="informationLabel" value=""/>
+            	<hbox hflex="1" pack="center">
+            		<button id="generateReportButton" label="Generar Reporte"/>
+            	</hbox>
+                <separator/>
+                <grid id="reportProductionPlanGrid" mold="paging" pageSize="7" sizedByContent="true" span="true">
+			        <columns>
+			            <column label="Plan de Produccion" align="center"/>
+			            <column label="Fecha Inicio" align="center"/>
+			            <column label="Inicio Real" align="center"/>
+			            <column label="Informacion" align="center"/>
+			            <column label="Abrir" align="center"/>
+			        </columns>
+			        <template name="model">
+			            <row>
+			                <label value="${each.name}"/>
+			                <label value="${reportWindow$composer.getFormattedDate(each.dateStart)}"/>
+			                <label value="${reportWindow$composer.getFormattedDate(reportWindow$composer.getDateStartReal(each))}"/>
+			                <label value="${reportWindow$composer.getDeviation(each)}"/>
+			                <button forward="onClick=reportProductionPlanGrid.onNavigateToProductionOrder(${each})" label="Ordenes de Produccion" />
+			            </row>
+			        </template>
+			    </grid>
             </vlayout>
         </panelchildren>
     </panel>

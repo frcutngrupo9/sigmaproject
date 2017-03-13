@@ -85,12 +85,12 @@
 						<auxheader label="Detalles Orden de Produccion" colspan="10"/>
 					</auxhead>
         			<columns>
-			            <column label="Proceso" align="center" sort="auto(process.type.name)"/>
+			            <column label="Proceso" align="left" sort="auto(process.type.name)"/>
 			            <column label="Pieza" align="center"/>
 			            <column label="Maquina Necesaria" align="center"/>
 			            <column label="Detalles" align="center"/>
-			            <column label="Tiempo x Producto" align="center"/>
-			            <column label="Tiempo Total" align="center"/>
+			            <column label="Duracion x Producto" align="center"/>
+			            <column label="Duracion Total" align="center"/>
 			            <column label="Maquina Asignada" align="center"/>
 			            <column label="Cant Pieza" align="center"/>
 			            <column label="Cant Finalizada" align="center"/>
@@ -115,8 +115,8 @@
 			                    <label value="NO REQUIERE" if="${!win_production_order_creation$composer.isMachineNecessary(each.process)}"/>
 		                    </cell>
 			            	<label value="${each.quantityPiece}"/>
-			            	<doublebox inplace="true" value="${each.quantityFinished}" forward="onChanging=productionOrderDetailGrid.onEditProductionOrderDetailQuantityFinished(${each})"/>
-			            	<checkbox checked="${each.isFinished()}" forward="onCheck=productionOrderDetailGrid.onEditProductionOrderDetailIsFinished(${each})"/>
+			            	<doublebox disabled="${!win_production_order_creation$composer.isStartAndEditionAllowed()}" inplace="true" value="${each.quantityFinished}" forward="onChanging=productionOrderDetailGrid.onEditProductionOrderDetailQuantityFinished(${each})"/>
+			            	<checkbox disabled="${!win_production_order_creation$composer.isStartAndEditionAllowed()}" checked="${each.isFinished()}" forward="onCheck=productionOrderDetailGrid.onEditProductionOrderDetailIsFinished(${each})"/>
 						</row>
 		            </template>
     			</grid>
@@ -138,11 +138,11 @@
 			                <listcell label="${each.supplyType.description}"/>
 			                <listcell label="${each.quantity}"/>
 			                <listcell>
-			                	<doublebox inplace="true" value="${each.quantityUsed}" forward="onChanging=productionOrderSupplyListbox.onEditUsedSupply(${each})"/>
-			                	<button label="Completar" forward="onClick=productionOrderSupplyListbox.onCompleteUsedSupply(${each})"/>
+			                	<doublebox disabled="${!win_production_order_creation$composer.isStartAndEditionAllowed()}" inplace="true" value="${each.quantityUsed}" forward="onChanging=productionOrderSupplyListbox.onEditUsedSupply(${each})"/>
+			                	<button disabled="${!win_production_order_creation$composer.isStartAndEditionAllowed()}" label="Completar" forward="onClick=productionOrderSupplyListbox.onCompleteUsedSupply(${each})"/>
 			                </listcell>
 			                <listcell>
-			                	<textbox hflex="1"/>
+			                	<textbox disabled="${!win_production_order_creation$composer.isStartAndEditionAllowed()}" hflex="1"/>
 			                </listcell>
 			            </listitem>
 			        </template>
@@ -163,11 +163,11 @@
 			                <listcell label="${each.rawMaterialType.name}"/>
 			                <listcell label="${each.quantity}"/>
 			                <listcell>
-			                	<doublebox inplace="true" value="${each.quantityUsed}" forward="onChanging=productionOrderRawMaterialListbox.onEditUsedRawMaterial(${each})"/>
-			                	<button label="Completar" forward="onClick=productionOrderRawMaterialListbox.onCompleteUsedRawMaterial(${each})"/>
+			                	<doublebox disabled="${!win_production_order_creation$composer.isStartAndEditionAllowed()}" inplace="true" value="${each.quantityUsed}" forward="onChanging=productionOrderRawMaterialListbox.onEditUsedRawMaterial(${each})"/>
+			                	<button disabled="${!win_production_order_creation$composer.isStartAndEditionAllowed()}" label="Completar" forward="onClick=productionOrderRawMaterialListbox.onCompleteUsedRawMaterial(${each})"/>
 			                </listcell>
 			                <listcell>
-			                	<textbox hflex="1"/>
+			                	<textbox disabled="${!win_production_order_creation$composer.isStartAndEditionAllowed()}" hflex="1"/>
 			                </listcell>
 			            </listitem>
 			        </template>

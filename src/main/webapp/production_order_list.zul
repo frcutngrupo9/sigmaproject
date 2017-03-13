@@ -51,8 +51,8 @@
         				<column label="Estado Orden" align="center"/>
 		                <column label="Empleado Asignado" align="center"/>
 		                <column label="% Completo" align="center"/>
-		                <column label="Tiempo Total" align="center"/>
-		                <column label="T. Unidad" align="center"/>
+		                <column label="Duracion Total" align="center"/>
+		                <column label="Duracion Unidad" align="center"/>
 		                <column label="Fecha Inicio Real" align="center"/>
 		                <column label="Fecha Fin Real" align="center"/>
 		            </columns>

@@ -38,8 +38,11 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 
 	BigDecimal quantityFinished = BigDecimal.ZERO;
 
-	boolean isFinished;
-	Date dateFinished;
+	boolean isFinished = false;
+	Date dateStart = null;
+	Date dateFinish = null;
+	Date dateStartReal = null;
+	Date dateFinishReal = null;
 
 	public ProductionOrderDetail() {
 
@@ -50,8 +53,6 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 		this.machine = machine;
 		this.setTimeTotal(timeTotal);
 		this.quantityPiece = quantityPiece;
-		isFinished = false;
-		dateFinished = null;
 	}
 
 	public Long getId() {
@@ -122,11 +123,35 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 		this.isFinished = isFinished;
 	}
 
-	public Date getDateFinished() {
-		return dateFinished;
+	public Date getDateStart() {
+		return dateStart;
 	}
 
-	public void setDateFinished(Date dateFinished) {
-		this.dateFinished = dateFinished;
+	public void setDateStart(Date dateStart) {
+		this.dateStart = dateStart;
+	}
+
+	public Date getDateFinish() {
+		return dateFinish;
+	}
+
+	public void setDateFinish(Date dateFinish) {
+		this.dateFinish = dateFinish;
+	}
+
+	public Date getDateStartReal() {
+		return dateStartReal;
+	}
+
+	public void setDateStartReal(Date dateStartReal) {
+		this.dateStartReal = dateStartReal;
+	}
+
+	public Date getDateFinishReal() {
+		return dateFinishReal;
+	}
+
+	public void setDateFinishReal(Date dateFinishReal) {
+		this.dateFinishReal = dateFinishReal;
 	}
 }
