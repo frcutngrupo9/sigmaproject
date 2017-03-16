@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
-import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -20,18 +19,14 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
-import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Comboitem;
 import org.zkoss.zul.Datebox;
-import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Listcell;
-import org.zkoss.zul.Row;
 import org.zkoss.zul.Spinner;
 import org.zkoss.zul.Textbox;
 
@@ -101,10 +96,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	Datebox productionOrderStartDatebox;
 	@Wire
 	Datebox productionOrderFinishDatebox;
-	@Wire
-	Datebox productionOrderRealStartDatebox;
-	@Wire
-	Datebox productionOrderRealFinishDatebox;
 	@Wire
 	Button saveButton;
 	@Wire
@@ -198,8 +189,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	private void refreshView() {
 		productionOrderStartDatebox.setDisabled(true);
 		productionOrderFinishDatebox.setDisabled(true);
-		productionOrderRealStartDatebox.setDisabled(true);
-		productionOrderRealFinishDatebox.setDisabled(true);
 		productionPlanNameTextbox.setDisabled(true);
 		productNameTextbox.setDisabled(true);
 		productionPlanCreationDatebox.setDisabled(true);
@@ -228,8 +217,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		workerCombobox.setModel(workerListModel);
 		productionOrderStartDatebox.setValue(currentProductionOrder.getDateStart());
 		productionOrderFinishDatebox.setValue(currentProductionOrder.getDateFinish());
-		productionOrderRealStartDatebox.setValue(currentProductionOrder.getDateStartReal());
-		productionOrderRealFinishDatebox.setValue(currentProductionOrder.getDateFinishReal());
 		refreshProductionOrderDetailGridView();
 		refreshProductionOrderOrderSupplyAndRawMaterialListbox();
 		List<ProductionOrderStateType> productionOrderStateTypeList = productionOrderStateTypeRepository.findAll();
@@ -544,106 +531,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		refreshProductionOrderDetailGridView();
 	}
 
-	@Listen("onEditProductionOrderDetailQuantityFinished = #productionOrderDetailGrid")
-	public void doEditProductionOrderDetailQuantityFinished(ForwardEvent evt) {
-		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
-		InputEvent inputEvent = (InputEvent) evt.getOrigin();
-		String inputValue = inputEvent.getValue();
-		BigDecimal value = null;
-		if(inputValue == null || inputValue.equals("")) {
-			value = BigDecimal.ZERO;
-		} else {
-			value = new BigDecimal(inputValue);
-		}
-		BigDecimal quantityPiece = new BigDecimal(data.getQuantityPiece());
-		Doublebox element = (Doublebox) evt.getOrigin().getTarget();
-		Row fila = (Row)element.getParent();
-		Checkbox chkbox = (Checkbox)fila.getChildren().get(fila.getChildren().size()-1);
-		if(value.compareTo(quantityPiece) > 0) {
-			// si el valor ingresado supera la cantidad, se lo modifica y se agrega la cantidad
-			element.setValue(quantityPiece.doubleValue());
-			data.setQuantityFinished(quantityPiece);
-			chkbox.setChecked(true);
-			data.setFinished(true);
-		} else {// si el valor ingresado es igual o menos a la cantidad
-			data.setQuantityFinished(value);
-			if(value.compareTo(quantityPiece) == 0) {
-				chkbox.setChecked(true);
-				data.setFinished(true);
-			} else {
-				chkbox.setChecked(false);
-				data.setFinished(false);
-			}
-		}
-	}
-
-	@Listen("onEditProductionOrderDetailIsFinished = #productionOrderDetailGrid")
-	public void doEditProductionOrderDetailIsFinished(ForwardEvent evt) {
-		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
-		Checkbox element = (Checkbox) evt.getOrigin().getTarget();// obtenemos el elemento web
-		data.setFinished(element.isChecked());// cargamos al objeto el valor
-	}
-
-	@Listen("onEditUsedSupply = #productionOrderSupplyListbox")
-	public void doEditUsedSupply(ForwardEvent evt) {
-		ProductionOrderSupply data = (ProductionOrderSupply) evt.getData();// obtenemos el objeto pasado por parametro
-		InputEvent inputEvent = (InputEvent) evt.getOrigin();
-		String inputValue = inputEvent.getValue();
-		BigDecimal value = null;
-		if(inputValue == null || inputValue.equals("")) {
-			value = BigDecimal.ZERO;
-		} else {
-			value = new BigDecimal(inputValue);
-		}
-		if(value.compareTo(data.getQuantity()) > 0) {
-			Doublebox element = (Doublebox) evt.getOrigin().getTarget();
-			element.setValue(data.getQuantity().doubleValue());
-			data.setQuantityUsed(data.getQuantity());
-		} else {
-			data.setQuantityUsed(value);
-		}
-	}
-
-	@Listen("onEditUsedRawMaterial = #productionOrderRawMaterialListbox")
-	public void doEditUsedRawMaterial(ForwardEvent evt) {
-		ProductionOrderRawMaterial data = (ProductionOrderRawMaterial) evt.getData();// obtenemos el objeto pasado por parametro
-		InputEvent inputEvent = (InputEvent) evt.getOrigin();
-		String inputValue = inputEvent.getValue();
-		BigDecimal value = null;
-		if(inputValue == null || inputValue.equals("")) {
-			value = BigDecimal.ZERO;
-		} else {
-			value = new BigDecimal(inputValue);
-		}
-		if(value.compareTo(data.getQuantity()) > 0) {
-			Doublebox element = (Doublebox) evt.getOrigin().getTarget();
-			element.setValue(data.getQuantity().doubleValue());
-			data.setQuantityUsed(data.getQuantity());
-		} else {
-			data.setQuantityUsed(value);
-		}
-	}
-
-	@Listen("onCompleteUsedSupply = #productionOrderSupplyListbox")
-	public void doCompleteUsedSupply(ForwardEvent evt) {
-		ProductionOrderSupply data = (ProductionOrderSupply) evt.getData();// obtenemos el objeto pasado por parametro
-		Button element = (Button) evt.getOrigin().getTarget();
-		Listcell listcell = (Listcell)element.getParent();
-		Doublebox doublebox = (Doublebox)listcell.getChildren().get(listcell.getChildren().size()-2);
-		doublebox.setValue(data.getQuantity().doubleValue());
-		data.setQuantityUsed(data.getQuantity());
-	}
-
-	@Listen("onCompleteUsedRawMaterial = #productionOrderRawMaterialListbox")
-	public void doCompleteUsedRawMaterial(ForwardEvent evt) {
-		ProductionOrderRawMaterial data = (ProductionOrderRawMaterial) evt.getData();// obtenemos el objeto pasado por parametro
-		Button element = (Button) evt.getOrigin().getTarget();
-		Listcell listcell = (Listcell)element.getParent();
-		Doublebox doublebox = (Doublebox)listcell.getChildren().get(listcell.getChildren().size()-2);
-		doublebox.setValue(data.getQuantity().doubleValue());
-		data.setQuantityUsed(data.getQuantity());
-	}
-
 	@Listen("onChange = #productionOrderStartDatebox")
 	public void productionOrderStartDateboxOnChange() {
 		//Date finishDate = getFinishDate(productionOrderStartDatebox.getValue(), currentProductionOrder.getDurationTotal());
@@ -725,27 +612,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		} else {
 			return supplyReserved.getStockReserved();
 		}
-	}
-
-	public boolean isStartAndEditionAllowed() {
-		// si el plan esta Registrado (no abastecido) o Cancelado o Suspendido, no se pueden modificar las cantidades producidas ni iniciar la produccion
-		ProductionPlanStateType productionPlanStateTypeAbastecido = productionPlanStateTypeRepository.findFirstByName("Abastecido");
-		ProductionPlanStateType productionPlanStateTypeEnEjecucion = productionPlanStateTypeRepository.findFirstByName("En Ejecucion");
-		// se puede seguir modificando en finalizado ya que quizas se quiere volver atras a estado en ejecucion a causa de algun error
-		ProductionPlanStateType productionPlanStateTypeFinalizada = productionPlanStateTypeRepository.findFirstByName("Finalizado");
-		boolean estaAbastecido = productionPlanStateTypeAbastecido.equals(productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId()));
-		boolean estaEnEjecucion = productionPlanStateTypeEnEjecucion.equals(productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId()));
-		boolean estaFinalizado = productionPlanStateTypeFinalizada.equals(productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId()));
-		if(estaAbastecido) {
-			return true;
-		}
-		if(estaEnEjecucion) {
-			return true;
-		}
-		if(estaFinalizado) {
-			return true;
-		}
-		return false;
 	}
 
 }

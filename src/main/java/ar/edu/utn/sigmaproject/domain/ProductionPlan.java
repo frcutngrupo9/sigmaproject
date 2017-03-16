@@ -3,11 +3,14 @@ package ar.edu.utn.sigmaproject.domain;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
 
 @Entity
 public class ProductionPlan  implements Serializable, Cloneable {
@@ -33,6 +36,7 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	String name = "";
 	Date dateCreation = null;
 	Date dateStart = null;
+	ProductionPlanStateType currentStateType = null;
 
 	public ProductionPlan() {
 
@@ -61,11 +65,7 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	}
 
 	public ProductionPlanStateType getCurrentStateType() {
-		ProductionPlanState result = getCurrentState();
-		if(result != null) {
-			return result.getProductionPlanStateType();
-		}
-		return null;
+		return currentStateType;
 	}
 
 	public ProductionPlanState getCurrentState() {
@@ -86,6 +86,7 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	}
 
 	public void setState(ProductionPlanState state) {
+		currentStateType = state.getProductionPlanStateType();
 		states.add(state);
 	}
 

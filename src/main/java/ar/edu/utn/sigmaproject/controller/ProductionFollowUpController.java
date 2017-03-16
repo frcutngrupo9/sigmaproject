@@ -18,7 +18,6 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
-import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Combobox;
@@ -32,7 +31,6 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Row;
-import org.zkoss.zul.Spinner;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Machine;
@@ -42,7 +40,6 @@ import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
-import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderRawMaterial;
@@ -179,13 +176,10 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		super.doAfterCompose(comp);
 		currentProductionOrder = (ProductionOrder) Executions.getCurrent().getAttribute("selected_production_order");
 		if(currentProductionOrder == null) {throw new RuntimeException("ProductionOrder not found");}
-		currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
-		if(currentProductionPlan == null) {throw new RuntimeException("ProductionPlan not found");}
-
+		currentProductionPlan = currentProductionOrder.getProductionPlan();
 		productionOrderDetailList = currentProductionOrder.getDetails();
 
 		machineList = machineRepository.findAll();
-
 		refreshView();
 	}
 

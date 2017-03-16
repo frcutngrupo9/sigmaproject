@@ -37,7 +37,7 @@
 				    								<listheader label="Pedido" align="center"/>
 				    								<listheader label="Cliente" align="center"/>
 				    								<listheader label="Fecha" align="center"/>
-				    								<listheader label="Cantidad de Productos" align="center"/>
+				    								<listheader label="Productos Distintos" align="center"/>
 				    							</listhead>
 				    							<template name="model">
 				    								<listitem>
@@ -66,7 +66,7 @@
             			<column label="Fecha Creacion" align="center"/>
             			<column label="Fecha Necesidad" align="center"/>
             			<column label="Cliente" align="center"/>
-           			 	<column label="Cantidad Productos" align="center"/>
+           			 	<column label="Productos Distintos" align="center"/>
            			 	<column label="Quitar" width="120px" align="center"/>
         			</columns>
         			<template name="model">
@@ -87,9 +87,9 @@
 					</auxhead>
         			<listhead>
         				<listheader label="Codigo" align="center"/>
-            			<listheader label="Nombre Producto" align="center"/>
+            			<listheader label="Producto" align="center"/>
             			<listheader label="Detalles" align="center"/>
-            			<listheader label="Cantidad de Producto" align="center"/>
+            			<listheader label="Cantidad" align="center"/>
         			</listhead>
         			<template name="model">
             			<listitem>

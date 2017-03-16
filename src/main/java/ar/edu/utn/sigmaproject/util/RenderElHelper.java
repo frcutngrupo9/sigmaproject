@@ -7,6 +7,9 @@ import ar.edu.utn.sigmaproject.domain.RawMaterialType;
 
 import javax.xml.datatype.Duration;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class RenderElHelper {
@@ -48,6 +51,22 @@ public class RenderElHelper {
 		String depth = "(E) " + rawMaterialType.getDepth().doubleValue() + " " + rawMaterialType.getDepthMeasureUnit().getShortName();
 		String width = "(A) " + rawMaterialType.getWidth().doubleValue() + " " + rawMaterialType.getWidthMeasureUnit().getShortName();
 		return lenght + " x " + depth + " x " + width;
+	}
+	
+	public static String getFormattedDate(Date date) {
+		if(date != null) {
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			return dateFormat.format(date);
+		}
+		return "";
+	}
+	
+	public static String getFormattedDateTime(Date date) {
+		if(date != null) {
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+			return dateFormat.format(date);
+		}
+		return "";
 	}
 
 }

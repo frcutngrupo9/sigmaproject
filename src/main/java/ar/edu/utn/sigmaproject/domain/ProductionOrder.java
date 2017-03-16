@@ -45,6 +45,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 	Date dateFinish = null;
 	Date dateStartReal = null;
 	Date dateFinishReal = null;
+	ProductionOrderStateType currentStateType = null;
 
 	@OneToMany(orphanRemoval = true)
 	List<ProductionOrderSupply> productionOrderSupplies = new ArrayList<>();
@@ -62,6 +63,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 		this.product = product;
 		this.units = units;
 		this.states.add(state);
+		this.currentStateType = state.getProductionOrderStateType();
 	}
 
 	public Long getId() {
@@ -165,11 +167,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 	}
 
 	public ProductionOrderStateType getCurrentStateType() {
-		ProductionOrderState result = getCurrentState();
-		if(result != null) {
-			return result.getProductionOrderStateType();
-		}
-		return null;
+		return currentStateType;
 	}
 
 	public ProductionOrderState getCurrentState() {
@@ -190,6 +188,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 	}
 
 	public void setState(ProductionOrderState state) {
+		currentStateType = state.getProductionOrderStateType();
 		states.add(state);
 	}
 

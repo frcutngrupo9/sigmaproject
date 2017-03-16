@@ -36,6 +36,7 @@ public class Order implements Serializable, Cloneable {
 	Integer number = 0;
 	Date date = new Date();
 	Date needDate = new Date();
+	OrderStateType currentStateType = null;
 
 	public Order() {
 
@@ -71,8 +72,12 @@ public class Order implements Serializable, Cloneable {
 	public void setDetails(List<OrderDetail> details) {
 		this.details = details;
 	}
-
+	
 	public OrderStateType getCurrentStateType() {
+		return currentStateType;
+	}
+
+	public OrderState getCurrentState() {
 		OrderState result = null;
 		for(OrderState each : states) {// busca el objeto con la fecha mas reciente
 			if(result != null) {
@@ -84,12 +89,13 @@ public class Order implements Serializable, Cloneable {
 			}
 		}
 		if(result != null) {
-			return result.getType();
+			return result;
 		}
 		return null;
 	}
 	
 	public void setState(OrderState state) {
+		currentStateType = state.getType();
 		states.add(state);
 	}
 

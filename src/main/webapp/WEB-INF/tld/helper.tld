@@ -27,4 +27,18 @@
             org.zkoss.zul.ListModel listModel(java.util.List items)
         </function-signature>
     </function>
+    <function>
+        <name>getFormattedDate</name>
+        <function-class>ar.edu.utn.sigmaproject.util.RenderElHelper</function-class>
+        <function-signature>
+            java.lang.String getFormattedDate(java.util.Date date)
+        </function-signature>
+    </function>
+    <function>
+        <name>getFormattedDateTime</name>
+        <function-class>ar.edu.utn.sigmaproject.util.RenderElHelper</function-class>
+        <function-signature>
+            java.lang.String getFormattedDateTime(java.util.Date date)
+        </function-signature>
+    </function>
 </taglib>

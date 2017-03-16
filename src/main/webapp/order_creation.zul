@@ -84,18 +84,18 @@
                     <doublebox id="productPriceDoublebox" constraint="no negative" format=",###.##" width="77px"/>
                     <button id="saveOrderDetailButton" label="Grabar Detalle"/>
                     <button id="resetOrderDetailButton" label="Reset Detalle"/>
-                    <button id="deleteOrderDetailButton" label="Eliminar Detalle"/>
                     <button id="cancelOrderDetailButton" label="Cancelar Edicion"/>
                 </hbox>
                 <listbox id="orderDetailListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
                     <auxhead>
-                        <auxheader label="Productos" colspan="4"/>
+                        <auxheader label="Productos" colspan="5"/>
                     </auxhead>
                     <listhead>
                         <listheader label="Nombre Producto" align="center"/>
                         <listheader label="Unidades" align="center"/>
                         <listheader label="Monto Unitario" align="center"/>
                         <listheader label="Subtotal" align="center"/>
+                        <listheader label="Quitar" align="center"/>
                     </listhead>
                     <template name="model">
                         <listitem>
@@ -103,6 +103,9 @@
                             <listcell label="${each.units}"/>
                             <listcell label="${each.price.doubleValue()} $"/>
                             <listcell label="${win_order_creation$composer.getSubTotal(each.units, each.price).doubleValue()} $"/>
+                            <listcell>
+                            	<button forward="onClick=orderDetailListbox.onRemoveDetail(${each})" image="/img/delete16x16.png"/>
+                            </listcell>
                         </listitem>
                     </template>
                     <listfoot>

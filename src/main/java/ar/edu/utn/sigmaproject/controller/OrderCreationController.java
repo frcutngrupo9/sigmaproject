@@ -8,6 +8,7 @@ import java.util.List;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
@@ -77,8 +78,6 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	Button cancelOrderDetailButton;
 	@Wire
 	Button saveOrderDetailButton;
-	@Wire
-	Button deleteOrderDetailButton;
 	@Wire
 	Button resetOrderDetailButton;
 	@Wire
@@ -338,7 +337,6 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			productUnitsIntbox.setValue(null);
 			productPriceDoublebox.setValue(null);
 			currentProduct = null;
-			deleteOrderDetailButton.setDisabled(true);
 			cancelOrderDetailButton.setDisabled(true);
 		} else {
 			currentProduct = currentOrderDetail.getProduct();
@@ -350,7 +348,6 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			} else {
 				productPriceDoublebox.setValue(null);
 			}
-			deleteOrderDetailButton.setDisabled(false);
 			cancelOrderDetailButton.setDisabled(false);
 		}
 		productPopupListbox.clearSelection();
@@ -398,21 +395,24 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Listen("onClick = #deleteOrderDetailButton")
-	public void deleteOrderDetail() {
-		if(currentOrderDetail != null) {
-			Messagebox.show("Esta seguro que desea eliminar " + currentOrderDetail.getProduct().getName() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
-				public void onEvent(Event evt) throws InterruptedException {
-					if (evt.getName().equals("onOK")) {
-						orderDetailList.remove(currentOrderDetail);// quitamos el detalle de la lista
+	@Listen("onRemoveDetail = #orderDetailListbox")
+	public void deleteOrderDetail(ForwardEvent evt) {
+		final OrderDetail orderDetail = (OrderDetail) evt.getData();
+		Messagebox.show("Esta seguro que desea eliminar " + orderDetail.getProduct().getName() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+			public void onEvent(Event evt) throws InterruptedException {
+				if (evt.getName().equals("onOK")) {
+					orderDetailList.remove(orderDetail);// quitamos el detalle de la lista
+					// eliminamos el detalle si estaba seleccionado
+					if(currentOrderDetail != null && orderDetail.equals(currentOrderDetail)) {
 						currentOrderDetail = null;// eliminamos el detalle
-						refreshProductPopup();// actualizamos el popup para que aparezca el producto eliminado del detalle
-						refreshViewOrderDetail();
-						alert("Detalle eliminado.");
 					}
+					refreshProductPopup();// actualizamos el popup para que aparezca el producto eliminado del detalle
+					refreshViewOrderDetail();
+					alert("Detalle eliminado.");
 				}
-			});
-		}
+			}
+		});
+		
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
