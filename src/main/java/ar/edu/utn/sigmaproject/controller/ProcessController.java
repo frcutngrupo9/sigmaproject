@@ -92,7 +92,7 @@ public class ProcessController extends SelectorComposer<Component> {
 		refreshView();
 		processTypeGrid.setVisible(true);
 	}
-
+//TODO: agregar edicion de nro de secuencia
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
 		if(Strings.isBlank(nameTextbox.getText())){
@@ -105,10 +105,10 @@ public class ProcessController extends SelectorComposer<Component> {
 			machineType = machineTypeCombobox.getSelectedItem().getValue();
 		}
 		if (currentProcessType == null) {
-			// es un nuevo insumo
-			currentProcessType = new ProcessType(name, machineType);
+			// nuevo
+			currentProcessType = new ProcessType(null, name, machineType);
 		} else {
-			// es una edicion
+			// edicion
 			currentProcessType.setName(name);
 			currentProcessType.setMachineType(machineType);
 		}

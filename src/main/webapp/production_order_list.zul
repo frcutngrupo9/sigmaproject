@@ -36,7 +36,7 @@
 				</hbox>
     			<grid id="productionOrderGrid" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Listado Ordenes de Produccion" colspan="15"/>
+						<auxheader label="Listado Productos a Fabricar" colspan="14"/>
 					</auxhead>
         			<columns>
         				<!-- <column width="40px" align="center"/> -->
@@ -44,7 +44,6 @@
         				<column label="Secuencia" align="center"/>
         				<column label="Fecha Inicio" align="center"/>
 		                <column label="Fecha Fin" align="center"/>
-        				<column label="Nro" align="center"/>
         				<column label="Producto" align="center"/>
 		                <column label="Unids" align="center"/>
         				<column label="Cod" align="center"/>
@@ -68,7 +67,6 @@
 			            	<spinner value="${each.sequence}" constraint="no empty,min 1" forward="onChanging=productionOrderGrid.onEditProductionOrderSequence(${each})" width="60px"/>
 		                	<datebox buttonVisible="false" format="dd/MM/yyyy HH:mm" value="${each.dateStart}" disabled="true" width="110px"/>
 		                    <datebox buttonVisible="false" format="dd/MM/yyyy HH:mm" value="${each.dateFinish}" disabled="true" width="110px"/>
-		                    <label value="${each.number}"/>
 		                	<label value="${each.product.name}"/>
 		                	<label value="${each.units}"/>
 		                	<label value="${each.product.code}"/>

@@ -9,11 +9,13 @@
 		    <separator/>
 		    <listbox id="processTypeListbox">
 		        <listhead>
+		            <listheader label="Secuencia" align="center"/>
 		            <listheader label="Nombre" align="center"/>
 		            <listheader label="Maquina Necesaria" align="center"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
+		                <listcell label="${each.sequence}"/>
 		                <listcell label="${each.name}"/>
 		                <listcell label="${empty each.machineType.name ? 'Ninguna' : each.machineType.name}"/>
 		            </listitem>

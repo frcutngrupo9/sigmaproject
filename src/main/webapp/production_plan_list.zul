@@ -29,7 +29,7 @@
 		                <label value="${win_production_plan_list$composer.getQuantityOfProduct(each)}"/>
 		                <label value="${win_production_plan_list$composer.getProductionPlanStateName(each)}"/>
 		                <button forward="onClick=productionPlanGrid.onEditProductionPlan(${each})"  image="/img/edit16x16.png"/>
-		                <button forward="onClick=productionPlanGrid.onGenerateProductionOrder(${each})" label="Ordenes de Produccion" />
+		                <button forward="onClick=productionPlanGrid.onGenerateProductionOrder(${each})" label="Productos" />
 		                <button forward="onClick=productionPlanGrid.onOpenRequirementPlan(${each})" label="Requerimiento de Materiales" />
 		            </row>
 		        </template>

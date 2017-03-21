@@ -43,6 +43,9 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 	Date dateFinish = null;
 	Date dateStartReal = null;
 	Date dateFinishReal = null;
+	
+	@ManyToOne
+	Worker worker = null;
 
 	public ProductionOrderDetail() {
 
@@ -153,5 +156,13 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 
 	public void setDateFinishReal(Date dateFinishReal) {
 		this.dateFinishReal = dateFinishReal;
+	}
+
+	public Worker getWorker() {
+		return worker;
+	}
+
+	public void setWorker(Worker worker) {
+		this.worker = worker;
 	}
 }

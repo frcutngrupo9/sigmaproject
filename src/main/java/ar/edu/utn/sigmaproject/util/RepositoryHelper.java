@@ -212,25 +212,23 @@ public class RepositoryHelper {
 		if (processTypeRepository.count() == 0) {
 			generateMachineType();
 			List<ProcessType> list = new ArrayList<>();
-			list.add(new ProcessType("Trazado de Madera", null));
-			list.add(new ProcessType("Garlopeado", machineTypeRepository.findFirstByName("Garlopa")));
-			list.add(new ProcessType("Acentuado", machineTypeRepository.findFirstByName("Garlopa")));
-			list.add(new ProcessType("Cepillado", machineTypeRepository.findFirstByName("Cepilladora")));
-			list.add(new ProcessType("Cortado de Ancho", machineTypeRepository.findFirstByName("Escuadradora")));
-			list.add(new ProcessType("Cortado de Largo", machineTypeRepository.findFirstByName("Escuadradora")));
-			list.add(new ProcessType("Cortado Curvo", machineTypeRepository.findFirstByName("Sierra Sin Fin")));
-			list.add(new ProcessType("Escopleado", machineTypeRepository.findFirstByName("Escopladora")));
-			list.add(new ProcessType("Espigado", machineTypeRepository.findFirstByName("Tupi")));
-			list.add(new ProcessType("Moldurado", machineTypeRepository.findFirstByName("Tupi")));
-			list.add(new ProcessType("Acanalado", machineTypeRepository.findFirstByName("Tupi")));
-			list.add(new ProcessType("Replanado", null));
-			list.add(new ProcessType("Masillado", null));
-			list.add(new ProcessType("Pegado", null));
-			list.add(new ProcessType("Clavado", null));
-			list.add(new ProcessType("Lijado Cruzado", machineTypeRepository.findFirstByName("Lijadora")));
-			list.add(new ProcessType("Lijado Derecho", machineTypeRepository.findFirstByName("Lijadora")));
-			list.add(new ProcessType("Agregado de Herrajes", null));
-			list.add(new ProcessType("Ensamblado", null));
+			list.add(new ProcessType(1, "Trazado de Madera", null));
+			list.add(new ProcessType(2, "Garlopeado", machineTypeRepository.findFirstByName("Garlopa")));
+			list.add(new ProcessType(3, "Acentuado", machineTypeRepository.findFirstByName("Garlopa")));
+			list.add(new ProcessType(4, "Cepillado", machineTypeRepository.findFirstByName("Cepilladora")));
+			list.add(new ProcessType(5, "Cortado de Ancho", machineTypeRepository.findFirstByName("Escuadradora")));
+			list.add(new ProcessType(6, "Cortado de Largo", machineTypeRepository.findFirstByName("Escuadradora")));
+			list.add(new ProcessType(7, "Cortado Curvo", machineTypeRepository.findFirstByName("Sierra Sin Fin")));
+			list.add(new ProcessType(8, "Escopleado", machineTypeRepository.findFirstByName("Escopladora")));
+			list.add(new ProcessType(9, "Espigado", machineTypeRepository.findFirstByName("Tupi")));
+			list.add(new ProcessType(10, "Moldurado", machineTypeRepository.findFirstByName("Tupi")));
+			list.add(new ProcessType(11, "Acanalado", machineTypeRepository.findFirstByName("Tupi")));
+			list.add(new ProcessType(12, "Replanado", null));
+			list.add(new ProcessType(13, "Masillado", null));
+			list.add(new ProcessType(14, "Pegado", null));
+			list.add(new ProcessType(15, "Lijado Cruzado", machineTypeRepository.findFirstByName("Lijadora")));
+			list.add(new ProcessType(16, "Lijado Derecho", machineTypeRepository.findFirstByName("Lijadora")));
+			list.add(new ProcessType(17, "Ensamblado", null));
 			processTypeRepository.save(list);
 		}
 	}
