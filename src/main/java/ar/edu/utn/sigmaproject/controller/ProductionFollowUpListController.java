@@ -64,7 +64,7 @@ public class ProductionFollowUpListController extends SelectorComposer<Component
 		// busca todos los planes de produccion que esten en estado "Lanzado" o "En Produccion", y 
 		// guarda todas sus ordenes de produccion en la lista
 		ProductionPlanStateType productionPlanStateTypeLanzado = productionPlanStateTypeRepository.findFirstByName("Lanzado");
-		ProductionPlanStateType productionPlanStateTypeEnProduccion = productionPlanStateTypeRepository.findFirstByName("En Produccion");
+		ProductionPlanStateType productionPlanStateTypeEnProduccion = productionPlanStateTypeRepository.findFirstByName("En Ejecucion");
 		List<ProductionPlan> productionPlanListLanzado = productionPlanRepository.findByCurrentStateType(productionPlanStateTypeLanzado);
 		List<ProductionPlan> productionPlanListEnProduccion = productionPlanRepository.findByCurrentStateType(productionPlanStateTypeEnProduccion);
 		productionOrderList = new ArrayList<ProductionOrder>();

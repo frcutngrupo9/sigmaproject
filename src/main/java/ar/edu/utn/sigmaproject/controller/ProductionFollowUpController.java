@@ -40,6 +40,7 @@ import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
+import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderRawMaterial;
@@ -50,17 +51,13 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
-import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
-import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
-import ar.edu.utn.sigmaproject.domain.SupplyReserved;
-import ar.edu.utn.sigmaproject.domain.WoodReserved;
-import ar.edu.utn.sigmaproject.domain.Worker;
 import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.PieceRepository;
+import ar.edu.utn.sigmaproject.service.ProductRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRawMaterialRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
@@ -86,13 +83,9 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	@Wire
 	Textbox productNameTextbox;
 	@Wire
-	Datebox productionPlanCreationDatebox;
-	@Wire
 	Grid productionOrderDetailGrid;
 	@Wire
 	Intbox productUnitsIntbox;
-	@Wire
-	Textbox workerNameTextbox;
 	@Wire
 	Datebox productionOrderStartDatebox;
 	@Wire
@@ -107,8 +100,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	Button cancelButton;
 	@Wire
 	Button resetButton;
-	@Wire
-	Combobox productionOrderStateTypeCombobox;
 	@Wire
 	Button generateDetailsButton;
 	@Wire
@@ -153,6 +144,8 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	private OrderStateRepository orderStateRepository;
 	@WireVariable
 	private OrderRepository orderRepository;
+	@WireVariable
+	private ProductRepository productRepository;
 
 	// atributes
 	private ProductionOrder currentProductionOrder;
@@ -160,14 +153,12 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 
 	// list
 	private List<ProductionOrderDetail> productionOrderDetailList;
-	private List<Worker> workerList;
 	private List<Machine> machineList;
 	private List<ProductionOrderSupply> productionOrderSupplyList;
 	private List<ProductionOrderRawMaterial> productionOrderRawMaterialList;
 
 	// list models
 	private ListModelList<ProductionOrderDetail> productionOrderDetailListModel;
-	private ListModelList<ProductionOrderStateType> productionOrderStateTypeListModel;
 	private ListModelList<ProductionOrderSupply> productionOrderSupplyListModel;
 	private ListModelList<ProductionOrderRawMaterial> productionOrderRawMaterialListModel;
 
@@ -190,11 +181,9 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		productionOrderRealFinishDatebox.setDisabled(true);
 		productionPlanNameTextbox.setDisabled(true);
 		productNameTextbox.setDisabled(true);
-		productionPlanCreationDatebox.setDisabled(true);
 		productUnitsIntbox.setDisabled(true);
 		productionPlanStateTypeTextbox.setDisabled(true);
 		productionPlanNameTextbox.setText(currentProductionPlan.getName());
-		productionPlanCreationDatebox.setValue(currentProductionPlan.getDateCreation());
 		ProductionPlanStateType lastProductionPlanStateType = currentProductionPlan.getCurrentStateType();
 		if(lastProductionPlanStateType != null) {
 			productionPlanStateTypeTextbox.setText(lastProductionPlanStateType.getName());
@@ -203,18 +192,12 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		}
 		productNameTextbox.setText(currentProductionOrder.getProduct().getName());
 		productUnitsIntbox.setValue(currentProductionOrder.getUnits());
-		workerList = workerRepository.findAll();
-		workerNameTextbox.setText(currentProductionOrder.getWorker().getName());
 		productionOrderStartDatebox.setValue(currentProductionOrder.getDateStart());
 		productionOrderFinishDatebox.setValue(currentProductionOrder.getDateFinish());
 		productionOrderRealStartDatebox.setValue(currentProductionOrder.getDateStartReal());
 		productionOrderRealFinishDatebox.setValue(currentProductionOrder.getDateFinishReal());
 		refreshProductionOrderDetailGridView();
 		refreshProductionOrderOrderSupplyAndRawMaterialListbox();
-		List<ProductionOrderStateType> productionOrderStateTypeList = productionOrderStateTypeRepository.findAll();
-		productionOrderStateTypeListModel = new ListModelList<ProductionOrderStateType>(productionOrderStateTypeList);
-		productionOrderStateTypeListModel.addToSelection(productionOrderStateTypeRepository.findOne(currentProductionOrder.getCurrentStateType().getId()));
-		productionOrderStateTypeCombobox.setModel(productionOrderStateTypeListModel);
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		resetButton.setDisabled(false);
@@ -232,17 +215,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		productionOrderRawMaterialListModel = new ListModelList<ProductionOrderRawMaterial>(productionOrderRawMaterialList);
 		productionOrderSupplyListbox.setModel(productionOrderSupplyListModel);
 		productionOrderRawMaterialListbox.setModel(productionOrderRawMaterialListModel);
-	}
-
-	private Integer getNewProductionOrderNumber() {
-		Integer lastValue = 0;
-		List<ProductionOrder> list = productionOrderRepository.findByProductionPlan(currentProductionPlan);
-		for(ProductionOrder each : list) {
-			if(each.getNumber()!=null && each.getNumber()>lastValue) {
-				lastValue = each.getNumber();
-			}
-		}
-		return lastValue + 1;
 	}
 
 	@Listen("onClick = #generateDetailsButton")
@@ -274,13 +246,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	public void saveButtonClick() {
 		ProductionOrderStateType lastStateType = productionOrderStateTypeRepository.findOne(currentProductionOrder.getCurrentStateType().getId());
 
-		if(lastStateType.equals(productionOrderStateTypeRepository.findFirstByName("Cancelada"))) {
-			alert("No se puede modificar una Orden de Produccion Cancelada.");
-			return;
-		}
-		
-		ProductionOrderStateType newStateType = getProductionOrderStateType();
-		
 		//Date productionOrderRealDateStart = productionOrderRealStartDatebox.getValue();
 		//Date productionOrderRealDateFinish = productionOrderRealFinishDatebox.getValue();
 		//currentProductionOrder.setDateStartReal(productionOrderRealDateStart);
@@ -293,10 +258,11 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		currentProductionOrder.setProductionOrderSupplies(productionOrderSupplyList);
 		currentProductionOrder.setProductionOrderRawMaterials(productionOrderRawMaterialList);
 
-		// el estado de la orden debe cambiar automaticamente en base a las modificaciones que se le hagan y no se deberia poder cambiar manualmente excepto en el caso de la cancelacion
+		// el estado de la orden debe cambiar automaticamente a 3 estados: Preparada, Iniciada, Finalizada
+		ProductionOrderStateType newStateType = getProductionOrderStateType();
 		ProductionOrderStateType productionOrderStateType = null;
 		if(!lastStateType.equals(newStateType)) {// si el estado anterior es distindo del nuevo
-			if(newStateType.equals(productionOrderStateTypeRepository.findFirstByName("Registrada"))) {// si el nuevo estado es no iniciado
+			if(newStateType.equals(productionOrderStateTypeRepository.findFirstByName("Preparada"))) {
 				currentProductionOrder.setDateStartReal(null);
 				currentProductionOrder.setDateFinishReal(null);
 			} else if(newStateType.equals(productionOrderStateTypeRepository.findFirstByName("Iniciada"))) {
@@ -326,11 +292,12 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	}
 
 	private void updateProductionPlanState() {
+		// el estado del plan debe cambiar automaticamente a 3 estados: Lanzado, En Ejecucion, Finalizado
 		// recorre todas las ordenes del plan y comprueba
-		// si no inicio ninguna, se guarda el estado en base a sus requerimientos
-		// si inicio 1 o mas pero no todas, se guarda estado "En Ejecucion" si no es ese el estado actual
-		// si finalizaron todas, se guarda estado "Finalizado" si no es ese el estado actual
-		ProductionPlanStateType currentProductionPlanStateType = currentProductionPlan.getCurrentStateType();
+		// si no inicio ninguna, se guarda el estado "Lanzado"
+		// si inicio 1 o mas pero no todas, se guarda estado "En Ejecucion"
+		// si finalizaron todas, se guarda estado "Finalizado"
+		ProductionPlanStateType currentProductionPlanStateType = productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId());
 		ProductionPlanStateType newProductionPlanStateType = null;
 		boolean allNotStarted = true;
 		boolean allFinish = true;
@@ -350,16 +317,16 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		if(allFinish) {
 			newProductionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Finalizado");
 			orderStateType = orderStateTypeRepository.findFirstByName("Finalizado");
-		} else if(allNotStarted) {// ninguno iniciado, se busca el estado del plan en base a sus requerimientos
-			newProductionPlanStateType = getProductionPlanStateType();
+		} else if(allNotStarted) {// ninguno iniciado
+			newProductionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Lanzado");
 			orderStateType = orderStateTypeRepository.findFirstByName("Planificado");
 		} else {
 			newProductionPlanStateType = productionPlanStateTypeRepository.findFirstByName("En Ejecucion");
 			orderStateType = orderStateTypeRepository.findFirstByName("En Produccion");
 		}
 
-		//si el estado actual es igual al nuevo no se realiza el guardado
-		if(newProductionPlanStateType!=null && !productionPlanStateTypeRepository.findOne(currentProductionPlanStateType.getId()).equals(newProductionPlanStateType)) {
+		//si el estado previo es igual al nuevo no se realiza el guardado
+		if(newProductionPlanStateType!=null && !currentProductionPlanStateType.equals(newProductionPlanStateType)) {
 			ProductionPlanState productionPlanState = new ProductionPlanState(newProductionPlanStateType, new Date());
 			productionPlanState = productionPlanStateRepository.save(productionPlanState);
 			currentProductionPlan.setState(productionPlanState);
@@ -376,6 +343,16 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 					orderRepository.save(order);
 				}
 			}
+
+			// se modifica la cantidad en stock si el estado es Finalizado
+			if(productionPlanStateTypeRepository.findFirstByName("Finalizado").equals(newProductionPlanStateType)) {
+				for(ProductionOrder each : productionOrderList) {
+					Product product = each.getProduct();
+					// TODO: sumar las cantidades REALES que se produjeron
+					product.setStock(product.getStock() + each.getUnits());
+					product = productRepository.save(product);
+				}
+			}
 		}
 
 	}
@@ -383,7 +360,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 
 	private ProductionOrderStateType getProductionOrderStateType() {
 		// devuelve el estado actual de la orden de produccion
-		// "No iniciada" si no inicio, "Iniciada" o "Finalizada" si finalizaron todos los detalles
+		// "Preparada" si no inicio, "Iniciada" o "Finalizada" si finalizaron todos los detalles
 		ProductionOrderStateType productionOrderStateType = null;
 		boolean finished = true;// si se finalizo todos los procesos
 		boolean notStarted = true;// no inicio ningun proceso
@@ -401,8 +378,8 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		if(finished) {
 			productionOrderStateType = productionOrderStateTypeRepository.findFirstByName("Finalizada");
 		} else if(notStarted) {
-			productionOrderStateType = productionOrderStateTypeRepository.findFirstByName("Registrada");
-		} else {// si no esta finalizado ni no iniciado, esta iniciado
+			productionOrderStateType = productionOrderStateTypeRepository.findFirstByName("Preparada");
+		} else {// si no esta Finalizada ni Preparada, esta Iniciada
 			productionOrderStateType = productionOrderStateTypeRepository.findFirstByName("Iniciada");
 		}
 		return productionOrderStateType;
@@ -410,9 +387,8 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #cancelButton")
 	public void cancelButtonClick() {
-		Executions.getCurrent().setAttribute("selected_production_plan", currentProductionPlan);
 		Include include = (Include) Selectors.iterable(productionOrderDetailGrid.getPage(), "#mainInclude").iterator().next();
-		include.setSrc("/production_order_list.zul");
+		include.setSrc("/production_follow_up_list.zul");
 	}
 
 	@Listen("onClick = #resetButton")
@@ -557,6 +533,15 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		}
 	}
 
+	@Listen("onEditUsedSupplyObservation = #productionOrderSupplyListbox")
+	public void doEditUsedSupplyObservation(ForwardEvent evt) {
+		ProductionOrderSupply data = (ProductionOrderSupply) evt.getData();// obtenemos el objeto pasado por parametro
+		Textbox origin = (Textbox)evt.getOrigin().getTarget();
+		InputEvent inputEvent = (InputEvent) evt.getOrigin();
+		origin.setValue(inputEvent.getValue());
+		data.setObservation(origin.getText());
+	}
+
 	@Listen("onEditUsedRawMaterial = #productionOrderRawMaterialListbox")
 	public void doEditUsedRawMaterial(ForwardEvent evt) {
 		ProductionOrderRawMaterial data = (ProductionOrderRawMaterial) evt.getData();// obtenemos el objeto pasado por parametro
@@ -575,6 +560,15 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		} else {
 			data.setQuantityUsed(value);
 		}
+	}
+
+	@Listen("onEditUsedRawMaterialObservation = #productionOrderRawMaterialListbox")
+	public void doEditUsedRawMaterialObservation(ForwardEvent evt) {
+		ProductionOrderRawMaterial data = (ProductionOrderRawMaterial) evt.getData();// obtenemos el objeto pasado por parametro
+		Textbox origin = (Textbox)evt.getOrigin().getTarget();
+		InputEvent inputEvent = (InputEvent) evt.getOrigin();
+		origin.setValue(inputEvent.getValue());
+		data.setObservation(origin.getText());
 	}
 
 	@Listen("onCompleteUsedSupply = #productionOrderSupplyListbox")
@@ -601,103 +595,5 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	public void productionOrderStartDateboxOnChange() {
 		//Date finishDate = getFinishDate(productionOrderStartDatebox.getValue(), currentProductionOrder.getDurationTotal());
 		//productionOrderFinishDatebox.setValue(finishDate);
-	}
-
-	private ProductionPlanStateType getProductionPlanStateType() {
-		// recorre todos los requerimientos para ver si estan todos abastecidos
-		boolean isCompleted = true;
-		List<SupplyRequirement> supplyRequirementList = currentProductionPlan.getSupplyRequirements();
-		for(SupplyRequirement each : supplyRequirementList) {
-			if(!isSupplyRequirementFulfilled(each)) {
-				isCompleted = false;
-				break;
-			}
-		}
-		List<RawMaterialRequirement> rawMaterialRequirementList = currentProductionPlan.getRawMaterialRequirements();
-		if(isCompleted) {// si no cambio el valor a false en el anterior loop for
-			for(RawMaterialRequirement each : rawMaterialRequirementList) {
-				if(!isRawMaterialRequirementFulfilled(each)) {
-					isCompleted = false;
-					break;
-				}
-			}
-		}
-		ProductionPlanStateType productionPlanStateType = null;
-		if(isCompleted) {
-			productionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Abastecido");
-		} else {
-			productionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Registrado");
-		}
-		return productionPlanStateType;
-	}
-
-	private boolean isRawMaterialRequirementFulfilled(RawMaterialRequirement supplyRequirement) {
-		// si ya se ha reservado la cantidad necesaria
-		boolean value = false;
-		if(getRawMaterialRequirementStockMissing(supplyRequirement).doubleValue() == 0) {
-			value = true;
-		}
-		return value;
-	}
-
-	private BigDecimal getRawMaterialRequirementStockMissing(RawMaterialRequirement rawMaterialRequirement) {
-		return rawMaterialRequirement.getQuantity().subtract(getRawMaterialRequirementStockReserved(rawMaterialRequirement));
-	}
-
-	private BigDecimal getRawMaterialRequirementStockReserved(RawMaterialRequirement rawMaterialRequirement) {
-		// busca todos los woodReserved, ya que puede haber, para el mismo requirement, un wood reserved de cada tipo de madera
-		List<WoodReserved> woodReserved = woodReservedRepository.findByRawMaterialRequirement(rawMaterialRequirement);
-		if(woodReserved.isEmpty()) {
-			return BigDecimal.ZERO;
-		} else {
-			BigDecimal stockReserved = BigDecimal.ZERO;
-			for(WoodReserved each : woodReserved) {
-				stockReserved = stockReserved.add(each.getStockReserved());
-			}
-			return stockReserved;
-		}
-	}
-
-	private boolean isSupplyRequirementFulfilled(SupplyRequirement supplyRequirement) {
-		// si ya se ha reservado la cantidad necesaria
-		boolean value = false;
-		if(getSupplyStockMissing(supplyRequirement).doubleValue() == 0) {
-			value = true;
-		}
-		return value;
-	}
-
-	private BigDecimal getSupplyStockMissing(SupplyRequirement supplyRequirement) {
-		return supplyRequirement.getQuantity().subtract(getSupplyStockReserved(supplyRequirement));
-	}
-
-	private BigDecimal getSupplyStockReserved(SupplyRequirement supplyRequirement) {
-		SupplyReserved supplyReserved = supplyReservedRepository.findBySupplyRequirement(supplyRequirement);
-		if(supplyReserved == null) {
-			return BigDecimal.ZERO;
-		} else {
-			return supplyReserved.getStockReserved();
-		}
-	}
-
-	public boolean isStartAndEditionAllowed() {
-		// si el plan esta Registrado (no abastecido) o Cancelado o Suspendido, no se pueden modificar las cantidades producidas ni iniciar la produccion
-		ProductionPlanStateType productionPlanStateTypeAbastecido = productionPlanStateTypeRepository.findFirstByName("Abastecido");
-		ProductionPlanStateType productionPlanStateTypeEnEjecucion = productionPlanStateTypeRepository.findFirstByName("En Ejecucion");
-		// se puede seguir modificando en finalizado ya que quizas se quiere volver atras a estado en ejecucion a causa de algun error
-		ProductionPlanStateType productionPlanStateTypeFinalizada = productionPlanStateTypeRepository.findFirstByName("Finalizado");
-		boolean estaAbastecido = productionPlanStateTypeAbastecido.equals(productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId()));
-		boolean estaEnEjecucion = productionPlanStateTypeEnEjecucion.equals(productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId()));
-		boolean estaFinalizado = productionPlanStateTypeFinalizada.equals(productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId()));
-		if(estaAbastecido) {
-			return true;
-		}
-		if(estaEnEjecucion) {
-			return true;
-		}
-		if(estaFinalizado) {
-			return true;
-		}
-		return false;
 	}
 }

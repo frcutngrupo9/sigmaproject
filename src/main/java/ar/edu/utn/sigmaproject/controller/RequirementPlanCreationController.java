@@ -146,25 +146,29 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 				}
 			}
 		}
-		
+
+		ProductionPlanStateType stateTypeAbastecido = productionPlanStateTypeRepository.findFirstByName("Abastecido");
+		ProductionPlanStateType stateTypeRegistrado = productionPlanStateTypeRepository.findFirstByName("Registrado");
+		ProductionPlanStateType currentStateType =productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId());
+		ProductionPlanState productionPlanState = null;
 		if(isCompleted) {
-			ProductionPlanStateType productionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Abastecido");
-			ProductionPlanState productionPlanState = new ProductionPlanState(productionPlanStateType, new Date());
+			// solo se actualiza el estado a abastecido si el estado anterior era Registrado
+			if(currentStateType.equals(stateTypeRegistrado)) {
+				productionPlanState = new ProductionPlanState(stateTypeAbastecido, new Date());
+			}
+		} else {// si dejo de estar abastecido
+			// solo se actualiza el estado a Registrado si el estado anterior era abastecido
+			if(currentStateType.equals(stateTypeAbastecido)) {
+				productionPlanState = new ProductionPlanState(stateTypeRegistrado, new Date());
+			}
+		}
+		if(productionPlanState != null) {
 			productionPlanState = productionPlanStateRepository.save(productionPlanState);
 			currentProductionPlan.setState(productionPlanState);
 			currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
-			refreshView();
-		} else {
-			ProductionPlanStateType productionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Registrado");
-			if(!productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId()).equals(productionPlanStateType)) {
-				// si dejo de estar abastecido
-				ProductionPlanState productionPlanState = new ProductionPlanState(productionPlanStateType, new Date());
-				productionPlanState = productionPlanStateRepository.save(productionPlanState);
-				currentProductionPlan.setState(productionPlanState);
-				currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
-				refreshView();
-			}
+			productionPlanStateTextbox.setText(currentProductionPlan.getCurrentStateType().getName());
 		}
+
 	}
 
 	private void refreshView() {
@@ -213,14 +217,14 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 		}
 		return stock;
 	}
-	
+
 	public BigDecimal getRawMaterialTypeStockAvailable(RawMaterialType rawMaterialType) {
 		// devuelve la resta entre el stock total y el total reservado
 		BigDecimal stockTotal = getRawMaterialTypeStock(rawMaterialType);
 		BigDecimal stockReservedTotal = getRawMaterialTypeStockReserved(rawMaterialType);
 		return stockTotal.subtract(stockReservedTotal);
 	}
-	
+
 	public BigDecimal getRawMaterialTypeStockReserved(RawMaterialType rawMaterialType) {
 		// busca la cantidad de reserva total de la materia prima, sin importar el tipo de madera
 		List<Wood> woodList = woodRepository.findByRawMaterialType(rawMaterialType);
@@ -234,7 +238,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 		}
 		return stockReserved;
 	}
-	
+
 	public BigDecimal getRawMaterialTypeStockMissing(RawMaterialType rawMaterialType) {
 		return getRawMaterialTypeStock(rawMaterialType).subtract(getRawMaterialTypeStockReserved(rawMaterialType));
 	}
@@ -256,7 +260,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	public BigDecimal getRawMaterialRequirementStockMissing(RawMaterialRequirement rawMaterialRequirement) {
 		return rawMaterialRequirement.getQuantity().subtract(getRawMaterialRequirementStockReserved(rawMaterialRequirement));
 	}
-	
+
 	@Listen("onClickReservation = #rawMaterialRequirementListbox")
 	public void doRawMaterialRequirementReservation(ForwardEvent evt) {
 		RawMaterialRequirement data = (RawMaterialRequirement) evt.getData();// obtenemos el objeto pasado por parametro
@@ -289,7 +293,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 		}
 		return value;
 	}
-	
+
 	public boolean isSupplyRequirementFulfilled(SupplyRequirement supplyRequirement) {
 		// si ya se ha reservado la cantidad necesaria
 		boolean value = false;

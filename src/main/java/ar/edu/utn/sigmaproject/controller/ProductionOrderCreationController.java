@@ -33,9 +33,6 @@ import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
-import ar.edu.utn.sigmaproject.domain.Order;
-import ar.edu.utn.sigmaproject.domain.OrderState;
-import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
@@ -46,8 +43,6 @@ import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderStateType;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderSupply;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
-import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
-import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
@@ -307,28 +302,44 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		}
 		return productionOrderDetailList;
 	}
+	
+	private boolean isEditionAllowed() {
+		// no se puede modificar si el plan esta Cancelado, Lanzado, En Ejecucion o Finalizado. Si esta Suspendido se puede modificar para solucionar problemas de maquinas en reparacion o empreados ausentes.
+		ProductionPlanStateType stateLanzado = productionPlanStateTypeRepository.findFirstByName("Lanzado");
+		ProductionPlanStateType stateEnEjecucion = productionPlanStateTypeRepository.findFirstByName("En Ejecucion");
+		ProductionPlanStateType stateFinalizado = productionPlanStateTypeRepository.findFirstByName("Finalizado");
+		ProductionPlanStateType stateCancelado = productionPlanStateTypeRepository.findFirstByName("Cancelado");
+		ProductionPlanStateType currentStateType = currentProductionPlan.getCurrentStateType();
+		currentStateType = productionPlanStateTypeRepository.findOne(currentStateType.getId());
+		if(currentStateType.equals(stateLanzado) || currentStateType.equals(stateEnEjecucion) || currentStateType.equals(stateFinalizado) || currentStateType.equals(stateCancelado)) {
+			return false;
+		}
+		return true;
+	}
 
 	@Transactional
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
 		ProductionOrderStateType lastStateType = productionOrderStateTypeRepository.findOne(currentProductionOrder.getCurrentStateType().getId());
-
+		if(!isEditionAllowed()) {
+			alert("No se puede modificar porque el Plan de Produccion esta Cancelado, Lanzado, En Ejecucion o Finalizado.");
+			return;
+		}
 		if(lastStateType.equals(productionOrderStateTypeRepository.findFirstByName("Cancelada"))) {
 			alert("No se puede modificar una Orden de Produccion Cancelada.");
 			return;
 		}
-
-		ProductionOrderStateType newStateType = getProductionOrderStateType();
-
 		//		int selectedIndexWorker = workerCombobox.getSelectedIndex();
 		//		if (selectedIndexWorker == -1) {// no hay un empleado seleccionado
 		//			Clients.showNotification("Debe seleccionar un Empleado");
 		//			return;
 		//		}
 		for (ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
-			Process process = productionOrderDetail.getProcess();
-			ProcessType processType = process.getType();
-			MachineType machineType = processType.getMachineType();
+			if (productionOrderDetail.getWorker() == null) {
+				Clients.showNotification("Existen Procesos sin Trabajador Asignado", productionOrderDetailGrid);
+				return;
+			}
+			MachineType machineType = productionOrderDetail.getProcess().getType().getMachineType();
 			if (machineType != null) {
 				if (productionOrderDetail.getMachine() == null) {
 					Clients.showNotification("Existen Procesos sin Maquina Asignada", productionOrderDetailGrid);
@@ -340,10 +351,14 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		//		Worker productionOrderWorker = workerCombobox.getSelectedItem().getValue();
 		Date productionOrderDateStart = productionOrderStartDatebox.getValue();
 		Date productionOrderDateFinish = productionOrderFinishDatebox.getValue();
+		if (productionOrderDateStart == null) {
+			Clients.showNotification("Debe Seleccionar Fecha de Inicio", productionOrderStartDatebox);
+			return;
+		}
 		//Date productionOrderRealDateStart = productionOrderRealStartDatebox.getValue();
 		//Date productionOrderRealDateFinish = productionOrderRealFinishDatebox.getValue();
 		//		currentProductionOrder.setNumber(productionOrderNumber);
-		if(currentProductionOrder.getNumber() == null) {
+		if(currentProductionOrder.getNumber() == 0) {
 			currentProductionOrder.setNumber(getNewProductionOrderNumber());
 		}
 		//		currentProductionOrder.setWorker(productionOrderWorker);
@@ -359,24 +374,9 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		currentProductionOrder.setProductionOrderSupplies(productionOrderSupplyList);
 		currentProductionOrder.setProductionOrderRawMaterials(productionOrderRawMaterialList);
 
-		// el estado de la orden debe cambiar automaticamente en base a las modificaciones que se le hagan y no se deberia poder cambiar manualmente excepto en el caso de la cancelacion
-		ProductionOrderStateType productionOrderStateType = null;
-		if(!lastStateType.equals(newStateType)) {// si el estado anterior es distindo del nuevo
-			if(newStateType.equals(productionOrderStateTypeRepository.findFirstByName("Registrada"))) {// si el nuevo estado es no iniciado
-				currentProductionOrder.setDateStartReal(null);
-				currentProductionOrder.setDateFinishReal(null);
-			} else if(newStateType.equals(productionOrderStateTypeRepository.findFirstByName("Iniciada"))) {
-				currentProductionOrder.setDateStartReal(new Date());
-				currentProductionOrder.setDateFinishReal(null);
-			} else if(newStateType.equals(productionOrderStateTypeRepository.findFirstByName("Finalizada"))) {
-				currentProductionOrder.setDateFinishReal(new Date());
-				if(currentProductionOrder.getDateStartReal() == null) {
-					currentProductionOrder.setDateStartReal(new Date());
-				}
-			}
-			productionOrderStateType = newStateType;
-		}
-		if(productionOrderStateType != null) {
+		// el estado de la orden debe cambiar automaticamente 
+		ProductionOrderStateType productionOrderStateType = productionOrderStateTypeRepository.findFirstByName("Preparada");
+		if(!productionOrderStateType.equals(lastStateType)) { // no se graba si es el mismo estado
 			ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateType, new Date());
 			productionOrderState = productionOrderStateRepository.save(productionOrderState);
 			currentProductionOrder.setState(productionOrderState);
@@ -384,13 +384,14 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 		currentProductionOrder = productionOrderRepository.save(currentProductionOrder);
 
-		updateProductionPlanState();
+//		updateProductionPlanState();
 
 		alert("Orden de Produccion Guardada.");
 		//cancelButtonClick();
 		refreshView();
 	}
-
+	
+	/*
 	private void updateProductionPlanState() {
 		// recorre todas las ordenes del plan y comprueba
 		// si no inicio ninguna, se guarda el estado en base a sus requerimientos
@@ -444,37 +445,9 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			}
 		}
 
-	}
+	}*/
 
 	//"Registrado""Abastecido""Lanzado""En Ejecucion""Finalizado""Cancelado""Suspendido"
-
-	private ProductionOrderStateType getProductionOrderStateType() {
-		// devuelve el estado actual de la orden de produccion
-		// "No iniciada" si no inicio, "Iniciada" o "Finalizada" si finalizaron todos los detalles
-		// "Registrada" si no inicio y tampoco se le asignaron todas las maquinas, empleados y fechas
-		ProductionOrderStateType productionOrderStateType = null;
-		boolean finished = true;// si se finalizo todos los procesos
-		boolean notStarted = true;// no inicio ningun proceso
-		for (ProductionOrderDetail each : productionOrderDetailList) {
-			if(each.isFinished()==true || each.getQuantityFinished().compareTo(BigDecimal.ZERO)!=0) {
-				// si inicio o finalizo algun proceso
-				notStarted = false;
-			}
-			if(each.isFinished()!=true) {
-				// si no finalizo algun proceso
-				finished = false;
-			}
-		}
-
-		if(finished) {
-			productionOrderStateType = productionOrderStateTypeRepository.findFirstByName("Finalizada");
-		} else if(notStarted) {
-			productionOrderStateType = productionOrderStateTypeRepository.findFirstByName("Registrada");
-		} else {// si no esta finalizado ni no iniciado, esta iniciado
-			productionOrderStateType = productionOrderStateTypeRepository.findFirstByName("Iniciada");
-		}
-		return productionOrderStateType;
-	}
 
 	@Listen("onClick = #cancelButton")
 	public void cancelButtonClick() {

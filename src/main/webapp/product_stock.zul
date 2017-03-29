@@ -117,6 +117,8 @@
 				        <separator/>
 			        </panelchildren>
 			    </panel>
+			    <separator/>
+			    <separator/>
 		    </vlayout>
         </panelchildren>
     </panel>

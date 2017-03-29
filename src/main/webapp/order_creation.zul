@@ -93,7 +93,7 @@
                     <listhead>
                         <listheader label="Nombre Producto" align="center"/>
                         <listheader label="Unidades" align="center"/>
-                        <listheader label="Monto Unitario" align="center"/>
+                        <listheader label="Importe Unitario" align="center"/>
                         <listheader label="Subtotal" align="center"/>
                         <listheader label="Quitar" align="center"/>
                     </listhead>

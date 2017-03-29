@@ -48,7 +48,6 @@
 		                <column label="Unids" align="center"/>
         				<column label="Cod" align="center"/>
         				<column label="Estado Orden" align="center"/>
-		                <column label="Empleado Asignado" align="center"/>
 		                <column label="% Completo" align="center"/>
 		                <column label="Duracion Total" align="center"/>
 		                <column label="Duracion Unidad" align="center"/>
@@ -71,7 +70,6 @@
 		                	<label value="${each.units}"/>
 		                	<label value="${each.product.code}"/>
 		                    <label value="${each.getCurrentStateType().name}"/>
-		                    <label value="${win_production_order_list$composer.getWorkerName(each)}"/>
 		                    <label value="${win_production_order_list$composer.getPercentComplete(each)}"/>
 		                    <label value="${r:getFormattedTime(each.getDurationTotal())}"/>
 		                    <label value="${r:getFormattedTime(each.product.getDurationTotal())}"/>
@@ -80,7 +78,10 @@
 						</row>
 		            </template>
     			</grid>
-    			<hbox hflex="1" pack="left">
+    			<hbox hflex="1" pack="center">
+	    			<button id="productionPlanLaunchButton" label="Lanzar Plan"/>
+				</hbox>
+				<hbox hflex="1" pack="left">
 	    			<button id="saveButton" label="Guardar"/>
 	    			<button id="resetButton" label="Reset"/>
 	    			<button id="returnButton" label="Volver"/>

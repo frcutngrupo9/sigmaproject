@@ -1,3 +1,4 @@
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="win_order_list" title="Lista de Pedidos" closable="false" apply="ar.edu.utn.sigmaproject.controller.OrderListController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
@@ -9,30 +10,32 @@
 		    <separator/>
 		    <grid id="orderGrid" mold="paging" pageSize="7">
 		    	<auxhead>
-					<auxheader label="Pedidos" colspan="9"/>
+					<auxheader label="Pedidos" colspan="10"/>
 				</auxhead>
 		        <columns>
 		            <column label="Numero" align="center"/>
 		            <column label="Cliente" align="center"/>
 		            <column label="Fecha Creacion" align="center"/>
 		            <column label="Fecha Necesidad" align="center"/>
-		            <column label="Cantidad Productos" align="center"/>
+		            <column label="Cant. Productos" align="center"/>
 		            <column label="Estado" align="center"/>
-		            <column label="Monto Total" align="center"/>
+		            <column label="Importe Total" align="center"/>
 		            <column label="Editar" width="120px" align="center"/>
 		            <column label="Cancelar" width="120px" align="center"/>
+		            <column label="Entrega" align="center"/>
 		        </columns>
 		        <template name="model">
 		            <row>
 		                <label value="${each.number}"/>
 		                <label value="${each.getClient().getName()}"/>
-		                <label value="${each.date}"/>
+		                <label value="${r:getFormattedDate(each.date)}"/>
 		                <label value="${each.getFormattedNeedDate()}"/>
 		                <label value="${each.details.size()}"/>
 		                <label value="${each.getCurrentStateType().getName()}"/>
 		                <label value="${win_order_list$composer.totalPrice(each)} $"/>
 		                <button forward="onClick=orderGrid.onEditOrder(${each})"  image="/img/edit16x16.png"/>
 		                <button disabled="${win_order_list$composer.isStateCancel(each)}" forward="onClick=orderGrid.onCancelOrder(${each})"  image="/img/delete16x16.png"/>
+		                <button disabled="${win_order_list$composer.isStateNotFinished(each)}" label="Registrar" forward="onClick=orderGrid.onDeliverOrder(${each})"/>
 		            </row>
 		        </template>
 		    </grid>

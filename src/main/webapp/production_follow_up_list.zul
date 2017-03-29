@@ -3,7 +3,7 @@
     <panel title="Ordenes de Produccion" id="productionOrderCreationBlock" border="rounded">
         <panelchildren>
             <vlayout>
-    			<grid id="productionOrderGrid" sizedByContent="true" span="true">
+    			<grid id="productionOrderGrid" sizedByContent="true" span="true" emptyMessage="No existen Planes de Produccion en estado Lanzado.">
     				<auxhead>
 						<auxheader label="Listado Ordenes de Produccion de Planes Lanzados" colspan="10"/>
 					</auxhead>
@@ -22,7 +22,7 @@
 		            <template name="model">
 		                <row>
 		                	<button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})"  label="Abrir"/>
-			            	<label value=""/>
+			            	<label value="${each.productionPlan.name}"/>
 			            	<label value="${each.sequence}" width="60px"/>
 			            	<label value="${each.product.name}"/>
 			            	<label value="${each.units}"/>

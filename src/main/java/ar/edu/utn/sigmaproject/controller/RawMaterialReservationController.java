@@ -187,9 +187,9 @@ public class RawMaterialReservationController extends SelectorComposer<Component
 			currentWoodReserved.setStockReserved(stockReserved);
 			woodReservedRepository.save(currentWoodReserved);
 		}
-		alert("Reserva guardada.");
 		EventQueue<Event> eq = EventQueues.lookup("Requirement Reservation Queue", EventQueues.DESKTOP, true);
 		eq.publish(new Event("onRawMaterialReservation", null, null));
+		alert("Reserva guardada.");
 		rawMaterialReservationWindow.detach();
 	}
 

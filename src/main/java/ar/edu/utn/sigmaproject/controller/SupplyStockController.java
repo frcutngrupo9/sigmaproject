@@ -9,13 +9,9 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
-import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
-import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Grid;
-import org.zkoss.zul.Intbox;
-import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
@@ -24,7 +20,6 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
 import ar.edu.utn.sigmaproject.domain.SupplyReserved;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
-import ar.edu.utn.sigmaproject.domain.Worker;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
@@ -55,31 +50,11 @@ public class SupplyStockController extends SelectorComposer<Component> {
 	@Wire
 	Doublebox stockRepoDoublebox;
 	@Wire
-	Button stockIncreaseButton;
-	@Wire
-	Button stockDecreaseButton;
-	@Wire
 	Button saveButton;
 	@Wire
 	Button cancelButton;
 	@Wire
 	Button resetButton;
-	@Wire
-	Grid stockModificationGrid;
-	@Wire
-	Doublebox quantityDoublebox;
-	@Wire
-	Label stockModificationLabel;
-	@Wire
-	Intbox numberIntbox;
-	@Wire
-	Combobox workerCombobox;
-	@Wire
-	Button saveNewStockButton;
-	@Wire
-	Button cancelNewStockButton;
-	@Wire
-	Button resetNewStockButton;
 
 	// services
 	@WireVariable
@@ -97,12 +72,10 @@ public class SupplyStockController extends SelectorComposer<Component> {
 	// list
 	private List<SupplyType> supplyTypeList;
 	private List<SupplyReserved> supplyReservedList;
-	private List<Worker> workerList;
 
 	// list models
 	private ListModelList<SupplyType> supplyTypeListModel;
 	private ListModelList<SupplyReserved> supplyReservedListModel;
-	private ListModelList<Worker> workerListModel;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
@@ -114,9 +87,6 @@ public class SupplyStockController extends SelectorComposer<Component> {
 		supplyReservedListModel = new ListModelList<>(supplyReservedList);
 		supplyReservedListbox.setModel(supplyReservedListModel);
 		currentSupplyType = null;
-		workerList = workerRepository.findAll();
-		workerListModel = new ListModelList<Worker>(workerList);
-		workerCombobox.setModel(workerListModel);
 		refreshView();
 	}
 
@@ -192,68 +162,6 @@ public class SupplyStockController extends SelectorComposer<Component> {
 		supplyTypeListModel = new ListModelList<SupplyType>(supplyTypeList);
 		currentSupplyType = null;
 		refreshView();
-	}
-
-	@Listen("onClick = #stockIncreaseButton")
-	public void stockIncreaseButtonClick() {
-		stockModificationGrid.setVisible(true);
-		stockModificationLabel.setValue("Ingreso Stock");
-		workerCombobox.setSelectedIndex(-1);
-		numberIntbox.setValue(null);
-		quantityDoublebox.setValue(null);
-	}
-
-	@Listen("onClick = #stockDecreaseButton")
-	public void stockDecreaseButtonClick() {
-		stockModificationGrid.setVisible(true);
-		stockModificationLabel.setValue("Egreso Stock");
-		workerCombobox.setSelectedIndex(-1);
-		numberIntbox.setValue(null);
-		quantityDoublebox.setValue(null);
-	}
-
-	@Listen("onClick = #saveNewStockButton")
-	public void saveNewStockButton() {
-		if(numberIntbox.getValue() <= 0) {
-			Clients.showNotification("Debe ingresar un numero", numberIntbox);
-			return;
-		}
-		if(quantityDoublebox.getValue() <= 0) {
-			Clients.showNotification("Debe ingresar una cantidad", quantityDoublebox);
-			return;
-		}
-		if(workerCombobox.getSelectedIndex() == -1) {
-			Clients.showNotification("Debe seleccionar un empleado", workerCombobox);
-			return;
-		}
-		if(currentSupplyType != null) {
-			BigDecimal newStock;
-			BigDecimal quantity = BigDecimal.valueOf(quantityDoublebox.getValue());
-			if(stockModificationLabel.getValue().equals("Ingreso Stock")) {
-				newStock = currentSupplyType.getStock().add(quantity);
-			} else {
-				if(currentSupplyType.getStock().compareTo(quantity) > 0) {// hay suficiente stock
-					newStock = currentSupplyType.getStock().subtract(quantity);
-				} else {
-					Clients.showNotification("No hay stock suficiente", quantityDoublebox);
-					return;
-				}
-			}
-			stockDoublebox.setValue(newStock.doubleValue());
-		}
-		stockModificationGrid.setVisible(false);
-	}
-
-	@Listen("onClick = #cancelNewStockButton")
-	public void cancelNewStockButtonClick() {
-		stockModificationGrid.setVisible(false);
-	}
-
-	@Listen("onClick = #resetNewStockButton")
-	public void resetNewStockButtonClick() {
-		workerCombobox.setSelectedIndex(-1);
-		numberIntbox.setValue(null);
-		quantityDoublebox.setValue(null);
 	}
 	
 	public String getProductionPlanName(SupplyReserved supplyReserved) {
