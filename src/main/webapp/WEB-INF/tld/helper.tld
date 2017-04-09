@@ -41,4 +41,11 @@
             java.lang.String getFormattedDateTime(java.util.Date date)
         </function-signature>
     </function>
+    <function>
+        <name>getProductImage</name>
+        <function-class>ar.edu.utn.sigmaproject.util.RenderElHelper</function-class>
+        <function-signature>
+            org.zkoss.image.Image getProductImage(ar.edu.utn.sigmaproject.domain.Product product)
+        </function-signature>
+    </function>
 </taglib>

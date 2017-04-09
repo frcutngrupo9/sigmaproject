@@ -106,7 +106,13 @@ public class ProductDeliveryController extends SelectorComposer<Component> {
 		clientNameTextbox.setDisabled(true);
 		clientNameTextbox.setText(currentOrder.getClient().getName());
 		needDateTextbox.setDisabled(true);
-		needDateTextbox.setText(currentOrder.getFormattedNeedDate());
+		Date needDate = currentOrder.getNeedDate();
+		String needDateString = "";
+		if(needDate != null) {
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			needDateString = dateFormat.format(needDate);
+		}
+		needDateTextbox.setText(needDateString);
 		deliveryDatebox.setValue(null);
 	}
 

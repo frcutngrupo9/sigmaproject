@@ -23,6 +23,7 @@ import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
@@ -36,6 +37,7 @@ import ar.edu.utn.sigmaproject.domain.SupplyReserved;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.domain.Wood;
 import ar.edu.utn.sigmaproject.domain.WoodReserved;
+import ar.edu.utn.sigmaproject.domain.WoodType;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateRepository;
@@ -46,6 +48,7 @@ import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
 import ar.edu.utn.sigmaproject.service.WoodReservedRepository;
+import ar.edu.utn.sigmaproject.service.WoodTypeRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class RequirementPlanCreationController extends SelectorComposer<Component> {
@@ -63,6 +66,10 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	Listbox supplyRequirementListbox;
 	@Wire
 	Button returnButton;
+	@Wire
+	Button returnToProductionButton;
+	@Wire
+	Button allRequirementReservationButton;
 
 	// services
 	@WireVariable
@@ -75,6 +82,8 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
 	@WireVariable
 	private WoodRepository woodRepository;
+	@WireVariable
+	private WoodTypeRepository woodTypeRepository;
 	@WireVariable
 	private RawMaterialRequirementRepository rawMaterialRequirementRepository;
 	@WireVariable
@@ -283,6 +292,97 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	public void returnButtonClick() {
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/production_plan_list.zul");
+	}
+
+	@Listen("onClick = #returnToProductionButton")
+	public void returnToProductionButtonClick() {
+		Executions.getCurrent().setAttribute("selected_production_plan", currentProductionPlan);
+		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/production_order_list.zul");
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Listen("onClick = #allRequirementReservationButton")
+	public void allRequirementReservationButtonClick() {
+		// se registra una reserva por cada uno de los insumos y materias primas por la cantidad necesaria
+		// TODO: en caso de que no existan suficientes materiales en stock para hacer una reserva se crea el pedido de materiales
+		Messagebox.show("Se realizara la reserva de todos los materiales necesarios.", "Confirmar", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+			public void onEvent(Event evt) throws InterruptedException {
+				if (evt.getName().equals("onOK")) {
+					for(SupplyRequirement each : supplyRequirementList) {
+						SupplyReserved currentSupplyReserved = supplyReservedRepository.findBySupplyRequirement(each);
+						// si existe ya una reserva se la completa si esta incompleta
+						BigDecimal quantityNecessary = each.getQuantity();
+						BigDecimal stockAvailable = each.getSupplyType().getStockAvailable();
+						BigDecimal quantityReservation = null;// si no hay stock suficiente se reserva lo posible
+						if(currentSupplyReserved == null) {
+							if(stockAvailable.compareTo(quantityNecessary) == 1) { // si el disponible es mayor
+								quantityReservation = quantityNecessary;
+							} else {
+								quantityReservation = stockAvailable;
+							}
+							currentSupplyReserved = new SupplyReserved(each, quantityReservation);
+							currentSupplyReserved = supplyReservedRepository.save(currentSupplyReserved);
+							SupplyType supplyType = each.getSupplyType();
+							supplyType.getSuppliesReserved().add(currentSupplyReserved);
+							supplyTypeRepository.save(supplyType);
+						} else {
+							// como ya hay una reserva, esa cantidad se sustrae de la cantidad necesaria
+							if(stockAvailable.compareTo(quantityNecessary.subtract(currentSupplyReserved.getStockReserved())) == 1) { // si el disponible es mayor
+								quantityReservation = quantityNecessary;
+							} else {
+								quantityReservation = stockAvailable;
+							}
+							currentSupplyReserved.setStockReserved(quantityReservation);
+							supplyReservedRepository.save(currentSupplyReserved);
+						}
+					}
+					for(RawMaterialRequirement each : rawMaterialRequirementList) {
+						WoodReserved currentWoodReserved = null;
+						BigDecimal quantityNecessary = each.getQuantity();
+						WoodType woodTypePino = woodTypeRepository.findFirstByName("Pino");// busca seleccionar el wood que sea pino
+						Wood currentWood = woodRepository.findByRawMaterialTypeAndWoodType(each.getRawMaterialType(), woodTypePino);
+						for(WoodReserved eachWoodReserved : currentWood.getWoodsReserved()) {
+							if(rawMaterialRequirementRepository.findOne(eachWoodReserved.getRawMaterialRequirement().getId()).equals(rawMaterialRequirementRepository.findOne(each.getId()))) {
+								currentWoodReserved = eachWoodReserved;
+								break;
+							}
+						}
+						BigDecimal stockAvailable = currentWood.getStockAvailable();
+						BigDecimal quantityReservation = null;// si no hay stock suficiente se reserva lo posible
+						if(currentWoodReserved == null) {
+							if(stockAvailable.compareTo(quantityNecessary) == 1) { // si el disponible es mayor
+								quantityReservation = quantityNecessary;
+							} else {
+								quantityReservation = stockAvailable;
+							}
+							currentWoodReserved = new WoodReserved(each, quantityReservation);
+							currentWoodReserved = woodReservedRepository.save(currentWoodReserved);
+							if(currentWood != null) {
+								currentWood.getWoodsReserved().add(currentWoodReserved);
+								woodRepository.save(currentWood);
+							} else {
+								throw new RuntimeException("currentWood null");
+							}
+						} else {
+							// como ya hay una reserva, esa cantidad se sustrae de la cantidad necesaria
+							if(stockAvailable.compareTo(quantityNecessary.subtract(currentWoodReserved.getStockReserved())) == 1) { // si el disponible es mayor
+								quantityReservation = quantityNecessary;
+							} else {
+								quantityReservation = stockAvailable;
+							}
+							currentWoodReserved.setStockReserved(quantityReservation);
+							woodReservedRepository.save(currentWoodReserved);
+						}
+					}
+					supplyRequirementListbox.setModel(supplyRequirementListModel);
+					rawMaterialRequirementListbox.setModel(rawMaterialRequirementListModel);
+					updateProductionPlanState();// actualiza el estado del plan si es que esta abastecido
+					alert("Se Realizaron las Reservas.");
+				}
+			}
+		});
+
 	}
 
 	public boolean isRawMaterialRequirementFulfilled(RawMaterialRequirement supplyRequirement) {

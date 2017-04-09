@@ -232,7 +232,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 			List<Process> auxProcessList = piece.getProcesses();
 			for(Process process : auxProcessList) {
 				// por cada proceso hay que crear un detalle
-				//TODO verificar si el tiempo de proceso es por todas las piezas iguales de un producto o individual
 				Integer quantityPiece = productionOrder.getUnits() * piece.getUnits();// cantidad total de la pieza
 				Duration timeTotal = process.getTime().multiply(productionOrder.getUnits());// cantidad total de tiempo del proceso
 				productionOrderDetailList.add(new ProductionOrderDetail(process, null, timeTotal, quantityPiece));
@@ -343,6 +342,8 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 					orderRepository.save(order);
 				}
 			}
+			
+			//TODO: si el estado es En Ejecucion se restan los materiales de stock
 
 			// se modifica la cantidad en stock si el estado es Finalizado
 			if(productionPlanStateTypeRepository.findFirstByName("Finalizado").equals(newProductionPlanStateType)) {
@@ -487,7 +488,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		BigDecimal quantityPiece = new BigDecimal(data.getQuantityPiece());
 		Doublebox element = (Doublebox) evt.getOrigin().getTarget();
 		Row fila = (Row)element.getParent();
-		Checkbox chkbox = (Checkbox)fila.getChildren().get(fila.getChildren().size()-1);
+		Checkbox chkbox = (Checkbox)fila.getChildren().get(0);
 		if(value.compareTo(quantityPiece) > 0) {
 			// si el valor ingresado supera la cantidad, se lo modifica y se agrega la cantidad
 			element.setValue(quantityPiece.doubleValue());
@@ -524,13 +525,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		} else {
 			value = new BigDecimal(inputValue);
 		}
-		if(value.compareTo(data.getQuantity()) > 0) {
-			Doublebox element = (Doublebox) evt.getOrigin().getTarget();
-			element.setValue(data.getQuantity().doubleValue());
-			data.setQuantityUsed(data.getQuantity());
-		} else {
-			data.setQuantityUsed(value);
-		}
+		data.setQuantityUsed(value);
 	}
 
 	@Listen("onEditUsedSupplyObservation = #productionOrderSupplyListbox")
@@ -553,13 +548,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		} else {
 			value = new BigDecimal(inputValue);
 		}
-		if(value.compareTo(data.getQuantity()) > 0) {
-			Doublebox element = (Doublebox) evt.getOrigin().getTarget();
-			element.setValue(data.getQuantity().doubleValue());
-			data.setQuantityUsed(data.getQuantity());
-		} else {
-			data.setQuantityUsed(value);
-		}
+		data.setQuantityUsed(value);
 	}
 
 	@Listen("onEditUsedRawMaterialObservation = #productionOrderRawMaterialListbox")

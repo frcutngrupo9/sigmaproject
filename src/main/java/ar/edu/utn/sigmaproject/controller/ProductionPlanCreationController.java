@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.xml.datatype.Duration;
 
 import org.springframework.transaction.annotation.Transactional;
+import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
@@ -215,6 +216,10 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	@Transactional
 	@Listen("onClick = #saveProductionPlanButton")
 	public void saveProductionPlan() {
+		if(Strings.isBlank(productionPlanNameTextbox.getValue())) {
+			Clients.showNotification("Ingresar Nombre Plan de Produccion", productionPlanNameTextbox);
+			return;
+		}
 		if(productionPlanDetailList.size() == 0) {
 			Clients.showNotification("Ingresar al menos 1 pedido", addOrderButton);
 			return;

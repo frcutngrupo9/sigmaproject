@@ -1,15 +1,16 @@
 package ar.edu.utn.sigmaproject.domain;
 
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.IndexedEmbedded;
-
-import javax.persistence.*;
-
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 
 @Indexed
 @Analyzer(definition = "edge_ngram")
@@ -105,5 +106,12 @@ public class Wood extends Item implements Cloneable {
 			}
 		}
 		return aux;
+	}
+	
+	public BigDecimal getStockAvailable() {
+		// devuelve la diferencia entre el stock total y el total reservado
+		BigDecimal stockTotal = getStock();
+		BigDecimal stockReservedTotal = getStockReserved();
+		return stockTotal.subtract(stockReservedTotal);
 	}
 }

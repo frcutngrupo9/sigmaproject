@@ -1,6 +1,6 @@
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
-<window id="win_production_order_creation" apply="ar.edu.utn.sigmaproject.controller.ProductionOrderCreationController" width="95%" style="background:white">
-    <panel title="Orden de Produccion" id="productionOrderCreationBlock" border="rounded">
+<window id="win_production_order_creation" title="Orden de Produccion" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductionOrderCreationController" sclass="sigma-content">
+    <panel id="productionOrderCreationBlock" border="none">
         <panelchildren>
         	<vlayout>
         		<grid hflex="1" sclass="sigma-form">
@@ -58,19 +58,11 @@
 				    </listbox>
 			    </hbox>
 				<hbox hflex="1" pack="center" if="false">
-					<label value="Empleado Asignado: " if="false"/>
-					<combobox id="workerCombobox" readonly="true" if="false">
-			        	<template name="model">
-			        		<comboitem label="${each.name}" value="${each}"/>
-			        	</template>
-			        </combobox>
-				</hbox>
-				<hbox hflex="1" pack="center" if="false">
 					<button id="generateDetailsButton" label="Actualizar Detalles"/>
 				</hbox>
         		<grid id="processTypeGrid" sizedByContent="true" span="true">
         			<columns>
-			            <column label="Proceso" align="left" sort="auto(process.type.name)"/>
+			            <column label="Proceso" align="left"/>
 			            <column label="Tipo de Maquina" align="center"/>
 			            <column label="Asignar Empleado" align="center"/>
 			            <column label="Asignar Maquina" align="center"/>
@@ -180,6 +172,8 @@
 				    <button id="resetButton" label="Reset"/>
 				    <button id="cancelButton" label="Volver"/>
 			    </hbox>
+			    <separator/>
+			    <separator/>
 			</vlayout>
         </panelchildren>
     </panel>

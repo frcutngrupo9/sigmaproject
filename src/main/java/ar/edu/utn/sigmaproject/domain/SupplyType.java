@@ -6,18 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import org.apache.lucene.analysis.core.KeywordTokenizerFactory;
-import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
-import org.apache.lucene.analysis.ngram.EdgeNGramFilterFactory;
-import org.apache.lucene.analysis.ngram.EdgeNGramTokenizerFactory;
-import org.apache.lucene.analysis.standard.StandardFilterFactory;
-import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
-import org.hibernate.search.annotations.*;
+import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 
 @Indexed
 @Analyzer(definition = "edge_ngram")
@@ -157,5 +150,12 @@ public class SupplyType extends Item implements Serializable, Cloneable {
 
 	public void setStockRepo(BigDecimal stockRepo) {
 		this.stockRepo = stockRepo;
+	}
+	
+	public BigDecimal getStockAvailable() {
+		// devuelve la diferencia entre el stock total y el total reservado
+		BigDecimal stockTotal = getStock();
+		BigDecimal stockReservedTotal = getStockReserved();
+		return stockTotal.subtract(stockReservedTotal);
 	}
 }

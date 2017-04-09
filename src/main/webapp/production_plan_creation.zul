@@ -1,6 +1,7 @@
-<window id="win_production_plan_creation" apply="ar.edu.utn.sigmaproject.controller.ProductionPlanCreationController" width="95%" style="background:white">
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
+<window id="win_production_plan_creation" apply="ar.edu.utn.sigmaproject.controller.ProductionPlanCreationController" closable="false" sclass="sigma-content">
     <caption id="productionPlanCaption" label="Creacion/Edicion de Plan"/>
-    <panel title="Plan de Produccion" id="productionPlanCreationBlock" border="rounded">
+    <panel id="productionPlanCreationBlock" border="none">
         <panelchildren>
             <vlayout>
             	<grid hflex="1" sclass="sigma-form">
@@ -66,14 +67,14 @@
             			<column label="Fecha Creacion" align="center"/>
             			<column label="Fecha Necesidad" align="center"/>
             			<column label="Cliente" align="center"/>
-           			 	<column label="Productos Distintos" align="center"/>
+           			 	<column label="Cantidad Productos Distintos" align="center"/>
            			 	<column label="Quitar" width="120px" align="center"/>
         			</columns>
         			<template name="model">
             			<row>
                 			<label value="${each.getOrder().getNumber()}"/>
-                			<label value="${each.getOrder().getDate()}"/>
-                			<label value="${each.getOrder().getFormattedNeedDate()}"/>
+                			<label value="${r:getFormattedDateTime(each.getOrder().getDate())}"/>
+                			<label value="${r:getFormattedDate(each.getOrder().getNeedDate())}"/>
                 			<label value="${each.getOrder().getClient().getName()}"/>
                 			<label value="${each.getOrder().getDetails().size()}"/>
                 			<button forward="onClick=productionPlanDetailGrid.onRemoveOrder(${each})" image="/img/delete16x16.png"/>
@@ -83,9 +84,10 @@
     			<separator/>
     			<listbox id="productTotalListbox" mold="paging" pageSize="7" visible="true" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Productos" colspan="4"/>
+						<auxheader label="Productos" colspan="5"/>
 					</auxhead>
         			<listhead>
+        				<listheader label="Foto" align="center"/>
         				<listheader label="Codigo" align="center"/>
             			<listheader label="Producto" align="center"/>
             			<listheader label="Detalles" align="center"/>
@@ -93,6 +95,11 @@
         			</listhead>
         			<template name="model">
             			<listitem>
+                			<custom-attributes product_image="${r:getProductImage(each.getProduct())}"/>
+                			<listcell>
+                            	<image if="${!empty product_image}" content="${product_image}" width="30px" height="30px"/>
+				                <image if="${empty product_image}" width="0px" height="0px"/>
+                            </listcell>
                 			<listcell label="${each.getProduct().getCode()}"/>
                 			<listcell label="${each.getProduct().getName()}"/>
                 			<listcell label="${each.getProduct().getDetails()}"/>
@@ -104,7 +111,9 @@
                     <button id="saveProductionPlanButton" label="Guardar Plan de Produccion"/>
                     <button id="resetProductionPlanButton" label="Reset Plan de Produccion"/>
                     <button id="deleteProductionPlanButton" label="Eliminar Plan de Produccion"/>
-                    <button id="returnButton" label="Volver a Listado"/>
+                    <hbox pack="center" align="center" hflex="1">
+			        	<button id="returnButton" label="Volver a Listado"/>
+			        </hbox>
                 </hlayout>
             </vlayout>
         </panelchildren>

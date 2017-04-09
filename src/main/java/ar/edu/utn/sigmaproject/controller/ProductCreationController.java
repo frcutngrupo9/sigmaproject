@@ -23,6 +23,7 @@ import org.zkoss.zk.ui.event.EventQueues;
 import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
+import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
@@ -35,6 +36,7 @@ import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Image;
+import org.zkoss.zul.Include;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
@@ -302,6 +304,8 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			productImage.setWidth("225px");
 			productImage.setStyle("margin: 8px");
 			productImage.setContent(img);
+			refreshViewPiece();// para que se pueda scrollear
+			productNameTextbox.setFocus(true);
 		} else {
 			Messagebox.show("No es una imagen: " + media, "Error", Messagebox.OK, Messagebox.ERROR);
 		}
@@ -317,6 +321,8 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			productImage.setWidth("0px");
 			productImage.setStyle("margin: 0px");
 			productGrid.setHflex("2");
+			refreshViewPiece();
+			productNameTextbox.setFocus(true);
 		}
 	}
 
@@ -326,6 +332,12 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		refreshViewPiece();
 		pieceCreationBlock.setVisible(true);
 		processCreationBlock.setVisible(true);
+		String a;
+		String b;
+		a = "hola";
+		b = a;
+		a = "que tal?";
+		System.out.println("- - - - - - b contiene:" + b +" - a contiene: " + a);
 	}
 
 	@Listen("onClick = #cancelPieceButton")
@@ -401,7 +413,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			deleteProductButton.setDisabled(true);
 			productNameTextbox.setText("");
 			productDetailsTextbox.setText("");
-			productCodeTextbox.setText("");
+			productCodeTextbox.setText(getNewProductCode());
 			productCategoryCombobox.setSelectedIndex(-1);
 			productPriceDoublebox.setText("");
 			org.zkoss.image.Image img = null;
@@ -450,6 +462,22 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			supplyList = new ArrayList<>(currentProduct.getSupplies());
 			rawMaterialList = new ArrayList<>(currentProduct.getRawMaterials());
 		}
+	}
+
+	private String getNewProductCode() {
+		Integer lastValue = 0;
+		List<Product> list = productRepository.findAll();
+		for(Product each : list) {
+			int code = 0;
+			if(!each.getCode().equals("")) {
+				code = Integer.parseInt(each.getCode());
+			}
+			if(code > lastValue) {
+				lastValue = code;
+			}
+		}
+		lastValue = lastValue + 1;
+		return lastValue + "";
 	}
 
 	private void refreshViewPiece() {
@@ -555,8 +583,9 @@ public class ProductCreationController extends SelectorComposer<Component> {
 
 	private Process getProcessFromListbox(ProcessType processType) {
 		if(listboxProcessList != null) {
+			ProcessType processTypeAux = processTypeRepository.findOne(processType.getId());
 			for(Process process : listboxProcessList) {
-				if(process.getType().equals(processType)) {
+				if(processTypeRepository.findOne(process.getType().getId()).equals(processTypeAux)) {
 					return process;
 				}
 			}
@@ -771,8 +800,9 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	private void fillProcessCopy(Piece pieceCopy) {
 		processCreationBlock.setVisible(true);
 		List<Process> processListCopy = pieceCopy.getProcesses();
+		listboxProcessList = new ArrayList<Process>();
 		for(Process processCopy : processListCopy) {
-			listboxProcessList.add(new Process(processCopy.getType(), processCopy.getDetails(), processCopy.getTime()));
+			listboxProcessList.add(new Process(processTypeRepository.findOne(processCopy.getType().getId()), processCopy.getDetails(), processCopy.getTime()));
 		}
 		refreshViewProcess();
 	}
@@ -789,5 +819,11 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		Executions.getCurrent().setAttribute("supplyList", supplyList);
 		Window window = (Window)Executions.createComponents("/product_supply.zul", null, null);
 		window.doModal();
+	}
+
+	@Listen("onClick = #returnButton")
+	public void returnButtonClick() {
+		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/product_list.zul");
 	}
 }

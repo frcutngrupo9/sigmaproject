@@ -1,8 +1,6 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -129,13 +127,5 @@ public class Order implements Serializable, Cloneable {
 
 	public void setNeedDate(Date needDate) {
 		this.needDate = needDate;
-	}
-	
-	public String getFormattedNeedDate() {
-		if(needDate != null) {
-			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-			return dateFormat.format(needDate);
-		}
-		return "";
 	}
 }

@@ -6,6 +6,9 @@
 		        <label>Buscar:</label>
 		        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
 		        <button id="searchButton" label="Buscar"/>
+		        <hbox pack="center" align="center" hflex="1">
+		        	<button id="newOrderButton" label="Nuevo Pedido"/>
+		        </hbox>
 		    </hlayout>
 		    <separator/>
 		    <grid id="orderGrid" mold="paging" pageSize="7">
@@ -22,25 +25,24 @@
 		            <column label="Importe Total" align="center"/>
 		            <column label="Editar" width="120px" align="center"/>
 		            <column label="Cancelar" width="120px" align="center"/>
-		            <column label="Entrega" align="center"/>
+		            <column label="Accion" align="center"/>
 		        </columns>
 		        <template name="model">
 		            <row>
-		                <label value="${each.number}"/>
+		                <label value="${each.getNumber()}"/>
 		                <label value="${each.getClient().getName()}"/>
-		                <label value="${r:getFormattedDate(each.date)}"/>
-		                <label value="${each.getFormattedNeedDate()}"/>
-		                <label value="${each.details.size()}"/>
+		                <label value="${r:getFormattedDate(each.getDate())}"/>
+		                <label value="${r:getFormattedDate(each.getNeedDate())}"/>
+		                <label value="${each.getDetails().size()}"/>
 		                <label value="${each.getCurrentStateType().getName()}"/>
 		                <label value="${win_order_list$composer.totalPrice(each)} $"/>
 		                <button forward="onClick=orderGrid.onEditOrder(${each})"  image="/img/edit16x16.png"/>
-		                <button disabled="${win_order_list$composer.isStateCancel(each)}" forward="onClick=orderGrid.onCancelOrder(${each})"  image="/img/delete16x16.png"/>
-		                <button disabled="${win_order_list$composer.isStateNotFinished(each)}" label="Registrar" forward="onClick=orderGrid.onDeliverOrder(${each})"/>
+		                <button disabled="${win_order_list$composer.isStateCancel(each) or win_order_list$composer.isStateDelivered(each)}" forward="onClick=orderGrid.onCancelOrder(${each})"  image="/img/delete16x16.png"/>
+		                <button disabled="${win_order_list$composer.isStateCancel(each) or win_order_list$composer.isStateNotFinished(each)}" label="Entregar" forward="onClick=orderGrid.onDeliverOrder(${each})"/>
 		            </row>
 		        </template>
 		    </grid>
 		    <separator/>
-		    <button id="newOrderButton" label="Nuevo Pedido"/>
         </panelchildren>
     </panel>
 </window>

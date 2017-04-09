@@ -1,16 +1,17 @@
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
-<window id="win_production_follow_up_list" apply="ar.edu.utn.sigmaproject.controller.ProductionFollowUpListController" width="100%" style="background:white">
-    <panel title="Ordenes de Produccion" id="productionOrderCreationBlock" border="rounded">
+<window title="Seguimiento de Produccion" id="win_production_follow_up_list" apply="ar.edu.utn.sigmaproject.controller.ProductionFollowUpListController" closable="false" sclass="sigma-content">
+    <panel id="productionOrderCreationBlock" border="none">
         <panelchildren>
             <vlayout>
     			<grid id="productionOrderGrid" sizedByContent="true" span="true" emptyMessage="No existen Planes de Produccion en estado Lanzado.">
     				<auxhead>
-						<auxheader label="Listado Ordenes de Produccion de Planes Lanzados" colspan="10"/>
+						<auxheader label="Listado Ordenes de Produccion de Planes Lanzados" colspan="11"/>
 					</auxhead>
         			<columns>
         				<column label="Accion" align="center"/>
         				<column label="Plan de Produccion" align="center"/>
         				<column label="Secuencia" align="center"/>
+        				<column label="Foto" align="center"/>
         				<column label="Producto" align="center"/>
         				<column label="Cantidad" align="center"/>
         				<column label="Fecha Inicio" align="center"/>
@@ -21,9 +22,14 @@
 		            </columns>
 		            <template name="model">
 		                <row>
+		                	<custom-attributes product_image="${r:getProductImage(each.product)}"/>
 		                	<button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})"  label="Abrir"/>
 			            	<label value="${each.productionPlan.name}"/>
 			            	<label value="${each.sequence}" width="60px"/>
+			            	<cell>
+				                <image if="${!empty product_image}" content="${product_image}" width="40px" height="40px"/>
+				                <image if="${empty product_image}" width="0px" height="0px"/>
+			                </cell>
 			            	<label value="${each.product.name}"/>
 			            	<label value="${each.units}"/>
 		                	<label value="${r:getFormattedDateTime(each.dateStart)}"/>

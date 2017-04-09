@@ -1,12 +1,16 @@
 package ar.edu.utn.sigmaproject.util;
 
+import org.zkoss.image.AImage;
+import org.zkoss.image.Image;
 import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
 
+import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.RawMaterialType;
 
 import javax.xml.datatype.Duration;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -67,6 +71,17 @@ public class RenderElHelper {
 			return dateFormat.format(date);
 		}
 		return "";
+	}
+	
+	public static Image getProductImage(Product product) {
+		Image img = null;
+		try {
+			img = new AImage("", product.getImageData());
+		} catch (IOException exception) {}
+		if(img != null) {
+			return img;
+		}
+		return img;
 	}
 
 }

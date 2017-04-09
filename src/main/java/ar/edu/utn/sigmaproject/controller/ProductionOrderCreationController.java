@@ -1,7 +1,8 @@
 package ar.edu.utn.sigmaproject.controller;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -44,10 +45,6 @@ import ar.edu.utn.sigmaproject.domain.ProductionOrderStateType;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderSupply;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
-import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
-import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
-import ar.edu.utn.sigmaproject.domain.SupplyReserved;
-import ar.edu.utn.sigmaproject.domain.WoodReserved;
 import ar.edu.utn.sigmaproject.domain.Worker;
 import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
@@ -108,14 +105,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	Listbox productionOrderSupplyListbox;
 	@Wire
 	Listbox productionOrderRawMaterialListbox;
-	//	@Wire
-	//	Listbox candidateWorkerListbox;
-	//	@Wire
-	//	Listbox chosenWorkerListbox;
-	//	@Wire
-	//	Button chooseWorkerButton;
-	//	@Wire
-	//	Button removeWorkerButton;
 	@Wire
 	Grid processTypeGrid;
 
@@ -172,11 +161,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	// list models
 	private ListModelList<ProductionOrderDetail> productionOrderDetailListModel;
 	private ListModelList<Worker> workerListModel;
-	//	private ListModelList<ProductionOrderStateType> productionOrderStateTypeListModel;
 	private ListModelList<ProductionOrderSupply> productionOrderSupplyListModel;
 	private ListModelList<ProductionOrderRawMaterial> productionOrderRawMaterialListModel;
-	//	private ListModelList<Worker> candidateWorkerListModel;
-	//	private ListModelList<Worker> chosenWorkerListModel;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
@@ -187,15 +173,13 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		if(currentProductionPlan == null) {throw new RuntimeException("ProductionPlan not found");}
 
 		productionOrderDetailList = currentProductionOrder.getDetails();
+		Collections.sort(productionOrderDetailList, new ProductionOrderDetailComparator());
 		//List<ProductionOrderDetail> details = getProductionOrderDetailList(currentProductionOrder);// genera los detalles para para ver si no se edito el producto y que posea una cantidad mas grande de procesos.
 		//if(details.size() != productionOrderDetailList.size()) {
 		//	productionOrderDetailList = details;
 		//}
 
 		machineList = machineRepository.findAll();
-
-		// la lista de procesos se crea en base a los tipos de procesos que incluye la orden
-		processTypeList = getProcessTypeTotalList();
 
 		refreshView();
 	}
@@ -227,32 +211,17 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		//		}
 		workerList = workerRepository.findAll();
 		workerListModel = new ListModelList<>(workerList);
-		if (currentProductionOrder.getWorker() != null) {
-			workerListModel.addToSelection(workerRepository.findOne(currentProductionOrder.getWorker().getId()));
-		}
-		//		fillCandidateWorkerListbox();
-		//		workerCombobox.setModel(workerListModel);
 		productionOrderStartDatebox.setValue(currentProductionOrder.getDateStart());
 		productionOrderFinishDatebox.setValue(currentProductionOrder.getDateFinish());
 		refreshProductionOrderDetailGridView();
 		refreshProductionOrderOrderSupplyAndRawMaterialListbox();
-		//		List<ProductionOrderStateType> productionOrderStateTypeList = productionOrderStateTypeRepository.findAll();
-		//		productionOrderStateTypeListModel = new ListModelList<ProductionOrderStateType>(productionOrderStateTypeList);
-		//		productionOrderStateTypeListModel.addToSelection(productionOrderStateTypeRepository.findOne(currentProductionOrder.getCurrentStateType().getId()));
-		//		productionOrderStateTypeCombobox.setModel(productionOrderStateTypeListModel);
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		resetButton.setDisabled(false);
+		// la lista de procesos se crea en base a los tipos de procesos que incluye la orden
+		processTypeList = getProcessTypeTotalList();
 		refreshProcessTypeGridView();
 	}
-
-	//	private void fillCandidateWorkerListbox() {
-	//		//TODO debe cargar solo los empleados que esten disponibles en las fechas indicadas por la orden de produccion
-	//		candidateWorkerListModel = new ListModelList<>(workerList);
-	//		candidateWorkerListbox.setModel(candidateWorkerListModel);
-	//		chosenWorkerListModel = new ListModelList<>(new ArrayList<Worker>());
-	//		chosenWorkerListbox.setModel(chosenWorkerListModel);
-	//	}
 
 	private void refreshProductionOrderDetailGridView() {
 		productionOrderDetailListModel = new ListModelList<ProductionOrderDetail>(productionOrderDetailList);
@@ -329,11 +298,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			alert("No se puede modificar una Orden de Produccion Cancelada.");
 			return;
 		}
-		//		int selectedIndexWorker = workerCombobox.getSelectedIndex();
-		//		if (selectedIndexWorker == -1) {// no hay un empleado seleccionado
-		//			Clients.showNotification("Debe seleccionar un Empleado");
-		//			return;
-		//		}
 		for (ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
 			if (productionOrderDetail.getWorker() == null) {
 				Clients.showNotification("Existen Procesos sin Trabajador Asignado", productionOrderDetailGrid);
@@ -347,25 +311,17 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 				}
 			}
 		}
-		//		Integer productionOrderNumber = productionOrderNumberSpinner.getValue();
-		//		Worker productionOrderWorker = workerCombobox.getSelectedItem().getValue();
 		Date productionOrderDateStart = productionOrderStartDatebox.getValue();
 		Date productionOrderDateFinish = productionOrderFinishDatebox.getValue();
 		if (productionOrderDateStart == null) {
 			Clients.showNotification("Debe Seleccionar Fecha de Inicio", productionOrderStartDatebox);
 			return;
 		}
-		//Date productionOrderRealDateStart = productionOrderRealStartDatebox.getValue();
-		//Date productionOrderRealDateFinish = productionOrderRealFinishDatebox.getValue();
-		//		currentProductionOrder.setNumber(productionOrderNumber);
 		if(currentProductionOrder.getNumber() == 0) {
 			currentProductionOrder.setNumber(getNewProductionOrderNumber());
 		}
-		//		currentProductionOrder.setWorker(productionOrderWorker);
 		currentProductionOrder.setDateStart(productionOrderDateStart);
 		currentProductionOrder.setDateFinish(productionOrderDateFinish);
-		//currentProductionOrder.setDateStartReal(productionOrderRealDateStart);
-		//currentProductionOrder.setDateFinishReal(productionOrderRealDateFinish);
 		productionOrderDetailList = productionOrderDetailRepository.save(productionOrderDetailList);
 		currentProductionOrder.setDetails(productionOrderDetailList);
 
@@ -390,62 +346,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		//cancelButtonClick();
 		refreshView();
 	}
-	
-	/*
-	private void updateProductionPlanState() {
-		// recorre todas las ordenes del plan y comprueba
-		// si no inicio ninguna, se guarda el estado en base a sus requerimientos
-		// si inicio 1 o mas pero no todas, se guarda estado "En Ejecucion" si no es ese el estado actual
-		// si finalizaron todas, se guarda estado "Finalizado" si no es ese el estado actual
-		ProductionPlanStateType currentProductionPlanStateType = currentProductionPlan.getCurrentStateType();
-		ProductionPlanStateType newProductionPlanStateType = null;
-		boolean allNotStarted = true;
-		boolean allFinish = true;
-		List<ProductionOrder> productionOrderList = productionOrderRepository.findByProductionPlan(currentProductionPlan);
-		for(ProductionOrder each : productionOrderList) {
-			if(!productionOrderStateTypeRepository.findOne(each.getCurrentStateType().getId()).equals(productionOrderStateTypeRepository.findFirstByName("Registrada"))) {
-				// si existe alguna con estado diferente de no iniciado
-				allNotStarted = false;
-			}
-			if(!productionOrderStateTypeRepository.findOne(each.getCurrentStateType().getId()).equals(productionOrderStateTypeRepository.findFirstByName("Finalizada"))) {
-				// si existe alguna con estado diferente de finalizado
-				allFinish = false;
-			}
-		}
-
-		OrderStateType orderStateType = null;
-		if(allFinish) {
-			newProductionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Finalizado");
-			orderStateType = orderStateTypeRepository.findFirstByName("Finalizado");
-		} else if(allNotStarted) {// ninguno iniciado, se busca el estado del plan en base a sus requerimientos
-			newProductionPlanStateType = getProductionPlanStateType();
-			orderStateType = orderStateTypeRepository.findFirstByName("Planificado");
-		} else {
-			newProductionPlanStateType = productionPlanStateTypeRepository.findFirstByName("En Ejecucion");
-			orderStateType = orderStateTypeRepository.findFirstByName("En Produccion");
-		}
-
-		//si el estado actual es igual al nuevo no se realiza el guardado
-		if(newProductionPlanStateType!=null && !productionPlanStateTypeRepository.findOne(currentProductionPlanStateType.getId()).equals(newProductionPlanStateType)) {
-			ProductionPlanState productionPlanState = new ProductionPlanState(newProductionPlanStateType, new Date());
-			productionPlanState = productionPlanStateRepository.save(productionPlanState);
-			currentProductionPlan.setState(productionPlanState);
-			currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
-
-			// se cambia el estado de todos los pedidos en base al estado del plan
-			if(orderStateType != null) {
-				List<ProductionPlanDetail> productionPlanDetailList = currentProductionPlan.getPlanDetails();
-				for(ProductionPlanDetail each : productionPlanDetailList) {
-					Order order = each.getOrder();
-					OrderState state = new OrderState(orderStateType, new Date());
-					state = orderStateRepository.save(state);
-					order.setState(state);
-					orderRepository.save(order);
-				}
-			}
-		}
-
-	}*/
 
 	//"Registrado""Abastecido""Lanzado""En Ejecucion""Finalizado""Cancelado""Suspendido"
 
@@ -586,105 +486,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		//Date finishDate = getFinishDate(productionOrderStartDatebox.getValue(), currentProductionOrder.getDurationTotal());
 		//productionOrderFinishDatebox.setValue(finishDate);
 	}
-
-	private ProductionPlanStateType getProductionPlanStateType() {
-		// recorre todos los requerimientos para ver si estan todos abastecidos
-		boolean isCompleted = true;
-		List<SupplyRequirement> supplyRequirementList = currentProductionPlan.getSupplyRequirements();
-		for(SupplyRequirement each : supplyRequirementList) {
-			if(!isSupplyRequirementFulfilled(each)) {
-				isCompleted = false;
-				break;
-			}
-		}
-		List<RawMaterialRequirement> rawMaterialRequirementList = currentProductionPlan.getRawMaterialRequirements();
-		if(isCompleted) {// si no cambio el valor a false en el anterior loop for
-			for(RawMaterialRequirement each : rawMaterialRequirementList) {
-				if(!isRawMaterialRequirementFulfilled(each)) {
-					isCompleted = false;
-					break;
-				}
-			}
-		}
-		ProductionPlanStateType productionPlanStateType = null;
-		if(isCompleted) {
-			productionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Abastecido");
-		} else {
-			productionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Registrado");
-		}
-		return productionPlanStateType;
-	}
-
-	private boolean isRawMaterialRequirementFulfilled(RawMaterialRequirement supplyRequirement) {
-		// si ya se ha reservado la cantidad necesaria
-		boolean value = false;
-		if(getRawMaterialRequirementStockMissing(supplyRequirement).doubleValue() == 0) {
-			value = true;
-		}
-		return value;
-	}
-
-	private BigDecimal getRawMaterialRequirementStockMissing(RawMaterialRequirement rawMaterialRequirement) {
-		return rawMaterialRequirement.getQuantity().subtract(getRawMaterialRequirementStockReserved(rawMaterialRequirement));
-	}
-
-	private BigDecimal getRawMaterialRequirementStockReserved(RawMaterialRequirement rawMaterialRequirement) {
-		// busca todos los woodReserved, ya que puede haber, para el mismo requirement, un wood reserved de cada tipo de madera
-		List<WoodReserved> woodReserved = woodReservedRepository.findByRawMaterialRequirement(rawMaterialRequirement);
-		if(woodReserved.isEmpty()) {
-			return BigDecimal.ZERO;
-		} else {
-			BigDecimal stockReserved = BigDecimal.ZERO;
-			for(WoodReserved each : woodReserved) {
-				stockReserved = stockReserved.add(each.getStockReserved());
-			}
-			return stockReserved;
-		}
-	}
-
-	private boolean isSupplyRequirementFulfilled(SupplyRequirement supplyRequirement) {
-		// si ya se ha reservado la cantidad necesaria
-		boolean value = false;
-		if(getSupplyStockMissing(supplyRequirement).doubleValue() == 0) {
-			value = true;
-		}
-		return value;
-	}
-
-	private BigDecimal getSupplyStockMissing(SupplyRequirement supplyRequirement) {
-		return supplyRequirement.getQuantity().subtract(getSupplyStockReserved(supplyRequirement));
-	}
-
-	private BigDecimal getSupplyStockReserved(SupplyRequirement supplyRequirement) {
-		SupplyReserved supplyReserved = supplyReservedRepository.findBySupplyRequirement(supplyRequirement);
-		if(supplyReserved == null) {
-			return BigDecimal.ZERO;
-		} else {
-			return supplyReserved.getStockReserved();
-		}
-	}
-
-	//	@Listen("onClick = #chooseWorkerButton")
-	//	public void chooseWorkerButtonClick() {
-	//		if(candidateWorkerListbox.getSelectedIndex() != -1) {
-	//			Worker selectedWorker = candidateWorkerListModel.getElementAt(candidateWorkerListbox.getSelectedIndex());
-	//			candidateWorkerListModel.remove(selectedWorker);
-	//			candidateWorkerListbox.setModel(candidateWorkerListModel);
-	//			chosenWorkerListModel.add(selectedWorker);
-	//			chosenWorkerListbox.setModel(chosenWorkerListModel);
-	//		}
-	//	}
-	//	
-	//	@Listen("onClick = #removeWorkerButton")
-	//	public void removeWorkerButtonClick() {
-	//		if(chosenWorkerListbox.getSelectedIndex() != -1) {
-	//			Worker selectedWorker = candidateWorkerListModel.getElementAt(candidateWorkerListbox.getSelectedIndex());
-	//			chosenWorkerListModel.remove(selectedWorker);
-	//			chosenWorkerListbox.setModel(chosenWorkerListModel);
-	//			candidateWorkerListModel.add(selectedWorker);
-	//			candidateWorkerListbox.setModel(candidateWorkerListModel);
-	//		}
-	//	}
 
 	public ListModelList<Machine> getMachineListModelByProcessType(ProcessType processType) {
 		List<Machine> list = new ArrayList<Machine>();
@@ -828,7 +629,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	}
 
 	private void refreshProcessTypeGridView() {
-		processTypeGrid.setModel(new ListModelList<ProcessType>(processTypeList));
+		ListModelList<ProcessType> processTypeListModelList = new ListModelList<ProcessType>(processTypeList);
+		processTypeGrid.setModel(processTypeListModelList);
 	}
 
 	private List<ProcessType> getProcessTypeTotalList() {
@@ -840,7 +642,22 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		for (ProcessType eachProcessType : processTypeSet) {
 			list.add(eachProcessType);
 		}
+		Collections.sort(list, new ProcessTypeComparator());
 		return list;
+	}
+	
+	public class ProcessTypeComparator implements Comparator<ProcessType> {
+	    @Override
+	    public int compare(ProcessType o1, ProcessType o2) {
+	        return o2.getSequence().compareTo(o1.getSequence());
+	    }
+	}
+	
+	public class ProductionOrderDetailComparator implements Comparator<ProductionOrderDetail> {
+	    @Override
+	    public int compare(ProductionOrderDetail o1, ProductionOrderDetail o2) {
+	        return o2.getProcess().getType().getSequence().compareTo(o1.getProcess().getType().getSequence());
+	    }
 	}
 
 }

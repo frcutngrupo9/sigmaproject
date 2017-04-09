@@ -1,3 +1,4 @@
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="win_production_plan_list" title="Planes de Produccion" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductionPlanListController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
@@ -5,6 +6,9 @@
 		        <label>Buscar:</label>
 		        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
 		        <button id="searchButton" label="Buscar"/>
+		        <hbox pack="center" align="center" hflex="1">
+		        	<button id="newButton" label="Nuevo Plan de Produccion"/>
+		        </hbox>
 		    </hlayout>
 		    <separator/>
 		    <grid id="productionPlanGrid" mold="paging" pageSize="7" sizedByContent="true" span="true">
@@ -24,18 +28,17 @@
 		        <template name="model">
 		            <row>
 		                <label value="${each.name}"/>
-		                <label value="${each.dateCreation}"/>
+		                <label value="${r:getFormattedDateTime(each.dateCreation)}"/>
 		                <label value="${each.planDetails.size()}"/>
 		                <label value="${win_production_plan_list$composer.getQuantityOfProduct(each)}"/>
 		                <label value="${win_production_plan_list$composer.getProductionPlanStateName(each)}"/>
 		                <button forward="onClick=productionPlanGrid.onEditProductionPlan(${each})"  image="/img/edit16x16.png"/>
-		                <button forward="onClick=productionPlanGrid.onGenerateProductionOrder(${each})" label="Productos" />
+		                <button forward="onClick=productionPlanGrid.onGenerateProductionOrder(${each})" label="Ordenes de Produccion" />
 		                <button forward="onClick=productionPlanGrid.onOpenRequirementPlan(${each})" label="Requerimiento de Materiales" />
 		            </row>
 		        </template>
 		    </grid>
 		    <separator/>
-		    <button id="newButton" label="Nuevo"/>
         </panelchildren>
     </panel>
 </window>

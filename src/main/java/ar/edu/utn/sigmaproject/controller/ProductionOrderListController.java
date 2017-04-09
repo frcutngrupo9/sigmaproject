@@ -509,18 +509,21 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 	
 	@Listen("onClick = #productionPlanLaunchButton")
 	public void productionPlanLaunchButtonClick() {
+		ProductionPlanStateType currentPlanState = productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId());
 		ProductionPlanStateType planStateLanzado = productionPlanStateTypeRepository.findFirstByName("Lanzado");
-		if(productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId()).equals(planStateLanzado)) {
-			alert("No se puede lanzar un plan que ya esta lanzado.");
+		ProductionPlanStateType planStateFinalizado = productionPlanStateTypeRepository.findFirstByName("Finalizado");
+		ProductionPlanStateType planStateEnEjecucion = productionPlanStateTypeRepository.findFirstByName("En Ejecucion");
+		if(currentPlanState.equals(planStateLanzado) || currentPlanState.equals(planStateEnEjecucion) || currentPlanState.equals(planStateFinalizado)) {
+			alert("No se puede lanzar un plan que ya esta lanzado o en un estado posterior.");
 			return;
 		}
 		currentProductionPlan.setDateStart(getTimeboxDate());
 		if(!isProductionPlanReady()) {
-			alert("No se puede lanzar el plan hasta que todas ordenes esten preparadas.");
+			alert("No se puede lanzar hasta que todas Ordenes esten Preparadas.");
 			return;
 		}
 		if(!productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId()).equals(productionPlanStateTypeRepository.findFirstByName("Abastecido"))) {
-			alert("No se puede lanzar el plan hasta que este completamente abastecido.");
+			alert("No se puede lanzar el Plan hasta estar Abastecido.");
 			return;
 		}
 		ProductionPlanState state = new ProductionPlanState(planStateLanzado, new Date());
@@ -529,5 +532,12 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		productionPlanRepository.save(currentProductionPlan);
 		Clients.showNotification("Plan de Produccion Lanzado");
 		refreshView();
+	}
+	
+	@Listen("onClick = #productionPlanRequirementButton")
+	public void productionPlanRequirementButtonClick() {
+		Executions.getCurrent().setAttribute("selected_production_plan", currentProductionPlan);
+		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/requirement_plan_creation.zul");
 	}
 }

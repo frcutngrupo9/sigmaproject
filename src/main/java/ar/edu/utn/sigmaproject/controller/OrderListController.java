@@ -30,7 +30,6 @@ import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
-import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
@@ -145,9 +144,13 @@ public class OrderListController extends SelectorComposer<Component> {
 	public boolean isStateCancel(Order order) {
 		return getStateName(order).equals("Cancelado");
 	}
-	
+
 	public boolean isStateNotFinished(Order order) {
 		return !getStateName(order).equals("Finalizado");
+	}
+	
+	public boolean isStateDelivered(Order order) {
+		return getStateName(order).equals("Entregado");
 	}
 
 	public String getStateName(Order order) {
