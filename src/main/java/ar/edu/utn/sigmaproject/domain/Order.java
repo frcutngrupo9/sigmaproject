@@ -1,8 +1,6 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -36,6 +34,7 @@ public class Order implements Serializable, Cloneable {
 	Integer number = 0;
 	Date date = new Date();
 	Date needDate = new Date();
+	OrderStateType currentStateType = null;
 
 	public Order() {
 
@@ -71,8 +70,12 @@ public class Order implements Serializable, Cloneable {
 	public void setDetails(List<OrderDetail> details) {
 		this.details = details;
 	}
-
+	
 	public OrderStateType getCurrentStateType() {
+		return currentStateType;
+	}
+
+	public OrderState getCurrentState() {
 		OrderState result = null;
 		for(OrderState each : states) {// busca el objeto con la fecha mas reciente
 			if(result != null) {
@@ -84,12 +87,13 @@ public class Order implements Serializable, Cloneable {
 			}
 		}
 		if(result != null) {
-			return result.getType();
+			return result;
 		}
 		return null;
 	}
 	
 	public void setState(OrderState state) {
+		currentStateType = state.getType();
 		states.add(state);
 	}
 
@@ -123,13 +127,5 @@ public class Order implements Serializable, Cloneable {
 
 	public void setNeedDate(Date needDate) {
 		this.needDate = needDate;
-	}
-	
-	public String getFormattedNeedDate() {
-		if(needDate != null) {
-			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-			return dateFormat.format(needDate);
-		}
-		return "";
 	}
 }

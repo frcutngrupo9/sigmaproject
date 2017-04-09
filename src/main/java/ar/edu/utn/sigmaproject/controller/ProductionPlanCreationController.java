@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.xml.datatype.Duration;
 
 import org.springframework.transaction.annotation.Transactional;
+import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
@@ -182,10 +183,10 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	private void refreshOrderPopupList() {// el popup se actualiza en base a los detalles
 		List<Order> orderList = orderRepository.findAll();
 		orderPopupList = new ArrayList<>();
-		// se buscan los pedidos que no estan asignados a un plan y no estan cancelados (estan en estado iniciado)
+		// se buscan los pedidos que no estan asignados a un plan y no estan cancelados (estan en estado Creado)
 		OrderStateType orderStateTypeInitiated = orderStateTypeRepository.findFirstByName("Creado");
 		for(Order each : orderList) {
-			if(each.getCurrentStateType().equals(orderStateTypeInitiated)) {
+			if(orderStateTypeRepository.findOne(each.getCurrentStateType().getId()).equals(orderStateTypeInitiated)) {
 				orderPopupList.add(each);
 			}
 		}
@@ -215,6 +216,10 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	@Transactional
 	@Listen("onClick = #saveProductionPlanButton")
 	public void saveProductionPlan() {
+		if(Strings.isBlank(productionPlanNameTextbox.getValue())) {
+			Clients.showNotification("Ingresar Nombre Plan de Produccion", productionPlanNameTextbox);
+			return;
+		}
 		if(productionPlanDetailList.size() == 0) {
 			Clients.showNotification("Ingresar al menos 1 pedido", addOrderButton);
 			return;
@@ -256,6 +261,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		}
 
 		currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
+		//TODO si no es nuevo pero se modificaron los detalles deberia actualizar las ordenes de produccion
 		if(isNewProductionPlan) {
 			// crea los requerimientos
 			List<SupplyRequirement> supplyRequirementList = createSupplyRequirements(currentProductionPlan);
@@ -267,7 +273,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			// crea ordenes de produccion
 			int sequence = 0;
 			for(ProductTotal each : getProductTotalList()) {
-				ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateTypeRepository.findFirstByName("No Iniciada"), new Date());
+				ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateTypeRepository.findFirstByName("Registrada"), new Date());
 				productionOrderState = productionOrderStateRepository.save(productionOrderState);
 				sequence += 1;
 				ProductionOrder productionOrder = new ProductionOrder(sequence, currentProductionPlan, each.getProduct(), each.getTotalUnits(), productionOrderState);
@@ -428,7 +434,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		refreshOrder();
 		if (currentProductionPlan == null) {// nuevo plan de produccion
 			productionPlanCaption.setLabel("Creacion de Plan de Produccion");
-			productionPlanStateTypeListModel.addToSelection(productionPlanStateTypeRepository.findFirstByName("Planificado"));
+			productionPlanStateTypeListModel.addToSelection(productionPlanStateTypeRepository.findFirstByName("Registrado"));
 			productionPlanStateTypeCombobox.setModel(productionPlanStateTypeListModel);
 			productionPlanNameTextbox.setText("");
 			productionPlanDetailList = new ArrayList<ProductionPlanDetail>();

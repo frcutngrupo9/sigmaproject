@@ -22,6 +22,7 @@ public class ProductionOrderSupply implements Serializable, Cloneable {
 
 	BigDecimal quantity = BigDecimal.ZERO;
 	BigDecimal quantityUsed = BigDecimal.ZERO;
+	String observation = "";
 	
 	public ProductionOrderSupply() {
 
@@ -62,5 +63,13 @@ public class ProductionOrderSupply implements Serializable, Cloneable {
 
 	public void setQuantityUsed(BigDecimal quantityUsed) {
 		this.quantityUsed = quantityUsed;
+	}
+
+	public String getObservation() {
+		return observation;
+	}
+
+	public void setObservation(String observation) {
+		this.observation = observation;
 	}
 }

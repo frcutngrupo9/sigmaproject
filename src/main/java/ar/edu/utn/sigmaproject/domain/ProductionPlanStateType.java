@@ -13,7 +13,7 @@ public class ProductionPlanStateType implements Serializable, Cloneable {
 	Long id;
 
 	@Column(unique = true)
-	String name = "";// "Iniciado""Cancelado""Abastecido""Lanzado""En Produccion""Finalizado"
+	String name = "";// "Registrado""Abastecido""Lanzado""En Produccion""Finalizado""Cancelado"
 	String details = "";
 
 	public ProductionPlanStateType() {

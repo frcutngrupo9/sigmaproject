@@ -105,10 +105,10 @@ public class ProcessController extends SelectorComposer<Component> {
 			machineType = machineTypeCombobox.getSelectedItem().getValue();
 		}
 		if (currentProcessType == null) {
-			// es un nuevo insumo
+			// nuevo
 			currentProcessType = new ProcessType(name, machineType);
 		} else {
-			// es una edicion
+			// edicion
 			currentProcessType.setName(name);
 			currentProcessType.setMachineType(machineType);
 		}

@@ -155,8 +155,9 @@ public class RepositoryHelper {
 	private void generateProductionPlanStateTypes() {
 		if (productionPlanStateTypeRepository.count() == 0) {
 			List<ProductionPlanStateType> list = new ArrayList<>();
-			list.add(new ProductionPlanStateType("Planificado", null));
+			list.add(new ProductionPlanStateType("Registrado", null));
 			list.add(new ProductionPlanStateType("Abastecido", null));
+			list.add(new ProductionPlanStateType("Lanzado", null));
 			list.add(new ProductionPlanStateType("En Ejecucion", null));
 			list.add(new ProductionPlanStateType("Finalizado", null));
 			list.add(new ProductionPlanStateType("Cancelado", null));
@@ -168,7 +169,8 @@ public class RepositoryHelper {
 	private void generateProductionOrderStateTypes() {
 		if (productionOrderStateTypeRepository.count() == 0) {
 			List<ProductionOrderStateType> list = new ArrayList<>();
-			list.add(new ProductionOrderStateType("No Iniciada"));
+			list.add(new ProductionOrderStateType("Registrada"));
+			list.add(new ProductionOrderStateType("Preparada"));
 			list.add(new ProductionOrderStateType("Iniciada"));
 			list.add(new ProductionOrderStateType("Finalizada"));
 			list.add(new ProductionOrderStateType("Cancelada"));
@@ -179,7 +181,7 @@ public class RepositoryHelper {
 	private void generateOrderStateType() {
 		if (orderStateTypeRepository.count() == 0) {
 			List<OrderStateType> list = new ArrayList<>();
-			list.add(new OrderStateType("Creado", null));
+			list.add(new OrderStateType("Creado", null));// TODO: cambiar por estado presupuestado y confirmado.
 			list.add(new OrderStateType("Cancelado", null));
 			list.add(new OrderStateType("Planificado", null));
 			list.add(new OrderStateType("En Produccion", null));
@@ -196,7 +198,7 @@ public class RepositoryHelper {
 			list.add(new MachineType("Cepilladora", "", null));
 			list.add(new MachineType("Escuadradora", "", null));
 			list.add(new MachineType("Escopladora", "", null));
-			list.add(new MachineType("Tup�", "", null));
+			list.add(new MachineType("Tupi", "", null));
 			list.add(new MachineType("Sierra Sin Fin", "", null));
 			list.add(new MachineType("Lijadora", "", null));
 			list.add(new MachineType("Caladora", "", null));
@@ -207,27 +209,26 @@ public class RepositoryHelper {
 
 
 	private void generateProcessType() {
+		// TODO: agregar las 3 etapas - (Corte) (Armado) (Terminacion)
 		if (processTypeRepository.count() == 0) {
 			generateMachineType();
 			List<ProcessType> list = new ArrayList<>();
-			list.add(new ProcessType("Trazar", null));
-			list.add(new ProcessType("Garlopear", machineTypeRepository.findFirstByName("Garlopa")));
-			list.add(new ProcessType("Asentar", machineTypeRepository.findFirstByName("Garlopa")));
-			list.add(new ProcessType("Cepillar", machineTypeRepository.findFirstByName("Cepilladora")));
-			list.add(new ProcessType("Cortar el Ancho", machineTypeRepository.findFirstByName("Escuadradora")));
-			list.add(new ProcessType("Cortar el Largo", machineTypeRepository.findFirstByName("Escuadradora")));
-			list.add(new ProcessType("Hacer Cortes Curvos", machineTypeRepository.findFirstByName("Sierra Sin Fin")));
-			list.add(new ProcessType("Hacer Escopladuras", machineTypeRepository.findFirstByName("Escopladora")));
-			list.add(new ProcessType("Hacer Espigas", machineTypeRepository.findFirstByName("Tup�")));
-			list.add(new ProcessType("Hacer Molduras", machineTypeRepository.findFirstByName("Tup�")));
-			list.add(new ProcessType("Hacer Canales", machineTypeRepository.findFirstByName("Tup�")));
-			list.add(new ProcessType("Replanar", null));
-			list.add(new ProcessType("Masillar", null));
-			list.add(new ProcessType("Clavar", null));
-			list.add(new ProcessType("Lijar Cruzado", machineTypeRepository.findFirstByName("Lijadora")));
-			list.add(new ProcessType("Lijar Derecho", machineTypeRepository.findFirstByName("Lijadora")));
-			list.add(new ProcessType("Agregar Herrajes", null));
-			list.add(new ProcessType("Armar", null));
+			list.add(new ProcessType(1, "Trazado de Madera", null));
+			list.add(new ProcessType(2, "Garlopeado", machineTypeRepository.findFirstByName("Garlopa")));
+			list.add(new ProcessType(3, "Cepillado", machineTypeRepository.findFirstByName("Cepilladora")));
+			list.add(new ProcessType(4, "Cortado de Ancho", machineTypeRepository.findFirstByName("Escuadradora")));
+			list.add(new ProcessType(5, "Cortado de Largo", machineTypeRepository.findFirstByName("Escuadradora")));
+			list.add(new ProcessType(6, "Cortado Curvo", machineTypeRepository.findFirstByName("Sierra Sin Fin")));
+			list.add(new ProcessType(7, "Escoplado", machineTypeRepository.findFirstByName("Escopladora")));
+			list.add(new ProcessType(8, "Espigado", machineTypeRepository.findFirstByName("Tupi")));
+			list.add(new ProcessType(9, "Hacer Molduras", machineTypeRepository.findFirstByName("Tupi")));
+			list.add(new ProcessType(10, "Hacer Canal", machineTypeRepository.findFirstByName("Tupi")));
+			list.add(new ProcessType(11, "Replanado", null));
+			list.add(new ProcessType(12, "Masillado", null));
+			list.add(new ProcessType(13, "Clavado", null));
+			list.add(new ProcessType(14, "Lijado", machineTypeRepository.findFirstByName("Lijadora")));
+			list.add(new ProcessType(15, "Armado", null));
+			
 			processTypeRepository.save(list);
 		}
 	}
@@ -237,7 +238,7 @@ public class RepositoryHelper {
 			List<WoodType> list = new ArrayList<>();
 			list.add(new WoodType("Pino", "Semi-pesada, semi-dura."));
 			list.add(new WoodType("Caoba", "Tradicional, dura y compacta."));
-			list.add(new WoodType("Nogal", "Dura, homog�nea."));
+			list.add(new WoodType("Nogal", "Dura, homogenea."));
 			list.add(new WoodType("Roble", "Resistente, duradera y compacta."));
 			woodTypeRepository.save(list);
 		}
@@ -265,7 +266,7 @@ public class RepositoryHelper {
 			generateProductCategory();
 			List<Product> list = new ArrayList<>();
 			list.add(new Product("26", "Dressoir patas rectas de 0.90x0.45mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Comoda"), new BigDecimal("483")));
-			list.add(new Product("29", "Banqueta alta  con respaldo de 0.30mts de di�metro".toUpperCase(), "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("226")));
+			list.add(new Product("29", "Banqueta alta  con respaldo de 0.30mts de diametro".toUpperCase(), "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("226")));
 			list.add(new Product("32", "Silla Omega respaldo inclinado patas rectas".toUpperCase(), "", productCategoryRepository.findFirstByName("Silla"), new BigDecimal("231")));
 			list.add(new Product("37", "Cama Monterrey c/curva patas 4x4 de 080cm".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("1050")));
 			list.add(new Product("40", "Respaldo para Somier Monterrey X o Curvo de 1.50mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Respaldo"), new BigDecimal("1029")));

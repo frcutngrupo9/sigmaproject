@@ -29,12 +29,20 @@ public class ProcessType implements Serializable, Cloneable {
 
 	@OneToMany
 	List<ProcessType> predecessorList = new ArrayList<>(); 
+	
+	Integer sequence = null;
 
 	public ProcessType() {
 
 	}
 
 	public ProcessType(String name, MachineType machineType) {
+		this.name = name;
+		this.machineType = machineType;
+	}
+	
+	public ProcessType(Integer sequence, String name, MachineType machineType) {
+		this.sequence = sequence;
 		this.name = name;
 		this.machineType = machineType;
 	}
@@ -69,5 +77,13 @@ public class ProcessType implements Serializable, Cloneable {
 
 	public void setPredecessorList(List<ProcessType> predecessorList) {
 		this.predecessorList = predecessorList;
+	}
+
+	public Integer getSequence() {
+		return sequence;
+	}
+
+	public void setSequence(Integer sequence) {
+		this.sequence = sequence;
 	}
 }

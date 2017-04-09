@@ -1,38 +1,48 @@
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
-<window id="win_product_list" title="Lista de Productos" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductListController" sclass="sigma-content">
+<window id="win_product_list" title="Listado de Productos" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductListController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
-		    <hlayout>
-		        <label>Buscar:</label>
-		        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
-		        <button id="searchButton" label="Buscar"/>
-		    </hlayout>
-		    <separator/>
-		    <grid id="productGrid" sizedByContent="true" span="true">
-		    	<auxhead>
-					<auxheader label="Productos" colspan="5"/>
-				</auxhead>
-		        <columns>
-		            <column label="Codigo" align="center"/>
-		            <column label="Nombre" align="center"/>
-		            <column label="Categoria" align="center"/>
-		            <column label="Precio" align="center"/>
-		            <column label="Editar" align="center"/>
-		        </columns>
-		        <template name="model">
-		            <row>
-		                <label value="${each.code}"/>
-		                <label value="${each.name}"/>
-		                <label value="${each.category.name}"/>
-		                <label value="${each.price.doubleValue()} $"/>
-		                <button forward="onClick=productGrid.onEditProduct(${each})" image="/img/edit16x16.png"/>
-		            </row>
-		        </template>
-		    </grid>
-			<paging id="pager" pageSize="10" sclass="sigma-paging"/>
-		    <separator/>
-		    <button id="newProductButton" label="Crear Producto Nuevo"/>
-		    <separator/>
+		    <vlayout>
+			    <hlayout>
+			        <label>Buscar:</label>
+			        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
+			        <button id="searchButton" label="Buscar"/>
+			        <hbox pack="center" align="center" hflex="1">
+			        	<button id="newProductButton" label="Nuevo Producto"/>
+			        </hbox>
+			    </hlayout>
+			    <separator/>
+			    <grid id="productGrid" sizedByContent="true" span="true">
+			    	<auxhead>
+						<auxheader label="Productos" colspan="6"/>
+					</auxhead>
+			        <columns>
+			        	<column label="Foto" align="center"/>
+			            <column label="Codigo" align="center"/>
+			            <column label="Nombre" align="center"/>
+			            <column label="Categoria" align="center"/>
+			            <column label="Precio" align="center"/>
+			            <column label="Editar" align="center"/>
+			        </columns>
+			        <template name="model">
+			            <row>
+			            	<custom-attributes product_image="${r:getProductImage(each)}"/>
+			            	<cell>
+				                <image if="${!empty product_image}" content="${product_image}" width="40px" height="40px"/>
+				                <image if="${empty product_image}" width="0px" height="0px"/>
+			                </cell>
+			                <label value="${each.getCode()}"/>
+			                <label value="${each.getName()}"/>
+			                <label value="${each.getCategory().getName()}"/>
+			                <label value="${each.getPrice().doubleValue()} $"/>
+			                <button forward="onClick=productGrid.onEditProduct(${each})" image="/img/edit16x16.png"/>
+			            </row>
+			        </template>
+			    </grid>
+				<paging id="pager" pageSize="10" sclass="sigma-paging"/>
+			    <separator/>
+			    <separator/>
+		    </vlayout>
         </panelchildren>
     </panel>
 </window>

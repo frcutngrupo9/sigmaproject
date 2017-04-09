@@ -1,6 +1,6 @@
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
-<window id="win_production_order_list" apply="ar.edu.utn.sigmaproject.controller.ProductionOrderListController" width="100%" style="background:white">
-    <panel title="Ordenes de Produccion" id="productionOrderCreationBlock" border="rounded">
+<window id="win_production_order_list" title="Ordenes de Produccion" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductionOrderListController" sclass="sigma-content">
+    <panel id="productionOrderCreationBlock" border="none">
         <panelchildren>
             <vlayout>
             	<grid hflex="1" sclass="sigma-form">
@@ -36,7 +36,7 @@
 				</hbox>
     			<grid id="productionOrderGrid" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Listado Ordenes de Produccion" colspan="15"/>
+						<auxheader label="Listado Productos a Fabricar" colspan="15"/>
 					</auxhead>
         			<columns>
         				<!-- <column width="40px" align="center"/> -->
@@ -44,15 +44,14 @@
         				<column label="Secuencia" align="center"/>
         				<column label="Fecha Inicio" align="center"/>
 		                <column label="Fecha Fin" align="center"/>
-        				<column label="Nro" align="center"/>
+        				<column label="Foto" align="center"/>
         				<column label="Producto" align="center"/>
 		                <column label="Unids" align="center"/>
         				<column label="Cod" align="center"/>
         				<column label="Estado Orden" align="center"/>
-		                <column label="Empleado Asignado" align="center"/>
 		                <column label="% Completo" align="center"/>
-		                <column label="Tiempo Total" align="center"/>
-		                <column label="T. Unidad" align="center"/>
+		                <column label="Duracion Total" align="center"/>
+		                <column label="Duracion Unidad" align="center"/>
 		                <column label="Fecha Inicio Real" align="center"/>
 		                <column label="Fecha Fin Real" align="center"/>
 		            </columns>
@@ -64,16 +63,19 @@
 			            		<include src="/production_order_processes.zul" production_order_detail_list="${production_order_detail_list}"/>
 			            	</detail>
 			            -->
+			            	<custom-attributes product_image="${r:getProductImage(each.product)}"/>
 			            	<button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})"  label="Abrir" disabled="${win_production_order_list$composer.isProductionPlanStateCancel()}"/>
 			            	<spinner value="${each.sequence}" constraint="no empty,min 1" forward="onChanging=productionOrderGrid.onEditProductionOrderSequence(${each})" width="60px"/>
 		                	<datebox buttonVisible="false" format="dd/MM/yyyy HH:mm" value="${each.dateStart}" disabled="true" width="110px"/>
 		                    <datebox buttonVisible="false" format="dd/MM/yyyy HH:mm" value="${each.dateFinish}" disabled="true" width="110px"/>
-		                    <label value="${each.number}"/>
+		                	<cell>
+				                <image if="${!empty product_image}" content="${product_image}" width="40px" height="40px"/>
+				                <image if="${empty product_image}" width="0px" height="0px"/>
+			                </cell>
 		                	<label value="${each.product.name}"/>
 		                	<label value="${each.units}"/>
 		                	<label value="${each.product.code}"/>
 		                    <label value="${each.getCurrentStateType().name}"/>
-		                    <label value="${win_production_order_list$composer.getWorkerName(each)}"/>
 		                    <label value="${win_production_order_list$composer.getPercentComplete(each)}"/>
 		                    <label value="${r:getFormattedTime(each.getDurationTotal())}"/>
 		                    <label value="${r:getFormattedTime(each.product.getDurationTotal())}"/>
@@ -82,7 +84,11 @@
 						</row>
 		            </template>
     			</grid>
-    			<hbox hflex="1" pack="left">
+    			<hbox hflex="1" pack="center">
+	    			<button id="productionPlanRequirementButton" label="Abastecer Plan"/>
+	    			<button id="productionPlanLaunchButton" label="Lanzar Plan"/>
+				</hbox>
+				<hbox hflex="1" pack="left">
 	    			<button id="saveButton" label="Guardar"/>
 	    			<button id="resetButton" label="Reset"/>
 	    			<button id="returnButton" label="Volver"/>

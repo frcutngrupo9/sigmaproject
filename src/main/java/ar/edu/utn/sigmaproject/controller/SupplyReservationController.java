@@ -144,9 +144,9 @@ public class SupplyReservationController extends SelectorComposer<Component> {
 			currentSupplyReserved.setStockReserved(stockReserved);
 			supplyReservedRepository.save(currentSupplyReserved);
 		}
-		alert("Reserva guardada.");
 		EventQueue<Event> eq = EventQueues.lookup("Requirement Reservation Queue", EventQueues.DESKTOP, true);
 		eq.publish(new Event("onSupplyReservation", null, null));
+		alert("Reserva guardada.");
 		supplyReservationWindow.detach();
 	}
 

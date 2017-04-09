@@ -1,3 +1,4 @@
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="win_product_stock" title="Stock de Productos" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductStockController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
@@ -9,9 +10,10 @@
 		    <separator/>
 		    <listbox id="productListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
 		    	<auxhead>
-					<auxheader label="Productos" colspan="5"/>
+					<auxheader label="Productos" colspan="6"/>
 				</auxhead>
 		        <listhead>
+		            <listheader label="Foto" align="center"/>
 		            <listheader label="Codigo" align="center"/>
 		            <listheader label="Descripcion" align="center"/>
 		            <listheader label="Stock Actual" align="center"/>
@@ -20,6 +22,11 @@
 		        </listhead>
 		        <template name="model">
 		            <listitem>
+		            	<custom-attributes product_image="${r:getProductImage(each)}"/>
+		                <listcell>
+                        	<image if="${!empty product_image}" content="${product_image}" width="30px" height="30px"/>
+			                <image if="${empty product_image}" width="0px" height="0px"/>
+                        </listcell>
 		                <listcell label="${each.code}"/>
 		                <listcell label="${each.name}"/>
 		                <listcell label="${each.stock}"/>
@@ -117,6 +124,8 @@
 				        <separator/>
 			        </panelchildren>
 			    </panel>
+			    <separator/>
+			    <separator/>
 		    </vlayout>
         </panelchildren>
     </panel>

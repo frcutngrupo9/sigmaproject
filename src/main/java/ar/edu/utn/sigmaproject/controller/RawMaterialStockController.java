@@ -49,10 +49,6 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	@Wire
 	Doublebox stockRepoDoublebox;
 	@Wire
-	Button stockIncreaseButton;
-	@Wire
-	Button stockDecreaseButton;
-	@Wire
 	Button saveButton;
 	@Wire
 	Button cancelButton;
@@ -60,22 +56,6 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	Button resetButton;
 	@Wire
 	Button newButton;
-	@Wire
-	Grid stockModificationGrid;
-	@Wire
-	Doublebox quantityDoublebox;
-	@Wire
-	Label stockModificationLabel;
-	@Wire
-	Intbox numberIntbox;
-	@Wire
-	Combobox workerCombobox;
-	@Wire
-	Button saveNewStockButton;
-	@Wire
-	Button cancelNewStockButton;
-	@Wire
-	Button resetNewStockButton;
 	@Wire
 	Listbox woodReservedListbox;
 
@@ -89,8 +69,6 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	@WireVariable
 	private WoodTypeRepository woodTypeRepository;
 	@WireVariable
-	private WorkerRepository workerRepository;
-	@WireVariable
 	private ProductionPlanRepository productionPlanRepository;
 
 	// attributes
@@ -101,14 +79,12 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	private List<Wood> woodList;
 	private List<WoodType> woodTypeList;
 	private List<WoodReserved> woodReservedList;
-	private List<Worker> workerList;
 
 	// list models
 	private ListModelList<RawMaterialType> rawMaterialTypeListModel;
 	private ListModelList<Wood> woodListModel;
 	private ListModelList<WoodType> woodTypeListModel;
 	private ListModelList<WoodReserved> woodReservedListModel;
-	private ListModelList<Worker> workerListModel;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
@@ -126,9 +102,6 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		woodReservedListModel = new ListModelList<>(woodReservedList);
 		woodReservedListbox.setModel(woodReservedListModel);
 		currentWood = null;
-		workerList = workerRepository.findAll();
-		workerListModel = new ListModelList<>(workerList);
-		workerCombobox.setModel(workerListModel);
 		refreshView();
 	}
 
@@ -169,10 +142,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 			stockDoublebox.setDisabled(false);
 			stockMinDoublebox.setDisabled(false);
 			stockRepoDoublebox.setDisabled(false);
-			stockIncreaseButton.setDisabled(true);
-			stockDecreaseButton.setDisabled(true);
 			resetButton.setDisabled(true);
-			stockModificationGrid.setVisible(false);
 		}else {// editar
 			woodCreationGrid.setVisible(true);
 			woodTypeCombobox.setSelectedIndex(woodTypeListModel.indexOf(currentWood.getWoodType()));
@@ -186,8 +156,6 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 			stockDoublebox.setDisabled(true);
 			stockMinDoublebox.setDisabled(false);
 			stockRepoDoublebox.setDisabled(false);
-			stockIncreaseButton.setDisabled(false);
-			stockDecreaseButton.setDisabled(false);
 			resetButton.setDisabled(false);
 		}
 	}
@@ -247,71 +215,6 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	@Listen("onClick = #resetButton")
 	public void resetButtonClick() {
 		refreshView();
-	}
-
-	@Listen("onClick = #stockIncreaseButton")
-	public void stockIncreaseButtonClick() {
-		stockModificationGrid.setVisible(true);
-		stockModificationLabel.setValue("Ingreso Stock");
-		workerCombobox.setSelectedIndex(-1);
-		numberIntbox.setValue(null);
-		quantityDoublebox.setValue(null);
-	}
-
-	@Listen("onClick = #saveNewStockButton")
-	public void saveNewStockButton() {
-		if(numberIntbox.getValue() <= 0) {
-			Clients.showNotification("Debe ingresar un numero", numberIntbox);
-			return;
-		}
-		if(quantityDoublebox.getValue() <= 0) {
-			Clients.showNotification("Debe ingresar una cantidad", quantityDoublebox);
-			return;
-		}
-		if(workerCombobox.getSelectedIndex() == -1) {
-			Clients.showNotification("Debe seleccionar un empleado", workerCombobox);
-			return;
-		}
-		if(currentWood != null) {
-			BigDecimal newStock = BigDecimal.ZERO;
-			BigDecimal quantity = BigDecimal.valueOf(quantityDoublebox.doubleValue());
-			if(stockModificationLabel.getValue().equals("Ingreso Stock")) {
-				newStock = currentWood.getStock().add(quantity);
-			} else {
-				if(currentWood.getStock().compareTo(quantity) > 0) {// hay suficiente stock
-					newStock = currentWood.getStock().subtract(quantity);
-				} else {
-					Clients.showNotification("No hay stock suficiente", quantityDoublebox);
-					return;
-				}
-			}
-			stockDoublebox.setValue(newStock.doubleValue());
-			//			currentWood.setStock(newStock);
-			//			currentWood = woodRepository.updateWood(currentWood);
-			//			refreshView();
-		}
-		stockModificationGrid.setVisible(false);
-	}
-
-	@Listen("onClick = #cancelNewStockButton")
-	public void cancelNewStockButtonClick() {
-		stockModificationGrid.setVisible(false);
-	}
-
-	@Listen("onClick = #resetNewStockButton")
-	public void resetNewStockButtonClick() {
-		workerCombobox.setSelectedIndex(-1);
-		numberIntbox.setValue(null);
-		quantityDoublebox.setValue(null);
-	}
-
-	@Listen("onClick = #stockDecreaseButton")
-	public void stockDecreaseButtonClick() {
-		stockModificationGrid.setVisible(true);
-		stockModificationLabel.setValue("Egreso Stock");
-		workerCombobox.setSelectedIndex(-1);
-		numberIntbox.setValue(null);
-		quantityDoublebox.setValue(null);
 	}
 	
 	public String getProductionPlanName(WoodReserved woodReserved) {

@@ -1,6 +1,7 @@
-<window id="win_order_creation" apply="ar.edu.utn.sigmaproject.controller.OrderCreationController" width="95%" style="background:white">
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
+<window id="win_order_creation" apply="ar.edu.utn.sigmaproject.controller.OrderCreationController" closable="false" sclass="sigma-content">
     <caption id="orderCaption" label="Creacion/Edicion de Pedido"/>
-    <panel title="Pedido" id="OrderCreationBlock" border="rounded">
+    <panel id="OrderCreationBlock" border="none">
         <panelchildren>
             <vlayout>
             	<grid hflex="1" sclass="sigma-form">
@@ -65,12 +66,18 @@
                                     Buscar
                                     <textbox id="productNameFilterTextbox"/>
                                 </hbox>
-                                <listbox id="productPopupListbox" width="420px">
+                                <listbox id="productPopupListbox" width="500px" sizedByContent="true" span="true">
                                 <listhead>
+                                    <listheader label="Foto" align="center"/>
                                     <listheader label="Producto" align="center"/>
                                 </listhead>
                                 <template name="model">
                                     <listitem>
+                                        <custom-attributes product_image="${r:getProductImage(each)}"/>
+                                        <listcell>
+			                            	<image if="${!empty product_image}" content="${product_image}" width="30px" height="30px"/>
+							                <image if="${empty product_image}" width="0px" height="0px"/>
+			                            </listcell>
                                         <listcell label="${each.name}"/>
                                     </listitem>
                                 </template>
@@ -84,36 +91,51 @@
                     <doublebox id="productPriceDoublebox" constraint="no negative" format=",###.##" width="77px"/>
                     <button id="saveOrderDetailButton" label="Grabar Detalle"/>
                     <button id="resetOrderDetailButton" label="Reset Detalle"/>
-                    <button id="deleteOrderDetailButton" label="Eliminar Detalle"/>
                     <button id="cancelOrderDetailButton" label="Cancelar Edicion"/>
                 </hbox>
-                <listbox id="orderDetailListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
+                <listbox id="orderDetailListbox" mold="paging" pageSize="7" sizedByContent="true" span="true" style="margin: 4px">
                     <auxhead>
-                        <auxheader label="Productos" colspan="4"/>
+                        <auxheader label="Productos" colspan="6"/>
                     </auxhead>
                     <listhead>
-                        <listheader label="Nombre Producto" align="center"/>
+                    	<listheader label="Foto" align="center"/>
+                        <listheader label="Nombre" align="center"/>
                         <listheader label="Unidades" align="center"/>
-                        <listheader label="Monto Unitario" align="center"/>
+                        <listheader label="Importe Unitario" align="center"/>
                         <listheader label="Subtotal" align="center"/>
+                        <listheader label="Quitar" align="center"/>
                     </listhead>
                     <template name="model">
                         <listitem>
-                            <listcell label="${each.product.getName()}"/>
-                            <listcell label="${each.units}"/>
-                            <listcell label="${each.price.doubleValue()} $"/>
-                            <listcell label="${win_order_creation$composer.getSubTotal(each.units, each.price).doubleValue()} $"/>
+                        	<custom-attributes product_image="${r:getProductImage(each.getProduct())}"/>
+                        	<listcell>
+                            	<image if="${!empty product_image}" content="${product_image}" width="30px" height="30px"/>
+				                <image if="${empty product_image}" width="0px" height="0px"/>
+                            </listcell>
+                            <listcell label="${each.getProduct().getName()}"/>
+                            <listcell label="${each.getUnits()}"/>
+                            <listcell label="${each.getPrice().doubleValue()} $"/>
+                            <listcell label="${win_order_creation$composer.getSubTotal(each.getUnits(), each.getPrice()).doubleValue()} $"/>
+                            <listcell>
+                            	<button forward="onClick=orderDetailListbox.onRemoveDetail(${each})" image="/img/delete16x16.png"/>
+                            </listcell>
                         </listitem>
                     </template>
                     <listfoot>
+			            <listfooter></listfooter>
+			            <listfooter></listfooter>
+			            <listfooter></listfooter>
+			            <listfooter></listfooter>
 			            <listfooter><label id="orderTotalPriceLabel"/></listfooter>
 			        </listfoot>
                 </listbox>
-                <hlayout>
+                <hlayout style="margin: 4px">
                     <button id="saveOrderButton" label="Guardar Pedido"/>
                     <button id="resetOrderButton" label="Reset Pedido"/>
                     <button id="deleteOrderButton" label="Eliminar Pedido"/>
-                    <button id="returnButton" label="Volver a Listado"/>
+                    <hbox pack="center" align="center" hflex="1">
+			        	<button id="returnButton" label="Volver a Listado"/>
+			        </hbox>
                 </hlayout>
             </vlayout>
         </panelchildren>

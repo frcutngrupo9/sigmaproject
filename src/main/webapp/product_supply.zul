@@ -1,6 +1,6 @@
 <window id="productSupplyWindow" apply="ar.edu.utn.sigmaproject.controller.ProductSupplyController" width="60%" position="center,center" closable="true" action="show: slideDown;hide: slideUp">
 	<caption label="Insumos de Producto" style="text-align:center; font-weight: bold;"/>
-	<panel border="rounded">
+	<panel border="none">
         <panelchildren>
             <vlayout>
                 <hlayout>

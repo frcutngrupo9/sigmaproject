@@ -52,6 +52,8 @@
 			            </row>
 			        </rows>
 		    	</grid>
+		    	<separator/>
+		    	<separator/>
 		    </vlayout>
         </panelchildren>
     </panel>

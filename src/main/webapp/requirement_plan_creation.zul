@@ -1,5 +1,5 @@
-<window id="win_requirement_plan_creation" apply="ar.edu.utn.sigmaproject.controller.RequirementPlanCreationController" width="95%" style="background:white">
-    <panel title="Plan de Requerimiento de Materiales" id="requirementPlanCreationBlock" border="rounded">
+<window id="win_requirement_plan_creation" title="Plan de Requerimiento de Materiales" closable="false" apply="ar.edu.utn.sigmaproject.controller.RequirementPlanCreationController" sclass="sigma-content">
+    <panel id="requirementPlanCreationBlock" border="none">
         <panelchildren>
             <vlayout>
             	<grid hflex="1" sclass="sigma-form">
@@ -22,6 +22,11 @@
                         </row>
                     </rows>
                 </grid>
+                <hbox pack="center" align="center" hflex="1">
+		        	<button id="allRequirementReservationButton" label="Reservar Todo"/>
+		        	<button id="returnToProductionButton" label="Volver a Produccion"/>
+		        	<button id="returnButton" label="Volver a Listado"/>
+		        </hbox>
                 <separator/>
     			<listbox id="rawMaterialRequirementListbox" sizedByContent="true" span="true">
     				<auxhead>
@@ -29,9 +34,9 @@
 					</auxhead>
         			<listhead>
         				<listheader label="Materia Prima"/>
+        				<listheader label="Cantidad Necesaria"/>
 		                <listheader label="Stock Total"/>
 		                <listheader label="Cantidad Disponible"/>
-		                <listheader label="Cantidad Necesaria"/>
 		                <listheader label="Cantidad Faltante"/>
 		                <listheader label="Cantidad Reservada"/>
 		                <listheader label="Esta Abastecido?"/>
@@ -40,9 +45,9 @@
 		            <template name="model">
 		                <listitem>
 		                	<listcell label="${each.rawMaterialType.name}"/>
+		                	<listcell label="${each.quantity}"/>
 		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialTypeStock(each.rawMaterialType).doubleValue()}"/>
 		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialTypeStockAvailable(each.rawMaterialType).doubleValue()}"/>
-		                    <listcell label="${each.quantity}"/>
 		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialRequirementStockMissing(each).doubleValue()}"/>
 		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialRequirementStockReserved(each).doubleValue()}"/>
 		                    <listcell>
@@ -92,7 +97,8 @@
 						</listitem>
 		            </template>
     			</listbox>
-    			<button id="returnButton" label="Volver"/>
+    			<separator/>
+    			<separator/>
             </vlayout>
         </panelchildren>
     </panel>

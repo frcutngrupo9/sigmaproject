@@ -2,11 +2,15 @@ package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.EventQueue;
+import org.zkoss.zk.ui.event.EventQueues;
 import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
@@ -20,6 +24,7 @@ import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
@@ -50,7 +55,7 @@ public class OrderListController extends SelectorComposer<Component> {
 	@WireVariable
 	private ClientRepository clientRepository;
 	@WireVariable
-	private ProductRepository productSRepository;
+	private ProductRepository productRepository;
 	@WireVariable
 	private OrderStateTypeRepository orderStateTypeRepository;
 
@@ -60,20 +65,27 @@ public class OrderListController extends SelectorComposer<Component> {
 	// list models
 	private ListModelList<Order> orderListModel;
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
+		// se crea un listener para cuando se actualice el estado de algun pedido a entregado
+		EventQueue<Event> eq = EventQueues.lookup("Product Delivery Queue", EventQueues.DESKTOP, true);
+		eq.subscribe(new EventListener() {
+			public void onEvent(Event event) throws Exception {
+				if(event.getName().equals("onProductDelivery")) {
+					refreshView();
+				}
+			}
+		});
+		refreshView();
+	}
+
+	private void refreshView() {
 		orderList = orderRepository.findAll();
 		orderListModel = new ListModelList<Order>(orderList);
 		orderGrid.setModel(orderListModel);
 	}
-	/*
-    @Listen("onSelect = #orderGrid")
-    public void onOrderSelect() {
-    	Executions.getCurrent().setAttribute("selected_order", ((Order) orderListbox.getSelectedItem().getValue()));
-        Include include = (Include) Selectors.iterable(orderListbox.getPage(), "#mainInclude").iterator().next();
-    	include.setSrc("/order_creation.zul");
-    }*/
 
 	@Listen("onClick = #newOrderButton")
 	public void goToOrderCreation() {
@@ -114,6 +126,15 @@ public class OrderListController extends SelectorComposer<Component> {
 		include.setSrc("/order_creation.zul");
 	}
 
+	@Listen("onDeliverOrder = #orderGrid")
+	public void doDeliverOrder(ForwardEvent evt) {
+		Order order = (Order) evt.getData();
+		final HashMap<String, Order> map = new HashMap<String, Order>();
+		map.put("selected_order", order);
+		Window window = (Window)Executions.createComponents("/product_delivery.zul", null, map);
+		window.doModal();
+	}
+
 	private void refreshList() {
 		orderList = orderRepository.findAll();
 		orderListModel = new ListModelList<Order>(orderList);
@@ -122,6 +143,14 @@ public class OrderListController extends SelectorComposer<Component> {
 
 	public boolean isStateCancel(Order order) {
 		return getStateName(order).equals("Cancelado");
+	}
+
+	public boolean isStateNotFinished(Order order) {
+		return !getStateName(order).equals("Finalizado");
+	}
+	
+	public boolean isStateDelivered(Order order) {
+		return getStateName(order).equals("Entregado");
 	}
 
 	public String getStateName(Order order) {

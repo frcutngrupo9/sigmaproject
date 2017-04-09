@@ -1,0 +1,73 @@
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
+<window id="productDeliveryWindow" apply="ar.edu.utn.sigmaproject.controller.ProductDeliveryController" width="75%" position="center,center" closable="true" action="show: slideDown;hide: slideUp">
+	<caption label="Entrega del Pedido" style="text-align:center; font-weight: bold;"/>
+	<panel border="rounded">
+        <panelchildren>
+            <vlayout>
+                <grid sclass="sigma-form" sizedByContent="true" span="true">
+			        <columns>
+		                <column align="right"/>
+		                <column align="left"/>
+		                <column align="right"/>
+		                <column align="left"/>
+		                <column align="right"/>
+		                <column align="left"/>
+		            </columns>
+			        <rows>
+			            <row>
+			                <label>Nro. de Pedido: </label>
+			                <intbox id="orderNumberIntbox" width="40px"/>
+			                <label>Cliente: </label>
+			                <textbox id="clientNameTextbox" hflex="1"/>
+			                <label>Fecha Necesidad: </label>
+			                <textbox id="needDateTextbox" width="90px"/>
+			            </row>
+			        </rows>
+		    	</grid>
+		    	<listbox id="orderDetailListbox" sizedByContent="true" span="true">
+    				<auxhead>
+						<auxheader label="Detalle del Pedido" colspan="6"/>
+					</auxhead>
+        			<listhead>
+        				<listheader label="Foto" align="center"/>
+        				<listheader label="Cod. Producto"/>
+		                <listheader label="Nombre"/>
+		                <listheader label="Cantidad"/>
+		                <listheader label="Fecha Inicio Fab"/>
+		                <listheader label="Fecha Fin Fab"/>
+		            </listhead>
+		            <template name="model">
+		                <listitem>
+		                	<listcell>
+                            	<image if="${!empty r:getProductImage(each.getProduct())}" content="${r:getProductImage(each.getProduct())}" width="30px" height="30px"/>
+				                <image if="${empty r:getProductImage(each.getProduct())}" width="0px" height="0px"/>
+                            </listcell>
+		                	<listcell label="${each.getProduct().getCode()}"/>
+		                    <listcell label="${each.getProduct().getName()}"/>
+		                    <listcell label="${each.getUnits()}"/>
+		                    <listcell label="${productDeliveryWindow$composer.getFormattedDateStart(each)}"/>
+		                    <listcell label="${productDeliveryWindow$composer.getFormattedDateFinish(each)}"/>
+						</listitem>
+		            </template>
+    			</listbox>
+    			<grid sclass="sigma-form">
+			        <columns>
+		                <column hflex="max" align="right"/>
+		                <column hflex="max" align="left"/>
+		            </columns>
+			        <rows>
+			            <row>
+			                <label>Entregado el </label>
+			                <datebox id="deliveryDatebox" buttonVisible="true" format="dd/MM/yyyy" constraint="no future" width="160px"/>
+			            </row>
+			        </rows>
+		    	</grid>
+                <hbox hflex="1" align="center" pack="center">
+                	<button id="saveButton" label="Guardar"/>
+			        <button id="resetButton" label="Reset"/>
+			        <button id="cancelButton" label="Cancelar"/>
+                </hbox>
+            </vlayout>
+        </panelchildren>
+    </panel>
+</window>

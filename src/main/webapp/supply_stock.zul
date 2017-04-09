@@ -1,42 +1,41 @@
 <window id="win_supply_stock" title="Stock de Insumos" closable="false" apply="ar.edu.utn.sigmaproject.controller.SupplyStockController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
-		    <hlayout>
-		        <label>Buscar:</label>
-		        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
-		        <button id="searchButton" label="Buscar"/>
-		    </hlayout>
-		    <separator/>
-		    <listbox id="supplyTypeListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
-		    	<auxhead>
-					<auxheader label="Insumos" colspan="8"/>
-				</auxhead>
-		        <listhead>
-		            <listheader label="Codigo" align="center"/>
-		            <listheader label="Descripcion" align="center"/>
-		            <listheader label="Medidas" align="center"/>
-		            <listheader label="Stock Total" align="center"/>
-		            <listheader label="Stock Disponible" align="center"/>
-		            <listheader label="Stock Reservado" align="center"/>
-		            <listheader label="Stock Minimo" align="center"/>
-		            <listheader label="Stock Reposicion" align="center"/>
-		        </listhead>
-		        <template name="model">
-		            <listitem>
-		                <listcell label="${each.code}"/>
-		                <listcell label="${each.description}"/>
-		                <listcell label="${each.measure}"/>
-		                <listcell label="${each.stock}"/>
-		                <listcell label="${win_supply_stock$composer.getSupplyStockAvailable(each)}"/>
-		                <listcell label="${win_supply_stock$composer.getSupplyStockReserved(each)}"/>
-		                <listcell label="${each.stockMin}"/>
-		                <listcell label="${each.stockRepo}"/>
-		            </listitem>
-		        </template>
-		    </listbox>
-		    <vlayout>
-		        <separator/>
-				<grid id="supplyTypeExistenceGrid" width="40%" sclass="sigma-form" visible="false">
+        	<vlayout>
+			    <hlayout>
+			        <label>Buscar:</label>
+			        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
+			        <button id="searchButton" label="Buscar"/>
+			    </hlayout>
+			    <separator/>
+			    <listbox id="supplyTypeListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
+			    	<auxhead>
+						<auxheader label="Insumos" colspan="8"/>
+					</auxhead>
+			        <listhead>
+			            <listheader label="Codigo" align="center"/>
+			            <listheader label="Descripcion" align="center"/>
+			            <listheader label="Medidas" align="center"/>
+			            <listheader label="Stock Total" align="center"/>
+			            <listheader label="Stock Disponible" align="center"/>
+			            <listheader label="Stock Reservado" align="center"/>
+			            <listheader label="Stock Minimo" align="center"/>
+			            <listheader label="Stock Reposicion" align="center"/>
+			        </listhead>
+			        <template name="model">
+			            <listitem>
+			                <listcell label="${each.code}"/>
+			                <listcell label="${each.description}"/>
+			                <listcell label="${each.measure}"/>
+			                <listcell label="${each.stock}"/>
+			                <listcell label="${win_supply_stock$composer.getSupplyStockAvailable(each)}"/>
+			                <listcell label="${win_supply_stock$composer.getSupplyStockReserved(each)}"/>
+			                <listcell label="${each.stockMin}"/>
+			                <listcell label="${each.stockRepo}"/>
+			            </listitem>
+			        </template>
+			    </listbox>
+		        <grid id="supplyTypeExistenceGrid" width="40%" sclass="sigma-form" visible="false">
 			        <columns>
 		                <column hflex="min" align="right"/>
 		                <column />
@@ -56,13 +55,7 @@
 			            </row>
 			            <row>
 			                <label>Stock Actual:</label>
-			                <cell colspan="1" style="text-align:center">
-			                	<hbox>
-				                	<doublebox id="stockDoublebox" value="0" width="100px"/>
-				                	<button id="stockIncreaseButton" label="Registrar Ingreso"/>
-				                	<button id="stockDecreaseButton" label="Registrar Egreso"/>
-			                	</hbox>
-			                </cell>
+			                <doublebox id="stockDoublebox" value="0" width="100px"/>
 			            </row>
 			            <row>
 			                <label>Stock Minimo:</label>
@@ -121,27 +114,29 @@
 			            </row>
 			        </rows>
 				</grid>
+			    <separator/>
+			    <listbox id="supplyReservedListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
+			    	<auxhead>
+						<auxheader label="Reservas" colspan="4"/>
+					</auxhead>
+			        <listhead>
+			            <listheader label="Plan de Produccion" align="center"/>
+			            <listheader label="Codigo" align="center"/>
+			            <listheader label="Descripcion" align="center"/>
+			            <listheader label="Cantidad Reservada" align="center"/>
+			        </listhead>
+			        <template name="model">
+			            <listitem>
+			                <listcell label="${win_supply_stock$composer.getProductionPlanName(each)}"/>
+			                <listcell label="${each.supplyRequirement.supplyType.code}"/>
+			                <listcell label="${each.supplyRequirement.supplyType.description}"/>
+			                <listcell label="${each.stockReserved}"/>
+			            </listitem>
+			        </template>
+			    </listbox>
+			    <separator/>
+			    <separator/>
 		    </vlayout>
-		    <separator/>
-		    <listbox id="supplyReservedListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
-		    	<auxhead>
-					<auxheader label="Reservas" colspan="4"/>
-				</auxhead>
-		        <listhead>
-		            <listheader label="Plan de Produccion" align="center"/>
-		            <listheader label="Codigo" align="center"/>
-		            <listheader label="Descripcion" align="center"/>
-		            <listheader label="Cantidad Reservada" align="center"/>
-		        </listhead>
-		        <template name="model">
-		            <listitem>
-		                <listcell label="${win_supply_stock$composer.getProductionPlanName(each)}"/>
-		                <listcell label="${each.supplyRequirement.supplyType.code}"/>
-		                <listcell label="${each.supplyRequirement.supplyType.description}"/>
-		                <listcell label="${each.stockReserved}"/>
-		            </listitem>
-		        </template>
-		    </listbox>
         </panelchildren>
     </panel>
 </window>

@@ -2,7 +2,7 @@
     apply="ar.edu.utn.sigmaproject.controller.PieceSelectionModalController"
     position="center,center" closable="true"
     action="show: slideDown;hide: slideUp">
-	<panel border="rounded">
+	<panel border="none">
         <panelchildren>
 			<vlayout>
 		        <separator/>
