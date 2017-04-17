@@ -107,6 +107,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	Listbox productionOrderRawMaterialListbox;
 	@Wire
 	Grid processTypeGrid;
+	@Wire
+	Button autoAssignButton;
 
 	// services
 	@WireVariable
@@ -154,13 +156,10 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	private List<ProductionOrderDetail> productionOrderDetailList;
 	private List<Worker> workerList;
 	private List<Machine> machineList;
-	private List<ProductionOrderSupply> productionOrderSupplyList;
-	private List<ProductionOrderRawMaterial> productionOrderRawMaterialList;
 	private List<ProcessType> processTypeList;
 
 	// list models
 	private ListModelList<ProductionOrderDetail> productionOrderDetailListModel;
-	private ListModelList<Worker> workerListModel;
 	private ListModelList<ProductionOrderSupply> productionOrderSupplyListModel;
 	private ListModelList<ProductionOrderRawMaterial> productionOrderRawMaterialListModel;
 
@@ -173,7 +172,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		if(currentProductionPlan == null) {throw new RuntimeException("ProductionPlan not found");}
 
 		productionOrderDetailList = currentProductionOrder.getDetails();
-		Collections.sort(productionOrderDetailList, new ProductionOrderDetailComparator());
+//		Collections.sort(productionOrderDetailList, new ProductionOrderDetailComparator());
 		//List<ProductionOrderDetail> details = getProductionOrderDetailList(currentProductionOrder);// genera los detalles para para ver si no se edito el producto y que posea una cantidad mas grande de procesos.
 		//if(details.size() != productionOrderDetailList.size()) {
 		//	productionOrderDetailList = details;
@@ -210,7 +209,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		//			productionOrderNumberSpinner.setValue(getNewProductionOrderNumber());
 		//		}
 		workerList = workerRepository.findAll();
-		workerListModel = new ListModelList<>(workerList);
 		productionOrderStartDatebox.setValue(currentProductionOrder.getDateStart());
 		productionOrderFinishDatebox.setValue(currentProductionOrder.getDateFinish());
 		refreshProductionOrderDetailGridView();
@@ -229,8 +227,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	}
 
 	private void refreshProductionOrderOrderSupplyAndRawMaterialListbox() {
-		productionOrderSupplyList = currentProductionOrder.getProductionOrderSupplies();
-		productionOrderRawMaterialList = currentProductionOrder.getProductionOrderRawMaterials();
+		List<ProductionOrderSupply> productionOrderSupplyList = currentProductionOrder.getProductionOrderSupplies();
+		List<ProductionOrderRawMaterial> productionOrderRawMaterialList = currentProductionOrder.getProductionOrderRawMaterials();
 		productionOrderSupplyListModel = new ListModelList<ProductionOrderSupply>(productionOrderSupplyList);
 		productionOrderRawMaterialListModel = new ListModelList<ProductionOrderRawMaterial>(productionOrderRawMaterialList);
 		productionOrderSupplyListbox.setModel(productionOrderSupplyListModel);
@@ -271,7 +269,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		}
 		return productionOrderDetailList;
 	}
-	
+
 	private boolean isEditionAllowed() {
 		// no se puede modificar si el plan esta Cancelado, Lanzado, En Ejecucion o Finalizado. Si esta Suspendido se puede modificar para solucionar problemas de maquinas en reparacion o empreados ausentes.
 		ProductionPlanStateType stateLanzado = productionPlanStateTypeRepository.findFirstByName("Lanzado");
@@ -289,12 +287,11 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	@Transactional
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
-		ProductionOrderStateType lastStateType = productionOrderStateTypeRepository.findOne(currentProductionOrder.getCurrentStateType().getId());
 		if(!isEditionAllowed()) {
 			alert("No se puede modificar porque el Plan de Produccion esta Cancelado, Lanzado, En Ejecucion o Finalizado.");
 			return;
 		}
-		if(lastStateType.equals(productionOrderStateTypeRepository.findFirstByName("Cancelada"))) {
+		if(currentProductionOrder.getCurrentStateType().getName().equalsIgnoreCase("Cancelada")) {
 			alert("No se puede modificar una Orden de Produccion Cancelada.");
 			return;
 		}
@@ -312,7 +309,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			}
 		}
 		Date productionOrderDateStart = productionOrderStartDatebox.getValue();
-		Date productionOrderDateFinish = productionOrderFinishDatebox.getValue();
+		//		Date productionOrderDateFinish = productionOrderFinishDatebox.getValue();
 		if (productionOrderDateStart == null) {
 			Clients.showNotification("Debe Seleccionar Fecha de Inicio", productionOrderStartDatebox);
 			return;
@@ -320,28 +317,21 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		if(currentProductionOrder.getNumber() == 0) {
 			currentProductionOrder.setNumber(getNewProductionOrderNumber());
 		}
-		currentProductionOrder.setDateStart(productionOrderDateStart);
-		currentProductionOrder.setDateFinish(productionOrderDateFinish);
-		productionOrderDetailList = productionOrderDetailRepository.save(productionOrderDetailList);
-		currentProductionOrder.setDetails(productionOrderDetailList);
-
-		productionOrderSupplyList = productionOrderSupplyRepository.save(productionOrderSupplyList);
-		productionOrderRawMaterialList = productionOrderRawMaterialRepository.save(productionOrderRawMaterialList);
-		currentProductionOrder.setProductionOrderSupplies(productionOrderSupplyList);
-		currentProductionOrder.setProductionOrderRawMaterials(productionOrderRawMaterialList);
-
+		//		currentProductionOrder.setDateStart(productionOrderDateStart);
+		//		currentProductionOrder.setDateFinish(productionOrderDateFinish);
 		// el estado de la orden debe cambiar automaticamente 
 		ProductionOrderStateType productionOrderStateType = productionOrderStateTypeRepository.findFirstByName("Preparada");
-		if(!productionOrderStateType.equals(lastStateType)) { // no se graba si es el mismo estado
+		if(!productionOrderStateType.getName().equalsIgnoreCase(currentProductionOrder.getCurrentStateType().getName())) { // no se vuelve a grabar si es el mismo estado
 			ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateType, new Date());
 			productionOrderState = productionOrderStateRepository.save(productionOrderState);
 			currentProductionOrder.setState(productionOrderState);
 		}
 
+		productionOrderDetailList = productionOrderDetailRepository.save(productionOrderDetailList);
+		currentProductionOrder.setDetails(productionOrderDetailList);
 		currentProductionOrder = productionOrderRepository.save(currentProductionOrder);
 
-//		updateProductionPlanState();
-
+		//		updateProductionPlanState();
 		alert("Orden de Produccion Guardada.");
 		//cancelButtonClick();
 		refreshView();
@@ -488,16 +478,22 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	}
 
 	public ListModelList<Machine> getMachineListModelByProcessType(ProcessType processType) {
+		return new ListModelList<>(getMachineListByProcessType(processType));
+	}
+
+	private List<Machine> getMachineListByProcessType(ProcessType processType) {
 		List<Machine> list = new ArrayList<Machine>();
-		MachineType machineType = machineTypeRepository.findOne(processType.getMachineType().getId());
-		if (machineType != null) {
-			for (Machine machine : machineList) {
-				if (machineType.equals(machineTypeRepository.findOne(machine.getMachineType().getId()))) {
-					list.add(machine);
+		if(processType.getMachineType() != null) {
+			MachineType machineType = machineTypeRepository.findOne(processType.getMachineType().getId());
+			if (machineType != null) {
+				for (Machine machine : machineList) {
+					if (machineType.equals(machineTypeRepository.findOne(machine.getMachineType().getId()))) {
+						list.add(machine);
+					}
 				}
 			}
 		}
-		return new ListModelList<>(list);
+		return list;
 	}
 
 	public ListModelList<Worker> getProcessTypeWorkerListModel(ProcessType processType) {
@@ -645,19 +641,38 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		Collections.sort(list, new ProcessTypeComparator());
 		return list;
 	}
-	
-	public class ProcessTypeComparator implements Comparator<ProcessType> {
-	    @Override
-	    public int compare(ProcessType o1, ProcessType o2) {
-	        return o2.getSequence().compareTo(o1.getSequence());
-	    }
-	}
-	
-	public class ProductionOrderDetailComparator implements Comparator<ProductionOrderDetail> {
-	    @Override
-	    public int compare(ProductionOrderDetail o1, ProductionOrderDetail o2) {
-	        return o2.getProcess().getType().getSequence().compareTo(o1.getProcess().getType().getSequence());
-	    }
+
+	@Listen("onClick = #autoAssignButton")
+	public void autoAssignButtonClick() {
+		// asigna la primer maquina o trabajador disponible a cada detalle
+		Worker worker = null;
+		Machine machine = null;
+		if(workerList.size() > 0) {
+			worker = workerList.get(0);
+		}
+		for(ProductionOrderDetail each : productionOrderDetailList) {
+			List<Machine> list = getMachineListByProcessType(each.getProcess().getType());
+			if(list.size() > 0) {
+				machine = list.get(0);
+			}
+			each.setWorker(worker);
+			each.setMachine(machine);
+		}
+		refreshProductionOrderDetailGridView();
+		refreshProcessTypeGridView();
 	}
 
+	public class ProcessTypeComparator implements Comparator<ProcessType> {
+		@Override
+		public int compare(ProcessType o1, ProcessType o2) {
+			return o2.getSequence().compareTo(o1.getSequence());
+		}
+	}
+
+	public class ProductionOrderDetailComparator implements Comparator<ProductionOrderDetail> {
+		@Override
+		public int compare(ProductionOrderDetail o1, ProductionOrderDetail o2) {
+			return o2.getProcess().getType().getSequence().compareTo(o1.getProcess().getType().getSequence());
+		}
+	}
 }

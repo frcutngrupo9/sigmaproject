@@ -61,6 +61,19 @@ public class ProductionFollowUpListController extends SelectorComposer<Component
 	}
 
 	private void refreshView() {
+		/*
+		//busca todas las ordenes de produccion en estado "Preparada" o "Iniciada"
+		ProductionOrderStateType productionOrderStateTypePreparada = productionOrderStateTypeRepository.findFirstByName("Preparada");
+		ProductionOrderStateType productionOrderStateTypeIniciada = productionOrderStateTypeRepository.findFirstByName("Iniciada");
+		productionOrderList = new ArrayList<ProductionOrder>();
+		for(ProductionOrder each : productionOrderRepository.findAll()) {
+			String currentStateTypeName = each.getCurrentStateType().getName();
+			if(currentStateTypeName.equalsIgnoreCase(productionOrderStateTypePreparada.getName()) || currentStateTypeName.equalsIgnoreCase(productionOrderStateTypeIniciada.getName())) {
+
+			}
+		}
+		 */
+
 		// busca todos los planes de produccion que esten en estado "Lanzado" o "En Produccion", y 
 		// guarda todas sus ordenes de produccion en la lista
 		ProductionPlanStateType productionPlanStateTypeLanzado = productionPlanStateTypeRepository.findFirstByName("Lanzado");
@@ -77,7 +90,7 @@ public class ProductionFollowUpListController extends SelectorComposer<Component
 		productionOrderListModel = new ListModelList<ProductionOrder>(productionOrderList);
 		productionOrderGrid.setModel(productionOrderListModel);
 	}
-	
+
 	@Listen("onEditProductionOrder = #productionOrderGrid")
 	public void doEditProductionOrder(ForwardEvent evt) {
 		ProductionOrder productionOrder = (ProductionOrder) evt.getData();
@@ -85,7 +98,7 @@ public class ProductionFollowUpListController extends SelectorComposer<Component
 		Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/production_follow_up.zul");
 	}
-	
+
 	public String getPercentComplete(ProductionOrder aux) {
 		if(aux != null) {
 			List<ProductionOrderDetail> productionOrderDetailList = aux.getDetails();
