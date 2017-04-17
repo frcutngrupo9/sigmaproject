@@ -61,6 +61,12 @@
 					<button id="generateDetailsButton" label="Actualizar Detalles"/>
 				</hbox>
         		<grid id="processTypeGrid" sizedByContent="true" span="true">
+        			<auxhead>
+						<auxheader colspan="2"/>
+					    <auxheader colspan="2" align="center">
+					        <button id="autoAssignButton" label="Asignar Empleados y Maquinas Automaticamente"/>
+					    </auxheader>
+					</auxhead>
         			<columns>
 			            <column label="Proceso" align="left"/>
 			            <column label="Tipo de Maquina" align="center"/>
