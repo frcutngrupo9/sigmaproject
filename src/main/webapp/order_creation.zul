@@ -26,12 +26,7 @@
                             <label value="Cliente: "/>
 		                    <bandbox id="clientBandbox" buttonVisible = "true" autodrop = "true" width="25%">
 		                        <bandpopup>
-		                            <vbox>
-		                                <hbox>
-		                                    Buscar
-		                                    <textbox/>
-		                                </hbox>
-		                                <listbox id="clientPopupListbox" width="200px">
+		                            <listbox id="clientPopupListbox" width="200px">
 		                                <listhead>
 		                                    <listheader label="Cliente"/>
 		                                    <listheader label="Email"/>
@@ -42,8 +37,7 @@
 		                                        <listcell label="${each.email}"/>
 		                                    </listitem>
 		                                </template>
-		                                </listbox>
-		                            </vbox>
+		                        	</listbox>
 		                        </bandpopup>
 		                    </bandbox>
                         </row>
@@ -59,14 +53,9 @@
                 </grid>
                 <hbox hflex="1" style="margin: 4px">
                 	<label value="Seleccionar Producto: "/>
-                    <bandbox id="productBandbox" buttonVisible = "true" autodrop = "true">
+                    <bandbox id="productBandbox" buttonVisible="true" autodrop="true">
                         <bandpopup>
-                            <vbox>
-                                <hbox>
-                                    Buscar
-                                    <textbox id="productNameFilterTextbox"/>
-                                </hbox>
-                                <listbox id="productPopupListbox" width="500px" sizedByContent="true" span="true">
+                        	<listbox id="productPopupListbox" width="500px" height="250px" sizedByContent="true" span="true">
                                 <listhead>
                                     <listheader label="Foto" align="center"/>
                                     <listheader label="Producto" align="center"/>
@@ -81,8 +70,7 @@
                                         <listcell label="${each.name}"/>
                                     </listitem>
                                 </template>
-                                </listbox>
-                            </vbox>
+                        	</listbox>
                         </bandpopup>
                     </bandbox>
                     <label value="Cantidad: "/>
@@ -93,7 +81,7 @@
                     <button id="resetOrderDetailButton" label="Reset Detalle"/>
                     <button id="cancelOrderDetailButton" label="Cancelar Edicion"/>
                 </hbox>
-                <listbox id="orderDetailListbox" mold="paging" pageSize="7" sizedByContent="true" span="true" style="margin: 4px">
+                <listbox id="orderDetailListbox" mold="paging" pageSize="7" sizedByContent="true" span="true" style="margin: 4px" emptyMessage="Debe Agregar Detalles.">
                     <auxhead>
                         <auxheader label="Productos" colspan="6"/>
                     </auxhead>
@@ -134,6 +122,7 @@
                     <button id="resetOrderButton" label="Reset Pedido"/>
                     <button id="deleteOrderButton" label="Eliminar Pedido"/>
                     <hbox pack="center" align="center" hflex="1">
+			        	<button id="newOrderButton" label="Nuevo Pedido"/>
 			        	<button id="returnButton" label="Volver a Listado"/>
 			        </hbox>
                 </hlayout>

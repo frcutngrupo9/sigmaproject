@@ -8,26 +8,20 @@
                     <label value="Insumo: "/>
                     <bandbox id="supplyTypeBandbox" buttonVisible = "true" autodrop = "true">
                         <bandpopup>
-                            <vbox>
-                                <hbox>
-                                    Buscar
-                                    <textbox />
-                                </hbox>
-                                <listbox id="supplyTypePopupListbox" width="500px">
-	                                <listhead>
-	                                    <listheader label="Descripcion" align="center"/>
-	                                    <listheader label="Detalles" align="center"/>
-	                                    <listheader label="Medida" align="center"/>
-	                                </listhead>
-	                                <template name="model">
-	                                    <listitem>
-	                                        <listcell label="${each.description}"/>
-	                                        <listcell label="${each.details}"/>
-	                                        <listcell label="${each.measure}"/>
-	                                    </listitem>
-	                                </template>
-                                </listbox>
-                            </vbox>
+                            <listbox id="supplyTypePopupListbox" width="500px">
+                                <listhead>
+                                    <listheader label="Descripcion" align="center"/>
+                                    <listheader label="Detalles" align="center"/>
+                                    <listheader label="Medida" align="center"/>
+                                </listhead>
+                                <template name="model">
+                                    <listitem>
+                                        <listcell label="${each.description}"/>
+                                        <listcell label="${each.details}"/>
+                                        <listcell label="${each.measure}"/>
+                                    </listitem>
+                                </template>
+                            </listbox>
                         </bandpopup>
                     </bandbox>
                     <label value="Cantidad: "/>

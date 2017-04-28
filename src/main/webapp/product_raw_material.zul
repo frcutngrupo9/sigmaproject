@@ -8,28 +8,22 @@
                     <label value="Materia Prima: "/>
                     <bandbox id="rawMaterialTypeBandbox" buttonVisible = "true" autodrop = "true">
                         <bandpopup>
-                            <vbox>
-                                <hbox>
-                                    Buscar
-                                    <textbox />
-                                </hbox>
-                                <listbox id="rawMaterialTypePopupListbox" width="500px">
-	                                <listhead>
-	                                    <listheader label="Nombre" align="center"/>
-	                                    <listheader label="Largo (L)" align="center"/>
-							            <listheader label="Espesor (E)" align="center"/>
-							            <listheader label="Ancho (A)" align="center"/>
-	                                </listhead>
-	                                <template name="model">
-	                                    <listitem>
-	                                        <listcell label="${each.name}"/>
-	                                        <listcell label="${each.length.doubleValue()} ${each.getLengthMeasureUnit().getShortName()}"/>
-							                <listcell label="${each.depth.doubleValue()} ${each.getDepthMeasureUnit().getShortName()}"/>
-							                <listcell label="${each.width.doubleValue()} ${each.getWidthMeasureUnit().getShortName()}"/>
-	                                    </listitem>
-	                                </template>
-                                </listbox>
-                            </vbox>
+                            <listbox id="rawMaterialTypePopupListbox" width="500px">
+                                <listhead>
+                                    <listheader label="Nombre" align="center"/>
+                                    <listheader label="Largo (L)" align="center"/>
+						            <listheader label="Espesor (E)" align="center"/>
+						            <listheader label="Ancho (A)" align="center"/>
+                                </listhead>
+                                <template name="model">
+                                    <listitem>
+                                        <listcell label="${each.name}"/>
+                                        <listcell label="${each.length.doubleValue()} ${each.getLengthMeasureUnit().getShortName()}"/>
+						                <listcell label="${each.depth.doubleValue()} ${each.getDepthMeasureUnit().getShortName()}"/>
+						                <listcell label="${each.width.doubleValue()} ${each.getWidthMeasureUnit().getShortName()}"/>
+                                    </listitem>
+                                </template>
+                            </listbox>
                         </bandpopup>
                     </bandbox>
                     <label value="Cantidad: "/>

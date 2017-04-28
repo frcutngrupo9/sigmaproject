@@ -1,0 +1,36 @@
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
+<window id="win_materials_order_list" title="Lista de Pedidos de Materiales" closable="false" apply="ar.edu.utn.sigmaproject.controller.MaterialsOrderListController" sclass="sigma-content">
+	<panel border="none">
+        <panelchildren>
+		    <hlayout>
+		        <label>Buscar:</label>
+		        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
+		        <button id="searchButton" label="Buscar"/>
+		        <hbox pack="center" align="center" hflex="1">
+		        	<button id="newMaterialsOrderButton" label="Nuevo Pedido de Materiales"/>
+		        </hbox>
+		    </hlayout>
+		    <separator/>
+		    <grid id="materialsOrderGrid" mold="paging" pageSize="7">
+		    	<auxhead>
+					<auxheader label="Pedidos de Materiales" colspan="4"/>
+				</auxhead>
+		        <columns>
+		            <column label="Numero" align="center" sort="auto(number)"/>
+		            <column label="Fecha Creacion" align="center"/>
+		            <column label="Cant. Materiales Diferentes" align="center"/>
+		            <column label="Detalles" width="120px" align="center"/>
+		        </columns>
+		        <template name="model">
+		            <row>
+		                <label value="${each.number}"/>
+		                <label value="${r:getFormattedDateTime(each.date)}"/>
+		                <label value="${each.details.size()}"/>
+		                <button forward="onClick=materialsOrderGrid.onEditMaterialsOrder(${each})"  image="/img/Search16x16.png"/>
+		            </row>
+		        </template>
+		    </grid>
+		    <separator/>
+        </panelchildren>
+    </panel>
+</window>

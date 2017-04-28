@@ -14,6 +14,7 @@ import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
+import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -30,6 +31,7 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
+import ar.edu.utn.sigmaproject.domain.Client;
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.OrderState;
@@ -527,6 +529,28 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	public void returnButtonClick() {
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/production_plan_list.zul");
+	}
+	
+	private void filter() {
+		List<Order> some = new ArrayList<>();
+		String nameFilter = orderBandbox.getValue().toLowerCase();
+		for(Order each : orderPopupList) {// busca filtrando por varios atributos
+			if((each.getClient().getName()+each.getClient().getEmail()+each.getNumber()).toLowerCase().contains(nameFilter) || nameFilter.equals("")) {
+				some.add(each);
+			}
+		}
+		orderPopupListModel = new ListModelList<Order>(some);
+		orderPopupListbox.setModel(orderPopupListModel);
+	}
+
+	@Listen("onChanging = #orderBandbox")
+	public void changeFilter(InputEvent event) {
+		if(currentOrder != null) {// al cambiar el filtro se deselecciona
+			currentOrder = null;
+		}
+		Bandbox target = (Bandbox)event.getTarget();
+		target.setText(event.getValue());
+		filter();
 	}
 
 }

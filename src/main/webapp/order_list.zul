@@ -16,12 +16,12 @@
 					<auxheader label="Pedidos" colspan="10"/>
 				</auxhead>
 		        <columns>
-		            <column label="Numero" align="center"/>
-		            <column label="Cliente" align="center"/>
+		            <column label="Numero" align="center" sort="auto(number)"/>
+		            <column label="Cliente" align="center" sort="auto(client.name)"/>
 		            <column label="Fecha Creacion" align="center"/>
 		            <column label="Fecha Necesidad" align="center"/>
 		            <column label="Cant. Productos" align="center"/>
-		            <column label="Estado" align="center"/>
+		            <column label="Estado" align="center" sort="auto(currentStateType.name)"/>
 		            <column label="Importe Total" align="center"/>
 		            <column label="Editar" width="120px" align="center"/>
 		            <column label="Cancelar" width="120px" align="center"/>

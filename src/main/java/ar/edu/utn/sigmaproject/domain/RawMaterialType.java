@@ -1,15 +1,25 @@
 package ar.edu.utn.sigmaproject.domain;
 
-import ar.edu.utn.sigmaproject.domain.indexbridge.RawMaterialTypeFieldsClassBridge;
-import org.hibernate.search.annotations.*;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.ClassBridge;
+import org.hibernate.search.annotations.ContainedIn;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Store;
+
+import ar.edu.utn.sigmaproject.domain.indexbridge.RawMaterialTypeFieldsClassBridge;
 
 @Indexed
 @ClassBridge(
@@ -133,9 +143,9 @@ public class RawMaterialType implements Serializable, Cloneable {
 	}
 
 	public String getFormattedMeasure() {
-		String lengthText = "(L) " + length.doubleValue() + " " + lengthMeasureUnit.getShortName();
 		String depthText = "(E) " + depth.doubleValue() + " " + depthMeasureUnit.getShortName();
 		String widthText = "(A) " + width.doubleValue() + " " + widthMeasureUnit.getShortName();
-		return lengthText + " x " + depthText + " x " + widthText;
+		String lengthText = "(L) " + length.doubleValue() + " " + lengthMeasureUnit.getShortName();
+		return depthText + " x " + widthText + " x " + lengthText;
 	}
 }

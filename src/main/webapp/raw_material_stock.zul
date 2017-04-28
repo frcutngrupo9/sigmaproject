@@ -11,13 +11,14 @@
 			    <separator/>
 			    <listbox id="woodListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
 			    	<auxhead>
-						<auxheader label="Materia Prima" colspan="7"/>
+						<auxheader label="Materia Prima" colspan="8"/>
 					</auxhead>
 			        <listhead>
 			        	<listheader label="Madera" align="center"/>
 			            <listheader label="Nombre" align="center"/>
 			            <listheader label="Medidas" align="center"/>
-			            <listheader label="Stock Actual" align="center"/>
+			            <listheader label="Stock Total" align="center"/>
+			            <listheader label="Stock No Reservado" align="center"/>
 			            <listheader label="Stock Reservado" align="center"/>
 			            <listheader label="Stock Minimo" align="center"/>
 			            <listheader label="Stock Reposicion" align="center"/>
@@ -28,6 +29,7 @@
 			                <listcell label="${each.rawMaterialType.name}"/>
 			                <listcell label="${r:getFormattedMeasure(each.rawMaterialType)}"/>
 			                <listcell label="${each.stock}"/>
+			                <listcell label="(impl pend)"/>
 			                <listcell label="(impl pend)"/>
 			                <listcell label="${each.stockMin}"/>
 			                <listcell label="${each.stockRepo}"/>

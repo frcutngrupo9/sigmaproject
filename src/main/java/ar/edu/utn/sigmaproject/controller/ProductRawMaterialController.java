@@ -1,6 +1,7 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
@@ -8,6 +9,7 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventQueue;
 import org.zkoss.zk.ui.event.EventQueues;
+import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -20,6 +22,7 @@ import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
@@ -213,5 +216,28 @@ public class ProductRawMaterialController extends SelectorComposer<Component> {
 		} else {
 			return "[Sin Unidad de Medida]";
 		}
+	}
+	
+	private void filterItems() {
+		List<RawMaterialType> someItems = new ArrayList<>();
+		String textFilter = rawMaterialTypeBandbox.getValue().toLowerCase();
+		for(RawMaterialType each : rawMaterialTypePopupList) {
+			if((each.getFormattedMeasure()+each.getName()).toLowerCase().contains(textFilter) || textFilter.equals("")) {
+				someItems.add(each);
+			}
+		}
+		rawMaterialTypePopupListModel = new ListModelList<>(someItems);
+		rawMaterialTypePopupListbox.setModel(rawMaterialTypePopupListModel);
+	}
+
+	@Listen("onChanging = #rawMaterialTypeBandbox")
+	public void changeFilter(InputEvent event) {
+		if(currentRawMaterialType != null) {
+			rawMaterialQuantityDoublebox.setValue(null);
+			currentRawMaterialType = null;
+		}
+		Textbox target = (Bandbox)event.getTarget();
+		target.setText(event.getValue());
+		filterItems();
 	}
 }

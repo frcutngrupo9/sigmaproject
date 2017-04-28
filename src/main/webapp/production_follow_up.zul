@@ -3,29 +3,42 @@
     <panel title="Seguimiento de Produccion segun Tareas" id="productionOrderCreationBlock" border="rounded">
         <panelchildren>
         	<vlayout>
-        		<hbox hflex="1" pack="center">
-        			<label value="Plan de Produccion: "/>
-        			<textbox id="productionPlanNameTextbox"/>
-        			<label value="Estado Plan: "/>
-        			<textbox id="productionPlanStateTypeTextbox"/>
-				</hbox>
-                <hbox hflex="1" pack="center">
-					<label value="Producto: "/>
-					<textbox id="productNameTextbox" width="370px"/>
-					<label value="Cantidad: "/>
-					<intbox id="productUnitsIntbox" width="40px"/>
-				</hbox>
+        		<grid id="productGrid" hflex="1" sclass="sigma-form">
+                    <columns>
+                        <column align="right"/>
+                        <column align="left"/>
+                        <column align="right"/>
+                        <column align="left"/>
+                    </columns>
+                    <rows>
+                        <row>
+                            <label value="Plan de Produccion: "/>
+		        			<textbox id="productionPlanNameTextbox"/>
+		        			<label value="Estado Plan: "/>
+		        			<textbox id="productionPlanStateTypeTextbox"/>
+                        </row>
+                        <row>
+                            <label value="Producto: "/>
+							<textbox id="productNameTextbox" width="370px"/>
+							<label value="Cantidad: "/>
+							<intbox id="productUnitsIntbox" width="40px"/>
+                        </row>
+                        <row>
+                            <label value="Fecha Inicio Estimada: "/>
+							<datebox buttonVisible="false" disabled="true" id="productionOrderStartDatebox" cols="12" format="dd-MM-yyyy"/>
+							<label value="Fecha Finalizacion Estimada: "/>
+							<datebox buttonVisible="false" disabled="true" id="productionOrderFinishDatebox" cols="12" format="dd-MM-yyyy"/>
+                        </row>
+                        <row>
+                            <label value="Fecha Inicio Real: "/>
+							<datebox id="productionOrderRealStartDatebox" cols="12" format="dd-MM-yyyy"/>
+							<label value="Fecha Finalizacion Real: "/>
+							<datebox id="productionOrderRealFinishDatebox" cols="12" format="dd-MM-yyyy"/>
+                        </row>
+                    </rows>
+                </grid>
 				<hbox hflex="1" pack="center">
-					<label value="Fecha Inicio Estimada: "/>
-					<datebox buttonVisible="false" disabled="true" id="productionOrderStartDatebox" cols="12" format="dd-MM-yyyy"/>
-					<label value="Fecha Finalizacion Estimada: "/>
-					<datebox buttonVisible="false" disabled="true" id="productionOrderFinishDatebox" cols="12" format="dd-MM-yyyy"/>
-				</hbox>
-				<hbox hflex="1" pack="center">
-					<label value="Fecha Inicio Real: "/>
-					<datebox id="productionOrderRealStartDatebox" cols="12" format="dd-MM-yyyy"/>
-					<label value="Fecha Finalizacion Real: "/>
-					<datebox id="productionOrderRealFinishDatebox" cols="12" format="dd-MM-yyyy"/>
+					<button id="materialsWithdrawalButton" label="Retirar Materiales"/>
 				</hbox>
         		<grid id="productionOrderDetailGrid" sizedByContent="true" span="true">
     				<auxhead>
@@ -42,7 +55,6 @@
 			            <column label="Maquina" align="center"/>
 			            <column label="Cant Pieza" align="center"/>
 			            <column label="Cant Finalizada" align="center"/>
-			            
 		            </columns>
 		            <template name="model">
 		                <row>

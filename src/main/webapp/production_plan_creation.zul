@@ -28,28 +28,24 @@
 	                    		<hlayout>
 				                	<bandbox id="orderBandbox" buttonVisible = "true" autodrop = "true">
 				    					<bandpopup>
-				    						<vbox>
-				    							<hbox>
-				    								Buscar
-				    								<textbox />
-				    							</hbox>
-				    							<listbox id="orderPopupListbox" width="300px">
+				    						<listbox id="orderPopupListbox" width="500px">
 				    							<listhead>
 				    								<listheader label="Pedido" align="center"/>
 				    								<listheader label="Cliente" align="center"/>
 				    								<listheader label="Fecha" align="center"/>
+				    								<listheader label="Fecha Necesidad" align="center"/>
 				    								<listheader label="Productos Distintos" align="center"/>
 				    							</listhead>
 				    							<template name="model">
 				    								<listitem>
 				    									<listcell label="${each.id}"/>
 				    									<listcell label="${each.getClient().getName()}"/>
-				    									<listcell label="${each.date}"/>
+				    									<listcell label="${r:getFormattedDate(each.date)}"/>
+				    									<listcell label="${r:getFormattedDate(each.needDate)}"/>
 				    									<listcell label="${each.getDetails().size()}"/>
 				    								</listitem>
 				    							</template>
-				    							</listbox>
-				    						</vbox>
+				    						</listbox>
 				    					</bandpopup>
 				    				</bandbox>
 				    				<button id="addOrderButton" label="Agregar Pedido"/>

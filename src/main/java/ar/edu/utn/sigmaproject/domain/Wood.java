@@ -47,7 +47,7 @@ public class Wood extends Item implements Cloneable {
 
 	@Override
 	public String getDescription() {
-		return getRawMaterialType().getFormattedMeasure() + "(" + getWoodType().getName() + ")";
+		return getRawMaterialType().getFormattedMeasure() + " (" + getWoodType().getName() + ")";
 	}
 
 	public RawMaterialType getRawMaterialType() {
