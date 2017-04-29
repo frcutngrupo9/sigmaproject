@@ -106,6 +106,8 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	Listbox productionOrderSupplyListbox;
 	@Wire
 	Listbox productionOrderRawMaterialListbox;
+	@Wire
+	Button materialsWithdrawalButton;
 
 	// services
 	@WireVariable
@@ -584,5 +586,10 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	public void productionOrderStartDateboxOnChange() {
 		//Date finishDate = getFinishDate(productionOrderStartDatebox.getValue(), currentProductionOrder.getDurationTotal());
 		//productionOrderFinishDatebox.setValue(finishDate);
+	}
+	
+	@Listen("onClick = #materialsWithdrawalButton")
+	public void materialsWithdrawalButtonClick() {
+		
 	}
 }

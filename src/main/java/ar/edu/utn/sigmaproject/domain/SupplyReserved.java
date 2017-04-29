@@ -12,7 +12,7 @@ public class SupplyReserved implements Serializable, Cloneable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
 
-	@ManyToOne
+	@OneToOne
 	SupplyRequirement supplyRequirement;
 
 	BigDecimal stockReserved = BigDecimal.ZERO;

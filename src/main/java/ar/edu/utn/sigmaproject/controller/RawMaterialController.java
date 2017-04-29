@@ -12,6 +12,7 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.ListModelList;
@@ -21,10 +22,12 @@ import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
 import ar.edu.utn.sigmaproject.domain.MeasureUnitType;
-import ar.edu.utn.sigmaproject.domain.RawMaterialType;
+import ar.edu.utn.sigmaproject.domain.Wood;
+import ar.edu.utn.sigmaproject.domain.WoodType;
 import ar.edu.utn.sigmaproject.service.MeasureUnitRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitTypeRepository;
-import ar.edu.utn.sigmaproject.service.RawMaterialTypeRepository;
+import ar.edu.utn.sigmaproject.service.WoodRepository;
+import ar.edu.utn.sigmaproject.service.WoodTypeRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class RawMaterialController extends SelectorComposer<Component> {
@@ -60,35 +63,44 @@ public class RawMaterialController extends SelectorComposer<Component> {
 	Selectbox widthMeasureUnitSelectbox;
 	@Wire
 	Grid rawMaterialTypeGrid;
+	@Wire
+	Combobox woodTypeCombobox;
 
 	// services
 	@WireVariable
-	private RawMaterialTypeRepository rawMaterialTypeRepository;
+	private WoodRepository woodRepository;
 	@WireVariable
 	private MeasureUnitRepository measureUnitRepository;
 	@WireVariable
 	private MeasureUnitTypeRepository measureUnitTypeRepository;
+	@WireVariable
+	private WoodTypeRepository woodTypeRepository;
 
 	// atributes
-	private RawMaterialType currentRawMaterialType;
+	private Wood currentWood;
 
 	// list
-	private List<RawMaterialType> rawMaterialTypeList;
+	private List<Wood> rawMaterialTypeList;
 	private List<MeasureUnit> measureUnitList;
+	private List<WoodType> woodTypeList;
 
 	// list models
-	private ListModelList<RawMaterialType> rawMaterialTypeListModel;
+	private ListModelList<Wood> rawMaterialTypeListModel;
 	private ListModelList<MeasureUnit> lengthMeasureUnitListModel;
 	private ListModelList<MeasureUnit> depthMeasureUnitListModel;
 	private ListModelList<MeasureUnit> widthMeasureUnitListModel;
+	private ListModelList<WoodType> woodTypeListModel;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		rawMaterialTypeList = rawMaterialTypeRepository.findAll();
+		woodTypeList = woodTypeRepository.findAll();
+		woodTypeListModel = new ListModelList<>(woodTypeList);
+		woodTypeCombobox.setModel(woodTypeListModel);
+		rawMaterialTypeList = woodRepository.findAll();
 		rawMaterialTypeListModel = new ListModelList<>(rawMaterialTypeList);
 		rawMaterialTypeListbox.setModel(rawMaterialTypeListModel);
-		currentRawMaterialType = null;
+		currentWood = null;
 		MeasureUnitType measureUnitType = measureUnitTypeRepository.findFirstByName("Longitud");
 		measureUnitList = measureUnitRepository.findByType(measureUnitType);
 		lengthMeasureUnitListModel = new ListModelList<>(measureUnitList);
@@ -109,7 +121,7 @@ public class RawMaterialController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #newButton")
 	public void newRawMaterial() {
-		currentRawMaterialType = null;
+		currentWood = null;
 		refreshView();
 		rawMaterialTypeGrid.setVisible(true);
 	}
@@ -122,17 +134,21 @@ public class RawMaterialController extends SelectorComposer<Component> {
 		}
 		int lengthSelectedIndex = lengthMeasureUnitSelectbox.getSelectedIndex();
 		if(lengthSelectedIndex == -1) {// no hay una unidad de medida seleccionada
-			Clients.showNotification("Debe seleccionar una unidad de medida", lengthMeasureUnitSelectbox);
+			Clients.showNotification("Debe seleccionar una unidad de medida.", lengthMeasureUnitSelectbox);
 			return;
 		}
 		int depthSelectedIndex = depthMeasureUnitSelectbox.getSelectedIndex();
 		if(depthSelectedIndex == -1) {// no hay una unidad de medida seleccionada
-			Clients.showNotification("Debe seleccionar una unidad de medida", depthMeasureUnitSelectbox);
+			Clients.showNotification("Debe seleccionar una unidad de medida.", depthMeasureUnitSelectbox);
 			return;
 		}
 		int widthSelectedIndex = widthMeasureUnitSelectbox.getSelectedIndex();
 		if(widthSelectedIndex == -1) {// no hay una unidad de medida seleccionada
-			Clients.showNotification("Debe seleccionar una unidad de medida", widthMeasureUnitSelectbox);
+			Clients.showNotification("Debe seleccionar una unidad de medida.", widthMeasureUnitSelectbox);
+			return;
+		}
+		if(woodTypeCombobox.getSelectedIndex() == -1) {
+			Clients.showNotification("Debe seleccionar un tipo de madera.", woodTypeCombobox);
 			return;
 		}
 		String name = nameTextbox.getText();
@@ -142,28 +158,30 @@ public class RawMaterialController extends SelectorComposer<Component> {
 		MeasureUnit depthMeasureUnit = depthMeasureUnitListModel.getElementAt(depthSelectedIndex);
 		BigDecimal width = BigDecimal.valueOf(widthDoublebox.doubleValue());
 		MeasureUnit widthMeasureUnit = widthMeasureUnitListModel.getElementAt(widthSelectedIndex);
-		if(currentRawMaterialType == null)	{// si es nuevo
-			currentRawMaterialType = new RawMaterialType(name, length, lengthMeasureUnit, depth, depthMeasureUnit, width, widthMeasureUnit);
+		WoodType woodType = woodTypeCombobox.getSelectedItem().getValue();
+		if(currentWood == null)	{// si es nuevo
+			currentWood = new Wood(name, length, lengthMeasureUnit, depth, depthMeasureUnit, width, widthMeasureUnit, woodType, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
 		} else {
 			// si es una edicion
-			currentRawMaterialType.setName(name);
-			currentRawMaterialType.setLength(length);
-			currentRawMaterialType.setDepth(depth);
-			currentRawMaterialType.setWidth(width);
-			currentRawMaterialType.setLengthMeasureUnit(lengthMeasureUnit);
-			currentRawMaterialType.setDepthMeasureUnit(depthMeasureUnit);
-			currentRawMaterialType.setWidthMeasureUnit(widthMeasureUnit);
+			currentWood.setWoodType(woodType);
+			currentWood.setName(name);
+			currentWood.setLength(length);
+			currentWood.setDepth(depth);
+			currentWood.setWidth(width);
+			currentWood.setLengthMeasureUnit(lengthMeasureUnit);
+			currentWood.setDepthMeasureUnit(depthMeasureUnit);
+			currentWood.setWidthMeasureUnit(widthMeasureUnit);
 		}
-		rawMaterialTypeRepository.save(currentRawMaterialType);
-		rawMaterialTypeList = rawMaterialTypeRepository.findAll();
+		woodRepository.save(currentWood);
+		rawMaterialTypeList = woodRepository.findAll();
 		rawMaterialTypeListModel = new ListModelList<>(rawMaterialTypeList);
-		currentRawMaterialType = null;
+		currentWood = null;
 		refreshView();
 	}
 
 	@Listen("onClick = #cancelButton")
 	public void cancelButtonClick() {
-		currentRawMaterialType = null;
+		currentWood = null;
 		refreshView();
 	}
 
@@ -175,9 +193,9 @@ public class RawMaterialController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
-		rawMaterialTypeRepository.delete(currentRawMaterialType);
-		rawMaterialTypeListModel.remove(currentRawMaterialType);
-		currentRawMaterialType = null;
+		woodRepository.delete(currentWood);
+		rawMaterialTypeListModel.remove(currentWood);
+		currentWood = null;
 		refreshView();
 	}
 
@@ -185,10 +203,10 @@ public class RawMaterialController extends SelectorComposer<Component> {
 	public void doListBoxSelect() {
 		if(rawMaterialTypeListModel.isSelectionEmpty()) {
 			//just in case for the no selection
-			currentRawMaterialType = null;
+			currentWood = null;
 		}else {
-			if(currentRawMaterialType == null) {
-				currentRawMaterialType = rawMaterialTypeListbox.getSelectedItem().getValue();
+			if(currentWood == null) {
+				currentWood = rawMaterialTypeListbox.getSelectedItem().getValue();
 				refreshView();
 			}
 		}
@@ -209,8 +227,10 @@ public class RawMaterialController extends SelectorComposer<Component> {
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		newButton.setDisabled(false);
-		if(currentRawMaterialType == null) {// creando
+		if(currentWood == null) {// creando
 			rawMaterialTypeGrid.setVisible(false);
+			woodTypeListModel.addToSelection(woodTypeRepository.findFirstByName("Pino"));
+			woodTypeCombobox.setModel(woodTypeListModel);
 			nameTextbox.setValue( null);
 			lengthDoublebox.setValue(null);
 			depthDoublebox.setValue(null);
@@ -225,23 +245,24 @@ public class RawMaterialController extends SelectorComposer<Component> {
 			resetButton.setDisabled(true);
 		} else {// editando
 			rawMaterialTypeGrid.setVisible(true);
-			nameTextbox.setValue(currentRawMaterialType.getName());
-			lengthDoublebox.setValue(currentRawMaterialType.getLength().doubleValue());
-			depthDoublebox.setValue(currentRawMaterialType.getDepth().doubleValue());
-			widthDoublebox.setValue(currentRawMaterialType.getWidth().doubleValue());
-			MeasureUnit lengthMeasureUnit = currentRawMaterialType.getLengthMeasureUnit();
+			woodTypeCombobox.setSelectedIndex(woodTypeListModel.indexOf(currentWood.getWoodType()));
+			nameTextbox.setValue(currentWood.getName());
+			lengthDoublebox.setValue(currentWood.getLength().doubleValue());
+			depthDoublebox.setValue(currentWood.getDepth().doubleValue());
+			widthDoublebox.setValue(currentWood.getWidth().doubleValue());
+			MeasureUnit lengthMeasureUnit = currentWood.getLengthMeasureUnit();
 			if(lengthMeasureUnit != null) {
 				lengthMeasureUnitSelectbox.setSelectedIndex(lengthMeasureUnitListModel.indexOf(lengthMeasureUnit));
 			} else {
 				lengthMeasureUnitSelectbox.setSelectedIndex(-1);
 			}
-			MeasureUnit depthMeasureUnit = currentRawMaterialType.getDepthMeasureUnit();
+			MeasureUnit depthMeasureUnit = currentWood.getDepthMeasureUnit();
 			if(depthMeasureUnit != null) {
 				depthMeasureUnitSelectbox.setSelectedIndex(depthMeasureUnitListModel.indexOf(depthMeasureUnit));
 			} else {
 				depthMeasureUnitSelectbox.setSelectedIndex(-1);
 			}
-			MeasureUnit widthMeasureUnit = currentRawMaterialType.getWidthMeasureUnit();
+			MeasureUnit widthMeasureUnit = currentWood.getWidthMeasureUnit();
 			if(widthMeasureUnit != null) {
 				widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(widthMeasureUnit));
 			} else {

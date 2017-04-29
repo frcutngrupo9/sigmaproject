@@ -9,6 +9,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
@@ -20,14 +21,26 @@ public class Wood extends Item implements Cloneable {
 
 	@IndexedEmbedded
 	@ManyToOne
-	RawMaterialType rawMaterialType;
-
-	@IndexedEmbedded
-	@ManyToOne
 	WoodType woodType;
 
 	@OneToMany(orphanRemoval = true)
 	List<WoodReserved> woodsReserved = new ArrayList<>();
+	
+	@ManyToOne
+	MeasureUnit lengthMeasureUnit;
+
+	@ManyToOne
+	MeasureUnit depthMeasureUnit;
+
+	@ManyToOne
+	MeasureUnit widthMeasureUnit;
+
+	@Field
+	String name = "";
+
+	BigDecimal length = BigDecimal.ZERO;
+	BigDecimal depth = BigDecimal.ZERO;
+	BigDecimal width = BigDecimal.ZERO;
 
 	BigDecimal stock = BigDecimal.ZERO;
 	BigDecimal stockMin = BigDecimal.ZERO;
@@ -37,8 +50,14 @@ public class Wood extends Item implements Cloneable {
 
 	}
 
-	public Wood(RawMaterialType rawMaterialType, WoodType woodType, BigDecimal stock, BigDecimal stockMin, BigDecimal stockRepo) {
-		this.rawMaterialType = rawMaterialType;
+	public Wood(String name, BigDecimal length, MeasureUnit lengthMeasureUnit, BigDecimal depth, MeasureUnit depthMeasureUnit, BigDecimal width, MeasureUnit widthMeasureUnit, WoodType woodType, BigDecimal stock, BigDecimal stockMin, BigDecimal stockRepo) {
+		this.name = name;
+		this.length = length;
+		this.lengthMeasureUnit = lengthMeasureUnit;
+		this.depth = depth;
+		this.depthMeasureUnit = depthMeasureUnit;
+		this.width = width;
+		this.widthMeasureUnit = widthMeasureUnit;
 		this.woodType = woodType;
 		this.stock = stock;
 		this.stockMin = stockMin;
@@ -47,15 +66,70 @@ public class Wood extends Item implements Cloneable {
 
 	@Override
 	public String getDescription() {
-		return getRawMaterialType().getFormattedMeasure() + "(" + getWoodType().getName() + ")";
+		return getFormattedMeasure() + " (" + getWoodType().getName() + ")";
 	}
 
-	public RawMaterialType getRawMaterialType() {
-		return rawMaterialType;
+	public String getName() {
+		return name;
 	}
 
-	public void setRawMaterialType(RawMaterialType rawMaterialType) {
-		this.rawMaterialType = rawMaterialType;
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public BigDecimal getWidth() {
+		return width;
+	}
+
+	public void setWidth(BigDecimal width) {
+		this.width = width;
+	}
+
+	public BigDecimal getLength() {
+		return length;
+	}
+
+	public void setLength(BigDecimal length) {
+		this.length = length;
+	}
+
+	public BigDecimal getDepth() {
+		return depth;
+	}
+
+	public void setDepth(BigDecimal depth) {
+		this.depth = depth;
+	}
+
+	public MeasureUnit getLengthMeasureUnit() {
+		return lengthMeasureUnit;
+	}
+
+	public void setLengthMeasureUnit(MeasureUnit lengthMeasureUnit) {
+		this.lengthMeasureUnit = lengthMeasureUnit;
+	}
+
+	public MeasureUnit getDepthMeasureUnit() {
+		return depthMeasureUnit;
+	}
+
+	public void setDepthMeasureUnit(MeasureUnit depthMeasureUnit) {
+		this.depthMeasureUnit = depthMeasureUnit;
+	}
+
+	public MeasureUnit getWidthMeasureUnit() {
+		return widthMeasureUnit;
+	}
+
+	public void setWidthMeasureUnit(MeasureUnit widthMeasureUnit) {
+		this.widthMeasureUnit = widthMeasureUnit;
+	}
+
+	public String getFormattedMeasure() {
+		String depthText = "(E) " + depth.doubleValue() + " " + depthMeasureUnit.getShortName();
+		String widthText = "(A) " + width.doubleValue() + " " + widthMeasureUnit.getShortName();
+		String lengthText = "(L) " + length.doubleValue() + " " + lengthMeasureUnit.getShortName();
+		return depthText + " x " + widthText + " x " + lengthText;
 	}
 
 	public WoodType getWoodType() {

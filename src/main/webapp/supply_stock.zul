@@ -17,7 +17,7 @@
 			            <listheader label="Descripcion" align="center"/>
 			            <listheader label="Medidas" align="center"/>
 			            <listheader label="Stock Total" align="center"/>
-			            <listheader label="Stock Disponible" align="center"/>
+			            <listheader label="Stock No Reservado" align="center"/>
 			            <listheader label="Stock Reservado" align="center"/>
 			            <listheader label="Stock Minimo" align="center"/>
 			            <listheader label="Stock Reposicion" align="center"/>

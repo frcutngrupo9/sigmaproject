@@ -16,6 +16,7 @@ public class SupplyRequirement implements Serializable, Cloneable {
 	SupplyType supplyType;
 
 	BigDecimal quantity = BigDecimal.ZERO;
+	BigDecimal quantityWithdrawn = BigDecimal.ZERO;
 
 	public SupplyRequirement() {
 
@@ -48,5 +49,18 @@ public class SupplyRequirement implements Serializable, Cloneable {
 
 	public void setQuantity(BigDecimal quantity) {
 		this.quantity = quantity;
+	}
+
+	public BigDecimal getQuantityWithdrawn() {
+		return quantityWithdrawn;
+	}
+
+	public void setQuantityWithdrawn(BigDecimal quantityWithdrawn) {
+		this.quantityWithdrawn = quantityWithdrawn;
+	}
+	
+	public BigDecimal getQuantityNotWithdrawn() {
+		// es la cantidad que aun no ha sido retirada
+		return quantity.subtract(quantityWithdrawn);
 	}
 }

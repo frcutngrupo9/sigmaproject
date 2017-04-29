@@ -29,7 +29,6 @@ import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
-import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Client;
 import ar.edu.utn.sigmaproject.domain.Order;
@@ -87,8 +86,6 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	@Wire
 	Caption orderCaption;
 	@Wire
-	Textbox productNameFilterTextbox;
-	@Wire
 	Button returnButton;
 
 	// services
@@ -145,6 +142,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		currentClient = null;
 		refreshViewOrder();
 	}
+	
 	@Listen("onSelect = #clientPopupListbox")
 	public void selectionClientPopupListbox() {
 		currentClient = (Client) clientPopupListbox.getSelectedItem().getValue();
@@ -260,13 +258,18 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		}
 		productPopupListModel = new ListModelList<Product>(productPopupList);
 		productPopupListbox.setModel(productPopupListModel);
-		productNameFilterTextbox.setValue(null);
+		productBandbox.setValue(null);
 	}
 
 	private void refreshOrderDetailListbox() {
+		BigDecimal totalPrice = getTotalPrice();
+		String totalPriceValue = "";
+		if(!totalPrice.equals(new BigDecimal("0"))) {
+			totalPriceValue = "Importe Total: " + totalPrice.doubleValue() + " $";
+		}
+		orderTotalPriceLabel.setValue(totalPriceValue);
 		orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
 		orderDetailListbox.setModel(orderDetailListModel);// actualizamos la vista del order detail
-		orderTotalPriceLabel.setValue("Importe Total: " + getTotalPrice().doubleValue() + " $");
 	}
 
 	private void refreshViewOrder() {
@@ -434,7 +437,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 
 	private void filterProducts() {
 		List<Product> someProducts = new ArrayList<>();
-		String nameFilter = productNameFilterTextbox.getValue().toLowerCase();
+		String nameFilter = productBandbox.getValue().toLowerCase();
 		for(Product each : productPopupList) {
 			if(each.getName().toLowerCase().contains(nameFilter) || nameFilter.equals("")) {
 				someProducts.add(each);
@@ -444,9 +447,13 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		productPopupListbox.setModel(productPopupListModel);
 	}
 
-	@Listen("onChanging = #productNameFilterTextbox")
-	public void changeFilter(InputEvent event) {
-		Textbox target = (Textbox)event.getTarget();
+	@Listen("onChanging = #productBandbox")
+	public void changeFilterProducts(InputEvent event) {
+		if(currentProduct != null) {
+			productPriceDoublebox.setValue(null);
+			currentProduct = null;
+		}
+		Bandbox target = (Bandbox)event.getTarget();
 		target.setText(event.getValue());
 		filterProducts();
 	}
@@ -455,6 +462,34 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	public void returnButtonClick() {
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/order_list.zul");
+	}
+	
+	private void filterClients() {
+		List<Client> someClients = new ArrayList<>();
+		String nameFilter = clientBandbox.getValue().toLowerCase();
+		for(Client each : clientPopupList) {// busca filtrando por mail y nombre
+			if((each.getName()+each.getEmail()).toLowerCase().contains(nameFilter) || nameFilter.equals("")) {
+				someClients.add(each);
+			}
+		}
+		clientPopupListModel = new ListModelList<Client>(someClients);
+		clientPopupListbox.setModel(clientPopupListModel);
+	}
+
+	@Listen("onChanging = #clientBandbox")
+	public void changeFilter(InputEvent event) {
+		if(currentClient != null) {
+			currentClient = null;
+		}
+		Bandbox target = (Bandbox)event.getTarget();
+		target.setText(event.getValue());
+		filterClients();
+	}
+	
+	@Listen("onClick = #newOrderButton")
+	public void newOrderButtonClick() {
+		currentOrder = null;
+		refreshViewOrder();
 	}
 
 }

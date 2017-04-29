@@ -14,6 +14,7 @@ import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
+import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -326,7 +327,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		List<ProductionOrderRawMaterial> list = new ArrayList<>();
 		for(RawMaterial each : productionOrder.getProduct().getRawMaterials()) {
 			BigDecimal totalQuantity = each.getQuantity().multiply(new BigDecimal(productionOrder.getUnits()));
-			ProductionOrderRawMaterial productionOrderRawMaterial = new ProductionOrderRawMaterial(each.getRawMaterialType(), totalQuantity);
+			ProductionOrderRawMaterial productionOrderRawMaterial = new ProductionOrderRawMaterial(each.getWood(), totalQuantity);
 			list.add(productionOrderRawMaterial);
 		}
 		return list;
@@ -363,14 +364,14 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			for(RawMaterial rawMaterial : product.getRawMaterials()) {
 				RawMaterialRequirement auxRawMaterialRequirement = null;
 				for(RawMaterialRequirement supplyRequirement : list) {// buscamos si la materia prima no se encuentra agregada
-					if(rawMaterial.getRawMaterialType().equals(supplyRequirement.getRawMaterialType())) {
+					if(rawMaterial.getWood().equals(supplyRequirement.getWood())) {
 						auxRawMaterialRequirement = supplyRequirement;
 					}
 				}
 				if(auxRawMaterialRequirement != null) {// la materia prima si se encuentra agregada, sumamos sus cantidades
 					auxRawMaterialRequirement.setQuantity(auxRawMaterialRequirement.getQuantity().add(rawMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
 				} else {// la materia prima no se encuentra, se la agrega
-					list.add(new RawMaterialRequirement(rawMaterial.getRawMaterialType(), rawMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
+					list.add(new RawMaterialRequirement(rawMaterial.getWood(), rawMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
 				}
 			}
 		}
@@ -527,6 +528,28 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	public void returnButtonClick() {
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/production_plan_list.zul");
+	}
+	
+	private void filter() {
+		List<Order> some = new ArrayList<>();
+		String nameFilter = orderBandbox.getValue().toLowerCase();
+		for(Order each : orderPopupList) {// busca filtrando por varios atributos
+			if((each.getClient().getName()+each.getClient().getEmail()+each.getNumber()).toLowerCase().contains(nameFilter) || nameFilter.equals("")) {
+				some.add(each);
+			}
+		}
+		orderPopupListModel = new ListModelList<Order>(some);
+		orderPopupListbox.setModel(orderPopupListModel);
+	}
+
+	@Listen("onChanging = #orderBandbox")
+	public void changeFilter(InputEvent event) {
+		if(currentOrder != null) {// al cambiar el filtro se deselecciona
+			currentOrder = null;
+		}
+		Bandbox target = (Bandbox)event.getTarget();
+		target.setText(event.getValue());
+		filter();
 	}
 
 }

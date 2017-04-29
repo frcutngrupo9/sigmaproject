@@ -1,6 +1,7 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
@@ -8,6 +9,7 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventQueue;
 import org.zkoss.zk.ui.event.EventQueues;
+import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -20,6 +22,7 @@ import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.Supply;
@@ -202,5 +205,28 @@ public class ProductSupplyController extends SelectorComposer<Component> {
 		refreshSupplyTypePopup();// actualizamos el popup
 		currentSupply = null;
 		refreshViewSupply();
+	}
+	
+	private void filterItems() {
+		List<SupplyType> someItems = new ArrayList<>();
+		String textFilter = supplyTypeBandbox.getValue().toLowerCase();
+		for(SupplyType each : supplyTypePopupList) {
+			if(each.getDescription().toLowerCase().contains(textFilter) || textFilter.equals("")) {
+				someItems.add(each);
+			}
+		}
+		supplyTypePopupListModel = new ListModelList<>(someItems);
+		supplyTypePopupListbox.setModel(supplyTypePopupListModel);
+	}
+
+	@Listen("onChanging = #supplyTypeBandbox")
+	public void changeFilter(InputEvent event) {
+		if(currentSupplyType != null) {
+			supplyQuantityDoublebox.setValue(null);
+			currentSupplyType = null;
+		}
+		Textbox target = (Bandbox)event.getTarget();
+		target.setText(event.getValue());
+		filterItems();
 	}
 }

@@ -138,17 +138,17 @@ public class ProductDeliveryController extends SelectorComposer<Component> {
 		orderState = orderStateRepository.save(orderState);
 		currentOrder.setState(orderState);
 		currentOrder = orderRepository.save(currentOrder);
-		
+
 		// modifica la cantidad en stock
 		for(OrderDetail each : currentOrder.getDetails()) {
 			Product product = each.getProduct();
 			product.setStock(product.getStock() - each.getUnits());
 			product = productRepository.save(product);
 		}
-		
+
 		EventQueue<Event> eq = EventQueues.lookup("Product Delivery Queue", EventQueues.DESKTOP, true);
 		eq.publish(new Event("onProductDelivery", null, null));
-		alert("Reserva guardada.");
+		alert("Entrega de Producto Registrada.");
 		productDeliveryWindow.detach();
 	}
 

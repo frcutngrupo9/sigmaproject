@@ -1,6 +1,7 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
@@ -8,6 +9,7 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventQueue;
 import org.zkoss.zk.ui.event.EventQueues;
+import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -20,12 +22,13 @@ import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
 import ar.edu.utn.sigmaproject.domain.RawMaterial;
-import ar.edu.utn.sigmaproject.domain.RawMaterialType;
-import ar.edu.utn.sigmaproject.service.RawMaterialTypeRepository;
+import ar.edu.utn.sigmaproject.domain.Wood;
+import ar.edu.utn.sigmaproject.service.WoodRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProductRawMaterialController extends SelectorComposer<Component> {
@@ -56,19 +59,19 @@ public class ProductRawMaterialController extends SelectorComposer<Component> {
 
 	// services
 	@WireVariable
-	private RawMaterialTypeRepository rawMaterialTypeRepository;
+	private WoodRepository woodRepository;
 
 	// attributes
 	private RawMaterial currentRawMaterial;
-	private RawMaterialType currentRawMaterialType;
+	private Wood currentWood;
 
 	// list
 	private List<RawMaterial> rawMaterialList;
-	private List<RawMaterialType> rawMaterialTypePopupList;
+	private List<Wood> rawMaterialTypePopupList;
 
 	// list models
 	private ListModelList<RawMaterial> rawMaterialListModel;
-	private ListModelList<RawMaterialType> rawMaterialTypePopupListModel;
+	private ListModelList<Wood> rawMaterialTypePopupListModel;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -78,7 +81,7 @@ public class ProductRawMaterialController extends SelectorComposer<Component> {
 		rawMaterialList = (List<RawMaterial>) Executions.getCurrent().getAttribute("rawMaterialList");
 
 		currentRawMaterial = null;
-		currentRawMaterialType = null;
+		currentWood = null;
 
 		refreshViewRawMaterial();
 		refreshRawMaterialTypePopup();
@@ -105,13 +108,13 @@ public class ProductRawMaterialController extends SelectorComposer<Component> {
 			rawMaterialTypeBandbox.setDisabled(false);
 			rawMaterialTypeBandbox.setValue("");
 			rawMaterialQuantityDoublebox.setValue(null);
-			currentRawMaterialType = null;
+			currentWood = null;
 			deleteRawMaterialButton.setDisabled(true);
 			cancelRawMaterialButton.setDisabled(true);
 		} else {
-			currentRawMaterialType = currentRawMaterial.getRawMaterialType();
+			currentWood = currentRawMaterial.getWood();
 			rawMaterialTypeBandbox.setDisabled(true);// no se permite modificar en la edicion
-			rawMaterialTypeBandbox.setValue(currentRawMaterialType.getName());
+			rawMaterialTypeBandbox.setValue(currentWood.getName());
 			rawMaterialQuantityDoublebox.setValue(currentRawMaterial.getQuantity().doubleValue());
 			deleteRawMaterialButton.setDisabled(false);
 			cancelRawMaterialButton.setDisabled(false);
@@ -120,9 +123,9 @@ public class ProductRawMaterialController extends SelectorComposer<Component> {
 
 	private void refreshRawMaterialTypePopup() {// el popup se actualiza en base a la lista
 		rawMaterialTypePopupListbox.clearSelection();
-		rawMaterialTypePopupList = rawMaterialTypeRepository.findAll();
+		rawMaterialTypePopupList = woodRepository.findAll();
 		for(RawMaterial rawMaterial : rawMaterialList) {
-			rawMaterialTypePopupList.remove(rawMaterialTypeRepository.findOne(rawMaterial.getRawMaterialType().getId()));// sacamos del popup
+			rawMaterialTypePopupList.remove(woodRepository.findOne(rawMaterial.getWood().getId()));// sacamos del popup
 		}
 		rawMaterialTypePopupListModel = new ListModelList<>(rawMaterialTypePopupList);
 		rawMaterialTypePopupListbox.setModel(rawMaterialTypePopupListModel);
@@ -130,8 +133,8 @@ public class ProductRawMaterialController extends SelectorComposer<Component> {
 
 	@Listen("onSelect = #rawMaterialTypePopupListbox")
 	public void selectionRawMaterialTypePopupListbox() {
-		currentRawMaterialType = (RawMaterialType) rawMaterialTypePopupListbox.getSelectedItem().getValue();
-		rawMaterialTypeBandbox.setValue(currentRawMaterialType.getName());
+		currentWood = (Wood) rawMaterialTypePopupListbox.getSelectedItem().getValue();
+		rawMaterialTypeBandbox.setValue(currentWood.getName());
 		rawMaterialTypeBandbox.close();
 		rawMaterialQuantityDoublebox.setFocus(true);
 	}
@@ -149,7 +152,7 @@ public class ProductRawMaterialController extends SelectorComposer<Component> {
 		} else {
 			if(currentRawMaterial == null) {// permite la seleccion solo si no existe nada seleccionado
 				currentRawMaterial = rawMaterialListbox.getSelectedItem().getValue();
-				currentRawMaterialType = currentRawMaterial.getRawMaterialType();
+				currentWood = currentRawMaterial.getWood();
 				refreshViewRawMaterial();
 			}
 		}
@@ -171,7 +174,7 @@ public class ProductRawMaterialController extends SelectorComposer<Component> {
 	@Listen("onClick = #deleteRawMaterialButton")
 	public void deleteRawMaterial() {
 		if(currentRawMaterial != null) {
-			Messagebox.show("Esta seguro que desea eliminar " + currentRawMaterial.getRawMaterialType().getName() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+			Messagebox.show("Esta seguro que desea eliminar " + currentRawMaterial.getWood().getName() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 				public void onEvent(Event evt) throws InterruptedException {
 					if (evt.getName().equals("onOK")) {
 						rawMaterialList.remove(currentRawMaterial);// quitamos de la lista
@@ -190,16 +193,16 @@ public class ProductRawMaterialController extends SelectorComposer<Component> {
 			Clients.showNotification("Ingresar Cantidad de la Materia Prima", rawMaterialQuantityDoublebox);
 			return;
 		}
-		if(currentRawMaterialType == null) {
+		if(currentWood == null) {
 			Clients.showNotification("Debe seleccionar una Materia Prima", rawMaterialTypeBandbox);
 			return;
 		}
 		double rawMaterialQuantity = rawMaterialQuantityDoublebox.getValue();
 		if(currentRawMaterial == null) { // es nuevo
-			currentRawMaterial = new RawMaterial(currentRawMaterialType, BigDecimal.valueOf(rawMaterialQuantity));
+			currentRawMaterial = new RawMaterial(currentWood, BigDecimal.valueOf(rawMaterialQuantity));
 			rawMaterialList.add(currentRawMaterial);
 		} else { // se edita
-			currentRawMaterial.setRawMaterialType(currentRawMaterialType);;
+			currentRawMaterial.setWood(currentWood);;
 			currentRawMaterial.setQuantity(BigDecimal.valueOf(rawMaterialQuantity));
 		}
 		refreshRawMaterialTypePopup();// actualizamos el popup
@@ -213,5 +216,28 @@ public class ProductRawMaterialController extends SelectorComposer<Component> {
 		} else {
 			return "[Sin Unidad de Medida]";
 		}
+	}
+	
+	private void filterItems() {
+		List<Wood> someItems = new ArrayList<>();
+		String textFilter = rawMaterialTypeBandbox.getValue().toLowerCase();
+		for(Wood each : rawMaterialTypePopupList) {
+			if((each.getFormattedMeasure()+each.getName()).toLowerCase().contains(textFilter) || textFilter.equals("")) {
+				someItems.add(each);
+			}
+		}
+		rawMaterialTypePopupListModel = new ListModelList<>(someItems);
+		rawMaterialTypePopupListbox.setModel(rawMaterialTypePopupListModel);
+	}
+
+	@Listen("onChanging = #rawMaterialTypeBandbox")
+	public void changeFilter(InputEvent event) {
+		if(currentWood != null) {
+			rawMaterialQuantityDoublebox.setValue(null);
+			currentWood = null;
+		}
+		Textbox target = (Bandbox)event.getTarget();
+		target.setText(event.getValue());
+		filterItems();
 	}
 }

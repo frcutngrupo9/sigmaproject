@@ -14,13 +14,6 @@
         </function-signature>
     </function>
     <function>
-        <name>getFormattedMeasure</name>
-        <function-class>ar.edu.utn.sigmaproject.util.RenderElHelper</function-class>
-        <function-signature>
-            java.lang.String getFormattedMeasure(ar.edu.utn.sigmaproject.domain.RawMaterialType rawMaterialType)
-        </function-signature>
-    </function>
-    <function>
         <name>listModel</name>
         <function-class>ar.edu.utn.sigmaproject.util.RenderElHelper</function-class>
         <function-signature>

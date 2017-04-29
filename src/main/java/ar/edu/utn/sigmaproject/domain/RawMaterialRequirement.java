@@ -13,20 +13,18 @@ public class RawMaterialRequirement implements Serializable, Cloneable {
 	Long id;
 
 	@ManyToOne
-	RawMaterialType rawMaterialType;
+	Wood wood;
 
 	BigDecimal quantity = BigDecimal.ZERO;
-
-	boolean isFulfilled;
+	BigDecimal quantityWithdrawn = BigDecimal.ZERO;
 
 	public RawMaterialRequirement() {
 
 	}
 
-	public RawMaterialRequirement(RawMaterialType rawMaterialType, BigDecimal quantity) {
-		this.rawMaterialType = rawMaterialType;
+	public RawMaterialRequirement(Wood wood, BigDecimal quantity) {
+		this.wood = wood;
 		this.quantity = quantity;
-		isFulfilled = false;
 	}
 
 	public Long getId() {
@@ -37,12 +35,12 @@ public class RawMaterialRequirement implements Serializable, Cloneable {
 		this.id = id;
 	}
 
-	public RawMaterialType getRawMaterialType() {
-		return rawMaterialType;
+	public Wood getWood() {
+		return wood;
 	}
 
-	public void setRawMaterialType(RawMaterialType rawMaterialType) {
-		this.rawMaterialType = rawMaterialType;
+	public void setWood(Wood wood) {
+		this.wood = wood;
 	}
 
 	public BigDecimal getQuantity() {
@@ -52,12 +50,17 @@ public class RawMaterialRequirement implements Serializable, Cloneable {
 	public void setQuantity(BigDecimal quantity) {
 		this.quantity = quantity;
 	}
-
-	public boolean isFulfilled() {
-		return isFulfilled;
+	
+	public BigDecimal getQuantityWithdrawn() {
+		return quantityWithdrawn;
 	}
 
-	public void setFulfilled(boolean isFulfilled) {
-		this.isFulfilled = isFulfilled;
+	public void setQuantityWithdrawn(BigDecimal quantityWithdrawn) {
+		this.quantityWithdrawn = quantityWithdrawn;
+	}
+	
+	public BigDecimal getQuantityNotWithdrawn() {
+		// es la cantidad que aun no ha sido retirada
+		return quantity.subtract(quantityWithdrawn);
 	}
 }
