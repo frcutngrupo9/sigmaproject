@@ -31,7 +31,6 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
-import ar.edu.utn.sigmaproject.domain.Client;
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.OrderState;
@@ -328,7 +327,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		List<ProductionOrderRawMaterial> list = new ArrayList<>();
 		for(RawMaterial each : productionOrder.getProduct().getRawMaterials()) {
 			BigDecimal totalQuantity = each.getQuantity().multiply(new BigDecimal(productionOrder.getUnits()));
-			ProductionOrderRawMaterial productionOrderRawMaterial = new ProductionOrderRawMaterial(each.getRawMaterialType(), totalQuantity);
+			ProductionOrderRawMaterial productionOrderRawMaterial = new ProductionOrderRawMaterial(each.getWood(), totalQuantity);
 			list.add(productionOrderRawMaterial);
 		}
 		return list;
@@ -365,14 +364,14 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			for(RawMaterial rawMaterial : product.getRawMaterials()) {
 				RawMaterialRequirement auxRawMaterialRequirement = null;
 				for(RawMaterialRequirement supplyRequirement : list) {// buscamos si la materia prima no se encuentra agregada
-					if(rawMaterial.getRawMaterialType().equals(supplyRequirement.getRawMaterialType())) {
+					if(rawMaterial.getWood().equals(supplyRequirement.getWood())) {
 						auxRawMaterialRequirement = supplyRequirement;
 					}
 				}
 				if(auxRawMaterialRequirement != null) {// la materia prima si se encuentra agregada, sumamos sus cantidades
 					auxRawMaterialRequirement.setQuantity(auxRawMaterialRequirement.getQuantity().add(rawMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
 				} else {// la materia prima no se encuentra, se la agrega
-					list.add(new RawMaterialRequirement(rawMaterial.getRawMaterialType(), rawMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
+					list.add(new RawMaterialRequirement(rawMaterial.getWood(), rawMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
 				}
 			}
 		}

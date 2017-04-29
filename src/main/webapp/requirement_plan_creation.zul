@@ -44,10 +44,10 @@
 		            </listhead>
 		            <template name="model">
 		                <listitem>
-		                	<listcell label="${each.rawMaterialType.name}"/>
+		                	<listcell label="${each.wood.name}"/>
 		                	<listcell label="${each.quantity}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialTypeStock(each.rawMaterialType).doubleValue()}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialTypeStockAvailable(each.rawMaterialType).doubleValue()}"/>
+		                    <listcell label="${each.wood.stock.doubleValue()}"/>
+		                    <listcell label="${each.wood.getStockAvailable().doubleValue()}"/>
 		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialRequirementStockReserved(each).doubleValue()}"/>
 		                    <listcell>
 		                    	<label value="Si" if="${win_requirement_plan_creation$composer.isRawMaterialRequirementFulfilled(each)}"/>

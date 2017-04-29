@@ -167,7 +167,7 @@
 				        </listhead>
 				        <template name="model">
 				            <listitem>
-				                <listcell label="${each.rawMaterialType.name}"/>
+				                <listcell label="${each.wood.name}"/>
 				                <listcell label="${each.quantity}"/>
 				            </listitem>
 				        </template>

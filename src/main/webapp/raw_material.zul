@@ -9,6 +9,7 @@
 		    <separator/>
 		    <listbox id="rawMaterialTypeListbox"  mold="paging" pageSize="7">
 		        <listhead>
+		            <listheader label="Madera" align="center"/>
 		            <listheader label="Nombre" align="center"/>
 		            <listheader label="Largo (L)" align="center"/>
 		            <listheader label="Espesor (E)" align="center"/>
@@ -16,6 +17,7 @@
 		        </listhead>
 		        <template name="model">
 		            <listitem>
+		                <listcell label="${each.woodType.name}"/>
 		                <listcell label="${each.name}"/>
 		                <listcell label="${each.length} ${each.getLengthMeasureUnit().getShortName()}"/>
 		                <listcell label="${each.depth} ${each.getDepthMeasureUnit().getShortName()}"/>
@@ -71,6 +73,14 @@
 			                        </template>
 			                    </selectbox>
 		                    </hlayout>
+		                </row>
+		                <row>	
+		                    <label>Tipo Madera:</label>
+		                    <combobox id="woodTypeCombobox" readonly="true">
+		                        <template name="model">
+		                            <comboitem label="${each.name}" value="${each}"/>
+		                        </template>
+		                    </combobox>
 		                </row>
 		                <row>
 		                    <cell colspan="2" style="text-align:center">

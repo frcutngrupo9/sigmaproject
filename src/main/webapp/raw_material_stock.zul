@@ -26,11 +26,11 @@
 			        <template name="model">
 			            <listitem>
 			            	<listcell label="${each.woodType.name}"/>
-			                <listcell label="${each.rawMaterialType.name}"/>
-			                <listcell label="${r:getFormattedMeasure(each.rawMaterialType)}"/>
+			                <listcell label="${each.name}"/>
+			                <listcell label="${each.getFormattedMeasure()}"/>
 			                <listcell label="${each.stock}"/>
-			                <listcell label="(impl pend)"/>
-			                <listcell label="(impl pend)"/>
+			                <listcell label="${each.getStockAvailable()}"/>
+			                <listcell label="${each.getStockReserved()}"/>
 			                <listcell label="${each.stockMin}"/>
 			                <listcell label="${each.stockRepo}"/>
 			            </listitem>
@@ -55,12 +55,8 @@
 		                    </combobox>
 			            </row>
 			        	<row>
-			                <label>Materia Prima:</label>
-			                <combobox id="rawMaterialTypeCombobox" readonly="true">
-		                        <template name="model">
-		                            <comboitem label="${each.name}" value="${each}"/>
-		                        </template>
-		                    </combobox>
+			                <label>Nombre:</label>
+			                <textbox id="woodNameTextbox" disabled="true"/>
 			            </row>
 			            <row>
 			                <label>Stock Actual:</label>
@@ -99,8 +95,8 @@
 			        <template name="model">
 			            <listitem>
 			                <listcell label="${win_raw_material_stock$composer.getProductionPlanName(each)}"/>
-			                <listcell label="${win_raw_material_stock$composer.getWood(each).woodType.name}"/>
-			                <listcell label="${each.rawMaterialRequirement.rawMaterialType.name}"/>
+			                <listcell label="${each.rawMaterialRequirement.wood.woodType.name}"/>
+			                <listcell label="${each.rawMaterialRequirement.wood.name}"/>
 			                <listcell label="${each.stockReserved}"/>
 			            </listitem>
 			        </template>

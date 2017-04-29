@@ -3,27 +3,6 @@
 	<panel border="rounded">
         <panelchildren>
             <vlayout>
-            	<listbox id="woodListbox" sizedByContent="true" span="true">
-    				<auxhead>
-						<auxheader label="Materias Primas Disponibles" colspan="7"/>
-					</auxhead>
-        			<listhead>
-        				<listheader label="Madera"/>
-		                <listheader label="Materia Prima"/>
-		                <listheader label="Stock Actual"/>
-		                <listheader label="Cantidad Reservada"/>
-		                <listheader label="Cantidad Disponible"/>
-		            </listhead>
-		            <template name="model">
-		                <listitem>
-		                	<listcell label="${each.woodType.name}"/>
-		                    <listcell label="${each.rawMaterialType.name}"/>
-		                    <listcell label="${each.stock}"/>
-		                    <listcell label="${each.getStockReserved()}"/>
-		                    <listcell label="${each.stock - each.getStockReserved()}"/>
-						</listitem>
-		            </template>
-    			</listbox>
                 <grid id="rawMaterialReservationGrid" sclass="sigma-form">
 			        <columns>
 		                <column hflex="min" align="right"/>

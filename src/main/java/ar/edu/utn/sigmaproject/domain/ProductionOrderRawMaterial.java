@@ -18,7 +18,7 @@ public class ProductionOrderRawMaterial implements Serializable, Cloneable {
 	Long id;
 	
 	@ManyToOne
-	RawMaterialType rawMaterialType;
+	Wood wood;
 
 	BigDecimal quantity = BigDecimal.ZERO;
 	BigDecimal quantityUsed = BigDecimal.ZERO;
@@ -28,8 +28,8 @@ public class ProductionOrderRawMaterial implements Serializable, Cloneable {
 
 	}
 	
-	public ProductionOrderRawMaterial(RawMaterialType rawMaterialType, BigDecimal quantity) {
-		this.rawMaterialType = rawMaterialType;
+	public ProductionOrderRawMaterial(Wood wood, BigDecimal quantity) {
+		this.wood = wood;
 		this.quantity = quantity;
 	}
 
@@ -41,12 +41,12 @@ public class ProductionOrderRawMaterial implements Serializable, Cloneable {
 		this.id = id;
 	}
 
-	public RawMaterialType getRawMaterialType() {
-		return rawMaterialType;
+	public Wood getWood() {
+		return wood;
 	}
 
-	public void setRawMaterialType(RawMaterialType rawMaterialType) {
-		this.rawMaterialType = rawMaterialType;
+	public void setWood(Wood wood) {
+		this.wood = wood;
 	}
 
 	public BigDecimal getQuantity() {

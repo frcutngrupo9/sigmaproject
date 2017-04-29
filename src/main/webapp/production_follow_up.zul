@@ -114,7 +114,7 @@
 			        </listhead>
 			        <template name="model">
 			            <listitem>
-			                <listcell label="${each.rawMaterialType.name}"/>
+			                <listcell label="${each.wood.name}"/>
 			                <listcell label="${each.quantity}"/>
 			                <listcell>
 			                	<doublebox disabled="false" inplace="true" value="${each.quantityUsed}" forward="onChanging=productionOrderRawMaterialListbox.onEditUsedRawMaterial(${each})"/>

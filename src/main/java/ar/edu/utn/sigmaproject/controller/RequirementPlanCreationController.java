@@ -36,13 +36,11 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
-import ar.edu.utn.sigmaproject.domain.RawMaterialType;
 import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
 import ar.edu.utn.sigmaproject.domain.SupplyReserved;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.domain.Wood;
 import ar.edu.utn.sigmaproject.domain.WoodReserved;
-import ar.edu.utn.sigmaproject.domain.WoodType;
 import ar.edu.utn.sigmaproject.service.MaterialsOrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.MaterialsOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
@@ -223,51 +221,13 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 		return supplyRequirement.getQuantity().subtract(getSupplyStockReserved(supplyRequirement));
 	}
 
-	public BigDecimal getRawMaterialTypeStock(RawMaterialType rawMaterialType) {
-		List<Wood> woodList = woodRepository.findByRawMaterialType(rawMaterialType);
-		BigDecimal stock = BigDecimal.ZERO;
-		for(Wood each : woodList) {
-			stock = stock.add(each.getStock());
-		}
-		return stock;
-	}
-
-	public BigDecimal getRawMaterialTypeStockAvailable(RawMaterialType rawMaterialType) {
-		// devuelve la resta entre el stock total y el total reservado
-		BigDecimal stockTotal = getRawMaterialTypeStock(rawMaterialType);
-		BigDecimal stockReservedTotal = getRawMaterialTypeStockReserved(rawMaterialType);
-		return stockTotal.subtract(stockReservedTotal);
-	}
-
-	public BigDecimal getRawMaterialTypeStockReserved(RawMaterialType rawMaterialType) {
-		// busca la cantidad de reserva total de la materia prima, sin importar el tipo de madera
-		List<Wood> woodList = woodRepository.findByRawMaterialType(rawMaterialType);
-		BigDecimal stockReserved = BigDecimal.ZERO;
-		for(Wood each : woodList) {
-			for(WoodReserved eachReserved : each.getWoodsReserved()) {
-				if(!eachReserved.isWithdrawn()) {
-					stockReserved = stockReserved.add(eachReserved.getStockReserved());
-				}
-			}
-		}
-		return stockReserved;
-	}
-
-	public BigDecimal getRawMaterialTypeStockMissing(RawMaterialType rawMaterialType) {
-		return getRawMaterialTypeStock(rawMaterialType).subtract(getRawMaterialTypeStockReserved(rawMaterialType));
-	}
-
 	public BigDecimal getRawMaterialRequirementStockReserved(RawMaterialRequirement rawMaterialRequirement) {
 		// busca todos los woodReserved, ya que puede haber, para el mismo requirement, un wood reserved de cada tipo de madera
-		List<WoodReserved> woodReserved = woodReservedRepository.findByRawMaterialRequirement(rawMaterialRequirement);
-		if(woodReserved.isEmpty()) {
+		WoodReserved woodReserved = woodReservedRepository.findByRawMaterialRequirement(rawMaterialRequirement);
+		if(woodReserved == null) {
 			return BigDecimal.ZERO;
 		} else {
-			BigDecimal stockReserved = BigDecimal.ZERO;
-			for(WoodReserved each : woodReserved) {
-				stockReserved = stockReserved.add(each.getStockReserved());
-			}
-			return stockReserved;
+			return woodReserved.getStockReserved();
 		}
 	}
 
@@ -351,8 +311,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 					for(RawMaterialRequirement each : rawMaterialRequirementList) {
 						WoodReserved currentWoodReserved = null;
 						BigDecimal quantityNecessary = each.getQuantity();
-						WoodType woodTypePino = woodTypeRepository.findFirstByName("Pino");// busca seleccionar el wood que sea pino
-						Wood currentWood = woodRepository.findByRawMaterialTypeAndWoodType(each.getRawMaterialType(), woodTypePino);
+						Wood currentWood = each.getWood();
 						for(WoodReserved eachWoodReserved : currentWood.getWoodsReserved()) {
 							if(rawMaterialRequirementRepository.findOne(eachWoodReserved.getRawMaterialRequirement().getId()).equals(rawMaterialRequirementRepository.findOne(each.getId()))) {
 								currentWoodReserved = eachWoodReserved;
@@ -427,7 +386,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 			}
 		});
 	}
-	
+
 	private void materialsOrderCreationAction() {
 		List<MaterialsOrderDetail> materialsOrderDetailList = new ArrayList<>();
 		for(SupplyRequirement each : supplyRequirementList) {
@@ -443,14 +402,11 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 			}
 		}
 		for(RawMaterialRequirement each : rawMaterialRequirementList) {
-			BigDecimal stockMissing = getRawMaterialTypeStockMissing(each.getRawMaterialType());
-			BigDecimal stockAvailable = getRawMaterialTypeStockAvailable(each.getRawMaterialType());
+			BigDecimal stockMissing = getRawMaterialRequirementStockMissing(each);
+			BigDecimal stockAvailable = each.getWood().getStockAvailable();
 			if(stockAvailable.compareTo(stockMissing) == -1) {// si stockAvailable es menor a stockMissing
 				// no existe suficiente en stock por lo tanto se crea un detalle de pedido de materiales
-				RawMaterialType rawMaterialType = each.getRawMaterialType();
-				WoodType woodType = woodTypeRepository.findFirstByName("Pino");
-				Wood wood = woodRepository.findByRawMaterialTypeAndWoodType(rawMaterialType, woodType);
-				Item currentItem = wood;
+				Item currentItem = each.getWood();
 				BigDecimal stockToOrder = stockMissing.subtract(stockAvailable);// cantidad necesaria que no hay suficiente en stock
 				MaterialsOrderDetail materialsOrderDetail = new MaterialsOrderDetail(currentItem, currentItem.getDescription(), stockToOrder);
 				materialsOrderDetailList.add(materialsOrderDetail);

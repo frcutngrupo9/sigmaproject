@@ -38,7 +38,7 @@
 		    <vlayout>
 		        <separator/>
 		        <hbox>
-		            <button id="newProvisionOrderButton" label="Nuevo Pedido Para Productos con bajo stock"/>
+		            <button id="newProvisionOrderButton" label="Nuevo Pedido Para Productos con bajo stock" visible="false"/>
 		        </hbox>
 		        <separator/>
 				<grid id="productExistenceGrid" width="400px" sclass="sigma-form" visible="false">
@@ -78,52 +78,6 @@
 			            </row>
 			        </rows>
 		    	</grid>
-		    	<panel title="Pedido de Restock" id="orderCreationBlock" collapsible="true" visible="false" closable="false">
-		        	<panelchildren>
-		        		<separator/>
-		        		<hlayout>
-		        			<separator/>
-		                    <label value="Numero: "/>
-		                    <intbox id="orderNumberIntbox" constraint="no negative"/>
-		                    <separator/>
-		                    <separator/>
-		                    <label value="Fecha de necesidad: "/>
-		                    <datebox id="orderNeedDatebox" cols="12" format="dd-MM-yyyy"/>
-		                </hlayout>
-		                <separator/>
-		                <hlayout>
-		        			<separator/>
-					    	<listbox id="orderDetailListbox" mold="paging" pageSize="7">
-					            <auxhead>
-					                <auxheader label="Productos" colspan="3"/>
-					            </auxhead>
-					            <listhead>
-					            	<listheader label="Codigo Producto"/>
-					                <listheader label="Nombre Producto"/>
-					                <listheader label="Unidades"/>
-					            </listhead>
-					            <template name="model">
-					                <listitem>
-					                	<listcell label="${win_product_stock$composer.getProductCode(each.idProduct)}"/>
-					                    <listcell label="${win_product_stock$composer.getProductName(each.idProduct)}"/>
-					                    <listcell>
-				                        	<spinner inplace="true" value="${each.units}" forward="onChange=orderDetailListbox.onEditOrderDetailUnits(${each})" constraint="no negative: No puede ser valor negativo." width="98%"/>
-			                    		</listcell>
-									</listitem>
-					            </template>
-					        </listbox>
-					        <separator/>
-				        </hlayout>
-				        <separator/>
-				        <hlayout>
-				        	<separator/>
-				            <button id="saveOrderButton" label="Guardar"/>
-				            <button id="resetOrderButton" label="Reset"/>
-				            <button id="cancelOrderButton" label="Cancelar"/>
-				        </hlayout>
-				        <separator/>
-			        </panelchildren>
-			    </panel>
 			    <separator/>
 			    <separator/>
 		    </vlayout>

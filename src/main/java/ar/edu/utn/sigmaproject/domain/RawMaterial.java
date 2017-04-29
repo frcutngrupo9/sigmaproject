@@ -13,7 +13,7 @@ public class RawMaterial implements Serializable, Cloneable {
 	Long id;
 
 	@ManyToOne
-	RawMaterialType rawMaterialType;
+	Wood wood;
 
 	BigDecimal quantity = BigDecimal.ZERO;
 	boolean isClone;
@@ -22,8 +22,8 @@ public class RawMaterial implements Serializable, Cloneable {
 
 	}
 
-	public RawMaterial(RawMaterialType rawMaterialType, BigDecimal quantity) {
-		this.rawMaterialType = rawMaterialType;
+	public RawMaterial(Wood wood, BigDecimal quantity) {
+		this.wood = wood;
 		this.quantity = quantity;
 		isClone = false;
 	}
@@ -36,12 +36,12 @@ public class RawMaterial implements Serializable, Cloneable {
 		this.id = id;
 	}
 
-	public RawMaterialType getRawMaterialType() {
-		return rawMaterialType;
+	public Wood getWood() {
+		return wood;
 	}
 
-	public void setRawMaterialType(RawMaterialType rawMaterialType) {
-		this.rawMaterialType = rawMaterialType;
+	public void setWood(Wood wood) {
+		this.wood = wood;
 	}
 
 	public BigDecimal getQuantity() {
