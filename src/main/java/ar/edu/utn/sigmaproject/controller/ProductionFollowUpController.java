@@ -10,6 +10,7 @@ import javax.xml.datatype.Duration;
 import org.springframework.transaction.annotation.Transactional;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -18,6 +19,7 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Combobox;
@@ -30,6 +32,7 @@ import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
+import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Row;
 import org.zkoss.zul.Textbox;
 
@@ -51,6 +54,14 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
+import ar.edu.utn.sigmaproject.domain.RawMaterial;
+import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
+import ar.edu.utn.sigmaproject.domain.Supply;
+import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
+import ar.edu.utn.sigmaproject.domain.SupplyReserved;
+import ar.edu.utn.sigmaproject.domain.SupplyType;
+import ar.edu.utn.sigmaproject.domain.Wood;
+import ar.edu.utn.sigmaproject.domain.WoodReserved;
 import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
@@ -67,7 +78,11 @@ import ar.edu.utn.sigmaproject.service.ProductionOrderSupplyRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
+import ar.edu.utn.sigmaproject.service.RawMaterialRequirementRepository;
+import ar.edu.utn.sigmaproject.service.SupplyRequirementRepository;
 import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
+import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
+import ar.edu.utn.sigmaproject.service.WoodRepository;
 import ar.edu.utn.sigmaproject.service.WoodReservedRepository;
 import ar.edu.utn.sigmaproject.service.WorkerRepository;
 
@@ -129,7 +144,15 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	@WireVariable
 	private WoodReservedRepository woodReservedRepository;
 	@WireVariable
+	private WoodRepository woodRepository;
+	@WireVariable
+	private RawMaterialRequirementRepository rawMaterialRequirementRepository;
+	@WireVariable
 	private SupplyReservedRepository supplyReservedRepository;
+	@WireVariable
+	private SupplyTypeRepository supplyTypeRepository;
+	@WireVariable
+	private SupplyRequirementRepository supplyRequirementRepository;
 	@WireVariable
 	private ProductionOrderSupplyRepository productionOrderSupplyRepository;
 	@WireVariable
@@ -344,7 +367,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 					orderRepository.save(order);
 				}
 			}
-			
+
 			//TODO: si el estado es En Ejecucion se restan los materiales de stock
 
 			// se modifica la cantidad en stock si el estado es Finalizado
@@ -587,9 +610,71 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		//Date finishDate = getFinishDate(productionOrderStartDatebox.getValue(), currentProductionOrder.getDurationTotal());
 		//productionOrderFinishDatebox.setValue(finishDate);
 	}
-	
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Listen("onClick = #materialsWithdrawalButton")
 	public void materialsWithdrawalButtonClick() {
-		
+		// si ya se retiraron los materiales mostrar mensaje
+		if(currentProductionOrder.getDateMaterialsWithdrawal() != null) {
+			Clients.showNotification("Imposible Retirar Materiales, los Materiales ya se han retirado anteriormente.");
+			return;
+		}
+		Messagebox.show("Se realizara el retiro de todos los materiales reservados para la orden produccion.", "Confirmar", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+			public void onEvent(Event evt) throws InterruptedException {
+				if (evt.getName().equals("onOK")) {
+					materialsWithdrawalAction();
+				}
+			}
+		});
+	}
+
+	private void materialsWithdrawalAction() {
+		// buscamos los materiales necesarios para esta orden y luego vemos cuales son las reservas para dichos materiales y disminuimos su cantidad tanto en la reserva como en el stock
+		Product product = currentProductionOrder.getProduct();
+		Integer units = currentProductionOrder.getUnits();
+		// la cantidad a restar es la cantidad de materiales del producto por la cantidad de unidades del producto
+		List<Supply> supplyList = product.getSupplies();
+		List<RawMaterial> woodList = product.getRawMaterials();
+		for(Supply each : supplyList) {
+			BigDecimal quantityTotal = each.getQuantity().multiply(new BigDecimal(units));
+			SupplyType supplyType = each.getSupplyType();
+			supplyType.setStock(supplyType.getStock().subtract(quantityTotal));
+			supplyType = supplyTypeRepository.save(supplyType);
+			// se busca la reserva del material y se resta la cantidad, y se suma esa cantidad a la cantidad retirada del requirement
+			SupplyRequirement supplyRequirement = null;
+			for(SupplyRequirement req : currentProductionPlan.getSupplyRequirements()) {
+				if(supplyTypeRepository.findOne(req.getSupplyType().getId()).equals(supplyTypeRepository.findOne(supplyType.getId()))) {
+					supplyRequirement = req;
+					break;
+				}
+			}
+			SupplyReserved supplyReserved = supplyReservedRepository.findBySupplyRequirement(supplyRequirement);
+			supplyReserved.setStockReserved(supplyReserved.getStockReserved().subtract(quantityTotal));
+			supplyReservedRepository.save(supplyReserved);
+			supplyRequirement.setQuantityWithdrawn(supplyRequirement.getQuantityWithdrawn().add(quantityTotal));
+			supplyRequirementRepository.save(supplyRequirement);
+		}
+		for(RawMaterial each : woodList) {
+			BigDecimal quantityTotal = each.getQuantity().multiply(new BigDecimal(units));
+			Wood wood = each.getWood();
+			wood.setStock(wood.getStock().subtract(quantityTotal));
+			wood = woodRepository.save(wood);
+			// se busca la reserva del material y se resta la cantidad, y se suma esa cantidad a la cantidad retirada del requirement
+			RawMaterialRequirement rawMaterialRequirement = null;
+			for(RawMaterialRequirement req : currentProductionPlan.getRawMaterialRequirements()) {
+				if(woodRepository.findOne(req.getWood().getId()).equals(woodRepository.findOne(wood.getId()))) {
+					rawMaterialRequirement = req;
+					break;
+				}
+			}
+			WoodReserved woodReserved = woodReservedRepository.findByRawMaterialRequirement(rawMaterialRequirement);
+			woodReserved.setStockReserved(woodReserved.getStockReserved().subtract(quantityTotal));
+			woodReservedRepository.save(woodReserved);
+			rawMaterialRequirement.setQuantityWithdrawn(rawMaterialRequirement.getQuantityWithdrawn().add(quantityTotal));
+			rawMaterialRequirementRepository.save(rawMaterialRequirement);
+		}
+		currentProductionOrder.setDateMaterialsWithdrawal(new Date());
+		currentProductionOrder = productionOrderRepository.save(currentProductionOrder);
+		alert("Retiro de Materiales Registrado.");
 	}
 }

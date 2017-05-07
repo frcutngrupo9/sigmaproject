@@ -20,8 +20,8 @@ public class MaterialsOrderDetail implements Serializable, Cloneable {
 	@ManyToOne(optional = false)
 	private Item item;
 	
-	@ManyToOne
-	private ProductionPlan productionPlan;
+	@ManyToOne(targetEntity = MaterialsOrder.class)
+	private MaterialsOrder materialsOrder = null;
 	
 	private String description = "";
 	private BigDecimal quantity = BigDecimal.ZERO;
@@ -31,7 +31,8 @@ public class MaterialsOrderDetail implements Serializable, Cloneable {
 		
 	}
 	
-	public MaterialsOrderDetail(Item item, String description, BigDecimal quantity) {
+	public MaterialsOrderDetail(MaterialsOrder materialsOrder, Item item, String description, BigDecimal quantity) {
+		this.materialsOrder = materialsOrder;
 		this.item = item;
 		this.description = description;
 		this.quantity = quantity;
@@ -77,11 +78,11 @@ public class MaterialsOrderDetail implements Serializable, Cloneable {
 		this.description = description;
 	}
 
-	public ProductionPlan getProductionPlan() {
-		return productionPlan;
+	public MaterialsOrder getMaterialsOrder() {
+		return materialsOrder;
 	}
 
-	public void setProductionPlan(ProductionPlan productionPlan) {
-		this.productionPlan = productionPlan;
+	public void setMaterialsOrder(MaterialsOrder materialsOrder) {
+		this.materialsOrder = materialsOrder;
 	}
 }

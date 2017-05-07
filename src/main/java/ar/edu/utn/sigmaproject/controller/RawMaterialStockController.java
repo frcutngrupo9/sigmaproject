@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
+import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
@@ -14,10 +17,12 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Grid;
+import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
+import ar.edu.utn.sigmaproject.domain.MaterialsOrder;
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
@@ -59,6 +64,9 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	Button newButton;
 	@Wire
 	Listbox woodReservedListbox;
+	
+	@Wire("#included #materialsOrderDetailListbox")
+	Listbox materialsOrderDetailListbox;
 
 	// services
 	@WireVariable
@@ -218,22 +226,11 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		}
 	}
 	
-	/*
-	public BigDecimal getRawMaterialStockReserved(Wood supplyType) {
-		List<SupplyReserved> supplyReservedTotal = supplyReservedRepository.findBySupplyRequirementSupplyType(supplyType);
-		BigDecimal stockReservedTotal = BigDecimal.ZERO;
-		for(SupplyReserved each : supplyReservedTotal) {
-			if(!each.isWithdrawn()) {// suma todas las reservas del insumo que aun no han sido retiradas
-				stockReservedTotal = stockReservedTotal.add(each.getStockReserved());
-			}
-		}
-		return stockReservedTotal;
+	@Listen("onSelectMaterialsOrder = #included #materialsOrderDetailListbox")
+	public void doSelectMaterialsOrder(ForwardEvent evt) {
+		MaterialsOrder materialsOrder = (MaterialsOrder) evt.getData();
+		Executions.getCurrent().setAttribute("selected_materials_order", materialsOrder);
+		Include include = (Include) Selectors.iterable(materialsOrderDetailListbox.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/materials_order_creation.zul");
 	}
-
-	public BigDecimal getRawMaterialStockAvailable(Wood supplyType) {
-		// devuelve la diferencia entre el stock total y el total reservado
-		BigDecimal stockTotal = supplyType.getStock();
-		BigDecimal stockReservedTotal = getRawMaterialStockReserved(supplyType);
-		return stockTotal.subtract(stockReservedTotal);
-	}*/
 }

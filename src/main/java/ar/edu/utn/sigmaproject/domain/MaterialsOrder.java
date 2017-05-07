@@ -5,12 +5,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderColumn;
+import javax.persistence.OneToOne;
 
 @Entity
 public class MaterialsOrder implements Serializable, Cloneable {
@@ -20,12 +21,15 @@ public class MaterialsOrder implements Serializable, Cloneable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@OneToMany(orphanRemoval = true)
-	@OrderColumn(name = "detail_index")
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "materialsOrder", targetEntity = MaterialsOrderDetail.class)
 	private List<MaterialsOrderDetail> details = new ArrayList<>();
+	
+	@OneToOne
+	private ProductionPlan productionPlan = null;
 	
 	private Integer number = 0;
 	private Date date = null;
+	private Date dateReception = null;
 	
 	public MaterialsOrder() {
 		
@@ -66,5 +70,21 @@ public class MaterialsOrder implements Serializable, Cloneable {
 
 	public void setDetails(List<MaterialsOrderDetail> details) {
 		this.details = details;
+	}
+
+	public Date getDateReception() {
+		return dateReception;
+	}
+
+	public void setDateReception(Date dateReception) {
+		this.dateReception = dateReception;
+	}
+
+	public ProductionPlan getProductionPlan() {
+		return productionPlan;
+	}
+
+	public void setProductionPlan(ProductionPlan productionPlan) {
+		this.productionPlan = productionPlan;
 	}
 }

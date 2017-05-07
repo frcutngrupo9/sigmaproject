@@ -30,7 +30,6 @@ import org.zkoss.zul.Messagebox;
 import ar.edu.utn.sigmaproject.domain.Item;
 import ar.edu.utn.sigmaproject.domain.MaterialsOrder;
 import ar.edu.utn.sigmaproject.domain.MaterialsOrderDetail;
-import ar.edu.utn.sigmaproject.service.MaterialsOrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.MaterialsOrderRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
@@ -75,8 +74,6 @@ public class MaterialsOrderCreationController extends SelectorComposer<Component
 	private WoodRepository woodRepository;
 	@WireVariable
 	private MaterialsOrderRepository materialsOrderRepository;
-	@WireVariable
-	private MaterialsOrderDetailRepository materialsOrderDetailRepository;
 
 	// attributes
 	private MaterialsOrder currentMaterialsOrder;
@@ -121,7 +118,11 @@ public class MaterialsOrderCreationController extends SelectorComposer<Component
 			currentMaterialsOrder.setNumber(materialsOrderNumber);
 		}
 		for(MaterialsOrderDetail each : materialsOrderDetailList) {
-			each = materialsOrderDetailRepository.save(each);
+			// si es un pedido nuevo hay que asignarle a todos los detalles la referencia
+			if(currentMaterialsOrder.getId() == null) {
+				each.setMaterialsOrder(currentMaterialsOrder);
+			}
+			//each = materialsOrderDetailRepository.save(each);
 		}
 		currentMaterialsOrder.setDetails(materialsOrderDetailList);
 		currentMaterialsOrder = materialsOrderRepository.save(currentMaterialsOrder);
@@ -166,7 +167,7 @@ public class MaterialsOrderCreationController extends SelectorComposer<Component
 		}
 		int materialUnits = materialUnitsIntbox.getValue();
 		if(currentMaterialsOrderDetail == null) { // es un detalle nuevo
-			currentMaterialsOrderDetail = new MaterialsOrderDetail(currentItem, currentItem.getDescription(), new BigDecimal(materialUnits));
+			currentMaterialsOrderDetail = new MaterialsOrderDetail(currentMaterialsOrder, currentItem, currentItem.getDescription(), new BigDecimal(materialUnits));
 			materialsOrderDetailList.add(currentMaterialsOrderDetail);
 		} else { // se edita un detalle
 			currentMaterialsOrderDetail.setItem(currentItem);

@@ -84,13 +84,15 @@
 			    <separator/>
 			    <listbox id="woodReservedListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
 			    	<auxhead>
-						<auxheader label="Reservas" colspan="4"/>
+						<auxheader label="Reservas" colspan="6"/>
 					</auxhead>
 			        <listhead>
 			            <listheader label="Plan de Produccion" align="center"/>
 			            <listheader label="Madera" align="center"/>
 			            <listheader label="Materia Prima" align="center"/>
 			            <listheader label="Cantidad Reservada" align="center"/>
+			            <listheader label="Cantidad Retirada" align="center"/>
+			            <listheader label="Cantidad Necesaria Total" align="center"/>
 			        </listhead>
 			        <template name="model">
 			            <listitem>
@@ -98,9 +100,13 @@
 			                <listcell label="${each.rawMaterialRequirement.wood.woodType.name}"/>
 			                <listcell label="${each.rawMaterialRequirement.wood.name}"/>
 			                <listcell label="${each.stockReserved}"/>
+			                <listcell label="${each.rawMaterialRequirement.quantityWithdrawn.doubleValue()}"/>
+			                <listcell label="${each.rawMaterialRequirement.quantity.doubleValue()}"/>
 			            </listitem>
 			        </template>
 			    </listbox>
+			    <separator/>
+			    <include id="included" src="materials_order_detail_listbox.zul"/>
 			    <separator/>
 			    <separator/>
 		    </vlayout>

@@ -13,20 +13,29 @@
 		    <separator/>
 		    <grid id="materialsOrderGrid" mold="paging" pageSize="7">
 		    	<auxhead>
-					<auxheader label="Pedidos de Materiales" colspan="4"/>
+					<auxheader label="Pedidos de Materiales" colspan="7"/>
 				</auxhead>
 		        <columns>
 		            <column label="Numero" align="center" sort="auto(number)"/>
+		            <column label="Plan de Produccion" align="center"/>
 		            <column label="Fecha Creacion" align="center"/>
+		            <column label="Fecha Recepcion" align="center"/>
 		            <column label="Cant. Materiales Diferentes" align="center"/>
 		            <column label="Detalles" width="120px" align="center"/>
+		            <column label="Accion" align="center"/>
 		        </columns>
 		        <template name="model">
 		            <row>
 		                <label value="${each.number}"/>
+		                <cell>
+		                	<label value="${each.productionPlan.name}" if="${!empty each.productionPlan}"/>
+                			<label value="Sin Plan" if="${empty each.productionPlan}"/>
+		                </cell>
 		                <label value="${r:getFormattedDateTime(each.date)}"/>
+		                <label value="${r:getFormattedDate(each.dateReception)}"/>
 		                <label value="${each.details.size()}"/>
 		                <button forward="onClick=materialsOrderGrid.onEditMaterialsOrder(${each})"  image="/img/Search16x16.png"/>
+		                <button disabled="${win_materials_order_list$composer.isReceived(each)}" label="Recibir" forward="onClick=materialsOrderGrid.onMaterialsOrderReception(${each})"/>
 		            </row>
 		        </template>
 		    </grid>

@@ -45,6 +45,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 	Date dateFinish = null;
 	Date dateStartReal = null;
 	Date dateFinishReal = null;
+	Date dateMaterialsWithdrawal = null;
 	ProductionOrderStateType currentStateType = null;
 
 	@OneToMany(orphanRemoval = true)
@@ -213,5 +214,13 @@ public class ProductionOrder implements Serializable, Cloneable {
 			return product.getDurationTotal().multiply(units);
 		}
 		return null;
+	}
+
+	public Date getDateMaterialsWithdrawal() {
+		return dateMaterialsWithdrawal;
+	}
+
+	public void setDateMaterialsWithdrawal(Date dateMaterialsWithdrawal) {
+		this.dateMaterialsWithdrawal = dateMaterialsWithdrawal;
 	}
 }

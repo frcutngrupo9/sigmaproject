@@ -38,7 +38,7 @@
                     </rows>
                 </grid>
 				<hbox hflex="1" pack="center">
-					<button id="materialsWithdrawalButton" label="Retirar Materiales"/>
+					<button id="materialsWithdrawalButton" label="Retirar Materiales de Stock para Produccion"/>
 				</hbox>
         		<grid id="productionOrderDetailGrid" sizedByContent="true" span="true">
     				<auxhead>
