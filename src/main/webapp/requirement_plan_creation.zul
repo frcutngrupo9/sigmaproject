@@ -25,8 +25,10 @@
                 <hbox pack="center" align="center" hflex="1">
 		        	<button id="materialsOrderCreationButton" label="Generar Pedido de Materiales"/>
 		        	<button id="allRequirementReservationButton" label="Reservar Todo"/>
-		        	<button id="returnToProductionButton" label="Volver a Produccion"/>
-		        	<button id="returnButton" label="Volver a Listado"/>
+		        	<separator/>
+		        	<separator/>
+		        	<button id="returnToProductionButton" label="Ir a Produccion"/>
+		        	<button id="returnButton" label="Ir a Listado"/>
 		        </hbox>
                 <separator/>
     			<listbox id="rawMaterialRequirementListbox" sizedByContent="true" span="true">
@@ -48,7 +50,7 @@
 		                	<listcell label="${each.quantity}"/>
 		                    <listcell label="${each.wood.stock.doubleValue()}"/>
 		                    <listcell label="${each.wood.getStockAvailable().doubleValue()}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialRequirementStockReserved(each).doubleValue()}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialStockReserved(each).doubleValue()}"/>
 		                    <listcell>
 		                    	<label value="Si" if="${win_requirement_plan_creation$composer.isRawMaterialRequirementFulfilled(each)}"/>
 			                    <label value="Faltan ${win_requirement_plan_creation$composer.getRawMaterialRequirementStockMissing(each).doubleValue()}" if="${!win_requirement_plan_creation$composer.isRawMaterialRequirementFulfilled(each)}"/>
