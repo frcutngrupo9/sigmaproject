@@ -1,10 +1,12 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -27,10 +29,10 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	@OneToMany(orphanRemoval = true)
 	List<ProductionPlanState> states = new ArrayList<>();
 
-	@OneToMany(orphanRemoval = true)
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionPlan", targetEntity = RawMaterialRequirement.class)
 	List<RawMaterialRequirement> rawMaterialRequirements = new ArrayList<>();
 
-	@OneToMany(orphanRemoval = true)
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionPlan", targetEntity = SupplyRequirement.class)
 	List<SupplyRequirement> supplyRequirements = new ArrayList<>();
 
 	String name = "";
@@ -136,5 +138,42 @@ public class ProductionPlan  implements Serializable, Cloneable {
 
 	public void setDateStart(Date dateStart) {
 		this.dateStart = dateStart;
+	}
+
+	public boolean isAllReservationsFulfilled() {
+		// recorre todos los requerimientos para ver si estan todos abastecidos
+		for(SupplyRequirement each : getSupplyRequirements()) {
+			BigDecimal stockReserved = BigDecimal.ZERO;
+			SupplyType item = each.getSupplyType();
+			SupplyReserved reservation = null;
+			for(SupplyReserved eachReservation : item.getSuppliesReserved()) {
+				if(eachReservation.getSupplyRequirement().equals(each)) {
+					reservation = eachReservation;// se encontro la reserva para ese requerimiento
+				}
+			}
+			if(reservation != null) {// se encontro reserva
+				stockReserved = reservation.getStockReserved().add(each.getQuantityWithdrawn());// se suma la cantidad que se retiro para produccion
+			}
+			if(each.getQuantity().subtract(stockReserved).compareTo(BigDecimal.ZERO) != 0) {
+				return false;
+			}
+		}
+		for(RawMaterialRequirement each : getRawMaterialRequirements()) {
+			BigDecimal stockReserved = BigDecimal.ZERO;
+			Wood item = each.getWood();
+			WoodReserved reservation = null;
+			for(WoodReserved eachReservation : item.getWoodsReserved()) {
+				if(eachReservation.getRawMaterialRequirement().equals(each)) {
+					reservation = eachReservation;// se encontro la reserva para ese requerimiento
+				}
+			}
+			if(reservation != null) {// se encontro reserva
+				stockReserved = reservation.getStockReserved().add(each.getQuantityWithdrawn());// se suma la cantidad que se retiro para produccion
+			}
+			if(each.getQuantity().subtract(stockReserved).compareTo(BigDecimal.ZERO) != 0) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

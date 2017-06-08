@@ -96,7 +96,7 @@
 			        </listhead>
 			        <template name="model">
 			            <listitem>
-			                <listcell label="${win_raw_material_stock$composer.getProductionPlanName(each)}"/>
+			                <listcell label="${each.getRawMaterialRequirement().getProductionPlan().getName()}"/>
 			                <listcell label="${each.rawMaterialRequirement.wood.woodType.name}"/>
 			                <listcell label="${each.rawMaterialRequirement.wood.name}"/>
 			                <listcell label="${each.stockReserved}"/>

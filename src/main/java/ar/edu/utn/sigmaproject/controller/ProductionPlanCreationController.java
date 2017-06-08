@@ -348,7 +348,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				if (auxSupplyRequirement != null) {// el insumo si se encuentra agregado, suma sus cantidades
 					auxSupplyRequirement.setQuantity(auxSupplyRequirement.getQuantity().add(supply.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
 				} else {// el insumo no se encuentra, se lo agrega
-					list.add(new SupplyRequirement(supply.getSupplyType(), supply.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
+					list.add(new SupplyRequirement(supply.getSupplyType(), productionPlan, supply.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
 				}
 			}
 		}
@@ -371,7 +371,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				if(auxRawMaterialRequirement != null) {// la materia prima si se encuentra agregada, sumamos sus cantidades
 					auxRawMaterialRequirement.setQuantity(auxRawMaterialRequirement.getQuantity().add(rawMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
 				} else {// la materia prima no se encuentra, se la agrega
-					list.add(new RawMaterialRequirement(rawMaterial.getWood(), rawMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
+					list.add(new RawMaterialRequirement(rawMaterial.getWood(), productionPlan, rawMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
 				}
 			}
 		}

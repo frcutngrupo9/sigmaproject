@@ -1,6 +1,7 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import javax.persistence.*;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -10,20 +11,24 @@ public class SupplyRequirement implements Serializable, Cloneable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 
 	@ManyToOne
-	SupplyType supplyType;
+	private SupplyType supplyType;
+	
+	@ManyToOne(targetEntity = ProductionPlan.class)
+	private ProductionPlan productionPlan = null;
 
-	BigDecimal quantity = BigDecimal.ZERO;
-	BigDecimal quantityWithdrawn = BigDecimal.ZERO;
+	private BigDecimal quantity = BigDecimal.ZERO;
+	private BigDecimal quantityWithdrawn = BigDecimal.ZERO;
 
 	public SupplyRequirement() {
 
 	}
 
-	public SupplyRequirement(SupplyType supplyType, BigDecimal quantity) {
+	public SupplyRequirement(SupplyType supplyType, ProductionPlan productionPlan, BigDecimal quantity) {
 		this.supplyType = supplyType;
+		this.productionPlan = productionPlan;
 		this.quantity = quantity;
 	}
 
@@ -41,6 +46,14 @@ public class SupplyRequirement implements Serializable, Cloneable {
 
 	public void setSupplyType(SupplyType supplyType) {
 		this.supplyType = supplyType;
+	}
+
+	public ProductionPlan getProductionPlan() {
+		return productionPlan;
+	}
+
+	public void setProductionPlan(ProductionPlan productionPlan) {
+		this.productionPlan = productionPlan;
 	}
 
 	public BigDecimal getQuantity() {

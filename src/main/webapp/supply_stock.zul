@@ -91,7 +91,7 @@
 			        </listhead>
 			        <template name="model">
 			            <listitem>
-			                <listcell label="${win_supply_stock$composer.getProductionPlanName(each)}"/>
+			                <listcell label="${each.getSupplyRequirement().getProductionPlan().getName()}"/>
 			                <listcell label="${each.supplyRequirement.supplyType.code}"/>
 			                <listcell label="${each.supplyRequirement.supplyType.description}"/>
 			                <listcell label="${each.stockReserved}"/>

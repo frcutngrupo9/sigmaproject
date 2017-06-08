@@ -24,16 +24,20 @@
 		    	</grid>
 		    	<listbox id="materialsOrderDetailListbox" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Detalle del Pedido de Materiales" colspan="2"/>
+						<auxheader label="Detalle del Pedido de Materiales" colspan="3"/>
 					</auxhead>
         			<listhead>
         				<listheader label="Nombre"/>
-	                    <listheader label="Cantidad" width="200px"/>
+	                    <listheader label="Cantidad Pedida"/>
+	                    <listheader label="Cantidad Recibida"/>
 		            </listhead>
 		            <template name="model">
 		                <listitem>
 		                	<listcell label="${each.description}"/>
-                        	<listcell label="${each.quantity}"/>
+                        	<listcell label="${each.quantity.doubleValue()}"/>
+                        	<listcell>
+                        		<textbox value="${each.quantityReceived.doubleValue()}"  forward="onChanging=materialsOrderDetailListbox.onOrderDetailsChange(${each})"/>
+                        	</listcell>
 						</listitem>
 		            </template>
     			</listbox>

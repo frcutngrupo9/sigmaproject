@@ -37,20 +37,20 @@
 					</auxhead>
         			<listhead>
         				<listheader label="Materia Prima"/>
-        				<listheader label="Cantidad Necesaria"/>
 		                <listheader label="Stock Total"/>
-		                <listheader label="Cantidad Disponible"/>
+		                <listheader label="Cantidad Necesaria"/>
 		                <listheader label="Cantidad Reservada"/>
+		                <listheader label="Cantidad Disponible"/>
 		                <listheader label="Esta Abastecido?"/>
 		                <listheader label="Generar Reserva"/>
 		            </listhead>
 		            <template name="model">
 		                <listitem>
 		                	<listcell label="${each.wood.name}"/>
-		                	<listcell label="${each.quantity}"/>
 		                    <listcell label="${each.wood.stock.doubleValue()}"/>
-		                    <listcell label="${each.wood.getStockAvailable().doubleValue()}"/>
+		                    <listcell label="${each.quantity}"/>
 		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialStockReserved(each).doubleValue()}"/>
+		                    <listcell label="${each.wood.getStockAvailable().doubleValue()}"/>
 		                    <listcell>
 		                    	<label value="Si" if="${win_requirement_plan_creation$composer.isRawMaterialRequirementFulfilled(each)}"/>
 			                    <label value="Faltan ${win_requirement_plan_creation$composer.getRawMaterialRequirementStockMissing(each).doubleValue()}" if="${!win_requirement_plan_creation$composer.isRawMaterialRequirementFulfilled(each)}"/>
@@ -69,10 +69,10 @@
         			<listhead>
         				<listheader label="Insumo"/>
 		            	<listheader label="Codigo"/>
-			            <listheader label="Cantidad Necesaria"/>
 		                <listheader label="Stock Total"/>
-		                <listheader label="Cantidad Disponible"/>
+		                <listheader label="Cantidad Necesaria"/>
 		                <listheader label="Cantidad Reservada"/>
+		                <listheader label="Cantidad Disponible"/>
 		                <listheader label="Esta Abastecido?"/>
 		                <listheader label="Generar Reserva"/>
 		            </listhead>
@@ -80,10 +80,10 @@
 		                <listitem>
 		                	<listcell label="${each.supplyType.description}"/>
 		                	<listcell label="${each.supplyType.code}"/>
-		                    <listcell label="${each.quantity}"/>
 		                    <listcell label="${each.supplyType.stock}"/>
-		                    <listcell label="${each.supplyType.getStockAvailable().doubleValue()}"/>
+		                    <listcell label="${each.quantity}"/>
 		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyStockReserved(each).doubleValue()}"/>
+		                    <listcell label="${each.supplyType.getStockAvailable().doubleValue()}"/>
 		                    <listcell>
 			                    <label value="Si" if="${win_requirement_plan_creation$composer.isSupplyRequirementFulfilled(each)}"/>
 			                    <label value="Faltan ${win_requirement_plan_creation$composer.getSupplyStockMissing(each).doubleValue()}" if="${!win_requirement_plan_creation$composer.isSupplyRequirementFulfilled(each)}"/>
