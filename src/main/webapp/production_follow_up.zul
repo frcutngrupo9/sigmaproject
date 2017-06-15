@@ -58,7 +58,8 @@
 		            </columns>
 		            <template name="model">
 		                <row>
-		                	<checkbox disabled="false" checked="${each.isFinished()}" forward="onCheck=productionOrderDetailGrid.onEditProductionOrderDetailIsFinished(${each})"/>
+		                	<custom-attributes state_finish="${win_production_follow_up$composer.isStateFinish(each.getState())}"/>
+		                	<checkbox disabled="false" checked="${state_finish}" forward="onCheck=productionOrderDetailGrid.onEditProductionOrderDetailIsFinished(${each})"/>
 			            	<label value="${each.process.type.name}"/>
 			            	<datebox buttonVisible="false" disabled="true" cols="12" format="dd/MM/yyyy HH:mm" value="${each.dateStart}"/>
 			            	<datebox buttonVisible="false" disabled="true" cols="12" format="dd/MM/yyyy HH:mm" value="${each.dateFinish}"/>

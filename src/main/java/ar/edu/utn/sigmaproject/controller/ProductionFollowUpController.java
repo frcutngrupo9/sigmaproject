@@ -43,6 +43,7 @@ import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
+import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
@@ -259,7 +260,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 				// por cada proceso hay que crear un detalle
 				Integer quantityPiece = productionOrder.getUnits() * piece.getUnits();// cantidad total de la pieza
 				Duration timeTotal = process.getTime().multiply(productionOrder.getUnits());// cantidad total de tiempo del proceso
-				productionOrderDetailList.add(new ProductionOrderDetail(process, null, timeTotal, quantityPiece));
+				productionOrderDetailList.add(new ProductionOrderDetail(process, ProcessState.Pendiente, null, timeTotal, quantityPiece));
 			}
 		}
 		return productionOrderDetailList;
@@ -296,6 +297,11 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 				currentProductionOrder.setDateFinishReal(new Date());
 				if(currentProductionOrder.getDateStartReal() == null) {
 					currentProductionOrder.setDateStartReal(new Date());
+				}
+				// si esta Finalizada y aun no se retiraron los materiales de stock, se los retiran
+				if(currentProductionOrder.getDateMaterialsWithdrawal() == null) {
+					alert("Se registrara el Retiro de Materiales de Stock.");
+					materialsWithdrawalAction();
 				}
 			}
 			productionOrderStateType = newStateType;
@@ -349,7 +355,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 			orderStateType = orderStateTypeRepository.findFirstByName("En Produccion");
 		}
 
-		//si el estado previo es igual al nuevo no se realiza el guardado
+		// si el estado previo es igual al nuevo no se realiza el guardado
 		if(newProductionPlanStateType!=null && !currentProductionPlanStateType.equals(newProductionPlanStateType)) {
 			ProductionPlanState productionPlanState = new ProductionPlanState(newProductionPlanStateType, new Date());
 			productionPlanState = productionPlanStateRepository.save(productionPlanState);
@@ -367,11 +373,9 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 					orderRepository.save(order);
 				}
 			}
-
-			//TODO: si el estado es En Ejecucion se restan los materiales de stock
-
-			// se modifica la cantidad en stock si el estado es Finalizado
-			if(productionPlanStateTypeRepository.findFirstByName("Finalizado").equals(newProductionPlanStateType)) {
+			
+			// se modifica la cantidad en stock de los productos si el estado del plan es Finalizado
+			if(newProductionPlanStateType.getName().equalsIgnoreCase("Finalizado")) {
 				for(ProductionOrder each : productionOrderList) {
 					Product product = each.getProduct();
 					// TODO: sumar las cantidades REALES que se produjeron
@@ -390,14 +394,16 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		ProductionOrderStateType productionOrderStateType = null;
 		boolean finished = true;// si se finalizo todos los procesos
 		boolean notStarted = true;// no inicio ningun proceso
-		for (ProductionOrderDetail each : productionOrderDetailList) {
-			if(each.isFinished()==true || each.getQuantityFinished().compareTo(BigDecimal.ZERO)!=0) {
-				// si inicio o finalizo algun proceso
-				notStarted = false;
-			}
-			if(each.isFinished()!=true) {
-				// si no finalizo algun proceso
-				finished = false;
+		for (ProductionOrderDetail each : productionOrderDetailList) {// no se verifica los cancelados
+			if(each.getState()!=ProcessState.Cancelado) {
+				if(each.getState()==ProcessState.Realizado || each.getQuantityFinished().compareTo(BigDecimal.ZERO)!=0) {
+					// si inicio o finalizo algun proceso
+					notStarted = false;
+				}
+				if(each.getState()!=ProcessState.Realizado) {
+					// si no finalizo algun proceso
+					finished = false;
+				}
 			}
 		}
 
@@ -519,15 +525,13 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 			element.setValue(quantityPiece.doubleValue());
 			data.setQuantityFinished(quantityPiece);
 			chkbox.setChecked(true);
-			data.setFinished(true);
-		} else {// si el valor ingresado es igual o menos a la cantidad
+			data.setState(ProcessState.Realizado);
+		} else {// si el valor ingresado es igual o menor a la cantidad
 			data.setQuantityFinished(value);
 			if(value.compareTo(quantityPiece) == 0) {
-				chkbox.setChecked(true);
-				data.setFinished(true);
+				data.setState(ProcessState.Realizado);
 			} else {
-				chkbox.setChecked(false);
-				data.setFinished(false);
+				data.setState(ProcessState.Pendiente);
 			}
 		}
 	}
@@ -536,7 +540,17 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	public void doEditProductionOrderDetailIsFinished(ForwardEvent evt) {
 		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
 		Checkbox element = (Checkbox) evt.getOrigin().getTarget();// obtenemos el elemento web
-		data.setFinished(element.isChecked());// cargamos al objeto el valor
+		Row fila = (Row)element.getParent();
+		Doublebox doublebox = (Doublebox) fila.getChildren().get(fila.getChildren().size()-1);
+		
+		if(element.isChecked()) {
+			data.setState(ProcessState.Realizado);
+			// agregamos como cantidad finalizada el total
+			data.setQuantityFinished(new BigDecimal(data.getQuantityPiece()));
+			doublebox.setValue(data.getQuantityPiece());
+		} else {
+			data.setState(ProcessState.Pendiente);
+		}
 	}
 
 	@Listen("onEditUsedSupply = #productionOrderSupplyListbox")
@@ -616,13 +630,14 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	public void materialsWithdrawalButtonClick() {
 		// si ya se retiraron los materiales mostrar mensaje
 		if(currentProductionOrder.getDateMaterialsWithdrawal() != null) {
-			Clients.showNotification("Imposible Retirar Materiales, los Materiales ya se han retirado anteriormente.");
+			Clients.showNotification("Imposible Retirar Materiales, los Materiales ya han sido retirados.");
 			return;
 		}
 		Messagebox.show("Se realizara el retiro de todos los materiales reservados para la orden produccion.", "Confirmar", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 			public void onEvent(Event evt) throws InterruptedException {
 				if (evt.getName().equals("onOK")) {
 					materialsWithdrawalAction();
+					alert("Retiro de Materiales Registrado.");
 				}
 			}
 		});
@@ -675,6 +690,9 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		}
 		currentProductionOrder.setDateMaterialsWithdrawal(new Date());
 		currentProductionOrder = productionOrderRepository.save(currentProductionOrder);
-		alert("Retiro de Materiales Registrado.");
+	}
+	
+	public boolean isStateFinish(ProcessState processState) {
+		return processState==ProcessState.Realizado;
 	}
 }

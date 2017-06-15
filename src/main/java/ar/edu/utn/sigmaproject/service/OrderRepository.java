@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import ar.edu.utn.sigmaproject.domain.Client;
 import ar.edu.utn.sigmaproject.domain.Order;
+import ar.edu.utn.sigmaproject.domain.OrderStateType;
 
 /**
 *
@@ -16,5 +17,6 @@ import ar.edu.utn.sigmaproject.domain.Order;
 public interface OrderRepository extends JpaRepository<Order, Long> {
 	
 	List<Order> findByClient(Client client);
+	List<Order> findByCurrentStateType(OrderStateType currentStateType);
 
 }

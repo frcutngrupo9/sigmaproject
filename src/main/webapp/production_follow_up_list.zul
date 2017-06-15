@@ -3,9 +3,9 @@
     <panel id="productionOrderCreationBlock" border="none">
         <panelchildren>
             <vlayout>
-    			<grid id="productionOrderGrid" sizedByContent="true" span="true" emptyMessage="No existen Planes de Produccion en estado Lanzado.">
+    			<grid id="productionOrderGrid" sizedByContent="true" span="true" emptyMessage="No existen Ordenes Preparadas.">
     				<auxhead>
-						<auxheader label="Listado Ordenes de Produccion de Planes Lanzados" colspan="11"/>
+						<auxheader label="Listado Ordenes de Produccion Preparadas" colspan="11"/>
 					</auxhead>
         			<columns>
         				<column label="Accion" align="center"/>

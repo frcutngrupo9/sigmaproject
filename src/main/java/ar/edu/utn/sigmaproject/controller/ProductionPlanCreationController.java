@@ -37,6 +37,7 @@ import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
+import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductTotal;
@@ -82,8 +83,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	Bandbox orderBandbox;
 	@Wire
 	Textbox productionPlanNameTextbox;
-	@Wire
-	Button addOrderButton;
 	@Wire
 	Button resetProductionPlanButton;
 	@Wire
@@ -147,7 +146,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	private ListModelList<ProductionPlanStateType> productionPlanStateTypeListModel;
 
 	// atributes
-	private Order currentOrder;
 	private ProductionPlan currentProductionPlan;
 
 	@Override
@@ -167,18 +165,14 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 
 	@Listen("onSelect = #orderPopupListbox")
 	public void selectionOrderPopupListbox() {
-		currentOrder = (Order) orderPopupListbox.getSelectedItem().getValue();
-		refreshOrder();
+		Order order = (Order) orderPopupListbox.getSelectedItem().getValue();
+		addOrder(order);
 	}
 
 	private void refreshOrder() {
-		if(currentOrder != null) {
-			orderBandbox.setValue("Pedido " + currentOrder.getId() + " (" + currentOrder.getClient().getName() + ")");
-			orderBandbox.close();
-		}else {
-			orderBandbox.setValue("");// borramos el text del producto  seleccionado
-			orderPopupListbox.clearSelection();// deseleccionamos la tabla
-		}
+		orderBandbox.setValue("");
+		orderPopupListbox.clearSelection();
+		orderBandbox.close();
 	}
 
 	private void refreshOrderPopupList() {// el popup se actualiza en base a los detalles
@@ -222,7 +216,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			return;
 		}
 		if(productionPlanDetailList.size() == 0) {
-			Clients.showNotification("Ingresar al menos 1 pedido", addOrderButton);
+			Clients.showNotification("Ingresar al menos 1 pedido", orderBandbox);
 			return;
 		}
 		String productionPlanName = productionPlanNameTextbox.getText().toUpperCase();
@@ -307,7 +301,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				Integer units = productionOrder.getUnits();
 				Integer quantityPiece = units * piece.getUnits();// cantidad total de la pieza
 				Duration timeTotal = process.getTime().multiply(units);// tiempo del proceso de las piezas del producto por las unidades del producto
-				details.add(new ProductionOrderDetail(process, null, timeTotal, quantityPiece));
+				details.add(new ProductionOrderDetail(process, ProcessState.Pendiente, null, timeTotal, quantityPiece));
 			}
 		}
 		return details;
@@ -378,15 +372,9 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		return list;
 	}
 
-	@Listen("onClick = #addOrderButton")
-	public void addOrder() {
-		if(currentOrder == null) {
-			Clients.showNotification("Debe seleccionar pedido", addOrderButton);
-			return;
-		}
-		productionPlanDetailList.add(new ProductionPlanDetail(currentOrder));
+	private void addOrder(Order order) {
+		productionPlanDetailList.add(new ProductionPlanDetail(order));
 		refreshProductionPlanDetailListGrid();
-		currentOrder = null;
 		refreshOrderPopupList();
 		refreshOrder();
 		refreshProductTotalListbox();
@@ -431,13 +419,13 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	}
 
 	private void refreshViewProductionPlan() {
-		currentOrder = null;// deseleccionamos el pedido
 		refreshOrder();
 		if (currentProductionPlan == null) {// nuevo plan de produccion
 			productionPlanCaption.setLabel("Creacion de Plan de Produccion");
 			productionPlanStateTypeListModel.addToSelection(productionPlanStateTypeRepository.findFirstByName("Registrado"));
 			productionPlanStateTypeCombobox.setModel(productionPlanStateTypeListModel);
-			productionPlanNameTextbox.setText("");
+			int planNumber = productionPlanRepository.findAll().size() + 1;
+			productionPlanNameTextbox.setText("Plan " + planNumber);
 			productionPlanDetailList = new ArrayList<ProductionPlanDetail>();
 			deleteProductionPlanButton.setDisabled(true);
 			productionPlanStateTypeCombobox.setDisabled(true);
@@ -544,9 +532,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 
 	@Listen("onChanging = #orderBandbox")
 	public void changeFilter(InputEvent event) {
-		if(currentOrder != null) {// al cambiar el filtro se deselecciona
-			currentOrder = null;
-		}
 		Bandbox target = (Bandbox)event.getTarget();
 		target.setText(event.getValue());
 		filter();

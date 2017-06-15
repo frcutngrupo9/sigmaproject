@@ -251,6 +251,11 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 						supplyType.getSuppliesReserved().add(reserved);
 						supplyTypeRepository.save(supplyType);
 					} else {// existe reserva, se suma la cantidad recibida a la actual
+						// si la cantidad sin reservar es menos a la cantidad recibida, se suma solo la cantidad sin reservar, esto puede pasar si ingresaron materiales y se reservaron sin recibir los materiales del pedido
+						BigDecimal quantityNonReserved = requirement.getQuantity().subtract(reserved.getStockReserved());
+						if(quantityNonReserved.compareTo(quantityReservation) == -1) {// si quantityNonReserved es menor a quantityReservation
+							quantityReservation = quantityNonReserved;
+						}
 						reserved.setStockReserved(reserved.getStockReserved().add(quantityReservation));
 						supplyReservedRepository.save(reserved);
 					}
@@ -268,6 +273,11 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 						wood.getWoodsReserved().add(reserved);
 						woodRepository.save(wood);
 					} else {// existe reserva, se suma la cantidad recibida a la actual
+						// si la cantidad sin reservar es menos a la cantidad recibida, se suma solo la cantidad sin reservar, esto puede pasar si ingresaron materiales y se reservaron sin recibir los materiales del pedido
+						BigDecimal quantityNonReserved = requirement.getQuantity().subtract(reserved.getStockReserved());
+						if(quantityNonReserved.compareTo(quantityReservation) == -1) {// si quantityNonReserved es menor a quantityReservation
+							quantityReservation = quantityNonReserved;
+						}
 						reserved.setStockReserved(reserved.getStockReserved().add(quantityReservation));
 						woodReservedRepository.save(reserved);
 					}

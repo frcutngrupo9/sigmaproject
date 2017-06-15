@@ -89,7 +89,7 @@
 			        <listhead>
 			            <listheader label="Plan de Produccion" align="center"/>
 			            <listheader label="Madera" align="center"/>
-			            <listheader label="Materia Prima" align="center"/>
+			            <listheader label="Descripcion" align="center"/>
 			            <listheader label="Cantidad Reservada" align="center"/>
 			            <listheader label="Cantidad Retirada" align="center"/>
 			            <listheader label="Cantidad Necesaria Total" align="center"/>

@@ -36,6 +36,7 @@ import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
+import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
@@ -264,21 +265,16 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 				//TODO verificar si el tiempo de proceso es por todas las piezas iguales de un producto o individual
 				Integer quantityPiece = productionOrder.getUnits() * piece.getUnits();// cantidad total de la pieza
 				Duration timeTotal = process.getTime().multiply(productionOrder.getUnits());// cantidad total de tiempo del proceso
-				productionOrderDetailList.add(new ProductionOrderDetail(process, null, timeTotal, quantityPiece));
+				productionOrderDetailList.add(new ProductionOrderDetail(process, ProcessState.Pendiente, null, timeTotal, quantityPiece));
 			}
 		}
 		return productionOrderDetailList;
 	}
 
 	private boolean isEditionAllowed() {
-		// no se puede modificar si el plan esta Cancelado, Lanzado, En Ejecucion o Finalizado. Si esta Suspendido se puede modificar para solucionar problemas de maquinas en reparacion o empreados ausentes.
-		ProductionPlanStateType stateLanzado = productionPlanStateTypeRepository.findFirstByName("Lanzado");
-		ProductionPlanStateType stateEnEjecucion = productionPlanStateTypeRepository.findFirstByName("En Ejecucion");
-		ProductionPlanStateType stateFinalizado = productionPlanStateTypeRepository.findFirstByName("Finalizado");
-		ProductionPlanStateType stateCancelado = productionPlanStateTypeRepository.findFirstByName("Cancelado");
+		// no se puede modificar si el plan esta Cancelado, o Finalizado. Si esta Suspendido se puede modificar para solucionar problemas de maquinas en reparacion o empreados ausentes.
 		ProductionPlanStateType currentStateType = currentProductionPlan.getCurrentStateType();
-		currentStateType = productionPlanStateTypeRepository.findOne(currentStateType.getId());
-		if(currentStateType.equals(stateLanzado) || currentStateType.equals(stateEnEjecucion) || currentStateType.equals(stateFinalizado) || currentStateType.equals(stateCancelado)) {
+		if(currentStateType.getName().equalsIgnoreCase("Finalizado") || currentStateType.getName().equalsIgnoreCase("Cancelado")) {
 			return false;
 		}
 		return true;

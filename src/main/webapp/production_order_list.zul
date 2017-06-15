@@ -86,7 +86,6 @@
     			</grid>
     			<hbox hflex="1" pack="center">
 	    			<button id="productionPlanRequirementButton" label="Abastecer Plan"/>
-	    			<button id="productionPlanLaunchButton" label="Lanzar Plan"/>
 				</hbox>
 				<hbox hflex="1" pack="left">
 	    			<button id="saveButton" label="Guardar"/>

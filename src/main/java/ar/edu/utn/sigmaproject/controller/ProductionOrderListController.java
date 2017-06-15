@@ -33,12 +33,12 @@ import org.zkoss.zul.Timebox;
 import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
 import ar.edu.utn.sigmaproject.domain.Process;
+import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
-import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
@@ -76,8 +76,6 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 	Button resetButton;
 	@Wire
 	Timebox productionPlanStartTimebox;
-	@Wire
-	Button productionPlanLaunchButton;
 
 	// services
 	@WireVariable
@@ -241,7 +239,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 			List<ProductionOrderDetail> productionOrderDetailList = aux.getDetails();
 			int quantityFinished = 0;
 			for(ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
-				if(productionOrderDetail.isFinished()) {
+				if(productionOrderDetail.getState()==ProcessState.Realizado) {
 					quantityFinished += 1;
 				}
 			}
@@ -423,6 +421,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 	}
 
 	public Date getFinishDate(Date startDate, Duration time) {
+		//TODO: no tienen en cuenta fines de semana y feriados
 		int firstHourOfDay = 9;// horario en el que se empieza a trabajar
 		int firstMinuteOfDay = 0;
 		int lastHourOfDay = 18;// horario en el que se termina de trabajar
@@ -448,7 +447,6 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 				}
 			}
 		}
-
 		if(time != null) {
 			int hours = time.getHours();
 			int minutes = time.getMinutes();// puede ser que los minutos sean mayor que 60, ya que se realizaron multiplicaciones sobre time
@@ -496,43 +494,43 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		return startDate;// si el tiempo es null se devuelve la misma fecha de inicio
 	}
 	
-	private boolean isProductionPlanReady() {
-		// recorre todas las ordenes y en caso de que todas esten en estado preparada, devuelve verdadero
-		List<ProductionOrder> productionOrderList = productionOrderRepository.findByProductionPlan(currentProductionPlan);
-		for(ProductionOrder each : productionOrderList) {
-			if(!productionOrderStateTypeRepository.findOne(each.getCurrentStateType().getId()).equals(productionOrderStateTypeRepository.findFirstByName("Preparada"))) {
-				return false;
-			}
-		}
-		return true;
-	}
+//	private boolean isProductionPlanReady() {
+//		// recorre todas las ordenes y en caso de que todas esten en estado preparada, devuelve verdadero
+//		List<ProductionOrder> productionOrderList = productionOrderRepository.findByProductionPlan(currentProductionPlan);
+//		for(ProductionOrder each : productionOrderList) {
+//			if(!productionOrderStateTypeRepository.findOne(each.getCurrentStateType().getId()).equals(productionOrderStateTypeRepository.findFirstByName("Preparada"))) {
+//				return false;
+//			}
+//		}
+//		return true;
+//	}
 	
-	@Listen("onClick = #productionPlanLaunchButton")
-	public void productionPlanLaunchButtonClick() {
-		ProductionPlanStateType currentPlanState = productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId());
-		ProductionPlanStateType planStateLanzado = productionPlanStateTypeRepository.findFirstByName("Lanzado");
-		ProductionPlanStateType planStateFinalizado = productionPlanStateTypeRepository.findFirstByName("Finalizado");
-		ProductionPlanStateType planStateEnEjecucion = productionPlanStateTypeRepository.findFirstByName("En Ejecucion");
-		if(currentPlanState.equals(planStateLanzado) || currentPlanState.equals(planStateEnEjecucion) || currentPlanState.equals(planStateFinalizado)) {
-			alert("No se puede lanzar un plan que ya esta lanzado o en un estado posterior.");
-			return;
-		}
-		currentProductionPlan.setDateStart(getTimeboxDate());
-		if(!isProductionPlanReady()) {
-			alert("No se puede lanzar hasta que todas Ordenes esten Preparadas.");
-			return;
-		}
-		if(!productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId()).equals(productionPlanStateTypeRepository.findFirstByName("Abastecido"))) {
-			alert("No se puede lanzar el Plan hasta estar Abastecido.");
-			return;
-		}
-		ProductionPlanState state = new ProductionPlanState(planStateLanzado, new Date());
-		productionPlanStateRepository.save(state);
-		currentProductionPlan.setState(state);
-		productionPlanRepository.save(currentProductionPlan);
-		Clients.showNotification("Plan de Produccion Lanzado");
-		refreshView();
-	}
+//	@Listen("onClick = #productionPlanLaunchButton")
+//	public void productionPlanLaunchButtonClick() {
+//		ProductionPlanStateType currentPlanState = productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId());
+//		ProductionPlanStateType planStateLanzado = productionPlanStateTypeRepository.findFirstByName("Lanzado");
+//		ProductionPlanStateType planStateFinalizado = productionPlanStateTypeRepository.findFirstByName("Finalizado");
+//		ProductionPlanStateType planStateEnEjecucion = productionPlanStateTypeRepository.findFirstByName("En Ejecucion");
+//		if(currentPlanState.equals(planStateLanzado) || currentPlanState.equals(planStateEnEjecucion) || currentPlanState.equals(planStateFinalizado)) {
+//			alert("No se puede lanzar un plan que ya esta lanzado o en un estado posterior.");
+//			return;
+//		}
+//		currentProductionPlan.setDateStart(getTimeboxDate());
+//		if(!isProductionPlanReady()) {
+//			alert("No se puede lanzar hasta que todas Ordenes esten Preparadas.");
+//			return;
+//		}
+//		if(!productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId()).equals(productionPlanStateTypeRepository.findFirstByName("Abastecido"))) {
+//			alert("No se puede lanzar el Plan hasta estar Abastecido.");
+//			return;
+//		}
+//		ProductionPlanState state = new ProductionPlanState(planStateLanzado, new Date());
+//		productionPlanStateRepository.save(state);
+//		currentProductionPlan.setState(state);
+//		productionPlanRepository.save(currentProductionPlan);
+//		Clients.showNotification("Plan de Produccion Lanzado");
+//		refreshView();
+//	}
 	
 	@Listen("onClick = #productionPlanRequirementButton")
 	public void productionPlanRequirementButtonClick() {

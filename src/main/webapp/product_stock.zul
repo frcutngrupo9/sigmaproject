@@ -10,7 +10,7 @@
 		    <separator/>
 		    <listbox id="productListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
 		    	<auxhead>
-					<auxheader label="Productos" colspan="6"/>
+					<auxheader label="Productos" colspan="7"/>
 				</auxhead>
 		        <listhead>
 		            <listheader label="Foto" align="center"/>
@@ -19,6 +19,7 @@
 		            <listheader label="Stock Actual" align="center"/>
 		            <listheader label="Stock Minimo" align="center"/>
 		            <listheader label="Stock Reposicion" align="center"/>
+		            <listheader label="Cantidad Entregada" align="center"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
@@ -32,6 +33,7 @@
 		                <listcell label="${each.stock}"/>
 		                <listcell label="${each.stockMin}"/>
 		                <listcell label="${each.stockRepo}"/>
+		                <listcell label="${win_product_stock$composer.getQuantityDelivered(each)}"/>
 		            </listitem>
 		        </template>
 		    </listbox>
