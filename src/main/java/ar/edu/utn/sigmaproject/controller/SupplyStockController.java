@@ -194,9 +194,7 @@ public class SupplyStockController extends SelectorComposer<Component> {
 		List<SupplyReserved> supplyReservedTotal = supplyReservedRepository.findBySupplyRequirementSupplyType(supplyType);
 		BigDecimal stockReservedTotal = BigDecimal.ZERO;
 		for(SupplyReserved each : supplyReservedTotal) {
-			if(!each.isWithdrawn()) {// suma todas las reservas del insumo que aun no han sido retiradas
-				stockReservedTotal = stockReservedTotal.add(each.getStockReserved());
-			}
+			stockReservedTotal = stockReservedTotal.add(each.getStockReserved());
 		}
 		return stockReservedTotal;
 	}

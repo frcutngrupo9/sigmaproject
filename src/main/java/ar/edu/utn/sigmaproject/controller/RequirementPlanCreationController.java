@@ -188,7 +188,6 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 			currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
 			productionPlanStateTextbox.setText(currentProductionPlan.getCurrentStateType().getName());
 		}
-
 	}
 
 	private void refreshView() {
@@ -317,7 +316,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 					currentSupplyReserved = supplyReservedRepository.save(currentSupplyReserved);
 					SupplyType supplyType = each.getSupplyType();
 					supplyType.getSuppliesReserved().add(currentSupplyReserved);
-					supplyTypeRepository.save(supplyType);
+					supplyType = supplyTypeRepository.save(supplyType);
 				} else {
 					// como ya hay una reserva, esa cantidad se sustrae de la cantidad necesaria
 					BigDecimal quantityNonReserved = quantityNecessary.subtract(currentSupplyReserved.getStockReserved());
@@ -327,7 +326,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 						quantityReservation = currentSupplyReserved.getStockReserved().add(stockAvailable);
 					}
 					currentSupplyReserved.setStockReserved(quantityReservation);
-					supplyReservedRepository.save(currentSupplyReserved);
+					currentSupplyReserved = supplyReservedRepository.save(currentSupplyReserved);
 				}
 			}
 		}
@@ -347,7 +346,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 					currentWoodReserved = new WoodReserved(each, quantityReservation);
 					currentWoodReserved = woodReservedRepository.save(currentWoodReserved);
 					currentWood.getWoodsReserved().add(currentWoodReserved);
-					woodRepository.save(currentWood);
+					currentWood = woodRepository.save(currentWood);
 				} else {
 					// como ya hay una reserva, esa cantidad se sustrae de la cantidad necesaria
 					BigDecimal quantityNonReserved = quantityNecessary.subtract(currentWoodReserved.getStockReserved());
@@ -357,10 +356,15 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 						quantityReservation = currentWoodReserved.getStockReserved().add(stockAvailable);
 					}
 					currentWoodReserved.setStockReserved(quantityReservation);
-					woodReservedRepository.save(currentWoodReserved);
+					currentWoodReserved = woodReservedRepository.save(currentWoodReserved);
 				}
 			}
 		}
+		currentProductionPlan = productionPlanRepository.findOne(currentProductionPlan.getId());// buscamos el plan nuevamente para que contenga en sus atributos los cambios recientes
+		supplyRequirementList = currentProductionPlan.getSupplyRequirements();
+		rawMaterialRequirementList = currentProductionPlan.getRawMaterialRequirements();
+		supplyRequirementListModel = new ListModelList<>(supplyRequirementList);
+		rawMaterialRequirementListModel = new ListModelList<>(rawMaterialRequirementList);
 		supplyRequirementListbox.setModel(supplyRequirementListModel);
 		rawMaterialRequirementListbox.setModel(rawMaterialRequirementListModel);
 		updateProductionPlanState();// actualiza el estado del plan
@@ -435,7 +439,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 		
 		// antes de hacer los pedidos realiza la reserva de los materiales disponibles si no se realizo aun
 		if(!isAllRequirementReservationDone()) {
-			Clients.showNotification("Imposible Generar Pedido, debe realizar las reservas antes de crear el pedido de materiales.");
+			Clients.showNotification("Debe realizar las reservas antes de crear el pedido de materiales.");
 			return;
 		}
 

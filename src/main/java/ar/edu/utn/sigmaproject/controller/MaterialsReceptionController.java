@@ -190,45 +190,44 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 		// crea stock movement con las cantidades recibidas
 		StockMovement stockMovementSupply = new StockMovement();
 		stockMovementSupply.setSign((short) 1);// signo de ingreso a stock
-		stockMovementSupply.setDate(receptionDate);
+		stockMovementSupply.setDate(new Date());
 		stockMovementSupply.setType(StockMovementType.Supply);
 		StockMovement stockMovementWood = new StockMovement();
-		stockMovementWood.setSign((short) -1);
-		stockMovementWood.setDate(receptionDate);
+		stockMovementWood.setSign((short) 1);// signo de ingreso a stock
+		stockMovementWood.setDate(new Date());
 		stockMovementWood.setType(StockMovementType.Wood);
+
+		// modifica la cantidad en stock y se agrega los stock movement details
 		for(MaterialsOrderDetail each : currentMaterialsOrder.getDetails()) {
-			StockMovementDetail stockMovementDetail = new StockMovementDetail();
 			Item item = each.getItem();
+			
+			StockMovementDetail stockMovementDetail = new StockMovementDetail();
 			stockMovementDetail.setDescription(item.getDescription());
 			stockMovementDetail.setItem(item);
 			stockMovementDetail.setQuantity(each.getQuantityReceived());
+			
 			if(item instanceof SupplyType) {
+				SupplyType supplyType = (SupplyType) item;
+				supplyType.setStock(supplyType.getStock().add(each.getQuantityReceived()));
+				supplyType = supplyTypeRepository.save(supplyType);
+				
 				stockMovementDetail.setStockMovement(stockMovementSupply);
 				stockMovementSupply.getDetails().add(stockMovementDetail);
 			} else if (item instanceof Wood) {
+				Wood wood = (Wood) item;
+				wood.setStock(wood.getStock().add(each.getQuantityReceived()));
+				wood = woodRepository.save(wood);
+				
 				stockMovementDetail.setStockMovement(stockMovementWood);
 				stockMovementWood.getDetails().add(stockMovementDetail);
 			}
 		}
+		// se comprueba q posean detalles por si llegaron materiales de un tipo y no otro
 		if(!stockMovementSupply.getDetails().isEmpty()) {
 			stockMovementRepository.save(stockMovementSupply);
 		}
 		if(!stockMovementWood.getDetails().isEmpty()) {
 			stockMovementRepository.save(stockMovementWood);
-		}
-
-		// modifica la cantidad en stock
-		for(MaterialsOrderDetail each : currentMaterialsOrder.getDetails()) {
-			Item item = each.getItem();
-			if(item instanceof SupplyType) {
-				SupplyType supplyType = (SupplyType) item;
-				supplyType.setStock(supplyType.getStock().add(each.getQuantityReceived()));
-				supplyType = supplyTypeRepository.save(supplyType);
-			} else if (item instanceof Wood) {
-				Wood wood = (Wood) item;
-				wood.setStock(wood.getStock().add(each.getQuantityReceived()));
-				wood = woodRepository.save(wood);
-			}
 		}
 
 		// agrega ese stock a la reserva del plan (solo si el pedido tiene plan asignado)
@@ -285,10 +284,8 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 			}
 		}
 
-		
 		if(currentMaterialsOrder.isTotallyReceived()) {
 			updateProductionPlanState(productionPlan);// actualiza el estado del plan a abastecido
-
 		} else {
 			// crea otro pedido de materiales con las cantidades que aun no se recibieron en caso de que no se haya recibido completamente
 			alert("Se Creara un nuevo Pedido para los Materiales Faltantes.");
@@ -345,7 +342,7 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 		}
 		return lastValue + 1;
 	}
-	
+
 	protected void updateProductionPlanState(ProductionPlan productionPlan) {
 		boolean isCompleted = productionPlan.isAllReservationsFulfilled();
 		ProductionPlanStateType stateTypeAbastecido = productionPlanStateTypeRepository.findFirstByName("Abastecido");

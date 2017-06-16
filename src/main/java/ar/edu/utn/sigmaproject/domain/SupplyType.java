@@ -121,9 +121,7 @@ public class SupplyType extends Item implements Serializable, Cloneable {
 	public BigDecimal getStockReserved() {
 		BigDecimal aux = BigDecimal.ZERO;
 		for(SupplyReserved each : suppliesReserved) {
-			if(!each.isWithdrawn()) {
-				aux = aux.add(each.getStockReserved());
-			}
+			aux = aux.add(each.getStockReserved());
 		}
 		return aux;
 	}

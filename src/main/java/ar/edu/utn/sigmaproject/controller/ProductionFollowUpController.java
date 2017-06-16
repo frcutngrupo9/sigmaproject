@@ -36,6 +36,7 @@ import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Row;
 import org.zkoss.zul.Textbox;
 
+import ar.edu.utn.sigmaproject.domain.Item;
 import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
 import ar.edu.utn.sigmaproject.domain.Order;
@@ -57,6 +58,9 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.domain.RawMaterial;
 import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
+import ar.edu.utn.sigmaproject.domain.StockMovement;
+import ar.edu.utn.sigmaproject.domain.StockMovementDetail;
+import ar.edu.utn.sigmaproject.domain.StockMovementType;
 import ar.edu.utn.sigmaproject.domain.Supply;
 import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
 import ar.edu.utn.sigmaproject.domain.SupplyReserved;
@@ -80,6 +84,7 @@ import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.RawMaterialRequirementRepository;
+import ar.edu.utn.sigmaproject.service.StockMovementRepository;
 import ar.edu.utn.sigmaproject.service.SupplyRequirementRepository;
 import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
@@ -172,6 +177,8 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	private OrderRepository orderRepository;
 	@WireVariable
 	private ProductRepository productRepository;
+	@WireVariable
+	private StockMovementRepository stockMovementRepository;
 
 	// atributes
 	private ProductionOrder currentProductionOrder;
@@ -373,7 +380,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 					orderRepository.save(order);
 				}
 			}
-			
+
 			// se modifica la cantidad en stock de los productos si el estado del plan es Finalizado
 			if(newProductionPlanStateType.getName().equalsIgnoreCase("Finalizado")) {
 				for(ProductionOrder each : productionOrderList) {
@@ -542,7 +549,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		Checkbox element = (Checkbox) evt.getOrigin().getTarget();// obtenemos el elemento web
 		Row fila = (Row)element.getParent();
 		Doublebox doublebox = (Doublebox) fila.getChildren().get(fila.getChildren().size()-1);
-		
+
 		if(element.isChecked()) {
 			data.setState(ProcessState.Realizado);
 			// agregamos como cantidad finalizada el total
@@ -647,6 +654,17 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		// buscamos los materiales necesarios para esta orden y luego vemos cuales son las reservas para dichos materiales y disminuimos su cantidad tanto en la reserva como en el stock
 		Product product = currentProductionOrder.getProduct();
 		Integer units = currentProductionOrder.getUnits();
+
+		// crea stock movement con las cantidades retiradas
+		StockMovement stockMovementSupply = new StockMovement();
+		stockMovementSupply.setSign((short) -1);// signo de egreso de stock
+		stockMovementSupply.setDate(new Date());
+		stockMovementSupply.setType(StockMovementType.Supply);
+		StockMovement stockMovementWood = new StockMovement();
+		stockMovementWood.setSign((short) -1);// signo de egreso de stock
+		stockMovementWood.setDate(new Date());
+		stockMovementWood.setType(StockMovementType.Wood);
+
 		// la cantidad a restar es la cantidad de materiales del producto por la cantidad de unidades del producto
 		List<Supply> supplyList = product.getSupplies();
 		List<RawMaterial> woodList = product.getRawMaterials();
@@ -666,8 +684,17 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 			SupplyReserved supplyReserved = supplyReservedRepository.findBySupplyRequirement(supplyRequirement);
 			supplyReserved.setStockReserved(supplyReserved.getStockReserved().subtract(quantityTotal));
 			supplyReservedRepository.save(supplyReserved);
-			supplyRequirement.setQuantityWithdrawn(supplyRequirement.getQuantityWithdrawn().add(quantityTotal));
+			BigDecimal quantityWithdrawn = supplyRequirement.getQuantityWithdrawn().add(quantityTotal);
+			supplyRequirement.setQuantityWithdrawn(quantityWithdrawn);
 			supplyRequirementRepository.save(supplyRequirement);
+
+			StockMovementDetail stockMovementDetail = new StockMovementDetail();
+			Item item = supplyType;
+			stockMovementDetail.setDescription(item.getDescription());
+			stockMovementDetail.setItem(item);
+			stockMovementDetail.setQuantity(quantityWithdrawn);
+			stockMovementDetail.setStockMovement(stockMovementSupply);
+			stockMovementSupply.getDetails().add(stockMovementDetail);
 		}
 		for(RawMaterial each : woodList) {
 			BigDecimal quantityTotal = each.getQuantity().multiply(new BigDecimal(units));
@@ -685,13 +712,29 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 			WoodReserved woodReserved = woodReservedRepository.findByRawMaterialRequirement(rawMaterialRequirement);
 			woodReserved.setStockReserved(woodReserved.getStockReserved().subtract(quantityTotal));
 			woodReservedRepository.save(woodReserved);
-			rawMaterialRequirement.setQuantityWithdrawn(rawMaterialRequirement.getQuantityWithdrawn().add(quantityTotal));
+			BigDecimal quantityWithdrawn = rawMaterialRequirement.getQuantityWithdrawn().add(quantityTotal);
+			rawMaterialRequirement.setQuantityWithdrawn(quantityWithdrawn);
 			rawMaterialRequirementRepository.save(rawMaterialRequirement);
+
+			StockMovementDetail stockMovementDetail = new StockMovementDetail();
+			Item item = wood;
+			stockMovementDetail.setDescription(item.getDescription());
+			stockMovementDetail.setItem(item);
+			stockMovementDetail.setQuantity(quantityWithdrawn);
+			stockMovementDetail.setStockMovement(stockMovementWood);
+			stockMovementWood.getDetails().add(stockMovementDetail);
 		}
 		currentProductionOrder.setDateMaterialsWithdrawal(new Date());
 		currentProductionOrder = productionOrderRepository.save(currentProductionOrder);
+
+		if(!stockMovementSupply.getDetails().isEmpty()) {
+			stockMovementRepository.save(stockMovementSupply);
+		}
+		if(!stockMovementWood.getDetails().isEmpty()) {
+			stockMovementRepository.save(stockMovementWood);
+		}
 	}
-	
+
 	public boolean isStateFinish(ProcessState processState) {
 		return processState==ProcessState.Realizado;
 	}
