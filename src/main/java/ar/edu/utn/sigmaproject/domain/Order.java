@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,22 +20,22 @@ public class Order implements Serializable, Cloneable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 
 	@ManyToOne
-	Client client;
+	private Client client;
 
-	@OneToMany(orphanRemoval = true)
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "order", targetEntity = OrderDetail.class)
 	@OrderColumn(name = "detail_index")
-	List<OrderDetail> details = new ArrayList<>();
+	private List<OrderDetail> details = new ArrayList<>();
 
 	@OneToMany(orphanRemoval = true)
-	List<OrderState> states = new ArrayList<>();
+	private List<OrderState> states = new ArrayList<>();
 
-	Integer number = 0;
-	Date date = new Date();
-	Date needDate = new Date();
-	OrderStateType currentStateType = null;
+	private Integer number = 0;
+	private Date date = new Date();
+	private Date needDate = new Date();
+	private OrderStateType currentStateType = null;
 
 	public Order() {
 
@@ -70,7 +71,7 @@ public class Order implements Serializable, Cloneable {
 	public void setDetails(List<OrderDetail> details) {
 		this.details = details;
 	}
-	
+
 	public OrderStateType getCurrentStateType() {
 		return currentStateType;
 	}
@@ -91,7 +92,7 @@ public class Order implements Serializable, Cloneable {
 		}
 		return null;
 	}
-	
+
 	public void setState(OrderState state) {
 		currentStateType = state.getType();
 		states.add(state);

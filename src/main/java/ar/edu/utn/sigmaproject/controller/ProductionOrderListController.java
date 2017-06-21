@@ -7,8 +7,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.datatype.Duration;
-
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
@@ -47,6 +45,7 @@ import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
+import ar.edu.utn.sigmaproject.util.ProductionDateTimeHelper;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProductionOrderListController extends SelectorComposer<Component> {
@@ -353,7 +352,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 					} else {
 						productionOrderStartDate = productionOrderFinishDate;// el inicio es al finalizar la ultima
 					}
-					productionOrderFinishDate = getFinishDate(productionOrderStartDate, productionOrder.getDurationTotal());
+					productionOrderFinishDate = ProductionDateTimeHelper.getFinishDate(productionOrderStartDate, productionOrder.getDurationTotal());
 					productionOrder.setDateStart(productionOrderStartDate);
 					productionOrder.setDateFinish(productionOrderFinishDate);
 					previousStartDate = productionOrderStartDate;
@@ -361,7 +360,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 					// si el valor de secuencia anterior es igual al actual se inician al mismo tiempo y se guarda el que finalice mas tarde para usarlo como inicio del proximo
 					if(sequence == productionOrder.getSequence()) {
 						productionOrder.setDateStart(previousStartDate);
-						Date currentFinishDate = getFinishDate(previousStartDate, productionOrder.getDurationTotal());
+						Date currentFinishDate = ProductionDateTimeHelper.getFinishDate(previousStartDate, productionOrder.getDurationTotal());
 						productionOrder.setDateFinish(currentFinishDate);
 						if(currentFinishDate.after(productionOrderFinishDate)) {// si la actual orden finaliza despues q la que anterior, la reemplaza
 							productionOrderFinishDate = currentFinishDate;
@@ -373,7 +372,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 						} else {
 							productionOrderStartDate = productionOrderFinishDate;// el inicio es al finalizar la ultima
 						}
-						productionOrderFinishDate = getFinishDate(productionOrderStartDate, productionOrder.getDurationTotal());
+						productionOrderFinishDate = ProductionDateTimeHelper.getFinishDate(productionOrderStartDate, productionOrder.getDurationTotal());
 						productionOrder.setDateStart(productionOrderStartDate);
 						productionOrder.setDateFinish(productionOrderFinishDate);
 						previousStartDate = productionOrderStartDate;
@@ -418,80 +417,6 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 			return calStartDate.getTime();
 		}
 		return null;
-	}
-
-	public Date getFinishDate(Date startDate, Duration time) {
-		//TODO: no tienen en cuenta fines de semana y feriados
-		int firstHourOfDay = 9;// horario en el que se empieza a trabajar
-		int firstMinuteOfDay = 0;
-		int lastHourOfDay = 18;// horario en el que se termina de trabajar
-		int lastMinuteOfDay = 0;
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(startDate);
-		// primero se comprueba que la fecha de inicio se encuentre dentro del horario
-		if(cal.get(Calendar.HOUR_OF_DAY) < firstHourOfDay ||
-				cal.get(Calendar.HOUR_OF_DAY) >= lastHourOfDay) {
-			return null;
-		} else {// si esta dentro del horario en horas pero no en minutos
-			if(firstMinuteOfDay!=0 || lastMinuteOfDay!=0) {//si estan configurados minutos en el horario
-				//solo es valido si la hora es igual a la de comienzo o igual al previo al final
-				if(cal.get(Calendar.HOUR_OF_DAY) == firstHourOfDay) {
-					if(cal.get(Calendar.MINUTE) < firstMinuteOfDay) {
-						return null;
-					}
-				}
-				if(cal.get(Calendar.HOUR_OF_DAY) == lastHourOfDay-1) {
-					if(cal.get(Calendar.MINUTE) >= lastMinuteOfDay) {
-						return null;
-					}
-				}
-			}
-		}
-		if(time != null) {
-			int hours = time.getHours();
-			int minutes = time.getMinutes();// puede ser que los minutos sean mayor que 60, ya que se realizaron multiplicaciones sobre time
-			while(minutes >= 60) {// se vuelven los minutos a menos de 60
-				minutes -= 60;
-				hours += 1;
-			}
-			while(hours > 0) {
-				hours -= 1;
-				cal.add(Calendar.HOUR_OF_DAY, 1);// agrega horas
-				// si luego de agregar 1 hora, el tiempo supera el horario de finalizacion
-				// se resta hasta el horario de finalizacion y ese tiempo se suma al dia siguiente
-				if(cal.get(Calendar.HOUR_OF_DAY) >= lastHourOfDay) {// caso supere el horario de finalizacion
-					if(cal.get(Calendar.MINUTE) > 0) {
-						// se agregan los minutos que superan al horario de finalizacion
-						minutes += cal.get(Calendar.MINUTE);
-						while(minutes >= 60) {
-							minutes -= 60;
-							hours += 1;
-						}
-					}
-					// agrega 1 dia y resetea el horario
-					cal.add(Calendar.DAY_OF_MONTH, 1);
-					cal.set(Calendar.HOUR_OF_DAY, firstHourOfDay);
-					cal.set(Calendar.MINUTE, firstMinuteOfDay);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
-				}
-			}
-			// agrega los minutos
-			if(minutes > 0) {
-				cal.add(Calendar.MINUTE, minutes);
-				// puede ser que al agregar los minutos se supere el horario de finalizacion
-				if(cal.get(Calendar.HOUR_OF_DAY) >= lastHourOfDay) {// caso supere el horario de finalizacion
-					cal.add(Calendar.DAY_OF_MONTH, 1);// agrega 1 dia
-					cal.set(Calendar.HOUR_OF_DAY, firstHourOfDay);
-					cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));// los minutos que superaron el horario de finalizacion se agregan al horario de inicio
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
-
-				}
-			}
-			return cal.getTime();
-		}
-		return startDate;// si el tiempo es null se devuelve la misma fecha de inicio
 	}
 	
 //	private boolean isProductionPlanReady() {

@@ -3,8 +3,13 @@ package ar.edu.utn.sigmaproject.domain;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -34,7 +39,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 	@OneToMany(orphanRemoval = true)
 	List<ProductionOrderState> states = new ArrayList<>();
 
-	@OneToMany(orphanRemoval = true)
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionOrder", targetEntity = ProductionOrderDetail.class)
 	@OrderColumn(name = "detail_index")
 	List<ProductionOrderDetail> details = new ArrayList<>();
 
@@ -222,5 +227,33 @@ public class ProductionOrder implements Serializable, Cloneable {
 
 	public void setDateMaterialsWithdrawal(Date dateMaterialsWithdrawal) {
 		this.dateMaterialsWithdrawal = dateMaterialsWithdrawal;
+	}
+	
+	public Map<ProcessType, List<ProductionOrderDetail>> getProcessTypeMap() {
+		// devuelve un map en que la llave es el ProcessType y el valor son los ProductionOrderDetail que referencian a un Process que referencia a ese ProcessType
+		Map<ProcessType, List<ProductionOrderDetail>> processTypeMap = new HashMap<ProcessType, List<ProductionOrderDetail>>();
+		for(ProductionOrderDetail each : getDetails()) {
+			ProcessType processType = each.getProcess().getType();
+			List<ProductionOrderDetail> list = processTypeMap.get(processType);
+			if(list == null) {
+				list = new ArrayList<ProductionOrderDetail>();
+			} else {
+				list.add(each);
+			}
+			processTypeMap.put(processType, list);
+		}
+		return processTypeMap;
+	}
+	
+	public List<ProcessType> getProcessTypeList() {
+		Set<ProcessType> processTypeSet = new HashSet<ProcessType>();
+		for(ProductionOrderDetail eachProductionOrderDetail : getDetails()) {
+			processTypeSet.add(eachProductionOrderDetail.getProcess().getType());// garantiza que los tipo de procesos no se repitan
+		}
+		List<ProcessType> list = new ArrayList<ProcessType>();
+		for (ProcessType eachProcessType : processTypeSet) {
+			list.add(eachProcessType);
+		}
+		return list;
 	}
 }

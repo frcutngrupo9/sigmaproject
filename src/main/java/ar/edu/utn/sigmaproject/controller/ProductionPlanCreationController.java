@@ -59,7 +59,6 @@ import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRawMaterialRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
@@ -123,8 +122,8 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	private RawMaterialRequirementRepository rawMaterialRequirementRepository;
 	@WireVariable
 	private ProductionOrderRepository productionOrderRepository;
-	@WireVariable
-	private ProductionOrderDetailRepository productionOrderDetailRepository;
+//	@WireVariable
+//	private ProductionOrderDetailRepository productionOrderDetailRepository;
 	@WireVariable
 	private ProductionOrderStateRepository productionOrderStateRepository;
 	@WireVariable
@@ -274,7 +273,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				ProductionOrder productionOrder = new ProductionOrder(sequence, currentProductionPlan, each.getProduct(), each.getTotalUnits(), productionOrderState);
 				//  agrega los detalles
 				List<ProductionOrderDetail> details = createProductionOrderDetailList(productionOrder);
-				details = productionOrderDetailRepository.save(details);
+//				details = productionOrderDetailRepository.save(details);
 				productionOrder.setDetails(details);
 				// agrega los materiales a las ordenes de produccion
 				List<ProductionOrderSupply> productionOrderSupplyList = createProductionOrderSupplyList(productionOrder);
@@ -301,7 +300,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				Integer units = productionOrder.getUnits();
 				Integer quantityPiece = units * piece.getUnits();// cantidad total de la pieza
 				Duration timeTotal = process.getTime().multiply(units);// tiempo del proceso de las piezas del producto por las unidades del producto
-				details.add(new ProductionOrderDetail(process, ProcessState.Pendiente, null, timeTotal, quantityPiece));
+				details.add(new ProductionOrderDetail(productionOrder, process, ProcessState.Pendiente, null, timeTotal, quantityPiece));
 			}
 		}
 		return details;

@@ -29,36 +29,7 @@
 					<label value="Fecha Inicio: "/>
 					<datebox id="productionOrderStartDatebox" cols="12" format="dd-MM-yyyy"/>
 					<label value="Fecha Fin: "/>
-					<datebox id="productionOrderFinishDatebox" cols="12" format="dd-MM-yyyy"/>
-				</hbox>
-				<hbox hflex="1" pack="center" if="false">
-					<listbox id="candidateWorkerListbox" width="250px" vflex="true" multiple="true" rows="4" sizedByContent="true">
-				        <listhead>
-				            <listheader hflex="1" label="Empleados Disponibles:" align="center"></listheader>
-				        </listhead>
-				        <template name="model">
-				            <listitem>
-				                <listcell label="${each.name}"/>
-				            </listitem>
-				        </template>
-				    </listbox>
-				    <vbox spacing="10px" width="24px">
-				    	<button id="chooseWorkerButton" image="/img/rightarrow.png"/>
-				    	<button id="removeWorkerButton" image="/img/leftarrow.png"/>
-				    </vbox>
-				    <listbox id="chosenWorkerListbox" width="250px" vflex="true" multiple="true" rows="4" sizedByContent="true">
-				        <listhead>
-				            <listheader hflex="1" label="Empleados Asignados:" align="center"></listheader>
-				        </listhead>
-				        <template name="model">
-				            <listitem>
-				                <listcell label="${each.name}"/>
-				            </listitem>
-				        </template>
-				    </listbox>
-			    </hbox>
-				<hbox hflex="1" pack="center" if="false">
-					<button id="generateDetailsButton" label="Actualizar Detalles"/>
+					<datebox buttonVisible="false" id="productionOrderFinishDatebox" cols="12" format="dd-MM-yyyy"/>
 				</hbox>
         		<grid id="processTypeGrid" sizedByContent="true" span="true">
         			<auxhead>
@@ -102,30 +73,36 @@
 						<auxheader label="Detalles" colspan="10"/>
 					</auxhead>
         			<columns>
+			            <column label="Cancelado" align="center"/>
 			            <column label="Proceso" align="left" sort="auto(process.type.name)"/>
+			            <column label="Inicio" align="left"/>
+			            <column label="Fin" align="left"/>
 			            <column label="Pieza" align="center"/>
 			            <column label="Cantidad" align="center"/>
 			            <column label="Duracion x Producto" align="center"/>
 			            <column label="Duracion Total" align="center"/>
 			            <column label="Empleado" align="center"/>
 			            <column label="Maquina" align="center"/>
-			            <column label="Fecha" align="left"/>
 		            </columns>
 		            <template name="model">
 		                <row>
+		                	<custom-attributes state_cancel="${win_production_order_creation$composer.isStateCancel(each.getState())}"/>
+			            	<checkbox disabled="false" checked="${state_cancel}" forward="onCheck=productionOrderDetailGrid.onEditProductionOrderDetailIsCanceled(${each})"/>
 			            	<label value="${each.process.type.name}"/>
+			            	<datebox buttonVisible="true" disabled="${state_cancel}" cols="12" format="dd/MM/yyyy HH:mm" value="${each.dateStart}"/>
+			            	<datebox buttonVisible="false" disabled="true" cols="12" format="dd/MM/yyyy HH:mm" value="${each.dateFinish}"/>
 			            	<label value="${win_production_order_creation$composer.getPieceNameByProcess(each.process)}"/>
 			            	<label value="${each.quantityPiece}"/>
 			            	<label value="${r:getFormattedProcessTime(each.process.time)}"/>
 			            	<label value="${r:getFormattedProcessTime(each.getTimeTotal())}"/>
-			            	<combobox visible="true" hflex="1" forward="onSelect=productionOrderDetailGrid.onEditProductionOrderDetailWorker(${each}), onAfterRender=productionOrderDetailGrid.onCreateWorkerCombobox(${each})"
+			            	<combobox disabled="${state_cancel}" visible="true" hflex="1" forward="onSelect=productionOrderDetailGrid.onEditProductionOrderDetailWorker(${each}), onAfterRender=productionOrderDetailGrid.onCreateWorkerCombobox(${each})"
 			            		model="${win_production_order_creation$composer.getWorkerListModel(each)}" readonly="true">
 			            		<template name="model">
 			            			<comboitem label="${each.name}" />
 			            		</template>
 			            	</combobox>
 			            	<cell>
-				            	<combobox visible="true" hflex="1" if="${win_production_order_creation$composer.isMachineNecessary(each.process.type)}"
+				            	<combobox disabled="${state_cancel}" visible="true" hflex="1" if="${win_production_order_creation$composer.isMachineNecessary(each.process.type)}"
 				            		forward="onSelect=productionOrderDetailGrid.onEditProductionOrderDetailMachine(${each}), onAfterRender=productionOrderDetailGrid.onCreateMachineCombobox(${each})"
 	                        		model="${win_production_order_creation$composer.getMachineListModel(each)}" readonly="true">
 			                        <template name="model">
@@ -134,7 +111,6 @@
 			                    </combobox>
 			                    <label value="NO REQUIERE" if="${!win_production_order_creation$composer.isMachineNecessary(each.process.type)}"/>
 		                    </cell>
-			            	<label value="${r:getFormattedDate(each.dateStart)}"/>
 						</row>
 		            </template>
     			</grid>

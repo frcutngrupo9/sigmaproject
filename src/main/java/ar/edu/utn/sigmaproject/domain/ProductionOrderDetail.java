@@ -21,6 +21,9 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
+	@ManyToOne(targetEntity = ProductionOrder.class)
+	private ProductionOrder productionOrder = null;
 
 	@ManyToOne
 	private Process process;
@@ -54,7 +57,8 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 
 	}
 
-	public ProductionOrderDetail(Process process, ProcessState state, Machine machine, Duration timeTotal, Integer quantityPiece) {
+	public ProductionOrderDetail(ProductionOrder productionOrder, Process process, ProcessState state, Machine machine, Duration timeTotal, Integer quantityPiece) {
+		this.productionOrder = productionOrder;
 		this.process = process;
 		this.state = state;
 		this.machine = machine;
@@ -168,5 +172,13 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 
 	public void setWorker(Worker worker) {
 		this.worker = worker;
+	}
+
+	public ProductionOrder getProductionOrder() {
+		return productionOrder;
+	}
+
+	public void setProductionOrder(ProductionOrder productionOrder) {
+		this.productionOrder = productionOrder;
 	}
 }

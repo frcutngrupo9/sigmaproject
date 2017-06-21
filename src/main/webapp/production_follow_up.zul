@@ -42,13 +42,15 @@
 				</hbox>
         		<grid id="productionOrderDetailGrid" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Detalle de Tareas a Realizar" colspan="10"/>
+						<auxheader label="Detalle de Tareas a Realizar" colspan="12"/>
 					</auxhead>
         			<columns>
         				<column label="Realizado" align="center"/>
 			            <column label="Proceso" align="left" sort="auto(process.type.name)"/>
 			            <column label="Inicio" align="left"/>
 			            <column label="Fin" align="left"/>
+			            <column label="Inicio Real" align="left"/>
+			            <column label="Fin Real" align="left"/>
 			            <column label="Pieza" align="center"/>
 			            <column label="Duracion" align="center"/>
 			            <column label="Empleado" align="center"/>
@@ -59,10 +61,13 @@
 		            <template name="model">
 		                <row>
 		                	<custom-attributes state_finish="${win_production_follow_up$composer.isStateFinish(each.getState())}"/>
-		                	<checkbox disabled="false" checked="${state_finish}" forward="onCheck=productionOrderDetailGrid.onEditProductionOrderDetailIsFinished(${each})"/>
+		                	<custom-attributes state_cancel="${win_production_follow_up$composer.isStateCancel(each.getState())}"/>
+		                	<checkbox disabled="${state_cancel}" checked="${state_finish}" forward="onCheck=productionOrderDetailGrid.onEditProductionOrderDetailIsFinished(${each})"/>
 			            	<label value="${each.process.type.name}"/>
 			            	<datebox buttonVisible="false" disabled="true" cols="12" format="dd/MM/yyyy HH:mm" value="${each.dateStart}"/>
 			            	<datebox buttonVisible="false" disabled="true" cols="12" format="dd/MM/yyyy HH:mm" value="${each.dateFinish}"/>
+			            	<datebox buttonVisible="true" disabled="${!state_finish}" visible="true" cols="12" format="dd/MM/yyyy HH:mm" value="${each.dateStartReal}" forward="onChange=productionOrderDetailGrid.onChangeProductionOrderDetailDateStartReal(${each})"/>
+			            	<datebox buttonVisible="true" disabled="${!state_finish}" visible="true" cols="12" format="dd/MM/yyyy HH:mm" value="${each.dateFinishReal}" forward="onChange=productionOrderDetailGrid.onChangeProductionOrderDetailDateFinishReal(${each})"/>
 			            	<label value="${win_production_follow_up$composer.getPieceNameByProcess(each.process)}"/>
 			            	<label value="${r:getFormattedProcessTime(each.getTimeTotal())}"/>
 			            	<label value="${each.getWorker().getName()}"/>
@@ -71,7 +76,7 @@
 			                    <label value="NO REQUIERE MAQUINA" if="${!win_production_follow_up$composer.isMachineNecessary(each.process)}"/>
 		                    </cell>
 			            	<label value="${each.quantityPiece}"/>
-			            	<doublebox disabled="false" inplace="true" value="${each.quantityFinished}" forward="onChanging=productionOrderDetailGrid.onEditProductionOrderDetailQuantityFinished(${each})"/>
+			            	<doublebox disabled="${state_cancel}" inplace="true" value="${each.quantityFinished}" forward="onChanging=productionOrderDetailGrid.onEditProductionOrderDetailQuantityFinished(${each})"/>
 						</row>
 		            </template>
     			</grid>

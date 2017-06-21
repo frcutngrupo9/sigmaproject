@@ -2,10 +2,10 @@ package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-
-import javax.xml.datatype.Duration;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.zkoss.zk.ui.Component;
@@ -42,7 +42,6 @@ import ar.edu.utn.sigmaproject.domain.MachineType;
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
-import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.Product;
@@ -74,7 +73,6 @@ import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.PieceRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRawMaterialRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
@@ -122,8 +120,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	@Wire
 	Button resetButton;
 	@Wire
-	Button generateDetailsButton;
-	@Wire
 	Listbox productionOrderSupplyListbox;
 	@Wire
 	Listbox productionOrderRawMaterialListbox;
@@ -133,8 +129,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	// services
 	@WireVariable
 	private ProductionOrderRepository productionOrderRepository;
-	@WireVariable
-	private ProductionOrderDetailRepository productionOrderDetailRepository;
 	@WireVariable
 	private ProductionOrderStateRepository productionOrderStateRepository;
 	@WireVariable
@@ -250,41 +244,10 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		productionOrderRawMaterialListbox.setModel(productionOrderRawMaterialListModel);
 	}
 
-	@Listen("onClick = #generateDetailsButton")
-	public void generateDetailListClick() {
-		List<ProductionOrderDetail> details = getProductionOrderDetailList(currentProductionOrder);
-		if(details.size() != productionOrderDetailList.size()) {
-			productionOrderDetailList = details;
-			refreshView();
-		}
-	}
-
-	private List<ProductionOrderDetail> getProductionOrderDetailList(ProductionOrder productionOrder) {
-		List<ProductionOrderDetail> productionOrderDetailList = new ArrayList<>();
-		for(Piece piece : productionOrder.getProduct().getPieces()) {
-			List<Process> auxProcessList = piece.getProcesses();
-			for(Process process : auxProcessList) {
-				// por cada proceso hay que crear un detalle
-				Integer quantityPiece = productionOrder.getUnits() * piece.getUnits();// cantidad total de la pieza
-				Duration timeTotal = process.getTime().multiply(productionOrder.getUnits());// cantidad total de tiempo del proceso
-				productionOrderDetailList.add(new ProductionOrderDetail(process, ProcessState.Pendiente, null, timeTotal, quantityPiece));
-			}
-		}
-		return productionOrderDetailList;
-	}
-
 	@Transactional
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
 		ProductionOrderStateType lastStateType = productionOrderStateTypeRepository.findOne(currentProductionOrder.getCurrentStateType().getId());
-
-		//Date productionOrderRealDateStart = productionOrderRealStartDatebox.getValue();
-		//Date productionOrderRealDateFinish = productionOrderRealFinishDatebox.getValue();
-		//currentProductionOrder.setDateStartReal(productionOrderRealDateStart);
-		//currentProductionOrder.setDateFinishReal(productionOrderRealDateFinish);
-		productionOrderDetailList = productionOrderDetailRepository.save(productionOrderDetailList);
-		currentProductionOrder.setDetails(productionOrderDetailList);
-
 		productionOrderSupplyList = productionOrderSupplyRepository.save(productionOrderSupplyList);
 		productionOrderRawMaterialList = productionOrderRawMaterialRepository.save(productionOrderRawMaterialList);
 		currentProductionOrder.setProductionOrderSupplies(productionOrderSupplyList);
@@ -323,7 +286,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 
 		updateProductionPlanState();
 
-		alert("Avance de Produccion Guardada.");
+		alert("Avance de Produccion Registrada.");
 		//cancelButtonClick();
 		refreshView();
 	}
@@ -393,7 +356,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		}
 
 	}
-
 
 	private ProductionOrderStateType getProductionOrderStateType() {
 		// devuelve el estado actual de la orden de produccion
@@ -527,19 +489,27 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		Doublebox element = (Doublebox) evt.getOrigin().getTarget();
 		Row fila = (Row)element.getParent();
 		Checkbox chkbox = (Checkbox)fila.getChildren().get(0);
-		if(value.compareTo(quantityPiece) > 0) {
+		Datebox dateboxStartReal = (Datebox) fila.getChildren().get(fila.getChildren().size()-8);
+		Datebox dateboxFinishReal = (Datebox) fila.getChildren().get(fila.getChildren().size()-7);
+		
+		if(value.compareTo(quantityPiece) >= 0) {
 			// si el valor ingresado supera la cantidad, se lo modifica y se agrega la cantidad
-			element.setValue(quantityPiece.doubleValue());
-			data.setQuantityFinished(quantityPiece);
+			if(value.compareTo(quantityPiece) > 0) {
+				element.setValue(quantityPiece.doubleValue());
+				data.setQuantityFinished(quantityPiece);
+			} else {
+				data.setQuantityFinished(value);
+			}
 			chkbox.setChecked(true);
 			data.setState(ProcessState.Realizado);
+			data.setDateStartReal(data.getDateStart());
+			data.setDateFinishReal(data.getDateFinish());
+			dateboxStartReal.setValue(data.getDateStartReal());
+			dateboxFinishReal.setValue(data.getDateFinishReal());
+			dateboxStartReal.setDisabled(false);
+			dateboxFinishReal.setDisabled(false);
 		} else {// si el valor ingresado es igual o menor a la cantidad
-			data.setQuantityFinished(value);
-			if(value.compareTo(quantityPiece) == 0) {
-				data.setState(ProcessState.Realizado);
-			} else {
-				data.setState(ProcessState.Pendiente);
-			}
+			data.setState(ProcessState.Pendiente);
 		}
 	}
 
@@ -549,14 +519,29 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		Checkbox element = (Checkbox) evt.getOrigin().getTarget();// obtenemos el elemento web
 		Row fila = (Row)element.getParent();
 		Doublebox doublebox = (Doublebox) fila.getChildren().get(fila.getChildren().size()-1);
-
+		Datebox dateboxStartReal = (Datebox) fila.getChildren().get(fila.getChildren().size()-8);
+		Datebox dateboxFinishReal = (Datebox) fila.getChildren().get(fila.getChildren().size()-7);
+		
 		if(element.isChecked()) {
 			data.setState(ProcessState.Realizado);
 			// agregamos como cantidad finalizada el total
 			data.setQuantityFinished(new BigDecimal(data.getQuantityPiece()));
 			doublebox.setValue(data.getQuantityPiece());
+			// agregamos como fechas reales las previstas para q no sea necesario modificar si no hace falta
+			data.setDateStartReal(data.getDateStart());
+			data.setDateFinishReal(data.getDateFinish());
+			dateboxStartReal.setValue(data.getDateStartReal());
+			dateboxFinishReal.setValue(data.getDateFinishReal());
+			dateboxStartReal.setDisabled(false);
+			dateboxFinishReal.setDisabled(false);
 		} else {
 			data.setState(ProcessState.Pendiente);
+			data.setDateStartReal(null);
+			data.setDateFinishReal(null);
+			dateboxStartReal.setValue(null);
+			dateboxFinishReal.setValue(null);
+			dateboxStartReal.setDisabled(true);
+			dateboxFinishReal.setDisabled(true);
 		}
 	}
 
@@ -624,12 +609,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		Doublebox doublebox = (Doublebox)listcell.getChildren().get(listcell.getChildren().size()-2);
 		doublebox.setValue(data.getQuantity().doubleValue());
 		data.setQuantityUsed(data.getQuantity());
-	}
-
-	@Listen("onChange = #productionOrderStartDatebox")
-	public void productionOrderStartDateboxOnChange() {
-		//Date finishDate = getFinishDate(productionOrderStartDatebox.getValue(), currentProductionOrder.getDurationTotal());
-		//productionOrderFinishDatebox.setValue(finishDate);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -736,6 +715,46 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	}
 
 	public boolean isStateFinish(ProcessState processState) {
-		return processState==ProcessState.Realizado;
+		return processState == ProcessState.Realizado;
+	}
+
+	public boolean isStateCancel(ProcessState processState) {
+		return processState == ProcessState.Cancelado;
+	}
+
+	@Listen("onChangeProductionOrderDetailDateStartReal = #productionOrderDetailGrid")
+	public void doChangeProductionOrderDetailDateStartReal(ForwardEvent evt) {
+		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
+		Datebox element = (Datebox) evt.getOrigin().getTarget();// obtenemos el elemento web
+		Date value = element.getValue();
+		if(value != null) {
+			data.setDateStartReal(value);
+		} else {
+			// no se modifica
+			element.setValue(data.getDateStartReal());
+		}
+	}
+
+	@Listen("onChangeProductionOrderDetailDateFinishReal = #productionOrderDetailGrid")
+	public void doChangeProductionOrderDetailDateFinishReal(ForwardEvent evt) {
+		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
+		Datebox element = (Datebox) evt.getOrigin().getTarget();// obtenemos el elemento web
+		Date value = element.getValue();
+		if(value != null) {
+			data.setDateFinishReal(value);
+		} else {
+			// no se modifica 
+			element.setValue(data.getDateFinishReal());
+		}
+	}
+
+	private void sortProductionOrderDetailListByProcessTypeSequence() {
+		Comparator<ProductionOrderDetail> comp = new Comparator<ProductionOrderDetail>() {
+			@Override
+			public int compare(ProductionOrderDetail a, ProductionOrderDetail b) {
+				return a.getProcess().getType().getSequence().compareTo(b.getProcess().getType().getSequence());
+			}
+		};
+		Collections.sort(productionOrderDetailList, comp);
 	}
 }
