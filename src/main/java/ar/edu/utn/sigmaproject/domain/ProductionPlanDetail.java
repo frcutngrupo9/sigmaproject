@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 @Entity
@@ -15,6 +16,9 @@ public class ProductionPlanDetail implements Serializable, Cloneable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
+	
+	@ManyToOne(targetEntity = ProductionPlan.class)
+	private ProductionPlan productionPlan = null;
 
 	@OneToOne
 	Order order;
@@ -23,7 +27,8 @@ public class ProductionPlanDetail implements Serializable, Cloneable {
 
 	}
 
-	public ProductionPlanDetail(Order order) {
+	public ProductionPlanDetail(ProductionPlan productionPlan, Order order) {
+		this.productionPlan = productionPlan;
 		this.order = order;
 	}
 
@@ -43,5 +48,12 @@ public class ProductionPlanDetail implements Serializable, Cloneable {
 		this.order = order;
 	}
 
+	public ProductionPlan getProductionPlan() {
+		return productionPlan;
+	}
+
+	public void setProductionPlan(ProductionPlan productionPlan) {
+		this.productionPlan = productionPlan;
+	}
 }
 

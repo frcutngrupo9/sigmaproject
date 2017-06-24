@@ -33,8 +33,8 @@
         				<listheader label="Cod. Producto"/>
 		                <listheader label="Nombre"/>
 		                <listheader label="Cantidad"/>
-		                <listheader label="Fecha Inicio Fab"/>
-		                <listheader label="Fecha Fin Fab"/>
+		                <listheader label="Inicio Fabricacion"/>
+		                <listheader label="Fin Fabricacion"/>
 		            </listhead>
 		            <template name="model">
 		                <listitem>

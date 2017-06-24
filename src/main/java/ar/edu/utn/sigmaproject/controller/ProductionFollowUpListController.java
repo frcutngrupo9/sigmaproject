@@ -16,6 +16,7 @@ import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
 
+import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
@@ -61,31 +62,26 @@ public class ProductionFollowUpListController extends SelectorComposer<Component
 	}
 
 	private void refreshView() {
-		/*
-		//busca todas las ordenes de produccion en estado "Preparada" o "Iniciada"
-		ProductionOrderStateType productionOrderStateTypePreparada = productionOrderStateTypeRepository.findFirstByName("Preparada");
-		ProductionOrderStateType productionOrderStateTypeIniciada = productionOrderStateTypeRepository.findFirstByName("Iniciada");
-		productionOrderList = new ArrayList<ProductionOrder>();
-		for(ProductionOrder each : productionOrderRepository.findAll()) {
-			String currentStateTypeName = each.getCurrentStateType().getName();
-			if(currentStateTypeName.equalsIgnoreCase(productionOrderStateTypePreparada.getName()) || currentStateTypeName.equalsIgnoreCase(productionOrderStateTypeIniciada.getName())) {
-
-			}
-		}
-		 */
-
-		// busca todos los planes de produccion que esten en estado "Lanzado" o "En Produccion", y 
-		// guarda todas sus ordenes de produccion en la lista
+		// busca todos los planes de produccion que esten en estado "Abastecido" o "Lanzado" o "En Produccion", y 
+		// guarda todas sus ordenes de produccion, que esten en estado "preparada" o posterior, a la lista
+		ProductionPlanStateType productionPlanStateTypeAbastecido = productionPlanStateTypeRepository.findFirstByName("Abastecido");
 		ProductionPlanStateType productionPlanStateTypeLanzado = productionPlanStateTypeRepository.findFirstByName("Lanzado");
 		ProductionPlanStateType productionPlanStateTypeEnProduccion = productionPlanStateTypeRepository.findFirstByName("En Ejecucion");
+		List<ProductionPlan> productionPlanListAbastecido = productionPlanRepository.findByCurrentStateType(productionPlanStateTypeAbastecido);
 		List<ProductionPlan> productionPlanListLanzado = productionPlanRepository.findByCurrentStateType(productionPlanStateTypeLanzado);
 		List<ProductionPlan> productionPlanListEnProduccion = productionPlanRepository.findByCurrentStateType(productionPlanStateTypeEnProduccion);
+		List<ProductionPlan> productionPlanList = new ArrayList<ProductionPlan>();
+		productionPlanList.addAll(productionPlanListAbastecido);
+		productionPlanList.addAll(productionPlanListLanzado);
+		productionPlanList.addAll(productionPlanListEnProduccion);
 		productionOrderList = new ArrayList<ProductionOrder>();
-		for(ProductionPlan eachPlan : productionPlanListLanzado) {
-			productionOrderList.addAll(productionOrderRepository.findByProductionPlan(eachPlan));
-		}
-		for(ProductionPlan eachPlan : productionPlanListEnProduccion) {
-			productionOrderList.addAll(productionOrderRepository.findByProductionPlan(eachPlan));
+		for(ProductionPlan eachPlan : productionPlanList) {
+			for(ProductionOrder eachProductionOrder : productionOrderRepository.findByProductionPlan(eachPlan)) {
+				String stateName = eachProductionOrder.getCurrentStateType().getName();
+				if(stateName.equalsIgnoreCase("Preparada") || stateName.equalsIgnoreCase("Iniciada") || stateName.equalsIgnoreCase("Finalizada")) {
+					productionOrderList.add(eachProductionOrder);
+				}
+			}
 		}
 		productionOrderListModel = new ListModelList<ProductionOrder>(productionOrderList);
 		productionOrderGrid.setModel(productionOrderListModel);
@@ -104,7 +100,7 @@ public class ProductionFollowUpListController extends SelectorComposer<Component
 			List<ProductionOrderDetail> productionOrderDetailList = aux.getDetails();
 			int quantityFinished = 0;
 			for(ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
-				if(productionOrderDetail.isFinished()) {
+				if(productionOrderDetail.getState()==ProcessState.Realizado) {
 					quantityFinished += 1;
 				}
 			}

@@ -37,7 +37,6 @@ import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
-import ar.edu.utn.sigmaproject.service.OrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
@@ -96,8 +95,6 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	@WireVariable
 	private OrderRepository orderRepository;
 	@WireVariable
-	private OrderDetailRepository orderDetailRepository;
-	@WireVariable
 	private OrderStateRepository orderStateRepository;
 	@WireVariable
 	private OrderStateTypeRepository orderStateTypeRepository;
@@ -127,10 +124,6 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		clientPopupList = clientRepository.findAll();
 		clientPopupListModel = new ListModelList<Client>(clientPopupList);
 		clientPopupListbox.setModel(clientPopupListModel);
-
-		orderDetailList = new ArrayList<OrderDetail>();
-		orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
-		orderDetailListbox.setModel(orderDetailListModel);
 
 		orderStateTypeList = orderStateTypeRepository.findAll();
 		orderStateTypeListModel = new ListModelList<OrderStateType>(orderStateTypeList);
@@ -180,15 +173,17 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		if(currentOrder == null) { // es un pedido nuevo
 			// creamos el nuevo pedido
 			currentOrder = new Order(currentClient, order_number, order_date, order_need_date);
+			// se hace q los detalles referencien al nuevo pedido
+			for(OrderDetail orderDetail : orderDetailList) {
+				orderDetail.setOrder(currentOrder);
+			}
+			currentOrder.getDetails().addAll(orderDetailList);
 		} else { // se edita un pedido
 			currentOrder.setClient(currentClient);
 			currentOrder.setNeedDate(order_need_date);
 			currentOrder.setNumber(order_number);
 		}
-		for(OrderDetail each : orderDetailList) {
-			each = orderDetailRepository.save(each);
-		}
-		currentOrder.setDetails(orderDetailList);
+//		currentOrder.setDetails(orderDetailList);
 		OrderState orderState = new OrderState(orderStateType, new Date());
 		orderState = orderStateRepository.save(orderState);
 		currentOrder.setState(orderState);
@@ -239,7 +234,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		int productUnits = productUnitsIntbox.getValue();
 		BigDecimal productPrice = new BigDecimal(productPriceDoublebox.getValue().doubleValue());
 		if(currentOrderDetail == null) { // es un detalle nuevo
-			currentOrderDetail = new OrderDetail(currentProduct, productUnits, productPrice);
+			currentOrderDetail = new OrderDetail(currentOrder, currentProduct, productUnits, productPrice);
 			orderDetailList.add(currentOrderDetail);
 		} else { // se edita un detalle
 			currentOrderDetail.setProduct(currentProduct);

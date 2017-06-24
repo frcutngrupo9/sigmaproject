@@ -21,6 +21,7 @@ import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
 
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
+import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductTotal;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
@@ -131,7 +132,7 @@ public class ProductionPlanListController  extends SelectorComposer<Component> {
 			List<ProductionOrderDetail> productionOrderDetailList = aux.getDetails();
 			int quantityFinished = 0;
 			for(ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
-				if(productionOrderDetail.isFinished()) {
+				if(productionOrderDetail.getState()==ProcessState.Realizado) {
 					quantityFinished += 1;
 				}
 			}

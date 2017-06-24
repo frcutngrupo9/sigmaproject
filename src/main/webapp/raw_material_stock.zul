@@ -89,14 +89,14 @@
 			        <listhead>
 			            <listheader label="Plan de Produccion" align="center"/>
 			            <listheader label="Madera" align="center"/>
-			            <listheader label="Materia Prima" align="center"/>
+			            <listheader label="Descripcion" align="center"/>
 			            <listheader label="Cantidad Reservada" align="center"/>
 			            <listheader label="Cantidad Retirada" align="center"/>
 			            <listheader label="Cantidad Necesaria Total" align="center"/>
 			        </listhead>
 			        <template name="model">
 			            <listitem>
-			                <listcell label="${win_raw_material_stock$composer.getProductionPlanName(each)}"/>
+			                <listcell label="${each.getRawMaterialRequirement().getProductionPlan().getName()}"/>
 			                <listcell label="${each.rawMaterialRequirement.wood.woodType.name}"/>
 			                <listcell label="${each.rawMaterialRequirement.wood.name}"/>
 			                <listcell label="${each.stockReserved}"/>

@@ -1,6 +1,7 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import javax.persistence.*;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -10,20 +11,24 @@ public class RawMaterialRequirement implements Serializable, Cloneable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 
 	@ManyToOne
-	Wood wood;
+	private Wood wood;
+	
+	@ManyToOne(targetEntity = ProductionPlan.class)
+	private ProductionPlan productionPlan = null;
 
-	BigDecimal quantity = BigDecimal.ZERO;
-	BigDecimal quantityWithdrawn = BigDecimal.ZERO;
+	private BigDecimal quantity = BigDecimal.ZERO;
+	private BigDecimal quantityWithdrawn = BigDecimal.ZERO;
 
 	public RawMaterialRequirement() {
 
 	}
 
-	public RawMaterialRequirement(Wood wood, BigDecimal quantity) {
+	public RawMaterialRequirement(Wood wood, ProductionPlan productionPlan, BigDecimal quantity) {
 		this.wood = wood;
+		this.productionPlan = productionPlan;
 		this.quantity = quantity;
 	}
 
@@ -41,6 +46,14 @@ public class RawMaterialRequirement implements Serializable, Cloneable {
 
 	public void setWood(Wood wood) {
 		this.wood = wood;
+	}
+
+	public ProductionPlan getProductionPlan() {
+		return productionPlan;
+	}
+
+	public void setProductionPlan(ProductionPlan productionPlan) {
+		this.productionPlan = productionPlan;
 	}
 
 	public BigDecimal getQuantity() {

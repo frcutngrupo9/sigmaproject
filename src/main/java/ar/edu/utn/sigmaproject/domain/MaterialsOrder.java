@@ -10,8 +10,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
 @Entity
 public class MaterialsOrder implements Serializable, Cloneable {
@@ -24,12 +24,13 @@ public class MaterialsOrder implements Serializable, Cloneable {
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "materialsOrder", targetEntity = MaterialsOrderDetail.class)
 	private List<MaterialsOrderDetail> details = new ArrayList<>();
 	
-	@OneToOne
+	@ManyToOne
 	private ProductionPlan productionPlan = null;
 	
 	private Integer number = 0;
 	private Date date = null;
 	private Date dateReception = null;
+	private String receiptNumber = "";
 	
 	public MaterialsOrder() {
 		
@@ -86,5 +87,31 @@ public class MaterialsOrder implements Serializable, Cloneable {
 
 	public void setProductionPlan(ProductionPlan productionPlan) {
 		this.productionPlan = productionPlan;
+	}
+
+	public String getReceiptNumber() {
+		return receiptNumber;
+	}
+
+	public void setReceiptNumber(String receiptNumber) {
+		this.receiptNumber = receiptNumber;
+	}
+	
+//	public String isTotallyReceived() {
+//		for(MaterialsOrderDetail each : details) {
+//			if(!each.getQuantity().equals(each.getQuantityReceived())) {
+//				return "NO";
+//			}
+//		}
+//		return "SI";
+//	}
+	
+	public boolean isTotallyReceived() {
+		for(MaterialsOrderDetail each : details) {
+			if(each.getQuantity().compareTo(each.getQuantityReceived()) > 0) {// cantidad necesaria mayor que cantidad recibida
+				return false;
+			}
+		}
+		return true;
 	}
 }

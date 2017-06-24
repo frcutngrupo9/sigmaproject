@@ -175,9 +175,7 @@ public class Wood extends Item implements Cloneable {
 	public BigDecimal getStockReserved() {
 		BigDecimal aux = BigDecimal.ZERO;
 		for(WoodReserved each : woodsReserved) {
-			if(!each.isWithdrawn()) {
-				aux = aux.add(each.getStockReserved());
-			}
+			aux = aux.add(each.getStockReserved());
 		}
 		return aux;
 	}

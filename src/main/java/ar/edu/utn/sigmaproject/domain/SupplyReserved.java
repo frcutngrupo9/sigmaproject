@@ -17,8 +17,6 @@ public class SupplyReserved implements Serializable, Cloneable {
 
 	BigDecimal stockReserved = BigDecimal.ZERO;
 
-	boolean isWithdrawn = false;
-
 	public SupplyReserved() {
 
 	}
@@ -50,13 +48,5 @@ public class SupplyReserved implements Serializable, Cloneable {
 
 	public void setStockReserved(BigDecimal stockReserved) {
 		this.stockReserved = stockReserved;
-	}
-
-	public boolean isWithdrawn() {
-		return isWithdrawn;
-	}
-
-	public void setWithdrawn(boolean isWithdrawn) {
-		this.isWithdrawn = isWithdrawn;
 	}
 }

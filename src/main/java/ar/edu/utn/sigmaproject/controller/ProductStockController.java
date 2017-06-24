@@ -20,6 +20,8 @@ import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
+import ar.edu.utn.sigmaproject.domain.OrderStateType;
+import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
@@ -176,5 +178,20 @@ public class ProductStockController extends SelectorComposer<Component> {
 		Spinner spinner = (Spinner) evt.getOrigin().getTarget();// obtenemos el elemento web
 		orderDetail.setUnits(spinner.getValue());// cargamos al objeto el valor actualizado del elemento web
 	}
-
+	
+	public int getQuantityDelivered(Product product) {
+		// suma la cantidad entregada del producto
+		// busca en los pedidos entregados los que contien el producto
+		OrderStateType stateType = orderStateTypeRepository.findFirstByName("Entregado");
+		List<Order> orderList = orderRepository.findByCurrentStateType(stateType);
+		int number = 0;
+		for(Order each : orderList) {
+			for(OrderDetail eachDetail : each.getDetails()) {
+				if(eachDetail.getProduct().equals(product)) {
+					number += eachDetail.getUnits();
+				}
+			}
+		}
+		return number;
+	}
 }

@@ -44,17 +44,19 @@
                 </hbox>
                 <listbox id="materialsOrderDetailListbox" mold="paging" pageSize="7" sizedByContent="true" span="true" style="margin: 4px">
                     <auxhead>
-                        <auxheader label="Materiales" colspan="3"/>
+                        <auxheader label="Materiales" colspan="4"/>
                     </auxhead>
                     <listhead>
                         <listheader label="Nombre"/>
 	                    <listheader label="Cantidad" width="200px"/>
+	                    <listheader label="Cantidad Recibida" width="200px"/>
 	                    <listheader label="" width="120px"/>
                     </listhead>
                     <template name="model">
                         <listitem>
                             <listcell label="${each.description}"/>
                         	<listcell label="${each.quantity}"/>
+                        	<listcell label="${each.quantityReceived}"/>
                             <listcell>
                             	<button forward="onClick=materialsOrderDetailListbox.onRemoveDetail(${each})" image="/img/delete16x16.png"/>
                             </listcell>

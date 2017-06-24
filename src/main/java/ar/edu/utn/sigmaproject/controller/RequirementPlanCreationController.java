@@ -169,7 +169,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 
 		ProductionPlanStateType stateTypeAbastecido = productionPlanStateTypeRepository.findFirstByName("Abastecido");
 		ProductionPlanStateType stateTypeRegistrado = productionPlanStateTypeRepository.findFirstByName("Registrado");
-		ProductionPlanStateType currentStateType =productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId());
+		ProductionPlanStateType currentStateType = productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId());
 		ProductionPlanState productionPlanState = null;
 		if(isCompleted) {
 			// solo se actualiza el estado a abastecido si el estado anterior era Registrado
@@ -188,7 +188,6 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 			currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
 			productionPlanStateTextbox.setText(currentProductionPlan.getCurrentStateType().getName());
 		}
-
 	}
 
 	private void refreshView() {
@@ -223,7 +222,6 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	}
 
 	public BigDecimal getRawMaterialStockReserved(RawMaterialRequirement rawMaterialRequirement) {
-		// busca todos los woodReserved, ya que puede haber, para el mismo requirement, un wood reserved de cada tipo de madera
 		WoodReserved woodReserved = woodReservedRepository.findByRawMaterialRequirement(rawMaterialRequirement);
 		if(woodReserved == null) {
 			return BigDecimal.ZERO;
@@ -275,89 +273,123 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 			Clients.showNotification("Imposible reservar, el Plan ya fue Abastecido.");
 			return;
 		}
+
+		// si no existe suficiente material disponible para realizar ninguna reserva, se informa.
+		if(insufficientStockForReservation()) {
+			Clients.showNotification("Imposible reservar, no existe suficiente material disponible para realizar la reserva.");
+			return;
+		}
+
+		if(isAllRequirementReservationDone()) {
+			Clients.showNotification("Imposible reservar, ya se realizaron las reservas posibles.");
+			return;
+		}
+
 		// se registra una reserva por cada uno de los insumos y materias primas por la cantidad necesaria
 		// si existe una reserva pero no esta reservando el maximo de stock disponible, se cambia a esa cantidad
-		// TODO: en caso de que no existan suficientes materiales en stock para hacer una reserva se crea el pedido de materiales
+		// en caso de que no existan suficientes materiales en stock para hacer una reserva se crea el pedido de materiales
 		Messagebox.show("Se realizara la reserva de todos los materiales necesarios.", "Confirmar", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 			public void onEvent(Event evt) throws InterruptedException {
 				if (evt.getName().equals("onOK")) {
-					for(SupplyRequirement each : supplyRequirementList) {
-						SupplyReserved currentSupplyReserved = supplyReservedRepository.findBySupplyRequirement(each);
-						// si existe ya una reserva se la completa si esta incompleta
-						BigDecimal quantityNecessary = each.getQuantity();
-						BigDecimal stockAvailable = each.getSupplyType().getStockAvailable();
-						BigDecimal quantityReservation = null;// si no hay stock suficiente se reserva lo posible
-						if(currentSupplyReserved == null) {
-							if(stockAvailable.compareTo(quantityNecessary) == 1) { // si el disponible es mayor
-								quantityReservation = quantityNecessary;
-							} else {
-								quantityReservation = stockAvailable;
-							}
-							currentSupplyReserved = new SupplyReserved(each, quantityReservation);
-							currentSupplyReserved = supplyReservedRepository.save(currentSupplyReserved);
-							SupplyType supplyType = each.getSupplyType();
-							supplyType.getSuppliesReserved().add(currentSupplyReserved);
-							supplyTypeRepository.save(supplyType);
-						} else {
-							// como ya hay una reserva, esa cantidad se sustrae de la cantidad necesaria
-							BigDecimal quantityNonReserved = quantityNecessary.subtract(currentSupplyReserved.getStockReserved());
-							if(stockAvailable.compareTo(quantityNonReserved) == 1) { // si el disponible es mayor
-								quantityReservation = currentSupplyReserved.getStockReserved().add(quantityNonReserved);
-							} else {
-								quantityReservation = currentSupplyReserved.getStockReserved().add(stockAvailable);
-							}
-							currentSupplyReserved.setStockReserved(quantityReservation);
-							supplyReservedRepository.save(currentSupplyReserved);
-						}
-					}
-					for(RawMaterialRequirement each : rawMaterialRequirementList) {
-						WoodReserved currentWoodReserved = null;
-						BigDecimal quantityNecessary = each.getQuantity();
-						Wood currentWood = each.getWood();
-						for(WoodReserved eachWoodReserved : currentWood.getWoodsReserved()) {
-							if(rawMaterialRequirementRepository.findOne(eachWoodReserved.getRawMaterialRequirement().getId()).equals(rawMaterialRequirementRepository.findOne(each.getId()))) {
-								currentWoodReserved = eachWoodReserved;
-								break;
-							}
-						}
-						BigDecimal stockAvailable = currentWood.getStockAvailable();
-						BigDecimal quantityReservation = null;// si no hay stock suficiente se reserva lo posible
-						if(currentWoodReserved == null) {
-							if(stockAvailable.compareTo(quantityNecessary) == 1) { // si el disponible es mayor
-								quantityReservation = quantityNecessary;
-							} else {
-								quantityReservation = stockAvailable;
-							}
-							currentWoodReserved = new WoodReserved(each, quantityReservation);
-							currentWoodReserved = woodReservedRepository.save(currentWoodReserved);
-							currentWood.getWoodsReserved().add(currentWoodReserved);
-							woodRepository.save(currentWood);
-						} else {
-							// como ya hay una reserva, esa cantidad se sustrae de la cantidad necesaria
-							BigDecimal quantityNonReserved = quantityNecessary.subtract(currentWoodReserved.getStockReserved());
-							if(stockAvailable.compareTo(quantityNonReserved) == 1) { // si el disponible es mayor
-								quantityReservation = currentWoodReserved.getStockReserved().add(quantityNonReserved);
-							} else {
-								quantityReservation = currentWoodReserved.getStockReserved().add(stockAvailable);
-							}
-							currentWoodReserved.setStockReserved(quantityReservation);
-							woodReservedRepository.save(currentWoodReserved);
-						}
-					}
-					supplyRequirementListbox.setModel(supplyRequirementListModel);
-					rawMaterialRequirementListbox.setModel(rawMaterialRequirementListModel);
-					updateProductionPlanState();// actualiza el estado del plan si es que esta abastecido
+					doAllRequirementReservation();
 					alert("Se Realizaron las Reservas.");
 				}
 			}
 		});
+	}
 
+	private void doAllRequirementReservation() {
+		for(SupplyRequirement each : supplyRequirementList) {
+			BigDecimal stockAvailable = each.getSupplyType().getStockAvailable();
+			if(stockAvailable.compareTo(BigDecimal.ZERO) == 1) {// si existe disponible
+				SupplyReserved currentSupplyReserved = supplyReservedRepository.findBySupplyRequirement(each);
+				// si existe ya una reserva se la completa si esta incompleta
+				BigDecimal quantityNecessary = each.getQuantity();
+				BigDecimal quantityReservation = null;// si no hay stock suficiente se reserva lo posible
+				if(currentSupplyReserved == null) {
+					if(stockAvailable.compareTo(quantityNecessary) == 1) { // si el disponible es mayor
+						quantityReservation = quantityNecessary;
+					} else {
+						quantityReservation = stockAvailable;
+					}
+					currentSupplyReserved = new SupplyReserved(each, quantityReservation);
+					currentSupplyReserved = supplyReservedRepository.save(currentSupplyReserved);
+					SupplyType supplyType = each.getSupplyType();
+					supplyType.getSuppliesReserved().add(currentSupplyReserved);
+					supplyType = supplyTypeRepository.save(supplyType);
+				} else {
+					// como ya hay una reserva, esa cantidad se sustrae de la cantidad necesaria
+					BigDecimal quantityNonReserved = quantityNecessary.subtract(currentSupplyReserved.getStockReserved());
+					if(stockAvailable.compareTo(quantityNonReserved) == 1) { // si el disponible es mayor
+						quantityReservation = currentSupplyReserved.getStockReserved().add(quantityNonReserved);
+					} else {
+						quantityReservation = currentSupplyReserved.getStockReserved().add(stockAvailable);
+					}
+					currentSupplyReserved.setStockReserved(quantityReservation);
+					currentSupplyReserved = supplyReservedRepository.save(currentSupplyReserved);
+				}
+			}
+		}
+		for(RawMaterialRequirement each : rawMaterialRequirementList) {
+			Wood currentWood = each.getWood();
+			BigDecimal stockAvailable = currentWood.getStockAvailable();
+			if(stockAvailable.compareTo(BigDecimal.ZERO) == 1) {// si existe disponible
+				WoodReserved currentWoodReserved = woodReservedRepository.findByRawMaterialRequirement(each);
+				BigDecimal quantityNecessary = each.getQuantity();
+				BigDecimal quantityReservation = null;// si no hay stock suficiente se reserva lo posible
+				if(currentWoodReserved == null) {
+					if(stockAvailable.compareTo(quantityNecessary) == 1) { // si el disponible es mayor
+						quantityReservation = quantityNecessary;
+					} else {
+						quantityReservation = stockAvailable;
+					}
+					currentWoodReserved = new WoodReserved(each, quantityReservation);
+					currentWoodReserved = woodReservedRepository.save(currentWoodReserved);
+					currentWood.getWoodsReserved().add(currentWoodReserved);
+					currentWood = woodRepository.save(currentWood);
+				} else {
+					// como ya hay una reserva, esa cantidad se sustrae de la cantidad necesaria
+					BigDecimal quantityNonReserved = quantityNecessary.subtract(currentWoodReserved.getStockReserved());
+					if(stockAvailable.compareTo(quantityNonReserved) == 1) { // si el disponible es mayor
+						quantityReservation = currentWoodReserved.getStockReserved().add(quantityNonReserved);
+					} else {
+						quantityReservation = currentWoodReserved.getStockReserved().add(stockAvailable);
+					}
+					currentWoodReserved.setStockReserved(quantityReservation);
+					currentWoodReserved = woodReservedRepository.save(currentWoodReserved);
+				}
+			}
+		}
+		currentProductionPlan = productionPlanRepository.findOne(currentProductionPlan.getId());// buscamos el plan nuevamente para que contenga en sus atributos los cambios recientes
+		supplyRequirementList = currentProductionPlan.getSupplyRequirements();
+		rawMaterialRequirementList = currentProductionPlan.getRawMaterialRequirements();
+		supplyRequirementListModel = new ListModelList<>(supplyRequirementList);
+		rawMaterialRequirementListModel = new ListModelList<>(rawMaterialRequirementList);
+		supplyRequirementListbox.setModel(supplyRequirementListModel);
+		rawMaterialRequirementListbox.setModel(rawMaterialRequirementListModel);
+		updateProductionPlanState();// actualiza el estado del plan
+	}
+
+	public boolean insufficientStockForReservation() {
+		// si no existe nada de stock disponible
+		boolean insufficientStockForReservation = true;
+		for(SupplyRequirement each : supplyRequirementList) {
+			if(each.getSupplyType().getStockAvailable().compareTo(BigDecimal.ZERO) == 1) {
+				insufficientStockForReservation = false;
+			}
+		}
+		for(RawMaterialRequirement each : rawMaterialRequirementList) {
+			if(each.getWood().getStockAvailable().compareTo(BigDecimal.ZERO) == 1) {
+				insufficientStockForReservation = false;
+			}
+		}
+		return insufficientStockForReservation;
 	}
 
 	public boolean isRawMaterialRequirementFulfilled(RawMaterialRequirement supplyRequirement) {
 		// si ya se ha reservado la cantidad necesaria
 		boolean value = false;
-		if(getRawMaterialRequirementStockMissing(supplyRequirement).doubleValue() == 0) {
+		if(getRawMaterialRequirementStockMissing(supplyRequirement).compareTo(BigDecimal.ZERO) == 0) {
 			value = true;
 		}
 		return value;
@@ -366,7 +398,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	public boolean isSupplyRequirementFulfilled(SupplyRequirement supplyRequirement) {
 		// si ya se ha reservado la cantidad necesaria
 		boolean value = false;
-		if(getSupplyStockMissing(supplyRequirement).doubleValue() == 0) {
+		if(getSupplyStockMissing(supplyRequirement).compareTo(BigDecimal.ZERO) == 0) {
 			value = true;
 		}
 		return value;
@@ -380,12 +412,46 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 			Clients.showNotification("Imposible Generar Pedido, el Plan ya fue Abastecido.");
 			return;
 		}
-		// se verifica que no exista pedido de materiales asignado al plan
-		MaterialsOrder materialsOrder = materialsOrderRepository.findByProductionPlan(currentProductionPlan);
-		if(materialsOrder != null) {
+		// verifica que el stock sea insuficiente para abastecer el plan antes de generar el pedido de materiales
+		boolean insufficientStock = false;
+		for(SupplyRequirement each : supplyRequirementList) {
+			BigDecimal stockMissing = getSupplyStockMissing(each);
+			BigDecimal stockAvailable = each.getSupplyType().getStockAvailable();
+			if(stockAvailable.compareTo(stockMissing) == -1) {// si stockAvailable es menor a stockMissing
+				// no existe suficiente en stock
+				insufficientStock = true;
+				break;
+			}
+		}
+		for(RawMaterialRequirement each : rawMaterialRequirementList) {
+			BigDecimal stockMissing = getRawMaterialRequirementStockMissing(each);
+			BigDecimal stockAvailable = each.getWood().getStockAvailable();
+			if(stockAvailable.compareTo(stockMissing) == -1) {// si stockAvailable es menor a stockMissing
+				// no existe suficiente en stock
+				insufficientStock = true;
+				break;
+			}
+		}
+		if(insufficientStock == false) {
+			Clients.showNotification("Imposible Generar Pedido, el Stock disponible es suficiente para abastecer al Plan.");
+			return;
+		}
+		
+		// antes de hacer los pedidos realiza la reserva de los materiales disponibles si no se realizo aun
+		if(!isAllRequirementReservationDone()) {
+			Clients.showNotification("Debe realizar las reservas antes de crear el pedido de materiales.");
+			return;
+		}
+
+		// verifica que no existan pedidos de materiales asignados al plan
+		List<MaterialsOrder> materialsOrder = materialsOrderRepository.findByProductionPlan(currentProductionPlan);
+		if(materialsOrder != null && !materialsOrder.isEmpty()) {
+			//TODO verifica que los pedidos existentes sean suficientes para satisfacer la necesidad del plan, ya que existe la posibilidad que el stock haya disminuido antes de que se realizaran las reservas de la cantidad disponible
+			// si existen pedidos pero la cantidad de esos pedidos no es suficiente para satisfacer el stock faltante, se modifica la cantidad del ultimo pedido no recibido.
 			Clients.showNotification("Imposible Generar Pedido, ya existe un pedido generado anteriormente.");
 			return;
 		}
+
 		Messagebox.show("Se realizara el pedido de todos los materiales para los cuales no exista stock disponible suficiente.", "Confirmar", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 			public void onEvent(Event evt) throws InterruptedException {
 				if (evt.getName().equals("onOK")) {
@@ -393,6 +459,47 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 				}
 			}
 		});
+	}
+
+	private boolean isAllRequirementReservationDone() {
+		// verifica si ya se ha reservado la cantidad disponible de todos los materiales
+		boolean value = true;
+		for(SupplyRequirement each : supplyRequirementList) {
+			BigDecimal stockAvailable = each.getSupplyType().getStockAvailable();
+			if(stockAvailable.compareTo(BigDecimal.ZERO) == 1) {// si existe disponible
+				SupplyReserved currentSupplyReserved = supplyReservedRepository.findBySupplyRequirement(each);
+				BigDecimal quantityNecessary = each.getQuantity();
+				if(currentSupplyReserved == null) {
+					// si no hay reserva y existe disponible devolver false
+					return false;
+				} else {
+					// como ya hay una reserva, se verifica que exista cantidad no reservada
+					BigDecimal quantityNonReserved = quantityNecessary.subtract(currentSupplyReserved.getStockReserved());
+					if(quantityNonReserved.compareTo(BigDecimal.ZERO) != 0) { // si existe cantidad no reservada
+						return false;
+					}
+				}
+			}
+		}
+		for(RawMaterialRequirement each : rawMaterialRequirementList) {
+			Wood currentWood = each.getWood();
+			BigDecimal stockAvailable = currentWood.getStockAvailable();
+			if(stockAvailable.compareTo(BigDecimal.ZERO) == 1) {// si existe disponible
+				WoodReserved currentWoodReserved = woodReservedRepository.findByRawMaterialRequirement(each);
+				BigDecimal quantityNecessary = each.getQuantity();
+				if(currentWoodReserved == null) {
+					// si no hay reserva y existe disponible devuelve false
+					return false;
+				} else {
+					// como ya hay una reserva, se verifica que exista cantidad no reservada
+					BigDecimal quantityNonReserved = quantityNecessary.subtract(currentWoodReserved.getStockReserved());
+					if(quantityNonReserved.compareTo(BigDecimal.ZERO) != 0) { // si existe cantidad no reservada devuelve false
+						return false;
+					}
+				}
+			}
+		}
+		return value;
 	}
 
 	private void materialsOrderCreationAction() {
@@ -406,7 +513,6 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 			BigDecimal stockAvailable = each.getSupplyType().getStockAvailable();
 			if(stockAvailable.compareTo(stockMissing) == -1) {// si stockAvailable es menor a stockMissing
 				// no existe suficiente en stock por lo tanto se crea un detalle de pedido de materiales
-
 				Item currentItem = each.getSupplyType();
 				BigDecimal stockToOrder = stockMissing.subtract(stockAvailable);// cantidad necesaria que no hay en stock, entonces es lo que se agrega al pedido de materiales
 				MaterialsOrderDetail materialsOrderDetail = new MaterialsOrderDetail(currentMaterialsOrder, currentItem, currentItem.getDescription(), stockToOrder);
@@ -424,10 +530,6 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 				materialsOrderDetailList.add(materialsOrderDetail);
 			}
 		}
-		//		for(MaterialsOrderDetail each : materialsOrderDetailList) {
-		//			each = materialsOrderDetailRepository.save(each);
-		//		}
-		//		materialsOrderDetailList = materialsOrderDetailRepository.save(materialsOrderDetailList);
 		currentMaterialsOrder.getDetails().addAll(materialsOrderDetailList);
 		currentMaterialsOrder = materialsOrderRepository.save(currentMaterialsOrder);
 		refreshView();

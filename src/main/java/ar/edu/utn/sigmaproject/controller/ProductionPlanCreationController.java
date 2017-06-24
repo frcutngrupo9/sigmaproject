@@ -37,6 +37,7 @@ import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
+import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductTotal;
@@ -58,13 +59,10 @@ import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRawMaterialRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderSupplyRepository;
-import ar.edu.utn.sigmaproject.service.ProductionPlanDetailRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
@@ -82,8 +80,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	Bandbox orderBandbox;
 	@Wire
 	Textbox productionPlanNameTextbox;
-	@Wire
-	Button addOrderButton;
 	@Wire
 	Button resetProductionPlanButton;
 	@Wire
@@ -111,8 +107,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	@WireVariable
 	private ProductionPlanRepository productionPlanRepository;
 	@WireVariable
-	private ProductionPlanDetailRepository productionPlanDetailRepository;
-	@WireVariable
 	private ClientRepository clientService;
 	@WireVariable
 	private ProductionPlanStateRepository productionPlanStateRepository;
@@ -122,10 +116,10 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	private SupplyRequirementRepository supplyRequirementRepository;
 	@WireVariable
 	private RawMaterialRequirementRepository rawMaterialRequirementRepository;
-	@WireVariable
-	private ProductionOrderRepository productionOrderRepository;
-	@WireVariable
-	private ProductionOrderDetailRepository productionOrderDetailRepository;
+//	@WireVariable
+//	private ProductionOrderRepository productionOrderRepository;
+	//	@WireVariable
+	//	private ProductionOrderDetailRepository productionOrderDetailRepository;
 	@WireVariable
 	private ProductionOrderStateRepository productionOrderStateRepository;
 	@WireVariable
@@ -147,7 +141,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	private ListModelList<ProductionPlanStateType> productionPlanStateTypeListModel;
 
 	// atributes
-	private Order currentOrder;
 	private ProductionPlan currentProductionPlan;
 
 	@Override
@@ -167,18 +160,14 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 
 	@Listen("onSelect = #orderPopupListbox")
 	public void selectionOrderPopupListbox() {
-		currentOrder = (Order) orderPopupListbox.getSelectedItem().getValue();
-		refreshOrder();
+		Order order = (Order) orderPopupListbox.getSelectedItem().getValue();
+		addOrder(order);
 	}
 
 	private void refreshOrder() {
-		if(currentOrder != null) {
-			orderBandbox.setValue("Pedido " + currentOrder.getId() + " (" + currentOrder.getClient().getName() + ")");
-			orderBandbox.close();
-		}else {
-			orderBandbox.setValue("");// borramos el text del producto  seleccionado
-			orderPopupListbox.clearSelection();// deseleccionamos la tabla
-		}
+		orderBandbox.setValue("");
+		orderPopupListbox.clearSelection();
+		orderBandbox.close();
 	}
 
 	private void refreshOrderPopupList() {// el popup se actualiza en base a los detalles
@@ -222,7 +211,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			return;
 		}
 		if(productionPlanDetailList.size() == 0) {
-			Clients.showNotification("Ingresar al menos 1 pedido", addOrderButton);
+			Clients.showNotification("Ingresar al menos 1 pedido", orderBandbox);
 			return;
 		}
 		String productionPlanName = productionPlanNameTextbox.getText().toUpperCase();
@@ -233,10 +222,14 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			productionPlanStateType = productionPlanStateTypeCombobox.getSelectedItem().getValue();
 		}
 		boolean isNewProductionPlan = false;
-		productionPlanDetailList = productionPlanDetailRepository.save(productionPlanDetailList);
 		if(currentProductionPlan == null) { // es un plan nuevo
 			// creamos el nuevo plan
-			currentProductionPlan = new ProductionPlan(productionPlanName, productionPlanDetailList);
+			currentProductionPlan = new ProductionPlan(productionPlanName);
+			for(ProductionPlanDetail each : productionPlanDetailList) {
+				// se agregan todas las referencias hacia el nuevo plan
+				each.setProductionPlan(currentProductionPlan);
+			}
+			currentProductionPlan.getPlanDetails().addAll(productionPlanDetailList);
 			ProductionPlanState productionPlanState = new ProductionPlanState(productionPlanStateType, new Date());
 			productionPlanState = productionPlanStateRepository.save(productionPlanState);
 			currentProductionPlan.setState(productionPlanState);
@@ -252,7 +245,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			isNewProductionPlan = true;
 		} else { // se edita un plan
 			currentProductionPlan.setName(productionPlanName);
-			currentProductionPlan.setPlanDetails(productionPlanDetailList);
+			//currentProductionPlan.setPlanDetails(productionPlanDetailList);
 			if (!currentProductionPlan.getCurrentStateType().equals(productionPlanStateType)) {
 				// si el estado ha cambiado
 				ProductionPlanState productionPlanState = new ProductionPlanState(productionPlanStateType, new Date());
@@ -280,7 +273,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				ProductionOrder productionOrder = new ProductionOrder(sequence, currentProductionPlan, each.getProduct(), each.getTotalUnits(), productionOrderState);
 				//  agrega los detalles
 				List<ProductionOrderDetail> details = createProductionOrderDetailList(productionOrder);
-				details = productionOrderDetailRepository.save(details);
+				//				details = productionOrderDetailRepository.save(details);
 				productionOrder.setDetails(details);
 				// agrega los materiales a las ordenes de produccion
 				List<ProductionOrderSupply> productionOrderSupplyList = createProductionOrderSupplyList(productionOrder);
@@ -290,7 +283,8 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				productionOrder.setProductionOrderSupplies(productionOrderSupplyList);
 				productionOrder.setProductionOrderRawMaterials(productionOrderRawMaterialList);
 
-				productionOrder = productionOrderRepository.save(productionOrder);
+				//productionOrder = productionOrderRepository.save(productionOrder);
+				currentProductionPlan.getProductionOrderList().add(productionOrder);
 			}
 			currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
 		}
@@ -307,7 +301,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				Integer units = productionOrder.getUnits();
 				Integer quantityPiece = units * piece.getUnits();// cantidad total de la pieza
 				Duration timeTotal = process.getTime().multiply(units);// tiempo del proceso de las piezas del producto por las unidades del producto
-				details.add(new ProductionOrderDetail(process, null, timeTotal, quantityPiece));
+				details.add(new ProductionOrderDetail(productionOrder, process, ProcessState.Pendiente, null, timeTotal, quantityPiece));
 			}
 		}
 		return details;
@@ -348,7 +342,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				if (auxSupplyRequirement != null) {// el insumo si se encuentra agregado, suma sus cantidades
 					auxSupplyRequirement.setQuantity(auxSupplyRequirement.getQuantity().add(supply.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
 				} else {// el insumo no se encuentra, se lo agrega
-					list.add(new SupplyRequirement(supply.getSupplyType(), supply.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
+					list.add(new SupplyRequirement(supply.getSupplyType(), productionPlan, supply.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
 				}
 			}
 		}
@@ -371,22 +365,16 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				if(auxRawMaterialRequirement != null) {// la materia prima si se encuentra agregada, sumamos sus cantidades
 					auxRawMaterialRequirement.setQuantity(auxRawMaterialRequirement.getQuantity().add(rawMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
 				} else {// la materia prima no se encuentra, se la agrega
-					list.add(new RawMaterialRequirement(rawMaterial.getWood(), rawMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
+					list.add(new RawMaterialRequirement(rawMaterial.getWood(), productionPlan, rawMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
 				}
 			}
 		}
 		return list;
 	}
 
-	@Listen("onClick = #addOrderButton")
-	public void addOrder() {
-		if(currentOrder == null) {
-			Clients.showNotification("Debe seleccionar pedido", addOrderButton);
-			return;
-		}
-		productionPlanDetailList.add(new ProductionPlanDetail(currentOrder));
+	private void addOrder(Order order) {
+		productionPlanDetailList.add(new ProductionPlanDetail(currentProductionPlan, order));
 		refreshProductionPlanDetailListGrid();
-		currentOrder = null;
 		refreshOrderPopupList();
 		refreshOrder();
 		refreshProductTotalListbox();
@@ -431,13 +419,13 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	}
 
 	private void refreshViewProductionPlan() {
-		currentOrder = null;// deseleccionamos el pedido
 		refreshOrder();
 		if (currentProductionPlan == null) {// nuevo plan de produccion
 			productionPlanCaption.setLabel("Creacion de Plan de Produccion");
 			productionPlanStateTypeListModel.addToSelection(productionPlanStateTypeRepository.findFirstByName("Registrado"));
 			productionPlanStateTypeCombobox.setModel(productionPlanStateTypeListModel);
-			productionPlanNameTextbox.setText("");
+			int planNumber = productionPlanRepository.findAll().size() + 1;
+			productionPlanNameTextbox.setText("Plan " + planNumber);
 			productionPlanDetailList = new ArrayList<ProductionPlanDetail>();
 			deleteProductionPlanButton.setDisabled(true);
 			productionPlanStateTypeCombobox.setDisabled(true);
@@ -529,7 +517,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/production_plan_list.zul");
 	}
-	
+
 	private void filter() {
 		List<Order> some = new ArrayList<>();
 		String nameFilter = orderBandbox.getValue().toLowerCase();
@@ -544,9 +532,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 
 	@Listen("onChanging = #orderBandbox")
 	public void changeFilter(InputEvent event) {
-		if(currentOrder != null) {// al cambiar el filtro se deselecciona
-			currentOrder = null;
-		}
 		Bandbox target = (Bandbox)event.getTarget();
 		target.setText(event.getValue());
 		filter();

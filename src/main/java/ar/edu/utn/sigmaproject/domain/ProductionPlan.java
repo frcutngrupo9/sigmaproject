@@ -1,10 +1,12 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -18,34 +20,36 @@ public class ProductionPlan  implements Serializable, Cloneable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
+	
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionPlan", targetEntity = ProductionOrder.class)
+	private List<ProductionOrder> productionOrderList = new ArrayList<>();
 
-	@OneToMany(orphanRemoval = true)
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionPlan", targetEntity = ProductionPlanDetail.class)
 	@OrderColumn(name = "detail_index")
-	List<ProductionPlanDetail> planDetails = new ArrayList<>();
+	private List<ProductionPlanDetail> planDetails = new ArrayList<>();
 
 	@OneToMany(orphanRemoval = true)
-	List<ProductionPlanState> states = new ArrayList<>();
+	private List<ProductionPlanState> states = new ArrayList<>();
 
-	@OneToMany(orphanRemoval = true)
-	List<RawMaterialRequirement> rawMaterialRequirements = new ArrayList<>();
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionPlan", targetEntity = RawMaterialRequirement.class)
+	private List<RawMaterialRequirement> rawMaterialRequirements = new ArrayList<>();
 
-	@OneToMany(orphanRemoval = true)
-	List<SupplyRequirement> supplyRequirements = new ArrayList<>();
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionPlan", targetEntity = SupplyRequirement.class)
+	private List<SupplyRequirement> supplyRequirements = new ArrayList<>();
 
-	String name = "";
-	Date dateCreation = null;
-	Date dateStart = null;
-	ProductionPlanStateType currentStateType = null;
+	private String name = "";
+	private Date dateCreation = null;
+	private Date dateStart = null;
+	private ProductionPlanStateType currentStateType = null;
 
 	public ProductionPlan() {
 
 	}
 
-	public ProductionPlan(String name, List<ProductionPlanDetail> planDetails) {
+	public ProductionPlan(String name) {
 		this.name = name;
 		this.dateCreation = new Date();
-		this.planDetails.addAll(planDetails);
 	}
 
 	public Long getId() {
@@ -136,5 +140,50 @@ public class ProductionPlan  implements Serializable, Cloneable {
 
 	public void setDateStart(Date dateStart) {
 		this.dateStart = dateStart;
+	}
+
+	public List<ProductionOrder> getProductionOrderList() {
+		return productionOrderList;
+	}
+
+	public void setProductionOrderList(List<ProductionOrder> productionOrderList) {
+		this.productionOrderList = productionOrderList;
+	}
+
+	public boolean isAllReservationsFulfilled() {
+		// recorre todos los requerimientos para ver si estan todos abastecidos
+		for(SupplyRequirement each : getSupplyRequirements()) {
+			BigDecimal stockReserved = BigDecimal.ZERO;
+			SupplyType item = each.getSupplyType();
+			SupplyReserved reservation = null;
+			for(SupplyReserved eachReservation : item.getSuppliesReserved()) {
+				if(eachReservation.getSupplyRequirement().equals(each)) {
+					reservation = eachReservation;// se encontro la reserva para ese requerimiento
+				}
+			}
+			if(reservation != null) {// se encontro reserva
+				stockReserved = reservation.getStockReserved().add(each.getQuantityWithdrawn());// se suma la cantidad que se retiro para produccion
+			}
+			if(each.getQuantity().subtract(stockReserved).compareTo(BigDecimal.ZERO) != 0) {
+				return false;
+			}
+		}
+		for(RawMaterialRequirement each : getRawMaterialRequirements()) {
+			BigDecimal stockReserved = BigDecimal.ZERO;
+			Wood item = each.getWood();
+			WoodReserved reservation = null;
+			for(WoodReserved eachReservation : item.getWoodsReserved()) {
+				if(eachReservation.getRawMaterialRequirement().equals(each)) {
+					reservation = eachReservation;// se encontro la reserva para ese requerimiento
+				}
+			}
+			if(reservation != null) {// se encontro reserva
+				stockReserved = reservation.getStockReserved().add(each.getQuantityWithdrawn());// se suma la cantidad que se retiro para produccion
+			}
+			if(each.getQuantity().subtract(stockReserved).compareTo(BigDecimal.ZERO) != 0) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

@@ -20,39 +20,47 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
+	
+	@ManyToOne(targetEntity = ProductionOrder.class)
+	private ProductionOrder productionOrder = null;
 
 	@ManyToOne
-	Process process;
+	private Process process;
 
 	@ManyToOne
-	Machine machine;
+	private Machine machine;
 
 	@Transient
-	Duration timeTotal;
+	private Duration timeTotal;
 
 	@Column
-	String timeTotalInternal;
+	private String timeTotalInternal;
 
-	Integer quantityPiece = 0;
+	private Integer quantityPiece = 0;
 
-	BigDecimal quantityFinished = BigDecimal.ZERO;
+	private BigDecimal quantityFinished = BigDecimal.ZERO;
 
-	boolean isFinished = false;
-	Date dateStart = null;
-	Date dateFinish = null;
-	Date dateStartReal = null;
-	Date dateFinishReal = null;
-	
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, updatable = true)
+	private ProcessState state;
+
+	private Date dateStart = null;
+	private Date dateFinish = null;
+	private Date dateStartReal = null;
+	private Date dateFinishReal = null;
+
 	@ManyToOne
-	Worker worker = null;
+	private Worker worker = null;
 
 	public ProductionOrderDetail() {
 
 	}
 
-	public ProductionOrderDetail(Process process, Machine machine, Duration timeTotal, Integer quantityPiece) {
+	public ProductionOrderDetail(ProductionOrder productionOrder, Process process, ProcessState state, Machine machine, Duration timeTotal, Integer quantityPiece) {
+		this.productionOrder = productionOrder;
 		this.process = process;
+		this.state = state;
 		this.machine = machine;
 		this.setTimeTotal(timeTotal);
 		this.quantityPiece = quantityPiece;
@@ -118,12 +126,12 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 		this.quantityFinished = quantityFinished;
 	}
 
-	public boolean isFinished() {
-		return isFinished;
+	public ProcessState getState() {
+		return state;
 	}
 
-	public void setFinished(boolean isFinished) {
-		this.isFinished = isFinished;
+	public void setState(ProcessState state) {
+		this.state = state;
 	}
 
 	public Date getDateStart() {
@@ -164,5 +172,13 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 
 	public void setWorker(Worker worker) {
 		this.worker = worker;
+	}
+
+	public ProductionOrder getProductionOrder() {
+		return productionOrder;
+	}
+
+	public void setProductionOrder(ProductionOrder productionOrder) {
+		this.productionOrder = productionOrder;
 	}
 }
