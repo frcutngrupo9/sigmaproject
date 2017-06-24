@@ -40,6 +40,8 @@ import org.zkoss.zul.Include;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Listcell;
+import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Selectbox;
 import org.zkoss.zul.Spinner;
@@ -332,16 +334,15 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		refreshViewPiece();
 		pieceCreationBlock.setVisible(true);
 		processCreationBlock.setVisible(true);
-		String a;
-		String b;
-		a = "hola";
-		b = a;
-		a = "que tal?";
-		System.out.println("- - - - - - b contiene:" + b +" - a contiene: " + a);
 	}
 
 	@Listen("onClick = #cancelPieceButton")
 	public void cancelPiece() {
+		if(currentPiece != null) {
+			// busca en la bd la version sin modificar y reemplaza en la lista
+			Piece piece = pieceRepository.findOne(currentPiece.getId());
+			pieceList.set(pieceList.indexOf(currentPiece), piece);
+		}
 		currentPiece = null;
 		refreshViewPiece();
 	}
@@ -625,7 +626,22 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		} else {
 			deleteProcessFromListbox(data);
 		}
-		refreshViewProcess();
+		Listcell listcell = (Listcell)cbox.getParent();
+		Listitem listitem = (Listitem)listcell.getParent();
+		doProcessLineVisible(cbox.isChecked(), listitem);
+	}
+	
+	private void doProcessLineVisible(boolean visible, Listitem listitem) {
+		// se hacen visibles o invisibles todos los elementos de la fila
+		Listcell listcell = (Listcell)listitem.getChildren().get(listitem.getChildren().size()-3);
+		Textbox textboxProcessDetails = (Textbox)listcell.getChildren().get(0);// el unico children debe ser el elemento
+		listcell = (Listcell)listitem.getChildren().get(listitem.getChildren().size()-2);
+		Spinner spinnerProcessHours = (Spinner)listcell.getChildren().get(0);
+		listcell = (Listcell)listitem.getChildren().get(listitem.getChildren().size()-1);
+		Spinner spinnerProcessMinutes = (Spinner)listcell.getChildren().get(0);
+		textboxProcessDetails.setVisible(visible);
+		spinnerProcessHours.setVisible(visible);
+		spinnerProcessMinutes.setVisible(visible);
 	}
 
 	@Listen("onProcessDetailsChange = #processListbox")
@@ -747,6 +763,10 @@ public class ProductCreationController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #resetProductButton")
 	public void resetProduct() {
+		// busca en la bd la version que tiene sin modificar los detalles
+		if(currentProduct != null) {
+			currentProduct = productRepository.findOne(currentProduct.getId());
+		}
 		refreshViewProduct();
 		currentPiece = null;
 		refreshViewPiece();
@@ -754,6 +774,12 @@ public class ProductCreationController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #resetPieceButton")
 	public void resetPiece() {
+		if(currentPiece != null) {
+			// busca en la bd la version sin modificar y reemplaza en la lista
+			Piece piece = pieceRepository.findOne(currentPiece.getId());
+			pieceList.set(pieceList.indexOf(currentPiece), piece);
+			currentPiece = piece;
+		}
 		refreshViewPiece();
 		pieceCreationBlock.setVisible(true);
 		processCreationBlock.setVisible(true);

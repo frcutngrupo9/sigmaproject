@@ -1,56 +1,64 @@
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="win_production_follow_up" apply="ar.edu.utn.sigmaproject.controller.ProductionFollowUpController" width="95%" style="background:white">
-    <panel title="Seguimiento de Produccion segun Tareas" id="productionOrderCreationBlock" border="rounded">
+    <panel title="Seguimiento de Produccion" id="productionOrderCreationBlock" border="rounded">
         <panelchildren>
         	<vlayout>
-        		<grid id="productGrid" hflex="1" sclass="sigma-form">
-                    <columns>
-                        <column align="right"/>
-                        <column align="left"/>
-                        <column align="right"/>
-                        <column align="left"/>
-                    </columns>
-                    <rows>
-                        <row>
-                            <label value="Plan de Produccion: "/>
-		        			<textbox id="productionPlanNameTextbox"/>
-		        			<label value="Estado Plan: "/>
-		        			<textbox id="productionPlanStateTypeTextbox"/>
-                        </row>
-                        <row>
-                            <label value="Producto: "/>
-							<textbox id="productNameTextbox" width="370px"/>
-							<label value="Cantidad: "/>
-							<intbox id="productUnitsIntbox" width="40px"/>
-                        </row>
-                        <row>
-                            <label value="Fecha Inicio Estimada: "/>
-							<datebox buttonVisible="false" disabled="true" id="productionOrderStartDatebox" cols="12" format="dd-MM-yyyy"/>
-							<label value="Fecha Finalizacion Estimada: "/>
-							<datebox buttonVisible="false" disabled="true" id="productionOrderFinishDatebox" cols="12" format="dd-MM-yyyy"/>
-                        </row>
-                        <row>
-                            <label value="Fecha Inicio Real: "/>
-							<datebox id="productionOrderRealStartDatebox" cols="12" format="dd-MM-yyyy"/>
-							<label value="Fecha Finalizacion Real: "/>
-							<datebox id="productionOrderRealFinishDatebox" cols="12" format="dd-MM-yyyy"/>
-                        </row>
-                    </rows>
-                </grid>
-				<hbox hflex="1" pack="center">
-					<button id="materialsWithdrawalButton" label="Retirar Materiales de Stock para Produccion"/>
-				</hbox>
+        		<hbox hflex="1" pack="center" align="center">
+	        		<image id="productImage"/>
+	        		<vbox hflex="1" pack="center" align="center">
+		        		<grid id="productGrid" hflex="1" sclass="sigma-form">
+		                    <columns>
+		                        <column align="right"/>
+		                        <column align="left"/>
+		                        <column align="right"/>
+		                        <column align="left"/>
+		                    </columns>
+		                    <rows>
+		                        <row>
+		                            <label value="Plan de Produccion: "/>
+				        			<textbox id="productionPlanNameTextbox"/>
+				        			<label value="Estado Plan: "/>
+				        			<textbox id="productionPlanStateTypeTextbox"/>
+		                        </row>
+		                        <row>
+		                            <label value="Producto: "/>
+									<textbox id="productNameTextbox" width="370px"/>
+									<label value="Cantidad: "/>
+									<intbox id="productUnitsIntbox" width="40px"/>
+		                        </row>
+		                        <row>
+		                            <label value="Fecha Inicio Estimada: "/>
+									<datebox buttonVisible="false" disabled="true" id="productionOrderStartDatebox" cols="12" format="dd-MM-yyyy HH:mm" width="110px"/>
+									<label value="Fecha Finalizacion Estimada: "/>
+									<datebox buttonVisible="false" disabled="true" id="productionOrderFinishDatebox" cols="12" format="dd-MM-yyyy HH:mm" width="110px"/>
+		                        </row>
+		                        <row>
+		                            <label value="Fecha Inicio Real: "/>
+									<datebox buttonVisible="false" disabled="true" id="productionOrderRealStartDatebox" cols="12" format="dd-MM-yyyy HH:mm" width="110px"/>
+									<label value="Fecha Finalizacion Real: "/>
+									<datebox buttonVisible="false" disabled="true" id="productionOrderRealFinishDatebox" cols="12" format="dd-MM-yyyy HH:mm" width="110px"/>
+		                        </row>
+		                    </rows>
+		                </grid>
+		                <hbox hflex="1" pack="center" align="center">
+			                <button id="materialsWithdrawalButton" label="Retirar Materiales de Stock para Produccion"/>
+		                	<button id="saveButton" label="Guardar"/>
+						    <button id="resetButton" label="Reset"/>
+						    <button id="cancelButton" label="Volver"/>
+					    </hbox>
+	                </vbox>
+                </hbox>
         		<grid id="productionOrderDetailGrid" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Detalle de Tareas a Realizar" colspan="12"/>
+						<auxheader label="Tareas a Realizar" colspan="12"/>
 					</auxhead>
         			<columns>
         				<column label="Realizado" align="center"/>
 			            <column label="Proceso" align="left" sort="auto(process.type.name)"/>
-			            <column label="Inicio" align="left"/>
-			            <column label="Fin" align="left"/>
-			            <column label="Inicio Real" align="left"/>
-			            <column label="Fin Real" align="left"/>
+			            <column label="Inicio" align="center"/>
+			            <column label="Fin" align="center"/>
+			            <column label="Inicio Real" align="center"/>
+			            <column label="Fin Real" align="center"/>
 			            <column label="Pieza" align="center"/>
 			            <column label="Duracion" align="center"/>
 			            <column label="Empleado" align="center"/>
@@ -62,7 +70,7 @@
 		                <row>
 		                	<custom-attributes state_finish="${win_production_follow_up$composer.isStateFinish(each.getState())}"/>
 		                	<custom-attributes state_cancel="${win_production_follow_up$composer.isStateCancel(each.getState())}"/>
-		                	<checkbox disabled="${state_cancel}" checked="${state_finish}" forward="onCheck=productionOrderDetailGrid.onEditProductionOrderDetailIsFinished(${each})"/>
+		                	<checkbox visible="${!state_cancel}" disabled="${state_cancel}" checked="${state_finish}" forward="onCheck=productionOrderDetailGrid.onEditProductionOrderDetailIsFinished(${each})"/>
 			            	<label value="${each.process.type.name}"/>
 			            	<datebox buttonVisible="false" disabled="true" cols="12" format="dd/MM/yyyy HH:mm" value="${each.dateStart}"/>
 			            	<datebox buttonVisible="false" disabled="true" cols="12" format="dd/MM/yyyy HH:mm" value="${each.dateFinish}"/>
@@ -132,11 +140,6 @@
 			            </listitem>
 			        </template>
 			    </listbox>
-    			<hlayout>
-				    <button id="saveButton" label="Guardar"/>
-				    <button id="resetButton" label="Reset"/>
-				    <button id="cancelButton" label="Volver"/>
-			    </hlayout>
 			</vlayout>
         </panelchildren>
     </panel>

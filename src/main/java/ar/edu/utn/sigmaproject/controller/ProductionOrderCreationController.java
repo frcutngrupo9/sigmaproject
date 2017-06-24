@@ -1,5 +1,6 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -8,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
+import org.zkoss.image.AImage;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
@@ -24,14 +26,17 @@ import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Comboitem;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Grid;
+import org.zkoss.zul.Image;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Row;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
+import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
@@ -75,16 +80,10 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	Textbox productCodeTextbox;
 	@Wire
 	Textbox productNameTextbox;
-	//	@Wire
-	//	Datebox productionPlanCreationDatebox;
 	@Wire
 	Grid productionOrderDetailGrid;
-	//	@Wire
-	//	Spinner productionOrderNumberSpinner;
 	@Wire
 	Intbox productUnitsIntbox;
-	//	@Wire
-	//	Combobox workerCombobox;
 	@Wire
 	Datebox productionOrderStartDatebox;
 	@Wire
@@ -95,8 +94,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	Button cancelButton;
 	@Wire
 	Button resetButton;
-	//	@Wire
-	//	Combobox productionOrderStateTypeCombobox;
 	@Wire
 	Button generateDetailsButton;
 	@Wire
@@ -107,6 +104,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	Grid processTypeGrid;
 	@Wire
 	Button autoAssignButton;
+	@Wire
+	Image productImage;
 
 	// services
 	@WireVariable
@@ -177,9 +176,23 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	}
 
 	private void refreshView() {
+		org.zkoss.image.Image img = null;
+		try {
+			img = new AImage("", currentProductionOrder.getProduct().getImageData());
+		} catch (IOException exception) {
+
+		}
+		if(img != null) {
+			productImage.setHeight("75px");
+			productImage.setWidth("75px");
+			productImage.setStyle("margin: 8px");
+		} else {
+			productImage.setHeight("0px");
+			productImage.setWidth("0px");
+			productImage.setStyle("margin: 0px");
+		}
+		productImage.setContent(img);
 		sortProductionOrderDetailListByProcessTypeSequence();
-		productionOrderStartDatebox.setDisabled(false);
-		productionOrderFinishDatebox.setDisabled(true);
 		productionPlanNameTextbox.setDisabled(true);
 		productNameTextbox.setDisabled(true);
 		productCodeTextbox.setDisabled(true);
@@ -197,11 +210,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		productNameTextbox.setText(currentProductionOrder.getProduct().getName());
 		productCodeTextbox.setText(currentProductionOrder.getProduct().getCode());
 		productUnitsIntbox.setValue(currentProductionOrder.getUnits());
-		//		if(currentProductionOrder.getNumber()!=null && currentProductionOrder.getNumber()!=0) {
-		//			productionOrderNumberSpinner.setValue(currentProductionOrder.getNumber());
-		//		} else {
-		//			productionOrderNumberSpinner.setValue(getNewProductionOrderNumber());
-		//		}
 		workerList = workerRepository.findAll();
 		productionOrderStartDatebox.setValue(currentProductionOrder.getDateStart());
 		productionOrderFinishDatebox.setValue(currentProductionOrder.getDateFinish());
@@ -210,8 +218,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		resetButton.setDisabled(false);
-		// la lista de procesos se crea en base a los tipos de procesos que incluye la orden
-		processTypeList = getProcessTypeTotalList();
+
 		refreshProcessTypeGridView();
 	}
 
@@ -276,7 +283,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			}
 		}
 		Date productionOrderDateStart = productionOrderStartDatebox.getValue();
-		Date productionOrderDateFinish = productionOrderFinishDatebox.getValue();
 		if (productionOrderDateStart == null) {
 			Clients.showNotification("Debe Seleccionar Fecha de Inicio", productionOrderStartDatebox);
 			return;
@@ -284,8 +290,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		if(currentProductionOrder.getNumber() == 0) {
 			currentProductionOrder.setNumber(getNewProductionOrderNumber());
 		}
-		currentProductionOrder.setDateStart(productionOrderDateStart);
-		currentProductionOrder.setDateFinish(productionOrderDateFinish);
+		// la fecha inicio y fin se calcularon y agregaron a currentProductionOrder al modificar la fecha inicio
 		// el estado de la orden debe cambiar automaticamente 
 		ProductionOrderStateType productionOrderStateType = productionOrderStateTypeRepository.findFirstByName("Preparada");
 		if(!productionOrderStateType.getName().equalsIgnoreCase(currentProductionOrder.getCurrentStateType().getName())) { // no se vuelve a grabar si es el mismo estado
@@ -293,15 +298,10 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			productionOrderState = productionOrderStateRepository.save(productionOrderState);
 			currentProductionOrder.setState(productionOrderState);
 		}
-
-		//		productionOrderDetailList = productionOrderDetailRepository.save(productionOrderDetailList);
-		//		currentProductionOrder.setDetails(productionOrderDetailList);
 		currentProductionOrder = productionOrderRepository.save(currentProductionOrder);
-
-		//		updateProductionPlanState();
-		alert("Orden de Produccion Guardada.");
-		//cancelButtonClick();
+		productionOrderDetailList = currentProductionOrder.getDetails();
 		refreshView();
+		alert("Orden de Produccion Guardada.");
 	}
 
 	//"Registrado""Abastecido""Lanzado""En Ejecucion""Finalizado""Cancelado""Suspendido"
@@ -436,12 +436,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		}
 		refreshProductionOrderDetailGridView();
 		refreshProcessTypeGridView();
-	}
-
-	@Listen("onChange = #productionOrderStartDatebox")
-	public void productionOrderStartDateboxOnChange() {
-		//Date finishDate = getFinishDate(productionOrderStartDatebox.getValue(), currentProductionOrder.getDurationTotal());
-		//productionOrderFinishDatebox.setValue(finishDate);
 	}
 
 	public ListModelList<Machine> getMachineListModelByProcessType(ProcessType processType) {
@@ -592,15 +586,21 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	}
 
 	private void refreshProcessTypeGridView() {
+		// la lista de procesos se crea en base a los tipos de procesos que incluye la orden
+		processTypeList = currentProductionOrder.getProcessTypeList();
 		sortProcessTypeListBySequence();
 		ListModelList<ProcessType> processTypeListModelList = new ListModelList<ProcessType>(processTypeList);
 		processTypeGrid.setModel(processTypeListModelList);
 	}
 
-	private List<ProcessType> getProcessTypeTotalList() {
-		List<ProcessType> list = currentProductionOrder.getProcessTypeList();
-		Collections.sort(list, new ProcessTypeComparator());
-		return list;
+	private void sortProcessTypeListBySequence() {
+		Comparator<ProcessType> comp = new Comparator<ProcessType>() {
+			@Override
+			public int compare(ProcessType a, ProcessType b) {
+				return a.getSequence().compareTo(b.getSequence());
+			}
+		};
+		Collections.sort(processTypeList, comp);
 	}
 
 	@Listen("onClick = #autoAssignButton")
@@ -629,54 +629,50 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		refreshProcessTypeGridView();
 	}
 
-	public class ProcessTypeComparator implements Comparator<ProcessType> {
-		@Override
-		public int compare(ProcessType o1, ProcessType o2) {
-			return o2.getSequence().compareTo(o1.getSequence());
-		}
-	}
-
-	public class ProductionOrderDetailComparator implements Comparator<ProductionOrderDetail> {
-		@Override
-		public int compare(ProductionOrderDetail o1, ProductionOrderDetail o2) {
-			return o2.getProcess().getType().getSequence().compareTo(o1.getProcess().getType().getSequence());
-		}
-	}
-
 	@Listen("onChange = #productionOrderStartDatebox")
-	public void productionOrderStartDateboxChange() {
+	public void doChangeProductionOrderStartDatebox() {
 		refreshProcessDates();
 	}
 
 	private void refreshProcessDates() {
 		Date startDate = getDateTimeStartWork(productionOrderStartDatebox.getValue());
-		Date finishDate = null;
-		if(startDate != null) {
-			for(ProductionOrderDetail each : productionOrderDetailList) {
-				if(each.getState() != ProcessState.Cancelado) {// solo se calcula para los procesos que no esten cancelados
-					if(finishDate == null) {// si es la primera vez que ingresa
-						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, each.getTimeTotal());
-					} else {
-						// el inicio de la actual es al finalizar la ultima
-						startDate = finishDate;
-						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, each.getTimeTotal());
-					}
-					each.setDateStart(startDate);
-					each.setDateFinish(finishDate);
-				} else {
-					each.setDateStart(null);
-					each.setDateFinish(null);
-				}
-			}
-		} else {
-			for(ProductionOrderDetail each : productionOrderDetailList) {
-				each.setDateStart(null);
-				each.setDateFinish(null);
-			}
-		}
-		// se usa la ultima fecha como el fin de la orden de produccion
-		productionOrderFinishDatebox.setValue(finishDate);
+
+		// asigna el valor a la clase para que calcule todos los tiempos de los detalles automaticamente
+		currentProductionOrder.setDateStart(startDate);
+		// TODO: debe poder actualizar las fechas luego de que se hayan modificado individualmente
+		//		Date finishDate = null;
+		//		if(startDate != null) {
+		//			for(ProductionOrderDetail each : productionOrderDetailList) {
+		//				if(each.getState() != ProcessState.Cancelado) {// solo se calcula para los procesos que no esten cancelados
+		//					if(finishDate == null) {// si es la primera vez que ingresa
+		//						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, each.getTimeTotal());
+		//					} else {
+		//						// el inicio de la actual es al finalizar la ultima
+		//						startDate = finishDate;
+		//						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, each.getTimeTotal());
+		//					}
+		//					each.setDateStart(startDate);
+		//					each.setDateFinish(finishDate);
+		//				} else {
+		//					each.setDateStart(null);
+		//					each.setDateFinish(null);
+		//					// por las dudas borramos tambien las fechas reales
+		//					each.setDateStartReal(null);
+		//					each.setDateFinishReal(null);
+		//				}
+		//			}
+		//		} else {
+		//			for(ProductionOrderDetail each : productionOrderDetailList) {
+		//				each.setDateStart(null);
+		//				each.setDateFinish(null);
+		//			}
+		//		}
+		productionOrderDetailList = currentProductionOrder.getDetails();
+		sortProductionOrderDetailListByProcessTypeSequence();
+		productionOrderStartDatebox.setValue(currentProductionOrder.getDateStart());// modifica el valor del datebox para que contenga la hora de inicio
+		productionOrderFinishDatebox.setValue(currentProductionOrder.getDateFinish());
 		refreshProductionOrderDetailGridView();
+		refreshProcessTypeGridView();
 	}
 
 	private Date getDateTimeStartWork(Date startDate) {
@@ -718,13 +714,29 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		autoAssignButtonClick();
 	}
 
-	private void sortProcessTypeListBySequence() {
-		Comparator<ProcessType> comp = new Comparator<ProcessType>() {
-			@Override
-			public int compare(ProcessType a, ProcessType b) {
-				return a.getSequence().compareTo(b.getSequence());
+	public List<Piece> getProcessTypePieceList(ProcessType processType) {
+		// devuelve la lista de piezas del processType
+		List<Piece> pieceList = new ArrayList<Piece>();
+		for(ProductionOrderDetail each : productionOrderDetailList) {
+			if(processType.equals(each.getProcess().getType())) {
+				pieceList.add(pieceRepository.findByProcesses(each.getProcess()));
 			}
-		};
-		Collections.sort(processTypeList, comp);
+		}
+		return pieceList;
+	}
+
+	@Listen("onChangeProductionOrderDetailStartDate = #productionOrderDetailGrid")
+	public void doChangeProductionOrderDetailStartDate(ForwardEvent evt) {
+		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
+		Datebox element = (Datebox) evt.getOrigin().getTarget();// obtenemos el elemento web
+		data.setDateStart(element.getValue());
+		// cambia la fecha de fin tambien
+		Date finish = ProductionDateTimeHelper.getFinishDate(element.getValue(), data.getTimeTotal());
+		data.setDateFinish(finish);
+		// cambia el valor del elemento con fecha fin
+		Row fila = (Row)element.getParent();
+		Datebox dateboxFinish = (Datebox) fila.getChildren().get(fila.getChildren().size()-7);
+		dateboxFinish.setValue(finish);
+		//TODO: recalcular todos los tiempos de los procesos posteriores para que inicien el final
 	}
 }

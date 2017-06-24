@@ -157,7 +157,7 @@ public class ProductDeliveryController extends SelectorComposer<Component> {
 		ProductionOrder productionOrder = getCorrelativeProductionOrder(currentOrder, orderDetail.getProduct());// busca la orden de produccion que tiene el mismo producto del detalle
 		Date date = productionOrder.getDateStartReal();
 		if(date != null) {
-			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 			return dateFormat.format(date);
 		}
 		return "";
@@ -168,7 +168,7 @@ public class ProductDeliveryController extends SelectorComposer<Component> {
 		ProductionOrder productionOrder = getCorrelativeProductionOrder(currentOrder, orderDetail.getProduct());// busca la orden de produccion que tiene el mismo producto del detalle
 		Date date = productionOrder.getDateFinishReal();
 		if(date != null) {
-			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 			return dateFormat.format(date);
 		}
 		return "";

@@ -5,7 +5,7 @@
             <vlayout>
     			<grid id="productionOrderGrid" sizedByContent="true" span="true" emptyMessage="No existen Ordenes Preparadas.">
     				<auxhead>
-						<auxheader label="Listado Ordenes de Produccion Preparadas" colspan="11"/>
+						<auxheader label="Ordenes Preparadas" colspan="13"/>
 					</auxhead>
         			<columns>
         				<column label="Accion" align="center"/>
@@ -14,11 +14,13 @@
         				<column label="Foto" align="center"/>
         				<column label="Producto" align="center"/>
         				<column label="Cantidad" align="center"/>
-        				<column label="Fecha Inicio" align="center"/>
-		                <column label="Fecha Fin" align="center"/>
+        				<column label="Inicio Estimado" align="center"/>
+		                <column label="Fin Estimado" align="center"/>
 		                <column label="% Completo" align="center"/>
 		                <column label="Duracion Total" align="center"/>
 		                <column label="Duracion Unidad" align="center"/>
+		                <column label="Inicio Real" align="center"/>
+		                <column label="Fin Real" align="center"/>
 		            </columns>
 		            <template name="model">
 		                <row>
@@ -37,6 +39,8 @@
 		                    <label value="${win_production_follow_up_list$composer.getPercentComplete(each)}"/>
 		                    <label value="${r:getFormattedTime(each.getDurationTotal())}"/>
 		                    <label value="${r:getFormattedTime(each.product.getDurationTotal())}"/>
+		                    <label value="${r:getFormattedDateTime(each.dateStartReal)}"/>
+		                    <label value="${r:getFormattedDateTime(each.dateFinishReal)}"/>
 						</row>
 		            </template>
     			</grid>

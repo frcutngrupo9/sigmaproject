@@ -60,11 +60,9 @@ import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRawMaterialRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderSupplyRepository;
-import ar.edu.utn.sigmaproject.service.ProductionPlanDetailRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
@@ -109,8 +107,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	@WireVariable
 	private ProductionPlanRepository productionPlanRepository;
 	@WireVariable
-	private ProductionPlanDetailRepository productionPlanDetailRepository;
-	@WireVariable
 	private ClientRepository clientService;
 	@WireVariable
 	private ProductionPlanStateRepository productionPlanStateRepository;
@@ -120,10 +116,10 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	private SupplyRequirementRepository supplyRequirementRepository;
 	@WireVariable
 	private RawMaterialRequirementRepository rawMaterialRequirementRepository;
-	@WireVariable
-	private ProductionOrderRepository productionOrderRepository;
 //	@WireVariable
-//	private ProductionOrderDetailRepository productionOrderDetailRepository;
+//	private ProductionOrderRepository productionOrderRepository;
+	//	@WireVariable
+	//	private ProductionOrderDetailRepository productionOrderDetailRepository;
 	@WireVariable
 	private ProductionOrderStateRepository productionOrderStateRepository;
 	@WireVariable
@@ -226,10 +222,14 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			productionPlanStateType = productionPlanStateTypeCombobox.getSelectedItem().getValue();
 		}
 		boolean isNewProductionPlan = false;
-		productionPlanDetailList = productionPlanDetailRepository.save(productionPlanDetailList);
 		if(currentProductionPlan == null) { // es un plan nuevo
 			// creamos el nuevo plan
-			currentProductionPlan = new ProductionPlan(productionPlanName, productionPlanDetailList);
+			currentProductionPlan = new ProductionPlan(productionPlanName);
+			for(ProductionPlanDetail each : productionPlanDetailList) {
+				// se agregan todas las referencias hacia el nuevo plan
+				each.setProductionPlan(currentProductionPlan);
+			}
+			currentProductionPlan.getPlanDetails().addAll(productionPlanDetailList);
 			ProductionPlanState productionPlanState = new ProductionPlanState(productionPlanStateType, new Date());
 			productionPlanState = productionPlanStateRepository.save(productionPlanState);
 			currentProductionPlan.setState(productionPlanState);
@@ -245,7 +245,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			isNewProductionPlan = true;
 		} else { // se edita un plan
 			currentProductionPlan.setName(productionPlanName);
-			currentProductionPlan.setPlanDetails(productionPlanDetailList);
+			//currentProductionPlan.setPlanDetails(productionPlanDetailList);
 			if (!currentProductionPlan.getCurrentStateType().equals(productionPlanStateType)) {
 				// si el estado ha cambiado
 				ProductionPlanState productionPlanState = new ProductionPlanState(productionPlanStateType, new Date());
@@ -273,7 +273,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				ProductionOrder productionOrder = new ProductionOrder(sequence, currentProductionPlan, each.getProduct(), each.getTotalUnits(), productionOrderState);
 				//  agrega los detalles
 				List<ProductionOrderDetail> details = createProductionOrderDetailList(productionOrder);
-//				details = productionOrderDetailRepository.save(details);
+				//				details = productionOrderDetailRepository.save(details);
 				productionOrder.setDetails(details);
 				// agrega los materiales a las ordenes de produccion
 				List<ProductionOrderSupply> productionOrderSupplyList = createProductionOrderSupplyList(productionOrder);
@@ -283,7 +283,8 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				productionOrder.setProductionOrderSupplies(productionOrderSupplyList);
 				productionOrder.setProductionOrderRawMaterials(productionOrderRawMaterialList);
 
-				productionOrder = productionOrderRepository.save(productionOrder);
+				//productionOrder = productionOrderRepository.save(productionOrder);
+				currentProductionPlan.getProductionOrderList().add(productionOrder);
 			}
 			currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
 		}
@@ -372,7 +373,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	}
 
 	private void addOrder(Order order) {
-		productionPlanDetailList.add(new ProductionPlanDetail(order));
+		productionPlanDetailList.add(new ProductionPlanDetail(currentProductionPlan, order));
 		refreshProductionPlanDetailListGrid();
 		refreshOrderPopupList();
 		refreshOrder();
@@ -516,7 +517,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/production_plan_list.zul");
 	}
-	
+
 	private void filter() {
 		List<Order> some = new ArrayList<>();
 		String nameFilter = orderBandbox.getValue().toLowerCase();

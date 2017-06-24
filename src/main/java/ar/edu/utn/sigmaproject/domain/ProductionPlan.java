@@ -20,34 +20,36 @@ public class ProductionPlan  implements Serializable, Cloneable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
+	
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionPlan", targetEntity = ProductionOrder.class)
+	private List<ProductionOrder> productionOrderList = new ArrayList<>();
 
-	@OneToMany(orphanRemoval = true)
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionPlan", targetEntity = ProductionPlanDetail.class)
 	@OrderColumn(name = "detail_index")
-	List<ProductionPlanDetail> planDetails = new ArrayList<>();
+	private List<ProductionPlanDetail> planDetails = new ArrayList<>();
 
 	@OneToMany(orphanRemoval = true)
-	List<ProductionPlanState> states = new ArrayList<>();
+	private List<ProductionPlanState> states = new ArrayList<>();
 
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionPlan", targetEntity = RawMaterialRequirement.class)
-	List<RawMaterialRequirement> rawMaterialRequirements = new ArrayList<>();
+	private List<RawMaterialRequirement> rawMaterialRequirements = new ArrayList<>();
 
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionPlan", targetEntity = SupplyRequirement.class)
-	List<SupplyRequirement> supplyRequirements = new ArrayList<>();
+	private List<SupplyRequirement> supplyRequirements = new ArrayList<>();
 
-	String name = "";
-	Date dateCreation = null;
-	Date dateStart = null;
-	ProductionPlanStateType currentStateType = null;
+	private String name = "";
+	private Date dateCreation = null;
+	private Date dateStart = null;
+	private ProductionPlanStateType currentStateType = null;
 
 	public ProductionPlan() {
 
 	}
 
-	public ProductionPlan(String name, List<ProductionPlanDetail> planDetails) {
+	public ProductionPlan(String name) {
 		this.name = name;
 		this.dateCreation = new Date();
-		this.planDetails.addAll(planDetails);
 	}
 
 	public Long getId() {
@@ -138,6 +140,14 @@ public class ProductionPlan  implements Serializable, Cloneable {
 
 	public void setDateStart(Date dateStart) {
 		this.dateStart = dateStart;
+	}
+
+	public List<ProductionOrder> getProductionOrderList() {
+		return productionOrderList;
+	}
+
+	public void setProductionOrderList(List<ProductionOrder> productionOrderList) {
+		this.productionOrderList = productionOrderList;
 	}
 
 	public boolean isAllReservationsFulfilled() {

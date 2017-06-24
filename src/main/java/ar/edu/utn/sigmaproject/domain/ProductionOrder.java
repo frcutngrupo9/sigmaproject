@@ -19,6 +19,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.xml.datatype.Duration;
 
+import ar.edu.utn.sigmaproject.util.ProductionDateTimeHelper;
+
 @Entity
 public class ProductionOrder implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
@@ -130,6 +132,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 
 	public void setDateStart(Date dateStart) {
 		this.dateStart = dateStart;
+		updateDetailDates(dateStart);// se calculan las fechas de los detalles automaticamente
 	}
 
 	public Date getDateFinish() {
@@ -215,10 +218,26 @@ public class ProductionOrder implements Serializable, Cloneable {
 	}
 
 	public Duration getDurationTotal() {
-		if(product.getDurationTotal() != null) {
-			return product.getDurationTotal().multiply(units);
+		// este metodo no tiene en cuenta el tiempo que se debe restar a causa de los procesos cancelados
+		//		if(product.getDurationTotal() != null) {
+		//			return product.getDurationTotal().multiply(units);
+		//		}
+		return getDurationTotalFromDetails();
+	}
+
+	private Duration getDurationTotalFromDetails() {
+		// este metodo si tiene en cuenta el tiempo que se debe restar a causa de los procesos cancelados
+		Duration duration = null;
+		for(ProductionOrderDetail each : getDetails()) {
+			if(each.getState() != ProcessState.Cancelado) {// no suma si esta cancelado
+				if(duration == null) {// primera vez
+					duration = each.getTimeTotal();
+				} else {
+					duration = duration.add(each.getTimeTotal());
+				}
+			}
 		}
-		return null;
+		return duration;
 	}
 
 	public Date getDateMaterialsWithdrawal() {
@@ -228,7 +247,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 	public void setDateMaterialsWithdrawal(Date dateMaterialsWithdrawal) {
 		this.dateMaterialsWithdrawal = dateMaterialsWithdrawal;
 	}
-	
+
 	public Map<ProcessType, List<ProductionOrderDetail>> getProcessTypeMap() {
 		// devuelve un map en que la llave es el ProcessType y el valor son los ProductionOrderDetail que referencian a un Process que referencia a ese ProcessType
 		Map<ProcessType, List<ProductionOrderDetail>> processTypeMap = new HashMap<ProcessType, List<ProductionOrderDetail>>();
@@ -244,7 +263,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 		}
 		return processTypeMap;
 	}
-	
+
 	public List<ProcessType> getProcessTypeList() {
 		Set<ProcessType> processTypeSet = new HashSet<ProcessType>();
 		for(ProductionOrderDetail eachProductionOrderDetail : getDetails()) {
@@ -255,5 +274,113 @@ public class ProductionOrder implements Serializable, Cloneable {
 			list.add(eachProcessType);
 		}
 		return list;
+	}
+
+	private void updateDetailDates(Date startDate) {
+		Date finishDate = null;
+		if(startDate != null) {
+			for(ProductionOrderDetail each : getDetails()) {
+				if(each.getState() != ProcessState.Cancelado) {// solo se calcula para los procesos que no esten cancelados
+					if(finishDate == null) {// si es la primera vez que ingresa
+						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, each.getTimeTotal());
+					} else {
+						// el inicio de la actual es al finalizar la ultima
+						startDate = finishDate;
+						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, each.getTimeTotal());
+					}
+					each.setDateStart(startDate);
+					each.setDateFinish(finishDate);
+				} else {
+					each.setDateStart(null);
+					each.setDateFinish(null);
+					// por las dudas borramos tambien las fechas reales
+					each.setDateStartReal(null);
+					each.setDateFinishReal(null);
+				}
+			}
+		} else {
+			for(ProductionOrderDetail each : getDetails()) {
+				each.setDateStart(null);
+				each.setDateFinish(null);
+			}
+		}
+		setDateFinish(finishDate);// se usa la ultima fecha como el fin de la orden de produccion
+	}
+
+
+	public Date getStartRealDateFromDetails() {
+		Date date = null;
+		for(ProductionOrderDetail each : getDetails()) {
+			Date startRealDate = each.getDateStartReal();
+			if(startRealDate != null) {
+				if(date == null) {
+					date = startRealDate;
+				} else {
+					if(startRealDate.before(date)) {
+						date = startRealDate;
+					}
+				}
+			}
+		}
+		return date;
+	}
+
+	public Date getFinishRealDateFromDetails() {
+		// solo si todos tienen fecha fin e inicio real
+		Date date = null;
+		for(ProductionOrderDetail each : getDetails()) {
+			Date finishRealDate = each.getDateFinishReal();
+			Date startRealDate = each.getDateStartReal();
+			if(finishRealDate == null || startRealDate == null) {
+				return null;
+			}
+			if(finishRealDate != null) {
+				if(date == null) {
+					date = finishRealDate;
+				} else {
+					if(finishRealDate.after(date)) {
+						date = finishRealDate;
+					}
+				}
+			}
+		}
+		return date;
+	}
+
+	public Date getStartDateFromDetails() {
+		Date date = null;
+		for(ProductionOrderDetail each : getDetails()) {
+			Date startDate = each.getDateStart();
+			if(startDate != null) {
+				if(date == null) {
+					date = startDate;
+				} else {
+					if(startDate.before(date)) {
+						date = startDate;
+					}
+				}
+			}
+		}
+		return date;
+	}
+
+	public Date getFinishDateFromDetails() {
+		// solo si todos tienen fecha fin e inicio
+		Date date = null;
+		for(ProductionOrderDetail each : getDetails()) {
+			Date finishDate = each.getDateFinish();
+			Date startDate = each.getDateStart();
+			if(finishDate == null || startDate == null) {
+				return null;
+			}
+			if(date == null) {
+				date = finishDate;
+			} else {
+				if(finishDate.after(date)) {
+					date = finishDate;
+				}
+			}
+		}
+		return date;
 	}
 }

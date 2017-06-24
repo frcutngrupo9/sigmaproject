@@ -1,5 +1,6 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
+import org.zkoss.image.AImage;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
@@ -27,6 +29,7 @@ import org.zkoss.zul.Comboitem;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Grid;
+import org.zkoss.zul.Image;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
@@ -125,6 +128,8 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	Listbox productionOrderRawMaterialListbox;
 	@Wire
 	Button materialsWithdrawalButton;
+	@Wire
+	Image productImage;
 
 	// services
 	@WireVariable
@@ -195,17 +200,30 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		currentProductionOrder = (ProductionOrder) Executions.getCurrent().getAttribute("selected_production_order");
 		if(currentProductionOrder == null) {throw new RuntimeException("ProductionOrder not found");}
 		currentProductionPlan = currentProductionOrder.getProductionPlan();
-		productionOrderDetailList = currentProductionOrder.getDetails();
-
 		machineList = machineRepository.findAll();
 		refreshView();
 	}
 
 	private void refreshView() {
-		productionOrderStartDatebox.setDisabled(true);
-		productionOrderFinishDatebox.setDisabled(true);
-		productionOrderRealStartDatebox.setDisabled(true);
-		productionOrderRealFinishDatebox.setDisabled(true);
+		currentProductionOrder = productionOrderRepository.findOne(currentProductionOrder.getId());
+		productionOrderDetailList = currentProductionOrder.getDetails();
+		sortProductionOrderDetailListByProcessTypeSequence();
+		org.zkoss.image.Image img = null;
+		try {
+			img = new AImage("", currentProductionOrder.getProduct().getImageData());
+		} catch (IOException exception) {
+
+		}
+		if(img != null) {
+			productImage.setHeight("175px");
+			productImage.setWidth("175px");
+			productImage.setStyle("margin: 8px");
+		} else {
+			productImage.setHeight("0px");
+			productImage.setWidth("0px");
+			productImage.setStyle("margin: 0px");
+		}
+		productImage.setContent(img);
 		productionPlanNameTextbox.setDisabled(true);
 		productNameTextbox.setDisabled(true);
 		productUnitsIntbox.setDisabled(true);
@@ -257,17 +275,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		ProductionOrderStateType newStateType = getProductionOrderStateType();
 		ProductionOrderStateType productionOrderStateType = null;
 		if(!lastStateType.equals(newStateType)) {// si el estado anterior es distindo del nuevo
-			if(newStateType.equals(productionOrderStateTypeRepository.findFirstByName("Preparada"))) {
-				currentProductionOrder.setDateStartReal(null);
-				currentProductionOrder.setDateFinishReal(null);
-			} else if(newStateType.equals(productionOrderStateTypeRepository.findFirstByName("Iniciada"))) {
-				currentProductionOrder.setDateStartReal(new Date());
-				currentProductionOrder.setDateFinishReal(null);
-			} else if(newStateType.equals(productionOrderStateTypeRepository.findFirstByName("Finalizada"))) {
-				currentProductionOrder.setDateFinishReal(new Date());
-				if(currentProductionOrder.getDateStartReal() == null) {
-					currentProductionOrder.setDateStartReal(new Date());
-				}
+			if(newStateType.equals(productionOrderStateTypeRepository.findFirstByName("Finalizada"))) {
 				// si esta Finalizada y aun no se retiraron los materiales de stock, se los retiran
 				if(currentProductionOrder.getDateMaterialsWithdrawal() == null) {
 					alert("Se registrara el Retiro de Materiales de Stock.");
@@ -276,6 +284,13 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 			}
 			productionOrderStateType = newStateType;
 		}
+		// si existe por lo menos 1 proceso finalizado, se busca la fecha inicio real del primero
+		// si todos los proceso estan finalizados, se busca la fecha fin del ultimo proceso
+		// caso contrario en los 2 casos se asigna null al atributo fecha respectivo
+		Date dateStartReal = currentProductionOrder.getStartRealDateFromDetails();
+		Date dateFinishReal = currentProductionOrder.getFinishRealDateFromDetails();
+		currentProductionOrder.setDateStartReal(dateStartReal);
+		currentProductionOrder.setDateFinishReal(dateFinishReal);
 		if(productionOrderStateType != null) {
 			ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateType, new Date());
 			productionOrderState = productionOrderStateRepository.save(productionOrderState);
@@ -287,7 +302,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		updateProductionPlanState();
 
 		alert("Avance de Produccion Registrada.");
-		//cancelButtonClick();
 		refreshView();
 	}
 
@@ -364,7 +378,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		boolean finished = true;// si se finalizo todos los procesos
 		boolean notStarted = true;// no inicio ningun proceso
 		for (ProductionOrderDetail each : productionOrderDetailList) {// no se verifica los cancelados
-			if(each.getState()!=ProcessState.Cancelado) {
+			if(each.getState() != ProcessState.Cancelado) {
 				if(each.getState()==ProcessState.Realizado || each.getQuantityFinished().compareTo(BigDecimal.ZERO)!=0) {
 					// si inicio o finalizo algun proceso
 					notStarted = false;
@@ -394,8 +408,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #resetButton")
 	public void resetButtonClick() {
-		currentProductionOrder = productionOrderRepository.findOne(currentProductionOrder.getId());// obtiene la misma orden sin cambios en los detalles
-		productionOrderDetailList = currentProductionOrder.getDetails();
 		refreshView();
 	}
 
@@ -491,7 +503,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		Checkbox chkbox = (Checkbox)fila.getChildren().get(0);
 		Datebox dateboxStartReal = (Datebox) fila.getChildren().get(fila.getChildren().size()-8);
 		Datebox dateboxFinishReal = (Datebox) fila.getChildren().get(fila.getChildren().size()-7);
-		
+
 		if(value.compareTo(quantityPiece) >= 0) {
 			// si el valor ingresado supera la cantidad, se lo modifica y se agrega la cantidad
 			if(value.compareTo(quantityPiece) > 0) {
@@ -521,7 +533,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		Doublebox doublebox = (Doublebox) fila.getChildren().get(fila.getChildren().size()-1);
 		Datebox dateboxStartReal = (Datebox) fila.getChildren().get(fila.getChildren().size()-8);
 		Datebox dateboxFinishReal = (Datebox) fila.getChildren().get(fila.getChildren().size()-7);
-		
+
 		if(element.isChecked()) {
 			data.setState(ProcessState.Realizado);
 			// agregamos como cantidad finalizada el total

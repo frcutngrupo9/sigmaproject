@@ -97,4 +97,19 @@ public class ProductionDateTimeHelper {
 		ProductionDateTimeHelper.firstMinuteOfDay = firstMinuteOfDay;
 	}
 
+	public static int getLastHourOfDay() {
+		return lastHourOfDay;
+	}
+
+	public static void setLastHourOfDay(int lastHourOfDay) {
+		ProductionDateTimeHelper.lastHourOfDay = lastHourOfDay;
+	}
+
+	public static int getLastMinuteOfDay() {
+		return lastMinuteOfDay;
+	}
+
+	public static void setLastMinuteOfDay(int lastMinuteOfDay) {
+		ProductionDateTimeHelper.lastMinuteOfDay = lastMinuteOfDay;
+	}
 }
