@@ -50,25 +50,21 @@ import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
-import ar.edu.utn.sigmaproject.domain.ProductionOrderRawMaterial;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderMaterial;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderStateType;
-import ar.edu.utn.sigmaproject.domain.ProductionOrderSupply;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
-import ar.edu.utn.sigmaproject.domain.RawMaterial;
-import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
+import ar.edu.utn.sigmaproject.domain.ProductMaterial;
+import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.StockMovement;
 import ar.edu.utn.sigmaproject.domain.StockMovementDetail;
 import ar.edu.utn.sigmaproject.domain.StockMovementType;
-import ar.edu.utn.sigmaproject.domain.Supply;
-import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
-import ar.edu.utn.sigmaproject.domain.SupplyReserved;
+import ar.edu.utn.sigmaproject.domain.MaterialReserved;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.domain.Wood;
-import ar.edu.utn.sigmaproject.domain.WoodReserved;
 import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
@@ -76,21 +72,17 @@ import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.PieceRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderRawMaterialRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderSupplyRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
-import ar.edu.utn.sigmaproject.service.RawMaterialRequirementRepository;
 import ar.edu.utn.sigmaproject.service.StockMovementRepository;
-import ar.edu.utn.sigmaproject.service.SupplyRequirementRepository;
-import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
+import ar.edu.utn.sigmaproject.service.MaterialRequirementRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
-import ar.edu.utn.sigmaproject.service.WoodReservedRepository;
+import ar.edu.utn.sigmaproject.service.MaterialReservedRepository;
 import ar.edu.utn.sigmaproject.service.WorkerRepository;
 
 
@@ -147,21 +139,13 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	@WireVariable
 	private PieceRepository pieceRepository;
 	@WireVariable
-	private WoodReservedRepository woodReservedRepository;
+	private MaterialReservedRepository materialReservedRepository;
 	@WireVariable
 	private WoodRepository woodRepository;
 	@WireVariable
-	private RawMaterialRequirementRepository rawMaterialRequirementRepository;
-	@WireVariable
-	private SupplyReservedRepository supplyReservedRepository;
+	private MaterialRequirementRepository materialRequirementRepository;
 	@WireVariable
 	private SupplyTypeRepository supplyTypeRepository;
-	@WireVariable
-	private SupplyRequirementRepository supplyRequirementRepository;
-	@WireVariable
-	private ProductionOrderSupplyRepository productionOrderSupplyRepository;
-	@WireVariable
-	private ProductionOrderRawMaterialRepository productionOrderRawMaterialRepository;
 	@WireVariable
 	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
 	@WireVariable
@@ -186,13 +170,13 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	// list
 	private List<ProductionOrderDetail> productionOrderDetailList;
 	private List<Machine> machineList;
-	private List<ProductionOrderSupply> productionOrderSupplyList;
-	private List<ProductionOrderRawMaterial> productionOrderRawMaterialList;
+	private List<ProductionOrderMaterial> productionOrderSupplyList;
+	private List<ProductionOrderMaterial> productionOrderRawMaterialList;
 
 	// list models
 	private ListModelList<ProductionOrderDetail> productionOrderDetailListModel;
-	private ListModelList<ProductionOrderSupply> productionOrderSupplyListModel;
-	private ListModelList<ProductionOrderRawMaterial> productionOrderRawMaterialListModel;
+	private ListModelList<ProductionOrderMaterial> productionOrderSupplyListModel;
+	private ListModelList<ProductionOrderMaterial> productionOrderRawMaterialListModel;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
@@ -256,8 +240,8 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	private void refreshProductionOrderOrderSupplyAndRawMaterialListbox() {
 		productionOrderSupplyList = currentProductionOrder.getProductionOrderSupplies();
 		productionOrderRawMaterialList = currentProductionOrder.getProductionOrderRawMaterials();
-		productionOrderSupplyListModel = new ListModelList<ProductionOrderSupply>(productionOrderSupplyList);
-		productionOrderRawMaterialListModel = new ListModelList<ProductionOrderRawMaterial>(productionOrderRawMaterialList);
+		productionOrderSupplyListModel = new ListModelList<ProductionOrderMaterial>(productionOrderSupplyList);
+		productionOrderRawMaterialListModel = new ListModelList<ProductionOrderMaterial>(productionOrderRawMaterialList);
 		productionOrderSupplyListbox.setModel(productionOrderSupplyListModel);
 		productionOrderRawMaterialListbox.setModel(productionOrderRawMaterialListModel);
 	}
@@ -266,10 +250,10 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
 		ProductionOrderStateType lastStateType = productionOrderStateTypeRepository.findOne(currentProductionOrder.getCurrentStateType().getId());
-		productionOrderSupplyList = productionOrderSupplyRepository.save(productionOrderSupplyList);
-		productionOrderRawMaterialList = productionOrderRawMaterialRepository.save(productionOrderRawMaterialList);
-		currentProductionOrder.setProductionOrderSupplies(productionOrderSupplyList);
-		currentProductionOrder.setProductionOrderRawMaterials(productionOrderRawMaterialList);
+		List<ProductionOrderMaterial> productionOrderMaterials = new ArrayList<ProductionOrderMaterial>();
+		productionOrderMaterials.addAll(productionOrderSupplyList);
+		productionOrderMaterials.addAll(productionOrderRawMaterialList);
+		currentProductionOrder.setProductionOrderMaterials(productionOrderMaterials);
 
 		// el estado de la orden debe cambiar automaticamente a 3 estados: Preparada, Iniciada, Finalizada
 		ProductionOrderStateType newStateType = getProductionOrderStateType();
@@ -558,8 +542,8 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	}
 
 	@Listen("onEditUsedSupply = #productionOrderSupplyListbox")
-	public void doEditUsedSupply(ForwardEvent evt) {
-		ProductionOrderSupply data = (ProductionOrderSupply) evt.getData();// obtenemos el objeto pasado por parametro
+	public void doEditUsedMaterial(ForwardEvent evt) {
+		ProductionOrderMaterial data = (ProductionOrderMaterial) evt.getData();// obtenemos el objeto pasado por parametro
 		InputEvent inputEvent = (InputEvent) evt.getOrigin();
 		String inputValue = inputEvent.getValue();
 		BigDecimal value = null;
@@ -572,31 +556,8 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	}
 
 	@Listen("onEditUsedSupplyObservation = #productionOrderSupplyListbox")
-	public void doEditUsedSupplyObservation(ForwardEvent evt) {
-		ProductionOrderSupply data = (ProductionOrderSupply) evt.getData();// obtenemos el objeto pasado por parametro
-		Textbox origin = (Textbox)evt.getOrigin().getTarget();
-		InputEvent inputEvent = (InputEvent) evt.getOrigin();
-		origin.setValue(inputEvent.getValue());
-		data.setObservation(origin.getText());
-	}
-
-	@Listen("onEditUsedRawMaterial = #productionOrderRawMaterialListbox")
-	public void doEditUsedRawMaterial(ForwardEvent evt) {
-		ProductionOrderRawMaterial data = (ProductionOrderRawMaterial) evt.getData();// obtenemos el objeto pasado por parametro
-		InputEvent inputEvent = (InputEvent) evt.getOrigin();
-		String inputValue = inputEvent.getValue();
-		BigDecimal value = null;
-		if(inputValue == null || inputValue.equals("")) {
-			value = BigDecimal.ZERO;
-		} else {
-			value = new BigDecimal(inputValue);
-		}
-		data.setQuantityUsed(value);
-	}
-
-	@Listen("onEditUsedRawMaterialObservation = #productionOrderRawMaterialListbox")
-	public void doEditUsedRawMaterialObservation(ForwardEvent evt) {
-		ProductionOrderRawMaterial data = (ProductionOrderRawMaterial) evt.getData();// obtenemos el objeto pasado por parametro
+	public void doEditUsedMaterialObservation(ForwardEvent evt) {
+		ProductionOrderMaterial data = (ProductionOrderMaterial) evt.getData();// obtenemos el objeto pasado por parametro
 		Textbox origin = (Textbox)evt.getOrigin().getTarget();
 		InputEvent inputEvent = (InputEvent) evt.getOrigin();
 		origin.setValue(inputEvent.getValue());
@@ -604,18 +565,8 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	}
 
 	@Listen("onCompleteUsedSupply = #productionOrderSupplyListbox")
-	public void doCompleteUsedSupply(ForwardEvent evt) {
-		ProductionOrderSupply data = (ProductionOrderSupply) evt.getData();// obtenemos el objeto pasado por parametro
-		Button element = (Button) evt.getOrigin().getTarget();
-		Listcell listcell = (Listcell)element.getParent();
-		Doublebox doublebox = (Doublebox)listcell.getChildren().get(listcell.getChildren().size()-2);
-		doublebox.setValue(data.getQuantity().doubleValue());
-		data.setQuantityUsed(data.getQuantity());
-	}
-
-	@Listen("onCompleteUsedRawMaterial = #productionOrderRawMaterialListbox")
-	public void doCompleteUsedRawMaterial(ForwardEvent evt) {
-		ProductionOrderRawMaterial data = (ProductionOrderRawMaterial) evt.getData();// obtenemos el objeto pasado por parametro
+	public void doCompleteUsedMaterial(ForwardEvent evt) {
+		ProductionOrderMaterial data = (ProductionOrderMaterial) evt.getData();// obtenemos el objeto pasado por parametro
 		Button element = (Button) evt.getOrigin().getTarget();
 		Listcell listcell = (Listcell)element.getParent();
 		Doublebox doublebox = (Doublebox)listcell.getChildren().get(listcell.getChildren().size()-2);
@@ -657,64 +608,49 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		stockMovementWood.setType(StockMovementType.Wood);
 
 		// la cantidad a restar es la cantidad de materiales del producto por la cantidad de unidades del producto
-		List<Supply> supplyList = product.getSupplies();
-		List<RawMaterial> woodList = product.getRawMaterials();
-		for(Supply each : supplyList) {
+		for(ProductMaterial each : product.getMaterials()) {
 			BigDecimal quantityTotal = each.getQuantity().multiply(new BigDecimal(units));
-			SupplyType supplyType = each.getSupplyType();
-			supplyType.setStock(supplyType.getStock().subtract(quantityTotal));
-			supplyType = supplyTypeRepository.save(supplyType);
-			// se busca la reserva del material y se resta la cantidad, y se suma esa cantidad a la cantidad retirada del requirement
-			SupplyRequirement supplyRequirement = null;
-			for(SupplyRequirement req : currentProductionPlan.getSupplyRequirements()) {
-				if(supplyTypeRepository.findOne(req.getSupplyType().getId()).equals(supplyTypeRepository.findOne(supplyType.getId()))) {
-					supplyRequirement = req;
-					break;
+			Item item = each.getItem();
+			MaterialRequirement materialRequirement = null;
+			if(item instanceof SupplyType) {
+				SupplyType supplyType = (SupplyType) item;
+				supplyType.setStock(supplyType.getStock().subtract(quantityTotal));
+				supplyType = supplyTypeRepository.save(supplyType);
+				// se busca la reserva del material y se resta la cantidad, y se suma esa cantidad a la cantidad retirada del requirement
+				for(MaterialRequirement req : currentProductionPlan.getSupplyRequirements()) {
+					if(supplyTypeRepository.findOne(req.getItem().getId()).equals(supplyTypeRepository.findOne(supplyType.getId()))) {
+						materialRequirement = req;
+						break;
+					}
+				}
+			} else if (item instanceof Wood) {
+				Wood wood = (Wood) item;
+				wood.setStock(wood.getStock().subtract(quantityTotal));
+				wood = woodRepository.save(wood);
+				// se busca la reserva del material y se resta la cantidad, y se suma esa cantidad a la cantidad retirada del requirement
+				for(MaterialRequirement req : currentProductionPlan.getRawMaterialRequirements()) {
+					if(woodRepository.findOne(req.getItem().getId()).equals(woodRepository.findOne(wood.getId()))) {
+						materialRequirement = req;
+						break;
+					}
 				}
 			}
-			SupplyReserved supplyReserved = supplyReservedRepository.findBySupplyRequirement(supplyRequirement);
-			supplyReserved.setStockReserved(supplyReserved.getStockReserved().subtract(quantityTotal));
-			supplyReservedRepository.save(supplyReserved);
-			BigDecimal quantityWithdrawn = supplyRequirement.getQuantityWithdrawn().add(quantityTotal);
-			supplyRequirement.setQuantityWithdrawn(quantityWithdrawn);
-			supplyRequirementRepository.save(supplyRequirement);
+			MaterialReserved materialReserved = materialRequirement.getMaterialReserved();
+			materialReserved.setStockReserved(materialReserved.getStockReserved().subtract(quantityTotal));
+			materialReservedRepository.save(materialReserved);
+			BigDecimal quantityWithdrawn = materialRequirement.getQuantityWithdrawn().add(quantityTotal);
+			materialRequirement.setQuantityWithdrawn(quantityWithdrawn);
+			materialRequirementRepository.save(materialRequirement);
 
 			StockMovementDetail stockMovementDetail = new StockMovementDetail();
-			Item item = supplyType;
+
 			stockMovementDetail.setDescription(item.getDescription());
 			stockMovementDetail.setItem(item);
 			stockMovementDetail.setQuantity(quantityWithdrawn);
 			stockMovementDetail.setStockMovement(stockMovementSupply);
 			stockMovementSupply.getDetails().add(stockMovementDetail);
 		}
-		for(RawMaterial each : woodList) {
-			BigDecimal quantityTotal = each.getQuantity().multiply(new BigDecimal(units));
-			Wood wood = each.getWood();
-			wood.setStock(wood.getStock().subtract(quantityTotal));
-			wood = woodRepository.save(wood);
-			// se busca la reserva del material y se resta la cantidad, y se suma esa cantidad a la cantidad retirada del requirement
-			RawMaterialRequirement rawMaterialRequirement = null;
-			for(RawMaterialRequirement req : currentProductionPlan.getRawMaterialRequirements()) {
-				if(woodRepository.findOne(req.getWood().getId()).equals(woodRepository.findOne(wood.getId()))) {
-					rawMaterialRequirement = req;
-					break;
-				}
-			}
-			WoodReserved woodReserved = woodReservedRepository.findByRawMaterialRequirement(rawMaterialRequirement);
-			woodReserved.setStockReserved(woodReserved.getStockReserved().subtract(quantityTotal));
-			woodReservedRepository.save(woodReserved);
-			BigDecimal quantityWithdrawn = rawMaterialRequirement.getQuantityWithdrawn().add(quantityTotal);
-			rawMaterialRequirement.setQuantityWithdrawn(quantityWithdrawn);
-			rawMaterialRequirementRepository.save(rawMaterialRequirement);
 
-			StockMovementDetail stockMovementDetail = new StockMovementDetail();
-			Item item = wood;
-			stockMovementDetail.setDescription(item.getDescription());
-			stockMovementDetail.setItem(item);
-			stockMovementDetail.setQuantity(quantityWithdrawn);
-			stockMovementDetail.setStockMovement(stockMovementWood);
-			stockMovementWood.getDetails().add(stockMovementDetail);
-		}
 		currentProductionOrder.setDateMaterialsWithdrawal(new Date());
 		currentProductionOrder = productionOrderRepository.save(currentProductionOrder);
 

@@ -22,16 +22,17 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
+import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.MaterialsOrder;
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
-import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
+import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.Wood;
-import ar.edu.utn.sigmaproject.domain.WoodReserved;
+import ar.edu.utn.sigmaproject.domain.MaterialReserved;
 import ar.edu.utn.sigmaproject.domain.WoodType;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
-import ar.edu.utn.sigmaproject.service.WoodReservedRepository;
+import ar.edu.utn.sigmaproject.service.MaterialReservedRepository;
 import ar.edu.utn.sigmaproject.service.WoodTypeRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -72,7 +73,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	@WireVariable
 	private WoodRepository woodRepository;
 	@WireVariable
-	private WoodReservedRepository woodReservedRepository;
+	private MaterialReservedRepository woodReservedRepository;
 	@WireVariable
 	private WoodTypeRepository woodTypeRepository;
 	@WireVariable
@@ -84,12 +85,12 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	// list
 	private List<Wood> woodList;
 	private List<WoodType> woodTypeList;
-	private List<WoodReserved> woodReservedList;
+	private List<MaterialReserved> woodReservedList;
 
 	// list models
 	private ListModelList<Wood> woodListModel;
 	private ListModelList<WoodType> woodTypeListModel;
-	private ListModelList<WoodReserved> woodReservedListModel;
+	private ListModelList<MaterialReserved> woodReservedListModel;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
@@ -100,7 +101,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		woodList = woodRepository.findAll();
 		woodListModel = new ListModelList<>(woodList);
 		woodListbox.setModel(woodListModel);
-		woodReservedList = woodReservedRepository.findAll();
+		woodReservedList = woodReservedRepository.findAllByType(MaterialType.Wood);
 		woodReservedListModel = new ListModelList<>(woodReservedList);
 		woodReservedListbox.setModel(woodReservedListModel);
 		currentWood = null;
@@ -208,13 +209,13 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		refreshView();
 	}
 	
-	public String getProductionPlanName(WoodReserved woodReserved) {
+	public String getProductionPlanName(MaterialReserved woodReserved) {
 		if(woodReserved == null) {
 			return "";
 		} else {
-			RawMaterialRequirement rawMaterialRequirement = woodReserved.getRawMaterialRequirement();
+			MaterialRequirement rawMaterialRequirement = woodReserved.getMaterialRequirement();
 			if(rawMaterialRequirement != null) {
-				ProductionPlan productionPlan = productionPlanRepository.findByRawMaterialRequirements(rawMaterialRequirement);
+				ProductionPlan productionPlan = productionPlanRepository.findByMaterialRequirements(rawMaterialRequirement);
 				if(productionPlan != null) {
 					return productionPlan.getName();
 				} else {

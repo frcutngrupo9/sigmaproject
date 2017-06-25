@@ -30,32 +30,27 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.Item;
+import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
+import ar.edu.utn.sigmaproject.domain.MaterialReserved;
 import ar.edu.utn.sigmaproject.domain.MaterialsOrder;
 import ar.edu.utn.sigmaproject.domain.MaterialsOrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
-import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.StockMovement;
 import ar.edu.utn.sigmaproject.domain.StockMovementDetail;
 import ar.edu.utn.sigmaproject.domain.StockMovementType;
-import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
-import ar.edu.utn.sigmaproject.domain.SupplyReserved;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.domain.Wood;
-import ar.edu.utn.sigmaproject.domain.WoodReserved;
-import ar.edu.utn.sigmaproject.service.MaterialsOrderDetailRepository;
+import ar.edu.utn.sigmaproject.service.MaterialRequirementRepository;
+import ar.edu.utn.sigmaproject.service.MaterialReservedRepository;
 import ar.edu.utn.sigmaproject.service.MaterialsOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
-import ar.edu.utn.sigmaproject.service.RawMaterialRequirementRepository;
 import ar.edu.utn.sigmaproject.service.StockMovementRepository;
-import ar.edu.utn.sigmaproject.service.SupplyRequirementRepository;
-import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
-import ar.edu.utn.sigmaproject.service.WoodReservedRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class MaterialsReceptionController extends SelectorComposer<Component> {
@@ -84,21 +79,15 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 	@WireVariable
 	private MaterialsOrderRepository materialsOrderRepository;
 	@WireVariable
-	private MaterialsOrderDetailRepository materialsOrderDetailRepository;
-	@WireVariable
 	private SupplyTypeRepository supplyTypeRepository;
 	@WireVariable
 	private WoodRepository woodRepository;
 	@WireVariable
 	private StockMovementRepository stockMovementRepository;
 	@WireVariable
-	private SupplyReservedRepository supplyReservedRepository;
+	private MaterialReservedRepository materialReservedRepository;
 	@WireVariable
-	private SupplyRequirementRepository supplyRequirementRepository;
-	@WireVariable
-	private RawMaterialRequirementRepository rawMaterialRequirementRepository;
-	@WireVariable
-	private WoodReservedRepository woodReservedRepository;
+	private MaterialRequirementRepository materialRequirementRepository;
 	@WireVariable
 	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
 	@WireVariable
@@ -200,24 +189,24 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 		// modifica la cantidad en stock y se agrega los stock movement details
 		for(MaterialsOrderDetail each : currentMaterialsOrder.getDetails()) {
 			Item item = each.getItem();
-			
+
 			StockMovementDetail stockMovementDetail = new StockMovementDetail();
 			stockMovementDetail.setDescription(item.getDescription());
 			stockMovementDetail.setItem(item);
 			stockMovementDetail.setQuantity(each.getQuantityReceived());
-			
+
 			if(item instanceof SupplyType) {
 				SupplyType supplyType = (SupplyType) item;
 				supplyType.setStock(supplyType.getStock().add(each.getQuantityReceived()));
 				supplyType = supplyTypeRepository.save(supplyType);
-				
+
 				stockMovementDetail.setStockMovement(stockMovementSupply);
 				stockMovementSupply.getDetails().add(stockMovementDetail);
 			} else if (item instanceof Wood) {
 				Wood wood = (Wood) item;
 				wood.setStock(wood.getStock().add(each.getQuantityReceived()));
 				wood = woodRepository.save(wood);
-				
+
 				stockMovementDetail.setStockMovement(stockMovementWood);
 				stockMovementWood.getDetails().add(stockMovementDetail);
 			}
@@ -235,51 +224,31 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 		if(productionPlan != null) {
 			for(MaterialsOrderDetail each : currentMaterialsOrder.getDetails()) {
 				Item item = each.getItem();
-				if(item instanceof SupplyType) {
-					SupplyType supplyType = (SupplyType) item;
-					// busca la reserva del material para el plan, y realiza la suma de la reserva de lo recibido
-					SupplyRequirement requirement = supplyRequirementRepository.findByProductionPlanAndSupplyType(productionPlan, supplyType);
-					SupplyReserved reserved = supplyReservedRepository.findBySupplyRequirement(requirement);
-					BigDecimal quantityReservation = each.getQuantityReceived();
-					if(each.getQuantityReceived().compareTo(requirement.getQuantity()) == 1) {// si la cantidad recibida es mayor a la necesaria del requerimiento significa que se debe reservar solo la necesaria
-						quantityReservation = requirement.getQuantity();
+				MaterialRequirement requirement = materialRequirementRepository.findByProductionPlanAndItem(productionPlan, item);
+				MaterialReserved reserved = requirement.getMaterialReserved();
+				BigDecimal quantityReservation = each.getQuantityReceived();
+				if(each.getQuantityReceived().compareTo(requirement.getQuantity()) == 1) {// si la cantidad recibida es mayor a la necesaria del requerimiento significa que se debe reservar solo la necesaria
+					quantityReservation = requirement.getQuantity();
+				}
+				if(reserved == null) {// no existe reserva, se crea la reserva y por la cantidad recibida
+					reserved = new MaterialReserved(requirement, quantityReservation);
+					requirement.setMaterialReserved(reserved);// se agrega la referencia al requirement
+					reserved = materialReservedRepository.save(reserved);
+					// se guarda la reserva
+					item.getMaterialReservedList().add(reserved);
+					if(item instanceof SupplyType) {
+						supplyTypeRepository.save((SupplyType) item);
+					} else if (item instanceof Wood) {
+						woodRepository.save((Wood) item);
 					}
-					if(reserved == null) {// no existe reserva, se crea la reserva y por la cantidad recibida
-						reserved = new SupplyReserved(requirement, quantityReservation);
-						reserved = supplyReservedRepository.save(reserved);
-						supplyType.getSuppliesReserved().add(reserved);
-						supplyTypeRepository.save(supplyType);
-					} else {// existe reserva, se suma la cantidad recibida a la actual
-						// si la cantidad sin reservar es menos a la cantidad recibida, se suma solo la cantidad sin reservar, esto puede pasar si ingresaron materiales y se reservaron sin recibir los materiales del pedido
-						BigDecimal quantityNonReserved = requirement.getQuantity().subtract(reserved.getStockReserved());
-						if(quantityNonReserved.compareTo(quantityReservation) == -1) {// si quantityNonReserved es menor a quantityReservation
-							quantityReservation = quantityNonReserved;
-						}
-						reserved.setStockReserved(reserved.getStockReserved().add(quantityReservation));
-						supplyReservedRepository.save(reserved);
+				} else {// existe reserva, se suma la cantidad recibida a la actual
+					// si la cantidad sin reservar es menos a la cantidad recibida, se suma solo la cantidad sin reservar, esto puede pasar si ingresaron materiales y se reservaron sin recibir los materiales del pedido
+					BigDecimal quantityNonReserved = requirement.getQuantity().subtract(reserved.getStockReserved());
+					if(quantityNonReserved.compareTo(quantityReservation) == -1) {// si quantityNonReserved es menor a quantityReservation
+						quantityReservation = quantityNonReserved;
 					}
-				} else if (item instanceof Wood) {
-					Wood wood = (Wood) item;
-					RawMaterialRequirement requirement = rawMaterialRequirementRepository.findByProductionPlanAndWood(productionPlan, wood);
-					WoodReserved reserved = woodReservedRepository.findByRawMaterialRequirement(requirement);
-					BigDecimal quantityReservation = each.getQuantityReceived();
-					if(each.getQuantityReceived().compareTo(requirement.getQuantity()) == 1) {// si la cantidad recibida es mayor a la necesaria del requerimiento significa que se debe reservar solo la necesaria y el resto dejar en stock
-						quantityReservation = requirement.getQuantity();
-					}
-					if(reserved == null) {// no existe reserva, se crea la reserva por la cantidad recibida
-						reserved = new WoodReserved(requirement, quantityReservation);
-						reserved = woodReservedRepository.save(reserved);
-						wood.getWoodsReserved().add(reserved);
-						woodRepository.save(wood);
-					} else {// existe reserva, se suma la cantidad recibida a la actual
-						// si la cantidad sin reservar es menos a la cantidad recibida, se suma solo la cantidad sin reservar, esto puede pasar si ingresaron materiales y se reservaron sin recibir los materiales del pedido
-						BigDecimal quantityNonReserved = requirement.getQuantity().subtract(reserved.getStockReserved());
-						if(quantityNonReserved.compareTo(quantityReservation) == -1) {// si quantityNonReserved es menor a quantityReservation
-							quantityReservation = quantityNonReserved;
-						}
-						reserved.setStockReserved(reserved.getStockReserved().add(quantityReservation));
-						woodReservedRepository.save(reserved);
-					}
+					reserved.setStockReserved(reserved.getStockReserved().add(quantityReservation));
+					materialReservedRepository.save(reserved);
 				}
 			}
 		}

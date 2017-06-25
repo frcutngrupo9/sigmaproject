@@ -24,7 +24,6 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.MaterialsOrder;
-import ar.edu.utn.sigmaproject.service.MaterialsOrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.MaterialsOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 
@@ -42,8 +41,6 @@ public class MaterialsOrderListController extends SelectorComposer<Component> {
 	// services
 	@WireVariable
 	private MaterialsOrderRepository materialsOrderRepository;
-	@WireVariable
-	private MaterialsOrderDetailRepository materialsOrderStateRepository;
 	@WireVariable
 	private ProductionPlanRepository productionPlanRepository;
 

@@ -55,11 +55,8 @@ public class ProductionOrder implements Serializable, Cloneable {
 	Date dateMaterialsWithdrawal = null;
 	ProductionOrderStateType currentStateType = null;
 
-	@OneToMany(orphanRemoval = true)
-	List<ProductionOrderSupply> productionOrderSupplies = new ArrayList<>();
-
-	@OneToMany(orphanRemoval = true)
-	List<ProductionOrderRawMaterial> productionOrderRawMaterials = new ArrayList<>();
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionOrder", targetEntity = ProductionOrderMaterial.class)
+	List<ProductionOrderMaterial> productionOrderMaterials = new ArrayList<>();
 
 	public ProductionOrder() {
 
@@ -159,20 +156,39 @@ public class ProductionOrder implements Serializable, Cloneable {
 		this.dateFinishReal = dateFinishReal;
 	}
 
-	public List<ProductionOrderSupply> getProductionOrderSupplies() {
+	public List<ProductionOrderMaterial> getProductionOrderSupplies() {
+		List<ProductionOrderMaterial> productionOrderSupplies = new ArrayList<>();
+		for(ProductionOrderMaterial each : productionOrderMaterials) {
+			Item item = each.getItem();
+			if(item instanceof SupplyType) {
+				productionOrderSupplies.add(each);
+			}
+		}
 		return productionOrderSupplies;
 	}
 
-	public void setProductionOrderSupplies(List<ProductionOrderSupply> productionOrderSupplyList) {
-		this.productionOrderSupplies = productionOrderSupplyList;
-	}
-
-	public List<ProductionOrderRawMaterial> getProductionOrderRawMaterials() {
+	public List<ProductionOrderMaterial> getProductionOrderRawMaterials() {
+		List<ProductionOrderMaterial> productionOrderRawMaterials = new ArrayList<>();
+		for(ProductionOrderMaterial each : productionOrderMaterials) {
+			Item item = each.getItem();
+			if(item instanceof Wood) {
+				productionOrderRawMaterials.add(each);
+			}
+		}
 		return productionOrderRawMaterials;
 	}
 
-	public void setProductionOrderRawMaterials(List<ProductionOrderRawMaterial> productionOrderRawMaterialList) {
-		this.productionOrderRawMaterials = productionOrderRawMaterialList;
+	public List<ProductionOrderMaterial> getProductionOrderMaterials() {
+		return productionOrderMaterials;
+	}
+
+	public void setProductionOrderMaterials(
+			List<ProductionOrderMaterial> productionOrderMaterials) {
+		this.productionOrderMaterials = productionOrderMaterials;
+	}
+
+	public void setProduct(Product product) {
+		this.product = product;
 	}
 
 	public ProductionOrderStateType getCurrentStateType() {

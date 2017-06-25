@@ -47,10 +47,10 @@
                     </listhead>
                     <template name="model">
                         <listitem>
-			                <listcell label="${each.getWood().name}"/>
-			                <listcell label="${each.getWood().length.doubleValue()} ${each.getWood().getLengthMeasureUnit().getShortName()}"/>
-			                <listcell label="${each.getWood().depth.doubleValue()} ${each.getWood().getDepthMeasureUnit().getShortName()}"/>
-			                <listcell label="${each.getWood().width.doubleValue()} ${each.getWood().getWidthMeasureUnit().getShortName()}"/>
+			                <listcell label="${each.getItem().name}"/>
+			                <listcell label="${each.getItem().length.doubleValue()} ${each.getItem().getLengthMeasureUnit().getShortName()}"/>
+			                <listcell label="${each.getItem().depth.doubleValue()} ${each.getItem().getDepthMeasureUnit().getShortName()}"/>
+			                <listcell label="${each.getItem().width.doubleValue()} ${each.getItem().getWidthMeasureUnit().getShortName()}"/>
 			                <listcell label="${each.quantity}"/>
                         </listitem>
                     </template>

@@ -46,14 +46,14 @@
 		            </listhead>
 		            <template name="model">
 		                <listitem>
-		                	<listcell label="${each.wood.name}"/>
-		                    <listcell label="${each.wood.stock.doubleValue()}"/>
+		                	<listcell label="${each.item.name}"/>
+		                    <listcell label="${each.item.stock.doubleValue()}"/>
 		                    <listcell label="${each.quantity}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getRawMaterialStockReserved(each).doubleValue()}"/>
-		                    <listcell label="${each.wood.getStockAvailable().doubleValue()}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getMaterialStockReserved(each).doubleValue()}"/>
+		                    <listcell label="${each.item.getStockAvailable().doubleValue()}"/>
 		                    <listcell>
-		                    	<label value="Si" if="${win_requirement_plan_creation$composer.isRawMaterialRequirementFulfilled(each)}"/>
-			                    <label value="Faltan ${win_requirement_plan_creation$composer.getRawMaterialRequirementStockMissing(each).doubleValue()}" if="${!win_requirement_plan_creation$composer.isRawMaterialRequirementFulfilled(each)}"/>
+		                    	<label value="Si" if="${win_requirement_plan_creation$composer.isMaterialRequirementFulfilled(each)}"/>
+			                    <label value="Faltan ${win_requirement_plan_creation$composer.getMaterialStockMissing(each).doubleValue()}" if="${!win_requirement_plan_creation$composer.isMaterialRequirementFulfilled(each)}"/>
 			                </listcell>
 			                <listcell>
 			                    <button label="Reservar" forward="onClick=rawMaterialRequirementListbox.onClickReservation(${each})"/>
@@ -78,15 +78,15 @@
 		            </listhead>
 		            <template name="model">
 		                <listitem>
-		                	<listcell label="${each.supplyType.description}"/>
-		                	<listcell label="${each.supplyType.code}"/>
-		                    <listcell label="${each.supplyType.stock}"/>
+		                	<listcell label="${each.item.description}"/>
+		                	<listcell label="${each.item.code}"/>
+		                    <listcell label="${each.item.stock}"/>
 		                    <listcell label="${each.quantity}"/>
-		                    <listcell label="${win_requirement_plan_creation$composer.getSupplyStockReserved(each).doubleValue()}"/>
-		                    <listcell label="${each.supplyType.getStockAvailable().doubleValue()}"/>
+		                    <listcell label="${win_requirement_plan_creation$composer.getMaterialStockReserved(each).doubleValue()}"/>
+		                    <listcell label="${each.item.getStockAvailable().doubleValue()}"/>
 		                    <listcell>
-			                    <label value="Si" if="${win_requirement_plan_creation$composer.isSupplyRequirementFulfilled(each)}"/>
-			                    <label value="Faltan ${win_requirement_plan_creation$composer.getSupplyStockMissing(each).doubleValue()}" if="${!win_requirement_plan_creation$composer.isSupplyRequirementFulfilled(each)}"/>
+			                    <label value="Si" if="${win_requirement_plan_creation$composer.isMaterialRequirementFulfilled(each)}"/>
+			                    <label value="Faltan ${win_requirement_plan_creation$composer.getMaterialStockMissing(each).doubleValue()}" if="${!win_requirement_plan_creation$composer.isMaterialRequirementFulfilled(each)}"/>
 			                </listcell>
 			                <listcell>
 			                    <button label="Reservar" forward="onClick=supplyRequirementListbox.onClickReservation(${each})"/>

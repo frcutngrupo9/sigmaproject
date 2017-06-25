@@ -28,8 +28,8 @@
 			                <listcell label="${each.description}"/>
 			                <listcell label="${each.measure}"/>
 			                <listcell label="${each.stock}"/>
-			                <listcell label="${win_supply_stock$composer.getSupplyStockAvailable(each)}"/>
-			                <listcell label="${win_supply_stock$composer.getSupplyStockReserved(each)}"/>
+			                <listcell label="${each.getStockAvailable()}"/>
+			                <listcell label="${each.getStockReserved()}"/>
 			                <listcell label="${each.stockMin}"/>
 			                <listcell label="${each.stockRepo}"/>
 			            </listitem>

@@ -19,10 +19,9 @@ import org.zkoss.zul.Grid;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
-import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
-import ar.edu.utn.sigmaproject.domain.SupplyReserved;
+import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
+import ar.edu.utn.sigmaproject.domain.MaterialReserved;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
-import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -59,12 +58,10 @@ public class SupplyReservationController extends SelectorComposer<Component> {
 	// services
 	@WireVariable
 	private SupplyTypeRepository supplyTypeRepository;
-	@WireVariable
-	private SupplyReservedRepository supplyReservedRepository;
 
 	// attributes
-	private SupplyRequirement currentSupplyRequirement;
-	private SupplyReserved currentSupplyReserved;
+	private MaterialRequirement currentSupplyRequirement;
+	private MaterialReserved currentSupplyReserved;
 
 	// list
 
@@ -74,9 +71,9 @@ public class SupplyReservationController extends SelectorComposer<Component> {
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		//		currentSupplyRequirement = (SupplyRequirement) Executions.getCurrent().getAttribute("selected_supply_requirement");
-		currentSupplyRequirement = (SupplyRequirement) Executions.getCurrent().getArg().get("selected_supply_requirement");
+		currentSupplyRequirement = (MaterialRequirement) Executions.getCurrent().getArg().get("selected_supply_requirement");
 		if(currentSupplyRequirement == null) {throw new RuntimeException("SupplyRequirement null");}
-		currentSupplyReserved = supplyReservedRepository.findBySupplyRequirement(currentSupplyRequirement);
+		currentSupplyReserved = currentSupplyRequirement.getMaterialReserved();
 
 		refreshView();
 	}
@@ -89,10 +86,11 @@ public class SupplyReservationController extends SelectorComposer<Component> {
 		stockMissingDoublebox.setDisabled(true);
 		quantityDoublebox.setDisabled(true);
 		stockAvailableDoublebox.setDisabled(true);
-		codeTextbox.setText(currentSupplyRequirement.getSupplyType().getCode());
-		descriptionTextbox.setText(currentSupplyRequirement.getSupplyType().getDescription());
-		stockDoublebox.setValue(currentSupplyRequirement.getSupplyType().getStock().doubleValue());
-		stockAvailableDoublebox.setValue(getSupplyStockAvailable(currentSupplyRequirement.getSupplyType()).doubleValue());
+		SupplyType supplyType = (SupplyType) currentSupplyRequirement.getItem();
+		codeTextbox.setText(supplyType.getCode());
+		descriptionTextbox.setText(supplyType.getDescription());
+		stockDoublebox.setValue(supplyType.getStock().doubleValue());
+		stockAvailableDoublebox.setValue(getSupplyStockAvailable(supplyType).doubleValue());
 		quantityDoublebox.setValue(currentSupplyRequirement.getQuantity().doubleValue());
 		if(currentSupplyReserved == null) {
 			stockReservedDoublebox.setValue(0.0);
@@ -113,7 +111,7 @@ public class SupplyReservationController extends SelectorComposer<Component> {
 	public void resetButtonClick() {
 		refreshView();
 	}
-	
+
 	@Listen("onClick = #completeButton")
 	public void completeButtonClick() {
 		stockReservedDoublebox.setValue(quantityDoublebox.getValue());
@@ -121,6 +119,7 @@ public class SupplyReservationController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
+		SupplyType supplyType = (SupplyType) currentSupplyRequirement.getItem();
 		if(stockReservedDoublebox.getValue() == 0.0) {
 			Clients.showNotification("Debe ingresar una cantidad mayor a cero", stockReservedDoublebox);
 			return;
@@ -129,21 +128,18 @@ public class SupplyReservationController extends SelectorComposer<Component> {
 			Clients.showNotification("Debe ingresar una cantidad menor o igual a la cantidad necesaria", stockReservedDoublebox);
 			return;
 		}
-		if(stockReservedDoublebox.getValue() > getSupplyStockAvailable(currentSupplyRequirement.getSupplyType()).doubleValue()) {
+		if(stockReservedDoublebox.getValue() > getSupplyStockAvailable(supplyType).doubleValue()) {
 			Clients.showNotification("No existe stock disponible suficiente para realizar la reserva", stockReservedDoublebox);
 			return;
 		}
 		BigDecimal stockReserved = BigDecimal.valueOf(stockReservedDoublebox.getValue());
 		if(currentSupplyReserved == null) {
-			currentSupplyReserved = new SupplyReserved(currentSupplyRequirement, stockReserved);
-			currentSupplyReserved = supplyReservedRepository.save(currentSupplyReserved);
-			SupplyType supplyType = currentSupplyRequirement.getSupplyType();
+			currentSupplyReserved = new MaterialReserved(currentSupplyRequirement, stockReserved);
 			supplyType.getSuppliesReserved().add(currentSupplyReserved);
-			supplyTypeRepository.save(supplyType);
 		} else {
 			currentSupplyReserved.setStockReserved(stockReserved);
-			supplyReservedRepository.save(currentSupplyReserved);
 		}
+		supplyTypeRepository.save(supplyType);
 		EventQueue<Event> eq = EventQueues.lookup("Requirement Reservation Queue", EventQueues.DESKTOP, true);
 		eq.publish(new Event("onSupplyReservation", null, null));
 		alert("Reserva guardada.");
@@ -160,7 +156,7 @@ public class SupplyReservationController extends SelectorComposer<Component> {
 		}
 		return stockTotal.subtract(stockReservedTotal);
 	}
-	
+
 	@Listen("onOK = #stockReservedDoublebox")
 	public void stockReservedDoubleboxOnOK() {
 		saveButtonClick();

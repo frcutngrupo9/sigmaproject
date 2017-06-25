@@ -19,12 +19,12 @@ import org.zkoss.zul.Grid;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
-import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
+import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.Wood;
-import ar.edu.utn.sigmaproject.domain.WoodReserved;
-import ar.edu.utn.sigmaproject.service.RawMaterialRequirementRepository;
+import ar.edu.utn.sigmaproject.domain.MaterialReserved;
+import ar.edu.utn.sigmaproject.service.MaterialRequirementRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
-import ar.edu.utn.sigmaproject.service.WoodReservedRepository;
+import ar.edu.utn.sigmaproject.service.MaterialReservedRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class RawMaterialReservationController extends SelectorComposer<Component> {
@@ -59,16 +59,16 @@ public class RawMaterialReservationController extends SelectorComposer<Component
 
 	// services
 	@WireVariable
-	private RawMaterialRequirementRepository rawMaterialRequirementRepository;
+	private MaterialRequirementRepository rawMaterialRequirementRepository;
 	@WireVariable
 	private WoodRepository woodRepository;
 	@WireVariable
-	private WoodReservedRepository woodReservedRepository;
+	private MaterialReservedRepository woodReservedRepository;
 
 	// attributes
-	private RawMaterialRequirement currentRawMaterialRequirement;
+	private MaterialRequirement currentRawMaterialRequirement;
 	private Wood currentWood;
-	private WoodReserved currentWoodReserved;
+	private MaterialReserved currentWoodReserved;
 
 	// list
 
@@ -78,10 +78,10 @@ public class RawMaterialReservationController extends SelectorComposer<Component
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		//		currentRawMaterialRequirement = (RawMaterialRequirement) Executions.getCurrent().getAttribute("selected_rawMaterial_requirement");
-		currentRawMaterialRequirement = (RawMaterialRequirement) Executions.getCurrent().getArg().get("selected_raw_material_requirement");
+		currentRawMaterialRequirement = (MaterialRequirement) Executions.getCurrent().getArg().get("selected_raw_material_requirement");
 		if(currentRawMaterialRequirement == null) {throw new RuntimeException("RawMaterialRequirement null");}
-		currentWood = currentRawMaterialRequirement.getWood();
-		currentWoodReserved = woodReservedRepository.findByRawMaterialRequirement(currentRawMaterialRequirement);
+		currentWood = (Wood) currentRawMaterialRequirement.getItem();
+		currentWoodReserved = currentRawMaterialRequirement.getMaterialReserved();
 		refreshView();
 	}
 
@@ -93,7 +93,7 @@ public class RawMaterialReservationController extends SelectorComposer<Component
 		stockMissingDoublebox.setDisabled(true);
 		quantityDoublebox.setDisabled(true);
 		stockAvailableDoublebox.setDisabled(true);
-		descriptionTextbox.setText(currentRawMaterialRequirement.getWood().getName());
+		descriptionTextbox.setText(((Wood) currentRawMaterialRequirement.getItem()).getName());
 		woodTypeTextbox.setText(currentWood.getWoodType().getName());
 		stockDoublebox.setValue(currentWood.getStock().doubleValue());
 		stockAvailableDoublebox.setValue(currentWood.getStock().doubleValue() - currentWood.getStockReserved().doubleValue());
@@ -138,7 +138,7 @@ public class RawMaterialReservationController extends SelectorComposer<Component
 		}
 		BigDecimal stockReserved = BigDecimal.valueOf(stockReservedDoublebox.getValue());
 		if(currentWoodReserved == null) {
-			currentWoodReserved = new WoodReserved(currentRawMaterialRequirement, stockReserved);
+			currentWoodReserved = new MaterialReserved(currentRawMaterialRequirement, stockReserved);
 			currentWoodReserved = woodReservedRepository.save(currentWoodReserved);
 			if(currentWood != null) {
 				currentWood.getWoodsReserved().add(currentWoodReserved);

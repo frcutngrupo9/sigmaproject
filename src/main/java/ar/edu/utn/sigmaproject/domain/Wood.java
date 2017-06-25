@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -23,8 +24,8 @@ public class Wood extends Item implements Cloneable {
 	@ManyToOne
 	WoodType woodType;
 
-	@OneToMany(orphanRemoval = true)
-	List<WoodReserved> woodsReserved = new ArrayList<>();
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "item", targetEntity = MaterialReserved.class)
+	List<MaterialReserved> woodsReserved = new ArrayList<>();
 	
 	@ManyToOne
 	MeasureUnit lengthMeasureUnit;
@@ -164,17 +165,17 @@ public class Wood extends Item implements Cloneable {
 		this.stockRepo = stockRepo;
 	}
 
-	public List<WoodReserved> getWoodsReserved() {
+	public List<MaterialReserved> getWoodsReserved() {
 		return woodsReserved;
 	}
 
-	public void setWoodsReserved(List<WoodReserved> woodsReserved) {
+	public void setWoodsReserved(List<MaterialReserved> woodsReserved) {
 		this.woodsReserved = woodsReserved;
 	}
 
 	public BigDecimal getStockReserved() {
 		BigDecimal aux = BigDecimal.ZERO;
-		for(WoodReserved each : woodsReserved) {
+		for(MaterialReserved each : woodsReserved) {
 			aux = aux.add(each.getStockReserved());
 		}
 		return aux;
@@ -185,5 +186,10 @@ public class Wood extends Item implements Cloneable {
 		BigDecimal stockTotal = getStock();
 		BigDecimal stockReservedTotal = getStockReserved();
 		return stockTotal.subtract(stockReservedTotal);
+	}
+
+	@Override
+	public List<MaterialReserved> getMaterialReservedList() {
+		return getWoodsReserved();
 	}
 }

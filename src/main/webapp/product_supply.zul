@@ -46,11 +46,11 @@
                     </listhead>
                     <template name="model">
                         <listitem>
-			                <listcell label="${each.getSupplyType().description}"/>
-			                <listcell label="${each.getSupplyType().details}"/>
-			                <listcell label="${each.getSupplyType().brand}"/>
-			                <listcell label="${each.getSupplyType().presentation}"/>
-			                <listcell label="${each.getSupplyType().measure}"/>
+			                <listcell label="${each.getItem().description}"/>
+			                <listcell label="${each.getItem().details}"/>
+			                <listcell label="${each.getItem().brand}"/>
+			                <listcell label="${each.getItem().presentation}"/>
+			                <listcell label="${each.getItem().measure}"/>
 			                <listcell label="${each.quantity}"/>
                         </listitem>
                     </template>

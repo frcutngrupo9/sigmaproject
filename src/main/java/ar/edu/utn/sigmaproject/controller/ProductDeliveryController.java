@@ -31,7 +31,6 @@ import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
-import ar.edu.utn.sigmaproject.service.OrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
@@ -65,8 +64,6 @@ public class ProductDeliveryController extends SelectorComposer<Component> {
 	// services
 	@WireVariable
 	private OrderRepository orderRepository;
-	@WireVariable
-	private OrderDetailRepository orderDetailRepository;
 	@WireVariable
 	private OrderStateRepository orderStateRepository;
 	@WireVariable

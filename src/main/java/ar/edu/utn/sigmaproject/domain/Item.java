@@ -6,7 +6,9 @@ import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.hibernate.search.annotations.*;
 
 import javax.persistence.*;
+
 import java.io.Serializable;
+import java.util.List;
 
 @AnalyzerDefs(value = {
 		@AnalyzerDef(name = "edge_ngram",
@@ -46,6 +48,8 @@ public abstract class Item implements Serializable {
 	}
 
 	public abstract String getDescription();
+	
+	public abstract List<MaterialReserved> getMaterialReservedList();
 
 	@Override
 	public String toString() {

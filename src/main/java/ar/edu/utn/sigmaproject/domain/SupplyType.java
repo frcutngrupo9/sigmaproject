@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 
@@ -36,8 +37,8 @@ public class SupplyType extends Item implements Serializable, Cloneable {
 	@Field
 	String measure = "";
 
-	@OneToMany(orphanRemoval = true)
-	List<SupplyReserved> suppliesReserved = new ArrayList<>();
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "item", targetEntity = MaterialReserved.class)
+	List<MaterialReserved> suppliesReserved = new ArrayList<>();
 
 	BigDecimal stock = BigDecimal.ZERO;
 	BigDecimal stockMin = BigDecimal.ZERO;
@@ -110,17 +111,17 @@ public class SupplyType extends Item implements Serializable, Cloneable {
 		this.measure = measure;
 	}
 
-	public List<SupplyReserved> getSuppliesReserved() {
+	public List<MaterialReserved> getSuppliesReserved() {
 		return suppliesReserved;
 	}
 
-	public void setSuppliesReserved(List<SupplyReserved> suppliesReserved) {
+	public void setSuppliesReserved(List<MaterialReserved> suppliesReserved) {
 		this.suppliesReserved = suppliesReserved;
 	}
 
 	public BigDecimal getStockReserved() {
 		BigDecimal aux = BigDecimal.ZERO;
-		for(SupplyReserved each : suppliesReserved) {
+		for(MaterialReserved each : suppliesReserved) {
 			aux = aux.add(each.getStockReserved());
 		}
 		return aux;
@@ -155,5 +156,10 @@ public class SupplyType extends Item implements Serializable, Cloneable {
 		BigDecimal stockTotal = getStock();
 		BigDecimal stockReservedTotal = getStockReserved();
 		return stockTotal.subtract(stockReservedTotal);
+	}
+
+	@Override
+	public List<MaterialReserved> getMaterialReservedList() {
+		return getSuppliesReserved();
 	}
 }

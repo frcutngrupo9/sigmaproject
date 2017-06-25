@@ -10,26 +10,30 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class ProductionOrderRawMaterial implements Serializable, Cloneable {
+public class ProductionOrderMaterial implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
 	
-	@ManyToOne
-	Wood wood;
+	@ManyToOne(targetEntity = ProductionOrder.class)
+	private ProductionOrder productionOrder = null;
+	
+	@ManyToOne(optional = false)
+	private Item item;
 
 	BigDecimal quantity = BigDecimal.ZERO;
 	BigDecimal quantityUsed = BigDecimal.ZERO;
 	String observation = "";
 	
-	public ProductionOrderRawMaterial() {
+	public ProductionOrderMaterial() {
 
 	}
 	
-	public ProductionOrderRawMaterial(Wood wood, BigDecimal quantity) {
-		this.wood = wood;
+	public ProductionOrderMaterial(ProductionOrder productionOrder, Item item, BigDecimal quantity) {
+		this.productionOrder = productionOrder;
+		this.item = item;
 		this.quantity = quantity;
 	}
 
@@ -41,12 +45,20 @@ public class ProductionOrderRawMaterial implements Serializable, Cloneable {
 		this.id = id;
 	}
 
-	public Wood getWood() {
-		return wood;
+	public ProductionOrder getProductionOrder() {
+		return productionOrder;
 	}
 
-	public void setWood(Wood wood) {
-		this.wood = wood;
+	public void setProductionOrder(ProductionOrder productionOrder) {
+		this.productionOrder = productionOrder;
+	}
+
+	public Item getItem() {
+		return item;
+	}
+
+	public void setItem(Item item) {
+		this.item = item;
 	}
 
 	public BigDecimal getQuantity() {

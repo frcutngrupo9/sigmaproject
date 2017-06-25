@@ -42,10 +42,9 @@ import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
-import ar.edu.utn.sigmaproject.domain.ProductionOrderRawMaterial;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderMaterial;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderStateType;
-import ar.edu.utn.sigmaproject.domain.ProductionOrderSupply;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.domain.Worker;
@@ -55,16 +54,12 @@ import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.PieceRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderRawMaterialRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderSupplyRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
-import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
-import ar.edu.utn.sigmaproject.service.WoodReservedRepository;
 import ar.edu.utn.sigmaproject.service.WorkerRepository;
 import ar.edu.utn.sigmaproject.util.ProductionDateTimeHelper;
 
@@ -125,14 +120,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	@WireVariable
 	private PieceRepository pieceRepository;
 	@WireVariable
-	private WoodReservedRepository woodReservedRepository;
-	@WireVariable
-	private SupplyReservedRepository supplyReservedRepository;
-	@WireVariable
-	private ProductionOrderSupplyRepository productionOrderSupplyRepository;
-	@WireVariable
-	private ProductionOrderRawMaterialRepository productionOrderRawMaterialRepository;
-	@WireVariable
 	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
 	@WireVariable
 	private ProductionPlanStateRepository productionPlanStateRepository;
@@ -157,8 +144,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 	// list models
 	private ListModelList<ProductionOrderDetail> productionOrderDetailListModel;
-	private ListModelList<ProductionOrderSupply> productionOrderSupplyListModel;
-	private ListModelList<ProductionOrderRawMaterial> productionOrderRawMaterialListModel;
+	private ListModelList<ProductionOrderMaterial> productionOrderSupplyListModel;
+	private ListModelList<ProductionOrderMaterial> productionOrderRawMaterialListModel;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
@@ -228,10 +215,10 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	}
 
 	private void refreshProductionOrderOrderSupplyAndRawMaterialListbox() {
-		List<ProductionOrderSupply> productionOrderSupplyList = currentProductionOrder.getProductionOrderSupplies();
-		List<ProductionOrderRawMaterial> productionOrderRawMaterialList = currentProductionOrder.getProductionOrderRawMaterials();
-		productionOrderSupplyListModel = new ListModelList<ProductionOrderSupply>(productionOrderSupplyList);
-		productionOrderRawMaterialListModel = new ListModelList<ProductionOrderRawMaterial>(productionOrderRawMaterialList);
+		List<ProductionOrderMaterial> productionOrderSupplyList = currentProductionOrder.getProductionOrderSupplies();
+		List<ProductionOrderMaterial> productionOrderRawMaterialList = currentProductionOrder.getProductionOrderRawMaterials();
+		productionOrderSupplyListModel = new ListModelList<ProductionOrderMaterial>(productionOrderSupplyList);
+		productionOrderRawMaterialListModel = new ListModelList<ProductionOrderMaterial>(productionOrderRawMaterialList);
 		productionOrderSupplyListbox.setModel(productionOrderSupplyListModel);
 		productionOrderRawMaterialListbox.setModel(productionOrderRawMaterialListModel);
 	}

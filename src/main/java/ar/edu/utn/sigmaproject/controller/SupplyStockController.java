@@ -20,13 +20,14 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
+import ar.edu.utn.sigmaproject.domain.MaterialReserved;
+import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.MaterialsOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
-import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
-import ar.edu.utn.sigmaproject.domain.SupplyReserved;
+import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
-import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
+import ar.edu.utn.sigmaproject.service.MaterialReservedRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 import ar.edu.utn.sigmaproject.service.WorkerRepository;
 
@@ -68,7 +69,7 @@ public class SupplyStockController extends SelectorComposer<Component> {
 	@WireVariable
 	private SupplyTypeRepository supplyTypeRepository;
 	@WireVariable
-	private SupplyReservedRepository supplyReservedRepository;
+	private MaterialReservedRepository supplyReservedRepository;
 	@WireVariable
 	private WorkerRepository workerRepository;
 	@WireVariable
@@ -79,11 +80,11 @@ public class SupplyStockController extends SelectorComposer<Component> {
 
 	// list
 	private List<SupplyType> supplyTypeList;
-	private List<SupplyReserved> supplyReservedList;
+	private List<MaterialReserved> supplyReservedList;
 
 	// list models
 	private ListModelList<SupplyType> supplyTypeListModel;
-	private ListModelList<SupplyReserved> supplyReservedListModel;
+	private ListModelList<MaterialReserved> supplyReservedListModel;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
@@ -91,7 +92,7 @@ public class SupplyStockController extends SelectorComposer<Component> {
 		supplyTypeList = supplyTypeRepository.findAll();
 		supplyTypeListModel = new ListModelList<>(supplyTypeList);
 		supplyTypeListbox.setModel(supplyTypeListModel);
-		supplyReservedList = supplyReservedRepository.findAll();
+		supplyReservedList = supplyReservedRepository.findAllByType(MaterialType.Supply);
 		supplyReservedListModel = new ListModelList<>(supplyReservedList);
 		supplyReservedListbox.setModel(supplyReservedListModel);
 		currentSupplyType = null;
@@ -172,13 +173,13 @@ public class SupplyStockController extends SelectorComposer<Component> {
 		refreshView();
 	}
 	
-	public String getProductionPlanName(SupplyReserved supplyReserved) {
+	public String getProductionPlanName(MaterialReserved supplyReserved) {
 		if(supplyReserved == null) {
 			return "";
 		} else {
-			SupplyRequirement supplyRequirement = supplyReserved.getSupplyRequirement();
+			MaterialRequirement supplyRequirement = supplyReserved.getMaterialRequirement();
 			if(supplyRequirement != null) {
-				ProductionPlan productionPlan = productionPlanRepository.findBySupplyRequirements(supplyRequirement);
+				ProductionPlan productionPlan = productionPlanRepository.findByMaterialRequirements(supplyRequirement);
 				if(productionPlan != null) {
 					return productionPlan.getName();
 				} else {
@@ -188,22 +189,6 @@ public class SupplyStockController extends SelectorComposer<Component> {
 				return "";
 			}
 		}
-	}
-	
-	public BigDecimal getSupplyStockReserved(SupplyType supplyType) {
-		List<SupplyReserved> supplyReservedTotal = supplyReservedRepository.findBySupplyRequirementSupplyType(supplyType);
-		BigDecimal stockReservedTotal = BigDecimal.ZERO;
-		for(SupplyReserved each : supplyReservedTotal) {
-			stockReservedTotal = stockReservedTotal.add(each.getStockReserved());
-		}
-		return stockReservedTotal;
-	}
-
-	public BigDecimal getSupplyStockAvailable(SupplyType supplyType) {
-		// devuelve la diferencia entre el stock total y el total reservado
-		BigDecimal stockTotal = supplyType.getStock();
-		BigDecimal stockReservedTotal = getSupplyStockReserved(supplyType);
-		return stockTotal.subtract(stockReservedTotal);
 	}
 	
 	@Listen("onSelectMaterialsOrder = #included #materialsOrderDetailListbox")

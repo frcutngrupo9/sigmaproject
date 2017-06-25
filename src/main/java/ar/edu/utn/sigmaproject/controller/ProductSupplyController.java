@@ -25,7 +25,9 @@ import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
-import ar.edu.utn.sigmaproject.domain.Supply;
+import ar.edu.utn.sigmaproject.domain.MaterialType;
+import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.domain.ProductMaterial;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 
@@ -61,15 +63,16 @@ public class ProductSupplyController extends SelectorComposer<Component> {
 	private SupplyTypeRepository supplyTypeRepository;
 
 	// attributes
-	private Supply currentSupply;
+	private ProductMaterial currentSupply;
 	private SupplyType currentSupplyType;
+	private Product currentProduct;
 
 	// list
-	private List<Supply> supplyList;
+	private List<ProductMaterial> supplyList;
 	private List<SupplyType> supplyTypePopupList;
 
 	// list models
-	private ListModelList<Supply> supplyListModel;
+	private ListModelList<ProductMaterial> supplyListModel;
 	private ListModelList<SupplyType> supplyTypePopupListModel;
 
 	@SuppressWarnings("unchecked")
@@ -77,8 +80,8 @@ public class ProductSupplyController extends SelectorComposer<Component> {
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 
-		supplyList = (List<Supply>) Executions.getCurrent().getAttribute("supplyList");
-
+		supplyList = (List<ProductMaterial>) Executions.getCurrent().getAttribute("supplyList");
+		currentProduct = (Product) Executions.getCurrent().getAttribute("currentProduct");
 		currentSupply = null;
 		currentSupplyType = null;
 
@@ -99,7 +102,7 @@ public class ProductSupplyController extends SelectorComposer<Component> {
 	}
 
 	private void refreshViewSupply() {
-		supplyListModel = new ListModelList<Supply>(supplyList);
+		supplyListModel = new ListModelList<ProductMaterial>(supplyList);
 		supplyListbox.setModel(supplyListModel);
 		if (currentSupply == null) {
 			supplyTypeBandbox.setDisabled(false);
@@ -109,7 +112,7 @@ public class ProductSupplyController extends SelectorComposer<Component> {
 			deleteSupplyButton.setDisabled(true);
 			cancelSupplyButton.setDisabled(true);
 		} else {
-			currentSupplyType = currentSupply.getSupplyType();
+			currentSupplyType = (SupplyType) currentSupply.getItem();
 			supplyTypeBandbox.setDisabled(true);// no se permite modificar en la edicion
 			supplyTypeBandbox.setValue(currentSupplyType.getDescription());
 			supplyQuantityDoublebox.setValue(currentSupply.getQuantity().doubleValue());
@@ -121,8 +124,8 @@ public class ProductSupplyController extends SelectorComposer<Component> {
 	private void refreshSupplyTypePopup() {// el popup se actualiza en base a la lista
 		supplyTypePopupListbox.clearSelection();
 		supplyTypePopupList = supplyTypeRepository.findAll();
-		for(Supply supply : supplyList) {
-			supplyTypePopupList.remove(supplyTypeRepository.findOne(supply.getSupplyType().getId()));// sacamos del popup
+		for(ProductMaterial supply : supplyList) {
+			supplyTypePopupList.remove(supplyTypeRepository.findOne(supply.getItem().getId()));// sacamos del popup
 		}
 		supplyTypePopupListModel = new ListModelList<SupplyType>(supplyTypePopupList);
 		supplyTypePopupListbox.setModel(supplyTypePopupListModel);
@@ -149,7 +152,7 @@ public class ProductSupplyController extends SelectorComposer<Component> {
 		} else {
 			if(currentSupply == null) {// permite la seleccion solo si no existe nada seleccionado
 				currentSupply = supplyListbox.getSelectedItem().getValue();
-				currentSupplyType = currentSupply.getSupplyType();
+				currentSupplyType = (SupplyType) currentSupply.getItem();
 				refreshViewSupply();
 			}
 		}
@@ -171,7 +174,7 @@ public class ProductSupplyController extends SelectorComposer<Component> {
 	@Listen("onClick = #deleteSupplyButton")
 	public void deleteSupply() {
 		if(currentSupply != null) {
-			Messagebox.show("Esta seguro que desea eliminar " + currentSupply.getSupplyType().getDescription() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+			Messagebox.show("Esta seguro que desea eliminar " + currentSupply.getItem().getDescription() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 				public void onEvent(Event evt) throws InterruptedException {
 					if (evt.getName().equals("onOK")) {
 						supplyList.remove(currentSupply);// quitamos de la lista
@@ -196,17 +199,17 @@ public class ProductSupplyController extends SelectorComposer<Component> {
 		}
 		double supplyQuantity = supplyQuantityDoublebox.getValue();
 		if(currentSupply == null) { // es nuevo
-			currentSupply = new Supply(currentSupplyType, BigDecimal.valueOf(supplyQuantity));
+			currentSupply = new ProductMaterial(currentProduct, MaterialType.Wood, currentSupplyType, BigDecimal.valueOf(supplyQuantity));
 			supplyList.add(currentSupply);
 		} else { // se edita
-			currentSupply.setSupplyType(currentSupplyType);;
+			currentSupply.setItem(currentSupplyType);
 			currentSupply.setQuantity(BigDecimal.valueOf(supplyQuantity));
 		}
 		refreshSupplyTypePopup();// actualizamos el popup
 		currentSupply = null;
 		refreshViewSupply();
 	}
-	
+
 	private void filterItems() {
 		List<SupplyType> someItems = new ArrayList<>();
 		String textFilter = supplyTypeBandbox.getValue().toLowerCase();

@@ -106,11 +106,11 @@
 			                <listcell label="${each.supplyType.description}"/>
 			                <listcell label="${each.quantity}"/>
 			                <listcell>
-			                	<doublebox disabled="false" inplace="true" value="${each.quantityUsed}" forward="onChanging=productionOrderSupplyListbox.onEditUsedSupply(${each})"/>
-			                	<button disabled="false" label="Completar" forward="onClick=productionOrderSupplyListbox.onCompleteUsedSupply(${each})"/>
+			                	<doublebox disabled="false" inplace="true" value="${each.quantityUsed}" forward="onChanging=productionOrderSupplyListbox.onEditUsedMaterial(${each})"/>
+			                	<button disabled="false" label="Completar" forward="onClick=productionOrderSupplyListbox.onCompleteUsedMaterial(${each})"/>
 			                </listcell>
 			                <listcell>
-			                	<textbox disabled="false" hflex="1" value="${each.observation}" forward="onChanging=productionOrderSupplyListbox.onEditUsedSupplyObservation(${each})"/>
+			                	<textbox disabled="false" hflex="1" value="${each.observation}" forward="onChanging=productionOrderSupplyListbox.onEditUsedMaterialObservation(${each})"/>
 			                </listcell>
 			            </listitem>
 			        </template>
@@ -131,11 +131,11 @@
 			                <listcell label="${each.wood.name}"/>
 			                <listcell label="${each.quantity}"/>
 			                <listcell>
-			                	<doublebox disabled="false" inplace="true" value="${each.quantityUsed}" forward="onChanging=productionOrderRawMaterialListbox.onEditUsedRawMaterial(${each})"/>
-			                	<button disabled="false" label="Completar" forward="onClick=productionOrderRawMaterialListbox.onCompleteUsedRawMaterial(${each})"/>
+			                	<doublebox disabled="false" inplace="true" value="${each.quantityUsed}" forward="onChanging=productionOrderRawMaterialListbox.onEditUsedMaterial(${each})"/>
+			                	<button disabled="false" label="Completar" forward="onClick=productionOrderRawMaterialListbox.onCompleteUsedMaterial(${each})"/>
 			                </listcell>
 			                <listcell>
-			                	<textbox value="${each.observation}" disabled="false" hflex="1" forward="onChanging=productionOrderSupplyListbox.onEditUsedRawMaterialObservation(${each})"/>
+			                	<textbox value="${each.observation}" disabled="false" hflex="1" forward="onChanging=productionOrderSupplyListbox.onEditUsedMaterialObservation(${each})"/>
 			                </listcell>
 			            </listitem>
 			        </template>

@@ -55,8 +55,7 @@ import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductCategory;
-import ar.edu.utn.sigmaproject.domain.RawMaterial;
-import ar.edu.utn.sigmaproject.domain.Supply;
+import ar.edu.utn.sigmaproject.domain.ProductMaterial;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitTypeRepository;
@@ -66,8 +65,6 @@ import ar.edu.utn.sigmaproject.service.ProcessRepository;
 import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductCategoryRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
-import ar.edu.utn.sigmaproject.service.RawMaterialRepository;
-import ar.edu.utn.sigmaproject.service.SupplyRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProductCreationController extends SelectorComposer<Component> {
@@ -164,10 +161,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@WireVariable
 	private ProductCategoryRepository productCategoryRepository;
 	@WireVariable
-	private SupplyRepository supplyRepository;
-	@WireVariable
-	private RawMaterialRepository rawMaterialRepository;
-	@WireVariable
 	private OrderDetailRepository orderDetailRepository;
 
 	// attributes
@@ -180,8 +173,8 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	private List<Piece> pieceList;
 	private List<ProcessType> processTypeList;
 	private List<Process> listboxProcessList;
-	private List<Supply> supplyList;
-	private List<RawMaterial> rawMaterialList;
+	private List<ProductMaterial> supplyList;
+	private List<ProductMaterial> rawMaterialList;
 
 	// list models
 	private ListModelList<Piece> pieceListModel;
@@ -215,9 +208,9 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		eq.subscribe(new EventListener() {
 			public void onEvent(Event event) throws Exception {
 				if(event.getName().equals("onSupplyChange")) {
-					supplyList = (List<Supply>) event.getData();
+					supplyList = (List<ProductMaterial>) event.getData();
 				} else {
-					rawMaterialList = (List<RawMaterial>) event.getData();
+					rawMaterialList = (List<ProductMaterial>) event.getData();
 				}
 			}
 		});
@@ -267,8 +260,15 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		BigDecimal productPrice = new BigDecimal(productPriceDoublebox.doubleValue());
 		org.zkoss.image.Image image = productImage.getContent();
 
+		List<ProductMaterial> productMaterialList = new ArrayList<ProductMaterial>();
+		productMaterialList.addAll(supplyList);
+		productMaterialList.addAll(rawMaterialList);
 		if(currentProduct == null) {// se esta creando un nuevo producto
 			currentProduct = new Product(productCode, productName, productDetails, productCategory, productPrice);
+			// se asigna la referencia al producto de los materiales
+			for(ProductMaterial each : productMaterialList) {
+				each.setProduct(currentProduct);
+			}
 		} else {// se esta editando un producto
 			currentProduct.setName(productName);
 			currentProduct.setDetails(productDetails);
@@ -284,11 +284,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			processRepository.save(eachPiece.getProcesses());
 			eachPiece = pieceRepository.save(eachPiece);
 		}
-		supplyRepository.save(supplyList);
-		currentProduct.setSupplies(supplyList);
-		rawMaterialRepository.save(rawMaterialList);
-		currentProduct.setRawMaterials(rawMaterialList);
-
+		currentProduct.setMaterials(productMaterialList);
 		currentProduct = productRepository.save(currentProduct);
 
 		// mostrar mensaje al user
@@ -630,7 +626,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		Listitem listitem = (Listitem)listcell.getParent();
 		doProcessLineVisible(cbox.isChecked(), listitem);
 	}
-	
+
 	private void doProcessLineVisible(boolean visible, Listitem listitem) {
 		// se hacen visibles o invisibles todos los elementos de la fila
 		Listcell listcell = (Listcell)listitem.getChildren().get(listitem.getChildren().size()-3);
@@ -836,6 +832,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@Listen("onClick = #openRawMaterialListButton")
 	public void openRawMaterialListButtonClick() {
 		Executions.getCurrent().setAttribute("rawMaterialList", rawMaterialList);
+		Executions.getCurrent().setAttribute("currentProduct", currentProduct);
 		Window window = (Window)Executions.createComponents("/product_raw_material.zul", null, null);
 		window.doModal();
 	}
@@ -843,6 +840,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@Listen("onClick = #openSupplyListButton")
 	public void openSupplyListButtonClick() {
 		Executions.getCurrent().setAttribute("supplyList", supplyList);
+		Executions.getCurrent().setAttribute("currentProduct", currentProduct);
 		Window window = (Window)Executions.createComponents("/product_supply.zul", null, null);
 		window.doModal();
 	}
