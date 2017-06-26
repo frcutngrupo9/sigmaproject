@@ -91,12 +91,12 @@
 			        </listhead>
 			        <template name="model">
 			            <listitem>
-			                <listcell label="${each.getSupplyRequirement().getProductionPlan().getName()}"/>
-			                <listcell label="${each.supplyRequirement.supplyType.code}"/>
-			                <listcell label="${each.supplyRequirement.supplyType.description}"/>
+			                <listcell label="${each.getMaterialRequirement().getProductionPlan().getName()}"/>
+			                <listcell label="${each.materialRequirement.item.code}"/>
+			                <listcell label="${each.materialRequirement.item.description}"/>
 			                <listcell label="${each.stockReserved}"/>
-			                <listcell label="${each.supplyRequirement.quantityWithdrawn.doubleValue()}"/>
-			                <listcell label="${each.supplyRequirement.quantity.doubleValue()}"/>
+			                <listcell label="${each.materialRequirement.quantityWithdrawn.doubleValue()}"/>
+			                <listcell label="${each.materialRequirement.quantity.doubleValue()}"/>
 			            </listitem>
 			        </template>
 			    </listbox>

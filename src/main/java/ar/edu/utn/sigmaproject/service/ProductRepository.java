@@ -12,8 +12,8 @@ import ar.edu.utn.sigmaproject.domain.Product;
 @Repository
 public interface ProductRepository extends SearchableRepository<Product, Long> {
 
-	Page<Product> findAllByCategory(ProductCategory productCategory, Pageable page);
+	public Page<Product> findAllByCategory(ProductCategory productCategory, Pageable page);
 
-	Product findByPieces(Piece piece);
+	public Product findByPieces(Piece piece);
 
 }

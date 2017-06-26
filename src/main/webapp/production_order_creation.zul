@@ -139,8 +139,8 @@
 				        </listhead>
 				        <template name="model">
 				            <listitem>
-				                <listcell label="${each.supplyType.code}"/>
-				                <listcell label="${each.supplyType.description}"/>
+				                <listcell label="${each.item.code}"/>
+				                <listcell label="${each.item.description}"/>
 				                <listcell label="${each.quantity}"/>
 				            </listitem>
 				        </template>
@@ -155,7 +155,7 @@
 				        </listhead>
 				        <template name="model">
 				            <listitem>
-				                <listcell label="${each.wood.name}"/>
+				                <listcell label="${each.item.name}"/>
 				                <listcell label="${each.quantity}"/>
 				            </listitem>
 				        </template>

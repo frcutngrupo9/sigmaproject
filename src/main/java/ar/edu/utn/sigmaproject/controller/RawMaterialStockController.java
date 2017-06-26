@@ -65,7 +65,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	Button newButton;
 	@Wire
 	Listbox woodReservedListbox;
-	
+
 	@Wire("#included #materialsOrderDetailListbox")
 	Listbox materialsOrderDetailListbox;
 
@@ -73,7 +73,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	@WireVariable
 	private WoodRepository woodRepository;
 	@WireVariable
-	private MaterialReservedRepository woodReservedRepository;
+	private MaterialReservedRepository materialReservedRepository;
 	@WireVariable
 	private WoodTypeRepository woodTypeRepository;
 	@WireVariable
@@ -101,7 +101,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		woodList = woodRepository.findAll();
 		woodListModel = new ListModelList<>(woodList);
 		woodListbox.setModel(woodListModel);
-		woodReservedList = woodReservedRepository.findAllByType(MaterialType.Wood);
+		woodReservedList = materialReservedRepository.findAllByType(MaterialType.Wood);
 		woodReservedListModel = new ListModelList<>(woodReservedList);
 		woodReservedListbox.setModel(woodReservedListModel);
 		currentWood = null;
@@ -208,7 +208,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	public void resetButtonClick() {
 		refreshView();
 	}
-	
+
 	public String getProductionPlanName(MaterialReserved woodReserved) {
 		if(woodReserved == null) {
 			return "";
@@ -226,7 +226,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 			}
 		}
 	}
-	
+
 	@Listen("onSelectMaterialsOrder = #included #materialsOrderDetailListbox")
 	public void doSelectMaterialsOrder(ForwardEvent evt) {
 		MaterialsOrder materialsOrder = (MaterialsOrder) evt.getData();

@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PieceRepository extends SearchableRepository<Piece, Long> {
 
-	Piece findByProcesses(Process process);
+	public Piece findByProcesses(Process process);
 
 }

@@ -11,7 +11,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 
 @Entity
 public class MaterialRequirement implements Serializable, Cloneable {
@@ -30,9 +29,6 @@ public class MaterialRequirement implements Serializable, Cloneable {
 
 	@ManyToOne(targetEntity = ProductionPlan.class)
 	private ProductionPlan productionPlan = null;
-
-	@OneToOne(targetEntity = MaterialReserved.class)
-	MaterialReserved materialReserved = null;
 
 	private BigDecimal quantity = BigDecimal.ZERO;
 	private BigDecimal quantityWithdrawn = BigDecimal.ZERO;
@@ -78,14 +74,6 @@ public class MaterialRequirement implements Serializable, Cloneable {
 
 	public void setProductionPlan(ProductionPlan productionPlan) {
 		this.productionPlan = productionPlan;
-	}
-
-	public MaterialReserved getMaterialReserved() {
-		return materialReserved;
-	}
-
-	public void setMaterialReserved(MaterialReserved materialReserved) {
-		this.materialReserved = materialReserved;
 	}
 
 	public BigDecimal getQuantity() {

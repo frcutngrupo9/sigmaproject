@@ -16,7 +16,7 @@ import ar.edu.utn.sigmaproject.domain.OrderStateType;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 	
-	List<Order> findByClient(Client client);
-	List<Order> findByCurrentStateType(OrderStateType currentStateType);
+	public List<Order> findByClient(Client client);
+	public List<Order> findByCurrentStateType(OrderStateType currentStateType);
 
 }

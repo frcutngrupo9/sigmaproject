@@ -10,7 +10,7 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 
 @Repository
 public interface MaterialsOrderRepository extends JpaRepository<MaterialsOrder, Long> {
-	
-	List<MaterialsOrder> findByProductionPlan(ProductionPlan productionPlan);
+
+	public List<MaterialsOrder> findByProductionPlan(ProductionPlan productionPlan);
 
 }

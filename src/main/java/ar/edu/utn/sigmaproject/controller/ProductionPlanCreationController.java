@@ -32,6 +32,7 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Item;
+import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
@@ -42,6 +43,7 @@ import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.domain.ProductMaterial;
 import ar.edu.utn.sigmaproject.domain.ProductTotal;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
@@ -51,8 +53,6 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
-import ar.edu.utn.sigmaproject.domain.ProductMaterial;
-import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.domain.Wood;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
@@ -65,7 +65,6 @@ import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
-import ar.edu.utn.sigmaproject.service.MaterialRequirementRepository;
 
 public class ProductionPlanCreationController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
@@ -110,8 +109,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	private ProductionPlanStateRepository productionPlanStateRepository;
 	@WireVariable
 	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
-	@WireVariable
-	private MaterialRequirementRepository materialRequirementRepository;
 	@WireVariable
 	private ProductionOrderStateRepository productionOrderStateRepository;
 	@WireVariable

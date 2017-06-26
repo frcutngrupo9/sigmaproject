@@ -9,7 +9,7 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 
 @Repository
 public interface MaterialRequirementRepository extends JpaRepository<MaterialRequirement, Long> {
-	
-	MaterialRequirement findByProductionPlanAndItem(ProductionPlan productionPlan, Item item);
+
+	public MaterialRequirement findByProductionPlanAndItem(ProductionPlan productionPlan, Item item);
 
 }

@@ -30,22 +30,22 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.Item;
+import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
+import ar.edu.utn.sigmaproject.domain.MaterialReserved;
+import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.MaterialsOrder;
 import ar.edu.utn.sigmaproject.domain.MaterialsOrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
-import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
-import ar.edu.utn.sigmaproject.domain.MaterialReserved;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.domain.Wood;
+import ar.edu.utn.sigmaproject.service.MaterialReservedRepository;
 import ar.edu.utn.sigmaproject.service.MaterialsOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
-import ar.edu.utn.sigmaproject.service.MaterialRequirementRepository;
-import ar.edu.utn.sigmaproject.service.MaterialReservedRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
 import ar.edu.utn.sigmaproject.service.WoodTypeRepository;
@@ -87,13 +87,11 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	@WireVariable
 	private WoodTypeRepository woodTypeRepository;
 	@WireVariable
-	private MaterialRequirementRepository materialRequirementRepository;
-	@WireVariable
-	private MaterialReservedRepository materialReservedRepository;
-	@WireVariable
 	private SupplyTypeRepository supplyTypeRepository;
 	@WireVariable
 	private MaterialsOrderRepository materialsOrderRepository;
+	@WireVariable
+	private MaterialReservedRepository materialReservedRepository;
 
 	// atributes
 	private ProductionPlan currentProductionPlan;
@@ -184,13 +182,13 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 		}
 	}
 
-	public BigDecimal getMaterialStockReserved(MaterialRequirement supplyRequirement) {
-		MaterialReserved supplyReserved = supplyRequirement.getMaterialReserved();
-		if(supplyReserved == null) {
+	public BigDecimal getMaterialStockReserved(MaterialRequirement materialRequirement) {
+		MaterialReserved materialReserved = getMaterialReserved(materialRequirement);
+		if(materialReserved == null) {
 			return BigDecimal.ZERO;
 		} else {
 			// a la cantidad reservada hay que sumarle la cantidad que se retiro para produccion
-			return supplyReserved.getStockReserved().add(supplyRequirement.getQuantityWithdrawn());
+			return materialReserved.getStockReserved().add(materialRequirement.getQuantityWithdrawn());
 		}
 	}
 
@@ -273,7 +271,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 				stockAvailable = wood.getStockAvailable();
 			}
 			if(stockAvailable.compareTo(BigDecimal.ZERO) == 1) {// si existe disponible
-				MaterialReserved currentMaterialReserved = each.getMaterialReserved();
+				MaterialReserved currentMaterialReserved = getMaterialReserved(each);
 				// si existe ya una reserva se la completa si esta incompleta
 				BigDecimal quantityNecessary = each.getQuantity();
 				BigDecimal quantityReservation = null;// si no hay stock suficiente se reserva lo posible
@@ -283,16 +281,14 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 					} else {
 						quantityReservation = stockAvailable;
 					}
-					currentMaterialReserved = new MaterialReserved(each, quantityReservation);
-					currentMaterialReserved = materialReservedRepository.save(currentMaterialReserved);
 					if(item instanceof SupplyType) {
+						currentMaterialReserved = new MaterialReserved(item, MaterialType.Supply, each, quantityReservation);
 						SupplyType supplyType = (SupplyType) each.getItem();
 						supplyType.getSuppliesReserved().add(currentMaterialReserved);
-						supplyType = supplyTypeRepository.save(supplyType);
 					} else if (item instanceof Wood) {
+						currentMaterialReserved = new MaterialReserved(item, MaterialType.Wood, each, quantityReservation);
 						Wood wood = (Wood) each.getItem();
 						wood.getWoodsReserved().add(currentMaterialReserved);
-						wood = woodRepository.save(wood);
 					}
 				} else {
 					// como ya hay una reserva, esa cantidad se sustrae de la cantidad necesaria
@@ -303,7 +299,13 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 						quantityReservation = currentMaterialReserved.getStockReserved().add(stockAvailable);
 					}
 					currentMaterialReserved.setStockReserved(quantityReservation);
-					currentMaterialReserved = materialReservedRepository.save(currentMaterialReserved);
+				}
+				if(item instanceof SupplyType) {
+					SupplyType supplyType = (SupplyType) each.getItem();
+					supplyType = supplyTypeRepository.save(supplyType);
+				} else if (item instanceof Wood) {
+					Wood wood = (Wood) each.getItem();
+					wood = woodRepository.save(wood);
 				}
 			}
 		}
@@ -419,7 +421,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 				stockAvailable = wood.getStockAvailable();
 			}
 			if(stockAvailable.compareTo(BigDecimal.ZERO) == 1) {// si existe disponible
-				MaterialReserved currentMaterialReserved = each.getMaterialReserved();
+				MaterialReserved currentMaterialReserved = getMaterialReserved(each);
 				BigDecimal quantityNecessary = each.getQuantity();
 				if(currentMaterialReserved == null) {
 					// si no hay reserva y existe disponible devolver false
@@ -476,5 +478,14 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 			}
 		}
 		return lastValue + 1;
+	}
+	
+	private MaterialReserved getMaterialReserved(MaterialRequirement materialRequirement) {
+		for(MaterialReserved each: materialRequirement.getItem().getMaterialReservedList()) {
+			if(productionPlanRepository.findOne(each.getMaterialRequirement().getProductionPlan().getId()).equals(productionPlanRepository.findOne(materialRequirement.getProductionPlan().getId()))) {
+				return each;
+			}
+		}
+		return null;
 	}
 }

@@ -28,7 +28,7 @@ public class MaterialReserved implements Serializable, Cloneable {
 	@Column(nullable = false, updatable = false)
 	private MaterialType type;
 
-	@OneToOne(targetEntity = MaterialRequirement.class)
+	@OneToOne
 	MaterialRequirement materialRequirement;
 
 	BigDecimal stockReserved = BigDecimal.ZERO;
@@ -37,10 +37,10 @@ public class MaterialReserved implements Serializable, Cloneable {
 
 	}
 
-	public MaterialReserved(MaterialRequirement materialRequirement, BigDecimal stockReserved) {
-		this.item = materialRequirement.getItem();
+	public MaterialReserved(Item item, MaterialType type, MaterialRequirement materialRequirement, BigDecimal stockReserved) {
+		this.item = item;
+		this.type = type;
 		this.materialRequirement = materialRequirement;
-		this.type = materialRequirement.getType();
 		this.stockReserved = stockReserved;
 	}
 

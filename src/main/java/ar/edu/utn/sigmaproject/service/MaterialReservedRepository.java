@@ -10,7 +10,7 @@ import ar.edu.utn.sigmaproject.domain.MaterialType;
 
 @Repository
 public interface MaterialReservedRepository extends JpaRepository<MaterialReserved, Long> {
-	
+
 	public List<MaterialReserved> findAllByType(MaterialType type);
 	
 }

@@ -159,19 +159,4 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	public void setProductionOrderList(List<ProductionOrder> productionOrderList) {
 		this.productionOrderList = productionOrderList;
 	}
-
-	public boolean isAllReservationsFulfilled() {
-		// recorre todos los requerimientos para ver si estan todos abastecidos
-		for(MaterialRequirement each : materialRequirements) {
-			BigDecimal stockReserved = BigDecimal.ZERO;
-			MaterialReserved reservation = each.getMaterialReserved();
-			if(reservation != null) {// se encontro reserva
-				stockReserved = reservation.getStockReserved().add(each.getQuantityWithdrawn());// se suma la cantidad que se retiro para produccion
-			}
-			if(each.getQuantity().subtract(stockReserved).compareTo(BigDecimal.ZERO) != 0) {
-				return false;
-			}
-		}
-		return true;
-	}
 }

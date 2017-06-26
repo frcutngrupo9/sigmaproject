@@ -21,7 +21,10 @@ import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.MaterialReserved;
+import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
+import ar.edu.utn.sigmaproject.service.MaterialReservedRepository;
+import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -58,6 +61,10 @@ public class SupplyReservationController extends SelectorComposer<Component> {
 	// services
 	@WireVariable
 	private SupplyTypeRepository supplyTypeRepository;
+	@WireVariable
+	private ProductionPlanRepository productionPlanRepository;
+	@WireVariable
+	private MaterialReservedRepository materialReservedRepository;
 
 	// attributes
 	private MaterialRequirement currentSupplyRequirement;
@@ -73,7 +80,7 @@ public class SupplyReservationController extends SelectorComposer<Component> {
 		//		currentSupplyRequirement = (SupplyRequirement) Executions.getCurrent().getAttribute("selected_supply_requirement");
 		currentSupplyRequirement = (MaterialRequirement) Executions.getCurrent().getArg().get("selected_supply_requirement");
 		if(currentSupplyRequirement == null) {throw new RuntimeException("SupplyRequirement null");}
-		currentSupplyReserved = currentSupplyRequirement.getMaterialReserved();
+		currentSupplyReserved = getMaterialReserved(currentSupplyRequirement);
 
 		refreshView();
 	}
@@ -134,7 +141,7 @@ public class SupplyReservationController extends SelectorComposer<Component> {
 		}
 		BigDecimal stockReserved = BigDecimal.valueOf(stockReservedDoublebox.getValue());
 		if(currentSupplyReserved == null) {
-			currentSupplyReserved = new MaterialReserved(currentSupplyRequirement, stockReserved);
+			currentSupplyReserved = new MaterialReserved(supplyType, MaterialType.Supply, currentSupplyRequirement, stockReserved);
 			supplyType.getSuppliesReserved().add(currentSupplyReserved);
 		} else {
 			currentSupplyReserved.setStockReserved(stockReserved);
@@ -160,5 +167,14 @@ public class SupplyReservationController extends SelectorComposer<Component> {
 	@Listen("onOK = #stockReservedDoublebox")
 	public void stockReservedDoubleboxOnOK() {
 		saveButtonClick();
+	}
+	
+	private MaterialReserved getMaterialReserved(MaterialRequirement materialRequirement) {
+		for(MaterialReserved each: materialRequirement.getItem().getMaterialReservedList()) {
+			if(productionPlanRepository.findOne(each.getMaterialRequirement().getProductionPlan().getId()).equals(productionPlanRepository.findOne(materialRequirement.getProductionPlan().getId()))) {
+				return each;
+			}
+		}
+		return null;
 	}
 }

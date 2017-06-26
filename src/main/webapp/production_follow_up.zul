@@ -102,8 +102,8 @@
 			        </listhead>
 			        <template name="model">
 			            <listitem>
-			                <listcell label="${each.supplyType.code}"/>
-			                <listcell label="${each.supplyType.description}"/>
+			                <listcell label="${each.item.code}"/>
+			                <listcell label="${each.item.description}"/>
 			                <listcell label="${each.quantity}"/>
 			                <listcell>
 			                	<doublebox disabled="false" inplace="true" value="${each.quantityUsed}" forward="onChanging=productionOrderSupplyListbox.onEditUsedMaterial(${each})"/>
@@ -128,14 +128,14 @@
 			        </listhead>
 			        <template name="model">
 			            <listitem>
-			                <listcell label="${each.wood.name}"/>
+			                <listcell label="${each.item.name}"/>
 			                <listcell label="${each.quantity}"/>
 			                <listcell>
 			                	<doublebox disabled="false" inplace="true" value="${each.quantityUsed}" forward="onChanging=productionOrderRawMaterialListbox.onEditUsedMaterial(${each})"/>
 			                	<button disabled="false" label="Completar" forward="onClick=productionOrderRawMaterialListbox.onCompleteUsedMaterial(${each})"/>
 			                </listcell>
 			                <listcell>
-			                	<textbox value="${each.observation}" disabled="false" hflex="1" forward="onChanging=productionOrderSupplyListbox.onEditUsedMaterialObservation(${each})"/>
+			                	<textbox value="${each.observation}" disabled="false" hflex="1" forward="onChanging=productionOrderRawMaterialListbox.onEditUsedMaterialObservation(${each})"/>
 			                </listcell>
 			            </listitem>
 			        </template>

@@ -2,6 +2,8 @@ package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -398,5 +400,15 @@ public class ProductionOrder implements Serializable, Cloneable {
 			}
 		}
 		return date;
+	}
+	
+	public void sortDetailsByProcessTypeSequence() {
+		Comparator<ProductionOrderDetail> comp = new Comparator<ProductionOrderDetail>() {
+			@Override
+			public int compare(ProductionOrderDetail a, ProductionOrderDetail b) {
+				return a.getProcess().getType().getSequence().compareTo(b.getProcess().getType().getSequence());
+			}
+		};
+		Collections.sort(details, comp);
 	}
 }

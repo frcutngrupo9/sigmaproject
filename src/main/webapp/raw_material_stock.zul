@@ -96,12 +96,12 @@
 			        </listhead>
 			        <template name="model">
 			            <listitem>
-			                <listcell label="${each.getRawMaterialRequirement().getProductionPlan().getName()}"/>
-			                <listcell label="${each.rawMaterialRequirement.wood.woodType.name}"/>
-			                <listcell label="${each.rawMaterialRequirement.wood.name}"/>
+			                <listcell label="${each.getMaterialRequirement().getProductionPlan().getName()}"/>
+			                <listcell label="${each.materialRequirement.item.woodType.name}"/>
+			                <listcell label="${each.materialRequirement.item.name}"/>
 			                <listcell label="${each.stockReserved}"/>
-			                <listcell label="${each.rawMaterialRequirement.quantityWithdrawn.doubleValue()}"/>
-			                <listcell label="${each.rawMaterialRequirement.quantity.doubleValue()}"/>
+			                <listcell label="${each.materialRequirement.quantityWithdrawn.doubleValue()}"/>
+			                <listcell label="${each.materialRequirement.quantity.doubleValue()}"/>
 			            </listitem>
 			        </template>
 			    </listbox>

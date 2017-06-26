@@ -8,6 +8,7 @@ import ar.edu.utn.sigmaproject.domain.Product;
 
 @Repository
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> {
-	OrderDetail findFirstByProduct(Product product);
+
+	public OrderDetail findFirstByProduct(Product product);
 
 }

@@ -623,37 +623,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 	private void refreshProcessDates() {
 		Date startDate = getDateTimeStartWork(productionOrderStartDatebox.getValue());
-
 		// asigna el valor a la clase para que calcule todos los tiempos de los detalles automaticamente
 		currentProductionOrder.setDateStart(startDate);
-		// TODO: debe poder actualizar las fechas luego de que se hayan modificado individualmente
-		//		Date finishDate = null;
-		//		if(startDate != null) {
-		//			for(ProductionOrderDetail each : productionOrderDetailList) {
-		//				if(each.getState() != ProcessState.Cancelado) {// solo se calcula para los procesos que no esten cancelados
-		//					if(finishDate == null) {// si es la primera vez que ingresa
-		//						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, each.getTimeTotal());
-		//					} else {
-		//						// el inicio de la actual es al finalizar la ultima
-		//						startDate = finishDate;
-		//						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, each.getTimeTotal());
-		//					}
-		//					each.setDateStart(startDate);
-		//					each.setDateFinish(finishDate);
-		//				} else {
-		//					each.setDateStart(null);
-		//					each.setDateFinish(null);
-		//					// por las dudas borramos tambien las fechas reales
-		//					each.setDateStartReal(null);
-		//					each.setDateFinishReal(null);
-		//				}
-		//			}
-		//		} else {
-		//			for(ProductionOrderDetail each : productionOrderDetailList) {
-		//				each.setDateStart(null);
-		//				each.setDateFinish(null);
-		//			}
-		//		}
 		productionOrderDetailList = currentProductionOrder.getDetails();
 		sortProductionOrderDetailListByProcessTypeSequence();
 		productionOrderStartDatebox.setValue(currentProductionOrder.getDateStart());// modifica el valor del datebox para que contenga la hora de inicio

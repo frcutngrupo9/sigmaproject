@@ -32,6 +32,7 @@ import org.zkoss.zul.Window;
 import ar.edu.utn.sigmaproject.domain.Item;
 import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.MaterialReserved;
+import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.MaterialsOrder;
 import ar.edu.utn.sigmaproject.domain.MaterialsOrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
@@ -85,8 +86,6 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 	@WireVariable
 	private StockMovementRepository stockMovementRepository;
 	@WireVariable
-	private MaterialReservedRepository materialReservedRepository;
-	@WireVariable
 	private MaterialRequirementRepository materialRequirementRepository;
 	@WireVariable
 	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
@@ -94,6 +93,8 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 	private ProductionPlanStateRepository productionPlanStateRepository;
 	@WireVariable
 	private ProductionPlanRepository productionPlanRepository;
+	@WireVariable
+	private MaterialReservedRepository materialReservedRepository;
 
 	// attributes
 	private MaterialsOrder currentMaterialsOrder;
@@ -225,22 +226,18 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 			for(MaterialsOrderDetail each : currentMaterialsOrder.getDetails()) {
 				Item item = each.getItem();
 				MaterialRequirement requirement = materialRequirementRepository.findByProductionPlanAndItem(productionPlan, item);
-				MaterialReserved reserved = requirement.getMaterialReserved();
+				MaterialReserved reserved = getMaterialReserved(requirement);
 				BigDecimal quantityReservation = each.getQuantityReceived();
 				if(each.getQuantityReceived().compareTo(requirement.getQuantity()) == 1) {// si la cantidad recibida es mayor a la necesaria del requerimiento significa que se debe reservar solo la necesaria
 					quantityReservation = requirement.getQuantity();
 				}
 				if(reserved == null) {// no existe reserva, se crea la reserva y por la cantidad recibida
-					reserved = new MaterialReserved(requirement, quantityReservation);
-					requirement.setMaterialReserved(reserved);// se agrega la referencia al requirement
-					reserved = materialReservedRepository.save(reserved);
-					// se guarda la reserva
-					item.getMaterialReservedList().add(reserved);
 					if(item instanceof SupplyType) {
-						supplyTypeRepository.save((SupplyType) item);
+						reserved = new MaterialReserved(item, MaterialType.Supply, requirement, quantityReservation);
 					} else if (item instanceof Wood) {
-						woodRepository.save((Wood) item);
+						reserved = new MaterialReserved(item, MaterialType.Wood, requirement, quantityReservation);
 					}
+					item.getMaterialReservedList().add(reserved);
 				} else {// existe reserva, se suma la cantidad recibida a la actual
 					// si la cantidad sin reservar es menos a la cantidad recibida, se suma solo la cantidad sin reservar, esto puede pasar si ingresaron materiales y se reservaron sin recibir los materiales del pedido
 					BigDecimal quantityNonReserved = requirement.getQuantity().subtract(reserved.getStockReserved());
@@ -248,7 +245,11 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 						quantityReservation = quantityNonReserved;
 					}
 					reserved.setStockReserved(reserved.getStockReserved().add(quantityReservation));
-					materialReservedRepository.save(reserved);
+				}
+				if(item instanceof SupplyType) {
+					supplyTypeRepository.save((SupplyType) item);
+				} else if (item instanceof Wood) {
+					woodRepository.save((Wood) item);
 				}
 			}
 		}
@@ -313,7 +314,7 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 	}
 
 	protected void updateProductionPlanState(ProductionPlan productionPlan) {
-		boolean isCompleted = productionPlan.isAllReservationsFulfilled();
+		boolean isCompleted = isAllReservationsFulfilled(productionPlan);
 		ProductionPlanStateType stateTypeAbastecido = productionPlanStateTypeRepository.findFirstByName("Abastecido");
 		ProductionPlanStateType stateTypeRegistrado = productionPlanStateTypeRepository.findFirstByName("Registrado");
 		ProductionPlanStateType currentStateType = productionPlanStateTypeRepository.findOne(productionPlan.getCurrentStateType().getId());
@@ -334,6 +335,29 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 			productionPlan.setState(productionPlanState);
 			productionPlan = productionPlanRepository.save(productionPlan);
 		}
+	}
 
+	private boolean isAllReservationsFulfilled(ProductionPlan productionPlan) {
+		// recorre todos los requerimientos para ver si estan todos abastecidos
+		for(MaterialRequirement each : productionPlan.getMaterialRequirements()) {
+			BigDecimal stockReserved = BigDecimal.ZERO;
+			MaterialReserved reservation = getMaterialReserved(each);
+			if(reservation != null) {// se encontro reserva
+				stockReserved = reservation.getStockReserved().add(each.getQuantityWithdrawn());// se suma la cantidad que se retiro para produccion
+			}
+			if(each.getQuantity().subtract(stockReserved).compareTo(BigDecimal.ZERO) != 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private MaterialReserved getMaterialReserved(MaterialRequirement materialRequirement) {
+		for(MaterialReserved each: materialRequirement.getItem().getMaterialReservedList()) {
+			if(productionPlanRepository.findOne(each.getMaterialRequirement().getProductionPlan().getId()).equals(productionPlanRepository.findOne(materialRequirement.getProductionPlan().getId()))) {
+				return each;
+			}
+		}
+		return null;
 	}
 }

@@ -61,7 +61,7 @@ public class SupplyStockController extends SelectorComposer<Component> {
 	Button cancelButton;
 	@Wire
 	Button resetButton;
-	
+
 	@Wire("#included #materialsOrderDetailListbox")
 	Listbox materialsOrderDetailListbox;
 
@@ -69,7 +69,7 @@ public class SupplyStockController extends SelectorComposer<Component> {
 	@WireVariable
 	private SupplyTypeRepository supplyTypeRepository;
 	@WireVariable
-	private MaterialReservedRepository supplyReservedRepository;
+	private MaterialReservedRepository materialReservedRepository;
 	@WireVariable
 	private WorkerRepository workerRepository;
 	@WireVariable
@@ -92,7 +92,7 @@ public class SupplyStockController extends SelectorComposer<Component> {
 		supplyTypeList = supplyTypeRepository.findAll();
 		supplyTypeListModel = new ListModelList<>(supplyTypeList);
 		supplyTypeListbox.setModel(supplyTypeListModel);
-		supplyReservedList = supplyReservedRepository.findAllByType(MaterialType.Supply);
+		supplyReservedList = materialReservedRepository.findAllByType(MaterialType.Supply);
 		supplyReservedListModel = new ListModelList<>(supplyReservedList);
 		supplyReservedListbox.setModel(supplyReservedListModel);
 		currentSupplyType = null;
@@ -172,7 +172,7 @@ public class SupplyStockController extends SelectorComposer<Component> {
 		currentSupplyType = null;
 		refreshView();
 	}
-	
+
 	public String getProductionPlanName(MaterialReserved supplyReserved) {
 		if(supplyReserved == null) {
 			return "";
@@ -190,7 +190,7 @@ public class SupplyStockController extends SelectorComposer<Component> {
 			}
 		}
 	}
-	
+
 	@Listen("onSelectMaterialsOrder = #included #materialsOrderDetailListbox")
 	public void doSelectMaterialsOrder(ForwardEvent evt) {
 		MaterialsOrder materialsOrder = (MaterialsOrder) evt.getData();
