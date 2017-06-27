@@ -329,13 +329,15 @@ public class ProductionOrder implements Serializable, Cloneable {
 	public Date getStartRealDateFromDetails() {
 		Date date = null;
 		for(ProductionOrderDetail each : getDetails()) {
-			Date startRealDate = each.getDateStartReal();
-			if(startRealDate != null) {
-				if(date == null) {
-					date = startRealDate;
-				} else {
-					if(startRealDate.before(date)) {
+			if(each.getState() != ProcessState.Cancelado) {
+				Date startRealDate = each.getDateStartReal();
+				if(startRealDate != null) {
+					if(date == null) {
 						date = startRealDate;
+					} else {
+						if(startRealDate.before(date)) {
+							date = startRealDate;
+						}
 					}
 				}
 			}
@@ -347,17 +349,19 @@ public class ProductionOrder implements Serializable, Cloneable {
 		// solo si todos tienen fecha fin e inicio real
 		Date date = null;
 		for(ProductionOrderDetail each : getDetails()) {
-			Date finishRealDate = each.getDateFinishReal();
-			Date startRealDate = each.getDateStartReal();
-			if(finishRealDate == null || startRealDate == null) {
-				return null;
-			}
-			if(finishRealDate != null) {
-				if(date == null) {
-					date = finishRealDate;
-				} else {
-					if(finishRealDate.after(date)) {
+			if(each.getState() != ProcessState.Cancelado) {
+				Date finishRealDate = each.getDateFinishReal();
+				Date startRealDate = each.getDateStartReal();
+				if(finishRealDate == null || startRealDate == null) {
+					return null;
+				}
+				if(finishRealDate != null) {
+					if(date == null) {
 						date = finishRealDate;
+					} else {
+						if(finishRealDate.after(date)) {
+							date = finishRealDate;
+						}
 					}
 				}
 			}
@@ -368,13 +372,15 @@ public class ProductionOrder implements Serializable, Cloneable {
 	public Date getStartDateFromDetails() {
 		Date date = null;
 		for(ProductionOrderDetail each : getDetails()) {
-			Date startDate = each.getDateStart();
-			if(startDate != null) {
-				if(date == null) {
-					date = startDate;
-				} else {
-					if(startDate.before(date)) {
+			if(each.getState() != ProcessState.Cancelado) {
+				Date startDate = each.getDateStart();
+				if(startDate != null) {
+					if(date == null) {
 						date = startDate;
+					} else {
+						if(startDate.before(date)) {
+							date = startDate;
+						}
 					}
 				}
 			}
@@ -386,22 +392,24 @@ public class ProductionOrder implements Serializable, Cloneable {
 		// solo si todos tienen fecha fin e inicio
 		Date date = null;
 		for(ProductionOrderDetail each : getDetails()) {
-			Date finishDate = each.getDateFinish();
-			Date startDate = each.getDateStart();
-			if(finishDate == null || startDate == null) {
-				return null;
-			}
-			if(date == null) {
-				date = finishDate;
-			} else {
-				if(finishDate.after(date)) {
+			if(each.getState() != ProcessState.Cancelado) {
+				Date finishDate = each.getDateFinish();
+				Date startDate = each.getDateStart();
+				if(finishDate == null || startDate == null) {
+					return null;
+				}
+				if(date == null) {
 					date = finishDate;
+				} else {
+					if(finishDate.after(date)) {
+						date = finishDate;
+					}
 				}
 			}
 		}
 		return date;
 	}
-	
+
 	public void sortDetailsByProcessTypeSequence() {
 		Comparator<ProductionOrderDetail> comp = new Comparator<ProductionOrderDetail>() {
 			@Override

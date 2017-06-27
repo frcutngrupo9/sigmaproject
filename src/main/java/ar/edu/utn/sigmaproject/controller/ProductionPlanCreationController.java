@@ -91,6 +91,10 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	Caption productionPlanCaption;
 	@Wire
 	Button returnButton;
+	@Wire
+	Button returnToProductionButton;
+	@Wire
+	Button returnToRequirementPlanButton;
 
 	// services
 	@WireVariable
@@ -379,6 +383,8 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			productionPlanDetailList = new ArrayList<ProductionPlanDetail>();
 			deleteProductionPlanButton.setDisabled(true);
 			productionPlanStateTypeCombobox.setDisabled(true);
+			returnToProductionButton.setDisabled(true);
+			returnToRequirementPlanButton.setDisabled(true);
 		} else {// se edita plan de produccion
 			productionPlanCaption.setLabel("Edicion de Plan de Produccion");
 			ProductionPlanStateType productionPlanStateType = currentProductionPlan.getCurrentStateType();
@@ -396,6 +402,8 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			productionPlanDetailList = currentProductionPlan.getPlanDetails();
 			deleteProductionPlanButton.setDisabled(false);
 			productionPlanStateTypeCombobox.setDisabled(false);
+			returnToProductionButton.setDisabled(false);
+			returnToRequirementPlanButton.setDisabled(false);
 		}
 		refreshOrderPopupList();
 		refreshProductionPlanDetailListGrid();
@@ -486,5 +494,18 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		target.setText(event.getValue());
 		filter();
 	}
-
+	
+	@Listen("onClick = #returnToProductionButton")
+	public void returnToProductionButtonClick() {
+		Executions.getCurrent().setAttribute("selected_production_plan", currentProductionPlan);
+		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/production_order_list.zul");
+	}
+	
+	@Listen("onClick = #returnToRequirementPlanButton")
+	public void returnToRequirementPlanButtonClick() {
+		Executions.getCurrent().setAttribute("selected_production_plan", currentProductionPlan);
+		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/requirement_plan_creation.zul");
+	}
 }

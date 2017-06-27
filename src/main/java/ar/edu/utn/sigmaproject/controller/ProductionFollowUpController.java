@@ -282,7 +282,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		currentProductionOrder = productionOrderRepository.save(currentProductionOrder);
 
 		updateProductionPlanState();
-
 		alert("Avance de Produccion Registrada.");
 		refreshView();
 	}
@@ -308,7 +307,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 				allFinish = false;
 			}
 		}
-
 		OrderStateType orderStateType = null;
 		if(allFinish) {
 			newProductionPlanStateType = productionPlanStateTypeRepository.findFirstByName("Finalizado");
@@ -320,14 +318,12 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 			newProductionPlanStateType = productionPlanStateTypeRepository.findFirstByName("En Ejecucion");
 			orderStateType = orderStateTypeRepository.findFirstByName("En Produccion");
 		}
-
 		// si el estado previo es igual al nuevo no se realiza el guardado
 		if(newProductionPlanStateType!=null && !currentProductionPlanStateType.equals(newProductionPlanStateType)) {
 			ProductionPlanState productionPlanState = new ProductionPlanState(newProductionPlanStateType, new Date());
 			productionPlanState = productionPlanStateRepository.save(productionPlanState);
 			currentProductionPlan.setState(productionPlanState);
 			currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
-
 			// se cambia el estado de todos los pedidos en base al estado del plan
 			if(orderStateType != null) {
 				List<ProductionPlanDetail> productionPlanDetailList = currentProductionPlan.getPlanDetails();
@@ -339,7 +335,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 					orderRepository.save(order);
 				}
 			}
-
 			// se modifica la cantidad en stock de los productos si el estado del plan es Finalizado
 			if(newProductionPlanStateType.getName().equalsIgnoreCase("Finalizado")) {
 				for(ProductionOrder each : productionOrderList) {

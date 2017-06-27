@@ -84,13 +84,13 @@
 						</row>
 		            </template>
     			</grid>
-    			<hbox hflex="1" pack="center">
-	    			<button id="productionPlanRequirementButton" label="Abastecer Plan"/>
-				</hbox>
 				<hbox hflex="1" pack="left">
 	    			<button id="saveButton" label="Guardar"/>
 	    			<button id="resetButton" label="Reset"/>
 	    			<button id="returnButton" label="Volver"/>
+	    			<hbox hflex="1" pack="center">
+	    				<button id="productionPlanRequirementButton" label="Ir a Plan de Requerimientos"/>
+					</hbox>
 				</hbox>
             </vlayout>
         </panelchildren>
