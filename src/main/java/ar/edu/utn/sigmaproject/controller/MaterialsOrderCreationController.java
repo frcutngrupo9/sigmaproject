@@ -110,7 +110,6 @@ public class MaterialsOrderCreationController extends SelectorComposer<Component
 		}
 		int materialsOrderNumber = materialsOrderNumberIntbox.intValue();
 		Date materialsOrderDate = materialsOrderDatebox.getValue();
-
 		if(currentMaterialsOrder == null) { // es un pedido nuevo
 			// creamos el nuevo pedido
 			currentMaterialsOrder = new MaterialsOrder(materialsOrderNumber, materialsOrderDate);
@@ -331,5 +330,4 @@ public class MaterialsOrderCreationController extends SelectorComposer<Component
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/materials_order_list.zul");
 	}
-
 }

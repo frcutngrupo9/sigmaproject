@@ -23,7 +23,6 @@ import org.zkoss.zul.Paging;
 import org.zkoss.zul.Radiogroup;
 import org.zkoss.zul.Textbox;
 
-import ar.edu.utn.sigmaproject.domain.MeasureUnit;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductCategory;
 import ar.edu.utn.sigmaproject.service.ProductCategoryRepository;
@@ -74,14 +73,6 @@ public class ProductListController extends SelectorComposer<Component> implement
 		Executions.getCurrent().setAttribute("selected_product", null);
 		Include include = (Include) Selectors.iterable(productGrid.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/product_creation.zul");
-	}
-
-	public String getMeasureUnitName(MeasureUnit measureUnit) {
-		if(measureUnit != null) {
-			return measureUnit.getName();
-		} else {
-			return "[Sin Unidad de Medida]";
-		}
 	}
 
 	@Listen("onEditProduct = #productGrid")

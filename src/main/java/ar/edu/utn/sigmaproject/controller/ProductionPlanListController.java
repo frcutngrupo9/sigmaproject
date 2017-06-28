@@ -17,25 +17,18 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
-import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
 
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
-import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductTotal;
-import ar.edu.utn.sigmaproject.domain.ProductionOrder;
-import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
-import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
-import ar.edu.utn.sigmaproject.service.WorkerRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class ProductionPlanListController  extends SelectorComposer<Component> {
+public class ProductionPlanListController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
 	@Wire
@@ -47,13 +40,7 @@ public class ProductionPlanListController  extends SelectorComposer<Component> {
 
 	// services
 	@WireVariable
-	private ProductionOrderRepository productionOrderRepository;
-	@WireVariable
 	private ProductionPlanRepository productionPlanRepository;
-	@WireVariable
-	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
-	@WireVariable
-	private WorkerRepository workerRepository;
 	@WireVariable
 	private ProductRepository productRepository;
 
@@ -80,72 +67,7 @@ public class ProductionPlanListController  extends SelectorComposer<Component> {
 	}
 
 	public String getQuantityOfProduct(ProductionPlan productionPlan) {
-		return this.getProductionPlanProducts(productionPlan).getSize() + "";
-	}
-
-	public String getProductionPlanStateName(ProductionPlan productionPlan) {
-		return productionPlan.getCurrentStateType() != null ? productionPlan.getCurrentStateType().getName() : "[sin estado]";
-	}
-
-	public ProductionOrder getProductionOrder(ProductionPlan productionPlan, Product product) {
-		return productionOrderRepository.findByProductionPlanAndProduct(productionPlan, product);
-	}
-
-	public String getProductionOrderState(ProductionPlan productionPlan, Product product) {
-		ProductionOrder aux = productionOrderRepository.findByProductionPlanAndProduct(productionPlan, product);
-		if(aux == null) {
-			return "No Generado";
-		} else {
-			if(aux.getCurrentStateType() == null) {
-				return "Generado";
-			} else {
-				return aux.getCurrentStateType().getName();
-			}
-		}
-
-	}
-	public String getProductionOrderNumber(ProductionPlan productionPlan, Product product) {
-		ProductionOrder aux = productionOrderRepository.findByProductionPlanAndProduct(productionPlan, product);
-		if(aux == null) {
-			return "";
-		} else {
-			return aux.getNumber() + "";
-		}
-	}
-
-	public String getWorkerName(ProductionPlan productionPlan, Product product) {
-		ProductionOrder aux = productionOrderRepository.findByProductionPlanAndProduct(productionPlan, product);
-		if(aux == null) {
-			return "";
-		} else {
-			if(aux.getWorker() != null) {
-				return aux.getWorker().getName();
-			} else {
-				return "[no asignado]";
-			}
-		}
-	}
-
-	public String getPercentComplete(ProductionPlan productionPlan, Product product) {
-		ProductionOrder aux = productionOrderRepository.findByProductionPlanAndProduct(productionPlan, product);
-		if(aux != null) {
-			List<ProductionOrderDetail> productionOrderDetailList = aux.getDetails();
-			int quantityFinished = 0;
-			for(ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
-				if(productionOrderDetail.getState()==ProcessState.Realizado) {
-					quantityFinished += 1;
-				}
-			}
-			double percentComplete;
-			if(productionOrderDetailList.size() == 0) {
-				percentComplete = 0;
-			} else {
-				percentComplete = (quantityFinished * 100) / productionOrderDetailList.size();
-			}
-			return percentComplete + " %";
-		} else {
-			return "";
-		}
+		return getProductTotalList(productionPlan).size() + "";
 	}
 
 	@Listen("onClick = #newButton")
@@ -153,10 +75,6 @@ public class ProductionPlanListController  extends SelectorComposer<Component> {
 		Executions.getCurrent().setAttribute("selected_production_plan", null);
 		Include include = (Include) Selectors.iterable(productionPlanGrid.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/production_plan_creation.zul");
-	}
-
-	public ListModel<ProductTotal> getProductionPlanProducts(ProductionPlan productionPlan) {
-		return new ListModelList<ProductTotal>(getProductTotalList(productionPlan));
 	}
 
 	@Listen("onGenerateProductionOrder = #productionPlanGrid")
@@ -174,7 +92,7 @@ public class ProductionPlanListController  extends SelectorComposer<Component> {
 		Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/requirement_plan_creation.zul");
 	}
-	
+
 	private List<ProductTotal> getProductTotalList(ProductionPlan productionPlan) {
 		List<ProductionPlanDetail> productionPlanDetailList = productionPlan.getPlanDetails();
 		Map<Product, Integer> productTotalMap = new HashMap<Product, Integer>();

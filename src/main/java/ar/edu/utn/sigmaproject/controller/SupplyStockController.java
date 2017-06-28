@@ -4,10 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
-import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
@@ -15,21 +12,15 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Grid;
-import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.MaterialReserved;
 import ar.edu.utn.sigmaproject.domain.MaterialType;
-import ar.edu.utn.sigmaproject.domain.MaterialsOrder;
-import ar.edu.utn.sigmaproject.domain.ProductionPlan;
-import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
-import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.MaterialReservedRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
-import ar.edu.utn.sigmaproject.service.WorkerRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SupplyStockController extends SelectorComposer<Component> {
@@ -62,18 +53,11 @@ public class SupplyStockController extends SelectorComposer<Component> {
 	@Wire
 	Button resetButton;
 
-	@Wire("#included #materialsOrderDetailListbox")
-	Listbox materialsOrderDetailListbox;
-
 	// services
 	@WireVariable
 	private SupplyTypeRepository supplyTypeRepository;
 	@WireVariable
 	private MaterialReservedRepository materialReservedRepository;
-	@WireVariable
-	private WorkerRepository workerRepository;
-	@WireVariable
-	private ProductionPlanRepository productionPlanRepository;
 
 	// attributes
 	private SupplyType currentSupplyType;
@@ -171,31 +155,5 @@ public class SupplyStockController extends SelectorComposer<Component> {
 		supplyTypeListModel = new ListModelList<SupplyType>(supplyTypeList);
 		currentSupplyType = null;
 		refreshView();
-	}
-
-	public String getProductionPlanName(MaterialReserved supplyReserved) {
-		if(supplyReserved == null) {
-			return "";
-		} else {
-			MaterialRequirement supplyRequirement = supplyReserved.getMaterialRequirement();
-			if(supplyRequirement != null) {
-				ProductionPlan productionPlan = productionPlanRepository.findByMaterialRequirements(supplyRequirement);
-				if(productionPlan != null) {
-					return productionPlan.getName();
-				} else {
-					return "";
-				}
-			} else {
-				return "";
-			}
-		}
-	}
-
-	@Listen("onSelectMaterialsOrder = #included #materialsOrderDetailListbox")
-	public void doSelectMaterialsOrder(ForwardEvent evt) {
-		MaterialsOrder materialsOrder = (MaterialsOrder) evt.getData();
-		Executions.getCurrent().setAttribute("selected_materials_order", materialsOrder);
-		Include include = (Include) Selectors.iterable(materialsOrderDetailListbox.getPage(), "#mainInclude").iterator().next();
-		include.setSrc("/materials_order_creation.zul");
 	}
 }

@@ -31,7 +31,7 @@
 			            </row>
 			            <row>
 			            	<cell colspan="2" />
-			            	<label>Cantidad a Reservar:</label>
+			            	<label>Cantidad Reserva:</label>
 			            	<doublebox id="stockReservedDoublebox" hflex="1"/>
 			            	<button id="completeButton" label="Completar"/>
 			            	<cell colspan="1" />

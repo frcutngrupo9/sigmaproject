@@ -135,7 +135,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		currentClient = null;
 		refreshViewOrder();
 	}
-	
+
 	@Listen("onSelect = #clientPopupListbox")
 	public void selectionClientPopupListbox() {
 		currentClient = (Client) clientPopupListbox.getSelectedItem().getValue();
@@ -150,16 +150,14 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			Clients.showNotification("Seleccionar Cliente", clientBandbox);
 			return;
 		}
-
 		if(orderDetailList.isEmpty()) {
 			Clients.showNotification("Debe agregar como minimo 1 producto al pedido", productBandbox);
 			return;
 		}
-		/*
-		if(orderNeedDateBox.getValue() == null){
-			Clients.showNotification("Debe seleccionar una fecha de  necesidad", orderNeedDateBox);
+		if(orderNeedDatebox.getValue() == null) {
+			Clients.showNotification("Debe seleccionar una fecha de necesidad", orderNeedDatebox);
 			return;
-		}*/
+		}
 		int order_number = orderNumberIntbox.intValue();
 		Date order_date = orderDatebox.getValue();
 		Date order_need_date = orderNeedDatebox.getValue();
@@ -169,7 +167,6 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		} else {
 			orderStateType = null;
 		}
-
 		if(currentOrder == null) { // es un pedido nuevo
 			// creamos el nuevo pedido
 			currentOrder = new Order(currentClient, order_number, order_date, order_need_date);
@@ -183,11 +180,11 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			currentOrder.setNeedDate(order_need_date);
 			currentOrder.setNumber(order_number);
 		}
-//		currentOrder.setDetails(orderDetailList);
 		OrderState orderState = new OrderState(orderStateType, new Date());
 		orderState = orderStateRepository.save(orderState);
 		currentOrder.setState(orderState);
 		currentOrder = orderRepository.save(currentOrder);
+		currentOrder = orderRepository.findOne(currentOrder.getId());// se recupera de la bd para que tenga los detalles actualizados
 		refreshViewOrder();
 		alert("Pedido guardado.");
 	}
@@ -368,13 +365,9 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		return total_price;
 	}
 
-	public String getClientName(Client client) {
-		return client.getName();
-	}
-
 	@Listen("onSelect = #orderDetailListbox")
 	public void selectOrderDetail() { // se selecciona un detalle de pedido
-		if(orderDetailListModel.isSelectionEmpty()){
+		if(orderDetailListModel.isSelectionEmpty()) {
 			//just in case for the no selection
 			currentOrderDetail = null;
 		} else {
@@ -410,7 +403,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 				}
 			}
 		});
-		
+
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -458,7 +451,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/order_list.zul");
 	}
-	
+
 	private void filterClients() {
 		List<Client> someClients = new ArrayList<>();
 		String nameFilter = clientBandbox.getValue().toLowerCase();
@@ -480,7 +473,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		target.setText(event.getValue());
 		filterClients();
 	}
-	
+
 	@Listen("onClick = #newOrderButton")
 	public void newOrderButtonClick() {
 		currentOrder = null;

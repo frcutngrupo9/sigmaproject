@@ -152,14 +152,13 @@ public class OrderListController extends SelectorComposer<Component> {
 	public boolean isStateDelivered(Order order) {
 		return getStateName(order).equals("Entregado");
 	}
+	
+	public boolean isStateFinish(Order order) {
+		return getStateName(order).equals("Finalizado");
+	}
 
-	public String getStateName(Order order) {
-		OrderStateType currentStateType = order.getCurrentStateType();
-		if(currentStateType != null) {
-			return currentStateType.getName();
-		} else {
-			return "[sin estado]";
-		}
+	private String getStateName(Order order) {
+		return order.getCurrentStateType().getName();
 	}
 
 	public double totalPrice(Order order) {

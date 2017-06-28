@@ -53,7 +53,12 @@ public class MaterialsOrderListController extends SelectorComposer<Component> {
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		// se crea un listener para cuando se reciba materiales
+		createReceptionListener();// se crea un listener para actualizar cuando se reciban materiales
+		refreshView();
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void createReceptionListener() {
 		EventQueue<Event> eq = EventQueues.lookup("Materials Reception Queue", EventQueues.DESKTOP, true);
 		eq.subscribe(new EventListener() {
 			public void onEvent(Event event) throws Exception {
@@ -62,7 +67,6 @@ public class MaterialsOrderListController extends SelectorComposer<Component> {
 				}
 			}
 		});
-		refreshView();
 	}
 
 	private void refreshView() {
@@ -93,9 +97,5 @@ public class MaterialsOrderListController extends SelectorComposer<Component> {
 		map.put("selected_materials_order", materialsOrder);
 		Window window = (Window)Executions.createComponents("/materials_reception.zul", null, map);
 		window.doModal();
-	}
-
-	public boolean isReceived(MaterialsOrder materialsOrder) {
-		return materialsOrder.getDateReception() != null;
 	}
 }

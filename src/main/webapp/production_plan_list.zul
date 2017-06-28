@@ -31,7 +31,7 @@
 		                <label value="${r:getFormattedDateTime(each.dateCreation)}"/>
 		                <label value="${each.planDetails.size()}"/>
 		                <label value="${win_production_plan_list$composer.getQuantityOfProduct(each)}"/>
-		                <label value="${win_production_plan_list$composer.getProductionPlanStateName(each)}"/>
+		                <label value="${each.getCurrentStateType().getName()}"/>
 		                <button forward="onClick=productionPlanGrid.onEditProductionPlan(${each})"  image="/img/edit16x16.png"/>
 		                <button forward="onClick=productionPlanGrid.onGenerateProductionOrder(${each})" label="Ordenes de Produccion" />
 		                <button forward="onClick=productionPlanGrid.onOpenRequirementPlan(${each})" label="Requerimiento de Materiales" />

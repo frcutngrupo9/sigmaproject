@@ -23,7 +23,6 @@ import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.MaterialReserved;
 import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.Wood;
-import ar.edu.utn.sigmaproject.service.MaterialReservedRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
 
@@ -63,8 +62,6 @@ public class RawMaterialReservationController extends SelectorComposer<Component
 	private WoodRepository woodRepository;
 	@WireVariable
 	private ProductionPlanRepository productionPlanRepository;
-	@WireVariable
-	private MaterialReservedRepository materialReservedRepository;
 
 	// attributes
 	private MaterialRequirement currentRawMaterialRequirement;
@@ -78,7 +75,6 @@ public class RawMaterialReservationController extends SelectorComposer<Component
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		//		currentRawMaterialRequirement = (RawMaterialRequirement) Executions.getCurrent().getAttribute("selected_rawMaterial_requirement");
 		currentRawMaterialRequirement = (MaterialRequirement) Executions.getCurrent().getArg().get("selected_raw_material_requirement");
 		if(currentRawMaterialRequirement == null) {throw new RuntimeException("RawMaterialRequirement null");}
 		currentWood = (Wood) currentRawMaterialRequirement.getItem();
@@ -97,7 +93,7 @@ public class RawMaterialReservationController extends SelectorComposer<Component
 		descriptionTextbox.setText(((Wood) currentRawMaterialRequirement.getItem()).getName());
 		woodTypeTextbox.setText(currentWood.getWoodType().getName());
 		stockDoublebox.setValue(currentWood.getStock().doubleValue());
-		stockAvailableDoublebox.setValue(currentWood.getStock().doubleValue() - currentWood.getStockReserved().doubleValue());
+		stockAvailableDoublebox.setValue(getStockAvailable(currentWood).doubleValue());
 		quantityDoublebox.setValue(currentRawMaterialRequirement.getQuantity().doubleValue());
 		if(currentWoodReserved == null) {
 			stockReservedDoublebox.setValue(0.0);
@@ -133,7 +129,7 @@ public class RawMaterialReservationController extends SelectorComposer<Component
 			Clients.showNotification("Debe ingresar una cantidad menor o igual a la cantidad necesaria", stockReservedDoublebox);
 			return;
 		}
-		if(stockReservedDoublebox.getValue() > currentWood.getStockAvailable().doubleValue()) {
+		if(stockReservedDoublebox.getValue() > getStockAvailable(currentWood).doubleValue()) {
 			Clients.showNotification("No existe stock disponible suficiente para realizar la reserva", stockReservedDoublebox);
 			return;
 		}
@@ -151,11 +147,21 @@ public class RawMaterialReservationController extends SelectorComposer<Component
 		rawMaterialReservationWindow.detach();
 	}
 
+	private BigDecimal getStockAvailable(Wood material) {
+		// devuelve la diferencia entre el stock total y el total de los reservados, sumando a esa diferencia lo que ya se reservo del actual
+		BigDecimal stockAvailable = material.getStockAvailable();
+		if(currentWoodReserved != null) {
+			// se suma porque lo reservado del actual es parte de lo que se puede reservar
+			stockAvailable = stockAvailable.add(currentWoodReserved.getStockReserved());
+		}
+		return stockAvailable;
+	}
+
 	@Listen("onOK = #stockReservedDoublebox")
 	public void stockReservedDoubleboxOnOK() {
 		saveButtonClick();
 	}
-	
+
 	private MaterialReserved getMaterialReserved(MaterialRequirement materialRequirement) {
 		for(MaterialReserved each: materialRequirement.getItem().getMaterialReservedList()) {
 			if(productionPlanRepository.findOne(each.getMaterialRequirement().getProductionPlan().getId()).equals(productionPlanRepository.findOne(materialRequirement.getProductionPlan().getId()))) {

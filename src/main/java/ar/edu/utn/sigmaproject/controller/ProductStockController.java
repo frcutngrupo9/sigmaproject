@@ -21,9 +21,7 @@ import org.zkoss.zul.Textbox;
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
-import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.Product;
-import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
@@ -67,8 +65,6 @@ public class ProductStockController extends SelectorComposer<Component> {
 
 	// services
 	@WireVariable
-	private ClientRepository clientRepository;
-	@WireVariable
 	private OrderRepository orderRepository;
 	@WireVariable
 	private OrderStateTypeRepository orderStateTypeRepository;
@@ -81,10 +77,10 @@ public class ProductStockController extends SelectorComposer<Component> {
 
 	// list
 	private List<Product> productList;
-	
+
 	// list models
 	private ListModelList<Product> productListModel;
-	
+
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
@@ -93,9 +89,7 @@ public class ProductStockController extends SelectorComposer<Component> {
 		productListbox.setModel(productListModel);
 		currentProduct = null;
 		refreshView();
-
 		currentOrder = null;
-		//		refreshViewOrder();
 	}
 
 	@Listen("onClick = #searchButton")
@@ -178,7 +172,7 @@ public class ProductStockController extends SelectorComposer<Component> {
 		Spinner spinner = (Spinner) evt.getOrigin().getTarget();// obtenemos el elemento web
 		orderDetail.setUnits(spinner.getValue());// cargamos al objeto el valor actualizado del elemento web
 	}
-	
+
 	public int getQuantityDelivered(Product product) {
 		// suma la cantidad entregada del producto
 		// busca en los pedidos entregados los que contien el producto

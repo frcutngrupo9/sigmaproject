@@ -74,5 +74,4 @@ public class PieceSelectionModalController extends SelectorComposer<Component> {
 		}
 		return "";
 	}
-
 }

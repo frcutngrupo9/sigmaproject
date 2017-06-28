@@ -1,6 +1,5 @@
 package ar.edu.utn.sigmaproject.controller;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,238 +8,114 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventQueue;
 import org.zkoss.zk.ui.event.EventQueues;
-import org.zkoss.zk.ui.event.InputEvent;
-import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
-import org.zkoss.zk.ui.util.Clients;
-import org.zkoss.zul.Bandbox;
-import org.zkoss.zul.Button;
-import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Messagebox;
-import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
+import ar.edu.utn.sigmaproject.domain.Item;
 import ar.edu.utn.sigmaproject.domain.MaterialType;
-import ar.edu.utn.sigmaproject.domain.MeasureUnit;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductMaterial;
 import ar.edu.utn.sigmaproject.domain.Wood;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class ProductRawMaterialController extends SelectorComposer<Component> {
+public class ProductRawMaterialController extends ProductMaterialController {
 	private static final long serialVersionUID = 1L;
 
 	@Wire
 	Window productRawMaterialWindow;
-	@Wire
-	Button acceptRawMaterialListButton;
-	@Wire
-	Button cancelRawMaterialListButton;
-	@Wire
-	Bandbox rawMaterialTypeBandbox;
-	@Wire
-	Listbox rawMaterialTypePopupListbox;
-	@Wire
-	Listbox rawMaterialListbox;
-	@Wire
-	Doublebox rawMaterialQuantityDoublebox;
-	@Wire
-	Button saveRawMaterialButton;
-	@Wire
-	Button resetRawMaterialButton;
-	@Wire
-	Button deleteRawMaterialButton;
-	@Wire
-	Button cancelRawMaterialButton;
 
 	// services
 	@WireVariable
 	private WoodRepository woodRepository;
 
-	// attributes
-	private ProductMaterial currentRawMaterial;
-	private Wood currentWood;
-	private Product currentProduct;
-
-	// list
-	private List<ProductMaterial> rawMaterialList;
-	private List<Wood> rawMaterialTypePopupList;
-
-	// list models
-	private ListModelList<ProductMaterial> rawMaterialListModel;
-	private ListModelList<Wood> rawMaterialTypePopupListModel;
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-
-		rawMaterialList = (List<ProductMaterial>) Executions.getCurrent().getAttribute("rawMaterialList");
+		productMaterialList = (List<ProductMaterial>) Executions.getCurrent().getAttribute("rawMaterialList");
 		currentProduct = (Product) Executions.getCurrent().getAttribute("currentProduct");
-		currentRawMaterial = null;
-		currentWood = null;
-
-		refreshViewRawMaterial();
-		refreshRawMaterialTypePopup();
+		currentProductMaterial = null;
+		currentMaterial = null;
+		refreshView();
+		refreshMaterialPopup();
 	}
-
-	@Listen("onClick = #acceptRawMaterialListButton")
-	public void acceptRawMaterialListButtonClick() {
+	
+	@Listen("onClick = #acceptProductMaterialButton")
+	public void acceptProductMaterialButtonClick() {
 		EventQueue<Event> eq = EventQueues.lookup("Product Change Queue", EventQueues.DESKTOP, true);
-		eq.publish(new Event("onRawMaterialChange", null, rawMaterialList));
+		eq.publish(new Event("onRawMaterialChange", null, productMaterialList));
 		productRawMaterialWindow.detach();
 	}
 
-	@Listen("onClick = #cancelRawMaterialListButton")
-	public void cancelRawMaterialListButtonClick() {
+	@Listen("onClick = #cancelProductMaterialButton")
+	public void cancelProductMaterialButtonClick() {
 		productRawMaterialWindow.detach();
 	}
+	
+	@Listen("onSelect = #materialPopupListbox")
+	public void materialPopupListboxSelect() {
+		currentMaterial = (Wood) materialPopupListbox.getSelectedItem().getValue();
+		materialBandbox.setValue(((Wood)currentMaterial).getName());
+		materialBandbox.close();
+		materialQuantityDoublebox.setFocus(true);
+	}
 
-	private void refreshViewRawMaterial() {
-		rawMaterialListModel = new ListModelList<>(rawMaterialList);
-		rawMaterialListbox.setModel(rawMaterialListModel);
-		if (currentRawMaterial == null) {
+	@Override
+	protected void refreshView() {
+		productMaterialListModel = new ListModelList<>(productMaterialList);
+		productMaterialListbox.setModel(productMaterialListModel);
+		if (currentProductMaterial == null) {
 			// borramos el text de la materia prima
 			// deseleccionamos la tabla y borramos la cantidad
-			rawMaterialTypeBandbox.setDisabled(false);
-			rawMaterialTypeBandbox.setValue("");
-			rawMaterialQuantityDoublebox.setValue(null);
-			currentWood = null;
-			deleteRawMaterialButton.setDisabled(true);
-			cancelRawMaterialButton.setDisabled(true);
+			materialBandbox.setDisabled(false);
+			materialBandbox.setValue("");
+			materialQuantityDoublebox.setValue(null);
+			currentMaterial = null;
+			deleteMaterialButton.setDisabled(true);
+			cancelMaterialButton.setDisabled(true);
 		} else {
-			currentWood = (Wood) currentRawMaterial.getItem();
-			rawMaterialTypeBandbox.setDisabled(true);// no se permite modificar en la edicion
-			rawMaterialTypeBandbox.setValue(currentWood.getName());
-			rawMaterialQuantityDoublebox.setValue(currentRawMaterial.getQuantity().doubleValue());
-			deleteRawMaterialButton.setDisabled(false);
-			cancelRawMaterialButton.setDisabled(false);
+			currentMaterial = currentProductMaterial.getItem();
+			materialBandbox.setDisabled(true);// no se permite modificar en la edicion
+			materialBandbox.setValue(((Wood)currentMaterial).getName());
+			materialQuantityDoublebox.setValue(currentProductMaterial.getQuantity().doubleValue());
+			deleteMaterialButton.setDisabled(false);
+			cancelMaterialButton.setDisabled(false);
 		}
 	}
 
-	private void refreshRawMaterialTypePopup() {// el popup se actualiza en base a la lista
-		rawMaterialTypePopupListbox.clearSelection();
-		rawMaterialTypePopupList = woodRepository.findAll();
-		for(ProductMaterial rawMaterial : rawMaterialList) {
-			rawMaterialTypePopupList.remove(woodRepository.findOne(rawMaterial.getItem().getId()));// sacamos del popup
+	@Override
+	protected void refreshMaterialPopup() {// el popup se actualiza en base a la lista
+		materialPopupListbox.clearSelection();
+		materialPopupList = new ArrayList<Item>();
+		materialPopupList.addAll(woodRepository.findAll());
+		for(ProductMaterial rawMaterial : productMaterialList) {
+			materialPopupList.remove(woodRepository.findOne(rawMaterial.getItem().getId()));// sacamos del popup
 		}
-		rawMaterialTypePopupListModel = new ListModelList<>(rawMaterialTypePopupList);
-		rawMaterialTypePopupListbox.setModel(rawMaterialTypePopupListModel);
+		materialPopupListModel = new ListModelList<>(materialPopupList);
+		materialPopupListbox.setModel(materialPopupListModel);
 	}
 
-	@Listen("onSelect = #rawMaterialTypePopupListbox")
-	public void selectionRawMaterialTypePopupListbox() {
-		currentWood = (Wood) rawMaterialTypePopupListbox.getSelectedItem().getValue();
-		rawMaterialTypeBandbox.setValue(currentWood.getName());
-		rawMaterialTypeBandbox.close();
-		rawMaterialQuantityDoublebox.setFocus(true);
-	}
-
-	@Listen("onOK = #rawMaterialQuantityDoublebox")
-	public void rawMaterialQuantityDoubleboxOnOK() {
-		saveRawMaterial();
-	}
-
-	@Listen("onSelect = #rawMaterialListbox")
-	public void selectRawMaterial() {
-		if(rawMaterialListModel.isSelectionEmpty()){
-			//just in case for the no selection
-			currentRawMaterial = null;
-		} else {
-			if(currentRawMaterial == null) {// permite la seleccion solo si no existe nada seleccionado
-				currentRawMaterial = rawMaterialListbox.getSelectedItem().getValue();
-				currentWood = (Wood) currentRawMaterial.getItem();
-				refreshViewRawMaterial();
-			}
-		}
-		rawMaterialListModel.clearSelection();
-	}
-
-	@Listen("onClick = #cancelRawMaterialButton")
-	public void cancelRawMaterial() {
-		currentRawMaterial = null;
-		refreshViewRawMaterial();
-	}
-
-	@Listen("onClick = #resetRawMaterialButton")
-	public void resetRawMaterial() {
-		refreshViewRawMaterial();
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Listen("onClick = #deleteRawMaterialButton")
-	public void deleteRawMaterial() {
-		if(currentRawMaterial != null) {
-			Messagebox.show("Esta seguro que desea eliminar " + currentRawMaterial.getItem().getDescription() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
-				public void onEvent(Event evt) throws InterruptedException {
-					if (evt.getName().equals("onOK")) {
-						rawMaterialList.remove(currentRawMaterial);// quitamos de la lista
-						currentRawMaterial = null;// eliminamos
-						refreshRawMaterialTypePopup();// actualizamos el popup para que aparezca vuelva a aparecer el eliminado
-						refreshViewRawMaterial();
-					}
-				}
-			});
-		} 
-	}
-
-	@Listen("onClick = #saveRawMaterialButton")
-	public void saveRawMaterial() {
-		if(rawMaterialQuantityDoublebox.getValue()==null || rawMaterialQuantityDoublebox.getValue()<=0) {
-			Clients.showNotification("Ingresar Cantidad de la Materia Prima", rawMaterialQuantityDoublebox);
-			return;
-		}
-		if(currentWood == null) {
-			Clients.showNotification("Debe seleccionar una Materia Prima", rawMaterialTypeBandbox);
-			return;
-		}
-		double rawMaterialQuantity = rawMaterialQuantityDoublebox.getValue();
-		if(currentRawMaterial == null) { // es nuevo
-			currentRawMaterial = new ProductMaterial(currentProduct, MaterialType.Wood, currentWood, BigDecimal.valueOf(rawMaterialQuantity));
-			rawMaterialList.add(currentRawMaterial);
-		} else { // se edita
-			currentRawMaterial.setItem(currentWood);;
-			currentRawMaterial.setQuantity(BigDecimal.valueOf(rawMaterialQuantity));
-		}
-		refreshRawMaterialTypePopup();// actualizamos el popup
-		currentRawMaterial = null;
-		refreshViewRawMaterial();
-	}
-
-	public String getMeasureUnitName(MeasureUnit measureUnit) {
-		if (measureUnit != null) {
-			return measureUnit.getName();
-		} else {
-			return "[Sin Unidad de Medida]";
-		}
-	}
-
-	private void filterItems() {
-		List<Wood> someItems = new ArrayList<>();
-		String textFilter = rawMaterialTypeBandbox.getValue().toLowerCase();
-		for(Wood each : rawMaterialTypePopupList) {
-			if((each.getFormattedMeasure()+each.getName()).toLowerCase().contains(textFilter) || textFilter.equals("")) {
+	@Override
+	protected void filterItems() {
+		List<Item> someItems = new ArrayList<>();
+		String textFilter = materialBandbox.getValue().toLowerCase();
+		for(Item each : materialPopupList) {
+			Wood eachWood = (Wood) each;
+			if((eachWood.getFormattedMeasure()+eachWood.getName()).toLowerCase().contains(textFilter) || textFilter.equals("")) {
 				someItems.add(each);
 			}
 		}
-		rawMaterialTypePopupListModel = new ListModelList<>(someItems);
-		rawMaterialTypePopupListbox.setModel(rawMaterialTypePopupListModel);
+		materialPopupListModel = new ListModelList<>(someItems);
+		materialPopupListbox.setModel(materialPopupListModel);
 	}
 
-	@Listen("onChanging = #rawMaterialTypeBandbox")
-	public void changeFilter(InputEvent event) {
-		if(currentWood != null) {
-			rawMaterialQuantityDoublebox.setValue(null);
-			currentWood = null;
-		}
-		Textbox target = (Bandbox)event.getTarget();
-		target.setText(event.getValue());
-		filterItems();
+	@Override
+	protected MaterialType getMaterialType() {
+		return MaterialType.Wood;
 	}
 }

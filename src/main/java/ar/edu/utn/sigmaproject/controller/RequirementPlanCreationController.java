@@ -110,7 +110,6 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-
 		currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
 		if(currentProductionPlan == null) {throw new RuntimeException("ProductionPlan not found");}
 
@@ -132,11 +131,10 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 				updateProductionPlanState();
 			}
 		});
-
 		refreshView();
 	}
 
-	protected void updateProductionPlanState() {
+	private void updateProductionPlanState() {
 		// recorre todos los requerimientos para ver si estan todos abastecidos
 		boolean isCompleted = true;
 		for(MaterialRequirement each : currentProductionPlan.getMaterialRequirements()) {
@@ -145,7 +143,6 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 				break;
 			}
 		}
-
 		ProductionPlanStateType stateTypeAbastecido = productionPlanStateTypeRepository.findFirstByName("Abastecido");
 		ProductionPlanStateType stateTypeRegistrado = productionPlanStateTypeRepository.findFirstByName("Registrado");
 		ProductionPlanStateType currentStateType = productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId());
@@ -234,18 +231,15 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 			Clients.showNotification("Imposible reservar, el Plan ya fue Abastecido.");
 			return;
 		}
-
 		// si no existe suficiente material disponible para realizar ninguna reserva, se informa.
 		if(insufficientStockForReservation()) {
 			Clients.showNotification("Imposible reservar, no existe suficiente material disponible para realizar la reserva.");
 			return;
 		}
-
 		if(isAllRequirementReservationDone()) {
 			Clients.showNotification("Imposible reservar, ya se realizaron las reservas posibles.");
 			return;
 		}
-
 		// se registra una reserva por cada uno de los insumos y materias primas por la cantidad necesaria
 		// si existe una reserva pero no esta reservando el maximo de stock disponible, se cambia a esa cantidad
 		// en caso de que no existan suficientes materiales en stock para hacer una reserva se crea el pedido de materiales
@@ -319,7 +313,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 		updateProductionPlanState();// actualiza el estado del plan
 	}
 
-	public boolean insufficientStockForReservation() {
+	private boolean insufficientStockForReservation() {
 		// si no existe nada de stock disponible
 		for(MaterialRequirement each : currentProductionPlan.getMaterialRequirements()) {
 			Item item = each.getItem();
@@ -340,11 +334,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 
 	public boolean isMaterialRequirementFulfilled(MaterialRequirement materialRequirement) {
 		// si ya se ha reservado la cantidad necesaria
-		boolean value = false;
-		if(getMaterialStockMissing(materialRequirement).compareTo(BigDecimal.ZERO) == 0) {
-			value = true;
-		}
-		return value;
+		return getMaterialStockMissing(materialRequirement).compareTo(BigDecimal.ZERO) == 0;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -382,13 +372,11 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 			Clients.showNotification("Imposible Generar Pedido, el Stock disponible es suficiente para abastecer al Plan.");
 			return;
 		}
-
 		// antes de hacer los pedidos realiza la reserva de los materiales disponibles si no se realizo aun
 		if(!isAllRequirementReservationDone()) {
 			Clients.showNotification("Debe realizar las reservas antes de crear el pedido de materiales.");
 			return;
 		}
-
 		// verifica que no existan pedidos de materiales asignados al plan
 		List<MaterialsOrder> materialsOrder = materialsOrderRepository.findByProductionPlan(currentProductionPlan);
 		if(materialsOrder != null && !materialsOrder.isEmpty()) {
@@ -397,7 +385,6 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 			Clients.showNotification("Imposible Generar Pedido, ya existe un pedido generado anteriormente.");
 			return;
 		}
-
 		Messagebox.show("Se realizara el pedido de todos los materiales para los cuales no exista stock disponible suficiente.", "Confirmar", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 			public void onEvent(Event evt) throws InterruptedException {
 				if (evt.getName().equals("onOK")) {
@@ -444,7 +431,6 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 		MaterialsOrder currentMaterialsOrder = new MaterialsOrder(materialsOrderNumber, materialsOrderDate);
 		currentMaterialsOrder.setProductionPlan(currentProductionPlan);
 		List<MaterialsOrderDetail> materialsOrderDetailList = new ArrayList<>();
-
 		for(MaterialRequirement each : currentProductionPlan.getMaterialRequirements()) {
 			Item item = each.getItem();
 			BigDecimal stockAvailable = BigDecimal.ZERO;
@@ -479,7 +465,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 		}
 		return lastValue + 1;
 	}
-	
+
 	private MaterialReserved getMaterialReserved(MaterialRequirement materialRequirement) {
 		for(MaterialReserved each: materialRequirement.getItem().getMaterialReservedList()) {
 			if(productionPlanRepository.findOne(each.getMaterialRequirement().getProductionPlan().getId()).equals(productionPlanRepository.findOne(materialRequirement.getProductionPlan().getId()))) {

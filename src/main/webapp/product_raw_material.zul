@@ -6,9 +6,9 @@
                 <hlayout>
                 	<separator/>
                     <label value="Materia Prima: "/>
-                    <bandbox id="rawMaterialTypeBandbox" buttonVisible = "true" autodrop = "true">
+                    <bandbox id="materialBandbox" buttonVisible = "true" autodrop = "true">
                         <bandpopup>
-                            <listbox id="rawMaterialTypePopupListbox" width="500px">
+                            <listbox id="materialPopupListbox" width="500px">
                                 <listhead>
                                     <listheader label="Nombre" align="center"/>
                                     <listheader label="Largo (L)" align="center"/>
@@ -27,14 +27,14 @@
                         </bandpopup>
                     </bandbox>
                     <label value="Cantidad: "/>
-                    <doublebox id="rawMaterialQuantityDoublebox" constraint="no negative" width="36px"/>
-                    <button id="saveRawMaterialButton" label="Agregar Materia Prima"/>
-                    <button id="resetRawMaterialButton" label="Reset Materia Prima"/>
-                    <button id="deleteRawMaterialButton" label="Eliminar Materia Prima"/>
-                    <button id="cancelRawMaterialButton" label="Cancelar Edicion"/>
+                    <doublebox id="materialQuantityDoublebox" constraint="no negative" width="36px"/>
+                    <button id="saveMaterialButton" label="Agregar Materia Prima"/>
+                    <button id="resetMaterialButton" label="Reset Materia Prima"/>
+                    <button id="deleteMaterialButton" label="Eliminar Materia Prima"/>
+                    <button id="cancelMaterialButton" label="Cancelar Edicion"/>
                 </hlayout>
                 <separator/>
-                <listbox id="rawMaterialListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
+                <listbox id="productMaterialListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
                     <auxhead>
                         <auxheader label="Materias Prima" colspan="5"/>
                     </auxhead>
@@ -56,8 +56,8 @@
                     </template>
                 </listbox>
                 <hlayout>
-                	<button id="acceptRawMaterialListButton" label="Aceptar"/>
-                    <button id="cancelRawMaterialListButton" label="Cancelar"/>
+                	<button id="acceptProductMaterialButton" label="Aceptar"/>
+                    <button id="cancelProductMaterialButton" label="Cancelar"/>
                 </hlayout>
             </vlayout>
         </panelchildren>

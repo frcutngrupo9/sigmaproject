@@ -41,7 +41,6 @@ import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessState;
-import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductMaterial;
 import ar.edu.utn.sigmaproject.domain.ProductTotal;
@@ -55,7 +54,6 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.domain.Wood;
-import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
@@ -107,8 +105,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	private ProductRepository productRepository;
 	@WireVariable
 	private ProductionPlanRepository productionPlanRepository;
-	@WireVariable
-	private ClientRepository clientService;
 	@WireVariable
 	private ProductionPlanStateRepository productionPlanStateRepository;
 	@WireVariable
@@ -410,66 +406,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		refreshProductTotalListbox();
 	}
 
-	public int getProductTotalUnits(Product product) {
-		int productTotalUnits = 0;
-		for(ProductTotal productTotal : productTotalList) {// buscamos el total de unidades
-			if(productTotal.getProduct().equals(product)) {
-				productTotalUnits = productTotal.getTotalUnits();
-			}
-		}
-		return productTotalUnits;
-	}
-
-	public BigDecimal getProductTotalPrice(Product product) {
-		int productTotalUnits = getProductTotalUnits(product);
-		return getTotalPrice(productTotalUnits, product.getPrice());// esta funcion es incorrecta pq agarra el valor actual del producto cuando deberia ser el valor en el pedido
-	}
-
-	private BigDecimal getTotalPrice(int units, BigDecimal price) {
-		if(price == null) {
-			price = BigDecimal.ZERO;
-		}
-		return price.multiply(new BigDecimal(units));
-	}
-
-	public String getPieceTotalUnits(Piece piece) {
-		int units = 0;
-		for(ProductionPlanDetail auxProductionPlanDetail : productionPlanDetailList) {
-			for (OrderDetail auxOrderDetail : auxProductionPlanDetail.getOrder().getDetails()) {
-				if (auxOrderDetail.getProduct().equals(productRepository.findByPieces(piece))) {
-					units = auxOrderDetail.getUnits();
-				}
-			}
-		}
-		if(units > 0) {
-			units = piece.getUnits() * units;
-		}
-		return units + "";
-	}
-
-	public String getTotalTime(Piece piece, ProcessType processType) {
-		Process process = null;
-		for(int j = 0; j < piece.getProcesses().size(); j++) {
-			if (piece.getProcesses().get(j).getType().equals(processType)) {
-				process = piece.getProcesses().get(j);
-				break;
-			}
-		}
-		long total = 0;
-		int units = 0;
-		for (ProductionPlanDetail productionPlanDetail : productionPlanDetailList) {
-			for (OrderDetail auxOrderDetail : productionPlanDetail.getOrder().getDetails()) {
-				if (auxOrderDetail.getProduct().equals(productRepository.findByPieces(piece))) {
-					units = auxOrderDetail.getUnits();
-				}
-			}
-		}
-		if(units > 0) {
-			total = process.getTime().getMinutes() * units;
-		}
-		return total + "";
-	}
-
 	@Listen("onClick = #returnButton")
 	public void returnButtonClick() {
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
@@ -494,14 +430,14 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		target.setText(event.getValue());
 		filter();
 	}
-	
+
 	@Listen("onClick = #returnToProductionButton")
 	public void returnToProductionButtonClick() {
 		Executions.getCurrent().setAttribute("selected_production_plan", currentProductionPlan);
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/production_order_list.zul");
 	}
-	
+
 	@Listen("onClick = #returnToRequirementPlanButton")
 	public void returnToRequirementPlanButtonClick() {
 		Executions.getCurrent().setAttribute("selected_production_plan", currentProductionPlan);

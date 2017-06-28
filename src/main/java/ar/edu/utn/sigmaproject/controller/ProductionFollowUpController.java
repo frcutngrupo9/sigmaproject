@@ -81,7 +81,6 @@ import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.StockMovementRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
-import ar.edu.utn.sigmaproject.service.WorkerRepository;
 
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -133,8 +132,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	@WireVariable
 	private MachineTypeRepository machineTypeRepository;
 	@WireVariable
-	private WorkerRepository workerRepository;
-	@WireVariable
 	private PieceRepository pieceRepository;
 	@WireVariable
 	private WoodRepository woodRepository;
@@ -167,7 +164,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 
 	// list
 	private List<ProductionOrderDetail> productionOrderDetailList;
-	private List<Machine> machineList;
 	private List<ProductionOrderMaterial> productionOrderSupplyList;
 	private List<ProductionOrderMaterial> productionOrderRawMaterialList;
 
@@ -182,7 +178,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		currentProductionOrder = (ProductionOrder) Executions.getCurrent().getAttribute("selected_production_order");
 		if(currentProductionOrder == null) {throw new RuntimeException("ProductionOrder not found");}
 		currentProductionPlan = currentProductionOrder.getProductionPlan();
-		machineList = machineRepository.findAll();
 		refreshView();
 	}
 
@@ -252,7 +247,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		productionOrderMaterials.addAll(productionOrderSupplyList);
 		productionOrderMaterials.addAll(productionOrderRawMaterialList);
 		currentProductionOrder.setProductionOrderMaterials(productionOrderMaterials);
-
 		// el estado de la orden debe cambiar automaticamente a 3 estados: Preparada, Iniciada, Finalizada
 		ProductionOrderStateType newStateType = getProductionOrderStateType();
 		ProductionOrderStateType productionOrderStateType = null;
@@ -278,9 +272,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 			productionOrderState = productionOrderStateRepository.save(productionOrderState);
 			currentProductionOrder.setState(productionOrderState);
 		}
-
 		currentProductionOrder = productionOrderRepository.save(currentProductionOrder);
-
 		updateProductionPlanState();
 		alert("Avance de Produccion Registrada.");
 		refreshView();
@@ -345,7 +337,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 				}
 			}
 		}
-
 	}
 
 	private ProductionOrderStateType getProductionOrderStateType() {
@@ -366,7 +357,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 				}
 			}
 		}
-
 		if(finished) {
 			productionOrderStateType = productionOrderStateTypeRepository.findFirstByName("Finalizada");
 		} else if(notStarted) {
@@ -392,31 +382,11 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		return pieceRepository.findByProcesses(process).getName();
 	}
 
-	public String getMachineTypeNameByProcess(Process process) {
-		if(process.getType().getMachineType() != null) {
-			return process.getType().getMachineType().getName();
-		}
-		return "NINGUNA";
-	}
-
 	public boolean isMachineNecessary(Process process) {
 		if(process.getType().getMachineType() != null) {
 			return true;
 		}
 		return false;
-	}
-
-	public ListModelList<Machine> getMachineListModel(ProductionOrderDetail productionOrderDetail) {
-		List<Machine> list = new ArrayList<Machine>();
-		MachineType machineType = machineTypeRepository.findOne(productionOrderDetail.getProcess().getType().getMachineType().getId());
-		if (machineType != null) {
-			for (Machine machine : machineList) {
-				if (machineType.equals(machineTypeRepository.findOne(machine.getMachineType().getId()))) {
-					list.add(machine);
-				}
-			}
-		}
-		return new ListModelList<>(list);
 	}
 
 	@Listen("onCreateMachineCombobox = #productionOrderDetailGrid")
@@ -480,7 +450,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		Checkbox chkbox = (Checkbox)fila.getChildren().get(0);
 		Datebox dateboxStartReal = (Datebox) fila.getChildren().get(fila.getChildren().size()-8);
 		Datebox dateboxFinishReal = (Datebox) fila.getChildren().get(fila.getChildren().size()-7);
-
 		if(value.compareTo(quantityPiece) >= 0) {
 			// si el valor ingresado supera la cantidad, se lo modifica y se agrega la cantidad
 			if(value.compareTo(quantityPiece) > 0) {
@@ -510,7 +479,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		Doublebox doublebox = (Doublebox) fila.getChildren().get(fila.getChildren().size()-1);
 		Datebox dateboxStartReal = (Datebox) fila.getChildren().get(fila.getChildren().size()-8);
 		Datebox dateboxFinishReal = (Datebox) fila.getChildren().get(fila.getChildren().size()-7);
-
 		if(element.isChecked()) {
 			data.setState(ProcessState.Realizado);
 			// agregamos como cantidad finalizada el total
@@ -613,34 +581,34 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 			MaterialReserved materialReserved = getMaterialReserved(materialRequirement);
 			materialReserved = materialReservedRepository.findOne(materialReserved.getId());
 			materialReserved.setStockReserved(materialReserved.getStockReserved().subtract(quantityTotal));
+			// se crean los detalles del stock movement
+			StockMovementDetail stockMovementDetail = new StockMovementDetail();
+			stockMovementDetail.setDescription(item.getDescription());
+			stockMovementDetail.setItem(item);
+			stockMovementDetail.setQuantity(quantityWithdrawn);
 			// se modifica el stock y se guarda con las reservas
 			if(item instanceof SupplyType) {
+				stockMovementDetail.setStockMovement(stockMovementSupply);
 				SupplyType supplyType = (SupplyType) item;
 				supplyType = supplyTypeRepository.findOne(supplyType.getId());
 				int index = supplyType.getMaterialReservedList().indexOf(materialReserved);
 				supplyType.setStock(supplyType.getStock().subtract(quantityTotal));
 				supplyType.getMaterialReservedList().set(index, materialReserved);
 				supplyTypeRepository.save(supplyType);
+				stockMovementSupply.getDetails().add(stockMovementDetail);
 			} else if (item instanceof Wood) {
+				stockMovementDetail.setStockMovement(stockMovementWood);
 				Wood wood = (Wood) item;
 				wood = woodRepository.findOne(wood.getId());
 				int index = wood.getMaterialReservedList().indexOf(materialReserved);
 				wood.setStock(wood.getStock().subtract(quantityTotal));
 				wood.getMaterialReservedList().set(index, materialReserved);
 				woodRepository.save(wood);
+				stockMovementWood.getDetails().add(stockMovementDetail);
 			}
-			// se crean los detalles del stock movement
-			StockMovementDetail stockMovementDetail = new StockMovementDetail();
-			stockMovementDetail.setDescription(item.getDescription());
-			stockMovementDetail.setItem(item);
-			stockMovementDetail.setQuantity(quantityWithdrawn);
-			stockMovementDetail.setStockMovement(stockMovementSupply);
-			stockMovementSupply.getDetails().add(stockMovementDetail);
 		}
-
 		currentProductionOrder.setDateMaterialsWithdrawal(new Date());
 		currentProductionOrder = productionOrderRepository.save(currentProductionOrder);
-
 		if(!stockMovementSupply.getDetails().isEmpty()) {
 			stockMovementRepository.save(stockMovementSupply);
 		}

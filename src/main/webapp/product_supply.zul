@@ -6,9 +6,9 @@
                 <hlayout>
                 	<separator/>
                     <label value="Insumo: "/>
-                    <bandbox id="supplyTypeBandbox" buttonVisible = "true" autodrop = "true">
+                    <bandbox id="materialBandbox" buttonVisible = "true" autodrop = "true">
                         <bandpopup>
-                            <listbox id="supplyTypePopupListbox" width="500px">
+                            <listbox id="materialPopupListbox" width="500px">
                                 <listhead>
                                     <listheader label="Descripcion" align="center"/>
                                     <listheader label="Detalles" align="center"/>
@@ -25,14 +25,14 @@
                         </bandpopup>
                     </bandbox>
                     <label value="Cantidad: "/>
-                    <doublebox id="supplyQuantityDoublebox" constraint="no negative" width="36px"/>
-                    <button id="saveSupplyButton" label="Agregar Insumo"/>
-                    <button id="resetSupplyButton" label="Reset Insumo"/>
-                    <button id="deleteSupplyButton" label="Eliminar Insumo"/>
-                    <button id="cancelSupplyButton" label="Cancelar Edicion"/>
+                    <doublebox id="materialQuantityDoublebox" constraint="no negative" width="36px"/>
+                    <button id="saveMaterialButton" label="Agregar Insumo"/>
+                    <button id="resetMaterialButton" label="Reset Insumo"/>
+                    <button id="deleteMaterialButton" label="Eliminar Insumo"/>
+                    <button id="cancelMaterialButton" label="Cancelar Edicion"/>
                 </hlayout>
                 <separator/>
-                <listbox id="supplyListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
+                <listbox id="productMaterialListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
                     <auxhead>
                         <auxheader label="Insumos" colspan="6"/>
                     </auxhead>
@@ -56,8 +56,8 @@
                     </template>
                 </listbox>
                 <hlayout>
-                    <button id="acceptSupplyListButton" label="Aceptar"/>
-                    <button id="cancelSupplyListButton" label="Cancelar"/>
+                    <button id="acceptProductMaterialButton" label="Aceptar"/>
+                    <button id="cancelProductMaterialButton" label="Cancelar"/>
                 </hlayout>
             </vlayout>
         </panelchildren>

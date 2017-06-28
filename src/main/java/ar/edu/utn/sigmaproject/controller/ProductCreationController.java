@@ -56,7 +56,6 @@ import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductCategory;
 import ar.edu.utn.sigmaproject.domain.ProductMaterial;
-import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitTypeRepository;
 import ar.edu.utn.sigmaproject.service.OrderDetailRepository;
@@ -151,8 +150,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@WireVariable
 	private ProcessTypeRepository processTypeRepository;
 	@WireVariable
-	private MachineTypeRepository machineTypeRepository;
-	@WireVariable
 	private ProductRepository productRepository;
 	@WireVariable
 	private PieceRepository pieceRepository;
@@ -199,10 +196,8 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		lengthMeasureUnitSelectbox.setModel(lengthMeasureUnitListModel);
 		depthMeasureUnitSelectbox.setModel(depthMeasureUnitListModel);
 		widthMeasureUnitSelectbox.setModel(widthMeasureUnitListModel);
-
 		currentProduct = (Product) Executions.getCurrent().getAttribute("selected_product");
 		currentPiece = null;
-
 		// listener para cuando se modifique el producto al agregar materias primas o insumos
 		eq = EventQueues.lookup("Product Change Queue", EventQueues.DESKTOP, true);
 		eq.subscribe(new EventListener() {
@@ -214,7 +209,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 				}
 			}
 		});
-
 		// agregamos un listener para cuando se seleccione una pieza en el modal de copia de otra pieza
 		eq = EventQueues.lookup("Piece Selection Queue", EventQueues.DESKTOP, true);
 		eq.subscribe(new EventListener() {
@@ -259,7 +253,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		String productCode = productCodeTextbox.getText();
 		BigDecimal productPrice = new BigDecimal(productPriceDoublebox.doubleValue());
 		org.zkoss.image.Image image = productImage.getContent();
-
 		List<ProductMaterial> productMaterialList = new ArrayList<ProductMaterial>();
 		productMaterialList.addAll(supplyList);
 		productMaterialList.addAll(rawMaterialList);
@@ -286,7 +279,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		}
 		currentProduct.setMaterials(productMaterialList);
 		currentProduct = productRepository.save(currentProduct);
-
 		// mostrar mensaje al user
 		Clients.showNotification("Producto guardado");
 
@@ -694,10 +686,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 				pieceList.remove(deletePiece);// eliminamos la pieza
 			}
 		}
-	}
-
-	public String quantityOfProcess(Piece piece) {
-		return "" + piece.getProcesses().size();
 	}
 
 	@Listen("onSelect = #pieceListbox")

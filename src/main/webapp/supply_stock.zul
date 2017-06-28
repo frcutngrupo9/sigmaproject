@@ -101,8 +101,6 @@
 			        </template>
 			    </listbox>
 			    <separator/>
-			    <include id="included" src="materials_order_detail_listbox.zul"/>
-			    <separator/>
 			    <separator/>
 		    </vlayout>
         </panelchildren>

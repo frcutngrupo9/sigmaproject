@@ -21,10 +21,7 @@ import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
-import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
 
@@ -37,17 +34,11 @@ public class ProductionFollowUpListController extends SelectorComposer<Component
 
 	// services
 	@WireVariable
-	private MachineRepository machineRepository;
-	@WireVariable
 	private ProductionOrderRepository productionOrderRepository;
 	@WireVariable
 	private ProductionPlanRepository productionPlanRepository;
 	@WireVariable
 	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
-	@WireVariable
-	private ProductionOrderStateRepository productionOrderStateRepository;
-	@WireVariable
-	private ProductionOrderStateTypeRepository productionOrderStateTypeRepository;
 
 	// list
 	private List<ProductionOrder> productionOrderList;

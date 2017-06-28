@@ -44,7 +44,6 @@ import ar.edu.utn.sigmaproject.domain.StockMovementType;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.domain.Wood;
 import ar.edu.utn.sigmaproject.service.MaterialRequirementRepository;
-import ar.edu.utn.sigmaproject.service.MaterialReservedRepository;
 import ar.edu.utn.sigmaproject.service.MaterialsOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateRepository;
@@ -93,8 +92,6 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 	private ProductionPlanStateRepository productionPlanStateRepository;
 	@WireVariable
 	private ProductionPlanRepository productionPlanRepository;
-	@WireVariable
-	private MaterialReservedRepository materialReservedRepository;
 
 	// attributes
 	private MaterialsOrder currentMaterialsOrder;
@@ -156,7 +153,6 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 			Clients.showNotification("Debe Ingresar Numero de Comprobante.", receiptNumberTextbox);
 			return;
 		}
-
 		// verifica que la cantidad recibida de al menos 1 material sea mayor a cero
 		boolean emptyReception = true;
 		for(MaterialsOrderDetail each : currentMaterialsOrder.getDetails()) {
@@ -169,14 +165,12 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 			Clients.showNotification("Debe existir al menos 1 Material con cantidad recibida mayor a cero.", materialsOrderDetailListbox);
 			return;
 		}
-
 		// guarda la recepcion de materiales
 		Date receptionDate = receptionDatebox.getValue();
 		String receiptNumber = receiptNumberTextbox.getText();
 		currentMaterialsOrder.setDateReception(receptionDate);
 		currentMaterialsOrder.setReceiptNumber(receiptNumber);
 		currentMaterialsOrder = materialsOrderRepository.save(currentMaterialsOrder);
-
 		// crea stock movement con las cantidades recibidas
 		StockMovement stockMovementSupply = new StockMovement();
 		stockMovementSupply.setSign((short) 1);// signo de ingreso a stock
@@ -186,7 +180,6 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 		stockMovementWood.setSign((short) 1);// signo de ingreso a stock
 		stockMovementWood.setDate(new Date());
 		stockMovementWood.setType(StockMovementType.Wood);
-
 		// modifica la cantidad en stock y se agrega los stock movement details
 		for(MaterialsOrderDetail each : currentMaterialsOrder.getDetails()) {
 			Item item = each.getItem();
@@ -219,7 +212,6 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 		if(!stockMovementWood.getDetails().isEmpty()) {
 			stockMovementRepository.save(stockMovementWood);
 		}
-
 		// agrega ese stock a la reserva del plan (solo si el pedido tiene plan asignado)
 		ProductionPlan productionPlan = currentMaterialsOrder.getProductionPlan();
 		if(productionPlan != null) {
@@ -253,7 +245,6 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 				}
 			}
 		}
-
 		if(currentMaterialsOrder.isTotallyReceived()) {
 			updateProductionPlanState(productionPlan);// actualiza el estado del plan a abastecido
 		} else {
@@ -261,13 +252,11 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 			alert("Se Creara un nuevo Pedido para los Materiales Faltantes.");
 			materialsOrderCreationAction(currentMaterialsOrder);			
 		}
-
 		EventQueue<Event> eq = EventQueues.lookup("Materials Reception Queue", EventQueues.DESKTOP, true);
 		eq.publish(new Event("onMaterialsReception", null, null));
 		alert("Recepcion de Materiales Registrada.");
 		materialsOrderDeliveryWindow.detach();
 	}
-
 
 	@Listen("onOrderDetailsChange = #materialsOrderDetailListbox")
 	public void doOrderDetailsChange(ForwardEvent evt) {
@@ -351,7 +340,7 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 		}
 		return true;
 	}
-	
+
 	private MaterialReserved getMaterialReserved(MaterialRequirement materialRequirement) {
 		for(MaterialReserved each: materialRequirement.getItem().getMaterialReservedList()) {
 			if(productionPlanRepository.findOne(each.getMaterialRequirement().getProductionPlan().getId()).equals(productionPlanRepository.findOne(materialRequirement.getProductionPlan().getId()))) {

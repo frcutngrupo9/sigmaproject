@@ -70,11 +70,11 @@ public class MachineStockController extends SelectorComposer<Component> {
 	@WireVariable
 	private MachineTypeRepository machineTypeRepository;
 	@WireVariable
-	MachineRepository machineRepository;
+	private MachineRepository machineRepository;
 
 	// attributes
 	private Machine currentMachine;
-	SortingPagingHelper<Machine> sortingPagingHelper;
+	private SortingPagingHelper<Machine> sortingPagingHelper;
 
 	// list
 	private List<Machine> machineList;
