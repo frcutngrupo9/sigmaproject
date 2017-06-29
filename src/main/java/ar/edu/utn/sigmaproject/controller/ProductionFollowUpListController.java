@@ -16,15 +16,10 @@ import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
 
-import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
-import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
-import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
 
@@ -37,17 +32,11 @@ public class ProductionFollowUpListController extends SelectorComposer<Component
 
 	// services
 	@WireVariable
-	private MachineRepository machineRepository;
-	@WireVariable
 	private ProductionOrderRepository productionOrderRepository;
 	@WireVariable
 	private ProductionPlanRepository productionPlanRepository;
 	@WireVariable
 	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
-	@WireVariable
-	private ProductionOrderStateRepository productionOrderStateRepository;
-	@WireVariable
-	private ProductionOrderStateTypeRepository productionOrderStateTypeRepository;
 
 	// list
 	private List<ProductionOrder> productionOrderList;
@@ -93,26 +82,5 @@ public class ProductionFollowUpListController extends SelectorComposer<Component
 		Executions.getCurrent().setAttribute("selected_production_order", productionOrder);
 		Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/production_follow_up.zul");
-	}
-
-	public String getPercentComplete(ProductionOrder aux) {
-		if(aux != null) {
-			List<ProductionOrderDetail> productionOrderDetailList = aux.getDetails();
-			int quantityFinished = 0;
-			for(ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
-				if(productionOrderDetail.getState()==ProcessState.Realizado) {
-					quantityFinished += 1;
-				}
-			}
-			double percentComplete;
-			if(productionOrderDetailList.size() == 0) {
-				percentComplete = 0;
-			} else {
-				percentComplete = (quantityFinished * 100) / productionOrderDetailList.size();
-			}
-			return percentComplete + " %";
-		} else {
-			return "";
-		}
 	}
 }

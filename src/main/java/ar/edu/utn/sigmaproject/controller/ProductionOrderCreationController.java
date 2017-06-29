@@ -37,34 +37,21 @@ import org.zkoss.zul.Textbox;
 import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
 import ar.edu.utn.sigmaproject.domain.Piece;
-import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
-import ar.edu.utn.sigmaproject.domain.ProductionOrderRawMaterial;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderMaterial;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderStateType;
-import ar.edu.utn.sigmaproject.domain.ProductionOrderSupply;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.domain.Worker;
 import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
-import ar.edu.utn.sigmaproject.service.OrderRepository;
-import ar.edu.utn.sigmaproject.service.OrderStateRepository;
-import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
-import ar.edu.utn.sigmaproject.service.PieceRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderRawMaterialRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderSupplyRepository;
-import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
-import ar.edu.utn.sigmaproject.service.ProductionPlanStateRepository;
-import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
-import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
-import ar.edu.utn.sigmaproject.service.WoodReservedRepository;
 import ar.edu.utn.sigmaproject.service.WorkerRepository;
 import ar.edu.utn.sigmaproject.util.ProductionDateTimeHelper;
 
@@ -110,8 +97,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	// services
 	@WireVariable
 	private ProductionOrderRepository productionOrderRepository;
-	//	@WireVariable
-	//	private ProductionOrderDetailRepository productionOrderDetailRepository;
 	@WireVariable
 	private ProductionOrderStateRepository productionOrderStateRepository;
 	@WireVariable
@@ -122,28 +107,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	private MachineTypeRepository machineTypeRepository;
 	@WireVariable
 	private WorkerRepository workerRepository;
-	@WireVariable
-	private PieceRepository pieceRepository;
-	@WireVariable
-	private WoodReservedRepository woodReservedRepository;
-	@WireVariable
-	private SupplyReservedRepository supplyReservedRepository;
-	@WireVariable
-	private ProductionOrderSupplyRepository productionOrderSupplyRepository;
-	@WireVariable
-	private ProductionOrderRawMaterialRepository productionOrderRawMaterialRepository;
-	@WireVariable
-	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
-	@WireVariable
-	private ProductionPlanStateRepository productionPlanStateRepository;
-	@WireVariable
-	private ProductionPlanRepository productionPlanRepository;
-	@WireVariable
-	private OrderStateTypeRepository orderStateTypeRepository;
-	@WireVariable
-	private OrderStateRepository orderStateRepository;
-	@WireVariable
-	private OrderRepository orderRepository;
 
 	// atributes
 	private ProductionOrder currentProductionOrder;
@@ -157,8 +120,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 	// list models
 	private ListModelList<ProductionOrderDetail> productionOrderDetailListModel;
-	private ListModelList<ProductionOrderSupply> productionOrderSupplyListModel;
-	private ListModelList<ProductionOrderRawMaterial> productionOrderRawMaterialListModel;
+	private ListModelList<ProductionOrderMaterial> productionOrderSupplyListModel;
+	private ListModelList<ProductionOrderMaterial> productionOrderRawMaterialListModel;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
@@ -167,11 +130,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		if(currentProductionOrder == null) {throw new RuntimeException("ProductionOrder not found");}
 		currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
 		if(currentProductionPlan == null) {throw new RuntimeException("ProductionPlan not found");}
-
 		productionOrderDetailList = currentProductionOrder.getDetails();
-
 		machineList = machineRepository.findAll();
-
 		refreshView();
 	}
 
@@ -179,9 +139,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		org.zkoss.image.Image img = null;
 		try {
 			img = new AImage("", currentProductionOrder.getProduct().getImageData());
-		} catch (IOException exception) {
-
-		}
+		} catch (IOException exception) { }
 		if(img != null) {
 			productImage.setHeight("75px");
 			productImage.setWidth("75px");
@@ -196,11 +154,9 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		productionPlanNameTextbox.setDisabled(true);
 		productNameTextbox.setDisabled(true);
 		productCodeTextbox.setDisabled(true);
-		//		productionPlanCreationDatebox.setDisabled(true);
 		productUnitsIntbox.setDisabled(true);
 		productionPlanStateTypeTextbox.setDisabled(true);
 		productionPlanNameTextbox.setText(currentProductionPlan.getName());
-		//		productionPlanCreationDatebox.setValue(currentProductionPlan.getDateCreation());
 		ProductionPlanStateType lastProductionPlanStateType = currentProductionPlan.getCurrentStateType();
 		if(lastProductionPlanStateType != null) {
 			productionPlanStateTypeTextbox.setText(lastProductionPlanStateType.getName());
@@ -218,7 +174,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		resetButton.setDisabled(false);
-
 		refreshProcessTypeGridView();
 	}
 
@@ -228,10 +183,10 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	}
 
 	private void refreshProductionOrderOrderSupplyAndRawMaterialListbox() {
-		List<ProductionOrderSupply> productionOrderSupplyList = currentProductionOrder.getProductionOrderSupplies();
-		List<ProductionOrderRawMaterial> productionOrderRawMaterialList = currentProductionOrder.getProductionOrderRawMaterials();
-		productionOrderSupplyListModel = new ListModelList<ProductionOrderSupply>(productionOrderSupplyList);
-		productionOrderRawMaterialListModel = new ListModelList<ProductionOrderRawMaterial>(productionOrderRawMaterialList);
+		List<ProductionOrderMaterial> productionOrderSupplyList = currentProductionOrder.getProductionOrderSupplies();
+		List<ProductionOrderMaterial> productionOrderRawMaterialList = currentProductionOrder.getProductionOrderRawMaterials();
+		productionOrderSupplyListModel = new ListModelList<ProductionOrderMaterial>(productionOrderSupplyList);
+		productionOrderRawMaterialListModel = new ListModelList<ProductionOrderMaterial>(productionOrderRawMaterialList);
 		productionOrderSupplyListbox.setModel(productionOrderSupplyListModel);
 		productionOrderRawMaterialListbox.setModel(productionOrderRawMaterialListModel);
 	}
@@ -318,17 +273,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		currentProductionOrder = productionOrderRepository.findOne(currentProductionOrder.getId());// obtiene la misma orden sin cambios en los detalles
 		productionOrderDetailList = currentProductionOrder.getDetails();
 		refreshView();
-	}
-
-	public String getPieceNameByProcess(Process process) {
-		return pieceRepository.findByProcesses(process).getName();
-	}
-
-	public String getMachineTypeNameByProcess(Process process) {
-		if(process.getType().getMachineType() != null) {
-			return process.getType().getMachineType().getName();
-		}
-		return "NINGUNA";
 	}
 
 	public String getMachineTypeNameByProcessType(ProcessType processType) {
@@ -636,37 +580,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 	private void refreshProcessDates() {
 		Date startDate = getDateTimeStartWork(productionOrderStartDatebox.getValue());
-
 		// asigna el valor a la clase para que calcule todos los tiempos de los detalles automaticamente
 		currentProductionOrder.setDateStart(startDate);
-		// TODO: debe poder actualizar las fechas luego de que se hayan modificado individualmente
-		//		Date finishDate = null;
-		//		if(startDate != null) {
-		//			for(ProductionOrderDetail each : productionOrderDetailList) {
-		//				if(each.getState() != ProcessState.Cancelado) {// solo se calcula para los procesos que no esten cancelados
-		//					if(finishDate == null) {// si es la primera vez que ingresa
-		//						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, each.getTimeTotal());
-		//					} else {
-		//						// el inicio de la actual es al finalizar la ultima
-		//						startDate = finishDate;
-		//						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, each.getTimeTotal());
-		//					}
-		//					each.setDateStart(startDate);
-		//					each.setDateFinish(finishDate);
-		//				} else {
-		//					each.setDateStart(null);
-		//					each.setDateFinish(null);
-		//					// por las dudas borramos tambien las fechas reales
-		//					each.setDateStartReal(null);
-		//					each.setDateFinishReal(null);
-		//				}
-		//			}
-		//		} else {
-		//			for(ProductionOrderDetail each : productionOrderDetailList) {
-		//				each.setDateStart(null);
-		//				each.setDateFinish(null);
-		//			}
-		//		}
 		productionOrderDetailList = currentProductionOrder.getDetails();
 		sortProductionOrderDetailListByProcessTypeSequence();
 		productionOrderStartDatebox.setValue(currentProductionOrder.getDateStart());// modifica el valor del datebox para que contenga la hora de inicio
@@ -719,7 +634,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		List<Piece> pieceList = new ArrayList<Piece>();
 		for(ProductionOrderDetail each : productionOrderDetailList) {
 			if(processType.equals(each.getProcess().getType())) {
-				pieceList.add(pieceRepository.findByProcesses(each.getProcess()));
+				pieceList.add(each.getProcess().getPiece());
 			}
 		}
 		return pieceList;

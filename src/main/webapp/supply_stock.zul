@@ -28,8 +28,8 @@
 			                <listcell label="${each.description}"/>
 			                <listcell label="${each.measure}"/>
 			                <listcell label="${each.stock}"/>
-			                <listcell label="${win_supply_stock$composer.getSupplyStockAvailable(each)}"/>
-			                <listcell label="${win_supply_stock$composer.getSupplyStockReserved(each)}"/>
+			                <listcell label="${each.getStockAvailable()}"/>
+			                <listcell label="${each.getStockReserved()}"/>
 			                <listcell label="${each.stockMin}"/>
 			                <listcell label="${each.stockRepo}"/>
 			            </listitem>
@@ -91,17 +91,15 @@
 			        </listhead>
 			        <template name="model">
 			            <listitem>
-			                <listcell label="${each.getSupplyRequirement().getProductionPlan().getName()}"/>
-			                <listcell label="${each.supplyRequirement.supplyType.code}"/>
-			                <listcell label="${each.supplyRequirement.supplyType.description}"/>
+			                <listcell label="${each.getMaterialRequirement().getProductionPlan().getName()}"/>
+			                <listcell label="${each.materialRequirement.item.code}"/>
+			                <listcell label="${each.materialRequirement.item.description}"/>
 			                <listcell label="${each.stockReserved}"/>
-			                <listcell label="${each.supplyRequirement.quantityWithdrawn.doubleValue()}"/>
-			                <listcell label="${each.supplyRequirement.quantity.doubleValue()}"/>
+			                <listcell label="${each.materialRequirement.quantityWithdrawn.doubleValue()}"/>
+			                <listcell label="${each.materialRequirement.quantity.doubleValue()}"/>
 			            </listitem>
 			        </template>
 			    </listbox>
-			    <separator/>
-			    <include id="included" src="materials_order_detail_listbox.zul"/>
 			    <separator/>
 			    <separator/>
 		    </vlayout>

@@ -62,7 +62,7 @@
             			<listheader label="Nombre Pieza" align="center"/>
             			<listheader label="Unidades por Producto" align="center"/>
             			<listheader label="Cantidad de Procesos" align="center"/>
-            			<listheader label="Tiempo Total" align="center"/>
+            			<listheader label="Duracion Total" align="center"/>
         			</listhead>
         			<template name="model">
             			<listitem>

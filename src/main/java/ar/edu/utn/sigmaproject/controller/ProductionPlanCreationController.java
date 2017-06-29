@@ -31,6 +31,9 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
+import ar.edu.utn.sigmaproject.domain.Item;
+import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
+import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.OrderState;
@@ -38,36 +41,28 @@ import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessState;
-import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.domain.ProductMaterial;
 import ar.edu.utn.sigmaproject.domain.ProductTotal;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
-import ar.edu.utn.sigmaproject.domain.ProductionOrderRawMaterial;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderMaterial;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
-import ar.edu.utn.sigmaproject.domain.ProductionOrderSupply;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
-import ar.edu.utn.sigmaproject.domain.RawMaterial;
-import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
-import ar.edu.utn.sigmaproject.domain.Supply;
-import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
-import ar.edu.utn.sigmaproject.service.ClientRepository;
+import ar.edu.utn.sigmaproject.domain.SupplyType;
+import ar.edu.utn.sigmaproject.domain.Wood;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderRawMaterialRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderSupplyRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
-import ar.edu.utn.sigmaproject.service.RawMaterialRequirementRepository;
-import ar.edu.utn.sigmaproject.service.SupplyRequirementRepository;
 
 public class ProductionPlanCreationController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
@@ -94,6 +89,10 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	Caption productionPlanCaption;
 	@Wire
 	Button returnButton;
+	@Wire
+	Button returnToProductionButton;
+	@Wire
+	Button returnToRequirementPlanButton;
 
 	// services
 	@WireVariable
@@ -107,27 +106,13 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	@WireVariable
 	private ProductionPlanRepository productionPlanRepository;
 	@WireVariable
-	private ClientRepository clientService;
-	@WireVariable
 	private ProductionPlanStateRepository productionPlanStateRepository;
 	@WireVariable
 	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
 	@WireVariable
-	private SupplyRequirementRepository supplyRequirementRepository;
-	@WireVariable
-	private RawMaterialRequirementRepository rawMaterialRequirementRepository;
-//	@WireVariable
-//	private ProductionOrderRepository productionOrderRepository;
-	//	@WireVariable
-	//	private ProductionOrderDetailRepository productionOrderDetailRepository;
-	@WireVariable
 	private ProductionOrderStateRepository productionOrderStateRepository;
 	@WireVariable
 	private ProductionOrderStateTypeRepository productionOrderStateTypeRepository;
-	@WireVariable
-	private ProductionOrderSupplyRepository productionOrderSupplyRepository;
-	@WireVariable
-	private ProductionOrderRawMaterialRepository productionOrderRawMaterialRepository;
 
 	// list
 	private List<Order> orderPopupList;
@@ -258,12 +243,8 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		//TODO si no es nuevo pero se modificaron los detalles deberia actualizar las ordenes de produccion
 		if(isNewProductionPlan) {
 			// crea los requerimientos
-			List<SupplyRequirement> supplyRequirementList = createSupplyRequirements(currentProductionPlan);
-			supplyRequirementList = supplyRequirementRepository.save(supplyRequirementList);
-			currentProductionPlan.getSupplyRequirements().addAll(supplyRequirementList);
-			List<RawMaterialRequirement> rawMaterialRequirementList = createRawMaterialRequirements(currentProductionPlan);
-			rawMaterialRequirementList = rawMaterialRequirementRepository.save(rawMaterialRequirementList);
-			currentProductionPlan.getRawMaterialRequirements().addAll(rawMaterialRequirementList);
+			List<MaterialRequirement> materialRequirementList = createMaterialRequirements(currentProductionPlan);
+			currentProductionPlan.getMaterialRequirements().addAll(materialRequirementList);
 			// crea ordenes de produccion
 			int sequence = 0;
 			for(ProductTotal each : getProductTotalList()) {
@@ -276,12 +257,8 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				//				details = productionOrderDetailRepository.save(details);
 				productionOrder.setDetails(details);
 				// agrega los materiales a las ordenes de produccion
-				List<ProductionOrderSupply> productionOrderSupplyList = createProductionOrderSupplyList(productionOrder);
-				List<ProductionOrderRawMaterial> productionOrderRawMaterialList = createProductionOrderRawMaterialList(productionOrder);
-				productionOrderSupplyList = productionOrderSupplyRepository.save(productionOrderSupplyList);
-				productionOrderRawMaterialList = productionOrderRawMaterialRepository.save(productionOrderRawMaterialList);
-				productionOrder.setProductionOrderSupplies(productionOrderSupplyList);
-				productionOrder.setProductionOrderRawMaterials(productionOrderRawMaterialList);
+				List<ProductionOrderMaterial> productionOrderMaterialList = createProductionOrderMaterialList(productionOrder);
+				productionOrder.setProductionOrderMaterials(productionOrderMaterialList);
 
 				//productionOrder = productionOrderRepository.save(productionOrder);
 				currentProductionPlan.getProductionOrderList().add(productionOrder);
@@ -307,65 +284,38 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		return details;
 	}
 
-	private List<ProductionOrderSupply> createProductionOrderSupplyList(ProductionOrder productionOrder) {
-		List<ProductionOrderSupply> list = new ArrayList<>();
-		for(Supply each : productionOrder.getProduct().getSupplies()) {
+	private List<ProductionOrderMaterial> createProductionOrderMaterialList(ProductionOrder productionOrder) {
+		List<ProductionOrderMaterial> list = new ArrayList<>();
+		for(ProductMaterial each : productionOrder.getProduct().getMaterials()) {
 			BigDecimal totalQuantity = each.getQuantity().multiply(new BigDecimal(productionOrder.getUnits()));
-			ProductionOrderSupply productionOrderSupply = new ProductionOrderSupply(each.getSupplyType(), totalQuantity);
-			list.add(productionOrderSupply);
+			ProductionOrderMaterial productionOrderMaterial = new ProductionOrderMaterial(productionOrder, each.getItem(), totalQuantity);
+			list.add(productionOrderMaterial);
 		}
 		return list;
 	}
 
-	private List<ProductionOrderRawMaterial> createProductionOrderRawMaterialList(ProductionOrder productionOrder) {
-		List<ProductionOrderRawMaterial> list = new ArrayList<>();
-		for(RawMaterial each : productionOrder.getProduct().getRawMaterials()) {
-			BigDecimal totalQuantity = each.getQuantity().multiply(new BigDecimal(productionOrder.getUnits()));
-			ProductionOrderRawMaterial productionOrderRawMaterial = new ProductionOrderRawMaterial(each.getWood(), totalQuantity);
-			list.add(productionOrderRawMaterial);
-		}
-		return list;
-	}
-
-	private List<SupplyRequirement> createSupplyRequirements(ProductionPlan productionPlan) {
-		// busca los requerimientos
-		List<SupplyRequirement> list = new ArrayList<>();
-		List<ProductTotal> productTotalList = getProductTotalList();
-		for (ProductTotal productTotal : productTotalList) {
-			for (Supply supply : productTotal.getProduct().getSupplies()) {
-				SupplyRequirement auxSupplyRequirement = null;
-				for (SupplyRequirement supplyRequirement : list) {// busca si el insumo no se encuentra agregado
-					if (supply.getSupplyType().equals(supplyRequirement.getSupplyType())) {
-						auxSupplyRequirement = supplyRequirement;
-					}
-				}
-				if (auxSupplyRequirement != null) {// el insumo si se encuentra agregado, suma sus cantidades
-					auxSupplyRequirement.setQuantity(auxSupplyRequirement.getQuantity().add(supply.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
-				} else {// el insumo no se encuentra, se lo agrega
-					list.add(new SupplyRequirement(supply.getSupplyType(), productionPlan, supply.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
-				}
-			}
-		}
-		return list;
-	}
-
-	private List<RawMaterialRequirement> createRawMaterialRequirements(ProductionPlan productionPlan) {
+	private List<MaterialRequirement> createMaterialRequirements(ProductionPlan productionPlan) {
 		// busca requerimientos de materias primas
-		List<RawMaterialRequirement> list = new ArrayList<RawMaterialRequirement>();
+		List<MaterialRequirement> list = new ArrayList<MaterialRequirement>();
 		List<ProductTotal> productTotalList = getProductTotalList();
 		for(ProductTotal productTotal : productTotalList) {
 			Product product = productTotal.getProduct();
-			for(RawMaterial rawMaterial : product.getRawMaterials()) {
-				RawMaterialRequirement auxRawMaterialRequirement = null;
-				for(RawMaterialRequirement supplyRequirement : list) {// buscamos si la materia prima no se encuentra agregada
-					if(rawMaterial.getWood().equals(supplyRequirement.getWood())) {
-						auxRawMaterialRequirement = supplyRequirement;
+			for(ProductMaterial productMaterial : product.getMaterials()) {
+				Item item = productMaterial.getItem();
+				MaterialRequirement auxMaterialRequirement = null;
+				for(MaterialRequirement eachMaterialRequirement : list) {// buscamos si la materia prima no se encuentra agregada
+					if(item.equals(eachMaterialRequirement.getItem())) {
+						auxMaterialRequirement = eachMaterialRequirement;
 					}
 				}
-				if(auxRawMaterialRequirement != null) {// la materia prima si se encuentra agregada, sumamos sus cantidades
-					auxRawMaterialRequirement.setQuantity(auxRawMaterialRequirement.getQuantity().add(rawMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
+				if(auxMaterialRequirement != null) {// la materia prima si se encuentra agregada, sumamos sus cantidades
+					auxMaterialRequirement.setQuantity(auxMaterialRequirement.getQuantity().add(productMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
 				} else {// la materia prima no se encuentra, se la agrega
-					list.add(new RawMaterialRequirement(rawMaterial.getWood(), productionPlan, rawMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
+					if(item instanceof SupplyType) {
+						list.add(new MaterialRequirement(item, MaterialType.Supply, productionPlan, productMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
+					} else if (item instanceof Wood) {
+						list.add(new MaterialRequirement(item, MaterialType.Wood, productionPlan, productMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
+					}
 				}
 			}
 		}
@@ -429,6 +379,8 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			productionPlanDetailList = new ArrayList<ProductionPlanDetail>();
 			deleteProductionPlanButton.setDisabled(true);
 			productionPlanStateTypeCombobox.setDisabled(true);
+			returnToProductionButton.setDisabled(true);
+			returnToRequirementPlanButton.setDisabled(true);
 		} else {// se edita plan de produccion
 			productionPlanCaption.setLabel("Edicion de Plan de Produccion");
 			ProductionPlanStateType productionPlanStateType = currentProductionPlan.getCurrentStateType();
@@ -446,70 +398,12 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			productionPlanDetailList = currentProductionPlan.getPlanDetails();
 			deleteProductionPlanButton.setDisabled(false);
 			productionPlanStateTypeCombobox.setDisabled(false);
+			returnToProductionButton.setDisabled(false);
+			returnToRequirementPlanButton.setDisabled(false);
 		}
 		refreshOrderPopupList();
 		refreshProductionPlanDetailListGrid();
 		refreshProductTotalListbox();
-	}
-
-	public int getProductTotalUnits(Product product) {
-		int productTotalUnits = 0;
-		for(ProductTotal productTotal : productTotalList) {// buscamos el total de unidades
-			if(productTotal.getProduct().equals(product)) {
-				productTotalUnits = productTotal.getTotalUnits();
-			}
-		}
-		return productTotalUnits;
-	}
-
-	public BigDecimal getProductTotalPrice(Product product) {
-		int productTotalUnits = getProductTotalUnits(product);
-		return getTotalPrice(productTotalUnits, product.getPrice());// esta funcion es incorrecta pq agarra el valor actual del producto cuando deberia ser el valor en el pedido
-	}
-
-	private BigDecimal getTotalPrice(int units, BigDecimal price) {
-		if(price == null) {
-			price = BigDecimal.ZERO;
-		}
-		return price.multiply(new BigDecimal(units));
-	}
-
-	public String getPieceTotalUnits(Piece piece) {
-		int units = 0;
-		for(ProductionPlanDetail auxProductionPlanDetail : productionPlanDetailList) {
-			for (OrderDetail auxOrderDetail : auxProductionPlanDetail.getOrder().getDetails()) {
-				if (auxOrderDetail.getProduct().equals(productRepository.findByPieces(piece))) {
-					units = auxOrderDetail.getUnits();
-				}
-			}
-		}
-		if(units > 0) {
-			units = piece.getUnits() * units;
-		}
-		return units + "";
-	}
-
-	public String getTotalTime(Piece piece, ProcessType processType) {
-		Process process = null;
-		for(int j = 0; j < piece.getProcesses().size(); j++) {
-			if (piece.getProcesses().get(j).getType().equals(processType)) {
-				process = piece.getProcesses().get(j);
-				break;
-			}
-		}
-		long total = 0;
-		int units = 0;
-		for (ProductionPlanDetail productionPlanDetail : productionPlanDetailList) {
-			for (OrderDetail auxOrderDetail : productionPlanDetail.getOrder().getDetails()) {
-				if (auxOrderDetail.getProduct().equals(productRepository.findByPieces(piece))) {
-					units = auxOrderDetail.getUnits();
-				}
-			}
-		}
-		if(units > 0) {
-			total = process.getTime().getMinutes() * units;
-		}
-		return total + "";
 	}
 
 	@Listen("onClick = #returnButton")
@@ -537,4 +431,17 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		filter();
 	}
 
+	@Listen("onClick = #returnToProductionButton")
+	public void returnToProductionButtonClick() {
+		Executions.getCurrent().setAttribute("selected_production_plan", currentProductionPlan);
+		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/production_order_list.zul");
+	}
+
+	@Listen("onClick = #returnToRequirementPlanButton")
+	public void returnToRequirementPlanButtonClick() {
+		Executions.getCurrent().setAttribute("selected_production_plan", currentProductionPlan);
+		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/requirement_plan_creation.zul");
+	}
 }

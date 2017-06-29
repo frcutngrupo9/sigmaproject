@@ -36,7 +36,7 @@
 			            	<label value="${each.units}"/>
 		                	<label value="${r:getFormattedDateTime(each.dateStart)}"/>
 		                    <label value="${r:getFormattedDateTime(each.dateFinish)}"/>
-		                    <label value="${win_production_follow_up_list$composer.getPercentComplete(each)}"/>
+		                    <label value="${each.getPercentComplete()}"/>
 		                    <label value="${r:getFormattedTime(each.getDurationTotal())}"/>
 		                    <label value="${r:getFormattedTime(each.product.getDurationTotal())}"/>
 		                    <label value="${r:getFormattedDateTime(each.dateStartReal)}"/>

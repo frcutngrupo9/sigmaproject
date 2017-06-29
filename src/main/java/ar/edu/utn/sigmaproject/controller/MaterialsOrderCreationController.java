@@ -91,11 +91,9 @@ public class MaterialsOrderCreationController extends SelectorComposer<Component
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-
 		materialsOrderDetailList = new ArrayList<>();
 		materialsOrderDetailListModel = new ListModelList<>(materialsOrderDetailList);
 		materialsOrderDetailListbox.setModel(materialsOrderDetailListModel);
-
 		currentMaterialsOrder = (MaterialsOrder) Executions.getCurrent().getAttribute("selected_materials_order");
 		currentMaterialsOrderDetail = null;
 		currentItem = null;
@@ -110,7 +108,6 @@ public class MaterialsOrderCreationController extends SelectorComposer<Component
 		}
 		int materialsOrderNumber = materialsOrderNumberIntbox.intValue();
 		Date materialsOrderDate = materialsOrderDatebox.getValue();
-
 		if(currentMaterialsOrder == null) { // es un pedido nuevo
 			// creamos el nuevo pedido
 			currentMaterialsOrder = new MaterialsOrder(materialsOrderNumber, materialsOrderDate);
@@ -247,7 +244,7 @@ public class MaterialsOrderCreationController extends SelectorComposer<Component
 
 	@Listen("onSelect = #materialsOrderDetailListbox")
 	public void selectDetail() { // se selecciona un detalle de pedido
-		if(materialsOrderDetailListModel.isSelectionEmpty()){
+		if(materialsOrderDetailListModel.isSelectionEmpty()) {
 			//just in case for the no selection
 			currentMaterialsOrderDetail = null;
 		} else {
@@ -271,7 +268,7 @@ public class MaterialsOrderCreationController extends SelectorComposer<Component
 		final MaterialsOrderDetail materialsOrderDetail = (MaterialsOrderDetail) evt.getData();
 		Messagebox.show("Esta seguro que desea eliminar " + materialsOrderDetail.getDescription() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 			public void onEvent(Event evt) throws InterruptedException {
-				if (evt.getName().equals("onOK")) {
+				if(evt.getName().equals("onOK")) {
 					materialsOrderDetailList.remove(materialsOrderDetail);// quitamos el detalle de la lista
 					// eliminamos el detalle si estaba seleccionado
 					if(currentMaterialsOrderDetail != null && materialsOrderDetail.equals(currentMaterialsOrderDetail)) {
@@ -283,7 +280,6 @@ public class MaterialsOrderCreationController extends SelectorComposer<Component
 				}
 			}
 		});
-
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -292,7 +288,7 @@ public class MaterialsOrderCreationController extends SelectorComposer<Component
 		if(currentMaterialsOrder != null) {
 			Messagebox.show("Esta seguro que desea eliminar el pedido?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 				public void onEvent(Event evt) throws InterruptedException {
-					if (evt.getName().equals("onOK")) {
+					if(evt.getName().equals("onOK")) {
 						materialsOrderRepository.delete(currentMaterialsOrder);// quitamos el detalle de la lista
 						currentMaterialsOrder = null;
 						refreshViewMaterialsOrder();
@@ -331,5 +327,4 @@ public class MaterialsOrderCreationController extends SelectorComposer<Component
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/materials_order_list.zul");
 	}
-
 }

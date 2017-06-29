@@ -112,15 +112,13 @@ public class RawMaterialController extends SelectorComposer<Component> {
 		refreshView();
 	}
 
-
-
 	@Listen("onClick = #searchButton")
 	public void search() {
 		//System.out.println("indice del measure elegido" + measureUnitSelectBox.getSelectedIndex());
 	}
 
 	@Listen("onClick = #newButton")
-	public void newRawMaterial() {
+	public void newButtonClick() {
 		currentWood = null;
 		refreshView();
 		rawMaterialTypeGrid.setVisible(true);
@@ -211,14 +209,6 @@ public class RawMaterialController extends SelectorComposer<Component> {
 			}
 		}
 		rawMaterialTypeListModel.clearSelection();
-	}
-
-	public String getMeasureUnitName(MeasureUnit measureUnit) {
-		if (measureUnit.getName() != null) {
-			return measureUnit.getName();
-		} else {
-			return "[Sin Unidad de Medida]";
-		}
 	}
 
 	private void refreshView() {

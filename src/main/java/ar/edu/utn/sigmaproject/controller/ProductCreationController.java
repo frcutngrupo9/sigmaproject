@@ -55,19 +55,13 @@ import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductCategory;
-import ar.edu.utn.sigmaproject.domain.RawMaterial;
-import ar.edu.utn.sigmaproject.domain.Supply;
-import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
+import ar.edu.utn.sigmaproject.domain.ProductMaterial;
 import ar.edu.utn.sigmaproject.service.MeasureUnitRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitTypeRepository;
 import ar.edu.utn.sigmaproject.service.OrderDetailRepository;
-import ar.edu.utn.sigmaproject.service.PieceRepository;
-import ar.edu.utn.sigmaproject.service.ProcessRepository;
 import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductCategoryRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
-import ar.edu.utn.sigmaproject.service.RawMaterialRepository;
-import ar.edu.utn.sigmaproject.service.SupplyRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProductCreationController extends SelectorComposer<Component> {
@@ -154,25 +148,16 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@WireVariable
 	private ProcessTypeRepository processTypeRepository;
 	@WireVariable
-	private MachineTypeRepository machineTypeRepository;
-	@WireVariable
 	private ProductRepository productRepository;
 	@WireVariable
-	private PieceRepository pieceRepository;
-	@WireVariable
-	private ProcessRepository processRepository;
-	@WireVariable
 	private ProductCategoryRepository productCategoryRepository;
-	@WireVariable
-	private SupplyRepository supplyRepository;
-	@WireVariable
-	private RawMaterialRepository rawMaterialRepository;
 	@WireVariable
 	private OrderDetailRepository orderDetailRepository;
 
 	// attributes
 	private Product currentProduct;
 	private Piece currentPiece;
+	private Piece clonedPiece;
 	@SuppressWarnings("rawtypes")
 	private EventQueue eq;
 
@@ -180,8 +165,8 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	private List<Piece> pieceList;
 	private List<ProcessType> processTypeList;
 	private List<Process> listboxProcessList;
-	private List<Supply> supplyList;
-	private List<RawMaterial> rawMaterialList;
+	private List<ProductMaterial> supplyList;
+	private List<ProductMaterial> rawMaterialList;
 
 	// list models
 	private ListModelList<Piece> pieceListModel;
@@ -206,22 +191,19 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		lengthMeasureUnitSelectbox.setModel(lengthMeasureUnitListModel);
 		depthMeasureUnitSelectbox.setModel(depthMeasureUnitListModel);
 		widthMeasureUnitSelectbox.setModel(widthMeasureUnitListModel);
-
 		currentProduct = (Product) Executions.getCurrent().getAttribute("selected_product");
 		currentPiece = null;
-
 		// listener para cuando se modifique el producto al agregar materias primas o insumos
 		eq = EventQueues.lookup("Product Change Queue", EventQueues.DESKTOP, true);
 		eq.subscribe(new EventListener() {
 			public void onEvent(Event event) throws Exception {
 				if(event.getName().equals("onSupplyChange")) {
-					supplyList = (List<Supply>) event.getData();
+					supplyList = (List<ProductMaterial>) event.getData();
 				} else {
-					rawMaterialList = (List<RawMaterial>) event.getData();
+					rawMaterialList = (List<ProductMaterial>) event.getData();
 				}
 			}
 		});
-
 		// agregamos un listener para cuando se seleccione una pieza en el modal de copia de otra pieza
 		eq = EventQueues.lookup("Piece Selection Queue", EventQueues.DESKTOP, true);
 		eq.subscribe(new EventListener() {
@@ -266,9 +248,18 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		String productCode = productCodeTextbox.getText();
 		BigDecimal productPrice = new BigDecimal(productPriceDoublebox.doubleValue());
 		org.zkoss.image.Image image = productImage.getContent();
-
+		List<ProductMaterial> productMaterialList = new ArrayList<ProductMaterial>();
+		productMaterialList.addAll(supplyList);
+		productMaterialList.addAll(rawMaterialList);
 		if(currentProduct == null) {// se esta creando un nuevo producto
 			currentProduct = new Product(productCode, productName, productDetails, productCategory, productPrice);
+			// se asigna la referencia al producto de los materiales y a las piezas
+			for(ProductMaterial each : productMaterialList) {
+				each.setProduct(currentProduct);
+			}
+			for(Piece each : pieceList) {
+				each.setProduct(currentProduct);
+			}
 		} else {// se esta editando un producto
 			currentProduct.setName(productName);
 			currentProduct.setDetails(productDetails);
@@ -280,20 +271,9 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			currentProduct.setImageData(image.getByteData());			
 		}
 		currentProduct.setPieces(pieceList);
-		for(Piece eachPiece : currentProduct.getPieces()) {
-			processRepository.save(eachPiece.getProcesses());
-			eachPiece = pieceRepository.save(eachPiece);
-		}
-		supplyRepository.save(supplyList);
-		currentProduct.setSupplies(supplyList);
-		rawMaterialRepository.save(rawMaterialList);
-		currentProduct.setRawMaterials(rawMaterialList);
-
+		currentProduct.setMaterials(productMaterialList);
 		currentProduct = productRepository.save(currentProduct);
-
-		// mostrar mensaje al user
 		Clients.showNotification("Producto guardado");
-
 		currentPiece = null;
 		refreshViewProduct();
 		refreshViewPiece();
@@ -334,17 +314,11 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		refreshViewPiece();
 		pieceCreationBlock.setVisible(true);
 		processCreationBlock.setVisible(true);
+		scrollToPieceBlock();
 	}
 
-	@Listen("onClick = #cancelPieceButton")
-	public void cancelPiece() {
-		if(currentPiece != null) {
-			// busca en la bd la version sin modificar y reemplaza en la lista
-			Piece piece = pieceRepository.findOne(currentPiece.getId());
-			pieceList.set(pieceList.indexOf(currentPiece), piece);
-		}
-		currentPiece = null;
-		refreshViewPiece();
+	private void scrollToPieceBlock() {
+		Clients.scrollIntoView(pieceCreationBlock);
 	}
 
 	@Listen("onClick = #finishProcessButton")
@@ -386,10 +360,13 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		String pieceSize = pieceSizeTextbox.getText();
 		Integer pieceUnits = pieceUnitsByProductIntbox.getValue();
 		boolean pieceIsGroup = pieceGroupCheckbox.isChecked();
-
 		if(currentPiece == null) { // se esta creando una pieza
-			currentPiece = new Piece(pieceName, pieceLength, lengthMeasureUnit, pieceDepth, depthMeasureUnit, pieceWidth, widthMeasureUnit, pieceSize, pieceIsGroup, pieceUnits);
+			currentPiece = new Piece(currentProduct, pieceName, pieceLength, lengthMeasureUnit, pieceDepth, depthMeasureUnit, pieceWidth, widthMeasureUnit, pieceSize, pieceIsGroup, pieceUnits);
+			// se agrega la pieza a todos los procesos
 			pieceList.add(currentPiece);// lo agregamos a la lista
+			for(Process each : listboxProcessList) {
+				each.setPiece(currentPiece);
+			}
 		} else { // se esta editando una pieza
 			currentPiece.setName(pieceName);
 			currentPiece.setLength(pieceLength);
@@ -535,7 +512,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			}
 			pieceSizeTextbox.setValue(currentPiece.getSize());
 			pieceUnitsByProductIntbox.setValue(currentPiece.getUnits());
-
 			listboxProcessList = currentPiece.getProcesses();// actualizamos la lista de procesos del Listbox con la lista de procesos obtenida de los procesos totales
 		}
 		refreshViewProcess();
@@ -612,7 +588,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			} catch (DatatypeConfigurationException e) {
 				System.out.println("Error en convertir a duracion: " + e.toString());
 			}
-			listboxProcessList.add(new Process(processType, "", duration));
+			listboxProcessList.add(new Process(currentPiece, processType, "", duration));
 		}
 	}
 
@@ -630,7 +606,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		Listitem listitem = (Listitem)listcell.getParent();
 		doProcessLineVisible(cbox.isChecked(), listitem);
 	}
-	
+
 	private void doProcessLineVisible(boolean visible, Listitem listitem) {
 		// se hacen visibles o invisibles todos los elementos de la fila
 		Listcell listcell = (Listcell)listitem.getChildren().get(listitem.getChildren().size()-3);
@@ -675,15 +651,18 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
 		Spinner origin = (Spinner)evt.getOrigin().getTarget();
 		InputEvent inputEvent = (InputEvent) evt.getOrigin();
-		origin.setValue(Integer.valueOf(inputEvent.getValue()));
-		Process process = getProcessFromListbox(data);
-		Duration duration = null;
-		try {
-			duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, 0, process.getTime().getHours(), origin.intValue(), 0);
-		} catch (DatatypeConfigurationException e) {
-			System.out.println("Error en convertir a duracion: " + e.toString());
+		String inputValue = inputEvent.getValue();
+		if(inputValue.compareTo("") != 0) {
+			origin.setValue(Integer.valueOf(inputEvent.getValue()));
+			Process process = getProcessFromListbox(data);
+			Duration duration = null;
+			try {
+				duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, 0, process.getTime().getHours(), origin.intValue(), 0);
+			} catch (DatatypeConfigurationException e) {
+				System.out.println("Error en convertir a duracion: " + e.toString());
+			}
+			process.setTime(duration);
 		}
-		process.setTime(duration);
 	}
 
 	private void deletePiece(Piece piece) {
@@ -700,10 +679,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		}
 	}
 
-	public String quantityOfProcess(Piece piece) {
-		return "" + piece.getProcesses().size();
-	}
-
 	@Listen("onSelect = #pieceListbox")
 	public void selectPiece() {
 		if(pieceListModel.isSelectionEmpty()) {
@@ -712,10 +687,39 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		} else {
 			if(currentPiece == null) {// si no hay nada editandose
 				currentPiece = pieceListbox.getSelectedItem().getValue();
+				// se crea un clon de la pieza para reemplazar al currentPiece en caso de que se cancele o resetee la edicion
+				clonedPiece = (Piece) Piece.copy(currentPiece);
 				refreshViewPiece();
 			}
 		}
 		pieceListModel.clearSelection();
+		scrollToPieceBlock();
+	}
+
+	@Listen("onClick = #resetPieceButton")
+	public void resetPiece() {
+		if(currentPiece != null) {
+			Piece piece = getOriginalPiece();
+			pieceList.set(pieceList.indexOf(currentPiece), piece);
+			currentPiece = piece;
+		}
+		refreshViewPiece();
+		pieceCreationBlock.setVisible(true);
+		processCreationBlock.setVisible(true);
+	}
+
+	private Piece getOriginalPiece() {
+		return (Piece) Piece.copy(clonedPiece);// se pasa solo la copia para evitar que el clon sea modificado
+	}
+
+	@Listen("onClick = #cancelPieceButton")
+	public void cancelPiece() {
+		if(currentPiece != null) {
+			Piece piece = getOriginalPiece();
+			pieceList.set(pieceList.indexOf(currentPiece), piece);
+		}
+		currentPiece = null;
+		refreshViewPiece();
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -772,19 +776,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		refreshViewPiece();
 	}
 
-	@Listen("onClick = #resetPieceButton")
-	public void resetPiece() {
-		if(currentPiece != null) {
-			// busca en la bd la version sin modificar y reemplaza en la lista
-			Piece piece = pieceRepository.findOne(currentPiece.getId());
-			pieceList.set(pieceList.indexOf(currentPiece), piece);
-			currentPiece = piece;
-		}
-		refreshViewPiece();
-		pieceCreationBlock.setVisible(true);
-		processCreationBlock.setVisible(true);
-	}
-
 	@Listen("onClick = #pieceCopyButton")
 	public void doPieceCopyButtonClick() {
 		newPieceButtonClick();
@@ -828,7 +819,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		List<Process> processListCopy = pieceCopy.getProcesses();
 		listboxProcessList = new ArrayList<Process>();
 		for(Process processCopy : processListCopy) {
-			listboxProcessList.add(new Process(processTypeRepository.findOne(processCopy.getType().getId()), processCopy.getDetails(), processCopy.getTime()));
+			listboxProcessList.add(new Process(null, processTypeRepository.findOne(processCopy.getType().getId()), processCopy.getDetails(), processCopy.getTime()));
 		}
 		refreshViewProcess();
 	}
@@ -836,6 +827,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@Listen("onClick = #openRawMaterialListButton")
 	public void openRawMaterialListButtonClick() {
 		Executions.getCurrent().setAttribute("rawMaterialList", rawMaterialList);
+		Executions.getCurrent().setAttribute("currentProduct", currentProduct);
 		Window window = (Window)Executions.createComponents("/product_raw_material.zul", null, null);
 		window.doModal();
 	}
@@ -843,6 +835,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@Listen("onClick = #openSupplyListButton")
 	public void openSupplyListButtonClick() {
 		Executions.getCurrent().setAttribute("supplyList", supplyList);
+		Executions.getCurrent().setAttribute("currentProduct", currentProduct);
 		Window window = (Window)Executions.createComponents("/product_supply.zul", null, null);
 		window.doModal();
 	}

@@ -31,7 +31,6 @@ import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
-import ar.edu.utn.sigmaproject.service.OrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
@@ -66,8 +65,6 @@ public class ProductDeliveryController extends SelectorComposer<Component> {
 	@WireVariable
 	private OrderRepository orderRepository;
 	@WireVariable
-	private OrderDetailRepository orderDetailRepository;
-	@WireVariable
 	private OrderStateRepository orderStateRepository;
 	@WireVariable
 	private OrderStateTypeRepository orderStateTypeRepository;
@@ -92,10 +89,8 @@ public class ProductDeliveryController extends SelectorComposer<Component> {
 		super.doAfterCompose(comp);
 		currentOrder = (Order) Executions.getCurrent().getArg().get("selected_order");
 		if(currentOrder == null) {throw new RuntimeException("Order null");}
-
 		orderDetailList = currentOrder.getDetails();
 		orderDetailListModel = new ListModelList<>(orderDetailList);
-
 		refreshView();
 	}
 
@@ -138,14 +133,12 @@ public class ProductDeliveryController extends SelectorComposer<Component> {
 		orderState = orderStateRepository.save(orderState);
 		currentOrder.setState(orderState);
 		currentOrder = orderRepository.save(currentOrder);
-
 		// modifica la cantidad en stock
 		for(OrderDetail each : currentOrder.getDetails()) {
 			Product product = each.getProduct();
 			product.setStock(product.getStock() - each.getUnits());
 			product = productRepository.save(product);
 		}
-
 		EventQueue<Event> eq = EventQueues.lookup("Product Delivery Queue", EventQueues.DESKTOP, true);
 		eq.publish(new Event("onProductDelivery", null, null));
 		alert("Entrega de Producto Registrada.");

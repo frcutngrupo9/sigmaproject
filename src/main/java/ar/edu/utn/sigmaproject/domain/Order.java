@@ -129,4 +129,12 @@ public class Order implements Serializable, Cloneable {
 	public void setNeedDate(Date needDate) {
 		this.needDate = needDate;
 	}
+	
+	public List<Product> getProductList() {
+		List<Product> productList = new ArrayList<Product>();
+		for(OrderDetail each : details) {
+			productList.add(each.getProduct());
+		}
+		return productList;
+	}
 }

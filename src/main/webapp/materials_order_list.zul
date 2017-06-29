@@ -41,7 +41,7 @@
 		                </cell>
 		                <label value="${each.details.size()}"/>
 		                <button forward="onClick=materialsOrderGrid.onEditMaterialsOrder(${each})"  image="/img/Search16x16.png"/>
-		                <button disabled="${win_materials_order_list$composer.isReceived(each)}" label="Recibir" forward="onClick=materialsOrderGrid.onMaterialsOrderReception(${each})"/>
+		                <button disabled="${!empty each.dateReception}" label="Recibir" forward="onClick=materialsOrderGrid.onMaterialsOrderReception(${each})"/>
 		            </row>
 		        </template>
 		    </grid>

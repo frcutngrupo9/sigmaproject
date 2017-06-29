@@ -17,9 +17,7 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.Piece;
-import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.service.PieceRepository;
-import ar.edu.utn.sigmaproject.service.ProductRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class PieceSelectionModalController extends SelectorComposer<Component> {
@@ -35,8 +33,6 @@ public class PieceSelectionModalController extends SelectorComposer<Component> {
 	// services
 	@WireVariable
 	private PieceRepository pieceRepository;
-	@WireVariable
-	private ProductRepository productRepository;
 
 	// atributes
 
@@ -66,13 +62,4 @@ public class PieceSelectionModalController extends SelectorComposer<Component> {
 	public void doCloseModal() {
 		modalDialog.detach();
 	}
-
-	public String getProductName(Piece piece) {
-		Product aux = productRepository.findByPieces(piece);
-		if(aux != null) {
-			return aux.getName();
-		}
-		return "";
-	}
-
 }

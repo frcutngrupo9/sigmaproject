@@ -126,6 +126,8 @@
 			        	<button id="returnButton" label="Volver a Listado"/>
 			        </hbox>
                 </hlayout>
+                <separator/>
+                <separator/>
             </vlayout>
         </panelchildren>
     </panel>

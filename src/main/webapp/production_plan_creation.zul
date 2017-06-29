@@ -106,8 +106,12 @@
                     <button id="deleteProductionPlanButton" label="Eliminar Plan de Produccion"/>
                     <hbox pack="center" align="center" hflex="1">
 			        	<button id="returnButton" label="Ir a Listado"/>
+			        	<button id="returnToProductionButton" label="Ir a Produccion"/>
+			        	<button id="returnToRequirementPlanButton" label="Ir a Abastecimiento"/>
 			        </hbox>
                 </hlayout>
+                <separator/>
+			    <separator/>
             </vlayout>
         </panelchildren>
     </panel>

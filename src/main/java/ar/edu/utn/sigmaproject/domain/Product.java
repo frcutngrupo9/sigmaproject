@@ -18,36 +18,33 @@ import javax.xml.datatype.Duration;
 public class Product extends Item implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	@OneToMany(orphanRemoval = true)
-	List<Piece> pieces = new ArrayList<>();
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "product", targetEntity = Piece.class)
+	private List<Piece> pieces = new ArrayList<>();
 
-	@OneToMany(orphanRemoval = true)
-	List<Supply> supplies = new ArrayList<>();
-
-	@OneToMany(orphanRemoval = true)
-	List<RawMaterial> rawMaterials = new ArrayList<>();
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "product", targetEntity = ProductMaterial.class)
+	private List<ProductMaterial> materials = new ArrayList<>();
 
 	@Lob
-	byte[] imageData = new byte[0];
+	private byte[] imageData = new byte[0];
 
 	@Field
-	String name = "";
+	private String name = "";
 
 	@Field
-	String details = "";
+	private String details = "";
 
 	@Field
-	String code = "";
+	private String code = "";
 
-	Integer stock = 0;
-	Integer stockMin = 0;
-	Integer stockRepo = 0;
+	private Integer stock = 0;
+	private Integer stockMin = 0;
+	private Integer stockRepo = 0;
 
 	@ManyToOne
-	ProductCategory category;
+	private ProductCategory category;
 
-	BigDecimal price = BigDecimal.ZERO;
-	boolean isClone;
+	private BigDecimal price = BigDecimal.ZERO;
+	private boolean isClone;
 
 	public Product() {
 
@@ -60,7 +57,7 @@ public class Product extends Item implements Serializable, Cloneable {
 		this.code = code;
 		this.price = price;
 	}
-	
+
 	public Duration getDurationTotal() {
 		Duration durationTotal = null;
 		for(Piece each : pieces) {
@@ -69,7 +66,7 @@ public class Product extends Item implements Serializable, Cloneable {
 			} else {
 				durationTotal = durationTotal.add(each.getDurationTotal());
 			}
-			
+
 		}
 		return durationTotal;
 	}
@@ -87,20 +84,32 @@ public class Product extends Item implements Serializable, Cloneable {
 		this.pieces = pieces;
 	}
 
-	public List<Supply> getSupplies() {
+	public List<ProductMaterial> getSupplies() {
+		List<ProductMaterial> supplies = new ArrayList<>();
+		for(ProductMaterial each : materials) {
+			if(each.getType() == MaterialType.Supply) {
+				supplies.add(each);
+			}
+		}
 		return supplies;
 	}
 
-	public void setSupplies(List<Supply> supplies) {
-		this.supplies = supplies;
-	}
-
-	public List<RawMaterial> getRawMaterials() {
+	public List<ProductMaterial> getRawMaterials() {
+		List<ProductMaterial> rawMaterials = new ArrayList<>();
+		for(ProductMaterial each : materials) {
+			if(each.getType() == MaterialType.Wood) {
+				rawMaterials.add(each);
+			}
+		}
 		return rawMaterials;
 	}
 
-	public void setRawMaterials(List<RawMaterial> rawMaterials) {
-		this.rawMaterials = rawMaterials;
+	public List<ProductMaterial> getMaterials() {
+		return materials;
+	}
+
+	public void setMaterials(List<ProductMaterial> materials) {
+		this.materials = materials;
 	}
 
 	public Integer getStock() {
@@ -181,5 +190,11 @@ public class Product extends Item implements Serializable, Cloneable {
 
 	public void setClone(boolean isClone) {
 		this.isClone = isClone;
+	}
+
+	@Override
+	public List<MaterialReserved> getMaterialReservedList() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

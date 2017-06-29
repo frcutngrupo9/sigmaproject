@@ -4,10 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
-import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
@@ -16,22 +13,17 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Doublebox;
-import org.zkoss.zul.Grid;
-import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
-import ar.edu.utn.sigmaproject.domain.MaterialsOrder;
+import ar.edu.utn.sigmaproject.domain.MaterialReserved;
+import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
-import ar.edu.utn.sigmaproject.domain.ProductionPlan;
-import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.Wood;
-import ar.edu.utn.sigmaproject.domain.WoodReserved;
 import ar.edu.utn.sigmaproject.domain.WoodType;
-import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
+import ar.edu.utn.sigmaproject.service.MaterialReservedRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
-import ar.edu.utn.sigmaproject.service.WoodReservedRepository;
 import ar.edu.utn.sigmaproject.service.WoodTypeRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -42,8 +34,6 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	Textbox searchTextbox;
 	@Wire
 	Listbox woodListbox;
-	@Wire
-	Grid woodCreationGrid;
 	@Wire
 	Textbox woodNameTextbox;
 	@Wire
@@ -61,22 +51,15 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	@Wire
 	Button resetButton;
 	@Wire
-	Button newButton;
-	@Wire
 	Listbox woodReservedListbox;
-	
-	@Wire("#included #materialsOrderDetailListbox")
-	Listbox materialsOrderDetailListbox;
 
 	// services
 	@WireVariable
 	private WoodRepository woodRepository;
 	@WireVariable
-	private WoodReservedRepository woodReservedRepository;
+	private MaterialReservedRepository materialReservedRepository;
 	@WireVariable
 	private WoodTypeRepository woodTypeRepository;
-	@WireVariable
-	private ProductionPlanRepository productionPlanRepository;
 
 	// attributes
 	private Wood currentWood;
@@ -84,12 +67,12 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	// list
 	private List<Wood> woodList;
 	private List<WoodType> woodTypeList;
-	private List<WoodReserved> woodReservedList;
+	private List<MaterialReserved> woodReservedList;
 
 	// list models
 	private ListModelList<Wood> woodListModel;
 	private ListModelList<WoodType> woodTypeListModel;
-	private ListModelList<WoodReserved> woodReservedListModel;
+	private ListModelList<MaterialReserved> woodReservedListModel;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
@@ -100,7 +83,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		woodList = woodRepository.findAll();
 		woodListModel = new ListModelList<>(woodList);
 		woodListbox.setModel(woodListModel);
-		woodReservedList = woodReservedRepository.findAll();
+		woodReservedList = materialReservedRepository.findAllByType(MaterialType.Wood);
 		woodReservedListModel = new ListModelList<>(woodReservedList);
 		woodReservedListbox.setModel(woodReservedListModel);
 		currentWood = null;
@@ -130,9 +113,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		woodListbox.setModel(woodListModel);// se actualiza la lista limpiar la seleccion
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
-		newButton.setDisabled(false);
 		if(currentWood == null) {// nuevo
-			woodCreationGrid.setVisible(false);
 			woodTypeListModel.addToSelection(woodTypeRepository.findFirstByName("Pino"));
 			woodTypeCombobox.setModel(woodTypeListModel);
 			woodNameTextbox.setText("");
@@ -146,7 +127,6 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 			stockRepoDoublebox.setDisabled(false);
 			resetButton.setDisabled(true);
 		}else {// editar
-			woodCreationGrid.setVisible(true);
 			woodTypeCombobox.setSelectedIndex(woodTypeListModel.indexOf(currentWood.getWoodType()));
 			woodNameTextbox.setText(currentWood.getName());
 			stockDoublebox.setValue(currentWood.getStock().doubleValue());
@@ -167,13 +147,6 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		} else {
 			return "[Sin Unidad de Medida]";
 		}
-	}
-
-	@Listen("onClick = #newButton")
-	public void newButtonClick() {
-		currentWood = null;
-		refreshView();
-		woodCreationGrid.setVisible(true);
 	}
 
 	@Listen("onClick = #saveButton")
@@ -206,31 +179,5 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	@Listen("onClick = #resetButton")
 	public void resetButtonClick() {
 		refreshView();
-	}
-	
-	public String getProductionPlanName(WoodReserved woodReserved) {
-		if(woodReserved == null) {
-			return "";
-		} else {
-			RawMaterialRequirement rawMaterialRequirement = woodReserved.getRawMaterialRequirement();
-			if(rawMaterialRequirement != null) {
-				ProductionPlan productionPlan = productionPlanRepository.findByRawMaterialRequirements(rawMaterialRequirement);
-				if(productionPlan != null) {
-					return productionPlan.getName();
-				} else {
-					return "";
-				}
-			} else {
-				return "";
-			}
-		}
-	}
-	
-	@Listen("onSelectMaterialsOrder = #included #materialsOrderDetailListbox")
-	public void doSelectMaterialsOrder(ForwardEvent evt) {
-		MaterialsOrder materialsOrder = (MaterialsOrder) evt.getData();
-		Executions.getCurrent().setAttribute("selected_materials_order", materialsOrder);
-		Include include = (Include) Selectors.iterable(materialsOrderDetailListbox.getPage(), "#mainInclude").iterator().next();
-		include.setSrc("/materials_order_creation.zul");
 	}
 }

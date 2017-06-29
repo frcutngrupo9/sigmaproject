@@ -34,10 +34,18 @@
 		                <label value="${r:getFormattedDate(each.getDate())}"/>
 		                <label value="${r:getFormattedDate(each.getNeedDate())}"/>
 		                <label value="${each.getDetails().size()}"/>
+		                <!-- <cell>
+		                	<hbox pack="center" align="center" hflex="1">
+		            		<zk forEach="${each.getProductList()}">
+		            			<image if="${!empty r:getProductImage(each)}" content="${r:getProductImage(each)}" width="35px" height="35px"/>
+		            			<image if="${empty r:getProductImage(each)}" width="0px" height="0px"/>
+		            		</zk>
+		            		</hbox>
+		            	</cell> -->
 		                <label value="${each.getCurrentStateType().getName()}"/>
 		                <label value="${win_order_list$composer.totalPrice(each)} $"/>
 		                <button forward="onClick=orderGrid.onEditOrder(${each})"  image="/img/edit16x16.png"/>
-		                <button disabled="${win_order_list$composer.isStateCancel(each) or win_order_list$composer.isStateDelivered(each)}" forward="onClick=orderGrid.onCancelOrder(${each})"  image="/img/delete16x16.png"/>
+		                <button disabled="${win_order_list$composer.isStateCancel(each) or win_order_list$composer.isStateDelivered(each) or win_order_list$composer.isStateFinish(each)}" forward="onClick=orderGrid.onCancelOrder(${each})"  image="/img/delete16x16.png"/>
 		                <button disabled="${win_order_list$composer.isStateCancel(each) or win_order_list$composer.isStateNotFinished(each)}" label="Entregar" forward="onClick=orderGrid.onDeliverOrder(${each})"/>
 		            </row>
 		        </template>

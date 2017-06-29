@@ -2,6 +2,8 @@ package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,11 +57,8 @@ public class ProductionOrder implements Serializable, Cloneable {
 	Date dateMaterialsWithdrawal = null;
 	ProductionOrderStateType currentStateType = null;
 
-	@OneToMany(orphanRemoval = true)
-	List<ProductionOrderSupply> productionOrderSupplies = new ArrayList<>();
-
-	@OneToMany(orphanRemoval = true)
-	List<ProductionOrderRawMaterial> productionOrderRawMaterials = new ArrayList<>();
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionOrder", targetEntity = ProductionOrderMaterial.class)
+	List<ProductionOrderMaterial> productionOrderMaterials = new ArrayList<>();
 
 	public ProductionOrder() {
 
@@ -159,20 +158,39 @@ public class ProductionOrder implements Serializable, Cloneable {
 		this.dateFinishReal = dateFinishReal;
 	}
 
-	public List<ProductionOrderSupply> getProductionOrderSupplies() {
+	public List<ProductionOrderMaterial> getProductionOrderSupplies() {
+		List<ProductionOrderMaterial> productionOrderSupplies = new ArrayList<>();
+		for(ProductionOrderMaterial each : productionOrderMaterials) {
+			Item item = each.getItem();
+			if(item instanceof SupplyType) {
+				productionOrderSupplies.add(each);
+			}
+		}
 		return productionOrderSupplies;
 	}
 
-	public void setProductionOrderSupplies(List<ProductionOrderSupply> productionOrderSupplyList) {
-		this.productionOrderSupplies = productionOrderSupplyList;
-	}
-
-	public List<ProductionOrderRawMaterial> getProductionOrderRawMaterials() {
+	public List<ProductionOrderMaterial> getProductionOrderRawMaterials() {
+		List<ProductionOrderMaterial> productionOrderRawMaterials = new ArrayList<>();
+		for(ProductionOrderMaterial each : productionOrderMaterials) {
+			Item item = each.getItem();
+			if(item instanceof Wood) {
+				productionOrderRawMaterials.add(each);
+			}
+		}
 		return productionOrderRawMaterials;
 	}
 
-	public void setProductionOrderRawMaterials(List<ProductionOrderRawMaterial> productionOrderRawMaterialList) {
-		this.productionOrderRawMaterials = productionOrderRawMaterialList;
+	public List<ProductionOrderMaterial> getProductionOrderMaterials() {
+		return productionOrderMaterials;
+	}
+
+	public void setProductionOrderMaterials(
+			List<ProductionOrderMaterial> productionOrderMaterials) {
+		this.productionOrderMaterials = productionOrderMaterials;
+	}
+
+	public void setProduct(Product product) {
+		this.product = product;
 	}
 
 	public ProductionOrderStateType getCurrentStateType() {
@@ -311,13 +329,15 @@ public class ProductionOrder implements Serializable, Cloneable {
 	public Date getStartRealDateFromDetails() {
 		Date date = null;
 		for(ProductionOrderDetail each : getDetails()) {
-			Date startRealDate = each.getDateStartReal();
-			if(startRealDate != null) {
-				if(date == null) {
-					date = startRealDate;
-				} else {
-					if(startRealDate.before(date)) {
+			if(each.getState() != ProcessState.Cancelado) {
+				Date startRealDate = each.getDateStartReal();
+				if(startRealDate != null) {
+					if(date == null) {
 						date = startRealDate;
+					} else {
+						if(startRealDate.before(date)) {
+							date = startRealDate;
+						}
 					}
 				}
 			}
@@ -329,17 +349,19 @@ public class ProductionOrder implements Serializable, Cloneable {
 		// solo si todos tienen fecha fin e inicio real
 		Date date = null;
 		for(ProductionOrderDetail each : getDetails()) {
-			Date finishRealDate = each.getDateFinishReal();
-			Date startRealDate = each.getDateStartReal();
-			if(finishRealDate == null || startRealDate == null) {
-				return null;
-			}
-			if(finishRealDate != null) {
-				if(date == null) {
-					date = finishRealDate;
-				} else {
-					if(finishRealDate.after(date)) {
+			if(each.getState() != ProcessState.Cancelado) {
+				Date finishRealDate = each.getDateFinishReal();
+				Date startRealDate = each.getDateStartReal();
+				if(finishRealDate == null || startRealDate == null) {
+					return null;
+				}
+				if(finishRealDate != null) {
+					if(date == null) {
 						date = finishRealDate;
+					} else {
+						if(finishRealDate.after(date)) {
+							date = finishRealDate;
+						}
 					}
 				}
 			}
@@ -350,13 +372,15 @@ public class ProductionOrder implements Serializable, Cloneable {
 	public Date getStartDateFromDetails() {
 		Date date = null;
 		for(ProductionOrderDetail each : getDetails()) {
-			Date startDate = each.getDateStart();
-			if(startDate != null) {
-				if(date == null) {
-					date = startDate;
-				} else {
-					if(startDate.before(date)) {
+			if(each.getState() != ProcessState.Cancelado) {
+				Date startDate = each.getDateStart();
+				if(startDate != null) {
+					if(date == null) {
 						date = startDate;
+					} else {
+						if(startDate.before(date)) {
+							date = startDate;
+						}
 					}
 				}
 			}
@@ -368,19 +392,53 @@ public class ProductionOrder implements Serializable, Cloneable {
 		// solo si todos tienen fecha fin e inicio
 		Date date = null;
 		for(ProductionOrderDetail each : getDetails()) {
-			Date finishDate = each.getDateFinish();
-			Date startDate = each.getDateStart();
-			if(finishDate == null || startDate == null) {
-				return null;
-			}
-			if(date == null) {
-				date = finishDate;
-			} else {
-				if(finishDate.after(date)) {
+			if(each.getState() != ProcessState.Cancelado) {
+				Date finishDate = each.getDateFinish();
+				Date startDate = each.getDateStart();
+				if(finishDate == null || startDate == null) {
+					return null;
+				}
+				if(date == null) {
 					date = finishDate;
+				} else {
+					if(finishDate.after(date)) {
+						date = finishDate;
+					}
 				}
 			}
 		}
 		return date;
+	}
+
+	public void sortDetailsByProcessTypeSequence() {
+		Comparator<ProductionOrderDetail> comp = new Comparator<ProductionOrderDetail>() {
+			@Override
+			public int compare(ProductionOrderDetail a, ProductionOrderDetail b) {
+				return a.getProcess().getType().getSequence().compareTo(b.getProcess().getType().getSequence());
+			}
+		};
+		Collections.sort(details, comp);
+	}
+
+	public String getPercentComplete() {
+		List<ProductionOrderDetail> productionOrderDetailList = getDetails();
+		int quantityFinished = 0;
+		int quantityCanceled = 0;
+		for(ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
+			if(productionOrderDetail.getState() == ProcessState.Realizado) {
+				quantityFinished += 1;
+			}
+			if(productionOrderDetail.getState() == ProcessState.Cancelado) {
+				quantityCanceled += 1;
+			}
+		}
+		double percentComplete;
+		int quantityTotalNotCanceled = productionOrderDetailList.size() - quantityCanceled;
+		if(quantityTotalNotCanceled == 0) {
+			percentComplete = 0;
+		} else {
+			percentComplete = (quantityFinished * 100) / quantityTotalNotCanceled;
+		}
+		return percentComplete + " %";
 	}
 }

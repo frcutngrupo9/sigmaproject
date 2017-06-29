@@ -1,4 +1,4 @@
-<window id="win_productCategory" title="Empleados" closable="false" apply="ar.edu.utn.sigmaproject.controller.WorkerController" sclass="sigma-content">
+<window id="win_product_category" title="Categorias Producto" closable="false" apply="ar.edu.utn.sigmaproject.controller.WorkerController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
 		    <hlayout>
@@ -10,12 +10,10 @@
 		    <listbox id="productCategoryListbox" mold="paging" pageSize="7">
 		        <listhead>
 		            <listheader label="Nombre" align="center"/>
-		            <listheader label="Fecha Ingreso" align="center"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
 		                <listcell label="${each.name}"/>
-		                <listcell label="${each.dateEmployed}"/>
 		            </listitem>
 		        </template>
 		    </listbox>
@@ -34,10 +32,6 @@
 			            <row>
 			                <label>Nombre:</label>
 			                <textbox id="nameTextbox" value="" hflex="1"/>
-			            </row>
-			            <row>
-			                <label>Fecha Ingreso:</label>
-			                <datebox id="dateEmployedDatebox" cols="12" format="dd-MM-yyyy"/>
 			            </row>
 			            <row>
 			                <cell colspan="2" style="text-align:center">

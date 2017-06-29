@@ -36,9 +36,6 @@
 			            </listitem>
 			        </template>
 			    </listbox>
-		        <hbox visible="false">
-		            <button id="newButton" label="Nueva Materia Prima en Stock"/>
-		        </hbox>
 		        <separator/>
 				<grid id="woodCreationGrid" width="45%" sclass="sigma-form" visible="false">
 			        <columns>
@@ -96,17 +93,15 @@
 			        </listhead>
 			        <template name="model">
 			            <listitem>
-			                <listcell label="${each.getRawMaterialRequirement().getProductionPlan().getName()}"/>
-			                <listcell label="${each.rawMaterialRequirement.wood.woodType.name}"/>
-			                <listcell label="${each.rawMaterialRequirement.wood.name}"/>
+			                <listcell label="${each.getMaterialRequirement().getProductionPlan().getName()}"/>
+			                <listcell label="${each.materialRequirement.item.woodType.name}"/>
+			                <listcell label="${each.materialRequirement.item.name}"/>
 			                <listcell label="${each.stockReserved}"/>
-			                <listcell label="${each.rawMaterialRequirement.quantityWithdrawn.doubleValue()}"/>
-			                <listcell label="${each.rawMaterialRequirement.quantity.doubleValue()}"/>
+			                <listcell label="${each.materialRequirement.quantityWithdrawn.doubleValue()}"/>
+			                <listcell label="${each.materialRequirement.quantity.doubleValue()}"/>
 			            </listitem>
 			        </template>
 			    </listbox>
-			    <separator/>
-			    <include id="included" src="materials_order_detail_listbox.zul"/>
 			    <separator/>
 			    <separator/>
 		    </vlayout>

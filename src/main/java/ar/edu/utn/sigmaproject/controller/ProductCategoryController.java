@@ -55,13 +55,11 @@ public class ProductCategoryController extends SelectorComposer<Component> {
 		productCategoryListModel = new ListModelList<>(productCategoryList);
 		productCategoryListbox.setModel(productCategoryListModel);
 		currentProductCategory = null;
-
 		refreshView();
 	}
 
 	@Listen("onClick = #searchButton")
 	public void search() {
-
 	}
 
 	@Listen("onClick = #newButton")
@@ -131,7 +129,7 @@ public class ProductCategoryController extends SelectorComposer<Component> {
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		newButton.setDisabled(false);
-		if (currentProductCategory == null) {// creando
+		if(currentProductCategory == null) {// creando
 			productCategoryGrid.setVisible(false);
 			nameTextbox.setValue(null);
 			deleteButton.setDisabled(true);
