@@ -257,9 +257,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 			}
 			productionOrderStateType = newStateType;
 		}
-		// si existe por lo menos 1 proceso finalizado, se busca la fecha inicio real del primero
-		// si todos los proceso estan finalizados, se busca la fecha fin del ultimo proceso
-		// caso contrario en los 2 casos se asigna null al atributo fecha respectivo
 		Date dateStartReal = currentProductionOrder.getStartRealDateFromDetails();
 		Date dateFinishReal = currentProductionOrder.getFinishRealDateFromDetails();
 		currentProductionOrder.setDateStartReal(dateStartReal);
