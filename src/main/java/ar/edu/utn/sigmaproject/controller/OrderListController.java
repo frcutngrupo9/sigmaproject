@@ -30,11 +30,9 @@ import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
-import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
-import ar.edu.utn.sigmaproject.service.ProductRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class OrderListController extends SelectorComposer<Component> {
@@ -53,10 +51,6 @@ public class OrderListController extends SelectorComposer<Component> {
 	@WireVariable
 	private OrderStateRepository orderStateRepository;
 	@WireVariable
-	private ClientRepository clientRepository;
-	@WireVariable
-	private ProductRepository productRepository;
-	@WireVariable
 	private OrderStateTypeRepository orderStateTypeRepository;
 
 	// list
@@ -65,11 +59,16 @@ public class OrderListController extends SelectorComposer<Component> {
 	// list models
 	private ListModelList<Order> orderListModel;
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		// se crea un listener para cuando se actualice el estado de algun pedido a entregado
+		createProductDeliveryListener();
+		refreshView();
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void createProductDeliveryListener() {
 		EventQueue<Event> eq = EventQueues.lookup("Product Delivery Queue", EventQueues.DESKTOP, true);
 		eq.subscribe(new EventListener() {
 			public void onEvent(Event event) throws Exception {
@@ -78,7 +77,6 @@ public class OrderListController extends SelectorComposer<Component> {
 				}
 			}
 		});
-		refreshView();
 	}
 
 	private void refreshView() {
@@ -115,7 +113,6 @@ public class OrderListController extends SelectorComposer<Component> {
 				}
 			}
 		});
-
 	}
 
 	@Listen("onEditOrder = #orderGrid")
@@ -148,11 +145,11 @@ public class OrderListController extends SelectorComposer<Component> {
 	public boolean isStateNotFinished(Order order) {
 		return !getStateName(order).equals("Finalizado");
 	}
-	
+
 	public boolean isStateDelivered(Order order) {
 		return getStateName(order).equals("Entregado");
 	}
-	
+
 	public boolean isStateFinish(Order order) {
 		return getStateName(order).equals("Finalizado");
 	}

@@ -24,26 +24,30 @@ public class Process implements Serializable, Cloneable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
+
+	@ManyToOne(targetEntity = Piece.class)
+	private Piece piece = null;
 
 	@ManyToOne
-	ProcessType type;
+	private ProcessType type;
 
-	String details = "";
+	private String details = "";
 
 	@Transient
-	Duration time;
+	private Duration time;
 
 	@Column
-	String timeInternal;
+	private String timeInternal;
 
-	boolean isClone;
+	private boolean isClone;
 
 	public Process() {
 
 	}
 
-	public Process(ProcessType processType, String details, Duration time) {
+	public Process(Piece piece, ProcessType processType, String details, Duration time) {
+		this.piece = piece;
 		this.type = processType;
 		this.details = details;
 		this.setTime(time);
@@ -56,6 +60,14 @@ public class Process implements Serializable, Cloneable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public Piece getPiece() {
+		return piece;
+	}
+
+	public void setPiece(Piece piece) {
+		this.piece = piece;
 	}
 
 	public ProcessType getType() {

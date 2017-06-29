@@ -28,7 +28,6 @@ import org.zkoss.zul.Spinner;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Timebox;
 
-import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
@@ -98,7 +97,6 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		productionPlanFinishDatebox.setDisabled(true);
 		productionPlanStartRealDatebox.setDisabled(true);
 		productionPlanFinishRealDatebox.setDisabled(true);
-
 		refreshView();
 	}
 
@@ -237,27 +235,6 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 			list = aux.getDetails();
 		}
 		return new ListModelList<>(list);
-	}
-
-	public String getPercentComplete(ProductionOrder aux) {
-		if(aux != null) {
-			List<ProductionOrderDetail> productionOrderDetailList = aux.getDetails();
-			int quantityFinished = 0;
-			for(ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
-				if(productionOrderDetail.getState()==ProcessState.Realizado) {
-					quantityFinished += 1;
-				}
-			}
-			double percentComplete;
-			if(productionOrderDetailList.size() == 0) {
-				percentComplete = 0;
-			} else {
-				percentComplete = (quantityFinished * 100) / productionOrderDetailList.size();
-			}
-			return percentComplete + " %";
-		} else {
-			return "";
-		}
 	}
 
 	public boolean isProductionPlanStateCancel() {

@@ -110,6 +110,8 @@
 			        	<button id="returnToRequirementPlanButton" label="Ir a Abastecimiento"/>
 			        </hbox>
                 </hlayout>
+                <separator/>
+			    <separator/>
             </vlayout>
         </panelchildren>
     </panel>

@@ -419,4 +419,26 @@ public class ProductionOrder implements Serializable, Cloneable {
 		};
 		Collections.sort(details, comp);
 	}
+
+	public String getPercentComplete() {
+		List<ProductionOrderDetail> productionOrderDetailList = getDetails();
+		int quantityFinished = 0;
+		int quantityCanceled = 0;
+		for(ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
+			if(productionOrderDetail.getState() == ProcessState.Realizado) {
+				quantityFinished += 1;
+			}
+			if(productionOrderDetail.getState() == ProcessState.Cancelado) {
+				quantityCanceled += 1;
+			}
+		}
+		double percentComplete;
+		int quantityTotalNotCanceled = productionOrderDetailList.size() - quantityCanceled;
+		if(quantityTotalNotCanceled == 0) {
+			percentComplete = 0;
+		} else {
+			percentComplete = (quantityFinished * 100) / quantityTotalNotCanceled;
+		}
+		return percentComplete + " %";
+	}
 }

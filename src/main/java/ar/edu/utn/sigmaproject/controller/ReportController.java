@@ -56,7 +56,7 @@ public class ReportController extends SelectorComposer<Component> {
 	public void generateReportButtonClick() {
 		reportProductionPlanGrid.setVisible(true);
 	}
-	
+
 	public Date getDateStartReal(ProductionPlan productionPlan) {
 		List<ProductionOrder> productionOrderList = productionOrderRepository.findByProductionPlan(productionPlan);
 		// busca la primera fecha de inicio real de ordenes de produccion
@@ -75,7 +75,7 @@ public class ReportController extends SelectorComposer<Component> {
 		}
 		return date;
 	}
-	
+
 	public String getDeviation(ProductionPlan productionPlan) {
 		Date dateStart = productionPlan.getDateStart();
 		if(dateStart == null) {
@@ -97,7 +97,7 @@ public class ReportController extends SelectorComposer<Component> {
 			return "Esta Adelantado";
 		}
 	}
-	
+
 	public String getFormattedDate(Date date) {
 		if(date == null) {
 			return "";
@@ -105,7 +105,7 @@ public class ReportController extends SelectorComposer<Component> {
 		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		return dateFormat.format(date);
 	}
-	
+
 	@Listen("onNavigateToProductionOrder = #reportProductionPlanGrid")
 	public void goToReportProductionOrder(ForwardEvent evt) {
 		ProductionPlan productionPlan = (ProductionPlan) evt.getData();

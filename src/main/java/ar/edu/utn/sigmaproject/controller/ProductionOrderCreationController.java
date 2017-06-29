@@ -37,7 +37,6 @@ import org.zkoss.zul.Textbox;
 import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
 import ar.edu.utn.sigmaproject.domain.Piece;
-import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
@@ -50,7 +49,6 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.domain.Worker;
 import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
-import ar.edu.utn.sigmaproject.service.PieceRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
@@ -109,8 +107,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	private MachineTypeRepository machineTypeRepository;
 	@WireVariable
 	private WorkerRepository workerRepository;
-	@WireVariable
-	private PieceRepository pieceRepository;
 
 	// atributes
 	private ProductionOrder currentProductionOrder;
@@ -277,10 +273,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		currentProductionOrder = productionOrderRepository.findOne(currentProductionOrder.getId());// obtiene la misma orden sin cambios en los detalles
 		productionOrderDetailList = currentProductionOrder.getDetails();
 		refreshView();
-	}
-
-	public String getPieceNameByProcess(Process process) {
-		return pieceRepository.findByProcesses(process).getName();
 	}
 
 	public String getMachineTypeNameByProcessType(ProcessType processType) {
@@ -642,7 +634,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		List<Piece> pieceList = new ArrayList<Piece>();
 		for(ProductionOrderDetail each : productionOrderDetailList) {
 			if(processType.equals(each.getProcess().getType())) {
-				pieceList.add(pieceRepository.findByProcesses(each.getProcess()));
+				pieceList.add(each.getProcess().getPiece());
 			}
 		}
 		return pieceList;

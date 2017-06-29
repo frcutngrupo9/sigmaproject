@@ -70,7 +70,6 @@ import ar.edu.utn.sigmaproject.service.MaterialReservedRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
-import ar.edu.utn.sigmaproject.service.PieceRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
@@ -131,8 +130,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	private MachineRepository machineRepository;
 	@WireVariable
 	private MachineTypeRepository machineTypeRepository;
-	@WireVariable
-	private PieceRepository pieceRepository;
 	@WireVariable
 	private WoodRepository woodRepository;
 	@WireVariable
@@ -376,10 +373,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	@Listen("onClick = #resetButton")
 	public void resetButtonClick() {
 		refreshView();
-	}
-
-	public String getPieceNameByProcess(Process process) {
-		return pieceRepository.findByProcesses(process).getName();
 	}
 
 	public boolean isMachineNecessary(Process process) {

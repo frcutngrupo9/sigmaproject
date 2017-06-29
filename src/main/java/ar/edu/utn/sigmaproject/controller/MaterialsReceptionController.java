@@ -114,7 +114,6 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 			each.setQuantityReceived(each.getQuantity());
 		}
 		materialsOrderDetailListModel = new ListModelList<>(materialsOrderDetailList);
-
 		refreshView();
 	}
 
@@ -183,24 +182,20 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 		// modifica la cantidad en stock y se agrega los stock movement details
 		for(MaterialsOrderDetail each : currentMaterialsOrder.getDetails()) {
 			Item item = each.getItem();
-
 			StockMovementDetail stockMovementDetail = new StockMovementDetail();
 			stockMovementDetail.setDescription(item.getDescription());
 			stockMovementDetail.setItem(item);
 			stockMovementDetail.setQuantity(each.getQuantityReceived());
-
 			if(item instanceof SupplyType) {
 				SupplyType supplyType = (SupplyType) item;
 				supplyType.setStock(supplyType.getStock().add(each.getQuantityReceived()));
 				supplyType = supplyTypeRepository.save(supplyType);
-
 				stockMovementDetail.setStockMovement(stockMovementSupply);
 				stockMovementSupply.getDetails().add(stockMovementDetail);
 			} else if (item instanceof Wood) {
 				Wood wood = (Wood) item;
 				wood.setStock(wood.getStock().add(each.getQuantityReceived()));
 				wood = woodRepository.save(wood);
-
 				stockMovementDetail.setStockMovement(stockMovementWood);
 				stockMovementWood.getDetails().add(stockMovementDetail);
 			}

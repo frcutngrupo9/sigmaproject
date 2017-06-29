@@ -18,33 +18,33 @@ import javax.xml.datatype.Duration;
 public class Product extends Item implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	@OneToMany(orphanRemoval = true)
-	List<Piece> pieces = new ArrayList<>();
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "product", targetEntity = Piece.class)
+	private List<Piece> pieces = new ArrayList<>();
 
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "product", targetEntity = ProductMaterial.class)
-	List<ProductMaterial> materials = new ArrayList<>();
+	private List<ProductMaterial> materials = new ArrayList<>();
 
 	@Lob
-	byte[] imageData = new byte[0];
+	private byte[] imageData = new byte[0];
 
 	@Field
-	String name = "";
+	private String name = "";
 
 	@Field
-	String details = "";
+	private String details = "";
 
 	@Field
-	String code = "";
+	private String code = "";
 
-	Integer stock = 0;
-	Integer stockMin = 0;
-	Integer stockRepo = 0;
+	private Integer stock = 0;
+	private Integer stockMin = 0;
+	private Integer stockRepo = 0;
 
 	@ManyToOne
-	ProductCategory category;
+	private ProductCategory category;
 
-	BigDecimal price = BigDecimal.ZERO;
-	boolean isClone;
+	private BigDecimal price = BigDecimal.ZERO;
+	private boolean isClone;
 
 	public Product() {
 
@@ -57,7 +57,7 @@ public class Product extends Item implements Serializable, Cloneable {
 		this.code = code;
 		this.price = price;
 	}
-	
+
 	public Duration getDurationTotal() {
 		Duration durationTotal = null;
 		for(Piece each : pieces) {
@@ -66,7 +66,7 @@ public class Product extends Item implements Serializable, Cloneable {
 			} else {
 				durationTotal = durationTotal.add(each.getDurationTotal());
 			}
-			
+
 		}
 		return durationTotal;
 	}

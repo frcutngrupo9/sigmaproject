@@ -44,7 +44,7 @@ public class ProductRawMaterialController extends ProductMaterialController {
 		refreshView();
 		refreshMaterialPopup();
 	}
-	
+
 	@Listen("onClick = #acceptProductMaterialButton")
 	public void acceptProductMaterialButtonClick() {
 		EventQueue<Event> eq = EventQueues.lookup("Product Change Queue", EventQueues.DESKTOP, true);
@@ -56,7 +56,7 @@ public class ProductRawMaterialController extends ProductMaterialController {
 	public void cancelProductMaterialButtonClick() {
 		productRawMaterialWindow.detach();
 	}
-	
+
 	@Listen("onSelect = #materialPopupListbox")
 	public void materialPopupListboxSelect() {
 		currentMaterial = (Wood) materialPopupListbox.getSelectedItem().getValue();

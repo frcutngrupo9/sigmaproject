@@ -120,7 +120,6 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-
 		clientPopupList = clientRepository.findAll();
 		clientPopupListModel = new ListModelList<Client>(clientPopupList);
 		clientPopupListbox.setModel(clientPopupListModel);
@@ -265,7 +264,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	}
 
 	private void refreshViewOrder() {
-		if (currentOrder == null) {// nuevo pedido
+		if(currentOrder == null) {// nuevo pedido
 			orderCaption.setLabel("Creacion de Pedido");
 			orderStateTypeListModel.addToSelection(orderStateTypeRepository.findFirstByName("Creado"));
 			orderStateTypeCombobox.setModel(orderStateTypeListModel);
@@ -281,7 +280,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		} else {// editar pedido
 			orderCaption.setLabel("Edicion de Pedido");
 			OrderStateType orderCurrentStateType = currentOrder.getCurrentStateType();
-			if (orderCurrentStateType != null) {
+			if(orderCurrentStateType != null) {
 				orderStateTypeListModel.addToSelection(orderStateTypeRepository.findOne(orderCurrentStateType.getId()));
 				orderStateTypeCombobox.setModel(orderStateTypeListModel);
 				// solo se puede grabar si esta en estado Creado o Cancelado
@@ -324,7 +323,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	}
 
 	private void refreshViewOrderDetail() {
-		if (currentOrderDetail == null) {
+		if(currentOrderDetail == null) {
 			// borramos el text del producto  seleccionado
 			// deseleccionamos la tabla y borramos la cantidad
 			productBandbox.setDisabled(false);
@@ -388,10 +387,10 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Listen("onRemoveDetail = #orderDetailListbox")
 	public void deleteOrderDetail(ForwardEvent evt) {
-		final OrderDetail orderDetail = (OrderDetail) evt.getData();
+		final OrderDetail orderDetail = (OrderDetail)evt.getData();
 		Messagebox.show("Esta seguro que desea eliminar " + orderDetail.getProduct().getName() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 			public void onEvent(Event evt) throws InterruptedException {
-				if (evt.getName().equals("onOK")) {
+				if(evt.getName().equals("onOK")) {
 					orderDetailList.remove(orderDetail);// quitamos el detalle de la lista
 					// eliminamos el detalle si estaba seleccionado
 					if(currentOrderDetail != null && orderDetail.equals(currentOrderDetail)) {
@@ -403,7 +402,6 @@ public class OrderCreationController extends SelectorComposer<Component> {
 				}
 			}
 		});
-
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -412,7 +410,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		if(currentOrder != null) {
 			Messagebox.show("Esta seguro que desea eliminar el pedido?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 				public void onEvent(Event evt) throws InterruptedException {
-					if (evt.getName().equals("onOK")) {
+					if(evt.getName().equals("onOK")) {
 						orderRepository.delete(currentOrder);// quitamos el detalle de la lista
 						currentOrder = null;
 						refreshViewOrder();
@@ -479,5 +477,4 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		currentOrder = null;
 		refreshViewOrder();
 	}
-
 }

@@ -103,7 +103,7 @@
 			            	<label value="${each.process.type.name}"/>
 			            	<datebox buttonVisible="true" disabled="${state_cancel}" cols="12" format="dd/MM/yyyy HH:mm" value="${each.dateStart}" forward="onChange=productionOrderDetailGrid.onChangeProductionOrderDetailStartDate(${each})"/>
 			            	<datebox buttonVisible="false" disabled="true" cols="12" format="dd/MM/yyyy HH:mm" value="${each.dateFinish}"/>
-			            	<label value="${win_production_order_creation$composer.getPieceNameByProcess(each.process)}"/>
+			            	<label value="${each.process.getPiece().getName()}"/>
 			            	<label value="${each.quantityPiece}"/>
 			            	<label value="${r:getFormattedProcessTime(each.process.time)}"/>
 			            	<label value="${r:getFormattedProcessTime(each.getTimeTotal())}"/>

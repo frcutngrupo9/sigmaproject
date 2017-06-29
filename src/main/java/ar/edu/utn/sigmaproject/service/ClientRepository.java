@@ -11,6 +11,4 @@ import ar.edu.utn.sigmaproject.domain.Client;
 @Repository
 public interface ClientRepository extends SearchableRepository<Client, Long> {
 
-	public Client findFirstByName(String name);
-
 }

@@ -1,6 +1,5 @@
 package ar.edu.utn.sigmaproject.controller;
 
-import java.util.Date;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
@@ -12,7 +11,6 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Button;
-import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
@@ -20,9 +18,7 @@ import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
-import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
-import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ReportProductionOrderController extends SelectorComposer<Component> {
@@ -38,8 +34,6 @@ public class ReportProductionOrderController extends SelectorComposer<Component>
 	// services
 	@WireVariable
 	private ProductionOrderRepository productionOrderRepository;
-	@WireVariable
-	private ProductionPlanRepository productionPlanRepository;
 
 	// atributes
 	private ProductionPlan currentProductionPlan;
@@ -59,15 +53,13 @@ public class ReportProductionOrderController extends SelectorComposer<Component>
 		productionOrderListModel = new ListModelList<ProductionOrder>(productionOrderList);
 		reportProductionOrderGrid.setModel(productionOrderListModel);
 
-
 		productionPlanNameTextbox.setDisabled(true);
 		productionPlanNameTextbox.setText(currentProductionPlan.getName());
 	}
-	
+
 	@Listen("onClick = #returnButton")
 	public void returnButtonClick() {
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("report.zul");
 	}
-
 }

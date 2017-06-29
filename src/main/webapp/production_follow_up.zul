@@ -76,7 +76,7 @@
 			            	<datebox buttonVisible="false" disabled="true" cols="12" format="dd/MM/yyyy HH:mm" value="${each.dateFinish}"/>
 			            	<datebox buttonVisible="true" disabled="${!state_finish}" visible="true" cols="12" format="dd/MM/yyyy HH:mm" value="${each.dateStartReal}" forward="onChange=productionOrderDetailGrid.onChangeProductionOrderDetailDateStartReal(${each})"/>
 			            	<datebox buttonVisible="true" disabled="${!state_finish}" visible="true" cols="12" format="dd/MM/yyyy HH:mm" value="${each.dateFinishReal}" forward="onChange=productionOrderDetailGrid.onChangeProductionOrderDetailDateFinishReal(${each})"/>
-			            	<label value="${win_production_follow_up$composer.getPieceNameByProcess(each.process)}"/>
+			            	<label value="${each.process.getPiece().getName()}"/>
 			            	<label value="${r:getFormattedProcessTime(each.getTimeTotal())}"/>
 			            	<label value="${each.getWorker().getName()}"/>
 			            	<cell>

@@ -25,7 +25,6 @@ import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.MaterialsOrder;
 import ar.edu.utn.sigmaproject.service.MaterialsOrderRepository;
-import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class MaterialsOrderListController extends SelectorComposer<Component> {
@@ -41,8 +40,6 @@ public class MaterialsOrderListController extends SelectorComposer<Component> {
 	// services
 	@WireVariable
 	private MaterialsOrderRepository materialsOrderRepository;
-	@WireVariable
-	private ProductionPlanRepository productionPlanRepository;
 
 	// list
 	private List<MaterialsOrder> materialsOrderList;

@@ -244,40 +244,20 @@ public class RepositoryHelper {
 			List<ProductCategory> list = new ArrayList<>();
 			list.add(new ProductCategory("Banco"));
 			list.add(new ProductCategory("Biblioteca"));
-			list.add(new ProductCategory("Comoda"));
 			list.add(new ProductCategory("Cajonera"));
 			list.add(new ProductCategory("Cama"));
 			list.add(new ProductCategory("Marco"));
 			list.add(new ProductCategory("Mesa"));
-			list.add(new ProductCategory("Respaldo"));
+			//			list.add(new ProductCategory("Respaldo"));se usa cama
 			list.add(new ProductCategory("Silla"));
-			list.add(new ProductCategory("Sillon"));
+			//			list.add(new ProductCategory("Sillon"));se usa silla
 			productCategoryRepository.save(list);
-		}
-	}
-
-	private void generateProduct() {
-		if (productRepository.count() == 0) {
-			generateProductCategory();
-			List<Product> list = new ArrayList<>();
-			list.add(new Product("26", "Dressoir patas rectas de 0.90x0.45mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Comoda"), new BigDecimal("483")));
-			list.add(new Product("29", "Banqueta alta  con respaldo de 0.30mts de diametro".toUpperCase(), "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("226")));
-			list.add(new Product("32", "Silla Omega respaldo inclinado patas rectas".toUpperCase(), "", productCategoryRepository.findFirstByName("Silla"), new BigDecimal("231")));
-			list.add(new Product("37", "Cama Monterrey c/curva patas 4x4 de 080cm".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("1050")));
-			list.add(new Product("40", "Respaldo para Somier Monterrey X o Curvo de 1.50mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Respaldo"), new BigDecimal("1029")));
-			list.add(new Product("43", "Marco de espejo".toUpperCase(), "", productCategoryRepository.findFirstByName("Marco"), new BigDecimal("189")));
-			list.add(new Product("44", "Sillon Hamaca grande".toUpperCase(), "", productCategoryRepository.findFirstByName("Sillon"), new BigDecimal("504")));
-			list.add(new Product("51", "Chiffonier de 1,45x0,70x0,40 mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cajonera"), new BigDecimal("1245")));
-			list.add(new Product("53", "Mesa de luz de 0,70x0,50x0,40 mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("473")));
-			list.add(new Product("57", "Biblioteca de 0,60 mts con 4 cajones y estantes".toUpperCase(), "", productCategoryRepository.findFirstByName("Biblioteca"), new BigDecimal("1024")));
-			productRepository.save(list);
 		}
 	}
 
 	private void generateClient() {
 		if (clientRepository.count() == 0) {
 			List<Client> list = new ArrayList<>();
-			list.add(new Client("RESTOCK", "", "", "", "RESERVADO RESTOCK"));
 			list.add(new Client("CLIENTE 1", "03514704411", "EMAIL1@MAILSERVER.COM", "DIRECCION 1", "DETALLES 1"));
 			list.add(new Client("CLIENTE 2", "03514704412", "EMAIL2@MAILSERVER.COM", "DIRECCION 2", "DETALLES 2"));
 			list.add(new Client("CLIENTE 3", "03514704413", "EMAIL3@MAILSERVER.COM", "DIRECCION 3", "DETALLES 3"));
@@ -370,4 +350,73 @@ public class RepositoryHelper {
 		fullTextEntityManager.createIndexer().startAndWait();
 	}
 
+	private void generateProduct() {
+		if (productRepository.count() == 0) {
+			generateProductCategory();
+			List<Product> list = new ArrayList<>();
+			list.add(new Product("1", "Mesa patas 4x4 rectas de 1.20x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("840")));
+			//			list.add(new Product("2", "Mesa patas 4x4 rectas de 1.40x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("956")));
+			//			list.add(new Product("3", "Mesa patas 4x4 rectas de 1.60x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1045")));
+			//			list.add(new Product("4", "Mesa patas 4x4 rectas de 1.80x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1150")));
+			list.add(new Product("5", "Mesa patas 4x4 rectas de 2.00x0.90mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1360")));
+			//			list.add(new Product("6", "Mesa patas Reina Ana de 1.20x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("956")));
+			//			list.add(new Product("7", "Mesa patas Reina Ana de 1.40x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1045")));
+			//			list.add(new Product("8", "Mesa patas Reina Ana de 1.60x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1150")));
+			//			list.add(new Product("9", "Mesa patas Reina Ana de 1.80x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1255")));
+			//			list.add(new Product("10", "Mesa patas Reina Ana de 2.00x0.90mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1449")));
+			list.add(new Product("11", "Mesa patas 3x3 tapa de 1\" de 1.20x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("609")));
+			//			list.add(new Product("12", "Mesa patas 3x3 tapa de 1\" de 1.40x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("693")));
+			//			list.add(new Product("13", "Mesa patas 3x3 tapa de 1\" de 1.60x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("756")));
+			//			list.add(new Product("14", "Mesa patas 3x3 tapa de 1\" de 1.80x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("872")));
+			list.add(new Product("15", "Mesa redonda pata central de 1.00mts de di\u00e1metro".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("872")));
+			//			list.add(new Product("16", "Mesa redonda pata central de 1.20mts de di\u00e1metro".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1061")));
+			//			list.add(new Product("17", "Mesa redonda pata central de 1.40mts de di\u00e1metro".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1239")));
+			//			list.add(new Product("18", "Mesa redonda patas Reina Ana de 1.00mts de di\u00e1metro".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1019")));
+			//			list.add(new Product("19", "Mesa redonda patas Reina Ana de 1.20mts de di\u00e1metro".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1208")));
+			//			list.add(new Product("20", "Mesa redonda patas Reina Ana de 1.40mts de di\u00e1metro".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1371")));
+			list.add(new Product("21", "Mesa de living patas 3x3 rectas de 0.60x0.45mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("378")));
+			//			list.add(new Product("22", "Mesa de living patas 4x4 rectas de 0.90x0.60mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("588")));
+			//			list.add(new Product("23", "Mesa de living patas 4x4 rectas de 1.00x0.70mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("678")));
+			//			list.add(new Product("24", "Mesa de living patas 4x4 rectas de 1.20x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("798")));
+			//			list.add(new Product("25", "Mesa de living Reina Ana 0.90x0.60 tapa de 1\" con regrueso".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("390")));
+			//			list.add(new Product("26", "Dressoir patas rectas de 0.90x0.45mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("483")));
+			//			list.add(new Product("27", "Dressoir patas Reina Ana de 0.90x0.45mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("567")));
+			//			list.add(new Product("28", "Banqueta alta sin respaldo de 0.30mts de di\u00e1metro".toUpperCase(), "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("177")));
+			list.add(new Product("29", "Banqueta alta  con respaldo de 0.30mts de di\u00e1metro".toUpperCase(), "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("226")));
+			//			list.add(new Product("30", "Banqueta alta con respaldo omega".toUpperCase(), "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("294")));
+			//			list.add(new Product("31", "Silla de campo resp. c/ tablero o varillas".toUpperCase(), "", productCategoryRepository.findFirstByName("Silla"), new BigDecimal("252")));
+			list.add(new Product("32", "Silla Omega respaldo inclinado patas rectas".toUpperCase(), "", productCategoryRepository.findFirstByName("Silla"), new BigDecimal("231")));
+			//			list.add(new Product("33", "Cama Omega de 0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("399")));
+			list.add(new Product("34", "Cama Omega de 1.40mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("704")));
+			//			list.add(new Product("35", "Cama Mexicana X patas 2x4 de 0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("667")));
+			list.add(new Product("36", "Cama Mexicana X patas 2x4 de 1.40mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("1045")));
+			//			list.add(new Product("37", "Cama Monterrey c/curva patas 4x4 de 080cm".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("1050")));
+			//			list.add(new Product("38", "Cama Monterrey resp. c/ X o Curva patas 4x4 de 1.40mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("1292")));
+			list.add(new Product("39", "Respaldo para Somier Mexicano X patas 2x4 de 1.50mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("798")));
+			//			list.add(new Product("40", "Respaldo para Somier Monterrey X o Curvo de 1.50mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("1029")));
+			//			list.add(new Product("41", "Respaldos Mexicanos X para Marineras".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("578")));
+			//			list.add(new Product("42", "Cucheta Mexicana X fija y desmontable".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("1271")));
+			//			list.add(new Product("43", "Marco de espejo".toUpperCase(), "", productCategoryRepository.findFirstByName("Marco"), new BigDecimal("189")));
+			//			list.add(new Product("44", "Sillon Hamaca grande".toUpperCase(), "", productCategoryRepository.findFirstByName("Silla"), new BigDecimal("504")));
+			//			list.add(new Product("45", "Dresoir de 3 cajones con estante".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("536")));
+			list.add(new Product("46", "Dresoir de 2 cajones con estante".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("431")));
+			list.add(new Product("47", "Mesa de l\u00e1mpara con 1 cajon".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("284")));
+			//			list.add(new Product("48", "Mesa de l\u00e1mpara con 2 cajones", "".toUpperCase(), productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("347")));
+			//			list.add(new Product("49", "Mesa de bar de 70x70 pata 3x3 tapa de 1\"".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("473")));
+			//			list.add(new Product("50", "Mesa de bar de 80x80 pata  3x3 tapa de 1\"".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("525")));
+			list.add(new Product("51", "Chiffonier de 1,45x0,70x0,40 mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cajonera"), new BigDecimal("1245")));
+			list.add(new Product("52", "C\u00f3moda de 1,00x0,90x0,40 mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cajonera"), new BigDecimal("1197")));
+			list.add(new Product("53", "Mesa de luz de 0,70x0,50x0,40 mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("473")));
+			list.add(new Product("54", "Biblioteca de 0,30 mts con estantes".toUpperCase(), "", productCategoryRepository.findFirstByName("Biblioteca"), new BigDecimal("546")));
+			//			list.add(new Product("55", "Biblioteca de 0,30 mts con 4 cajones y estantes".toUpperCase(), "", productCategoryRepository.findFirstByName("Biblioteca"), new BigDecimal("756")));
+			//			list.add(new Product("56", "Biblioteca de 0,60 mts con estantes".toUpperCase(), "", productCategoryRepository.findFirstByName("Biblioteca"), new BigDecimal("756")));
+			//			list.add(new Product("57", "Biblioteca de 0,60 mts con 4 cajones y estantes".toUpperCase(), "", productCategoryRepository.findFirstByName("Biblioteca"), new BigDecimal("1024")));
+			//			list.add(new Product("58", "Sillon Romano de un cuerpo".toUpperCase(), "", productCategoryRepository.findFirstByName("Silla"), new BigDecimal("321")));
+			//			list.add(new Product("59", "Sillon Romano de dos cuerpos".toUpperCase(), "", productCategoryRepository.findFirstByName("Silla"), new BigDecimal("483")));
+			//			list.add(new Product("60", "Banquito recto o redondo chico".toUpperCase(), "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("153")));
+			list.add(new Product("61", "Sillon punta de cama Reina Ana 1,00 mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Silla"), new BigDecimal("380")));
+
+			productRepository.save(list);
+		}
+	}
 }

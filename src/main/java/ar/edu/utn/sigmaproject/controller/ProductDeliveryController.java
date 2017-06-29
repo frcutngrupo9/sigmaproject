@@ -89,10 +89,8 @@ public class ProductDeliveryController extends SelectorComposer<Component> {
 		super.doAfterCompose(comp);
 		currentOrder = (Order) Executions.getCurrent().getArg().get("selected_order");
 		if(currentOrder == null) {throw new RuntimeException("Order null");}
-
 		orderDetailList = currentOrder.getDetails();
 		orderDetailListModel = new ListModelList<>(orderDetailList);
-
 		refreshView();
 	}
 
@@ -135,14 +133,12 @@ public class ProductDeliveryController extends SelectorComposer<Component> {
 		orderState = orderStateRepository.save(orderState);
 		currentOrder.setState(orderState);
 		currentOrder = orderRepository.save(currentOrder);
-
 		// modifica la cantidad en stock
 		for(OrderDetail each : currentOrder.getDetails()) {
 			Product product = each.getProduct();
 			product.setStock(product.getStock() - each.getUnits());
 			product = productRepository.save(product);
 		}
-
 		EventQueue<Event> eq = EventQueues.lookup("Product Delivery Queue", EventQueues.DESKTOP, true);
 		eq.publish(new Event("onProductDelivery", null, null));
 		alert("Entrega de Producto Registrada.");

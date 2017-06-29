@@ -12,11 +12,11 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 
 @Repository
 public interface ProductionPlanRepository extends JpaRepository<ProductionPlan, Long> {
-	
+
 	public ProductionPlan findByMaterialRequirements(MaterialRequirement materialRequirement);
-	
+
 	public List<ProductionPlan> findByCurrentStateType(ProductionPlanStateType productionPlanStateType);
-	
+
 	public ProductionPlan findByPlanDetailsOrder(Order order);
 
 }

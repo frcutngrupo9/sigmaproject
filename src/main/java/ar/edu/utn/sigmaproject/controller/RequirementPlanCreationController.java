@@ -40,15 +40,12 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.domain.Wood;
-import ar.edu.utn.sigmaproject.service.MaterialReservedRepository;
 import ar.edu.utn.sigmaproject.service.MaterialsOrderRepository;
-import ar.edu.utn.sigmaproject.service.ProductRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
-import ar.edu.utn.sigmaproject.service.WoodTypeRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class RequirementPlanCreationController extends SelectorComposer<Component> {
@@ -75,8 +72,6 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 
 	// services
 	@WireVariable
-	private ProductRepository productRepository;
-	@WireVariable
 	private ProductionPlanRepository productionPlanRepository;
 	@WireVariable
 	private ProductionPlanStateRepository productionPlanStateRepository;
@@ -85,13 +80,9 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	@WireVariable
 	private WoodRepository woodRepository;
 	@WireVariable
-	private WoodTypeRepository woodTypeRepository;
-	@WireVariable
 	private SupplyTypeRepository supplyTypeRepository;
 	@WireVariable
 	private MaterialsOrderRepository materialsOrderRepository;
-	@WireVariable
-	private MaterialReservedRepository materialReservedRepository;
 
 	// atributes
 	private ProductionPlan currentProductionPlan;
@@ -106,7 +97,6 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	private ListModelList<MaterialRequirement> supplyRequirementListModel;
 	private ListModelList<MaterialRequirement> rawMaterialRequirementListModel;
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
@@ -119,6 +109,12 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 		rawMaterialRequirementListModel = new ListModelList<>(rawMaterialRequirementList);
 
 		// listener para cuando se modifique alguna reserva
+		createRequirementReservationListener();
+		refreshView();
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void createRequirementReservationListener() {
 		eq = EventQueues.lookup("Requirement Reservation Queue", EventQueues.DESKTOP, true);
 		eq.subscribe(new EventListener() {
 			public void onEvent(Event event) throws Exception {
@@ -131,7 +127,6 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 				updateProductionPlanState();
 			}
 		});
-		refreshView();
 	}
 
 	private void updateProductionPlanState() {

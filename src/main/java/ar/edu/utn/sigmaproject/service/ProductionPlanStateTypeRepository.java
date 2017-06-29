@@ -9,5 +9,5 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 public interface ProductionPlanStateTypeRepository extends JpaRepository<ProductionPlanStateType, Long> {
 
 	public ProductionPlanStateType findFirstByName(String string);	
-	
+
 }

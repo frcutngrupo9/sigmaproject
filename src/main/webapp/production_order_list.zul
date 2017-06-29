@@ -76,7 +76,7 @@
 		                	<label value="${each.units}"/>
 		                	<label value="${each.product.code}"/>
 		                    <label value="${each.getCurrentStateType().name}"/>
-		                    <label value="${win_production_order_list$composer.getPercentComplete(each)}"/>
+		                    <label value="${each.getPercentComplete()}"/>
 		                    <label value="${r:getFormattedTime(each.getDurationTotal())}"/>
 		                    <label value="${r:getFormattedTime(each.product.getDurationTotal())}"/>
 		                    <label value="${each.dateStartReal}"/>

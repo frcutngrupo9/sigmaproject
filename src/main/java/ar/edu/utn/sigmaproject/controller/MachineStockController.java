@@ -137,7 +137,7 @@ public class MachineStockController extends SelectorComposer<Component> {
 			usedTimeIntboxMinutes.setValue(null);
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);
-		}else {// editar
+		} else {// editar
 			machineGrid.setVisible(true);
 			machineTypeListModel.addToSelection(currentMachine.getMachineType());
 			machineTypeCombobox.setModel(machineTypeListModel);
@@ -168,7 +168,7 @@ public class MachineStockController extends SelectorComposer<Component> {
 			Clients.showNotification("Debe seleccionar una Maquina", machineTypeCombobox);
 			return;
 		}
-		if(Strings.isBlank(nameTextbox.getValue())){
+		if(Strings.isBlank(nameTextbox.getValue())) {
 			Clients.showNotification("Ingrese el Nombre de la Maquina", nameTextbox);
 			return;
 		}

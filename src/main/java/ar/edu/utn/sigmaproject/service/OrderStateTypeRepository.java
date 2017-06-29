@@ -8,5 +8,5 @@ import ar.edu.utn.sigmaproject.domain.OrderStateType;
 public interface OrderStateTypeRepository extends SearchableRepository<OrderStateType, Long> {
 
 	public OrderStateType findFirstByName(String string);
-	
+
 }
