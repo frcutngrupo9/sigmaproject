@@ -15,18 +15,22 @@ public class OrderDetail  implements Serializable, Cloneable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
+	
+	@ManyToOne(targetEntity = Order.class)
+	private Order order = null;
 
 	@ManyToOne
-	Product product;
-	Integer units = 0;
-	BigDecimal price = BigDecimal.ZERO;
+	private Product product;
+	private Integer units = 0;
+	private BigDecimal price = BigDecimal.ZERO;
 
 	public OrderDetail() {
 
 	}
 
-	public OrderDetail(Product product, Integer units, BigDecimal price) {
+	public OrderDetail(Order order, Product product, Integer units, BigDecimal price) {
+		this.order = order;
 		this.product = product;
 		this.units = units;
 		this.price = price;
@@ -38,6 +42,14 @@ public class OrderDetail  implements Serializable, Cloneable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public Order getOrder() {
+		return order;
+	}
+
+	public void setOrder(Order order) {
+		this.order = order;
 	}
 
 	public Product getProduct() {
@@ -65,29 +77,4 @@ public class OrderDetail  implements Serializable, Cloneable {
 	public void setPrice(BigDecimal price) {
 		this.price = price;
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		OrderDetail other = (OrderDetail) obj;
-		if (id != null && other.id != null) {
-			return id.equals(other.id);
-		}
-		return false;
-	}
-
-	public static OrderDetail clone(OrderDetail orderDetail) {
-		try {
-			return (OrderDetail) orderDetail.clone();
-		} catch (CloneNotSupportedException e) {
-			// not possible
-		}
-		return null;
-	}
-
 }

@@ -84,7 +84,7 @@ public class ClientController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
-		if(Strings.isBlank(nameTextbox.getText())){
+		if(Strings.isBlank(nameTextbox.getText())) {
 			Clients.showNotification("Debe ingresar un nombre", nameTextbox);
 			return;
 		}
@@ -127,7 +127,7 @@ public class ClientController extends SelectorComposer<Component> {
 
 	@Listen("onSelect = #clientListbox")
 	public void doListBoxSelect() {
-		if (clientListbox.getSelectedItem() == null) {
+		if(clientListbox.getSelectedItem() == null) {
 			// just in case for the no selection
 			currentClient = null;
 		} else if (currentClient == null) {// si no hay nada editandose

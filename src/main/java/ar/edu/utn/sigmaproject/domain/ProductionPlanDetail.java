@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 @Entity
 public class ProductionPlanDetail implements Serializable, Cloneable {
@@ -15,15 +16,19 @@ public class ProductionPlanDetail implements Serializable, Cloneable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
+	
+	@ManyToOne(targetEntity = ProductionPlan.class)
+	private ProductionPlan productionPlan = null;
 
-	@ManyToOne
+	@OneToOne
 	Order order;
 
 	public ProductionPlanDetail() {
 
 	}
 
-	public ProductionPlanDetail(Order order) {
+	public ProductionPlanDetail(ProductionPlan productionPlan, Order order) {
+		this.productionPlan = productionPlan;
 		this.order = order;
 	}
 
@@ -43,44 +48,12 @@ public class ProductionPlanDetail implements Serializable, Cloneable {
 		this.order = order;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
+	public ProductionPlan getProductionPlan() {
+		return productionPlan;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof ProductionPlanDetail)) {
-			return false;
-		}
-		ProductionPlanDetail other = (ProductionPlanDetail) obj;
-		if (id == null) {
-			if (other.id != null) {
-				return false;
-			}
-		} else if (!id.equals(other.id)) {
-			return false;
-		}
-		return true;
+	public void setProductionPlan(ProductionPlan productionPlan) {
+		this.productionPlan = productionPlan;
 	}
-
-	public static ProductionPlanDetail clone(ProductionPlanDetail productionPlanDetail) {
-		try {
-			return (ProductionPlanDetail) productionPlanDetail.clone();
-		} catch (CloneNotSupportedException e) {
-			// not possible
-		}
-		return null;
-	}
-
 }
 

@@ -20,11 +20,10 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.EventQueue;
 import org.zkoss.zk.ui.event.EventQueues;
-import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.event.InputEvent;
-import org.zkoss.zk.ui.event.MouseEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
+import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
@@ -37,11 +36,15 @@ import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Image;
+import org.zkoss.zul.Include;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Listcell;
+import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Selectbox;
+import org.zkoss.zul.Spinner;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
@@ -52,18 +55,13 @@ import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductCategory;
-import ar.edu.utn.sigmaproject.domain.RawMaterial;
-import ar.edu.utn.sigmaproject.domain.Supply;
-import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
+import ar.edu.utn.sigmaproject.domain.ProductMaterial;
 import ar.edu.utn.sigmaproject.service.MeasureUnitRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitTypeRepository;
-import ar.edu.utn.sigmaproject.service.PieceRepository;
-import ar.edu.utn.sigmaproject.service.ProcessRepository;
+import ar.edu.utn.sigmaproject.service.OrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductCategoryRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
-import ar.edu.utn.sigmaproject.service.RawMaterialRepository;
-import ar.edu.utn.sigmaproject.service.SupplyRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProductCreationController extends SelectorComposer<Component> {
@@ -122,8 +120,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@Wire
 	Intbox pieceUnitsByProductIntbox;
 	@Wire
-	Button createProcessButton;
-	@Wire
 	Button cancelPieceButton;
 	@Wire
 	Component processCreationBlock;
@@ -152,23 +148,16 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@WireVariable
 	private ProcessTypeRepository processTypeRepository;
 	@WireVariable
-	private MachineTypeRepository machineTypeRepository;
-	@WireVariable
 	private ProductRepository productRepository;
-	@WireVariable
-	private PieceRepository pieceRepository;
-	@WireVariable
-	private ProcessRepository processRepository;
 	@WireVariable
 	private ProductCategoryRepository productCategoryRepository;
 	@WireVariable
-	private SupplyRepository supplyRepository;
-	@WireVariable
-	private RawMaterialRepository rawMaterialRepository;
+	private OrderDetailRepository orderDetailRepository;
 
 	// attributes
 	private Product currentProduct;
 	private Piece currentPiece;
+	private Piece clonedPiece;
 	@SuppressWarnings("rawtypes")
 	private EventQueue eq;
 
@@ -176,8 +165,8 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	private List<Piece> pieceList;
 	private List<ProcessType> processTypeList;
 	private List<Process> listboxProcessList;
-	private List<Supply> supplyList;
-	private List<RawMaterial> rawMaterialList;
+	private List<ProductMaterial> supplyList;
+	private List<ProductMaterial> rawMaterialList;
 
 	// list models
 	private ListModelList<Piece> pieceListModel;
@@ -202,22 +191,19 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		lengthMeasureUnitSelectbox.setModel(lengthMeasureUnitListModel);
 		depthMeasureUnitSelectbox.setModel(depthMeasureUnitListModel);
 		widthMeasureUnitSelectbox.setModel(widthMeasureUnitListModel);
-
 		currentProduct = (Product) Executions.getCurrent().getAttribute("selected_product");
 		currentPiece = null;
-
 		// listener para cuando se modifique el producto al agregar materias primas o insumos
 		eq = EventQueues.lookup("Product Change Queue", EventQueues.DESKTOP, true);
 		eq.subscribe(new EventListener() {
 			public void onEvent(Event event) throws Exception {
 				if(event.getName().equals("onSupplyChange")) {
-					supplyList = (List<Supply>) event.getData();
+					supplyList = (List<ProductMaterial>) event.getData();
 				} else {
-					rawMaterialList = (List<RawMaterial>) event.getData();
+					rawMaterialList = (List<ProductMaterial>) event.getData();
 				}
 			}
 		});
-
 		// agregamos un listener para cuando se seleccione una pieza en el modal de copia de otra pieza
 		eq = EventQueues.lookup("Piece Selection Queue", EventQueues.DESKTOP, true);
 		eq.subscribe(new EventListener() {
@@ -243,29 +229,37 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			Clients.showNotification("Ingresar Nombre Producto", productNameTextbox);
 			return;
 		}
+		ProductCategory productCategory = null;
 		if (productCategoryCombobox.getSelectedIndex() == -1) {
 			String manuallyEnteredCategoryName = productCategoryCombobox.getValue();
 			if (manuallyEnteredCategoryName.trim().length() > 0) {
 				ProductCategory newProductCategory = new ProductCategory(manuallyEnteredCategoryName);
-				newProductCategory = productCategoryRepository.save(newProductCategory);
-				productCategoryListModel = new ListModelList<>(productCategoryRepository.findAll());
-				productCategoryCombobox.setModel(productCategoryListModel);
-				productCategoryCombobox.onInitRender(new MouseEvent(Events.ON_CLICK, productCategoryCombobox));
-				productCategoryCombobox.setSelectedIndex(productCategoryListModel.indexOf(newProductCategory));
+				productCategory = productCategoryRepository.save(newProductCategory);
 			} else {
 				Clients.showNotification("Seleccionar Categoria Producto", productCategoryCombobox);
 				return;
 			}
 		}
+		if(productCategory == null) {
+			productCategory = productCategoryCombobox.getSelectedItem().getValue();
+		}
 		String productName = productNameTextbox.getText().toUpperCase();
 		String productDetails = productDetailsTextbox.getText();
 		String productCode = productCodeTextbox.getText();
-		ProductCategory productCategory = productCategoryCombobox.getSelectedItem().getValue();
 		BigDecimal productPrice = new BigDecimal(productPriceDoublebox.doubleValue());
 		org.zkoss.image.Image image = productImage.getContent();
-
+		List<ProductMaterial> productMaterialList = new ArrayList<ProductMaterial>();
+		productMaterialList.addAll(supplyList);
+		productMaterialList.addAll(rawMaterialList);
 		if(currentProduct == null) {// se esta creando un nuevo producto
 			currentProduct = new Product(productCode, productName, productDetails, productCategory, productPrice);
+			// se asigna la referencia al producto de los materiales y a las piezas
+			for(ProductMaterial each : productMaterialList) {
+				each.setProduct(currentProduct);
+			}
+			for(Piece each : pieceList) {
+				each.setProduct(currentProduct);
+			}
 		} else {// se esta editando un producto
 			currentProduct.setName(productName);
 			currentProduct.setDetails(productDetails);
@@ -277,20 +271,9 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			currentProduct.setImageData(image.getByteData());			
 		}
 		currentProduct.setPieces(pieceList);
-		for(Piece eachPiece : currentProduct.getPieces()) {
-			processRepository.save(eachPiece.getProcesses());
-			eachPiece = pieceRepository.save(eachPiece);
-		}
-		supplyRepository.save(supplyList);
-		currentProduct.setSupplies(supplyList);
-		rawMaterialRepository.save(rawMaterialList);
-		currentProduct.setRawMaterials(rawMaterialList);
-
+		currentProduct.setMaterials(productMaterialList);
 		currentProduct = productRepository.save(currentProduct);
-
-		// mostrar mensaje al user
 		Clients.showNotification("Producto guardado");
-
 		currentPiece = null;
 		refreshViewProduct();
 		refreshViewPiece();
@@ -303,6 +286,8 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			productImage.setWidth("225px");
 			productImage.setStyle("margin: 8px");
 			productImage.setContent(img);
+			refreshViewPiece();// para que se pueda scrollear
+			productNameTextbox.setFocus(true);
 		} else {
 			Messagebox.show("No es una imagen: " + media, "Error", Messagebox.OK, Messagebox.ERROR);
 		}
@@ -318,6 +303,8 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			productImage.setWidth("0px");
 			productImage.setStyle("margin: 0px");
 			productGrid.setHflex("2");
+			refreshViewPiece();
+			productNameTextbox.setFocus(true);
 		}
 	}
 
@@ -327,16 +314,15 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		refreshViewPiece();
 		pieceCreationBlock.setVisible(true);
 		processCreationBlock.setVisible(true);
+		scrollToPieceBlock();
 	}
 
-	@Listen("onClick = #cancelPieceButton")
-	public void cancelPiece() {
-		currentPiece = null;
-		refreshViewPiece();
+	private void scrollToPieceBlock() {
+		Clients.scrollIntoView(pieceCreationBlock);
 	}
 
-	@Listen("onClick = #createProcessButton")
-	public void createNewProcess() {
+	@Listen("onClick = #finishProcessButton")
+	public void finishPiece() {
 		if(Strings.isBlank(pieceNameTextbox.getValue())) {
 			Clients.showNotification("Ingrese el Nombre de la Pieza", pieceNameTextbox);
 			return;
@@ -345,25 +331,13 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			Clients.showNotification("La cantidad debe ser mayor a 0.", pieceUnitsByProductIntbox);
 			return;
 		}
-		processCreationBlock.setVisible(true);
-	}
-
-	@Listen("onClick = #cancelProcessButton")
-	public void cancelProcess() {
-		pieceCreationBlock.setVisible(true);
-		processCreationBlock.setVisible(false);
-	}
-
-	@Listen("onClick = #finishProcessButton")
-	public void finishPiece() {
 		// comprobamos que no existan checkbox activados que no posean valores de duracion
 		for(int i = 1; i < processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
 			Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
-			Intbox intboxDays = (Intbox)processListbox.getChildren().get(i).getChildren().get(3).getChildren().get(0);
-			Intbox intboxHours = (Intbox)processListbox.getChildren().get(i).getChildren().get(4).getChildren().get(0);
-			Intbox intboxMinutes = (Intbox)processListbox.getChildren().get(i).getChildren().get(5).getChildren().get(0);
-			if(chkbox.isChecked() && intboxDays.intValue() == 0 && intboxHours.intValue() == 0 && intboxMinutes.intValue() == 0) {
-				Clients.showNotification("Ingrese el Tiempo para el Proceso", intboxMinutes);
+			Spinner hoursSpinner = (Spinner)processListbox.getChildren().get(i).getChildren().get(3).getChildren().get(0);
+			Spinner minutesSpinner = (Spinner)processListbox.getChildren().get(i).getChildren().get(4).getChildren().get(0);
+			if(chkbox.isChecked() && hoursSpinner.intValue() == 0 && minutesSpinner.intValue() == 0) {
+				Clients.showNotification("Ingrese el Tiempo para el Proceso", minutesSpinner);
 				return;
 			}
 		}
@@ -386,10 +360,13 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		String pieceSize = pieceSizeTextbox.getText();
 		Integer pieceUnits = pieceUnitsByProductIntbox.getValue();
 		boolean pieceIsGroup = pieceGroupCheckbox.isChecked();
-
 		if(currentPiece == null) { // se esta creando una pieza
-			currentPiece = new Piece(pieceName, pieceLength, lengthMeasureUnit, pieceDepth, depthMeasureUnit, pieceWidth, widthMeasureUnit, pieceSize, pieceIsGroup, pieceUnits);
+			currentPiece = new Piece(currentProduct, pieceName, pieceLength, lengthMeasureUnit, pieceDepth, depthMeasureUnit, pieceWidth, widthMeasureUnit, pieceSize, pieceIsGroup, pieceUnits);
+			// se agrega la pieza a todos los procesos
 			pieceList.add(currentPiece);// lo agregamos a la lista
+			for(Process each : listboxProcessList) {
+				each.setPiece(currentPiece);
+			}
 		} else { // se esta editando una pieza
 			currentPiece.setName(pieceName);
 			currentPiece.setLength(pieceLength);
@@ -414,7 +391,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			deleteProductButton.setDisabled(true);
 			productNameTextbox.setText("");
 			productDetailsTextbox.setText("");
-			productCodeTextbox.setText("");
+			productCodeTextbox.setText(getNewProductCode());
 			productCategoryCombobox.setSelectedIndex(-1);
 			productPriceDoublebox.setText("");
 			org.zkoss.image.Image img = null;
@@ -432,7 +409,8 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			deleteProductButton.setDisabled(false);
 			productNameTextbox.setText(currentProduct.getName());
 			productDetailsTextbox.setText(currentProduct.getDetails());
-			productCategoryCombobox.setSelectedIndex(productCategoryListModel.indexOf(currentProduct.getCategory()));
+			productCategoryListModel = new ListModelList<>(productCategoryRepository.findAll());
+			productCategoryCombobox.setSelectedIndex(productCategoryListModel.indexOf(productCategoryRepository.findOne(currentProduct.getCategory().getId())));
 			productCodeTextbox.setText(currentProduct.getCode());
 			BigDecimal product_price = currentProduct.getPrice();
 			if(product_price != null) {
@@ -462,6 +440,22 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			supplyList = new ArrayList<>(currentProduct.getSupplies());
 			rawMaterialList = new ArrayList<>(currentProduct.getRawMaterials());
 		}
+	}
+
+	private String getNewProductCode() {
+		Integer lastValue = 0;
+		List<Product> list = productRepository.findAll();
+		for(Product each : list) {
+			int code = 0;
+			if(!each.getCode().equals("")) {
+				code = Integer.parseInt(each.getCode());
+			}
+			if(code > lastValue) {
+				lastValue = code;
+			}
+		}
+		lastValue = lastValue + 1;
+		return lastValue + "";
 	}
 
 	private void refreshViewPiece() {
@@ -518,7 +512,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			}
 			pieceSizeTextbox.setValue(currentPiece.getSize());
 			pieceUnitsByProductIntbox.setValue(currentPiece.getUnits());
-
 			listboxProcessList = currentPiece.getProcesses();// actualizamos la lista de procesos del Listbox con la lista de procesos obtenida de los procesos totales
 		}
 		refreshViewProcess();
@@ -535,15 +528,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			return "";
 		} else {
 			return aux.getDetails();
-		}
-	}
-
-	public Integer getProcessDays(ProcessType processType) {
-		Process aux = getProcessFromListbox(processType);
-		if(aux == null) {
-			return 0;
-		} else {
-			return aux.getTime().getDays();
 		}
 	}
 
@@ -576,8 +560,9 @@ public class ProductCreationController extends SelectorComposer<Component> {
 
 	private Process getProcessFromListbox(ProcessType processType) {
 		if(listboxProcessList != null) {
+			ProcessType processTypeAux = processTypeRepository.findOne(processType.getId());
 			for(Process process : listboxProcessList) {
-				if(process.getType().equals(processType)) {
+				if(processTypeRepository.findOne(process.getType().getId()).equals(processTypeAux)) {
 					return process;
 				}
 			}
@@ -603,7 +588,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			} catch (DatatypeConfigurationException e) {
 				System.out.println("Error en convertir a duracion: " + e.toString());
 			}
-			listboxProcessList.add(new Process(processType, "", duration));
+			listboxProcessList.add(new Process(currentPiece, processType, "", duration));
 		}
 	}
 
@@ -617,7 +602,22 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		} else {
 			deleteProcessFromListbox(data);
 		}
-		refreshViewProcess();
+		Listcell listcell = (Listcell)cbox.getParent();
+		Listitem listitem = (Listitem)listcell.getParent();
+		doProcessLineVisible(cbox.isChecked(), listitem);
+	}
+
+	private void doProcessLineVisible(boolean visible, Listitem listitem) {
+		// se hacen visibles o invisibles todos los elementos de la fila
+		Listcell listcell = (Listcell)listitem.getChildren().get(listitem.getChildren().size()-3);
+		Textbox textboxProcessDetails = (Textbox)listcell.getChildren().get(0);// el unico children debe ser el elemento
+		listcell = (Listcell)listitem.getChildren().get(listitem.getChildren().size()-2);
+		Spinner spinnerProcessHours = (Spinner)listcell.getChildren().get(0);
+		listcell = (Listcell)listitem.getChildren().get(listitem.getChildren().size()-1);
+		Spinner spinnerProcessMinutes = (Spinner)listcell.getChildren().get(0);
+		textboxProcessDetails.setVisible(visible);
+		spinnerProcessHours.setVisible(visible);
+		spinnerProcessMinutes.setVisible(visible);
 	}
 
 	@Listen("onProcessDetailsChange = #processListbox")
@@ -630,32 +630,16 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		process.setDetails(origin.getText());
 	}
 
-	@Listen("onProcessDaysChange = #processListbox")
-	public void doProcessDaysChange(ForwardEvent evt) {
-		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
-		Intbox origin = (Intbox)evt.getOrigin().getTarget();
-		InputEvent inputEvent = (InputEvent) evt.getOrigin();
-		origin.setValue(Integer.valueOf(inputEvent.getValue()));
-		Process process = getProcessFromListbox(data);
-		Duration duration = null;
-		try {
-			duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, origin.intValue(), process.getTime().getHours(), process.getTime().getMinutes(), 0);
-		} catch (DatatypeConfigurationException e) {
-			System.out.println("Error en convertir a duracion: " + e.toString());
-		}
-		process.setTime(duration);
-	}
-
 	@Listen("onProcessHoursChange = #processListbox")
 	public void doProcessHoursChange(ForwardEvent evt) {
 		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
-		Intbox origin = (Intbox)evt.getOrigin().getTarget();
+		Spinner origin = (Spinner)evt.getOrigin().getTarget();
 		InputEvent inputEvent = (InputEvent) evt.getOrigin();
 		origin.setValue(Integer.valueOf(inputEvent.getValue()));
 		Process process = getProcessFromListbox(data);
 		Duration duration = null;
 		try {
-			duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, process.getTime().getDays(), origin.intValue(), process.getTime().getMinutes(), 0);
+			duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, 0, origin.intValue(), process.getTime().getMinutes(), 0);
 		} catch (DatatypeConfigurationException e) {
 			System.out.println("Error en convertir a duracion: " + e.toString());
 		}
@@ -665,17 +649,20 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@Listen("onProcessMinutesChange = #processListbox")
 	public void doProcessMinutesChange(ForwardEvent evt) {
 		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
-		Intbox origin = (Intbox)evt.getOrigin().getTarget();
+		Spinner origin = (Spinner)evt.getOrigin().getTarget();
 		InputEvent inputEvent = (InputEvent) evt.getOrigin();
-		origin.setValue(Integer.valueOf(inputEvent.getValue()));
-		Process process = getProcessFromListbox(data);
-		Duration duration = null;
-		try {
-			duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, process.getTime().getDays(), process.getTime().getHours(), origin.intValue(), 0);
-		} catch (DatatypeConfigurationException e) {
-			System.out.println("Error en convertir a duracion: " + e.toString());
+		String inputValue = inputEvent.getValue();
+		if(inputValue.compareTo("") != 0) {
+			origin.setValue(Integer.valueOf(inputEvent.getValue()));
+			Process process = getProcessFromListbox(data);
+			Duration duration = null;
+			try {
+				duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, 0, process.getTime().getHours(), origin.intValue(), 0);
+			} catch (DatatypeConfigurationException e) {
+				System.out.println("Error en convertir a duracion: " + e.toString());
+			}
+			process.setTime(duration);
 		}
-		process.setTime(duration);
 	}
 
 	private void deletePiece(Piece piece) {
@@ -692,10 +679,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		}
 	}
 
-	public String quantityOfProcess(Piece piece) {
-		return "" + piece.getProcesses().size();
-	}
-
 	@Listen("onSelect = #pieceListbox")
 	public void selectPiece() {
 		if(pieceListModel.isSelectionEmpty()) {
@@ -704,16 +687,49 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		} else {
 			if(currentPiece == null) {// si no hay nada editandose
 				currentPiece = pieceListbox.getSelectedItem().getValue();
+				// se crea un clon de la pieza para reemplazar al currentPiece en caso de que se cancele o resetee la edicion
+				clonedPiece = (Piece) Piece.copy(currentPiece);
 				refreshViewPiece();
 			}
 		}
 		pieceListModel.clearSelection();
+		scrollToPieceBlock();
+	}
+
+	@Listen("onClick = #resetPieceButton")
+	public void resetPiece() {
+		if(currentPiece != null) {
+			Piece piece = getOriginalPiece();
+			pieceList.set(pieceList.indexOf(currentPiece), piece);
+			currentPiece = piece;
+		}
+		refreshViewPiece();
+		pieceCreationBlock.setVisible(true);
+		processCreationBlock.setVisible(true);
+	}
+
+	private Piece getOriginalPiece() {
+		return (Piece) Piece.copy(clonedPiece);// se pasa solo la copia para evitar que el clon sea modificado
+	}
+
+	@Listen("onClick = #cancelPieceButton")
+	public void cancelPiece() {
+		if(currentPiece != null) {
+			Piece piece = getOriginalPiece();
+			pieceList.set(pieceList.indexOf(currentPiece), piece);
+		}
+		currentPiece = null;
+		refreshViewPiece();
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Listen("onClick = #deleteProductButton")
 	public void deleteProduct() {
 		if(currentProduct != null) {
+			if(orderDetailRepository.findFirstByProduct(currentProduct) != null) {
+				Messagebox.show("No se puede eliminar, el producto se encuentra agregado en 1 o mas pedidos.", "Informacion", Messagebox.OK, Messagebox.ERROR);
+				return;
+			}
 			Messagebox.show("Esta seguro que quiere eliminar el producto?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 				public void onEvent(Event evt) throws InterruptedException {
 					if (evt.getName().equals("onOK")) {
@@ -751,16 +767,13 @@ public class ProductCreationController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #resetProductButton")
 	public void resetProduct() {
+		// busca en la bd la version que tiene sin modificar los detalles
+		if(currentProduct != null) {
+			currentProduct = productRepository.findOne(currentProduct.getId());
+		}
 		refreshViewProduct();
 		currentPiece = null;
 		refreshViewPiece();
-	}
-
-	@Listen("onClick = #resetPieceButton")
-	public void resetPiece() {
-		refreshViewPiece();
-		pieceCreationBlock.setVisible(true);
-		processCreationBlock.setVisible(true);
 	}
 
 	@Listen("onClick = #pieceCopyButton")
@@ -804,8 +817,9 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	private void fillProcessCopy(Piece pieceCopy) {
 		processCreationBlock.setVisible(true);
 		List<Process> processListCopy = pieceCopy.getProcesses();
+		listboxProcessList = new ArrayList<Process>();
 		for(Process processCopy : processListCopy) {
-			listboxProcessList.add(new Process(processCopy.getType(), processCopy.getDetails(), processCopy.getTime()));
+			listboxProcessList.add(new Process(null, processTypeRepository.findOne(processCopy.getType().getId()), processCopy.getDetails(), processCopy.getTime()));
 		}
 		refreshViewProcess();
 	}
@@ -813,6 +827,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@Listen("onClick = #openRawMaterialListButton")
 	public void openRawMaterialListButtonClick() {
 		Executions.getCurrent().setAttribute("rawMaterialList", rawMaterialList);
+		Executions.getCurrent().setAttribute("currentProduct", currentProduct);
 		Window window = (Window)Executions.createComponents("/product_raw_material.zul", null, null);
 		window.doModal();
 	}
@@ -820,7 +835,14 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@Listen("onClick = #openSupplyListButton")
 	public void openSupplyListButtonClick() {
 		Executions.getCurrent().setAttribute("supplyList", supplyList);
+		Executions.getCurrent().setAttribute("currentProduct", currentProduct);
 		Window window = (Window)Executions.createComponents("/product_supply.zul", null, null);
 		window.doModal();
+	}
+
+	@Listen("onClick = #returnButton")
+	public void returnButtonClick() {
+		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/product_list.zul");
 	}
 }

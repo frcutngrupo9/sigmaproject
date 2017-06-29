@@ -24,26 +24,30 @@ public class Process implements Serializable, Cloneable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
+
+	@ManyToOne(targetEntity = Piece.class)
+	private Piece piece = null;
 
 	@ManyToOne
-	ProcessType type;
+	private ProcessType type;
 
-	String details = "";
+	private String details = "";
 
 	@Transient
-	Duration time;
+	private Duration time;
 
 	@Column
-	String timeInternal;
+	private String timeInternal;
 
-	boolean isClone;
+	private boolean isClone;
 
 	public Process() {
 
 	}
 
-	public Process(ProcessType processType, String details, Duration time) {
+	public Process(Piece piece, ProcessType processType, String details, Duration time) {
+		this.piece = piece;
 		this.type = processType;
 		this.details = details;
 		this.setTime(time);
@@ -56,6 +60,14 @@ public class Process implements Serializable, Cloneable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public Piece getPiece() {
+		return piece;
+	}
+
+	public void setPiece(Piece piece) {
+		this.piece = piece;
 	}
 
 	public ProcessType getType() {
@@ -101,44 +113,4 @@ public class Process implements Serializable, Cloneable {
 	public void setClone(boolean isClone) {
 		this.isClone = isClone;
 	}
-
-	public static Process clone(Process process) {
-		try {
-			return (Process) process.clone();
-		} catch (CloneNotSupportedException e) {
-			// not possible
-		}
-		return null;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof Process)) {
-			return false;
-		}
-		Process other = (Process) obj;
-		if (id == null) {
-			if (other.id != null) {
-				return false;
-			}
-		} else if (!id.equals(other.id)) {
-			return false;
-		}
-		return true;
-	}
-
 }

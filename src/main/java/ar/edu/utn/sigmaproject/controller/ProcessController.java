@@ -101,14 +101,14 @@ public class ProcessController extends SelectorComposer<Component> {
 		}
 		String name = nameTextbox.getText();
 		MachineType machineType = null;
-		if (machineTypeCombobox.getSelectedItem() != null) {
+		if(machineTypeCombobox.getSelectedItem() != null) {
 			machineType = machineTypeCombobox.getSelectedItem().getValue();
 		}
-		if (currentProcessType == null) {
-			// es un nuevo insumo
+		if(currentProcessType == null) {
+			// nuevo
 			currentProcessType = new ProcessType(name, machineType);
 		} else {
-			// es una edicion
+			// edicion
 			currentProcessType.setName(name);
 			currentProcessType.setMachineType(machineType);
 		}
@@ -139,7 +139,7 @@ public class ProcessController extends SelectorComposer<Component> {
 
 	@Listen("onSelect = #processTypeListbox")
 	public void doListBoxSelect() {
-		if (processTypeListbox.getSelectedItem() == null) {
+		if(processTypeListbox.getSelectedItem() == null) {
 			//just in case for the no selection
 			currentProcessType = null;
 		} else {
@@ -163,7 +163,7 @@ public class ProcessController extends SelectorComposer<Component> {
 			machineTypeCombobox.setSelectedIndex(-1);
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
-		}else {// editando
+		} else {// editando
 			processTypeGrid.setVisible(true);
 			nameTextbox.setValue(currentProcessType.getName());
 			machineTypeCombobox.setSelectedIndex(machineTypeListModel.indexOf(currentProcessType.getMachineType()));

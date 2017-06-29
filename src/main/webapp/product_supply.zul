@@ -1,44 +1,38 @@
 <window id="productSupplyWindow" apply="ar.edu.utn.sigmaproject.controller.ProductSupplyController" width="60%" position="center,center" closable="true" action="show: slideDown;hide: slideUp">
 	<caption label="Insumos de Producto" style="text-align:center; font-weight: bold;"/>
-	<panel border="rounded">
+	<panel border="none">
         <panelchildren>
             <vlayout>
                 <hlayout>
                 	<separator/>
                     <label value="Insumo: "/>
-                    <bandbox id="supplyTypeBandbox" buttonVisible = "true" autodrop = "true">
+                    <bandbox id="materialBandbox" buttonVisible = "true" autodrop = "true">
                         <bandpopup>
-                            <vbox>
-                                <hbox>
-                                    Buscar
-                                    <textbox />
-                                </hbox>
-                                <listbox id="supplyTypePopupListbox" width="500px">
-	                                <listhead>
-	                                    <listheader label="Descripcion" align="center"/>
-	                                    <listheader label="Detalles" align="center"/>
-	                                    <listheader label="Medida" align="center"/>
-	                                </listhead>
-	                                <template name="model">
-	                                    <listitem>
-	                                        <listcell label="${each.description}"/>
-	                                        <listcell label="${each.details}"/>
-	                                        <listcell label="${each.measure}"/>
-	                                    </listitem>
-	                                </template>
-                                </listbox>
-                            </vbox>
+                            <listbox id="materialPopupListbox" width="500px">
+                                <listhead>
+                                    <listheader label="Descripcion" align="center"/>
+                                    <listheader label="Detalles" align="center"/>
+                                    <listheader label="Medida" align="center"/>
+                                </listhead>
+                                <template name="model">
+                                    <listitem>
+                                        <listcell label="${each.description}"/>
+                                        <listcell label="${each.details}"/>
+                                        <listcell label="${each.measure}"/>
+                                    </listitem>
+                                </template>
+                            </listbox>
                         </bandpopup>
                     </bandbox>
                     <label value="Cantidad: "/>
-                    <doublebox id="supplyQuantityDoublebox" constraint="no negative" width="36px"/>
-                    <button id="saveSupplyButton" label="Agregar Insumo"/>
-                    <button id="resetSupplyButton" label="Reset Insumo"/>
-                    <button id="deleteSupplyButton" label="Eliminar Insumo"/>
-                    <button id="cancelSupplyButton" label="Cancelar Edicion"/>
+                    <doublebox id="materialQuantityDoublebox" constraint="no negative" width="36px"/>
+                    <button id="saveMaterialButton" label="Agregar Insumo"/>
+                    <button id="resetMaterialButton" label="Reset Insumo"/>
+                    <button id="deleteMaterialButton" label="Eliminar Insumo"/>
+                    <button id="cancelMaterialButton" label="Cancelar Edicion"/>
                 </hlayout>
                 <separator/>
-                <listbox id="supplyListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
+                <listbox id="productMaterialListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
                     <auxhead>
                         <auxheader label="Insumos" colspan="6"/>
                     </auxhead>
@@ -52,18 +46,18 @@
                     </listhead>
                     <template name="model">
                         <listitem>
-			                <listcell label="${each.getSupplyType().description}"/>
-			                <listcell label="${each.getSupplyType().details}"/>
-			                <listcell label="${each.getSupplyType().brand}"/>
-			                <listcell label="${each.getSupplyType().presentation}"/>
-			                <listcell label="${each.getSupplyType().measure}"/>
+			                <listcell label="${each.getItem().description}"/>
+			                <listcell label="${each.getItem().details}"/>
+			                <listcell label="${each.getItem().brand}"/>
+			                <listcell label="${each.getItem().presentation}"/>
+			                <listcell label="${each.getItem().measure}"/>
 			                <listcell label="${each.quantity}"/>
                         </listitem>
                     </template>
                 </listbox>
                 <hlayout>
-                    <button id="acceptSupplyListButton" label="Aceptar"/>
-                    <button id="cancelSupplyListButton" label="Cancelar"/>
+                    <button id="acceptProductMaterialButton" label="Aceptar"/>
+                    <button id="cancelProductMaterialButton" label="Cancelar"/>
                 </hlayout>
             </vlayout>
         </panelchildren>

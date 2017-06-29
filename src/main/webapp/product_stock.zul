@@ -1,3 +1,4 @@
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="win_product_stock" title="Stock de Productos" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductStockController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
@@ -9,29 +10,37 @@
 		    <separator/>
 		    <listbox id="productListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
 		    	<auxhead>
-					<auxheader label="Productos" colspan="5"/>
+					<auxheader label="Productos" colspan="7"/>
 				</auxhead>
 		        <listhead>
+		            <listheader label="Foto" align="center"/>
 		            <listheader label="Codigo" align="center"/>
 		            <listheader label="Descripcion" align="center"/>
 		            <listheader label="Stock Actual" align="center"/>
 		            <listheader label="Stock Minimo" align="center"/>
 		            <listheader label="Stock Reposicion" align="center"/>
+		            <listheader label="Cantidad Entregada" align="center"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
+		            	<custom-attributes product_image="${r:getProductImage(each)}"/>
+		                <listcell>
+                        	<image if="${!empty product_image}" content="${product_image}" width="30px" height="30px"/>
+			                <image if="${empty product_image}" width="0px" height="0px"/>
+                        </listcell>
 		                <listcell label="${each.code}"/>
 		                <listcell label="${each.name}"/>
 		                <listcell label="${each.stock}"/>
 		                <listcell label="${each.stockMin}"/>
 		                <listcell label="${each.stockRepo}"/>
+		                <listcell label="${win_product_stock$composer.getQuantityDelivered(each)}"/>
 		            </listitem>
 		        </template>
 		    </listbox>
 		    <vlayout>
 		        <separator/>
 		        <hbox>
-		            <button id="newProvisionOrderButton" label="Nuevo Pedido Para Productos con bajo stock"/>
+		            <button id="newProvisionOrderButton" label="Nuevo Pedido Para Productos con bajo stock" visible="false"/>
 		        </hbox>
 		        <separator/>
 				<grid id="productExistenceGrid" width="400px" sclass="sigma-form" visible="false">
@@ -71,52 +80,8 @@
 			            </row>
 			        </rows>
 		    	</grid>
-		    	<panel title="Pedido de Restock" id="orderCreationBlock" collapsible="true" visible="false" closable="false">
-		        	<panelchildren>
-		        		<separator/>
-		        		<hlayout>
-		        			<separator/>
-		                    <label value="Numero: "/>
-		                    <intbox id="orderNumberIntbox" constraint="no negative"/>
-		                    <separator/>
-		                    <separator/>
-		                    <label value="Fecha de necesidad: "/>
-		                    <datebox id="orderNeedDatebox" cols="12" format="dd-MM-yyyy"/>
-		                </hlayout>
-		                <separator/>
-		                <hlayout>
-		        			<separator/>
-					    	<listbox id="orderDetailListbox" mold="paging" pageSize="7">
-					            <auxhead>
-					                <auxheader label="Productos" colspan="3"/>
-					            </auxhead>
-					            <listhead>
-					            	<listheader label="Codigo Producto"/>
-					                <listheader label="Nombre Producto"/>
-					                <listheader label="Unidades"/>
-					            </listhead>
-					            <template name="model">
-					                <listitem>
-					                	<listcell label="${win_product_stock$composer.getProductCode(each.idProduct)}"/>
-					                    <listcell label="${win_product_stock$composer.getProductName(each.idProduct)}"/>
-					                    <listcell>
-				                        	<spinner inplace="true" value="${each.units}" forward="onChange=orderDetailListbox.onEditOrderDetailUnits(${each})" constraint="no negative: No puede ser valor negativo." width="98%"/>
-			                    		</listcell>
-									</listitem>
-					            </template>
-					        </listbox>
-					        <separator/>
-				        </hlayout>
-				        <separator/>
-				        <hlayout>
-				        	<separator/>
-				            <button id="saveOrderButton" label="Guardar"/>
-				            <button id="resetOrderButton" label="Reset"/>
-				            <button id="cancelOrderButton" label="Cancelar"/>
-				        </hlayout>
-				        <separator/>
-			        </panelchildren>
-			    </panel>
+			    <separator/>
+			    <separator/>
 		    </vlayout>
         </panelchildren>
     </panel>

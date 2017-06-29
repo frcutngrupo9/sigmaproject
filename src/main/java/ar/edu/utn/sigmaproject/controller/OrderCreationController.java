@@ -8,8 +8,10 @@ import java.util.List;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
+import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
@@ -21,12 +23,12 @@ import org.zkoss.zul.Caption;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Doublebox;
+import org.zkoss.zul.Include;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
-import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Client;
 import ar.edu.utn.sigmaproject.domain.Order;
@@ -35,7 +37,6 @@ import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
-import ar.edu.utn.sigmaproject.service.OrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
@@ -76,8 +77,6 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	@Wire
 	Button saveOrderDetailButton;
 	@Wire
-	Button deleteOrderDetailButton;
-	@Wire
 	Button resetOrderDetailButton;
 	@Wire
 	Combobox orderStateTypeCombobox;
@@ -86,7 +85,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	@Wire
 	Caption orderCaption;
 	@Wire
-	Textbox productNameFilterTextbox;
+	Button returnButton;
 
 	// services
 	@WireVariable
@@ -95,8 +94,6 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	private ClientRepository clientRepository;
 	@WireVariable
 	private OrderRepository orderRepository;
-	@WireVariable
-	private OrderDetailRepository orderDetailRepository;
 	@WireVariable
 	private OrderStateRepository orderStateRepository;
 	@WireVariable
@@ -123,14 +120,9 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-
 		clientPopupList = clientRepository.findAll();
 		clientPopupListModel = new ListModelList<Client>(clientPopupList);
 		clientPopupListbox.setModel(clientPopupListModel);
-
-		orderDetailList = new ArrayList<OrderDetail>();
-		orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
-		orderDetailListbox.setModel(orderDetailListModel);
 
 		orderStateTypeList = orderStateTypeRepository.findAll();
 		orderStateTypeListModel = new ListModelList<OrderStateType>(orderStateTypeList);
@@ -142,6 +134,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		currentClient = null;
 		refreshViewOrder();
 	}
+
 	@Listen("onSelect = #clientPopupListbox")
 	public void selectionClientPopupListbox() {
 		currentClient = (Client) clientPopupListbox.getSelectedItem().getValue();
@@ -156,16 +149,14 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			Clients.showNotification("Seleccionar Cliente", clientBandbox);
 			return;
 		}
-
 		if(orderDetailList.isEmpty()) {
 			Clients.showNotification("Debe agregar como minimo 1 producto al pedido", productBandbox);
 			return;
 		}
-		/*
-		if(orderNeedDateBox.getValue() == null){
-			Clients.showNotification("Debe seleccionar una fecha de  necesidad", orderNeedDateBox);
+		if(orderNeedDatebox.getValue() == null) {
+			Clients.showNotification("Debe seleccionar una fecha de necesidad", orderNeedDatebox);
 			return;
-		}*/
+		}
 		int order_number = orderNumberIntbox.intValue();
 		Date order_date = orderDatebox.getValue();
 		Date order_need_date = orderNeedDatebox.getValue();
@@ -175,23 +166,24 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		} else {
 			orderStateType = null;
 		}
-
 		if(currentOrder == null) { // es un pedido nuevo
 			// creamos el nuevo pedido
 			currentOrder = new Order(currentClient, order_number, order_date, order_need_date);
+			// se hace q los detalles referencien al nuevo pedido
+			for(OrderDetail orderDetail : orderDetailList) {
+				orderDetail.setOrder(currentOrder);
+			}
+			currentOrder.getDetails().addAll(orderDetailList);
 		} else { // se edita un pedido
 			currentOrder.setClient(currentClient);
 			currentOrder.setNeedDate(order_need_date);
 			currentOrder.setNumber(order_number);
 		}
-		for(OrderDetail each : orderDetailList) {
-			each = orderDetailRepository.save(each);
-		}
-		currentOrder.setDetails(orderDetailList);
 		OrderState orderState = new OrderState(orderStateType, new Date());
 		orderState = orderStateRepository.save(orderState);
 		currentOrder.setState(orderState);
 		currentOrder = orderRepository.save(currentOrder);
+		currentOrder = orderRepository.findOne(currentOrder.getId());// se recupera de la bd para que tenga los detalles actualizados
 		refreshViewOrder();
 		alert("Pedido guardado.");
 	}
@@ -238,7 +230,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		int productUnits = productUnitsIntbox.getValue();
 		BigDecimal productPrice = new BigDecimal(productPriceDoublebox.getValue().doubleValue());
 		if(currentOrderDetail == null) { // es un detalle nuevo
-			currentOrderDetail = new OrderDetail(currentProduct, productUnits, productPrice);
+			currentOrderDetail = new OrderDetail(currentOrder, currentProduct, productUnits, productPrice);
 			orderDetailList.add(currentOrderDetail);
 		} else { // se edita un detalle
 			currentOrderDetail.setProduct(currentProduct);
@@ -253,23 +245,28 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	private void refreshProductPopup() {// el popup se actualiza en base a los detalles del pedido
 		productPopupList = productRepository.findAll();
 		for(OrderDetail orderDetail : orderDetailList) {
-			productPopupList.remove(orderDetail.getProduct());// sacamos todos los productos del popup
+			productPopupList.remove(productRepository.findOne(orderDetail.getProduct().getId()));// sacamos todos los productos del popup
 		}
 		productPopupListModel = new ListModelList<Product>(productPopupList);
 		productPopupListbox.setModel(productPopupListModel);
-		productNameFilterTextbox.setValue(null);
+		productBandbox.setValue(null);
 	}
 
 	private void refreshOrderDetailListbox() {
+		BigDecimal totalPrice = getTotalPrice();
+		String totalPriceValue = "";
+		if(!totalPrice.equals(new BigDecimal("0"))) {
+			totalPriceValue = "Importe Total: " + totalPrice.doubleValue() + " $";
+		}
+		orderTotalPriceLabel.setValue(totalPriceValue);
 		orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
 		orderDetailListbox.setModel(orderDetailListModel);// actualizamos la vista del order detail
-		orderTotalPriceLabel.setValue("Monto Total: " + getTotalPrice().doubleValue() + " $");
 	}
 
 	private void refreshViewOrder() {
-		if (currentOrder == null) {// nuevo pedido
+		if(currentOrder == null) {// nuevo pedido
 			orderCaption.setLabel("Creacion de Pedido");
-			orderStateTypeListModel.addToSelection(orderStateTypeRepository.findFirstByName("Iniciado"));
+			orderStateTypeListModel.addToSelection(orderStateTypeRepository.findFirstByName("Creado"));
 			orderStateTypeCombobox.setModel(orderStateTypeListModel);
 			currentClient = null;
 			clientBandbox.setValue("");
@@ -283,13 +280,13 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		} else {// editar pedido
 			orderCaption.setLabel("Edicion de Pedido");
 			OrderStateType orderCurrentStateType = currentOrder.getCurrentStateType();
-			if (orderCurrentStateType != null) {
-				orderStateTypeListModel.addToSelection(orderCurrentStateType);
+			if(orderCurrentStateType != null) {
+				orderStateTypeListModel.addToSelection(orderStateTypeRepository.findOne(orderCurrentStateType.getId()));
 				orderStateTypeCombobox.setModel(orderStateTypeListModel);
-				// solo se puede grabar si esta en estado Iniciado o Cancelado
-				OrderStateType stateTypeIniciado = orderStateTypeRepository.findFirstByName("Iniciado");
+				// solo se puede grabar si esta en estado Creado o Cancelado
+				OrderStateType stateTypeCreado = orderStateTypeRepository.findFirstByName("Creado");
 				OrderStateType stateTypeCancelado = orderStateTypeRepository.findFirstByName("Cancelado");
-				if(!orderCurrentStateType.equals(stateTypeIniciado) && !orderCurrentStateType.equals(stateTypeCancelado)) {
+				if(!orderStateTypeRepository.findOne(orderCurrentStateType.getId()).equals(stateTypeCreado) && !orderStateTypeRepository.findOne(orderCurrentStateType.getId()).equals(stateTypeCancelado)) {
 					saveOrderButton.setDisabled(true);
 					deleteOrderButton.setDisabled(true);
 				} else {
@@ -326,7 +323,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	}
 
 	private void refreshViewOrderDetail() {
-		if (currentOrderDetail == null) {
+		if(currentOrderDetail == null) {
 			// borramos el text del producto  seleccionado
 			// deseleccionamos la tabla y borramos la cantidad
 			productBandbox.setDisabled(false);
@@ -334,7 +331,6 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			productUnitsIntbox.setValue(null);
 			productPriceDoublebox.setValue(null);
 			currentProduct = null;
-			deleteOrderDetailButton.setDisabled(true);
 			cancelOrderDetailButton.setDisabled(true);
 		} else {
 			currentProduct = currentOrderDetail.getProduct();
@@ -346,7 +342,6 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			} else {
 				productPriceDoublebox.setValue(null);
 			}
-			deleteOrderDetailButton.setDisabled(false);
 			cancelOrderDetailButton.setDisabled(false);
 		}
 		productPopupListbox.clearSelection();
@@ -369,13 +364,9 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		return total_price;
 	}
 
-	public String getClientName(Client client) {
-		return client.getName();
-	}
-
 	@Listen("onSelect = #orderDetailListbox")
 	public void selectOrderDetail() { // se selecciona un detalle de pedido
-		if(orderDetailListModel.isSelectionEmpty()){
+		if(orderDetailListModel.isSelectionEmpty()) {
 			//just in case for the no selection
 			currentOrderDetail = null;
 		} else {
@@ -394,21 +385,23 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Listen("onClick = #deleteOrderDetailButton")
-	public void deleteOrderDetail() {
-		if(currentOrderDetail != null) {
-			Messagebox.show("Esta seguro que desea eliminar " + currentOrderDetail.getProduct().getName() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
-				public void onEvent(Event evt) throws InterruptedException {
-					if (evt.getName().equals("onOK")) {
-						orderDetailList.remove(currentOrderDetail);// quitamos el detalle de la lista
+	@Listen("onRemoveDetail = #orderDetailListbox")
+	public void deleteOrderDetail(ForwardEvent evt) {
+		final OrderDetail orderDetail = (OrderDetail)evt.getData();
+		Messagebox.show("Esta seguro que desea eliminar " + orderDetail.getProduct().getName() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+			public void onEvent(Event evt) throws InterruptedException {
+				if(evt.getName().equals("onOK")) {
+					orderDetailList.remove(orderDetail);// quitamos el detalle de la lista
+					// eliminamos el detalle si estaba seleccionado
+					if(currentOrderDetail != null && orderDetail.equals(currentOrderDetail)) {
 						currentOrderDetail = null;// eliminamos el detalle
-						refreshProductPopup();// actualizamos el popup para que aparezca el producto eliminado del detalle
-						refreshViewOrderDetail();
-						alert("Detalle eliminado.");
 					}
+					refreshProductPopup();// actualizamos el popup para que aparezca el producto eliminado del detalle
+					refreshViewOrderDetail();
+					alert("Detalle eliminado.");
 				}
-			});
-		}
+			}
+		});
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -417,7 +410,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		if(currentOrder != null) {
 			Messagebox.show("Esta seguro que desea eliminar el pedido?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 				public void onEvent(Event evt) throws InterruptedException {
-					if (evt.getName().equals("onOK")) {
+					if(evt.getName().equals("onOK")) {
 						orderRepository.delete(currentOrder);// quitamos el detalle de la lista
 						currentOrder = null;
 						refreshViewOrder();
@@ -430,7 +423,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 
 	private void filterProducts() {
 		List<Product> someProducts = new ArrayList<>();
-		String nameFilter = productNameFilterTextbox.getValue().toLowerCase();
+		String nameFilter = productBandbox.getValue().toLowerCase();
 		for(Product each : productPopupList) {
 			if(each.getName().toLowerCase().contains(nameFilter) || nameFilter.equals("")) {
 				someProducts.add(each);
@@ -440,11 +433,48 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		productPopupListbox.setModel(productPopupListModel);
 	}
 
-	@Listen("onChanging = #productNameFilterTextbox")
-	public void changeFilter(InputEvent event) {
-		Textbox target = (Textbox)event.getTarget();
+	@Listen("onChanging = #productBandbox")
+	public void changeFilterProducts(InputEvent event) {
+		if(currentProduct != null) {
+			productPriceDoublebox.setValue(null);
+			currentProduct = null;
+		}
+		Bandbox target = (Bandbox)event.getTarget();
 		target.setText(event.getValue());
 		filterProducts();
 	}
 
+	@Listen("onClick = #returnButton")
+	public void returnButtonClick() {
+		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/order_list.zul");
+	}
+
+	private void filterClients() {
+		List<Client> someClients = new ArrayList<>();
+		String nameFilter = clientBandbox.getValue().toLowerCase();
+		for(Client each : clientPopupList) {// busca filtrando por mail y nombre
+			if((each.getName()+each.getEmail()).toLowerCase().contains(nameFilter) || nameFilter.equals("")) {
+				someClients.add(each);
+			}
+		}
+		clientPopupListModel = new ListModelList<Client>(someClients);
+		clientPopupListbox.setModel(clientPopupListModel);
+	}
+
+	@Listen("onChanging = #clientBandbox")
+	public void changeFilter(InputEvent event) {
+		if(currentClient != null) {
+			currentClient = null;
+		}
+		Bandbox target = (Bandbox)event.getTarget();
+		target.setText(event.getValue());
+		filterClients();
+	}
+
+	@Listen("onClick = #newOrderButton")
+	public void newOrderButtonClick() {
+		currentOrder = null;
+		refreshViewOrder();
+	}
 }

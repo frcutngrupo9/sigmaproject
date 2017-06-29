@@ -1,17 +1,18 @@
 package ar.edu.utn.sigmaproject.controller;
 
-import java.math.BigDecimal;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.datatype.Duration;
-
 import org.springframework.transaction.annotation.Transactional;
+import org.zkoss.image.AImage;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
-import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -20,49 +21,39 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
-import org.zkoss.zul.Cell;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Comboitem;
 import org.zkoss.zul.Datebox;
-import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Grid;
+import org.zkoss.zul.Image;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Row;
-import org.zkoss.zul.Spinner;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
 import ar.edu.utn.sigmaproject.domain.Piece;
-import ar.edu.utn.sigmaproject.domain.Process;
+import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
-import ar.edu.utn.sigmaproject.domain.ProductionOrderRawMaterial;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderMaterial;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderStateType;
-import ar.edu.utn.sigmaproject.domain.ProductionOrderSupply;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
-import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
-import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
-import ar.edu.utn.sigmaproject.domain.SupplyRequirement;
 import ar.edu.utn.sigmaproject.domain.Worker;
 import ar.edu.utn.sigmaproject.service.MachineRepository;
-import ar.edu.utn.sigmaproject.service.PieceRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderDetailRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderRawMaterialRepository;
+import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
-import ar.edu.utn.sigmaproject.service.ProductionOrderSupplyRepository;
-import ar.edu.utn.sigmaproject.service.SupplyReservedRepository;
-import ar.edu.utn.sigmaproject.service.WoodReservedRepository;
 import ar.edu.utn.sigmaproject.service.WorkerRepository;
+import ar.edu.utn.sigmaproject.util.ProductionDateTimeHelper;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProductionOrderCreationController extends SelectorComposer<Component> {
@@ -73,25 +64,17 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	@Wire
 	Textbox productionPlanStateTypeTextbox;
 	@Wire
-	Textbox productNameTextbox;
+	Textbox productCodeTextbox;
 	@Wire
-	Datebox productionPlanDatebox;
+	Textbox productNameTextbox;
 	@Wire
 	Grid productionOrderDetailGrid;
 	@Wire
-	Spinner productionOrderNumberSpinner;
-	@Wire
 	Intbox productUnitsIntbox;
 	@Wire
-	Combobox workerCombobox;
+	Datebox productionOrderStartDatebox;
 	@Wire
-	Datebox productionOrderDatebox;
-	@Wire
-	Datebox productionOrderFinishedDatebox;
-	@Wire
-	Datebox productionOrderRealDatebox;
-	@Wire
-	Datebox productionOrderRealFinishedDatebox;
+	Datebox productionOrderFinishDatebox;
 	@Wire
 	Button saveButton;
 	@Wire
@@ -99,19 +82,21 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	@Wire
 	Button resetButton;
 	@Wire
-	Combobox productionOrderStateTypeCombobox;
-	@Wire
 	Button generateDetailsButton;
 	@Wire
 	Listbox productionOrderSupplyListbox;
 	@Wire
 	Listbox productionOrderRawMaterialListbox;
+	@Wire
+	Grid processTypeGrid;
+	@Wire
+	Button autoAssignButton;
+	@Wire
+	Image productImage;
 
 	// services
 	@WireVariable
 	private ProductionOrderRepository productionOrderRepository;
-	@WireVariable
-	private ProductionOrderDetailRepository productionOrderDetailRepository;
 	@WireVariable
 	private ProductionOrderStateRepository productionOrderStateRepository;
 	@WireVariable
@@ -119,17 +104,9 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	@WireVariable
 	private MachineRepository machineRepository;
 	@WireVariable
+	private MachineTypeRepository machineTypeRepository;
+	@WireVariable
 	private WorkerRepository workerRepository;
-	@WireVariable
-	private PieceRepository pieceRepository;
-	@WireVariable
-	private WoodReservedRepository woodReservedRepository;
-	@WireVariable
-	private SupplyReservedRepository supplyReservedRepository;
-	@WireVariable
-	private ProductionOrderSupplyRepository productionOrderSupplyRepository;
-	@WireVariable
-	private ProductionOrderRawMaterialRepository productionOrderRawMaterialRepository;
 
 	// atributes
 	private ProductionOrder currentProductionOrder;
@@ -139,15 +116,12 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	private List<ProductionOrderDetail> productionOrderDetailList;
 	private List<Worker> workerList;
 	private List<Machine> machineList;
-	private List<ProductionOrderSupply> productionOrderSupplyList;
-	private List<ProductionOrderRawMaterial> productionOrderRawMaterialList;
+	private List<ProcessType> processTypeList;
 
 	// list models
 	private ListModelList<ProductionOrderDetail> productionOrderDetailListModel;
-	private ListModelList<Worker> workerListModel;
-	private ListModelList<ProductionOrderStateType> productionOrderStateTypeListModel;
-	private ListModelList<ProductionOrderSupply> productionOrderSupplyListModel;
-	private ListModelList<ProductionOrderRawMaterial> productionOrderRawMaterialListModel;
+	private ListModelList<ProductionOrderMaterial> productionOrderSupplyListModel;
+	private ListModelList<ProductionOrderMaterial> productionOrderRawMaterialListModel;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
@@ -156,34 +130,33 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		if(currentProductionOrder == null) {throw new RuntimeException("ProductionOrder not found");}
 		currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
 		if(currentProductionPlan == null) {throw new RuntimeException("ProductionPlan not found");}
-
 		productionOrderDetailList = currentProductionOrder.getDetails();
-		workerList = workerRepository.findAll();
-		workerListModel = new ListModelList<>(workerList);
-		workerCombobox.setModel(workerListModel);
 		machineList = machineRepository.findAll();
-		List<ProductionOrderStateType> productionOrderStateTypeList = productionOrderStateTypeRepository.findAll();
-		productionOrderStateTypeListModel = new ListModelList<ProductionOrderStateType>(productionOrderStateTypeList);
-		productionOrderStateTypeCombobox.setModel(productionOrderStateTypeListModel);
-		
-		productionOrderSupplyList = currentProductionOrder.getProductionOrderSupplies();
-		productionOrderRawMaterialList = currentProductionOrder.getProductionOrderRawMaterials();
-		productionOrderSupplyListModel = new ListModelList<ProductionOrderSupply>(productionOrderSupplyList);
-		productionOrderRawMaterialListModel = new ListModelList<ProductionOrderRawMaterial>(productionOrderRawMaterialList);
-		productionOrderSupplyListbox.setModel(productionOrderSupplyListModel);
-		productionOrderRawMaterialListbox.setModel(productionOrderRawMaterialListModel);
-		
 		refreshView();
 	}
 
 	private void refreshView() {
+		org.zkoss.image.Image img = null;
+		try {
+			img = new AImage("", currentProductionOrder.getProduct().getImageData());
+		} catch (IOException exception) { }
+		if(img != null) {
+			productImage.setHeight("75px");
+			productImage.setWidth("75px");
+			productImage.setStyle("margin: 8px");
+		} else {
+			productImage.setHeight("0px");
+			productImage.setWidth("0px");
+			productImage.setStyle("margin: 0px");
+		}
+		productImage.setContent(img);
+		sortProductionOrderDetailListByProcessTypeSequence();
 		productionPlanNameTextbox.setDisabled(true);
 		productNameTextbox.setDisabled(true);
-		productionPlanDatebox.setDisabled(true);
+		productCodeTextbox.setDisabled(true);
 		productUnitsIntbox.setDisabled(true);
 		productionPlanStateTypeTextbox.setDisabled(true);
 		productionPlanNameTextbox.setText(currentProductionPlan.getName());
-		productionPlanDatebox.setValue(currentProductionPlan.getDate());
 		ProductionPlanStateType lastProductionPlanStateType = currentProductionPlan.getCurrentStateType();
 		if(lastProductionPlanStateType != null) {
 			productionPlanStateTypeTextbox.setText(lastProductionPlanStateType.getName());
@@ -191,31 +164,33 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			productionPlanStateTypeTextbox.setText("[Sin Estado]");
 		}
 		productNameTextbox.setText(currentProductionOrder.getProduct().getName());
+		productCodeTextbox.setText(currentProductionOrder.getProduct().getCode());
 		productUnitsIntbox.setValue(currentProductionOrder.getUnits());
-		if(currentProductionOrder.getNumber() != null) {
-			productionOrderNumberSpinner.setValue(currentProductionOrder.getNumber());
-		} else {
-			productionOrderNumberSpinner.setValue(getNewProductionOrderNumber());
-		}
-		productionOrderDatebox.setValue(currentProductionOrder.getDate());
-		if (currentProductionOrder.getWorker() != null) {
-			workerListModel.addToSelection(currentProductionOrder.getWorker());
-			workerCombobox.setModel(workerListModel);
-		} else {
-			workerCombobox.setSelectedIndex(-1);
-		}
-		productionOrderFinishedDatebox.setValue(currentProductionOrder.getDateFinished());
-		productionOrderRealDatebox.setValue(currentProductionOrder.getRealDate());
-		productionOrderRealFinishedDatebox.setValue(currentProductionOrder.getRealDateFinished());
-		productionOrderDetailListModel = new ListModelList<ProductionOrderDetail>(productionOrderDetailList);
-		productionOrderDetailGrid.setModel(productionOrderDetailListModel);
-		productionOrderStateTypeListModel.addToSelection(currentProductionOrder.getCurrentStateType());
-		productionOrderStateTypeCombobox.setModel(productionOrderStateTypeListModel);
+		workerList = workerRepository.findAll();
+		productionOrderStartDatebox.setValue(currentProductionOrder.getDateStart());
+		productionOrderFinishDatebox.setValue(currentProductionOrder.getDateFinish());
+		refreshProductionOrderDetailGridView();
+		refreshProductionOrderOrderSupplyAndRawMaterialListbox();
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		resetButton.setDisabled(false);
+		refreshProcessTypeGridView();
 	}
-	
+
+	private void refreshProductionOrderDetailGridView() {
+		productionOrderDetailListModel = new ListModelList<ProductionOrderDetail>(productionOrderDetailList);
+		productionOrderDetailGrid.setModel(productionOrderDetailListModel);
+	}
+
+	private void refreshProductionOrderOrderSupplyAndRawMaterialListbox() {
+		List<ProductionOrderMaterial> productionOrderSupplyList = currentProductionOrder.getProductionOrderSupplies();
+		List<ProductionOrderMaterial> productionOrderRawMaterialList = currentProductionOrder.getProductionOrderRawMaterials();
+		productionOrderSupplyListModel = new ListModelList<ProductionOrderMaterial>(productionOrderSupplyList);
+		productionOrderRawMaterialListModel = new ListModelList<ProductionOrderMaterial>(productionOrderRawMaterialList);
+		productionOrderSupplyListbox.setModel(productionOrderSupplyListModel);
+		productionOrderRawMaterialListbox.setModel(productionOrderRawMaterialListModel);
+	}
+
 	private Integer getNewProductionOrderNumber() {
 		Integer lastValue = 0;
 		List<ProductionOrder> list = productionOrderRepository.findByProductionPlan(currentProductionPlan);
@@ -227,37 +202,33 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		return lastValue + 1;
 	}
 
-	@Listen("onClick = #generateDetailsButton")
-	public void generateDetailListClick() {
-		List<ProductionOrderDetail> details = new ArrayList<>();
-		for(Piece piece : currentProductionOrder.getProduct().getPieces()) {
-			List<Process> auxProcessList = piece.getProcesses();
-			for(Process process : auxProcessList) {
-				// por cada proceso hay que crear un detalle
-				Integer quantityPiece = currentProductionOrder.getUnits() * piece.getUnits();// cantidad total de la pieza
-				Duration timeTotal = process.getTime().multiply(quantityPiece);// cantidad total de tiempo del proceso
-				details.add(new ProductionOrderDetail(process, null, timeTotal, quantityPiece));
-			}
+	private boolean isEditionAllowed() {
+		// no se puede modificar si el plan esta Cancelado, o Finalizado. Si esta Suspendido se puede modificar para solucionar problemas de maquinas en reparacion o empreados ausentes.
+		ProductionPlanStateType currentStateType = currentProductionPlan.getCurrentStateType();
+		if(currentStateType.getName().equalsIgnoreCase("Finalizado") || currentStateType.getName().equalsIgnoreCase("Cancelado")) {
+			return false;
 		}
-		if(details.size() != productionOrderDetailList.size()) {
-			productionOrderDetailList = details;
-			refreshView();
-		}
+		return true;
 	}
 
 	@Transactional
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
-		int selectedIndexWorker = workerCombobox.getSelectedIndex();
-		if (selectedIndexWorker == -1) {// no hay un empleado seleccionado
-			Clients.showNotification("Debe seleccionar un Empleado", workerCombobox);
+		if(!isEditionAllowed()) {
+			alert("No se puede modificar porque el Plan de Produccion esta Cancelado, Lanzado, En Ejecucion o Finalizado.");
 			return;
 		}
-		if(!productionOrderStateTypeCombobox.getSelectedItem().getValue().equals(productionOrderStateTypeRepository.findFirstByName("Generada"))) {
-			for (ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
-				Process process = productionOrderDetail.getProcess();
-				ProcessType processType = process.getType();
-				MachineType machineType = processType.getMachineType();
+		if(currentProductionOrder.getCurrentStateType().getName().equalsIgnoreCase("Cancelada")) {
+			alert("No se puede modificar una Orden de Produccion Cancelada.");
+			return;
+		}
+		for (ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
+			if (productionOrderDetail.getState() != ProcessState.Cancelado) {
+				if (productionOrderDetail.getWorker() == null) {
+					Clients.showNotification("Existen Procesos sin Trabajador Asignado", productionOrderDetailGrid);
+					return;
+				}
+				MachineType machineType = productionOrderDetail.getProcess().getType().getMachineType();
 				if (machineType != null) {
 					if (productionOrderDetail.getMachine() == null) {
 						Clients.showNotification("Existen Procesos sin Maquina Asignada", productionOrderDetailGrid);
@@ -266,37 +237,29 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 				}
 			}
 		}
-		Integer productionOrderNumber = productionOrderNumberSpinner.getValue();
-		Worker productionOrderWorker = workerCombobox.getSelectedItem().getValue();
-		Date productionOrderDate = productionOrderDatebox.getValue();
-		Date productionOrderDateFinished = productionOrderFinishedDatebox.getValue();
-		Date productionOrderRealDate = productionOrderRealDatebox.getValue();
-		Date productionOrderRealDateFinished = productionOrderRealFinishedDatebox.getValue();
-		currentProductionOrder.setNumber(productionOrderNumber);
-		currentProductionOrder.setWorker(productionOrderWorker);
-		currentProductionOrder.setDate(productionOrderDate);
-		currentProductionOrder.setDateFinished(productionOrderDateFinished);
-		currentProductionOrder.setRealDate(productionOrderRealDate);
-		currentProductionOrder.setRealDateFinished(productionOrderRealDateFinished);
-		// el estado de la orden debe cambiar automaticamente en base a las modificaciones que se le hagan y no se deberia poder cambiar manualmente excepto en el caso de la cancelacion
-//		ProductionOrderStateType ProductionOrderStateType = productionOrderStateTypeCombobox.getSelectedItem().getValue();
-//		ProductionOrderState productionOrderState = new ProductionOrderState(ProductionOrderStateType, new Date());
-//		productionOrderState = productionOrderStateRepository.save(productionOrderState);
-//		currentProductionOrder.setState(productionOrderState);
-		productionOrderDetailList = productionOrderDetailRepository.save(productionOrderDetailList);
-		currentProductionOrder.setDetails(productionOrderDetailList);
-		
-		productionOrderSupplyList = productionOrderSupplyRepository.save(productionOrderSupplyList);
-		productionOrderRawMaterialList = productionOrderRawMaterialRepository.save(productionOrderRawMaterialList);
-		currentProductionOrder.setProductionOrderSupplies(productionOrderSupplyList);
-		currentProductionOrder.setProductionOrderRawMaterials(productionOrderRawMaterialList);
-		
+		Date productionOrderDateStart = productionOrderStartDatebox.getValue();
+		if (productionOrderDateStart == null) {
+			Clients.showNotification("Debe Seleccionar Fecha de Inicio", productionOrderStartDatebox);
+			return;
+		}
+		if(currentProductionOrder.getNumber() == 0) {
+			currentProductionOrder.setNumber(getNewProductionOrderNumber());
+		}
+		// la fecha inicio y fin se calcularon y agregaron a currentProductionOrder al modificar la fecha inicio
+		// el estado de la orden debe cambiar automaticamente 
+		ProductionOrderStateType productionOrderStateType = productionOrderStateTypeRepository.findFirstByName("Preparada");
+		if(!productionOrderStateType.getName().equalsIgnoreCase(currentProductionOrder.getCurrentStateType().getName())) { // no se vuelve a grabar si es el mismo estado
+			ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateType, new Date());
+			productionOrderState = productionOrderStateRepository.save(productionOrderState);
+			currentProductionOrder.setState(productionOrderState);
+		}
 		currentProductionOrder = productionOrderRepository.save(currentProductionOrder);
-		
-		alert("Orden de Produccion Guardada.");
-		//cancelButtonClick();
+		productionOrderDetailList = currentProductionOrder.getDetails();
 		refreshView();
+		alert("Orden de Produccion Guardada.");
 	}
+
+	//"Registrado""Abastecido""Lanzado""En Ejecucion""Finalizado""Cancelado""Suspendido"
 
 	@Listen("onClick = #cancelButton")
 	public void cancelButtonClick() {
@@ -307,22 +270,20 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 	@Listen("onClick = #resetButton")
 	public void resetButtonClick() {
+		currentProductionOrder = productionOrderRepository.findOne(currentProductionOrder.getId());// obtiene la misma orden sin cambios en los detalles
+		productionOrderDetailList = currentProductionOrder.getDetails();
 		refreshView();
 	}
 
-	public String getPieceNameByProcess(Process process) {
-		return pieceRepository.findByProcesses(process).getName();
-	}
-
-	public String getMachineTypeNameByProcess(Process process) {
-		if(process.getType().getMachineType() != null) {
-			return process.getType().getMachineType().getName();
+	public String getMachineTypeNameByProcessType(ProcessType processType) {
+		if(processType.getMachineType() != null) {
+			return processType.getMachineType().getName();
 		}
 		return "NINGUNA";
 	}
 
-	public boolean isMachineNecessary(Process process) {
-		if(process.getType().getMachineType() != null) {
+	public boolean isMachineNecessary(ProcessType processType) {
+		if(processType.getMachineType() != null) {
 			return true;
 		}
 		return false;
@@ -330,10 +291,10 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 	public ListModelList<Machine> getMachineListModel(ProductionOrderDetail productionOrderDetail) {
 		List<Machine> list = new ArrayList<Machine>();
-		MachineType machineType = productionOrderDetail.getProcess().getType().getMachineType();
+		MachineType machineType = machineTypeRepository.findOne(productionOrderDetail.getProcess().getType().getMachineType().getId());
 		if (machineType != null) {
 			for (Machine machine : machineList) {
-				if (machineType.equals(machine.getMachineType())) {
+				if (machineType.equals(machineTypeRepository.findOne(machine.getMachineType().getId()))) {
 					list.add(machine);
 				}
 			}
@@ -341,156 +302,356 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		return new ListModelList<>(list);
 	}
 
-	@Listen("onCreateMachineCombobox = #productionOrderDetailGrid")
-	public void doCreateMachineCombobox(ForwardEvent evt) {// metodo utilizado para seleccionar el item del combobox luego de crearlo
+	public ListModelList<Worker> getWorkerListModel(ProductionOrderDetail productionOrderDetail) {
+		// TODO: mostrar solo los empleados disponibles en los horarios del proceso
+		return new ListModelList<>(workerRepository.findAll());
+	}
+
+	@Listen("onCreateWorkerCombobox = #productionOrderDetailGrid")
+	public void doCreateWorkerCombobox(ForwardEvent evt) {// metodo utilizado para seleccionar el item del combobox luego de crearlo
 		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
 		Combobox element = (Combobox) evt.getOrigin().getTarget();// obtenemos el elemento web
 		int value = -1;
-		for (int i = 0; i < element.getItems().size(); i++) {
-			if (element.getItems().get(i) != null) {
+		if(data.getWorker() != null) {
+			for (int i = 0; i < element.getItems().size(); i++) {
 				Comboitem item = element.getItems().get(i);
-				if (item.getValue().equals(data.getMachine())) {
-					value = i;
+				if (item != null) {
+					Worker worker = (Worker) item.getValue();
+					worker = workerRepository.findOne(worker.getId());// actualiza en base a la BD para poder hacer la comparacion
+					if (worker.equals(workerRepository.findOne(data.getWorker().getId()))) {
+						value = i;
+					}
 				}
 			}
 		}
 		element.setSelectedIndex(value);
 	}
 
+	@Listen("onCreateMachineCombobox = #productionOrderDetailGrid")
+	public void doCreateMachineCombobox(ForwardEvent evt) {// metodo utilizado para seleccionar el item del combobox luego de crearlo
+		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
+		Combobox element = (Combobox) evt.getOrigin().getTarget();// obtenemos el elemento web
+		int value = -1;
+		if(data.getMachine() != null) {
+			for (int i = 0; i < element.getItems().size(); i++) {
+				Comboitem item = element.getItems().get(i);
+				if (item != null) {
+					Machine machine = (Machine) item.getValue();
+					machine = machineRepository.findOne(machine.getId());// actualiza en base a la BD para poder hacer la comparacion
+					if (machine.equals(machineRepository.findOne(data.getMachine().getId()))) {
+						value = i;
+					}
+				}
+			}
+		}
+		element.setSelectedIndex(value);
+	}
+
+	@Listen("onEditProductionOrderDetailWorker = #productionOrderDetailGrid")
+	public void doEditProductionOrderDetailWorker(ForwardEvent evt) {
+		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
+		Combobox element = (Combobox) evt.getOrigin().getTarget();// obtenemos el elemento web
+		Worker workerSelected = (Worker)element.getSelectedItem().getValue();
+		data.setWorker(workerSelected);// cargamos al objeto el valor actualizado del elemento web
+		refreshProductionOrderDetailGridView();
+		refreshProcessTypeGridView();
+	}
+
 	@Listen("onEditProductionOrderDetailMachine = #productionOrderDetailGrid")
 	public void doEditProductionOrderDetailMachine(ForwardEvent evt) {
 		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
 		Combobox element = (Combobox) evt.getOrigin().getTarget();// obtenemos el elemento web
-		Machine machine = (Machine)element.getSelectedItem().getValue();
-		data.setMachine(machine);// cargamos al objeto el valor actualizado del elemento web
+		Machine machineSelected = (Machine)element.getSelectedItem().getValue();
+		data.setMachine(machineSelected);// cargamos al objeto el valor actualizado del elemento web
 		// asigna la misma maquina a todos los detalles que necesitan ese tipo de maquina
-		//		for(ProductionOrderDetail each : productionOrderDetailList) {
-		//			if(!data.equals(each)) {// no modifica el mismo detalle
-		//				if(each.getProcess().getType().getMachineType().equals(machine.getMachineType())) {
-		//					each.setMachine(machine);
-		//				}
-		//			}
-		//		}//TODO
-	}
-
-	@Listen("onEditProductionOrderDetailQuantityFinished = #productionOrderDetailGrid")
-	public void doEditProductionOrderDetailQuantityFinished(ForwardEvent evt) {
-		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
-		InputEvent inputEvent = (InputEvent) evt.getOrigin();
-		String inputValue = inputEvent.getValue();
-		BigDecimal value = null;
-		if(inputValue == null || inputValue.equals("")) {
-			value = BigDecimal.ZERO;
-		} else {
-			value = new BigDecimal(inputValue);
-		}
-		BigDecimal quantityPiece = new BigDecimal(data.getQuantityPiece());
-		Doublebox element = (Doublebox) evt.getOrigin().getTarget();
-		Row fila = (Row)element.getParent();
-		Checkbox chkbox = (Checkbox)fila.getChildren().get(fila.getChildren().size()-1);
-		if(value.compareTo(quantityPiece) > 0) {
-			element.setValue(quantityPiece.doubleValue());
-			data.setQuantityFinished(quantityPiece);
-			chkbox.setChecked(true);
-		} else {
-			data.setQuantityFinished(value);
-			if(value.compareTo(quantityPiece) == 0) {
-				chkbox.setChecked(true);
-			} else {
-				chkbox.setChecked(false);
-			}
-		}
-	}
-	
-	protected void updateProductionOrderState() {
-		// recorre todos los procesos para ver si estan todos finalizados
-		boolean isFinished = true;
 		for(ProductionOrderDetail each : productionOrderDetailList) {
-			if(!each.isFinished()) {
-				isFinished = false;
-			}
-		}
-		if(isFinished) {
-			ProductionOrderStateType productionOrderStateType = productionOrderStateTypeRepository.findFirstByName("Finalizada");
-			ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateType, new Date());
-			productionOrderState = productionOrderStateRepository.save(productionOrderState);
-			currentProductionOrder.setState(productionOrderState);
-			currentProductionOrder = productionOrderRepository.save(currentProductionOrder);
-			refreshView();
-		} else {
-			boolean isStarted = true;
-			// si ninguno de los procesos esta finalizado
-			for(ProductionOrderDetail each : productionOrderDetailList) {
-				if(each.isFinished()) {
-					isStarted = false;
-				}
-			}
-			if(isStarted) {
-				ProductionOrderStateType productionOrderStateType = productionOrderStateTypeRepository.findFirstByName("Generada");
-				ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateType, new Date());
-				productionOrderState = productionOrderStateRepository.save(productionOrderState);
-				currentProductionOrder.setState(productionOrderState);
-				currentProductionOrder = productionOrderRepository.save(currentProductionOrder);
-				refreshView();
-			} else {
-				// si alguno de los procesos esta finalizado
-				ProductionOrderStateType productionOrderStateType = productionOrderStateTypeRepository.findFirstByName("Iniciada");
-				if(!currentProductionOrder.getCurrentStateType().equals(productionOrderStateType)) {
-					// si dejo de estar completo
-					ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateType, new Date());
-					productionOrderState = productionOrderStateRepository.save(productionOrderState);
-					currentProductionOrder.setState(productionOrderState);
-					currentProductionOrder = productionOrderRepository.save(currentProductionOrder);
-					refreshView();
+			if(!data.equals(each)) {// no modifica el mismo detalle
+				if(each.getProcess().getType().getMachineType() != null) {// comprueba si se necesita una maquina para el detalle
+					// si el detalle ya posee una maquina asignada, se la deja igual
+					if(each.getMachine() == null) {
+						MachineType machineTypeSelected = machineTypeRepository.findOne(machineSelected.getMachineType().getId());
+						MachineType machineTypeEach = machineTypeRepository.findOne(each.getProcess().getType().getMachineType().getId());
+						if(machineTypeEach.equals(machineTypeSelected)) {
+							each.setMachine(machineSelected);
+						}
+					}
 				}
 			}
 		}
+		refreshProductionOrderDetailGridView();
+		refreshProcessTypeGridView();
 	}
 
-	@Listen("onEditProductionOrderDetailIsFinished = #productionOrderDetailGrid")
-	public void doEditProductionOrderDetailIsFinished(ForwardEvent evt) {
+	public ListModelList<Machine> getMachineListModelByProcessType(ProcessType processType) {
+		return new ListModelList<>(getMachineListByProcessType(processType));
+	}
+
+	private List<Machine> getMachineListByProcessType(ProcessType processType) {
+		List<Machine> list = new ArrayList<Machine>();
+		if(processType.getMachineType() != null) {
+			MachineType machineType = machineTypeRepository.findOne(processType.getMachineType().getId());
+			if (machineType != null) {
+				for (Machine machine : machineList) {
+					if (machineType.equals(machineTypeRepository.findOne(machine.getMachineType().getId()))) {
+						list.add(machine);
+					}
+				}
+			}
+		}
+		return list;
+	}
+
+	public ListModelList<Worker> getProcessTypeWorkerListModel(ProcessType processType) {
+		// TODO: debe buscar los empleados basandose en la disponibilidad de horarios, por lo que las fechas ya deberian estar seleccionadas
+		return new ListModelList<>(workerList);
+	}
+
+	@Listen("onEditProcessTypeWorker = #processTypeGrid")
+	public void doEditProcessTypeWorker(ForwardEvent evt) {
+		//selecciona el trabajador para todos los procesos que involucren ese tipo de proceso
+		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
+		Combobox element = (Combobox) evt.getOrigin().getTarget();// obtenemos el elemento web
+		Worker workerSelected = (Worker)element.getSelectedItem().getValue();
+		// asigna el trabajador a todos los detalles que necesitan ese tipo de proceso
+		for(ProductionOrderDetail each : productionOrderDetailList) {
+			if(each.getProcess().getType().equals(data)) {// comprueba si es el mismo tipo de proceso
+				each.setWorker(workerSelected);
+			}
+		}
+		refreshProcessTypeGridView();
+		// debe actualizar tambien la ProductionOrderDetailGridView para que los cambios sea aplicados en el otro grid
+		refreshProductionOrderDetailGridView();
+	}
+
+	@Listen("onCreateProcessTypeWorkerCombobox = #processTypeGrid")
+	public void doCreateProcessTypeWorkerCombobox(ForwardEvent evt) {// metodo utilizado para seleccionar el item del combobox luego de crearlo
+		//TODO: debe dejar seleccionado los empleados que esten seleccionados en esos procesos en los detalles de orden
+		// y en caso de que en un mismo tipo de proceso esten seleccionados mas de 1 empleado, mostrar la opcion mixto o custom
+		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
+		Combobox element = (Combobox) evt.getOrigin().getTarget();// obtenemos el elemento web
+		Worker worker = getProcessTypeWorker(data);
+		int value = -1;
+		if(worker != null) {
+			List<Comboitem> comboitemList = element.getItems();
+			for (int i = 0; i < comboitemList.size(); i++) {
+				Comboitem item = comboitemList.get(i);
+				if (item != null) {
+					Worker itemWorker = (Worker) item.getValue();
+					itemWorker = workerRepository.findOne(itemWorker.getId());// actualiza en base a la BD para poder hacer la comparacion
+					if (itemWorker.equals(workerRepository.findOne(worker.getId()))) {
+						value = i;
+					}
+				}
+			}
+		}
+		element.setSelectedIndex(value);
+	}
+
+	private Worker getProcessTypeWorker(ProcessType processType) {
+		// verifica si todos los detalles que tengan ese tipo de proceso estan asignados a algun trabajador
+		// en ese caso se devuelve el trabajador, caso contrario (no estan asignados todos, o estan asignados mas de 1 trabajador) se devuelve null
+		Worker prevWorker = null;
+		for(ProductionOrderDetail each : productionOrderDetailList) {
+			if(each.getProcess().getType() == processType) {
+				if(each.getWorker() != null) {
+					if(prevWorker == null) {//la primera vez carga el trabajador y no hace comparacion
+						prevWorker = each.getWorker();
+					} else {
+						if(!each.getWorker().equals(prevWorker)) {
+							return null;
+						}
+					}
+				} else {
+					return null;
+				}
+			}
+		}
+		return prevWorker;
+	}
+
+	@Listen("onEditProcessTypeMachine = #processTypeGrid")
+	public void doEditProcessTypeMachine(ForwardEvent evt) {
+		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
+		Combobox element = (Combobox) evt.getOrigin().getTarget();// obtenemos el elemento web
+		Machine machineSelected = (Machine)element.getSelectedItem().getValue();
+		// asigna la misma maquina a todos los detalles que sean del tipo de proceso
+		for(ProductionOrderDetail each : productionOrderDetailList) {
+			if(each.getProcess().getType().equals(data)) {
+				each.setMachine(machineSelected);
+			}
+		}
+		refreshProcessTypeGridView();
+		// debe actualizar tambien la ProductionOrderDetailGridView para que los cambios sea aplicados en el otro grid
+		refreshProductionOrderDetailGridView();
+	}
+
+	@Listen("onCreateProcessTypeMachineCombobox = #processTypeGrid")
+	public void doCreateProcessTypeMachineCombobox(ForwardEvent evt) {// metodo utilizado para seleccionar el item del combobox luego de crearlo
+		ProcessType data = (ProcessType) evt.getData();
+		Combobox element = (Combobox) evt.getOrigin().getTarget();// obtenemos el elemento web
+		int value = -1;
+		Machine machine = getProcessTypeMachine(data);
+		if(machine != null) {
+			List<Comboitem> comboitemList = element.getItems();
+			for (int i = 0; i < comboitemList.size(); i++) {
+				Comboitem item = comboitemList.get(i);
+				if (item != null) {
+					Machine itemMachine = (Machine) item.getValue();
+					itemMachine = machineRepository.findOne(itemMachine.getId());// actualiza en base a la BD para poder hacer la comparacion
+					if (itemMachine.equals(machineRepository.findOne(machine.getId()))) {
+						value = i;
+					}
+				}
+			}
+		}
+		element.setSelectedIndex(value);
+	}
+
+	private Machine getProcessTypeMachine(ProcessType processType) {
+		// verifica si todos los detalles que tengan ese tipo de proceso estan asignados a alguna maquina
+		// en ese caso se devuelve la maquina, caso contrario (no estan asignados todos, o estan asignados mas de 1 trabajador) se devuelve null
+		Machine prevMachine = null;
+		for(ProductionOrderDetail each : productionOrderDetailList) {
+			if(each.getProcess().getType() == processType) {
+				if(each.getMachine() != null) {
+					if(prevMachine == null) {//la primera vez carga la maquina y no hace comparacion
+						prevMachine = each.getMachine();
+					} else {
+						if(!each.getMachine().equals(prevMachine)) {// si no son todas iguales
+							return null;
+						}
+					}
+				} else {
+					return null;
+				}
+			}
+		}
+		return prevMachine;
+	}
+
+	private void refreshProcessTypeGridView() {
+		// la lista de procesos se crea en base a los tipos de procesos que incluye la orden
+		processTypeList = currentProductionOrder.getProcessTypeList();
+		sortProcessTypeListBySequence();
+		ListModelList<ProcessType> processTypeListModelList = new ListModelList<ProcessType>(processTypeList);
+		processTypeGrid.setModel(processTypeListModelList);
+	}
+
+	private void sortProcessTypeListBySequence() {
+		Comparator<ProcessType> comp = new Comparator<ProcessType>() {
+			@Override
+			public int compare(ProcessType a, ProcessType b) {
+				return a.getSequence().compareTo(b.getSequence());
+			}
+		};
+		Collections.sort(processTypeList, comp);
+	}
+
+	@Listen("onClick = #autoAssignButton")
+	public void autoAssignButtonClick() {
+		// asigna la primer maquina o trabajador disponible a cada detalle
+		// solo si el detalle no es cancelado
+		Worker worker = null;
+		Machine machine = null;
+		if(workerList.size() > 0) {
+			worker = workerList.get(0);
+		}
+		for(ProductionOrderDetail each : productionOrderDetailList) {
+			if(each.getState() == ProcessState.Cancelado) {
+				each.setWorker(null);
+				each.setMachine(null);
+			} else {
+				List<Machine> list = getMachineListByProcessType(each.getProcess().getType());
+				if(list.size() > 0) {
+					machine = list.get(0);
+				}
+				each.setWorker(worker);
+				each.setMachine(machine);
+			}
+		}
+		refreshProductionOrderDetailGridView();
+		refreshProcessTypeGridView();
+	}
+
+	@Listen("onChange = #productionOrderStartDatebox")
+	public void doChangeProductionOrderStartDatebox() {
+		refreshProcessDates();
+	}
+
+	private void refreshProcessDates() {
+		Date startDate = getDateTimeStartWork(productionOrderStartDatebox.getValue());
+		// asigna el valor a la clase para que calcule todos los tiempos de los detalles automaticamente
+		currentProductionOrder.setDateStart(startDate);
+		productionOrderDetailList = currentProductionOrder.getDetails();
+		sortProductionOrderDetailListByProcessTypeSequence();
+		productionOrderStartDatebox.setValue(currentProductionOrder.getDateStart());// modifica el valor del datebox para que contenga la hora de inicio
+		productionOrderFinishDatebox.setValue(currentProductionOrder.getDateFinish());
+		refreshProductionOrderDetailGridView();
+		refreshProcessTypeGridView();
+	}
+
+	private Date getDateTimeStartWork(Date startDate) {
+		// devuelve la union entre la fecha del datebox y la hora de inicio de trabajo
+		if(startDate != null) {
+			Calendar calStartDate = Calendar.getInstance();
+			calStartDate.setTime(startDate);
+			calStartDate.set(Calendar.HOUR_OF_DAY, ProductionDateTimeHelper.getFirstHourOfDay());
+			calStartDate.set(Calendar.MINUTE, ProductionDateTimeHelper.getFirstMinuteOfDay());
+			return calStartDate.getTime();
+		}
+		return null;
+	}
+
+	private void sortProductionOrderDetailListByProcessTypeSequence() {
+		Comparator<ProductionOrderDetail> comp = new Comparator<ProductionOrderDetail>() {
+			@Override
+			public int compare(ProductionOrderDetail a, ProductionOrderDetail b) {
+				return a.getProcess().getType().getSequence().compareTo(b.getProcess().getType().getSequence());
+			}
+		};
+		Collections.sort(productionOrderDetailList, comp);
+	}
+
+	public boolean isStateCancel(ProcessState processState) {
+		return processState == ProcessState.Cancelado;
+	}
+
+	@Listen("onEditProductionOrderDetailIsCanceled = #productionOrderDetailGrid")
+	public void doEditProductionOrderDetailIsCanceled(ForwardEvent evt) {
 		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
 		Checkbox element = (Checkbox) evt.getOrigin().getTarget();// obtenemos el elemento web
-		data.setFinished(element.isChecked());// cargamos al objeto el valor
+		if(element.isChecked()) {
+			data.setState(ProcessState.Cancelado);
+		} else {
+			data.setState(ProcessState.Pendiente);
+		}
+		refreshProcessDates();
+		autoAssignButtonClick();
 	}
-	
-	@Listen("onEditUsedSupply = #productionOrderSupplyListbox")
-	public void doEditUsedSupply(ForwardEvent evt) {
-		ProductionOrderSupply data = (ProductionOrderSupply) evt.getData();// obtenemos el objeto pasado por parametro
-		InputEvent inputEvent = (InputEvent) evt.getOrigin();
-		String inputValue = inputEvent.getValue();
-		BigDecimal value = null;
-		if(inputValue == null || inputValue.equals("")) {
-			value = BigDecimal.ZERO;
-		} else {
-			value = new BigDecimal(inputValue);
+
+	public List<Piece> getProcessTypePieceList(ProcessType processType) {
+		// devuelve la lista de piezas del processType
+		List<Piece> pieceList = new ArrayList<Piece>();
+		for(ProductionOrderDetail each : productionOrderDetailList) {
+			if(processType.equals(each.getProcess().getType())) {
+				pieceList.add(each.getProcess().getPiece());
+			}
 		}
-		if(value.compareTo(data.getQuantity()) > 0) {
-			Doublebox element = (Doublebox) evt.getOrigin().getTarget();
-			element.setValue(data.getQuantity().doubleValue());
-			data.setQuantityUsed(data.getQuantity());
-		} else {
-			data.setQuantityUsed(value);
-		}
+		return pieceList;
 	}
-	
-	@Listen("onEditUsedRawMaterial = #productionOrderRawMaterialListbox")
-	public void doEditUsedRawMaterial(ForwardEvent evt) {
-		ProductionOrderRawMaterial data = (ProductionOrderRawMaterial) evt.getData();// obtenemos el objeto pasado por parametro
-		InputEvent inputEvent = (InputEvent) evt.getOrigin();
-		String inputValue = inputEvent.getValue();
-		BigDecimal value = null;
-		if(inputValue == null || inputValue.equals("")) {
-			value = BigDecimal.ZERO;
-		} else {
-			value = new BigDecimal(inputValue);
-		}
-		if(value.compareTo(data.getQuantity()) > 0) {
-			Doublebox element = (Doublebox) evt.getOrigin().getTarget();
-			element.setValue(data.getQuantity().doubleValue());
-			data.setQuantityUsed(data.getQuantity());
-		} else {
-			data.setQuantityUsed(value);
-		}
+
+	@Listen("onChangeProductionOrderDetailStartDate = #productionOrderDetailGrid")
+	public void doChangeProductionOrderDetailStartDate(ForwardEvent evt) {
+		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
+		Datebox element = (Datebox) evt.getOrigin().getTarget();// obtenemos el elemento web
+		data.setDateStart(element.getValue());
+		// cambia la fecha de fin tambien
+		Date finish = ProductionDateTimeHelper.getFinishDate(element.getValue(), data.getTimeTotal());
+		data.setDateFinish(finish);
+		// cambia el valor del elemento con fecha fin
+		Row fila = (Row)element.getParent();
+		Datebox dateboxFinish = (Datebox) fila.getChildren().get(fila.getChildren().size()-7);
+		dateboxFinish.setValue(finish);
+		//TODO: recalcular todos los tiempos de los procesos posteriores para que inicien el final
 	}
 }

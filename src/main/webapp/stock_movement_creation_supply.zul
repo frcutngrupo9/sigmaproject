@@ -1,0 +1,3 @@
+<window title="Comprobante de Stock de Insumos" id="win_stock_movement_creation" apply="ar.edu.utn.sigmaproject.controller.StockMovementSupplyCreationController" width="95%" sclass="sigma-content">
+    <include id="included" src="stock_movement_creation.zul"/>
+</window>

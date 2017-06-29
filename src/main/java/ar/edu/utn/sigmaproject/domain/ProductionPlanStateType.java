@@ -13,7 +13,7 @@ public class ProductionPlanStateType implements Serializable, Cloneable {
 	Long id;
 
 	@Column(unique = true)
-	String name = "";// "Iniciado""Cancelado""Abastecido""Lanzado""En Produccion""Finalizado"
+	String name = "";// "Registrado""Abastecido""Lanzado""En Produccion""Finalizado""Cancelado"
 	String details = "";
 
 	public ProductionPlanStateType() {
@@ -46,39 +46,5 @@ public class ProductionPlanStateType implements Serializable, Cloneable {
 
 	public void setDetails(String details) {
 		this.details = details;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ProductionPlanStateType other = (ProductionPlanStateType) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
-
-	public static ProductionPlanStateType clone(ProductionPlanStateType other) {
-		try {
-			return (ProductionPlanStateType) other.clone();
-		} catch (CloneNotSupportedException e) {
-			// not possible
-		}
-		return null;
 	}
 }

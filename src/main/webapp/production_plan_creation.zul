@@ -1,6 +1,7 @@
-<window id="win_production_plan_creation" apply="ar.edu.utn.sigmaproject.controller.ProductionPlanCreationController" width="95%" style="background:white">
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
+<window id="win_production_plan_creation" apply="ar.edu.utn.sigmaproject.controller.ProductionPlanCreationController" closable="false" sclass="sigma-content">
     <caption id="productionPlanCaption" label="Creacion/Edicion de Plan"/>
-    <panel title="Plan de Produccion" id="productionPlanCreationBlock" border="rounded">
+    <panel id="productionPlanCreationBlock" border="none">
         <panelchildren>
             <vlayout>
             	<grid hflex="1" sclass="sigma-form">
@@ -22,73 +23,76 @@
 							<textbox id="productionPlanNameTextbox" width="25%"/>
                         </row>
                         <row>
-                            <label value="Seleccionar Pedido: "/>
+                            <label value="Agregar Pedido: "/>
                             <cell style="text-align:left">
-	                    		<hlayout>
-				                	<bandbox id="orderBandbox" buttonVisible = "true" autodrop = "true">
-				    					<bandpopup>
-				    						<vbox>
-				    							<hbox>
-				    								Buscar
-				    								<textbox />
-				    							</hbox>
-				    							<listbox id="orderPopupListbox" width="300px">
-				    							<listhead>
-				    								<listheader label="Pedido" align="center"/>
-				    								<listheader label="Cliente" align="center"/>
-				    								<listheader label="Fecha" align="center"/>
-				    								<listheader label="Cantidad de Productos" align="center"/>
-				    							</listhead>
-				    							<template name="model">
-				    								<listitem>
-				    									<listcell label="${each.id}"/>
-				    									<listcell label="${each.getClient().getName()}"/>
-				    									<listcell label="${each.date}"/>
-				    									<listcell label="${each.getDetails().size()}"/>
-				    								</listitem>
-				    							</template>
-				    							</listbox>
-				    						</vbox>
-				    					</bandpopup>
-				    				</bandbox>
-				    				<button id="addOrderButton" label="Agregar Pedido"/>
-								</hlayout>
+			                	<bandbox id="orderBandbox" buttonVisible = "true" autodrop = "true">
+			    					<bandpopup>
+			    						<listbox id="orderPopupListbox" width="500px" emptyMessage="No existen pedidos pendientes.">
+			    							<listhead>
+			    								<listheader label="Pedido" align="center"/>
+			    								<listheader label="Cliente" align="center"/>
+			    								<listheader label="Fecha" align="center"/>
+			    								<listheader label="Fecha Necesidad" align="center"/>
+			    								<listheader label="Productos Distintos" align="center"/>
+			    							</listhead>
+			    							<template name="model">
+			    								<listitem>
+			    									<listcell label="${each.id}"/>
+			    									<listcell label="${each.getClient().getName()}"/>
+			    									<listcell label="${r:getFormattedDate(each.date)}"/>
+			    									<listcell label="${r:getFormattedDate(each.needDate)}"/>
+			    									<listcell label="${each.getDetails().size()}"/>
+			    								</listitem>
+			    							</template>
+			    						</listbox>
+			    					</bandpopup>
+			    				</bandbox>
 			                </cell>
                         </row>
                    </rows>
                 </grid>
     			<grid id="productionPlanDetailGrid" mold="paging" pageSize="7">
     				<auxhead>
-						<auxheader label="Pedidos" colspan="4"/>
+						<auxheader label="Pedidos" colspan="6"/>
 					</auxhead>
         			<columns>
-            			<column label="Fecha" align="center"/>
+            			<column label="Nro" align="center"/>
+            			<column label="Fecha Creacion" align="center"/>
+            			<column label="Fecha Necesidad" align="center"/>
             			<column label="Cliente" align="center"/>
-           			 	<column label="Cantidad Productos" align="center"/>
+           			 	<column label="Cantidad Productos Distintos" align="center"/>
            			 	<column label="Quitar" width="120px" align="center"/>
         			</columns>
         			<template name="model">
             			<row>
-                			<label value="${each.getOrder().getDate()}"/>
+                			<label value="${each.getOrder().getNumber()}"/>
+                			<label value="${r:getFormattedDateTime(each.getOrder().getDate())}"/>
+                			<label value="${r:getFormattedDate(each.getOrder().getNeedDate())}"/>
                 			<label value="${each.getOrder().getClient().getName()}"/>
                 			<label value="${each.getOrder().getDetails().size()}"/>
-                			<button forward="onClick=productionPlanDetailGrid.onRemoveOrder(${each.getOrder()})" image="/img/delete16x16.png"/>
+                			<button forward="onClick=productionPlanDetailGrid.onRemoveOrder(${each})" image="/img/delete16x16.png"/>
             			</row>
         			</template>
     			</grid>
     			<separator/>
     			<listbox id="productTotalListbox" mold="paging" pageSize="7" visible="true" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Productos" colspan="4"/>
+						<auxheader label="Productos" colspan="5"/>
 					</auxhead>
         			<listhead>
+        				<listheader label="Foto" align="center"/>
         				<listheader label="Codigo" align="center"/>
-            			<listheader label="Nombre Producto" align="center"/>
+            			<listheader label="Producto" align="center"/>
             			<listheader label="Detalles" align="center"/>
-            			<listheader label="Cantidad de Producto" align="center"/>
+            			<listheader label="Cantidad" align="center"/>
         			</listhead>
         			<template name="model">
             			<listitem>
+                			<custom-attributes product_image="${r:getProductImage(each.getProduct())}"/>
+                			<listcell>
+                            	<image if="${!empty product_image}" content="${product_image}" width="30px" height="30px"/>
+				                <image if="${empty product_image}" width="0px" height="0px"/>
+                            </listcell>
                 			<listcell label="${each.getProduct().getCode()}"/>
                 			<listcell label="${each.getProduct().getName()}"/>
                 			<listcell label="${each.getProduct().getDetails()}"/>
@@ -100,7 +104,14 @@
                     <button id="saveProductionPlanButton" label="Guardar Plan de Produccion"/>
                     <button id="resetProductionPlanButton" label="Reset Plan de Produccion"/>
                     <button id="deleteProductionPlanButton" label="Eliminar Plan de Produccion"/>
+                    <hbox pack="center" align="center" hflex="1">
+			        	<button id="returnButton" label="Ir a Listado"/>
+			        	<button id="returnToProductionButton" label="Ir a Produccion"/>
+			        	<button id="returnToRequirementPlanButton" label="Ir a Abastecimiento"/>
+			        </hbox>
                 </hlayout>
+                <separator/>
+			    <separator/>
             </vlayout>
         </panelchildren>
     </panel>

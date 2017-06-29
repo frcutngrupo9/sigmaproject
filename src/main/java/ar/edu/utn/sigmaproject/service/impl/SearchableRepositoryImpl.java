@@ -9,14 +9,17 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jpa.Search;
-import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.query.dsl.TermContext;
+import org.hibernate.search.query.dsl.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -45,27 +48,31 @@ public class SearchableRepositoryImpl<T, ID extends Serializable> extends Simple
 
 	public Page<T> findAll(String queryString, Pageable pageable) {
 		FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
-        try {
-            // This will ensure that index for already inserted data is created.
-            fullTextEntityManager.createIndexer().startAndWait();
-        } catch (InterruptedException ignored) {
-
-        }
-        QueryBuilder qb = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(this.clazz).get();
-		List<String> fields = new ArrayList<>();
-		if (this.clazz.isAnnotationPresent(Indexed.class)) {
-			for (Field field : this.clazz.getDeclaredFields()) {
-				if (field.isAnnotationPresent(org.hibernate.search.annotations.Field.class)) {
-					fields.add(field.getName());
-				}
-			}
-		}
+        List<QueryField> fields = new ArrayList<>();
+		recursiveAddIndexedFields(this.clazz, new ArrayList<String>(), fields);
 		if (fields.isEmpty()) {
 			throw new java.lang.RuntimeException(
 					"The class " + this.clazz.getName() + " should have the @Indexed annotation present" +
 							" and it should have at least one field with the @Field annotation");
 		}
-		org.apache.lucene.search.Query query = qb.keyword().onFields(fields.toArray(new String[0])).matching(queryString).createQuery();
+		EntityContext entityContext = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(this.clazz);
+		// we use an analyzer with lowercase / edge ngram filters at index time, but at search time we just need a
+		// standard analyzer, so we override the analyzer to use when searching
+		for (QueryField field : fields) {
+			entityContext = entityContext.overridesForField(field.name, "standard");
+		}
+		QueryBuilder qb = entityContext.get();
+		TermMatchingContext matchingContext = qb.keyword().onField(fields.get(0).name);
+		for (QueryField field : fields) {
+			if (field.name.equals(fields.get(0).name)) {
+				continue;
+			}
+			matchingContext = matchingContext.andField(field.name);
+			if (field.ignoreFieldBridge) {
+				matchingContext = matchingContext.ignoreFieldBridge();
+			}
+		}
+		org.apache.lucene.search.Query query = matchingContext.matching(queryString).createQuery();
         FullTextQuery jpaQuery = fullTextEntityManager.createFullTextQuery(query, this.clazz);
 
         jpaQuery.setFirstResult(pageable.getOffset());
@@ -89,7 +96,48 @@ public class SearchableRepositoryImpl<T, ID extends Serializable> extends Simple
         // execute search
         @SuppressWarnings("unchecked")
 		List<T> results = jpaQuery.getResultList();
-        return new PageImpl<T>(results, pageable, resultSize);
+        return new PageImpl<>(results, pageable, resultSize);
+	}
+
+	private void recursiveAddIndexedFields(Class clazz, List<String> fieldStack, List<QueryField> fields) {
+		if (clazz.isAnnotationPresent(Indexed.class)) {
+			for (Field field : clazz.getDeclaredFields()) {
+				if (field.isAnnotationPresent(org.hibernate.search.annotations.Field.class)) {
+					String fieldName = "";
+					for (String parentField : fieldStack) {
+						fieldName += parentField + ".";
+					}
+					fieldName += field.getName();
+					QueryField queryField = new QueryField();
+					queryField.name = fieldName;
+					fields.add(queryField);
+				} else if (field.isAnnotationPresent(org.hibernate.search.annotations.IndexedEmbedded.class)) {
+					fieldStack.add(field.getName());
+					recursiveAddIndexedFields(field.getType(), fieldStack, fields);
+					fieldStack.remove(fieldStack.size() - 1);
+				}
+			}
+		}
+		if (clazz.isAnnotationPresent(ClassBridge.class)) {
+			Annotation annotation = clazz.getAnnotation(ClassBridge.class);
+			String fieldName = "";
+			for (String parentField : fieldStack) {
+				fieldName += parentField + ".";
+			}
+			//fieldName = fieldName.substring(0, fieldName.length() - 1);
+			fieldName += ((ClassBridge)annotation).name();
+			QueryField queryField = new QueryField();
+			queryField.name = fieldName;
+			queryField.ignoreFieldBridge = true;
+			fields.add(queryField);
+		}
+	}
+
+	class QueryField {
+
+		String name;
+		boolean ignoreFieldBridge;
+
 	}
 
 }

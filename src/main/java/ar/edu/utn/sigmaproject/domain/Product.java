@@ -1,5 +1,6 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
@@ -9,41 +10,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.*;
+import javax.xml.datatype.Duration;
 
 @Entity
 @Indexed
-public class Product implements Serializable, Cloneable {
+@Analyzer(definition = "edge_ngram")
+public class Product extends Item implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "product", targetEntity = Piece.class)
+	private List<Piece> pieces = new ArrayList<>();
 
-	@OneToMany(orphanRemoval = true)
-	List<Piece> pieces = new ArrayList<>();
-
-	@OneToMany(orphanRemoval = true)
-	List<Supply> supplies = new ArrayList<>();
-
-	@OneToMany(orphanRemoval = true)
-	List<RawMaterial> rawMaterials = new ArrayList<>();
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "product", targetEntity = ProductMaterial.class)
+	private List<ProductMaterial> materials = new ArrayList<>();
 
 	@Lob
-	byte[] imageData = new byte[0];
+	private byte[] imageData = new byte[0];
 
 	@Field
-	String name = "";
-	String details = "";
-	String code = "";
-	Integer stock = 0;
-	Integer stockMin = 0;
-	Integer stockRepo = 0;
+	private String name = "";
+
+	@Field
+	private String details = "";
+
+	@Field
+	private String code = "";
+
+	private Integer stock = 0;
+	private Integer stockMin = 0;
+	private Integer stockRepo = 0;
 
 	@ManyToOne
-	ProductCategory category;
+	private ProductCategory category;
 
-	BigDecimal price = BigDecimal.ZERO;
-	boolean isClone;
+	private BigDecimal price = BigDecimal.ZERO;
+	private boolean isClone;
 
 	public Product() {
 
@@ -57,12 +58,22 @@ public class Product implements Serializable, Cloneable {
 		this.price = price;
 	}
 
-	public Long getId() {
-		return id;
+	public Duration getDurationTotal() {
+		Duration durationTotal = null;
+		for(Piece each : pieces) {
+			if(durationTotal == null) {
+				durationTotal = each.getDurationTotal();
+			} else {
+				durationTotal = durationTotal.add(each.getDurationTotal());
+			}
+
+		}
+		return durationTotal;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	@Override
+	public String getDescription() {
+		return getName();
 	}
 
 	public List<Piece> getPieces() {
@@ -73,20 +84,32 @@ public class Product implements Serializable, Cloneable {
 		this.pieces = pieces;
 	}
 
-	public List<Supply> getSupplies() {
+	public List<ProductMaterial> getSupplies() {
+		List<ProductMaterial> supplies = new ArrayList<>();
+		for(ProductMaterial each : materials) {
+			if(each.getType() == MaterialType.Supply) {
+				supplies.add(each);
+			}
+		}
 		return supplies;
 	}
 
-	public void setSupplies(List<Supply> supplies) {
-		this.supplies = supplies;
-	}
-
-	public List<RawMaterial> getRawMaterials() {
+	public List<ProductMaterial> getRawMaterials() {
+		List<ProductMaterial> rawMaterials = new ArrayList<>();
+		for(ProductMaterial each : materials) {
+			if(each.getType() == MaterialType.Wood) {
+				rawMaterials.add(each);
+			}
+		}
 		return rawMaterials;
 	}
 
-	public void setRawMaterials(List<RawMaterial> rawMaterials) {
-		this.rawMaterials = rawMaterials;
+	public List<ProductMaterial> getMaterials() {
+		return materials;
+	}
+
+	public void setMaterials(List<ProductMaterial> materials) {
+		this.materials = materials;
 	}
 
 	public Integer getStock() {
@@ -170,31 +193,8 @@ public class Product implements Serializable, Cloneable {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Product other = (Product) obj;
-		return id != null && other.id != null && id.equals(other.id);
-	}
-
-	public static Product clone(Product product){
-		try {
-			return (Product)product.clone();
-		} catch (CloneNotSupportedException e) {
-			//not possible
-		}
+	public List<MaterialReserved> getMaterialReservedList() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

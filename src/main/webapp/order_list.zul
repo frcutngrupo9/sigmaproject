@@ -1,3 +1,4 @@
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="win_order_list" title="Lista de Pedidos" closable="false" apply="ar.edu.utn.sigmaproject.controller.OrderListController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
@@ -5,37 +6,51 @@
 		        <label>Buscar:</label>
 		        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
 		        <button id="searchButton" label="Buscar"/>
+		        <hbox pack="center" align="center" hflex="1">
+		        	<button id="newOrderButton" label="Nuevo Pedido"/>
+		        </hbox>
 		    </hlayout>
 		    <separator/>
 		    <grid id="orderGrid" mold="paging" pageSize="7">
 		    	<auxhead>
-					<auxheader label="Pedidos" colspan="8"/>
+					<auxheader label="Pedidos" colspan="10"/>
 				</auxhead>
 		        <columns>
-		            <column label="Numero" align="center"/>
-		            <column label="Cliente" align="center"/>
-		            <column label="Fecha" align="center"/>
-		            <column label="Cantidad Productos" align="center"/>
-		            <column label="Estado" align="center"/>
-		            <column label="Monto Total" align="center"/>
+		            <column label="Numero" align="center" sort="auto(number)"/>
+		            <column label="Cliente" align="center" sort="auto(client.name)"/>
+		            <column label="Fecha Creacion" align="center"/>
+		            <column label="Fecha Necesidad" align="center"/>
+		            <column label="Cant. Productos" align="center"/>
+		            <column label="Estado" align="center" sort="auto(currentStateType.name)"/>
+		            <column label="Importe Total" align="center"/>
 		            <column label="Editar" width="120px" align="center"/>
 		            <column label="Cancelar" width="120px" align="center"/>
+		            <column label="Accion" align="center"/>
 		        </columns>
 		        <template name="model">
 		            <row>
-		                <label value="${each.number}"/>
+		                <label value="${each.getNumber()}"/>
 		                <label value="${each.getClient().getName()}"/>
-		                <label value="${each.date}"/>
-		                <label value="${each.details.size()}"/>
+		                <label value="${r:getFormattedDate(each.getDate())}"/>
+		                <label value="${r:getFormattedDate(each.getNeedDate())}"/>
+		                <label value="${each.getDetails().size()}"/>
+		                <!-- <cell>
+		                	<hbox pack="center" align="center" hflex="1">
+		            		<zk forEach="${each.getProductList()}">
+		            			<image if="${!empty r:getProductImage(each)}" content="${r:getProductImage(each)}" width="35px" height="35px"/>
+		            			<image if="${empty r:getProductImage(each)}" width="0px" height="0px"/>
+		            		</zk>
+		            		</hbox>
+		            	</cell> -->
 		                <label value="${each.getCurrentStateType().getName()}"/>
 		                <label value="${win_order_list$composer.totalPrice(each)} $"/>
 		                <button forward="onClick=orderGrid.onEditOrder(${each})"  image="/img/edit16x16.png"/>
-		                <button disabled="${win_order_list$composer.isStateCancel(each)}" forward="onClick=orderGrid.onCancelOrder(${each})"  image="/img/delete16x16.png"/>
+		                <button disabled="${win_order_list$composer.isStateCancel(each) or win_order_list$composer.isStateDelivered(each) or win_order_list$composer.isStateFinish(each)}" forward="onClick=orderGrid.onCancelOrder(${each})"  image="/img/delete16x16.png"/>
+		                <button disabled="${win_order_list$composer.isStateCancel(each) or win_order_list$composer.isStateNotFinished(each)}" label="Entregar" forward="onClick=orderGrid.onDeliverOrder(${each})"/>
 		            </row>
 		        </template>
 		    </grid>
 		    <separator/>
-		    <button id="newOrderButton" label="Nuevo Pedido"/>
         </panelchildren>
     </panel>
 </window>

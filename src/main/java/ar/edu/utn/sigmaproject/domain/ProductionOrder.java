@@ -2,9 +2,16 @@ package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -12,6 +19,9 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
+import javax.xml.datatype.Duration;
+
+import ar.edu.utn.sigmaproject.util.ProductionDateTimeHelper;
 
 @Entity
 public class ProductionOrder implements Serializable, Cloneable {
@@ -33,46 +43,34 @@ public class ProductionOrder implements Serializable, Cloneable {
 	@OneToMany(orphanRemoval = true)
 	List<ProductionOrderState> states = new ArrayList<>();
 
-	@OneToMany(orphanRemoval = true)
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionOrder", targetEntity = ProductionOrderDetail.class)
 	@OrderColumn(name = "detail_index")
 	List<ProductionOrderDetail> details = new ArrayList<>();
 
+	Integer sequence = 0;
 	Integer number = 0;
 	Integer units = 0;
-	Date date = new Date();
-	Date dateFinished = new Date();
-	Date realDate = new Date();
-	Date realDateFinished = new Date();
-	
-	@OneToMany(orphanRemoval = true)
-	List<ProductionOrderSupply> productionOrderSupplies = new ArrayList<>();
-	
-	@OneToMany(orphanRemoval = true)
-	List<ProductionOrderRawMaterial> productionOrderRawMaterials = new ArrayList<>();
+	Date dateStart = null;
+	Date dateFinish = null;
+	Date dateStartReal = null;
+	Date dateFinishReal = null;
+	Date dateMaterialsWithdrawal = null;
+	ProductionOrderStateType currentStateType = null;
+
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionOrder", targetEntity = ProductionOrderMaterial.class)
+	List<ProductionOrderMaterial> productionOrderMaterials = new ArrayList<>();
 
 	public ProductionOrder() {
 
 	}
 
-	public ProductionOrder(ProductionPlan productionPlan, Product product, Worker worker, Integer number, Integer units, Date date, Date dateFinished, ProductionOrderState state) {
+	public ProductionOrder(Integer sequence, ProductionPlan productionPlan, Product product, Integer units, ProductionOrderState state) {
+		this.sequence = sequence;
 		this.productionPlan = productionPlan;
 		this.product = product;
-		this.worker = worker;
-		this.number = number;
 		this.units = units;
-		this.date = date;
-		this.dateFinished = dateFinished;
 		this.states.add(state);
-		// se crean los detalles
-		//		for(Piece piece : this.product.getPieces()) {
-		//			List<Process> auxProcessList = piece.getProcesses();
-		//			for(Process process : auxProcessList) {
-		//				// por cada proceso hay que crear un detalle de orden de produccion
-		//				Integer quantityPiece = this.units * piece.getUnits();// cantidad total de la pieza
-		//				Duration timeTotal = process.getTime().multiply(quantityPiece);// cantidad total de tiempo del proceso
-		//				this.details.add(new ProductionOrderDetail(process, null, timeTotal, quantityPiece));
-		//			}
-		//		}
+		this.currentStateType = state.getProductionOrderStateType();
 	}
 
 	public Long getId() {
@@ -127,60 +125,76 @@ public class ProductionOrder implements Serializable, Cloneable {
 		this.units = units;
 	}
 
-	public Date getDate() {
-		return date;
+	public Date getDateStart() {
+		return dateStart;
 	}
 
-	public void setDate(Date date) {
-		this.date = date;
+	public void setDateStart(Date dateStart) {
+		this.dateStart = dateStart;
+		updateDetailDates(dateStart);// se calculan las fechas de los detalles automaticamente
 	}
 
-	public Date getDateFinished() {
-		return dateFinished;
+	public Date getDateFinish() {
+		return dateFinish;
 	}
 
-	public void setDateFinished(Date dateFinished) {
-		this.dateFinished = dateFinished;
-	}
-	
-	public Date getRealDate() {
-		return realDate;
+	public void setDateFinish(Date dateFinish) {
+		this.dateFinish = dateFinish;
 	}
 
-	public void setRealDate(Date realDate) {
-		this.realDate = realDate;
+	public Date getDateStartReal() {
+		return dateStartReal;
 	}
 
-	public Date getRealDateFinished() {
-		return realDateFinished;
+	public void setDateStartReal(Date dateStartReal) {
+		this.dateStartReal = dateStartReal;
 	}
 
-	public void setRealDateFinished(Date realDateFinished) {
-		this.realDateFinished = realDateFinished;
+	public Date getDateFinishReal() {
+		return dateFinishReal;
 	}
 
-	public List<ProductionOrderSupply> getProductionOrderSupplies() {
+	public void setDateFinishReal(Date dateFinishReal) {
+		this.dateFinishReal = dateFinishReal;
+	}
+
+	public List<ProductionOrderMaterial> getProductionOrderSupplies() {
+		List<ProductionOrderMaterial> productionOrderSupplies = new ArrayList<>();
+		for(ProductionOrderMaterial each : productionOrderMaterials) {
+			Item item = each.getItem();
+			if(item instanceof SupplyType) {
+				productionOrderSupplies.add(each);
+			}
+		}
 		return productionOrderSupplies;
 	}
 
-	public void setProductionOrderSupplies(List<ProductionOrderSupply> productionOrderSupplyList) {
-		this.productionOrderSupplies = productionOrderSupplyList;
-	}
-
-	public List<ProductionOrderRawMaterial> getProductionOrderRawMaterials() {
+	public List<ProductionOrderMaterial> getProductionOrderRawMaterials() {
+		List<ProductionOrderMaterial> productionOrderRawMaterials = new ArrayList<>();
+		for(ProductionOrderMaterial each : productionOrderMaterials) {
+			Item item = each.getItem();
+			if(item instanceof Wood) {
+				productionOrderRawMaterials.add(each);
+			}
+		}
 		return productionOrderRawMaterials;
 	}
 
-	public void setProductionOrderRawMaterials(List<ProductionOrderRawMaterial> productionOrderRawMaterialList) {
-		this.productionOrderRawMaterials = productionOrderRawMaterialList;
+	public List<ProductionOrderMaterial> getProductionOrderMaterials() {
+		return productionOrderMaterials;
+	}
+
+	public void setProductionOrderMaterials(
+			List<ProductionOrderMaterial> productionOrderMaterials) {
+		this.productionOrderMaterials = productionOrderMaterials;
+	}
+
+	public void setProduct(Product product) {
+		this.product = product;
 	}
 
 	public ProductionOrderStateType getCurrentStateType() {
-		ProductionOrderState result = getCurrentState();
-		if(result != null) {
-			return result.getProductionOrderStateType();
-		}
-		return null;
+		return currentStateType;
 	}
 
 	public ProductionOrderState getCurrentState() {
@@ -201,6 +215,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 	}
 
 	public void setState(ProductionOrderState state) {
+		currentStateType = state.getProductionOrderStateType();
 		states.add(state);
 	}
 
@@ -212,42 +227,218 @@ public class ProductionOrder implements Serializable, Cloneable {
 		this.states = states;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
+	public Integer getSequence() {
+		return sequence;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof ProductionOrder)) {
-			return false;
-		}
-		ProductionOrder other = (ProductionOrder) obj;
-		if (id == null) {
-			if (other.id != null) {
-				return false;
+	public void setSequence(Integer sequence) {
+		this.sequence = sequence;
+	}
+
+	public Duration getDurationTotal() {
+		// este metodo no tiene en cuenta el tiempo que se debe restar a causa de los procesos cancelados
+		//		if(product.getDurationTotal() != null) {
+		//			return product.getDurationTotal().multiply(units);
+		//		}
+		return getDurationTotalFromDetails();
+	}
+
+	private Duration getDurationTotalFromDetails() {
+		// este metodo si tiene en cuenta el tiempo que se debe restar a causa de los procesos cancelados
+		Duration duration = null;
+		for(ProductionOrderDetail each : getDetails()) {
+			if(each.getState() != ProcessState.Cancelado) {// no suma si esta cancelado
+				if(duration == null) {// primera vez
+					duration = each.getTimeTotal();
+				} else {
+					duration = duration.add(each.getTimeTotal());
+				}
 			}
-		} else if (!id.equals(other.id)) {
-			return false;
 		}
-		return true;
+		return duration;
 	}
 
-	public static ProductionOrder clone(ProductionOrder order){
-		try {
-			return (ProductionOrder)order.clone();
-		} catch (CloneNotSupportedException e) {
-			//not possible
+	public Date getDateMaterialsWithdrawal() {
+		return dateMaterialsWithdrawal;
+	}
+
+	public void setDateMaterialsWithdrawal(Date dateMaterialsWithdrawal) {
+		this.dateMaterialsWithdrawal = dateMaterialsWithdrawal;
+	}
+
+	public Map<ProcessType, List<ProductionOrderDetail>> getProcessTypeMap() {
+		// devuelve un map en que la llave es el ProcessType y el valor son los ProductionOrderDetail que referencian a un Process que referencia a ese ProcessType
+		Map<ProcessType, List<ProductionOrderDetail>> processTypeMap = new HashMap<ProcessType, List<ProductionOrderDetail>>();
+		for(ProductionOrderDetail each : getDetails()) {
+			ProcessType processType = each.getProcess().getType();
+			List<ProductionOrderDetail> list = processTypeMap.get(processType);
+			if(list == null) {
+				list = new ArrayList<ProductionOrderDetail>();
+			} else {
+				list.add(each);
+			}
+			processTypeMap.put(processType, list);
 		}
-		return null;
+		return processTypeMap;
+	}
+
+	public List<ProcessType> getProcessTypeList() {
+		Set<ProcessType> processTypeSet = new HashSet<ProcessType>();
+		for(ProductionOrderDetail eachProductionOrderDetail : getDetails()) {
+			processTypeSet.add(eachProductionOrderDetail.getProcess().getType());// garantiza que los tipo de procesos no se repitan
+		}
+		List<ProcessType> list = new ArrayList<ProcessType>();
+		for (ProcessType eachProcessType : processTypeSet) {
+			list.add(eachProcessType);
+		}
+		return list;
+	}
+
+	private void updateDetailDates(Date startDate) {
+		Date finishDate = null;
+		if(startDate != null) {
+			for(ProductionOrderDetail each : getDetails()) {
+				if(each.getState() != ProcessState.Cancelado) {// solo se calcula para los procesos que no esten cancelados
+					if(finishDate == null) {// si es la primera vez que ingresa
+						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, each.getTimeTotal());
+					} else {
+						// el inicio de la actual es al finalizar la ultima
+						startDate = finishDate;
+						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, each.getTimeTotal());
+					}
+					each.setDateStart(startDate);
+					each.setDateFinish(finishDate);
+				} else {
+					each.setDateStart(null);
+					each.setDateFinish(null);
+					// por las dudas borramos tambien las fechas reales
+					each.setDateStartReal(null);
+					each.setDateFinishReal(null);
+				}
+			}
+		} else {
+			for(ProductionOrderDetail each : getDetails()) {
+				each.setDateStart(null);
+				each.setDateFinish(null);
+			}
+		}
+		setDateFinish(finishDate);// se usa la ultima fecha como el fin de la orden de produccion
+	}
+
+
+	public Date getStartRealDateFromDetails() {
+		Date date = null;
+		for(ProductionOrderDetail each : getDetails()) {
+			if(each.getState() != ProcessState.Cancelado) {
+				Date startRealDate = each.getDateStartReal();
+				if(startRealDate != null) {
+					if(date == null) {
+						date = startRealDate;
+					} else {
+						if(startRealDate.before(date)) {
+							date = startRealDate;
+						}
+					}
+				}
+			}
+		}
+		return date;
+	}
+
+	public Date getFinishRealDateFromDetails() {
+		// solo si todos tienen fecha fin e inicio real
+		Date date = null;
+		for(ProductionOrderDetail each : getDetails()) {
+			if(each.getState() != ProcessState.Cancelado) {
+				Date finishRealDate = each.getDateFinishReal();
+				Date startRealDate = each.getDateStartReal();
+				if(finishRealDate == null || startRealDate == null) {
+					return null;
+				}
+				if(finishRealDate != null) {
+					if(date == null) {
+						date = finishRealDate;
+					} else {
+						if(finishRealDate.after(date)) {
+							date = finishRealDate;
+						}
+					}
+				}
+			}
+		}
+		return date;
+	}
+
+	public Date getStartDateFromDetails() {
+		Date date = null;
+		for(ProductionOrderDetail each : getDetails()) {
+			if(each.getState() != ProcessState.Cancelado) {
+				Date startDate = each.getDateStart();
+				if(startDate != null) {
+					if(date == null) {
+						date = startDate;
+					} else {
+						if(startDate.before(date)) {
+							date = startDate;
+						}
+					}
+				}
+			}
+		}
+		return date;
+	}
+
+	public Date getFinishDateFromDetails() {
+		// solo si todos tienen fecha fin e inicio
+		Date date = null;
+		for(ProductionOrderDetail each : getDetails()) {
+			if(each.getState() != ProcessState.Cancelado) {
+				Date finishDate = each.getDateFinish();
+				Date startDate = each.getDateStart();
+				if(finishDate == null || startDate == null) {
+					return null;
+				}
+				if(date == null) {
+					date = finishDate;
+				} else {
+					if(finishDate.after(date)) {
+						date = finishDate;
+					}
+				}
+			}
+		}
+		return date;
+	}
+
+	public void sortDetailsByProcessTypeSequence() {
+		Comparator<ProductionOrderDetail> comp = new Comparator<ProductionOrderDetail>() {
+			@Override
+			public int compare(ProductionOrderDetail a, ProductionOrderDetail b) {
+				return a.getProcess().getType().getSequence().compareTo(b.getProcess().getType().getSequence());
+			}
+		};
+		Collections.sort(details, comp);
+	}
+
+	public String getPercentComplete() {
+		List<ProductionOrderDetail> productionOrderDetailList = getDetails();
+		int quantityFinished = 0;
+		int quantityCanceled = 0;
+		for(ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
+			if(productionOrderDetail.getState() == ProcessState.Realizado) {
+				quantityFinished += 1;
+			}
+			if(productionOrderDetail.getState() == ProcessState.Cancelado) {
+				quantityCanceled += 1;
+			}
+		}
+		double percentComplete;
+		int quantityTotalNotCanceled = productionOrderDetailList.size() - quantityCanceled;
+		if(quantityTotalNotCanceled == 0) {
+			percentComplete = 0;
+		} else {
+			percentComplete = (quantityFinished * 100) / quantityTotalNotCanceled;
+		}
+		return percentComplete + " %";
 	}
 }

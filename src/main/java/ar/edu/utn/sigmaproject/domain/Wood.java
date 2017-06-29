@@ -1,28 +1,47 @@
 package ar.edu.utn.sigmaproject.domain;
 
-import javax.persistence.*;
-
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
+
+@Indexed
+@Analyzer(definition = "edge_ngram")
 @Entity
-public class Wood implements Serializable, Cloneable {
+public class Wood extends Item implements Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
-
-	@ManyToOne
-	RawMaterialType rawMaterialType;
-
+	@IndexedEmbedded
 	@ManyToOne
 	WoodType woodType;
 
-	@OneToMany(orphanRemoval = true)
-	List<WoodReserved> woodsReserved = new ArrayList<>();
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "item", targetEntity = MaterialReserved.class)
+	List<MaterialReserved> woodsReserved = new ArrayList<>();
+	
+	@ManyToOne
+	MeasureUnit lengthMeasureUnit;
+
+	@ManyToOne
+	MeasureUnit depthMeasureUnit;
+
+	@ManyToOne
+	MeasureUnit widthMeasureUnit;
+
+	@Field
+	String name = "";
+
+	BigDecimal length = BigDecimal.ZERO;
+	BigDecimal depth = BigDecimal.ZERO;
+	BigDecimal width = BigDecimal.ZERO;
 
 	BigDecimal stock = BigDecimal.ZERO;
 	BigDecimal stockMin = BigDecimal.ZERO;
@@ -32,28 +51,86 @@ public class Wood implements Serializable, Cloneable {
 
 	}
 
-	public Wood(RawMaterialType rawMaterialType, WoodType woodType, BigDecimal stock, BigDecimal stockMin, BigDecimal stockRepo) {
-		this.rawMaterialType = rawMaterialType;
+	public Wood(String name, BigDecimal length, MeasureUnit lengthMeasureUnit, BigDecimal depth, MeasureUnit depthMeasureUnit, BigDecimal width, MeasureUnit widthMeasureUnit, WoodType woodType, BigDecimal stock, BigDecimal stockMin, BigDecimal stockRepo) {
+		this.name = name;
+		this.length = length;
+		this.lengthMeasureUnit = lengthMeasureUnit;
+		this.depth = depth;
+		this.depthMeasureUnit = depthMeasureUnit;
+		this.width = width;
+		this.widthMeasureUnit = widthMeasureUnit;
 		this.woodType = woodType;
 		this.stock = stock;
 		this.stockMin = stockMin;
 		this.stockRepo = stockRepo;
 	}
 
-	public Long getId() {
-		return id;
+	@Override
+	public String getDescription() {
+		return getFormattedMeasure() + " (" + getWoodType().getName() + ")";
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public String getName() {
+		return name;
 	}
 
-	public RawMaterialType getRawMaterialType() {
-		return rawMaterialType;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public void setRawMaterialType(RawMaterialType rawMaterialType) {
-		this.rawMaterialType = rawMaterialType;
+	public BigDecimal getWidth() {
+		return width;
+	}
+
+	public void setWidth(BigDecimal width) {
+		this.width = width;
+	}
+
+	public BigDecimal getLength() {
+		return length;
+	}
+
+	public void setLength(BigDecimal length) {
+		this.length = length;
+	}
+
+	public BigDecimal getDepth() {
+		return depth;
+	}
+
+	public void setDepth(BigDecimal depth) {
+		this.depth = depth;
+	}
+
+	public MeasureUnit getLengthMeasureUnit() {
+		return lengthMeasureUnit;
+	}
+
+	public void setLengthMeasureUnit(MeasureUnit lengthMeasureUnit) {
+		this.lengthMeasureUnit = lengthMeasureUnit;
+	}
+
+	public MeasureUnit getDepthMeasureUnit() {
+		return depthMeasureUnit;
+	}
+
+	public void setDepthMeasureUnit(MeasureUnit depthMeasureUnit) {
+		this.depthMeasureUnit = depthMeasureUnit;
+	}
+
+	public MeasureUnit getWidthMeasureUnit() {
+		return widthMeasureUnit;
+	}
+
+	public void setWidthMeasureUnit(MeasureUnit widthMeasureUnit) {
+		this.widthMeasureUnit = widthMeasureUnit;
+	}
+
+	public String getFormattedMeasure() {
+		String depthText = "(E) " + depth.doubleValue() + " " + depthMeasureUnit.getShortName();
+		String widthText = "(A) " + width.doubleValue() + " " + widthMeasureUnit.getShortName();
+		String lengthText = "(L) " + length.doubleValue() + " " + lengthMeasureUnit.getShortName();
+		return depthText + " x " + widthText + " x " + lengthText;
 	}
 
 	public WoodType getWoodType() {
@@ -88,55 +165,31 @@ public class Wood implements Serializable, Cloneable {
 		this.stockRepo = stockRepo;
 	}
 
-	public List<WoodReserved> getWoodsReserved() {
+	public List<MaterialReserved> getWoodsReserved() {
 		return woodsReserved;
 	}
 
-	public void setWoodsReserved(List<WoodReserved> woodsReserved) {
+	public void setWoodsReserved(List<MaterialReserved> woodsReserved) {
 		this.woodsReserved = woodsReserved;
 	}
 
 	public BigDecimal getStockReserved() {
 		BigDecimal aux = BigDecimal.ZERO;
-		for(WoodReserved each : woodsReserved) {
-			if(!each.isWithdrawn()) {
-				aux = aux.add(each.getStockReserved());
-			}
+		for(MaterialReserved each : woodsReserved) {
+			aux = aux.add(each.getStockReserved());
 		}
 		return aux;
 	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
+	
+	public BigDecimal getStockAvailable() {
+		// devuelve la diferencia entre el stock total y el total reservado
+		BigDecimal stockTotal = getStock();
+		BigDecimal stockReservedTotal = getStockReserved();
+		return stockTotal.subtract(stockReservedTotal);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Wood other = (Wood) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
-
-	public static Wood clone(Wood other) {
-		try {
-			return (Wood)other.clone();
-		} catch (CloneNotSupportedException e) {
-			//not possible
-		}
-		return null;
+	public List<MaterialReserved> getMaterialReservedList() {
+		return getWoodsReserved();
 	}
 }

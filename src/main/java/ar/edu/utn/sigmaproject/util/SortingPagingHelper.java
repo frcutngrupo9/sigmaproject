@@ -230,8 +230,10 @@ public final class SortingPagingHelper<T> {
 					}
 				}
 			}
-
-			searchTextbox.setText("");
+			
+			if (searchTextbox != null) {
+				searchTextbox.setText("");				
+			}
 
 			reloadCurrentPage();
 
@@ -271,7 +273,7 @@ public final class SortingPagingHelper<T> {
 		}
 	}
 
-	class PageActiveModel extends AbstractListModel<T> {
+	public class PageActiveModel extends AbstractListModel<T> {
 
 		private final String CACHE_KEY = System.identityHashCode(this) + "_cache";
 		private PageRequest pageRequest;

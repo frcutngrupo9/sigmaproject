@@ -21,7 +21,6 @@ import org.zkoss.zul.Textbox;
 public class LoginController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
-	//wire components
 	@Wire
 	Textbox account;
 	@Wire
@@ -48,18 +47,17 @@ public class LoginController extends SelectorComposer<Component> {
 	public void doLogin() {
 		String nm = account.getValue();
 		String pd = password.getValue();
-
 		currentUser = userRepository.findByAccount(nm);
 		final String wrongCredentialsMessage = "Usuario o password incorrecto.";
-		if (currentUser == null) {
+		if(currentUser == null) {
 			message.setValue(wrongCredentialsMessage);
 			return;
 		}
-		if (currentUser.getHash() == null || currentUser.getHash().length() == 0) {
+		if(currentUser.getHash() == null || currentUser.getHash().length() == 0) {
 			enterPasswordPopup.open(this.getSelf());
 			return;
 		}
-		if (passwordEncoder.matches(pd, currentUser.getHash())) {
+		if(passwordEncoder.matches(pd, currentUser.getHash())) {
 			showSuccessMessageAndRedirect();
 		} else {
 			message.setValue(wrongCredentialsMessage);
@@ -78,7 +76,6 @@ public class LoginController extends SelectorComposer<Component> {
 		Sessions.getCurrent(true).setAttribute(Attributes.USER_CREDENTIAL, currentUser);
 		message.setValue("Bienvenido, " + currentUser.getFullName());
 		message.setSclass("");
-
 		Executions.sendRedirect("/");
 	}
 }

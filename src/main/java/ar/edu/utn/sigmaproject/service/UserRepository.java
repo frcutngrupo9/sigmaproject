@@ -7,6 +7,6 @@ import ar.edu.utn.sigmaproject.domain.User;
 @Repository
 public interface UserRepository extends SearchableRepository<User, Long> {
 
-	User findByAccount(String account);
-	
+	public User findByAccount(String account);
+
 }

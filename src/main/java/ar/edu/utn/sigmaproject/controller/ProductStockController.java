@@ -20,8 +20,8 @@ import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
+import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Product;
-import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
@@ -65,8 +65,6 @@ public class ProductStockController extends SelectorComposer<Component> {
 
 	// services
 	@WireVariable
-	private ClientRepository clientRepository;
-	@WireVariable
 	private OrderRepository orderRepository;
 	@WireVariable
 	private OrderStateTypeRepository orderStateTypeRepository;
@@ -79,11 +77,9 @@ public class ProductStockController extends SelectorComposer<Component> {
 
 	// list
 	private List<Product> productList;
-	private List<OrderDetail> orderDetailList;
 
 	// list models
 	private ListModelList<Product> productListModel;
-	private ListModelList<OrderDetail> orderDetailListModel;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
@@ -93,9 +89,7 @@ public class ProductStockController extends SelectorComposer<Component> {
 		productListbox.setModel(productListModel);
 		currentProduct = null;
 		refreshView();
-
 		currentOrder = null;
-		//		refreshViewOrder();
 	}
 
 	@Listen("onClick = #searchButton")
@@ -172,112 +166,6 @@ public class ProductStockController extends SelectorComposer<Component> {
 		refreshView();
 	}
 
-	// creacion de pedido de restock
-	//	@Listen("onClick = #newProvisionOrderButton")
-	//	public void newProvisionOrder() {
-	//		Client client = clientRepository.findFirstByName("RESTOCK");
-	//		Date order_date = new Date();
-	//		currentOrder = new Order(client, null, order_date, null);
-	//
-	//		refreshViewOrder();
-	//	}
-	//
-	//	@Listen("onClick = #resetOrderButton")
-	//	public void resetOrder() {
-	//		refreshViewOrder();
-	//	}
-	//
-	//	@Listen("onClick = #cancelOrderButton")
-	//	public void cancelOrder() {
-	//		currentOrder = null;
-	//		refreshViewOrder();
-	//	}
-	//
-	//	@Listen("onClick = #saveOrderButton")
-	//	public void saveOrder() {
-	//		int order_number = orderNumberIntbox.intValue();
-	//		Date order_need_date = orderNeedDatebox.getValue();
-	//		OrderStateType orderStateType = orderStateTypeRepository.findFirstByName("Iniciado");
-	//		currentOrder.setNumber(order_number);
-	//		currentOrder.setNeedDate(order_need_date);
-	//		currentOrder.setCurrentStateType(orderStateType);
-	//		currentOrder.setDetails(orderDetailList);
-	//		currentOrder = orderRepository.save(currentOrder);
-	//		Clients.showNotification("Pedido guardado");
-	//		currentOrder = null;
-	//		refreshViewOrder();
-	//	}
-
-	//	private void refreshViewOrder() {
-	//		if(currentOrder == null) {
-	//			orderCreationBlock.setVisible(false);
-	//			orderDetailList = null;
-	//			newProvisionOrderButton.setDisabled(false);
-	//		} else {
-	//			OrderStateType orderStateTypeFinished = orderStateTypeRepository.findFirstByName("finalizado");
-	//			OrderStateType orderStateTypeCanceleded = orderStateTypeRepository.findFirstByName("cancelado");
-	//			List<Order> provisionOrderList = orderRepository.findByClient(clientRepository.findFirstByName("Auto Abastecimiento"));// obtenemos la lista de los pedidos de autoabastecimiento
-	//			// creamos una lista donde guardaremos todos los detalles de los pedidos de autoabastecimiento sumando su cantidad si el producto se repite
-	//			List<OrderDetail> completeProvisionOrderDetailList = new ArrayList<OrderDetail>();
-	//			for(Order eachProvisionOrder:provisionOrderList) {
-	//				// por cada pedido debemos verificar que no este en estado finalizado o cancelado
-	//				OrderStateType orderStateType = eachProvisionOrder.getCurrentStateType();
-	//				if(!orderStateType.equals(orderStateTypeFinished) && !orderStateType.equals(orderStateTypeCanceleded)) {
-	//					for(OrderDetail eachProvisionOrderDetail:eachProvisionOrder.getDetails()) {
-	//						boolean is_in_list = false;
-	//						for(OrderDetail eachCompleteProvisionOrderDetail:completeProvisionOrderDetailList) {
-	//							if(eachCompleteProvisionOrderDetail.getProduct().equals(eachProvisionOrderDetail.getProduct())) {
-	//								// si el mismo producto aparece en varios pedidos de reposicion hay que sumar sus cantidades y guardarlas en la lista completa de detalles de pedido de autoabasteciemiento
-	//								eachCompleteProvisionOrderDetail.setUnits(eachCompleteProvisionOrderDetail.getUnits() + eachProvisionOrderDetail.getUnits());
-	//								is_in_list = true;
-	//							}
-	//						}
-	//						if(!is_in_list) {
-	//							// si el producto no esta en la lista completa se lo agrega
-	//							completeProvisionOrderDetailList.add(eachProvisionOrderDetail);
-	//						}
-	//					}
-	//				}
-	//			}
-	//			// usamos la lista completa para asegurarnos que no se agreguen productos que ya tengan un pedido de autoabastecimiento activo o para que su cantidad sea la necesaria para llegar al stock
-	//			orderDetailList = new ArrayList<>();
-	//			List<ProductExistence> list_product_existence_complete = productExistenceRepository.findAll();
-	//			for(ProductExistence eachProductExistence:list_product_existence_complete) {
-	//				int units_to_repo = eachProductExistence.getStockRepo() - eachProductExistence.getStock();// si esta resta da un valor positivo quiere decir que el valor de reposicion esta por arriba del stock, por lo tanto ese valor es el necesario
-	//				if(units_to_repo > 0) {
-	//					// debemos recorrer los productos de los pedidos de autoabastecimiento para verificar si alguno es igual al producto que esta con bajo stock
-	//					int units_existing = 0;
-	//					for(OrderDetail eachCompleteProvisionOrderDetail:completeProvisionOrderDetailList) {// debemos buscar si este producto no tiene actualmente un pedido de auto abastecimiento sin finalizar
-	//						if(eachCompleteProvisionOrderDetail.getProduct().equals(eachProductExistence.getProduct())) {
-	//							units_existing = eachCompleteProvisionOrderDetail.getUnits();
-	//						}
-	//					}
-	//					// debemos revisar si la cantidad pedida en este detalle es mayor o igual a la necesitada en stock, en caso de ser asi, este producto no debe ser agregado al pedido de auto abastecimiento, caso contrario, se debe agregar el producto y la cantidad sera la diferencia entre lo que se necesita y lo que hay ya pedido
-	//					units_to_repo = units_to_repo - units_existing;
-	//					if(units_to_repo > 0) {
-	//						orderDetailList.add(new OrderDetail(null, eachProductExistence.getProduct(), units_to_repo, new BigDecimal("0")));
-	//					}
-	//				}
-	//			}
-	//			// si la orderDetailList esta vacia quiere decir que no hay productos que necesiten un pedido de autoasbastecimiento, por lo tanto se informa y se cancela la creacion
-	//			if(orderDetailList.isEmpty()) {
-	//				Clients.showNotification("No existen productos con stock bajo que necesiten un pedido");
-	//				orderCreationBlock.setVisible(false);
-	//				orderDetailList = null;
-	//				newProvisionOrderButton.setDisabled(false);
-	//			} else {
-	//				orderCreationBlock.setVisible(true);
-	//				orderNumberIntbox.setValue(currentOrder.getNumber());
-	//				orderNeedDatebox.setValue(null);
-	//				orderDetailListModel = new ListModelList<OrderDetail>(orderDetailList);
-	//				orderDetailListbox.setModel(orderDetailListModel);
-	//				newProvisionOrderButton.setDisabled(true);
-	//			}
-	//
-	//		}
-	//
-	//	}
-
 	@Listen("onEditOrderDetailUnits = #orderDetailListbox")
 	public void doEditOrderDetailUnits(ForwardEvent evt) {
 		OrderDetail orderDetail = (OrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
@@ -285,4 +173,19 @@ public class ProductStockController extends SelectorComposer<Component> {
 		orderDetail.setUnits(spinner.getValue());// cargamos al objeto el valor actualizado del elemento web
 	}
 
+	public int getQuantityDelivered(Product product) {
+		// suma la cantidad entregada del producto
+		// busca en los pedidos entregados los que contien el producto
+		OrderStateType stateType = orderStateTypeRepository.findFirstByName("Entregado");
+		List<Order> orderList = orderRepository.findByCurrentStateType(stateType);
+		int number = 0;
+		for(Order each : orderList) {
+			for(OrderDetail eachDetail : each.getDetails()) {
+				if(eachDetail.getProduct().equals(product)) {
+					number += eachDetail.getUnits();
+				}
+			}
+		}
+		return number;
+	}
 }

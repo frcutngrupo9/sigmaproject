@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,21 +20,22 @@ public class Order implements Serializable, Cloneable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 
 	@ManyToOne
-	Client client;
+	private Client client;
 
-	@OneToMany(orphanRemoval = true)
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "order", targetEntity = OrderDetail.class)
 	@OrderColumn(name = "detail_index")
-	List<OrderDetail> details = new ArrayList<>();
+	private List<OrderDetail> details = new ArrayList<>();
 
 	@OneToMany(orphanRemoval = true)
-	List<OrderState> states = new ArrayList<>();
+	private List<OrderState> states = new ArrayList<>();
 
-	Integer number = 0;
-	Date date = new Date();
-	Date needDate = new Date();
+	private Integer number = 0;
+	private Date date = new Date();
+	private Date needDate = new Date();
+	private OrderStateType currentStateType = null;
 
 	public Order() {
 
@@ -71,6 +73,10 @@ public class Order implements Serializable, Cloneable {
 	}
 
 	public OrderStateType getCurrentStateType() {
+		return currentStateType;
+	}
+
+	public OrderState getCurrentState() {
 		OrderState result = null;
 		for(OrderState each : states) {// busca el objeto con la fecha mas reciente
 			if(result != null) {
@@ -82,12 +88,13 @@ public class Order implements Serializable, Cloneable {
 			}
 		}
 		if(result != null) {
-			return result.getType();
+			return result;
 		}
 		return null;
 	}
-	
+
 	public void setState(OrderState state) {
+		currentStateType = state.getType();
 		states.add(state);
 	}
 
@@ -122,38 +129,12 @@ public class Order implements Serializable, Cloneable {
 	public void setNeedDate(Date needDate) {
 		this.needDate = needDate;
 	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Order other = (Order) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
-
-	public static Order clone(Order order){
-		try {
-			return (Order)order.clone();
-		} catch (CloneNotSupportedException e) {
-			//not possible
+	
+	public List<Product> getProductList() {
+		List<Product> productList = new ArrayList<Product>();
+		for(OrderDetail each : details) {
+			productList.add(each.getProduct());
 		}
-		return null;
+		return productList;
 	}
 }

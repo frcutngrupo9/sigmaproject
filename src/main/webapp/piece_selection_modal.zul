@@ -2,7 +2,7 @@
     apply="ar.edu.utn.sigmaproject.controller.PieceSelectionModalController"
     position="center,center" closable="true"
     action="show: slideDown;hide: slideUp">
-	<panel border="rounded">
+	<panel border="none">
         <panelchildren>
 			<vlayout>
 		        <separator/>
@@ -21,7 +21,7 @@
 			        </listhead>
 			        <template name="model">
 			            <listitem>
-			            	<listcell label="${modalDialog$composer.getProductName(each)}"/>
+			            	<listcell label="${each.getProduct().getName()}"/>
 			            	<listcell label="${each.name}"/>
 			                <listcell label="${each.length.doubleValue()} ${each.lengthMeasureUnit.getShortName()}"/>
 			                <listcell label="${each.width.doubleValue()} ${each.widthMeasureUnit.getShortName()}"/>

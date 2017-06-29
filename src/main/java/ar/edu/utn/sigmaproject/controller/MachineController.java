@@ -92,7 +92,7 @@ public class MachineController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
-		if(Strings.isBlank(nameTextbox.getText())){
+		if(Strings.isBlank(nameTextbox.getText())) {
 			Clients.showNotification("Debe ingresar un nombre", nameTextbox);
 			return;
 		}
@@ -162,7 +162,6 @@ public class MachineController extends SelectorComposer<Component> {
 		if(currentMachineType == null) {// creando
 			machineTypeGrid.setVisible(false);
 			nameTextbox.setValue(null);
-
 			detailsTextbox.setValue(null);
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
@@ -186,7 +185,7 @@ public class MachineController extends SelectorComposer<Component> {
 
 	public String getFormattedTime(Duration time) {
 		if(time != null) {
-			return String.format("A�os: %d Horas: %d Minutos: %d", time.getYears(), time.getHours(), time.getMinutes());
+			return String.format("A\u00f1os: %d Horas: %d Minutos: %d", time.getYears(), time.getHours(), time.getMinutes());
 		} else {
 			return "";
 		}

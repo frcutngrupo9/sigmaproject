@@ -1,7 +1,6 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
@@ -17,17 +16,15 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Grid;
-import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
-import ar.edu.utn.sigmaproject.domain.RawMaterialRequirement;
+import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
+import ar.edu.utn.sigmaproject.domain.MaterialReserved;
+import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.Wood;
-import ar.edu.utn.sigmaproject.domain.WoodReserved;
-import ar.edu.utn.sigmaproject.service.RawMaterialTypeRepository;
+import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
-import ar.edu.utn.sigmaproject.service.WoodReservedRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class RawMaterialReservationController extends SelectorComposer<Component> {
@@ -35,8 +32,6 @@ public class RawMaterialReservationController extends SelectorComposer<Component
 
 	@Wire
 	Window rawMaterialReservationWindow;
-	@Wire
-	Listbox woodListbox;
 	@Wire
 	Grid rawMaterialReservationGrid;
 	@Wire
@@ -59,53 +54,35 @@ public class RawMaterialReservationController extends SelectorComposer<Component
 	Button cancelButton;
 	@Wire
 	Button resetButton;
+	@Wire
+	Button completeButton;
 
 	// services
 	@WireVariable
-	private RawMaterialTypeRepository rawMaterialTypeRepository;
-	@WireVariable
 	private WoodRepository woodRepository;
 	@WireVariable
-	private WoodReservedRepository woodReservedRepository;
+	private ProductionPlanRepository productionPlanRepository;
 
 	// attributes
-	private RawMaterialRequirement currentRawMaterialRequirement;
+	private MaterialRequirement currentRawMaterialRequirement;
 	private Wood currentWood;
-	private WoodReserved currentWoodReserved;
+	private MaterialReserved currentWoodReserved;
 
 	// list
-	private List<Wood> woodList;
 
 	// list models
-	private ListModelList<Wood> woodListModel;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		//		currentRawMaterialRequirement = (RawMaterialRequirement) Executions.getCurrent().getAttribute("selected_rawMaterial_requirement");
-		currentRawMaterialRequirement = (RawMaterialRequirement) Executions.getCurrent().getArg().get("selected_raw_material_requirement");
+		currentRawMaterialRequirement = (MaterialRequirement) Executions.getCurrent().getArg().get("selected_raw_material_requirement");
 		if(currentRawMaterialRequirement == null) {throw new RuntimeException("RawMaterialRequirement null");}
-
-		woodList = woodRepository.findByRawMaterialType(currentRawMaterialRequirement.getRawMaterialType());
-		woodListModel = new ListModelList<>(woodList);
-		currentWood = null;
-		for(Wood each : woodList) {
-			if(each.getWoodType().getName().compareToIgnoreCase("Pino") == 0) {
-				currentWood = each;// busca seleccionar el wood que sea pino
-			}
-		}
-		if(currentWood != null) {// verifica si no hay una reserva para el requerimiento
-			for(WoodReserved each : currentWood.getWoodsReserved()) {
-				if(each.getRawMaterialRequirement().equals(currentRawMaterialRequirement)) {
-					currentWoodReserved = each;
-				}
-			}
-		}
+		currentWood = (Wood) currentRawMaterialRequirement.getItem();
+		currentWoodReserved = getMaterialReserved(currentRawMaterialRequirement);
 		refreshView();
 	}
 
 	private void refreshView() {
-		woodListbox.setModel(woodListModel);
 		woodTypeTextbox.setDisabled(true);
 		descriptionTextbox.setDisabled(true);
 		stockDoublebox.setDisabled(true);
@@ -113,10 +90,10 @@ public class RawMaterialReservationController extends SelectorComposer<Component
 		stockMissingDoublebox.setDisabled(true);
 		quantityDoublebox.setDisabled(true);
 		stockAvailableDoublebox.setDisabled(true);
-		descriptionTextbox.setText(currentRawMaterialRequirement.getRawMaterialType().getName());
+		descriptionTextbox.setText(((Wood) currentRawMaterialRequirement.getItem()).getName());
 		woodTypeTextbox.setText(currentWood.getWoodType().getName());
 		stockDoublebox.setValue(currentWood.getStock().doubleValue());
-		stockAvailableDoublebox.setValue(currentWood.getStock().doubleValue() - currentWood.getStockReserved().doubleValue());
+		stockAvailableDoublebox.setValue(getStockAvailable(currentWood).doubleValue());
 		quantityDoublebox.setValue(currentRawMaterialRequirement.getQuantity().doubleValue());
 		if(currentWoodReserved == null) {
 			stockReservedDoublebox.setValue(0.0);
@@ -125,18 +102,6 @@ public class RawMaterialReservationController extends SelectorComposer<Component
 			stockReservedDoublebox.setValue(currentWoodReserved.getStockReserved().doubleValue());
 			stockMissingDoublebox.setValue(currentRawMaterialRequirement.getQuantity().doubleValue() - currentWoodReserved.getStockReserved().doubleValue());
 		}
-	}
-
-	@Listen("onSelect = #woodListbox")
-	public void selectWood() {
-		if(woodListModel.isSelectionEmpty()) {
-			//just in case for the no selection
-			currentWood = null;
-		} else {
-			currentWood = woodListbox.getSelectedItem().getValue();
-			refreshView();
-		}
-		woodListModel.clearSelection();
 	}
 
 	@Listen("onClick = #cancelButton")
@@ -149,6 +114,11 @@ public class RawMaterialReservationController extends SelectorComposer<Component
 		refreshView();
 	}
 
+	@Listen("onClick = #completeButton")
+	public void completeButtonClick() {
+		stockReservedDoublebox.setValue(quantityDoublebox.getValue());
+	}
+
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
 		if(stockReservedDoublebox.getValue() == 0.0) {
@@ -159,43 +129,45 @@ public class RawMaterialReservationController extends SelectorComposer<Component
 			Clients.showNotification("Debe ingresar una cantidad menor o igual a la cantidad necesaria", stockReservedDoublebox);
 			return;
 		}
-		if(stockReservedDoublebox.getValue() > getRawMaterialStockAvailable(currentWood).doubleValue()) {
+		if(stockReservedDoublebox.getValue() > getStockAvailable(currentWood).doubleValue()) {
 			Clients.showNotification("No existe stock disponible suficiente para realizar la reserva", stockReservedDoublebox);
 			return;
 		}
 		BigDecimal stockReserved = BigDecimal.valueOf(stockReservedDoublebox.getValue());
 		if(currentWoodReserved == null) {
-			currentWoodReserved = new WoodReserved(currentRawMaterialRequirement, stockReserved);
-			currentWoodReserved = woodReservedRepository.save(currentWoodReserved);
-			if(currentWood != null) {
-				currentWood.getWoodsReserved().add(currentWoodReserved);
-				woodRepository.save(currentWood);
-			} else {
-				throw new RuntimeException("currentWood null");
-			}
+			currentWoodReserved = new MaterialReserved(currentWood, MaterialType.Wood, currentRawMaterialRequirement, stockReserved);
+			currentWood.getWoodsReserved().add(currentWoodReserved);
 		} else {
 			currentWoodReserved.setStockReserved(stockReserved);
-			woodReservedRepository.save(currentWoodReserved);
 		}
-		alert("Reserva guardada.");
+		woodRepository.save(currentWood);
 		EventQueue<Event> eq = EventQueues.lookup("Requirement Reservation Queue", EventQueues.DESKTOP, true);
 		eq.publish(new Event("onRawMaterialReservation", null, null));
+		alert("Reserva guardada.");
 		rawMaterialReservationWindow.detach();
 	}
 
-	public BigDecimal getRawMaterialStockAvailable(Wood wood) {
-		// devuelve la diferencia entre el stock total y el total reservado
-		BigDecimal stockTotal = wood.getStock();
-		BigDecimal stockReservedTotal = wood.getStockReserved();
-		// si existe una reserva hecha para este plan, entonces es parte del stock disponible
+	private BigDecimal getStockAvailable(Wood material) {
+		// devuelve la diferencia entre el stock total y el total de los reservados, sumando a esa diferencia lo que ya se reservo del actual
+		BigDecimal stockAvailable = material.getStockAvailable();
 		if(currentWoodReserved != null) {
-			stockReservedTotal = stockReservedTotal.subtract(currentWoodReserved.getStockReserved());
+			// se suma porque lo reservado del actual es parte de lo que se puede reservar
+			stockAvailable = stockAvailable.add(currentWoodReserved.getStockReserved());
 		}
-		return stockTotal.subtract(stockReservedTotal);
+		return stockAvailable;
 	}
 
 	@Listen("onOK = #stockReservedDoublebox")
 	public void stockReservedDoubleboxOnOK() {
 		saveButtonClick();
+	}
+
+	private MaterialReserved getMaterialReserved(MaterialRequirement materialRequirement) {
+		for(MaterialReserved each: materialRequirement.getItem().getMaterialReservedList()) {
+			if(productionPlanRepository.findOne(each.getMaterialRequirement().getProductionPlan().getId()).equals(productionPlanRepository.findOne(materialRequirement.getProductionPlan().getId()))) {
+				return each;
+			}
+		}
+		return null;
 	}
 }

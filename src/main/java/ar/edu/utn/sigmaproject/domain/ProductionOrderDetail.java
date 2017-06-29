@@ -20,38 +20,50 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
+	
+	@ManyToOne(targetEntity = ProductionOrder.class)
+	private ProductionOrder productionOrder = null;
 
 	@ManyToOne
-	Process process;
+	private Process process;
 
 	@ManyToOne
-	Machine machine;
+	private Machine machine;
 
 	@Transient
-	Duration timeTotal;
+	private Duration timeTotal;
 
 	@Column
-	String timeTotalInternal;
+	private String timeTotalInternal;
 
-	Integer quantityPiece = 0;
+	private Integer quantityPiece = 0;
 
-	BigDecimal quantityFinished = BigDecimal.ZERO;
+	private BigDecimal quantityFinished = BigDecimal.ZERO;
 
-	boolean isFinished;
-	Date dateFinished;
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, updatable = true)
+	private ProcessState state;
+
+	private Date dateStart = null;
+	private Date dateFinish = null;
+	private Date dateStartReal = null;
+	private Date dateFinishReal = null;
+
+	@ManyToOne
+	private Worker worker = null;
 
 	public ProductionOrderDetail() {
 
 	}
 
-	public ProductionOrderDetail(Process process, Machine machine, Duration timeTotal, Integer quantityPiece) {
+	public ProductionOrderDetail(ProductionOrder productionOrder, Process process, ProcessState state, Machine machine, Duration timeTotal, Integer quantityPiece) {
+		this.productionOrder = productionOrder;
 		this.process = process;
+		this.state = state;
 		this.machine = machine;
 		this.setTimeTotal(timeTotal);
 		this.quantityPiece = quantityPiece;
-		isFinished = false;
-		dateFinished = null;
 	}
 
 	public Long getId() {
@@ -114,43 +126,59 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 		this.quantityFinished = quantityFinished;
 	}
 
-	public boolean isFinished() {
-		return isFinished;
+	public ProcessState getState() {
+		return state;
 	}
 
-	public void setFinished(boolean isFinished) {
-		this.isFinished = isFinished;
+	public void setState(ProcessState state) {
+		this.state = state;
 	}
 
-	public Date getDateFinished() {
-		return dateFinished;
+	public Date getDateStart() {
+		return dateStart;
 	}
 
-	public void setDateFinished(Date dateFinished) {
-		this.dateFinished = dateFinished;
+	public void setDateStart(Date dateStart) {
+		this.dateStart = dateStart;
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-
-		ProductionOrderDetail that = (ProductionOrderDetail) o;
-
-		return id != null ? id.equals(that.id) : that.id == null;
+	public Date getDateFinish() {
+		return dateFinish;
 	}
 
-	@Override
-	public int hashCode() {
-		return id != null ? id.hashCode() : 0;
+	public void setDateFinish(Date dateFinish) {
+		this.dateFinish = dateFinish;
 	}
 
-	public static ProductionOrderDetail clone(ProductionOrderDetail other) {
-		try {
-			return (ProductionOrderDetail) other.clone();
-		} catch (CloneNotSupportedException e) {
-			// not possible
-		}
-		return null;
+	public Date getDateStartReal() {
+		return dateStartReal;
+	}
+
+	public void setDateStartReal(Date dateStartReal) {
+		this.dateStartReal = dateStartReal;
+	}
+
+	public Date getDateFinishReal() {
+		return dateFinishReal;
+	}
+
+	public void setDateFinishReal(Date dateFinishReal) {
+		this.dateFinishReal = dateFinishReal;
+	}
+
+	public Worker getWorker() {
+		return worker;
+	}
+
+	public void setWorker(Worker worker) {
+		this.worker = worker;
+	}
+
+	public ProductionOrder getProductionOrder() {
+		return productionOrder;
+	}
+
+	public void setProductionOrder(ProductionOrder productionOrder) {
+		this.productionOrder = productionOrder;
 	}
 }

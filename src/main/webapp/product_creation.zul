@@ -1,50 +1,52 @@
-<window id="win_product_creation" apply="ar.edu.utn.sigmaproject.controller.ProductCreationController" width="95%" style="background:white">
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
+<window id="win_product_creation" apply="ar.edu.utn.sigmaproject.controller.ProductCreationController" closable="false" sclass="sigma-content">
 	<caption id="productCaption" label="Creacion/Edicion Producto"/>
-    <panel title="Producto" id="productCreationBlock" border="rounded">
+    <panel id="productCreationBlock" border="none">
         <panelchildren>
             <vlayout>
-                <hbox hflex="1">
-                    <grid id="productGrid" hflex="1">
-                        <columns>
-                            <column align="right" width="25%"/>
-                            <column align="left"/>
-                        </columns>
-                        <rows>
-                            <row>
-                                <label value="Foto :"/>
-                                <image id="productImage" width="50%"/>
-                            </row>
-                            <row>
-                                <label value="Codigo :"/>
-                                <textbox id="productCodeTextbox" width="50%" placeholder="Codigo del Producto"/>
-                            </row>
-                            <row>
-                                <label value="Nombre :"/>
-                                <textbox id="productNameTextbox" width="50%" placeholder="Nombre del Producto"/>
-                            </row>
-                            <row>
-                                <label value="Detalles :"/>
-                                <textbox id="productDetailsTextbox" width="50%" rows="3" height="100px" />
-                            </row>
-                            <row>
-                                <label value="Categoria :"/>
-                                <combobox id="productCategoryCombobox">
-                                    <template name="model">
-                                        <comboitem label="${each.name}" />
-                                    </template>
-                                </combobox>
-                            </row>
-                            <row>
-                                <label value="Precio :"/>
-                                <doublebox id="productPriceDoublebox" width="50%" placeholder="Precio del Producto"/>
-                            </row>
-                        </rows>
-                    </grid>
-                </hbox>
-                <hlayout>
+                <grid id="productGrid" hflex="1" sclass="sigma-form">
+                    <columns>
+                        <column align="right" width="25%"/>
+                        <column align="left"/>
+                    </columns>
+                    <rows>
+                        <row>
+                            <label value="Foto: "/>
+                            <image id="productImage"/>
+                        </row>
+                        <row>
+                            <label value="Codigo: "/>
+                            <textbox id="productCodeTextbox" width="25%" placeholder="Codigo del Producto"/>
+                        </row>
+                        <row>
+                            <label value="Nombre: "/>
+                            <textbox id="productNameTextbox" width="50%" placeholder="Nombre del Producto"/>
+                        </row>
+                        <row>
+                            <label value="Detalles: "/>
+                            <textbox id="productDetailsTextbox" width="50%" rows="3" height="100px" />
+                        </row>
+                        <row>
+                            <label value="Categoria: "/>
+                            <combobox id="productCategoryCombobox">
+                                <template name="model">
+                                    <comboitem label="${each.name}" />
+                                </template>
+                            </combobox>
+                        </row>
+                        <row>
+                            <label value="Precio: "/>
+                            <doublebox id="productPriceDoublebox" width="50%" placeholder="Precio del Producto"/>
+                        </row>
+                    </rows>
+                </grid>
+                <hlayout style="margin: 4px">
                     <button id="saveProductButton" label="Guardar Producto"/>
                     <button id="resetProductButton" label="Reset Producto"/>
                     <button id="deleteProductButton" label="Eliminar Producto"/>
+                    <hbox pack="center" align="center" hflex="1">
+			        	<button id="returnButton" label="Volver a Listado"/>
+			        </hbox>
                 </hlayout>
                 <hlayout style="margin: 4px">
                 	<button id="uploadProductPhotoButton" label="Subir Foto Producto" upload="true" onUpload="win_product_creation$composer.doUploadProductPhoto(event.getMedia())"/>
@@ -54,18 +56,20 @@
                 </hlayout>
     			<listbox id="pieceListbox" style="margin: 4px">
     				<auxhead>
-						<auxheader label="Piezas" colspan="3"/>
+						<auxheader label="Piezas" colspan="4"/>
 					</auxhead>
         			<listhead>
             			<listheader label="Nombre Pieza" align="center"/>
             			<listheader label="Unidades por Producto" align="center"/>
             			<listheader label="Cantidad de Procesos" align="center"/>
+            			<listheader label="Duracion Total" align="center"/>
         			</listhead>
         			<template name="model">
             			<listitem>
                 			<listcell label="${each.name}"/>
                             <listcell label="${each.units}"/>
                 			<listcell label="${each.processes.size()}"/>
+                			<listcell label="${r:getFormattedTime(each.getDurationTotal())}"/>
             			</listitem>
         			</template>
     			</listbox>
@@ -77,10 +81,10 @@
         </panelchildren>
     </panel>
     <separator/>
-    <panel title="Pieza" id="pieceCreationBlock" collapsible="true" visible="false" closable="false" border="rounded">
+    <panel title="Pieza" id="pieceCreationBlock" collapsible="true" visible="false" closable="false" border="none">
         <panelchildren>
             <vlayout>
-                <grid hflex="1">
+                <grid hflex="1" sclass="sigma-form">
                     <columns>
                         <column align="right" width="35%"/>
                         <column align="left"/>
@@ -137,15 +141,11 @@
                         </row>
                     </rows>
                 </grid>
-                <hlayout>
-                    <button id="createProcessButton" label="Continuar"/>
-                    <button id="cancelPieceButton" label="Cancelar"/>
-                </hlayout>
             </vlayout>
         </panelchildren>
     </panel>
     <separator/>
-    <panel title="Procesos" id="processCreationBlock" collapsible="true" visible="false" closable="false" border="rounded">
+    <panel title="Procesos" id="processCreationBlock" collapsible="true" visible="false" closable="false" border="none">
         <panelchildren>
             <vlayout>
                 <listbox id="processListbox" hflex="1">
@@ -153,9 +153,8 @@
             			<listheader width="30px"/>
             			<listheader label="Proceso"/>
             			<listheader label="Detalles" width="450px"/>
-            			<listheader label="Dias" width="80px"/>
-            			<listheader label="Horas" width="80px"/>
-            			<listheader label="Minutos" width="80px"/>
+            			<listheader label="Horas" width="100px"/>
+            			<listheader label="Minutos" width="100px"/>
         			</listhead>
 					<template name="model">
                         <listitem>
@@ -170,23 +169,22 @@
                                 <textbox visible="${process_checked}" value="${win_product_creation$composer.getProcessDetails(each)}"  forward="onChanging=processListbox.onProcessDetailsChange(${each})" width="400px"/>
                             </listcell>
                             <listcell>
-                                <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessDays(each)}" forward="onChanging=processListbox.onProcessDaysChange(${each})" width="36px"/>
+                                <spinner constraint="no empty,min 0" visible="${process_checked}" forward="onChanging=processListbox.onProcessHoursChange(${each})" value="${win_product_creation$composer.getProcessHours(each)}" width="70px"/>
                             </listcell>
                             <listcell>
-                                <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessHours(each)}" forward="onChanging=processListbox.onProcessHoursChange(${each})" width="36px"/>
-                            </listcell>
-                            <listcell>
-                                <intbox visible="${process_checked}" value="${win_product_creation$composer.getProcessMinutes(each)}" forward="onChanging=processListbox.onProcessMinutesChange(${each})" width="36px"/>
+                                <spinner constraint="no empty,min 0 max 59" visible="${process_checked}" forward="onChanging=processListbox.onProcessMinutesChange(${each})" value="${win_product_creation$composer.getProcessMinutes(each)}" width="70px"/>
                             </listcell>
                         </listitem>
 					</template>
                 </listbox>
-                <hlayout>
-                    <button id="cancelProcessButton" label="Volver"/>
+                <hlayout style="margin: 4px">
+                	<button id="cancelPieceButton" label="Cancelar"/>
                     <button id="finishProcessButton" label="Guardar Pieza"/>
                     <button id="resetPieceButton" label="Reset Pieza"/>
                     <button id="deletePieceButton" label="Eliminar Pieza"/>
                 </hlayout>
+                <separator/>
+                <separator/>
             </vlayout>
         </panelchildren>
     </panel>

@@ -1,13 +1,18 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
 
 @Entity
 public class ProductionPlan  implements Serializable, Cloneable {
@@ -15,59 +20,33 @@ public class ProductionPlan  implements Serializable, Cloneable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 
-	@OneToMany(orphanRemoval = true)
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionPlan", targetEntity = ProductionOrder.class)
+	private List<ProductionOrder> productionOrderList = new ArrayList<>();
+
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionPlan", targetEntity = ProductionPlanDetail.class)
 	@OrderColumn(name = "detail_index")
-	List<ProductionPlanDetail> planDetails = new ArrayList<>();
+	private List<ProductionPlanDetail> planDetails = new ArrayList<>();
 
 	@OneToMany(orphanRemoval = true)
-	List<ProductionPlanState> states = new ArrayList<>();
+	private List<ProductionPlanState> states = new ArrayList<>();
 
-	@OneToMany(orphanRemoval = true)
-	List<RawMaterialRequirement> rawMaterialRequirements = new ArrayList<>();
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionPlan", targetEntity = MaterialRequirement.class)
+	private List<MaterialRequirement> materialRequirements = new ArrayList<>();
 
-	@OneToMany(orphanRemoval = true)
-	List<SupplyRequirement> supplyRequirements = new ArrayList<>();
-
-	String name = "";
-	Date date;
+	private String name = "";
+	private Date dateCreation = null;
+	private Date dateStart = null;
+	private ProductionPlanStateType currentStateType = null;
 
 	public ProductionPlan() {
 
 	}
 
-	public ProductionPlan(String name, List<ProductionPlanDetail> planDetails) {
+	public ProductionPlan(String name) {
 		this.name = name;
-		this.date = new Date();
-		this.planDetails.addAll(planDetails);
-	}
-
-	public List<ProductTotal> getProductTotalList() {
-		Map<Product, Integer> productTotalMap = new HashMap<Product, Integer>();
-		for(ProductionPlanDetail auxProductionPlanDetail : getPlanDetails()) {
-			for(OrderDetail auxOrderDetail : auxProductionPlanDetail.getOrder().getDetails()) {
-				Integer totalUnits = productTotalMap.get(auxOrderDetail.getProduct());
-				productTotalMap.put(auxOrderDetail.getProduct(), (totalUnits == null) ? auxOrderDetail.getUnits() : totalUnits + auxOrderDetail.getUnits());
-			}
-		}
-		List<ProductTotal> productTotalList = new ArrayList<ProductTotal>();
-		for (Map.Entry<Product, Integer> entry : productTotalMap.entrySet()) {
-			Product product = entry.getKey();
-			Integer totalUnits = entry.getValue();
-			ProductTotal productTotal = new ProductTotal(product, totalUnits);
-			productTotalList.add(productTotal);
-		}
-		return productTotalList;// devuelve el productTotalList lleno con todos los productos sin repetir y con el total, que conforman el plan de produccion
-	}
-
-	public ProductTotal getProductTotal(Product product) {
-		for(ProductTotal productTotal : getProductTotalList()) {
-			if(productTotal.getProduct().equals(product)) {
-				return productTotal;
-			}
-		}
-		return null;
+		this.dateCreation = new Date();
 	}
 
 	public Long getId() {
@@ -87,11 +66,7 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	}
 
 	public ProductionPlanStateType getCurrentStateType() {
-		ProductionPlanState result = getCurrentState();
-		if(result != null) {
-			return result.getProductionPlanStateType();
-		}
-		return null;
+		return currentStateType;
 	}
 
 	public ProductionPlanState getCurrentState() {
@@ -112,6 +87,7 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	}
 
 	public void setState(ProductionPlanState state) {
+		currentStateType = state.getProductionPlanStateType();
 		states.add(state);
 	}
 
@@ -123,20 +99,33 @@ public class ProductionPlan  implements Serializable, Cloneable {
 		this.states = states;
 	}
 
-	public List<RawMaterialRequirement> getRawMaterialRequirements() {
+	public List<MaterialRequirement> getRawMaterialRequirements() {
+		List<MaterialRequirement> rawMaterialRequirements = new ArrayList<>();
+		for(MaterialRequirement each : materialRequirements) {
+			if(each.getType() == MaterialType.Wood) {
+				rawMaterialRequirements.add(each);
+			}
+		}
 		return rawMaterialRequirements;
 	}
 
-	public void setRawMaterialRequirements(List<RawMaterialRequirement> rawMaterialRequirements) {
-		this.rawMaterialRequirements = rawMaterialRequirements;
-	}
-
-	public List<SupplyRequirement> getSupplyRequirements() {
+	public List<MaterialRequirement> getSupplyRequirements() {
+		List<MaterialRequirement> supplyRequirements = new ArrayList<>();
+		for(MaterialRequirement each : materialRequirements) {
+			if(each.getType() == MaterialType.Supply) {
+				supplyRequirements.add(each);
+			}
+		}
 		return supplyRequirements;
 	}
 
-	public void setSupplyRequirements(List<SupplyRequirement> supplyRequirements) {
-		this.supplyRequirements = supplyRequirements;
+	public List<MaterialRequirement> getMaterialRequirements() {
+		return materialRequirements;
+	}
+
+	public void setMaterialRequirements(
+			List<MaterialRequirement> materialRequirements) {
+		this.materialRequirements = materialRequirements;
 	}
 
 	public String getName() {
@@ -147,45 +136,27 @@ public class ProductionPlan  implements Serializable, Cloneable {
 		this.name = name;
 	}
 
-	public Date getDate() {
-		return date;
+	public Date getDateCreation() {
+		return dateCreation;
 	}
 
-	public void setDate(Date date) {
-		this.date = date;
+	public void setDateCreation(Date dateCreation) {
+		this.dateCreation = dateCreation;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
+	public Date getDateStart() {
+		return dateStart;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ProductionPlan other = (ProductionPlan) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
+	public void setDateStart(Date dateStart) {
+		this.dateStart = dateStart;
 	}
 
-	public static ProductionPlan clone(ProductionPlan productionPlan){
-		try {
-			return (ProductionPlan)productionPlan.clone();
-		} catch (CloneNotSupportedException e) {
-			//not possible
-		}
-		return null;
+	public List<ProductionOrder> getProductionOrderList() {
+		return productionOrderList;
+	}
+
+	public void setProductionOrderList(List<ProductionOrder> productionOrderList) {
+		this.productionOrderList = productionOrderList;
 	}
 }

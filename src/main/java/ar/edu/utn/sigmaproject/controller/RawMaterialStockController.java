@@ -3,14 +3,6 @@ package ar.edu.utn.sigmaproject.controller;
 import java.math.BigDecimal;
 import java.util.List;
 
-import ar.edu.utn.sigmaproject.domain.*;
-import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
-import ar.edu.utn.sigmaproject.service.RawMaterialTypeRepository;
-import ar.edu.utn.sigmaproject.service.WoodRepository;
-import ar.edu.utn.sigmaproject.service.WoodReservedRepository;
-import ar.edu.utn.sigmaproject.service.WoodTypeRepository;
-import ar.edu.utn.sigmaproject.service.WorkerRepository;
-
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -21,12 +13,18 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Doublebox;
-import org.zkoss.zul.Grid;
-import org.zkoss.zul.Intbox;
-import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
+
+import ar.edu.utn.sigmaproject.domain.MaterialReserved;
+import ar.edu.utn.sigmaproject.domain.MaterialType;
+import ar.edu.utn.sigmaproject.domain.MeasureUnit;
+import ar.edu.utn.sigmaproject.domain.Wood;
+import ar.edu.utn.sigmaproject.domain.WoodType;
+import ar.edu.utn.sigmaproject.service.MaterialReservedRepository;
+import ar.edu.utn.sigmaproject.service.WoodRepository;
+import ar.edu.utn.sigmaproject.service.WoodTypeRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class RawMaterialStockController extends SelectorComposer<Component> {
@@ -37,9 +35,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	@Wire
 	Listbox woodListbox;
 	@Wire
-	Grid woodCreationGrid;
-	@Wire
-	Combobox rawMaterialTypeCombobox;
+	Textbox woodNameTextbox;
 	@Wire
 	Combobox woodTypeCombobox;
 	@Wire
@@ -49,86 +45,48 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	@Wire
 	Doublebox stockRepoDoublebox;
 	@Wire
-	Button stockIncreaseButton;
-	@Wire
-	Button stockDecreaseButton;
-	@Wire
 	Button saveButton;
 	@Wire
 	Button cancelButton;
 	@Wire
 	Button resetButton;
 	@Wire
-	Button newButton;
-	@Wire
-	Grid stockModificationGrid;
-	@Wire
-	Doublebox quantityDoublebox;
-	@Wire
-	Label stockModificationLabel;
-	@Wire
-	Intbox numberIntbox;
-	@Wire
-	Combobox workerCombobox;
-	@Wire
-	Button saveNewStockButton;
-	@Wire
-	Button cancelNewStockButton;
-	@Wire
-	Button resetNewStockButton;
-	@Wire
 	Listbox woodReservedListbox;
 
 	// services
 	@WireVariable
-	private RawMaterialTypeRepository rawMaterialTypeRepository;
-	@WireVariable
 	private WoodRepository woodRepository;
 	@WireVariable
-	private WoodReservedRepository woodReservedRepository;
+	private MaterialReservedRepository materialReservedRepository;
 	@WireVariable
 	private WoodTypeRepository woodTypeRepository;
-	@WireVariable
-	private WorkerRepository workerRepository;
-	@WireVariable
-	private ProductionPlanRepository productionPlanRepository;
 
 	// attributes
 	private Wood currentWood;
 
 	// list
-	private List<RawMaterialType> rawMaterialTypeList;
 	private List<Wood> woodList;
 	private List<WoodType> woodTypeList;
-	private List<WoodReserved> woodReservedList;
-	private List<Worker> workerList;
+	private List<MaterialReserved> woodReservedList;
 
 	// list models
-	private ListModelList<RawMaterialType> rawMaterialTypeListModel;
 	private ListModelList<Wood> woodListModel;
 	private ListModelList<WoodType> woodTypeListModel;
-	private ListModelList<WoodReserved> woodReservedListModel;
-	private ListModelList<Worker> workerListModel;
+	private ListModelList<MaterialReserved> woodReservedListModel;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		rawMaterialTypeList = rawMaterialTypeRepository.findAll();
-		rawMaterialTypeListModel = new ListModelList<>(rawMaterialTypeList);
-		rawMaterialTypeCombobox.setModel(rawMaterialTypeListModel);
 		woodTypeList = woodTypeRepository.findAll();
 		woodTypeListModel = new ListModelList<>(woodTypeList);
 		woodTypeCombobox.setModel(woodTypeListModel);
 		woodList = woodRepository.findAll();
 		woodListModel = new ListModelList<>(woodList);
 		woodListbox.setModel(woodListModel);
-		woodReservedList = woodReservedRepository.findAll();
+		woodReservedList = materialReservedRepository.findAllByType(MaterialType.Wood);
 		woodReservedListModel = new ListModelList<>(woodReservedList);
 		woodReservedListbox.setModel(woodReservedListModel);
 		currentWood = null;
-		workerList = workerRepository.findAll();
-		workerListModel = new ListModelList<>(workerList);
-		workerCombobox.setModel(workerListModel);
 		refreshView();
 	}
 
@@ -155,39 +113,30 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		woodListbox.setModel(woodListModel);// se actualiza la lista limpiar la seleccion
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
-		newButton.setDisabled(false);
 		if(currentWood == null) {// nuevo
-			woodCreationGrid.setVisible(false);
 			woodTypeListModel.addToSelection(woodTypeRepository.findFirstByName("Pino"));
 			woodTypeCombobox.setModel(woodTypeListModel);
-			rawMaterialTypeCombobox.setSelectedIndex(-1);
+			woodNameTextbox.setText("");
 			stockDoublebox.setValue(0.0);
 			stockMinDoublebox.setValue(0.0);
 			stockRepoDoublebox.setValue(0.0);
 			woodTypeCombobox.setDisabled(false);
-			rawMaterialTypeCombobox.setDisabled(false);
+			woodNameTextbox.setDisabled(false);
 			stockDoublebox.setDisabled(false);
 			stockMinDoublebox.setDisabled(false);
 			stockRepoDoublebox.setDisabled(false);
-			stockIncreaseButton.setDisabled(true);
-			stockDecreaseButton.setDisabled(true);
 			resetButton.setDisabled(true);
-			stockModificationGrid.setVisible(false);
 		}else {// editar
-			woodCreationGrid.setVisible(true);
 			woodTypeCombobox.setSelectedIndex(woodTypeListModel.indexOf(currentWood.getWoodType()));
-			RawMaterialType currentRawMaterialType = currentWood.getRawMaterialType();
-			rawMaterialTypeCombobox.setSelectedIndex(rawMaterialTypeListModel.indexOf(currentRawMaterialType));
+			woodNameTextbox.setText(currentWood.getName());
 			stockDoublebox.setValue(currentWood.getStock().doubleValue());
 			stockMinDoublebox.setValue(currentWood.getStockMin().doubleValue());
 			stockRepoDoublebox.setValue(currentWood.getStockRepo().doubleValue());
 			woodTypeCombobox.setDisabled(true);
-			rawMaterialTypeCombobox.setDisabled(true);
+			woodNameTextbox.setDisabled(true);
 			stockDoublebox.setDisabled(true);
 			stockMinDoublebox.setDisabled(false);
 			stockRepoDoublebox.setDisabled(false);
-			stockIncreaseButton.setDisabled(false);
-			stockDecreaseButton.setDisabled(false);
 			resetButton.setDisabled(false);
 		}
 	}
@@ -200,37 +149,20 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		}
 	}
 
-	@Listen("onClick = #newButton")
-	public void newButtonClick() {
-		currentWood = null;
-		refreshView();
-		woodCreationGrid.setVisible(true);
-	}
-
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
-		if(rawMaterialTypeCombobox.getSelectedIndex() == -1) {
-			Clients.showNotification("Debe seleccionar una Materia Prima", rawMaterialTypeCombobox);
-			return;
-		}
 		if(woodTypeCombobox.getSelectedIndex() == -1) {
 			Clients.showNotification("Debe seleccionar una Madera", woodTypeCombobox);
 			return;
 		}
-		RawMaterialType rawMaterialType = rawMaterialTypeCombobox.getSelectedItem().getValue();
 		WoodType woodType = woodTypeCombobox.getSelectedItem().getValue();
 		BigDecimal stock = BigDecimal.valueOf(stockDoublebox.getValue());
 		BigDecimal stockMin = BigDecimal.valueOf(stockMinDoublebox.getValue());
 		BigDecimal stockRepo = BigDecimal.valueOf(stockRepoDoublebox.getValue());
-		if(currentWood == null) {// nuevo
-			currentWood = new Wood(rawMaterialType, woodType, stock, stockMin, stockRepo);
-		} else {// edicion
-			currentWood.setRawMaterialType(rawMaterialType);
-			currentWood.setWoodType(woodType);
-			currentWood.setStock(stock);
-			currentWood.setStockRepo(stockRepo);
-			currentWood.setStockMin(stockMin);
-		}
+		currentWood.setWoodType(woodType);
+		currentWood.setStock(stock);
+		currentWood.setStockRepo(stockRepo);
+		currentWood.setStockMin(stockMin);
 		currentWood = woodRepository.save(currentWood);
 		woodList = woodRepository.findAll();
 		woodListModel = new ListModelList<>(woodList);
@@ -247,92 +179,5 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	@Listen("onClick = #resetButton")
 	public void resetButtonClick() {
 		refreshView();
-	}
-
-	@Listen("onClick = #stockIncreaseButton")
-	public void stockIncreaseButtonClick() {
-		stockModificationGrid.setVisible(true);
-		stockModificationLabel.setValue("Ingreso Stock");
-		workerCombobox.setSelectedIndex(-1);
-		numberIntbox.setValue(null);
-		quantityDoublebox.setValue(null);
-	}
-
-	@Listen("onClick = #saveNewStockButton")
-	public void saveNewStockButton() {
-		if(numberIntbox.getValue() <= 0) {
-			Clients.showNotification("Debe ingresar un numero", numberIntbox);
-			return;
-		}
-		if(quantityDoublebox.getValue() <= 0) {
-			Clients.showNotification("Debe ingresar una cantidad", quantityDoublebox);
-			return;
-		}
-		if(workerCombobox.getSelectedIndex() == -1) {
-			Clients.showNotification("Debe seleccionar un empleado", workerCombobox);
-			return;
-		}
-		if(currentWood != null) {
-			BigDecimal newStock = BigDecimal.ZERO;
-			BigDecimal quantity = BigDecimal.valueOf(quantityDoublebox.doubleValue());
-			if(stockModificationLabel.getValue().equals("Ingreso Stock")) {
-				newStock = currentWood.getStock().add(quantity);
-			} else {
-				if(currentWood.getStock().compareTo(quantity) > 0) {// hay suficiente stock
-					newStock = currentWood.getStock().subtract(quantity);
-				} else {
-					Clients.showNotification("No hay stock suficiente", quantityDoublebox);
-					return;
-				}
-			}
-			stockDoublebox.setValue(newStock.doubleValue());
-			//			currentWood.setStock(newStock);
-			//			currentWood = woodRepository.updateWood(currentWood);
-			//			refreshView();
-		}
-		stockModificationGrid.setVisible(false);
-	}
-
-	@Listen("onClick = #cancelNewStockButton")
-	public void cancelNewStockButtonClick() {
-		stockModificationGrid.setVisible(false);
-	}
-
-	@Listen("onClick = #resetNewStockButton")
-	public void resetNewStockButtonClick() {
-		workerCombobox.setSelectedIndex(-1);
-		numberIntbox.setValue(null);
-		quantityDoublebox.setValue(null);
-	}
-
-	@Listen("onClick = #stockDecreaseButton")
-	public void stockDecreaseButtonClick() {
-		stockModificationGrid.setVisible(true);
-		stockModificationLabel.setValue("Egreso Stock");
-		workerCombobox.setSelectedIndex(-1);
-		numberIntbox.setValue(null);
-		quantityDoublebox.setValue(null);
-	}
-	
-	public String getProductionPlanName(WoodReserved woodReserved) {
-		if(woodReserved == null) {
-			return "";
-		} else {
-			RawMaterialRequirement rawMaterialRequirement = woodReserved.getRawMaterialRequirement();
-			if(rawMaterialRequirement != null) {
-				ProductionPlan productionPlan = productionPlanRepository.findByRawMaterialRequirements(rawMaterialRequirement);
-				if(productionPlan != null) {
-					return productionPlan.getName();
-				} else {
-					return "";
-				}
-			} else {
-				return "";
-			}
-		}
-	}
-	
-	public Wood getWood(WoodReserved woodReserved) {
-		return woodRepository.findFirstByWoodsReserved(woodReserved);
 	}
 }

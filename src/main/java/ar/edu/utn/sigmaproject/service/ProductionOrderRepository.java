@@ -13,8 +13,8 @@ import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 @Repository
 public interface ProductionOrderRepository extends JpaRepository<ProductionOrder, Long> {
 
-	ProductionOrder findByProductionPlanAndProduct(ProductionPlan productionPlan, Product product);
+	public ProductionOrder findByProductionPlanAndProduct(ProductionPlan productionPlan, Product product);
 
-	List<ProductionOrder> findByProductionPlan(ProductionPlan productionPlan);
+	public List<ProductionOrder> findByProductionPlan(ProductionPlan productionPlan);
 
 }

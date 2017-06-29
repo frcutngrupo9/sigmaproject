@@ -7,6 +7,6 @@ import ar.edu.utn.sigmaproject.domain.OrderStateType;
 @Repository
 public interface OrderStateTypeRepository extends SearchableRepository<OrderStateType, Long> {
 
-	OrderStateType findFirstByName(String string);
-	
+	public OrderStateType findFirstByName(String string);
+
 }

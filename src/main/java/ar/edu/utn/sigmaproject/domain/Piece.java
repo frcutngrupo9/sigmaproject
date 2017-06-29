@@ -1,16 +1,23 @@
 package ar.edu.utn.sigmaproject.domain;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.xml.datatype.Duration;
 
 @Entity
 public class Piece implements Serializable, Cloneable {
@@ -18,39 +25,43 @@ public class Piece implements Serializable, Cloneable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 
-	@OneToMany(orphanRemoval = true)
-	List<Process> processes = new ArrayList<>();
+	@ManyToOne(targetEntity = Product.class)
+	private Product product = null;
 
-	String name = "";
-	
-	BigDecimal length = BigDecimal.ZERO;
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "piece", targetEntity = Process.class)
+	private List<Process> processes = new ArrayList<>();
 
-	@ManyToOne
-	MeasureUnit lengthMeasureUnit;
+	private String name = "";
 
-	BigDecimal depth = BigDecimal.ZERO;
+	private BigDecimal length = BigDecimal.ZERO;
 
 	@ManyToOne
-	MeasureUnit depthMeasureUnit;
+	private MeasureUnit lengthMeasureUnit;
 
-	BigDecimal width = BigDecimal.ZERO;
+	private BigDecimal depth = BigDecimal.ZERO;
 
 	@ManyToOne
-	MeasureUnit widthMeasureUnit;
+	private MeasureUnit depthMeasureUnit;
 
-	String size = "";
-	boolean isGroup;
-	Integer units = 0;
+	private BigDecimal width = BigDecimal.ZERO;
 
-	boolean isClone;
+	@ManyToOne
+	private MeasureUnit widthMeasureUnit;
+
+	private String size = "";
+	private boolean isGroup;
+	private Integer units = 0;
+
+	private boolean isClone;
 
 	public Piece() {
 
 	}
 
-	public Piece(String name, BigDecimal length, MeasureUnit lengthMeasureUnit, BigDecimal depth, MeasureUnit depthMeasureUnit, BigDecimal width, MeasureUnit widthMeasureUnit, String size, boolean isGroup, Integer units) {
+	public Piece(Product product, String name, BigDecimal length, MeasureUnit lengthMeasureUnit, BigDecimal depth, MeasureUnit depthMeasureUnit, BigDecimal width, MeasureUnit widthMeasureUnit, String size, boolean isGroup, Integer units) {
+		this.product = product;
 		this.name = name;
 		this.length = length;
 		this.lengthMeasureUnit = lengthMeasureUnit;
@@ -62,6 +73,27 @@ public class Piece implements Serializable, Cloneable {
 		this.isGroup = isGroup;
 		this.units = units;
 		isClone = false;
+	}
+
+	public Product getProduct() {
+		return product;
+	}
+
+	public void setProduct(Product product) {
+		this.product = product;
+	}
+
+	public Duration getDurationTotal() {
+		Duration durationTotal = null;
+		for(Process each : processes) {
+			if(durationTotal == null) {
+				durationTotal = each.getTime();
+			} else {
+				durationTotal = durationTotal.add(each.getTime());
+			}
+
+		}
+		return durationTotal;
 	}
 
 	public Long getId() {
@@ -168,37 +200,34 @@ public class Piece implements Serializable, Cloneable {
 		this.isClone = isClone;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Piece other = (Piece) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
-
-	public static Piece clone(Piece piece){
+	/**
+	 * Returns a copy of the object, or null if the object cannot
+	 * be serialized.
+	 */
+	public static Object copy(Object orig) {
+		// crea una copia profunda de la pieza para que se copien tambien los procesos
+		Object obj = null;
 		try {
-			return (Piece)piece.clone();
-		} catch (CloneNotSupportedException e) {
-			//not possible
+			// Write the object out to a byte array
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			ObjectOutputStream out = new ObjectOutputStream(bos);
+			out.writeObject(orig);
+			out.flush();
+			out.close();
+
+			// Make an input stream from the byte array and read
+			// a copy of the object back in.
+			ObjectInputStream in = new ObjectInputStream(
+					new ByteArrayInputStream(bos.toByteArray()));
+			obj = in.readObject();
 		}
-		return null;
+		catch(IOException e) {
+			e.printStackTrace();
+		}
+		catch(ClassNotFoundException cnfe) {
+			cnfe.printStackTrace();
+		}
+		return obj;
 	}
+
 }

@@ -1,0 +1,68 @@
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
+<window id="materialsOrderDeliveryWindow" apply="ar.edu.utn.sigmaproject.controller.MaterialsReceptionController" width="75%" position="center,center" closable="true" action="show: slideDown;hide: slideUp">
+	<caption label="Recepcion del Pedido de Materiales" style="text-align:center; font-weight: bold;"/>
+	<panel border="rounded">
+        <panelchildren>
+            <vlayout>
+                <grid sclass="sigma-form" sizedByContent="true" span="true">
+			        <columns>
+		                <column align="right"/>
+		                <column align="left"/>
+		                <column align="right"/>
+		                <column align="left"/>
+		                <column align="right"/>
+		                <column align="left"/>
+		            </columns>
+			        <rows>
+			            <row>
+			                <label>Numero: </label>
+			                <intbox id="materialsOrderNumberIntbox" width="40px"/>
+			                <label>Fecha Creacion: </label>
+			                <textbox id="materialsOrderCreationDateTextbox" width="160px"/>
+			            </row>
+			        </rows>
+		    	</grid>
+		    	<listbox id="materialsOrderDetailListbox" sizedByContent="true" span="true">
+    				<auxhead>
+						<auxheader label="Detalle del Pedido de Materiales" colspan="3"/>
+					</auxhead>
+        			<listhead>
+        				<listheader label="Nombre"/>
+	                    <listheader label="Cantidad Pedida"/>
+	                    <listheader label="Cantidad Recibida"/>
+		            </listhead>
+		            <template name="model">
+		                <listitem>
+		                	<listcell label="${each.description}"/>
+                        	<listcell label="${each.quantity.doubleValue()}"/>
+                        	<listcell>
+                        		<textbox value="${each.quantityReceived.doubleValue()}"  forward="onChanging=materialsOrderDetailListbox.onOrderDetailsChange(${each})"/>
+                        	</listcell>
+						</listitem>
+		            </template>
+    			</listbox>
+    			<grid sclass="sigma-form">
+			        <columns>
+		                <column hflex="max" align="right"/>
+		                <column hflex="max" align="left"/>
+		            </columns>
+			        <rows>
+			            <row>
+			                <label>Recibido el </label>
+			                <datebox id="receptionDatebox" buttonVisible="true" format="dd/MM/yyyy" constraint="no future" width="160px"/>
+			            </row>
+			            <row>
+			                <label>Numero de Comprobante </label>
+			                <textbox id="receiptNumberTextbox" width="160px"/>
+			            </row>
+			        </rows>
+		    	</grid>
+                <hbox hflex="1" align="center" pack="center">
+                	<button id="saveButton" label="Guardar"/>
+			        <button id="resetButton" label="Reset"/>
+			        <button id="cancelButton" label="Cancelar"/>
+                </hbox>
+            </vlayout>
+        </panelchildren>
+    </panel>
+</window>

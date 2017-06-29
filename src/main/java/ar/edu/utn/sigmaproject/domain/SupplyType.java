@@ -5,23 +5,19 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
-@Entity
 @Indexed
-public class SupplyType implements Serializable, Cloneable {
+@Analyzer(definition = "edge_ngram")
+@Entity
+public class SupplyType extends Item implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
 
 	@Field
 	String code = "";
@@ -41,8 +37,8 @@ public class SupplyType implements Serializable, Cloneable {
 	@Field
 	String measure = "";
 
-	@OneToMany(orphanRemoval = true)
-	List<SupplyReserved> suppliesReserved = new ArrayList<>();
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "item", targetEntity = MaterialReserved.class)
+	List<MaterialReserved> suppliesReserved = new ArrayList<>();
 
 	BigDecimal stock = BigDecimal.ZERO;
 	BigDecimal stockMin = BigDecimal.ZERO;
@@ -65,14 +61,6 @@ public class SupplyType implements Serializable, Cloneable {
 		this.stock = stock;
 		this.stockMin = stockMin;
 		this.stockRepo = stockRepo;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public String getCode() {
@@ -123,20 +111,18 @@ public class SupplyType implements Serializable, Cloneable {
 		this.measure = measure;
 	}
 
-	public List<SupplyReserved> getSuppliesReserved() {
+	public List<MaterialReserved> getSuppliesReserved() {
 		return suppliesReserved;
 	}
 
-	public void setSuppliesReserved(List<SupplyReserved> suppliesReserved) {
+	public void setSuppliesReserved(List<MaterialReserved> suppliesReserved) {
 		this.suppliesReserved = suppliesReserved;
 	}
 
 	public BigDecimal getStockReserved() {
 		BigDecimal aux = BigDecimal.ZERO;
-		for(SupplyReserved each : suppliesReserved) {
-			if(!each.isWithdrawn()) {
-				aux = aux.add(each.getStockReserved());
-			}
+		for(MaterialReserved each : suppliesReserved) {
+			aux = aux.add(each.getStockReserved());
 		}
 		return aux;
 	}
@@ -164,38 +150,16 @@ public class SupplyType implements Serializable, Cloneable {
 	public void setStockRepo(BigDecimal stockRepo) {
 		this.stockRepo = stockRepo;
 	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
+	
+	public BigDecimal getStockAvailable() {
+		// devuelve la diferencia entre el stock total y el total reservado
+		BigDecimal stockTotal = getStock();
+		BigDecimal stockReservedTotal = getStockReserved();
+		return stockTotal.subtract(stockReservedTotal);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		SupplyType other = (SupplyType) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
-
-	public static SupplyType clone(SupplyType supplyType){
-		try {
-			return (SupplyType)supplyType.clone();
-		} catch (CloneNotSupportedException e) {
-			//not possible
-		}
-		return null;
+	public List<MaterialReserved> getMaterialReservedList() {
+		return getSuppliesReserved();
 	}
 }
