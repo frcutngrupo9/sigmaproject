@@ -12,6 +12,9 @@ public class ProductionDateTimeHelper {
 	private static int lastMinuteOfDay = 0;
 	
 	public static Date getFinishDate(Date startDate, Duration time) {
+		if(startDate == null) {
+			return null;
+		}
 		//TODO: tener en cuenta fines de semana y feriados
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(startDate);

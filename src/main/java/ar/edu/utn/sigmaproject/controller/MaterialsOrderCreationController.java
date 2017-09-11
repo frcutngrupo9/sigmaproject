@@ -204,11 +204,13 @@ public class MaterialsOrderCreationController extends SelectorComposer<Component
 			materialsOrderNumberIntbox.setValue(currentMaterialsOrder.getNumber());
 			materialsOrderDatebox.setValue(currentMaterialsOrder.getDate());
 			materialsOrderDetailList = currentMaterialsOrder.getDetails();
+			// TODO si el pedido ya esta recibido se deshabilita todas las modificaciones
 		}
 		materialsOrderDatebox.setDisabled(true);// nunca se debe poder modificar la fecha de creacion del pedido
 		currentMaterialsOrderDetail = null;
 		refreshItemPopupList();
 		refreshViewDetail();
+		
 	}
 
 	private Integer getNewOrderNumber() {

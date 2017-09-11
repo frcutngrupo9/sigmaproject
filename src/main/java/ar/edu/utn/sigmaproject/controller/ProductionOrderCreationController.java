@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.zkoss.image.AImage;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
@@ -31,6 +32,7 @@ import org.zkoss.zul.Include;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Row;
 import org.zkoss.zul.Textbox;
 
@@ -640,18 +642,50 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		return pieceList;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Listen("onChangeProductionOrderDetailStartDate = #productionOrderDetailGrid")
 	public void doChangeProductionOrderDetailStartDate(ForwardEvent evt) {
-		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
-		Datebox element = (Datebox) evt.getOrigin().getTarget();// obtenemos el elemento web
-		data.setDateStart(element.getValue());
+		// se envia el mensaje: se modificaran todos los tiempos de los procesos posteriores para que no se superpongan
+		final ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
+		final Datebox element = (Datebox) evt.getOrigin().getTarget();// obtenemos el elemento web
+		Messagebox.show("Los tiempos posteriores se modificaran, desea continuar?", "Confirmar Modificacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+			public void onEvent(Event evt) throws InterruptedException {
+				if (evt.getName().equals("onOK")) {
+					changeProductionOrderDetailDates(data, element);
+				} else {
+					// si se cancela se regresa al valor original
+					element.setValue(data.getDateStart());
+				}
+			}
+		});
+	}
+
+	private void changeProductionOrderDetailDates(ProductionOrderDetail productionOrderDetail, Datebox datebox) {
+		changeDetailStartDate(productionOrderDetail, datebox);
+		// recalcula todos los tiempos de los procesos posteriores para que inicien en el final
+		changeRemainDetailsDate(productionOrderDetail);
+		// se hace refresh de la lista para q aparezcan los cambios
+		refreshProductionOrderDetailGridView();
+	}
+
+	private void changeDetailStartDate(ProductionOrderDetail detail, Datebox dateboxStart) {
+		detail.setDateStart(dateboxStart.getValue());
 		// cambia la fecha de fin tambien
-		Date finish = ProductionDateTimeHelper.getFinishDate(element.getValue(), data.getTimeTotal());
-		data.setDateFinish(finish);
+		Date finish = ProductionDateTimeHelper.getFinishDate(dateboxStart.getValue(), detail.getTimeTotal());
+		detail.setDateFinish(finish);
 		// cambia el valor del elemento con fecha fin
-		Row fila = (Row)element.getParent();
+		//dateboxFinishSetValue(dateboxStart, finish); en lugar de cambiar el elemento se hace refresh de la lista
+	}
+
+	private void dateboxFinishSetValue(Datebox dateboxStart, Date finish) {
+		Row fila = (Row)dateboxStart.getParent();
 		Datebox dateboxFinish = (Datebox) fila.getChildren().get(fila.getChildren().size()-7);
 		dateboxFinish.setValue(finish);
-		//TODO: recalcular todos los tiempos de los procesos posteriores para que inicien el final
+	}
+
+	private void changeRemainDetailsDate(ProductionOrderDetail detail) {
+		System.out.println("changeRemainDetailsDate llamado");
+		ProductionOrder productionOrder = detail.getProductionOrder();
+		productionOrder.updateRemainDetailDates(detail);
 	}
 }

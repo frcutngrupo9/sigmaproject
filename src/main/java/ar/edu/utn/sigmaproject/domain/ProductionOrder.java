@@ -29,36 +29,36 @@ public class ProductionOrder implements Serializable, Cloneable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 
 	@ManyToOne
-	ProductionPlan productionPlan;
+	private ProductionPlan productionPlan;
 
 	@ManyToOne
-	Product product;
+	private Product product;
 
 	@ManyToOne
-	Worker worker;
+	private Worker worker;
 
 	@OneToMany(orphanRemoval = true)
-	List<ProductionOrderState> states = new ArrayList<>();
+	private List<ProductionOrderState> states = new ArrayList<>();
 
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionOrder", targetEntity = ProductionOrderDetail.class)
 	@OrderColumn(name = "detail_index")
-	List<ProductionOrderDetail> details = new ArrayList<>();
+	private List<ProductionOrderDetail> details = new ArrayList<>();
 
-	Integer sequence = 0;
-	Integer number = 0;
-	Integer units = 0;
-	Date dateStart = null;
-	Date dateFinish = null;
-	Date dateStartReal = null;
-	Date dateFinishReal = null;
-	Date dateMaterialsWithdrawal = null;
-	ProductionOrderStateType currentStateType = null;
+	private Integer sequence = 0;
+	private Integer number = 0;
+	private Integer units = 0;
+	private Date dateStart = null;
+	private Date dateFinish = null;
+	private Date dateStartReal = null;
+	private Date dateFinishReal = null;
+	private Date dateMaterialsWithdrawal = null;
+	private ProductionOrderStateType currentStateType = null;
 
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionOrder", targetEntity = ProductionOrderMaterial.class)
-	List<ProductionOrderMaterial> productionOrderMaterials = new ArrayList<>();
+	private List<ProductionOrderMaterial> productionOrderMaterials = new ArrayList<>();
 
 	public ProductionOrder() {
 
@@ -440,5 +440,38 @@ public class ProductionOrder implements Serializable, Cloneable {
 			percentComplete = (quantityFinished * 100) / quantityTotalNotCanceled;
 		}
 		return percentComplete + " %";
+	}
+
+	public void updateRemainDetailDates(ProductionOrderDetail changedDetail) {
+		// busca el detalle cambiado y modifica las fechas posteriores a el
+		boolean startUpdating = false;
+		Date finishDate = null;
+		Date startDate = null;
+		for(ProductionOrderDetail each : getDetails()) {
+			if(startUpdating) {
+				if(each.getState() != ProcessState.Cancelado) {// solo se calcula para los procesos que no esten cancelados
+					if(finishDate == null) {// si es la primera vez que ingresa
+						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, each.getTimeTotal());
+					} else {
+						// el inicio de la actual es al finalizar la ultima
+						startDate = finishDate;
+						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, each.getTimeTotal());
+					}
+					each.setDateStart(startDate);
+					each.setDateFinish(finishDate);
+				} else {
+					each.setDateStart(null);
+					each.setDateFinish(null);
+					// por las dudas borramos tambien las fechas reales
+					each.setDateStartReal(null);
+					each.setDateFinishReal(null);
+				}
+			}
+
+			if(each.getProcess().equals(changedDetail.getProcess())) {
+				startUpdating = true;
+				startDate = changedDetail.getDateFinish();
+			}
+		}
 	}
 }

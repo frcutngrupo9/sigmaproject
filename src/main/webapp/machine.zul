@@ -46,7 +46,7 @@
 		                    <label>Tiempo de Deterioro:</label>
 		                    <hlayout>
 		                    	<intbox id="deteriorationTimeIntboxYears" width="26px"/>
-		                    	<label value="(Anios)"/>
+		                    	<label value="(A\u00f1os)"/>
 		                    	<intbox id="deteriorationTimeIntboxDays" width="26px"/>
 		                    	<label value="(Dias)"/>
 		                    	<intbox id="deteriorationTimeIntboxHours" width="36px"/>

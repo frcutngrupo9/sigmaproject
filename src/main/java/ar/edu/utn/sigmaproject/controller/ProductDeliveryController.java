@@ -174,4 +174,12 @@ public class ProductDeliveryController extends SelectorComposer<Component> {
 		ProductionOrder productionOrder = productionOrderRepository.findByProductionPlanAndProduct(productionPlan, product);
 		return productionOrder;
 	}
+	
+	public String getPlanName(OrderDetail orderDetail) {
+		ProductionOrder productionOrder = getCorrelativeProductionOrder(currentOrder, orderDetail.getProduct());// busca la orden de produccion que tiene el mismo producto del detalle
+		if(productionOrder != null) {
+			return productionOrder.getProductionPlan().getName();
+		}
+		return "";
+	}
 }
