@@ -131,7 +131,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 
 	public void setDateStart(Date dateStart) {
 		this.dateStart = dateStart;
-		updateDetailDates(dateStart);// se calculan las fechas de los detalles automaticamente
+		//updateDetailDates(dateStart);// se calculan las fechas de los detalles automaticamente
 	}
 
 	public Date getDateFinish() {
@@ -294,7 +294,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 		return list;
 	}
 
-	private void updateDetailDates(Date startDate) {
+	public void updateDetailDates(Date startDate) {
 		Date finishDate = null;
 		if(startDate != null) {
 			for(ProductionOrderDetail each : getDetails()) {

@@ -325,6 +325,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 					}
 					productionOrder.sortDetailsByProcessTypeSequence();
 					productionOrder.setDateStart(productionOrderStartDate);// la fecha fin se calcula al asignar fecha inicio
+					productionOrder.updateDetailDates(productionOrderStartDate);
 					// se extrae la fecha calculada
 					productionOrderFinishDate = productionOrder.getDateFinish();
 					previousStartDate = productionOrderStartDate;
@@ -332,6 +333,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 					// si el valor de secuencia anterior es igual al actual se inician al mismo tiempo y se guarda el que finalice mas tarde para usarlo como inicio del proximo
 					if(sequence == productionOrder.getSequence()) {
 						productionOrder.setDateStart(previousStartDate);
+						productionOrder.updateDetailDates(previousStartDate);
 						Date currentFinishDate = productionOrder.getDateFinish();// se extrae la fecha calculada
 						if(currentFinishDate.after(productionOrderFinishDate)) {// si la actual orden finaliza despues q la que anterior, la reemplaza
 							productionOrderFinishDate = currentFinishDate;
@@ -344,6 +346,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 							productionOrderStartDate = productionOrderFinishDate;// el inicio es al finalizar la ultima
 						}
 						productionOrder.setDateStart(productionOrderStartDate);
+						productionOrder.updateDetailDates(productionOrderStartDate);
 						productionOrderFinishDate = productionOrder.getDateFinish();// se extrae la fecha calculada
 						previousStartDate = productionOrderStartDate;
 					}

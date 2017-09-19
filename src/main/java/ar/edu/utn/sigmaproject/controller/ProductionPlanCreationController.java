@@ -82,6 +82,8 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	@Wire
 	Button deleteProductionPlanButton;
 	@Wire
+	Button newProductionPlanButton;
+	@Wire
 	Listbox productTotalListbox;
 	@Wire
 	Combobox productionPlanStateTypeCombobox;
@@ -375,13 +377,15 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			productionPlanStateTypeListModel.addToSelection(productionPlanStateTypeRepository.findFirstByName("Registrado"));
 			productionPlanStateTypeCombobox.setModel(productionPlanStateTypeListModel);
 			int planNumber = productionPlanRepository.findAll().size() + 1;
-			productionPlanNameTextbox.setText("Plan " + planNumber);
+			productionPlanNameTextbox.setText("PLAN " + planNumber);
 			productionPlanDetailList = new ArrayList<ProductionPlanDetail>();
 			deleteProductionPlanButton.setDisabled(true);
 			productionPlanStateTypeCombobox.setDisabled(true);
 			returnToProductionButton.setDisabled(true);
 			returnToRequirementPlanButton.setDisabled(true);
 		} else {// se edita plan de produccion
+			// se busca de la bd el plan ya que puede ser que el current plan tenga detalles modificados
+			currentProductionPlan = productionPlanRepository.findOne(currentProductionPlan.getId());
 			productionPlanCaption.setLabel("Edicion de Plan de Produccion");
 			ProductionPlanStateType productionPlanStateType = currentProductionPlan.getCurrentStateType();
 			if (productionPlanStateType != null) {
@@ -443,5 +447,12 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		Executions.getCurrent().setAttribute("selected_production_plan", currentProductionPlan);
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/requirement_plan_creation.zul");
+	}
+	
+	@Listen("onClick = #newProductionPlanButton")
+	public void newProductionPlanButtonClick() {
+		currentProductionPlan = null;
+		refreshProductTotalListbox();
+		refreshViewProductionPlan();
 	}
 }

@@ -6,7 +6,9 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.zkoss.image.AImage;
@@ -51,6 +53,7 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.domain.Worker;
 import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
@@ -99,6 +102,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	// services
 	@WireVariable
 	private ProductionOrderRepository productionOrderRepository;
+	@WireVariable
+	private ProductionOrderDetailRepository productionOrderDetailRepository;
 	@WireVariable
 	private ProductionOrderStateRepository productionOrderStateRepository;
 	@WireVariable
@@ -247,7 +252,9 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		if(currentProductionOrder.getNumber() == 0) {
 			currentProductionOrder.setNumber(getNewProductionOrderNumber());
 		}
-		// la fecha inicio y fin se calcularon y agregaron a currentProductionOrder al modificar la fecha inicio
+		// la fecha inicio y fin se calcularon y agregaron a currentProductionOrder al modificar la fecha inicio, pero si despues se modifico la fecha del primer proceso se debe actualizar tbn
+		currentProductionOrder.setDateStart(currentProductionOrder.getStartDateFromDetails());
+		currentProductionOrder.setDateFinish(currentProductionOrder.getFinishDateFromDetails());
 		// el estado de la orden debe cambiar automaticamente 
 		ProductionOrderStateType productionOrderStateType = productionOrderStateTypeRepository.findFirstByName("Preparada");
 		if(!productionOrderStateType.getName().equalsIgnoreCase(currentProductionOrder.getCurrentStateType().getName())) { // no se vuelve a grabar si es el mismo estado
@@ -305,8 +312,51 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	}
 
 	public ListModelList<Worker> getWorkerListModel(ProductionOrderDetail productionOrderDetail) {
-		// TODO: mostrar solo los empleados disponibles en los horarios del proceso
-		return new ListModelList<>(workerRepository.findAll());
+		// muestra solo los empleados disponibles en los horarios del proceso
+		if(productionOrderDetail.getState() == ProcessState.Cancelado) {
+			return new ListModelList<>(new ArrayList<Worker>());
+		}
+		List<Worker> availableWorkerList = getAvailableWorkerList(productionOrderDetail);
+		return new ListModelList<>(availableWorkerList);
+	}
+	
+	private List<Worker> getAvailableWorkerList(ProductionOrderDetail productionOrderDetail) {
+		List<Worker> list = workerRepository.findAll();
+		// se eliminan de la lista los empleados que esten asignado a otros procesos en los intervalos de tiempo del proceso actual
+		for(Worker each : getUnavailableWorkerSet(getOverlappingDetails(productionOrderDetail))) {
+			list.remove(workerRepository.findOne(each.getId()));
+		}
+		return list;
+	}
+	
+	private Set<Worker> getUnavailableWorkerSet(List<ProductionOrderDetail> productionOrderDetailList) {
+		Set<Worker> workerSet = new HashSet<Worker>();
+		for(ProductionOrderDetail each : productionOrderDetailList) {
+			workerSet.add(each.getWorker());
+		}
+		return workerSet;
+	}
+
+	
+	private List<ProductionOrderDetail> getOverlappingDetails(ProductionOrderDetail productionOrderDetail) {
+		Date start = productionOrderDetail.getDateStart();
+		Date finish = productionOrderDetail.getDateFinish();
+		List<ProductionOrderDetail> overlappingDetails = productionOrderDetailRepository.findByDateFinishAfterAndDateStartBefore(start, finish);
+		// se elimina de la lista el mismo q se esta buscando
+		overlappingDetails.remove(productionOrderDetailRepository.findOne(productionOrderDetail.getId()));
+		// se remueven los procesos de ordenes canceladas o finalizadas y los procesos cancelados
+		List<ProductionOrderDetail> toRemoveDetails = new ArrayList<ProductionOrderDetail>();
+		for(ProductionOrderDetail each : overlappingDetails) {
+			// tambien lo remueve si no tiene asignado worker
+			if(each.getState() == ProcessState.Cancelado || each.getWorker() == null) {
+				toRemoveDetails.add(each);
+			}
+		}
+		// recorre la lista a de procesos a remover
+		for(ProductionOrderDetail each : toRemoveDetails) {
+			overlappingDetails.remove(each);
+		}
+		return overlappingDetails;
 	}
 
 	@Listen("onCreateWorkerCombobox = #productionOrderDetailGrid")
@@ -555,17 +605,18 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		// solo si el detalle no es cancelado
 		Worker worker = null;
 		Machine machine = null;
-		if(workerList.size() > 0) {
-			worker = workerList.get(0);
-		}
 		for(ProductionOrderDetail each : productionOrderDetailList) {
 			if(each.getState() == ProcessState.Cancelado) {
 				each.setWorker(null);
 				each.setMachine(null);
 			} else {
+				List<Worker> availableWorkerList = getAvailableWorkerList(each);
 				List<Machine> list = getMachineListByProcessType(each.getProcess().getType());
 				if(list.size() > 0) {
 					machine = list.get(0);
+				}
+				if(availableWorkerList.size() > 0) {
+					worker = availableWorkerList.get(0);
 				}
 				each.setWorker(worker);
 				each.setMachine(machine);
@@ -582,8 +633,9 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 	private void refreshProcessDates() {
 		Date startDate = getDateTimeStartWork(productionOrderStartDatebox.getValue());
-		// asigna el valor a la clase para que calcule todos los tiempos de los detalles automaticamente
+		// asigna el valor a la clase y hace que calcule todos los tiempos de los detalles
 		currentProductionOrder.setDateStart(startDate);
+		currentProductionOrder.updateDetailDates(startDate);
 		productionOrderDetailList = currentProductionOrder.getDetails();
 		sortProductionOrderDetailListByProcessTypeSequence();
 		productionOrderStartDatebox.setValue(currentProductionOrder.getDateStart());// modifica el valor del datebox para que contenga la hora de inicio
@@ -684,7 +736,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	}
 
 	private void changeRemainDetailsDate(ProductionOrderDetail detail) {
-		System.out.println("changeRemainDetailsDate llamado");
+		System.out.println("metodo changeRemainDetailsDate llamado");
 		ProductionOrder productionOrder = detail.getProductionOrder();
 		productionOrder.updateRemainDetailDates(detail);
 	}

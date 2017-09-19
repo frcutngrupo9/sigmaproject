@@ -36,58 +36,14 @@
 						</hbox>
 					</vbox>
 				</hbox>
-        		<grid id="processTypeGrid" sizedByContent="true" span="true">
-        			<auxhead>
-						<auxheader colspan="4"/>
-					    <auxheader colspan="2" align="center">
+    			<grid id="productionOrderDetailGrid" sizedByContent="true" span="true">
+    				<auxhead>
+						<auxheader colspan="11" align="center">
 					        <button id="autoAssignButton" label="Asignar Empleados y Maquinas Automaticamente"/>
 					    </auxheader>
 					</auxhead>
         			<columns>
-			            <column label="Secuencia" align="left"/>
-			            <column label="Proceso" align="left"/>
-			            <column label="Pieza/s" align="center"/>
-			            <column label="Tipo de Maquina" align="center"/>
-			            <column label="Asignar Empleado" align="center"/>
-			            <column label="Asignar Maquina" align="center"/>
-		            </columns>
-		            <template name="model">
-		                <row>
-			            	<label value="${each.sequence}"/>
-			            	<label value="${each.name}"/>
-			            	<cell>
-			            		<zk forEach="${win_production_order_creation$composer.getProcessTypePieceList(each)}">
-			            			<label value="${each.getName()} "/>
-			            		</zk>
-			            		 <!-- <label value="${each.getName()} " forEach="${win_production_order_creation$composer.getProcessTypePieceList(each)}"/> -->
-			            	</cell>
-			            	<label value="${win_production_order_creation$composer.getMachineTypeNameByProcessType(each)}"/>
-				            <combobox visible="true" hflex="1"
-				            	forward="onSelect=processTypeGrid.onEditProcessTypeWorker(${each}), onAfterRender=processTypeGrid.onCreateProcessTypeWorkerCombobox(${each})"
-	                        	model="${win_production_order_creation$composer.getProcessTypeWorkerListModel(each)}" readonly="true">
-			                	<template name="model">
-			                    	<comboitem label="${each.name}" />
-			                    </template>
-			                </combobox>
-		                    <cell>
-				            	<combobox visible="true" hflex="1" if="${win_production_order_creation$composer.isMachineNecessary(each)}"
-				            		forward="onSelect=processTypeGrid.onEditProcessTypeMachine(${each}), onAfterRender=processTypeGrid.onCreateProcessTypeMachineCombobox(${each})"
-	                        		model="${win_production_order_creation$composer.getMachineListModelByProcessType(each)}" readonly="true">
-			                        <template name="model">
-			                            <comboitem label="${each.name}" />
-			                        </template>
-			                    </combobox>
-			                    <label value="NO REQUIERE" if="${!win_production_order_creation$composer.isMachineNecessary(each)}"/>
-		                    </cell>
-						</row>
-		            </template>
-    			</grid>
-    			<grid id="productionOrderDetailGrid" sizedByContent="true" span="true">
-    				<auxhead>
-						<auxheader label="Detalles" colspan="11"/>
-					</auxhead>
-        			<columns>
-			            <column label="Cancelado" align="center"/>
+			            <column label="Cancelar" align="center"/>
 			            <column label="Secuencia" align="center"/>
 			            <column label="Proceso" align="left" sort="auto(process.type.name)"/>
 			            <column label="Inicio" align="left"/>
@@ -172,6 +128,50 @@
 			    </hbox>
 			    <separator/>
 			    <separator/>
+			    <grid id="processTypeGrid" sizedByContent="true" span="true" visible="false">
+        			<auxhead>
+						<auxheader colspan="6"/>
+					</auxhead>
+        			<columns>
+			            <column label="Secuencia" align="center"/>
+			            <column label="Proceso" align="left"/>
+			            <column label="Pieza/s" align="center"/>
+			            <column label="Tipo de Maquina" align="center"/>
+			            <column label="Asignar Empleado" align="center"/>
+			            <column label="Asignar Maquina" align="center"/>
+		            </columns>
+		            <template name="model">
+		                <row>
+			            	<label value="${each.sequence}"/>
+			            	<label value="${each.name}"/>
+			            	<cell>
+			            		<zk forEach="${win_production_order_creation$composer.getProcessTypePieceList(each)}">
+			            			<label value="${each.getName()} "/>
+			            		</zk>
+			            		 <!-- <label value="${each.getName()} " forEach="${win_production_order_creation$composer.getProcessTypePieceList(each)}"/> -->
+			            	</cell>
+			            	<label value="${win_production_order_creation$composer.getMachineTypeNameByProcessType(each)}"/>
+				            <combobox visible="true" hflex="1"
+				            	forward="onSelect=processTypeGrid.onEditProcessTypeWorker(${each}), onAfterRender=processTypeGrid.onCreateProcessTypeWorkerCombobox(${each})"
+	                        	model="${win_production_order_creation$composer.getProcessTypeWorkerListModel(each)}" readonly="true">
+			                	<template name="model">
+			                    	<comboitem label="${each.name}" />
+			                    </template>
+			                </combobox>
+		                    <cell>
+				            	<combobox visible="true" hflex="1" if="${win_production_order_creation$composer.isMachineNecessary(each)}"
+				            		forward="onSelect=processTypeGrid.onEditProcessTypeMachine(${each}), onAfterRender=processTypeGrid.onCreateProcessTypeMachineCombobox(${each})"
+	                        		model="${win_production_order_creation$composer.getMachineListModelByProcessType(each)}" readonly="true">
+			                        <template name="model">
+			                            <comboitem label="${each.name}" />
+			                        </template>
+			                    </combobox>
+			                    <label value="NO REQUIERE" if="${!win_production_order_creation$composer.isMachineNecessary(each)}"/>
+		                    </cell>
+						</row>
+		            </template>
+    			</grid>
+    			<separator/>
 			</vlayout>
         </panelchildren>
     </panel>
