@@ -181,7 +181,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		resetButton.setDisabled(false);
-		refreshProcessTypeGridView();
+		//refreshProcessTypeGridView();
 	}
 
 	private void refreshProductionOrderDetailGridView() {
@@ -299,36 +299,69 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	}
 
 	public ListModelList<Machine> getMachineListModel(ProductionOrderDetail productionOrderDetail) {
-		List<Machine> list = new ArrayList<Machine>();
-		MachineType machineType = machineTypeRepository.findOne(productionOrderDetail.getProcess().getType().getMachineType().getId());
-		if (machineType != null) {
-			for (Machine machine : machineList) {
-				if (machineType.equals(machineTypeRepository.findOne(machine.getMachineType().getId()))) {
-					list.add(machine);
+		if (productionOrderDetail.getProcess().getType().getMachineType() == null || isProductionOrderDetailNotValid(productionOrderDetail)) {
+			return new ListModelList<>(new ArrayList<Machine>());
+		}
+		// devuelve las maquinas que no estan asignadas en el horario del proceso
+		return new ListModelList<>(getAvailableMachineList(productionOrderDetail));
+	}
+
+	private List<Machine> getAvailableMachineList(ProductionOrderDetail productionOrderDetail) {
+		// buscan solo las maquinas del mismo tipo
+		List<Machine> list = getMachineListByProcessType(productionOrderDetail.getProcess().getType());;
+		List<ProductionOrderDetail> overlappingDetails = getOverlappingDetails(productionOrderDetail);
+		// se remueven los detalles que no requieren maquina
+		List<ProductionOrderDetail> nullMachineTypeDetails = new ArrayList<ProductionOrderDetail>();
+		for(ProductionOrderDetail each : overlappingDetails) {
+			if(each.getProcess().getType().getMachineType() == null) {
+				nullMachineTypeDetails.add(each);
+			}
+		}
+		for(ProductionOrderDetail each : nullMachineTypeDetails) {
+			overlappingDetails.remove(each);
+		}
+		for(Machine each : getUnavailableMachineSet(overlappingDetails, productionOrderDetail.getProcess().getType())) {
+			list.remove(machineRepository.findOne(each.getId()));
+		}
+		return list;
+	}
+
+	private Set<Machine> getUnavailableMachineSet(List<ProductionOrderDetail> productionOrderDetailList, ProcessType processType) {
+		Set<Machine> machineSet = new HashSet<Machine>();
+		if(processType.getMachineType() != null) {
+			for(ProductionOrderDetail each : productionOrderDetailList) {
+				// se agregan solo las del mismo tipo
+				if(each.getProcess().getType().getMachineType().equals(machineTypeRepository.findOne(processType.getMachineType().getId()))) {
+					machineSet.add(each.getMachine());
 				}
 			}
 		}
-		return new ListModelList<>(list);
+		return machineSet;
+	}
+
+	private boolean isProductionOrderDetailNotValid(ProductionOrderDetail productionOrderDetail) {
+		// si esta cancelado o si tiene fechas en null no es valido
+		return productionOrderDetail.getState() == ProcessState.Cancelado || productionOrderDetail.getDateStart() == null || productionOrderDetail.getDateFinish() == null;
 	}
 
 	public ListModelList<Worker> getWorkerListModel(ProductionOrderDetail productionOrderDetail) {
-		// muestra solo los empleados disponibles en los horarios del proceso
-		if(productionOrderDetail.getState() == ProcessState.Cancelado) {
+		// si esta cancelado o si tiene fechas en null, se devuelve una lista vacia
+		if(isProductionOrderDetailNotValid(productionOrderDetail)) {
 			return new ListModelList<>(new ArrayList<Worker>());
 		}
-		List<Worker> availableWorkerList = getAvailableWorkerList(productionOrderDetail);
-		return new ListModelList<>(availableWorkerList);
+		// devuelve los empleados disponibles en el horario del proceso
+		return new ListModelList<>(getAvailableWorkerList(productionOrderDetail));
 	}
-	
+
 	private List<Worker> getAvailableWorkerList(ProductionOrderDetail productionOrderDetail) {
 		List<Worker> list = workerRepository.findAll();
-		// se eliminan de la lista los empleados que esten asignado a otros procesos en los intervalos de tiempo del proceso actual
+		// se eliminan de la lista los empleados que esten asignado a otros procesos en los mismos intervalos de tiempo del proceso actual
 		for(Worker each : getUnavailableWorkerSet(getOverlappingDetails(productionOrderDetail))) {
 			list.remove(workerRepository.findOne(each.getId()));
 		}
 		return list;
 	}
-	
+
 	private Set<Worker> getUnavailableWorkerSet(List<ProductionOrderDetail> productionOrderDetailList) {
 		Set<Worker> workerSet = new HashSet<Worker>();
 		for(ProductionOrderDetail each : productionOrderDetailList) {
@@ -337,23 +370,21 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		return workerSet;
 	}
 
-	
 	private List<ProductionOrderDetail> getOverlappingDetails(ProductionOrderDetail productionOrderDetail) {
 		Date start = productionOrderDetail.getDateStart();
 		Date finish = productionOrderDetail.getDateFinish();
 		List<ProductionOrderDetail> overlappingDetails = productionOrderDetailRepository.findByDateFinishAfterAndDateStartBefore(start, finish);
-		// se elimina de la lista el mismo q se esta buscando
+		// se elimina de la lista el proceso actual
 		overlappingDetails.remove(productionOrderDetailRepository.findOne(productionOrderDetail.getId()));
-		// se remueven los procesos de ordenes canceladas o finalizadas y los procesos cancelados
-		List<ProductionOrderDetail> toRemoveDetails = new ArrayList<ProductionOrderDetail>();
+		// se crea una lista con los detalles de ordenes canceladas o finalizadas o sin worker para luego removerlos de la lista
+		List<ProductionOrderDetail> invalidDetails = new ArrayList<ProductionOrderDetail>();
 		for(ProductionOrderDetail each : overlappingDetails) {
-			// tambien lo remueve si no tiene asignado worker
-			if(each.getState() == ProcessState.Cancelado || each.getWorker() == null) {
-				toRemoveDetails.add(each);
+			if(each.getState() == ProcessState.Cancelado || each.getState() == ProcessState.Realizado || each.getWorker() == null) {
+				invalidDetails.add(each);
 			}
 		}
-		// recorre la lista a de procesos a remover
-		for(ProductionOrderDetail each : toRemoveDetails) {
+		// se remueven los detalles invalidos de la lista
+		for(ProductionOrderDetail each : invalidDetails) {
 			overlappingDetails.remove(each);
 		}
 		return overlappingDetails;
@@ -406,7 +437,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		Worker workerSelected = (Worker)element.getSelectedItem().getValue();
 		data.setWorker(workerSelected);// cargamos al objeto el valor actualizado del elemento web
 		refreshProductionOrderDetailGridView();
-		refreshProcessTypeGridView();
+		//refreshProcessTypeGridView();
 	}
 
 	@Listen("onEditProductionOrderDetailMachine = #productionOrderDetailGrid")
@@ -431,7 +462,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			}
 		}
 		refreshProductionOrderDetailGridView();
-		refreshProcessTypeGridView();
+		//refreshProcessTypeGridView();
 	}
 
 	public ListModelList<Machine> getMachineListModelByProcessType(ProcessType processType) {
@@ -470,7 +501,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 				each.setWorker(workerSelected);
 			}
 		}
-		refreshProcessTypeGridView();
+		//refreshProcessTypeGridView();
 		// debe actualizar tambien la ProductionOrderDetailGridView para que los cambios sea aplicados en el otro grid
 		refreshProductionOrderDetailGridView();
 	}
@@ -532,7 +563,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 				each.setMachine(machineSelected);
 			}
 		}
-		refreshProcessTypeGridView();
+		//refreshProcessTypeGridView();
 		// debe actualizar tambien la ProductionOrderDetailGridView para que los cambios sea aplicados en el otro grid
 		refreshProductionOrderDetailGridView();
 	}
@@ -581,6 +612,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		return prevMachine;
 	}
 
+	/*
 	private void refreshProcessTypeGridView() {
 		// la lista de procesos se crea en base a los tipos de procesos que incluye la orden
 		processTypeList = currentProductionOrder.getProcessTypeList();
@@ -588,6 +620,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		ListModelList<ProcessType> processTypeListModelList = new ListModelList<ProcessType>(processTypeList);
 		processTypeGrid.setModel(processTypeListModelList);
 	}
+	 */
 
 	private void sortProcessTypeListBySequence() {
 		Comparator<ProcessType> comp = new Comparator<ProcessType>() {
@@ -601,6 +634,12 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 	@Listen("onClick = #autoAssignButton")
 	public void autoAssignButtonClick() {
+		// si no estan asignadas las fechas de los procesos se informa
+		if(productionOrderStartDatebox.getValue()==null || productionOrderFinishDatebox.getValue()==null) {
+			alert("Debe seleccionar las fechas de los procesos antes de asignar recursos.");
+			return;
+		}
+
 		// asigna la primer maquina o trabajador disponible a cada detalle
 		// solo si el detalle no es cancelado
 		Worker worker = null;
@@ -611,9 +650,10 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 				each.setMachine(null);
 			} else {
 				List<Worker> availableWorkerList = getAvailableWorkerList(each);
-				List<Machine> list = getMachineListByProcessType(each.getProcess().getType());
-				if(list.size() > 0) {
-					machine = list.get(0);
+				List<Machine> availableMachineList = getAvailableMachineList(each);
+				//getMachineListByProcessType(each.getProcess().getType());
+				if(availableMachineList.size() > 0) {
+					machine = availableMachineList.get(0);
 				}
 				if(availableWorkerList.size() > 0) {
 					worker = availableWorkerList.get(0);
@@ -623,7 +663,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			}
 		}
 		refreshProductionOrderDetailGridView();
-		refreshProcessTypeGridView();
+		//refreshProcessTypeGridView();
 	}
 
 	@Listen("onChange = #productionOrderStartDatebox")
@@ -641,7 +681,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		productionOrderStartDatebox.setValue(currentProductionOrder.getDateStart());// modifica el valor del datebox para que contenga la hora de inicio
 		productionOrderFinishDatebox.setValue(currentProductionOrder.getDateFinish());
 		refreshProductionOrderDetailGridView();
-		refreshProcessTypeGridView();
+		//refreshProcessTypeGridView();
 	}
 
 	private Date getDateTimeStartWork(Date startDate) {
@@ -697,10 +737,17 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Listen("onChangeProductionOrderDetailStartDate = #productionOrderDetailGrid")
 	public void doChangeProductionOrderDetailStartDate(ForwardEvent evt) {
-		// se envia el mensaje: se modificaran todos los tiempos de los procesos posteriores para que no se superpongan
 		final ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
 		final Datebox element = (Datebox) evt.getOrigin().getTarget();// obtenemos el elemento web
-		Messagebox.show("Los tiempos posteriores se modificaran, desea continuar?", "Confirmar Modificacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+		// se verifica que la hora este dentro del horario de trabajo
+		if(ProductionDateTimeHelper.isOutsideWorkingHours(element.getValue())) {
+			alert("Error en la Hora. Debe seleccionar un horario entre las " + ProductionDateTimeHelper.getFormattedFirst() + " hs y las " + ProductionDateTimeHelper.getFormattedLast() + " hs");
+			// se regresa al valor original
+			element.setValue(data.getDateStart());
+			return;
+		}
+		// se envia el mensaje: se modificaran tiempos de los procesos posteriores para que no se superpongan
+		Messagebox.show("Los tiempos posteriores se modificaran, y los recursos asignados se removeran, desea continuar?", "Confirmar Modificacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 			public void onEvent(Event evt) throws InterruptedException {
 				if (evt.getName().equals("onOK")) {
 					changeProductionOrderDetailDates(data, element);
@@ -718,6 +765,9 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		changeRemainDetailsDate(productionOrderDetail);
 		// se hace refresh de la lista para q aparezcan los cambios
 		refreshProductionOrderDetailGridView();
+		// se actualizan los datebox de inicio y fin
+		productionOrderStartDatebox.setValue(productionOrderDetail.getProductionOrder().getStartDateFromDetails());
+		productionOrderFinishDatebox.setValue(productionOrderDetail.getProductionOrder().getFinishDateFromDetails());
 	}
 
 	private void changeDetailStartDate(ProductionOrderDetail detail, Datebox dateboxStart) {
@@ -725,18 +775,22 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		// cambia la fecha de fin tambien
 		Date finish = ProductionDateTimeHelper.getFinishDate(dateboxStart.getValue(), detail.getTimeTotal());
 		detail.setDateFinish(finish);
+		// se remueven las maquinas y empleados asignados, ya que puede ser que esten no disponibles para el nuevo horario
+		detail.setWorker(null);
+		detail.setMachine(null);
 		// cambia el valor del elemento con fecha fin
 		//dateboxFinishSetValue(dateboxStart, finish); en lugar de cambiar el elemento se hace refresh de la lista
 	}
 
+	/*
 	private void dateboxFinishSetValue(Datebox dateboxStart, Date finish) {
 		Row fila = (Row)dateboxStart.getParent();
 		Datebox dateboxFinish = (Datebox) fila.getChildren().get(fila.getChildren().size()-7);
 		dateboxFinish.setValue(finish);
 	}
+	*/
 
 	private void changeRemainDetailsDate(ProductionOrderDetail detail) {
-		System.out.println("metodo changeRemainDetailsDate llamado");
 		ProductionOrder productionOrder = detail.getProductionOrder();
 		productionOrder.updateRemainDetailDates(detail);
 	}

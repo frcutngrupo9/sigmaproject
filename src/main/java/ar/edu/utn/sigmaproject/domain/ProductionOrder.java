@@ -315,11 +315,16 @@ public class ProductionOrder implements Serializable, Cloneable {
 					each.setDateStartReal(null);
 					each.setDateFinishReal(null);
 				}
+				// se remueven las maquinas y empleados asignados, ya que puede ser que esten no disponibles para el nuevo horario
+				each.setWorker(null);
+				each.setMachine(null);
 			}
 		} else {
 			for(ProductionOrderDetail each : getDetails()) {
 				each.setDateStart(null);
 				each.setDateFinish(null);
+				each.setWorker(null);
+				each.setMachine(null);
 			}
 		}
 		setDateFinish(finishDate);// se usa la ultima fecha como el fin de la orden de produccion
@@ -370,10 +375,14 @@ public class ProductionOrder implements Serializable, Cloneable {
 	}
 
 	public Date getStartDateFromDetails() {
+		// solo si todos tienen fecha fin e inicio
 		Date date = null;
 		for(ProductionOrderDetail each : getDetails()) {
 			if(each.getState() != ProcessState.Cancelado) {
 				Date startDate = each.getDateStart();
+				if(each.getDateFinish() == null || startDate == null) {
+					return null;
+				}
 				if(startDate != null) {
 					if(date == null) {
 						date = startDate;
@@ -466,6 +475,9 @@ public class ProductionOrder implements Serializable, Cloneable {
 					each.setDateStartReal(null);
 					each.setDateFinishReal(null);
 				}
+				// se remueven las maquinas y empleados asignados, ya que puede ser que esten no disponibles para los nuevos horarios
+				each.setWorker(null);
+				each.setMachine(null);
 			}
 
 			if(each.getProcess().equals(changedDetail.getProcess())) {

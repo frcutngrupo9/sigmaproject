@@ -23,16 +23,16 @@
 		                   </rows>
 		                </grid>
 						<hbox hflex="1" pack="center" align="center">
+							<label value="Inicio: "/>
+							<datebox buttonVisible="true" disabled="false" id="productionOrderStartDatebox" cols="12" format="dd-MM-yyyy"/>
+							<label value="Fin: "/>
+							<datebox buttonVisible="false" disabled="true" id="productionOrderFinishDatebox" cols="12" format="dd-MM-yyyy"/>
 							<label value="Codigo: "/>
 							<textbox id="productCodeTextbox" width="30px"/>
 							<label value="Producto: "/>
 							<textbox id="productNameTextbox" width="370px"/>
 							<label value="Cantidad: "/>
 							<intbox id="productUnitsIntbox" width="30px"/>
-							<label value="Inicio: "/>
-							<datebox buttonVisible="true" disabled="false" id="productionOrderStartDatebox" cols="12" format="dd-MM-yyyy"/>
-							<label value="Fin: "/>
-							<datebox buttonVisible="false" disabled="true" id="productionOrderFinishDatebox" cols="12" format="dd-MM-yyyy"/>
 						</hbox>
 					</vbox>
 				</hbox>
@@ -128,7 +128,7 @@
 			    </hbox>
 			    <separator/>
 			    <separator/>
-			    <grid id="processTypeGrid" sizedByContent="true" span="true" visible="false">
+			    <grid id="processTypeGrid" sizedByContent="true" span="true" if="false">
         			<auxhead>
 						<auxheader colspan="6"/>
 					</auxhead>

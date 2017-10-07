@@ -10,7 +10,7 @@ public class ProductionDateTimeHelper {
 	private static int firstMinuteOfDay = 0;
 	private static int lastHourOfDay = 18;// horario en el que se termina de trabajar
 	private static int lastMinuteOfDay = 0;
-	
+
 	public static Date getFinishDate(Date startDate, Duration time) {
 		if(startDate == null) {
 			return null;
@@ -114,5 +114,45 @@ public class ProductionDateTimeHelper {
 
 	public static void setLastMinuteOfDay(int lastMinuteOfDay) {
 		ProductionDateTimeHelper.lastMinuteOfDay = lastMinuteOfDay;
+	}
+
+	public static boolean isOutsideWorkingHours(Date startDate) {
+		// devuelve true si la fecha se encuentra fuera de las horas de trabajo
+		Calendar startCalendar = Calendar.getInstance();
+		startCalendar.setTime(startDate);
+		// primero se comprueba que el startDate se encuentre dentro del horario
+		if(startCalendar.get(Calendar.HOUR_OF_DAY) < firstHourOfDay ||
+				startCalendar.get(Calendar.HOUR_OF_DAY) >= lastHourOfDay) {
+			return true;
+		} else {// si esta dentro del horario en horas pero no en minutos
+			if(firstMinuteOfDay!=0 || lastMinuteOfDay!=0) {//si estan configurados minutos en el horario
+				//solo es valido si la hora es igual a la de comienzo o igual al previo al final
+				if(startCalendar.get(Calendar.HOUR_OF_DAY) == firstHourOfDay) {
+					if(startCalendar.get(Calendar.MINUTE) < firstMinuteOfDay) {
+						return true;
+					}
+				}
+				if(startCalendar.get(Calendar.HOUR_OF_DAY) == lastHourOfDay-1) {
+					if(startCalendar.get(Calendar.MINUTE) >= lastMinuteOfDay) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
+	public static String getFormattedFirst() {
+		if(firstMinuteOfDay == 0) {
+			return firstHourOfDay + "";
+		}
+		return firstHourOfDay + " : " + firstMinuteOfDay;
+	}
+	
+	public static String getFormattedLast() {
+		if(lastMinuteOfDay == 0) {
+			return lastHourOfDay + "";
+		}
+		return lastHourOfDay + " : " + lastMinuteOfDay;
 	}
 }

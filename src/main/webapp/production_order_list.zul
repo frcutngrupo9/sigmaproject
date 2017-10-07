@@ -25,8 +25,7 @@
                 </grid>
                 <hbox hflex="1" pack="center">
 					<label value="Fecha Inicio Plan: "/>
-					<datebox id="productionPlanStartDatebox" format="d/M/yyyy" width="110px"/>
-					<timebox id="productionPlanStartTimebox" format="HH:mm" width="70px"/>
+					<datebox id="productionPlanStartDatebox"  buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
 					<label value="Fecha Fin Plan: "/>
 					<datebox id="productionPlanFinishDatebox" buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
 					<label value="Fecha Real Inicio: "/>
@@ -66,7 +65,10 @@
 			            	<custom-attributes product_image="${r:getProductImage(each.product)}"/>
 			            	<button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})"  label="Abrir" disabled="${win_production_order_list$composer.isProductionPlanStateCancel()}"/>
 			            	<spinner value="${each.sequence}" constraint="no empty,min 1" forward="onChanging=productionOrderGrid.onEditProductionOrderSequence(${each})" width="60px"/>
-		                	<datebox buttonVisible="false" format="dd/MM/yyyy HH:mm" value="${each.dateStart}" disabled="true" width="110px"/>
+			                <cell>
+			                	<datebox value="${each.dateStart}" buttonVisible="true" format="d/M/yyyy" width="110px" disabled="false" forward="onChange=productionOrderGrid.onProductionOrderStartDateboxChange(${each})"/>
+								<timebox value="${each.dateStart}" format="HH:mm" width="70px" forward="onChange=productionOrderGrid.onProductionOrderStartTimeboxChange(${each})"/>
+		                	</cell>
 		                    <datebox buttonVisible="false" format="dd/MM/yyyy HH:mm" value="${each.dateFinish}" disabled="true" width="110px"/>
 		                	<cell>
 				                <image if="${!empty product_image}" content="${product_image}" width="40px" height="40px"/>
@@ -87,8 +89,8 @@
 				<hbox hflex="1" pack="left">
 	    			<button id="saveButton" label="Guardar"/>
 	    			<button id="resetButton" label="Reset"/>
-	    			<button id="returnButton" label="Volver"/>
 	    			<hbox hflex="1" pack="center">
+	    				<button id="returnButton" label="Ir a Listado de Planes"/>
 	    				<button id="productionPlanRequirementButton" label="Ir a Plan de Requerimientos"/>
 					</hbox>
 				</hbox>

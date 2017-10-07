@@ -1,5 +1,7 @@
 package ar.edu.utn.sigmaproject.controller;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -19,11 +21,13 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Cell;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
+import org.zkoss.zul.Row;
 import org.zkoss.zul.Spinner;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Timebox;
@@ -64,8 +68,6 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 	Button saveButton;
 	@Wire
 	Button resetButton;
-	@Wire
-	Timebox productionPlanStartTimebox;
 
 	// services
 	@WireVariable
@@ -90,10 +92,10 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
 		if(currentProductionPlan == null) {throw new RuntimeException("ProductionPlan not found");}
 		productionOrderList = productionOrderRepository.findByProductionPlan(currentProductionPlan);
-
 		productionPlanNameTextbox.setDisabled(true);
 		productionPlanCreationDatebox.setDisabled(true);
 		productionPlanStateTypeTextbox.setDisabled(true);
+		productionPlanStartDatebox.setDisabled(true);
 		productionPlanFinishDatebox.setDisabled(true);
 		productionPlanStartRealDatebox.setDisabled(true);
 		productionPlanFinishRealDatebox.setDisabled(true);
@@ -128,6 +130,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 				}
 			}
 
+			/*
 			if(currentProductionPlan.getDateStart() == null) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(new Date());
@@ -139,6 +142,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 			} else {
 				productionPlanStartTimebox.setValue(currentProductionPlan.getDateStart());
 			}
+			 */
 			productionPlanStartDatebox.setValue(currentProductionPlan.getDateStart());
 			productionPlanFinishDatebox.setValue(getProductionPlanFinishDate());
 			productionPlanStartRealDatebox.setValue(getProductionPlanStartRealDate());
@@ -255,13 +259,14 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
-		currentProductionPlan.setDateStart(getTimeboxDate());
+		currentProductionPlan.setDateStart(productionPlanStartDatebox.getValue());
 		productionOrderList = productionOrderRepository.save(productionOrderList);
 		currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
 		Clients.showNotification("Plan y Ordenes de Produccion guardadas");
 		refreshView();
 	}
 
+	/*
 	@Listen("onChange = #productionPlanStartDatebox")
 	public void productionPlanStartDateboxChange() {
 		sortProductionOrderListBySequenceAndRefreshDates();
@@ -291,6 +296,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 
 		sortProductionOrderListBySequenceAndRefreshDates();
 	}
+	 */
 
 	@Listen("onEditProductionOrderSequence = #productionOrderGrid")
 	public void doEditProductionOrderSequence(ForwardEvent evt) {
@@ -304,10 +310,10 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 	}
 
 	private void sortProductionOrderListBySequenceAndRefreshDates() {
-		//se ordena la lista por secuencia
+		//se ordena la lista por secuencia basandose en la fecha de inicio del plan en el datebox
 		sortProductionOrderListBySequence();
 		// selecciona el primer valor de secuencia y le asigna como fecha de inicio el valor seleccionado, y calcula las demas fechas de los restantes ordenes y se las asigna
-		Date productionPlanStartDate = getTimeboxDate();
+		Date productionPlanStartDate = productionPlanStartDatebox.getValue();
 		if(productionPlanStartDate != null) {
 			int sequence = 0;
 			Date previousStartDate = null;
@@ -324,8 +330,8 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 						productionOrderStartDate = productionOrderFinishDate;// el inicio es al finalizar la ultima
 					}
 					productionOrder.sortDetailsByProcessTypeSequence();
-					productionOrder.setDateStart(productionOrderStartDate);// la fecha fin se calcula al asignar fecha inicio
-					productionOrder.updateDetailDates(productionOrderStartDate);
+					productionOrder.setDateStart(productionOrderStartDate);
+					productionOrder.updateDetailDates(productionOrderStartDate);// la fecha fin se calcula en este metodo
 					// se extrae la fecha calculada
 					productionOrderFinishDate = productionOrder.getDateFinish();
 					previousStartDate = productionOrderStartDate;
@@ -375,6 +381,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		Collections.sort(productionOrderList, comp);
 	}
 
+	/*
 	private Date getTimeboxDate() {
 		// devuelve la union entre la fecha del datebox y la hora del timebox
 		Date productionPlanStartDate = productionPlanStartDatebox.getValue();
@@ -390,11 +397,65 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		}
 		return null;
 	}
+	 */
 
 	@Listen("onClick = #productionPlanRequirementButton")
 	public void productionPlanRequirementButtonClick() {
 		Executions.getCurrent().setAttribute("selected_production_plan", currentProductionPlan);
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/requirement_plan_creation.zul");
+	}
+
+	@Listen("onProductionOrderStartDateboxChange = #productionOrderGrid")
+	public void doProductionOrderStartDateboxChange(ForwardEvent evt) {
+		ProductionOrder data = (ProductionOrder) evt.getData();// obtiene el objeto pasado por parametro
+		Datebox element = (Datebox)evt.getOrigin().getTarget();
+		Date date = (Date)element.getValue();
+		// se busca el elemento Timebox para realizar la union
+		Cell cell = (Cell)element.getParent();
+		Timebox timebox = (Timebox)cell.getChildren().get(1);
+		data.setDateStart(getTimeboxDate(date, timebox.getValue()));
+	}
+
+	@Listen("onProductionOrderStartTimeboxChange = #productionOrderGrid")
+	public void doProductionOrderStartTimeboxChange(ForwardEvent evt) {
+		ProductionOrder data = (ProductionOrder) evt.getData();// obtiene el objeto pasado por parametro
+		Timebox element = (Timebox)evt.getOrigin().getTarget();
+		Date time = (Date)element.getValue();
+		// se verifica que la hora este dentro del horario de trabajo
+		if(ProductionDateTimeHelper.isOutsideWorkingHours(element.getValue())) {
+			alert("Error en la Hora. Debe seleccionar un horario entre las " + ProductionDateTimeHelper.getFormattedFirst() + " hs y las " + ProductionDateTimeHelper.getFormattedLast() + " hs");
+			// se regresa al valor original
+			element.setValue(data.getDateStart());
+			return;
+		}
+		// se busca el elemento Datebox para realizar la union
+		Cell cell = (Cell)element.getParent();
+		Datebox datebox = (Datebox)cell.getChildren().get(0);
+		Date dateStart = getTimeboxDate(datebox.getValue(), time);
+		data.setDateStart(dateStart);
+		data.updateDetailDates(dateStart);// calcula las demas fechas
+		changeFinishDatebox(cell, data.getDateFinish());
+	}
+
+	private void changeFinishDatebox(Cell cell, Date date) {
+		// setea la fecha en el datebox finish
+		Row row = (Row)cell.getParent();
+		Datebox dateboxFinish = (Datebox)row.getChildren().get(3);
+		dateboxFinish.setValue(date);
+	}
+
+	private Date getTimeboxDate(Date startDate, Date startTime) {
+		// devuelve la union entre la fecha del datebox y la hora del timebox
+		if(startTime!=null && startDate!=null) {
+			Calendar calStartDate = Calendar.getInstance();
+			calStartDate.setTime(startDate);
+			Calendar calTimebox = Calendar.getInstance();
+			calTimebox.setTime(startTime);
+			calStartDate.set(Calendar.HOUR_OF_DAY, calTimebox.get(Calendar.HOUR_OF_DAY));
+			calStartDate.set(Calendar.MINUTE, calTimebox.get(Calendar.MINUTE));
+			return calStartDate.getTime();
+		}
+		return null;
 	}
 }
