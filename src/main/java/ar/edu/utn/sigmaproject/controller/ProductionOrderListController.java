@@ -1,7 +1,5 @@
 package ar.edu.utn.sigmaproject.controller;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -12,7 +10,6 @@ import java.util.List;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ForwardEvent;
-import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -25,19 +22,23 @@ import org.zkoss.zul.Cell;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
+import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Row;
-import org.zkoss.zul.Spinner;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Timebox;
 
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderStateType;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
 import ar.edu.utn.sigmaproject.util.ProductionDateTimeHelper;
@@ -76,6 +77,10 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 	private ProductionPlanRepository productionPlanRepository;
 	@WireVariable
 	private ProductionPlanStateTypeRepository productionPlanStateTypeRepository;
+	@WireVariable
+	private ProductionOrderStateRepository productionOrderStateRepository;
+	@WireVariable
+	private ProductionOrderStateTypeRepository productionOrderStateTypeRepository;
 
 	// atributes
 	private ProductionPlan currentProductionPlan;
@@ -92,23 +97,16 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
 		if(currentProductionPlan == null) {throw new RuntimeException("ProductionPlan not found");}
 		productionOrderList = productionOrderRepository.findByProductionPlan(currentProductionPlan);
-		productionPlanNameTextbox.setDisabled(true);
-		productionPlanCreationDatebox.setDisabled(true);
-		productionPlanStateTypeTextbox.setDisabled(true);
-		productionPlanStartDatebox.setDisabled(true);
-		productionPlanFinishDatebox.setDisabled(true);
-		productionPlanStartRealDatebox.setDisabled(true);
-		productionPlanFinishRealDatebox.setDisabled(true);
 		refreshView();
 	}
 
 	private void refreshView() {
 		if(currentProductionPlan != null) {
-			productionOrderList = productionOrderRepository.findByProductionPlan(currentProductionPlan);
+			currentProductionPlan = productionPlanRepository.findOne(currentProductionPlan.getId());
+			productionOrderList = currentProductionPlan.getProductionOrderList();
 			sortProductionOrderListBySequence();
 			productionOrderListModel = new ListModelList<ProductionOrder>(productionOrderList);
 			productionOrderGrid.setModel(productionOrderListModel);
-
 			productionPlanNameTextbox.setText(currentProductionPlan.getName());
 			productionPlanCreationDatebox.setValue(currentProductionPlan.getDateCreation());
 			ProductionPlanStateType lastProductionPlanState = currentProductionPlan.getCurrentStateType();
@@ -118,109 +116,8 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 				productionPlanStateTypeTextbox.setText("[Sin Estado]");
 			}
 
-			// se verifica si el calculo de las fechas de los detalles es igual al atributo fechas
-			Date startDate = getProductionPlanStartDate();
-			if(currentProductionPlan.getDateStart() == null) {
-				currentProductionPlan.setDateStart(startDate);
-			} else {
-				if(startDate!=null && startDate.compareTo(currentProductionPlan.getDateStart())!=0) {
-					// si no es el mismo el calculo se lo reemplaza y se guarda
-					currentProductionPlan.setDateStart(startDate);
-					currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
-				}
-			}
-
-			/*
-			if(currentProductionPlan.getDateStart() == null) {
-				Calendar cal = Calendar.getInstance();
-				cal.setTime(new Date());
-				cal.set(Calendar.HOUR_OF_DAY, 9);
-				cal.set(Calendar.MINUTE, 0);
-				cal.set(Calendar.SECOND, 0);
-				cal.set(Calendar.MILLISECOND, 0);
-				productionPlanStartTimebox.setValue(cal.getTime());
-			} else {
-				productionPlanStartTimebox.setValue(currentProductionPlan.getDateStart());
-			}
-			 */
-			productionPlanStartDatebox.setValue(currentProductionPlan.getDateStart());
-			productionPlanFinishDatebox.setValue(getProductionPlanFinishDate());
-			productionPlanStartRealDatebox.setValue(getProductionPlanStartRealDate());
-			productionPlanFinishRealDatebox.setValue(getProductionPlanFinishRealDate());
+			updatePlanDateboxes();
 		}
-	}
-
-	// busca la ultima fecha de las finalizaciones de ordenes de produccion
-	private Date getProductionPlanFinishDate() {
-		Date date = null;
-		for(ProductionOrder each : productionOrderList) {
-			if(each.getDateFinish() != null) {
-				if(date == null) {
-					date = each.getDateFinish();
-				} else {
-					if(each.getDateFinish().after(date)) {
-						date = each.getDateFinish();
-					}
-				}
-			}
-		}
-		return date;
-	}
-
-	// busca el  primero de los inicios de ordenes de produccion
-	private Date getProductionPlanStartDate() {
-		Date date = null;
-		for(ProductionOrder each : productionOrderList) {
-			if(each.getDateStart() != null) {
-				if(date == null) {
-					date = each.getDateStart();
-				} else {
-					if(each.getDateStart().before(date)) {
-						date = each.getDateStart();
-					}
-				}
-			}
-		}
-		return date;
-	}
-
-	// busca la primera fecha de inicio real de ordenes de produccion
-	private Date getProductionPlanStartRealDate() {
-		Date date = null;
-		for(ProductionOrder each : productionOrderList) {
-			Date startRealDate = each.getDateStartReal();
-			if(startRealDate != null) {
-				if(date == null) {
-					date = startRealDate;
-				} else {
-					if(startRealDate.before(date)) {
-						date = startRealDate;
-					}
-				}
-			}
-		}
-		return date;
-	}
-
-	// busca la ultima fecha de finalizacion real de ordenes de produccion en caso de que esten todas finalizadas
-	private Date getProductionPlanFinishRealDate() {
-		ProductionPlanStateType currentProductionPlanStateType = currentProductionPlan.getCurrentStateType();
-		Date date = null;
-		if(productionPlanStateTypeRepository.findOne(currentProductionPlanStateType.getId()).equals(productionPlanStateTypeRepository.findFirstByName("Finalizado"))) {// si esta finalizado el plan
-			for(ProductionOrder each : productionOrderList) {
-				Date finishRealDate = each.getDateFinishReal();
-				if(finishRealDate != null) {
-					if(date == null) {
-						date = finishRealDate;
-					} else {
-						if(finishRealDate.after(date)) {
-							date = finishRealDate;
-						}
-					}
-				}
-			}
-		}
-		return date;
 	}
 
 	@Listen("onEditProductionOrder = #productionOrderGrid")
@@ -266,111 +163,6 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		refreshView();
 	}
 
-	/*
-	@Listen("onChange = #productionPlanStartDatebox")
-	public void productionPlanStartDateboxChange() {
-		sortProductionOrderListBySequenceAndRefreshDates();
-	}
-
-	@Listen("onChange = #productionPlanStartTimebox")
-	public void productionPlanStartTimeboxChange() {
-		// verifica que el valor del Timebox este entre la hora de inicio y fin del dia
-		Date productionPlanStartTime = productionPlanStartTimebox.getValue();
-		if(productionPlanStartTime!=null) {
-			Calendar calTimebox = Calendar.getInstance();
-			calTimebox.setTime(productionPlanStartTimebox.getValue());
-			int hour = calTimebox.get(Calendar.HOUR_OF_DAY);
-			int minute = calTimebox.get(Calendar.MINUTE);
-			if(hour<ProductionDateTimeHelper.getFirstHourOfDay() || hour>=ProductionDateTimeHelper.getLastHourOfDay()) {
-				// si la hora se sale del rango se reinicia a la primer hora
-				hour = ProductionDateTimeHelper.getFirstHourOfDay();
-				minute = ProductionDateTimeHelper.getFirstMinuteOfDay();
-				Calendar calendar = Calendar.getInstance();
-				calendar.setTime(productionPlanStartTime);
-				calendar.set(Calendar.HOUR_OF_DAY, hour);
-				calendar.set(Calendar.MINUTE, minute);
-				productionPlanStartTimebox.setValue(calendar.getTime());
-			}
-
-		}
-
-		sortProductionOrderListBySequenceAndRefreshDates();
-	}
-	 */
-
-	@Listen("onEditProductionOrderSequence = #productionOrderGrid")
-	public void doEditProductionOrderSequence(ForwardEvent evt) {
-		ProductionOrder data = (ProductionOrder) evt.getData();// obtiene el objeto pasado por parametro
-		Spinner origin = (Spinner)evt.getOrigin().getTarget();
-		InputEvent inputEvent = (InputEvent) evt.getOrigin();
-		origin.setValue(Integer.valueOf(inputEvent.getValue()));
-		Integer sequence = (Integer)origin.intValue();
-		data.setSequence(sequence);// carga al objeto el valor actualizado del elemento web
-		sortProductionOrderListBySequenceAndRefreshDates();
-	}
-
-	private void sortProductionOrderListBySequenceAndRefreshDates() {
-		//se ordena la lista por secuencia basandose en la fecha de inicio del plan en el datebox
-		sortProductionOrderListBySequence();
-		// selecciona el primer valor de secuencia y le asigna como fecha de inicio el valor seleccionado, y calcula las demas fechas de los restantes ordenes y se las asigna
-		Date productionPlanStartDate = productionPlanStartDatebox.getValue();
-		if(productionPlanStartDate != null) {
-			int sequence = 0;
-			Date previousStartDate = null;
-			// calcula todas las fechas y las agrega a las ordenes de produccion
-			Date productionOrderFinishDate = null;
-			for(ProductionOrder productionOrder : productionOrderList) {
-				// las ordenes el mismo nro de secuencia, inician al mismo tiempo
-				if(sequence == 0) {
-					// si es la primera vez que ingresa
-					Date productionOrderStartDate;
-					if(productionOrderFinishDate == null) {// si es la primera fecha en asignarse
-						productionOrderStartDate = productionPlanStartDate;
-					} else {
-						productionOrderStartDate = productionOrderFinishDate;// el inicio es al finalizar la ultima
-					}
-					productionOrder.sortDetailsByProcessTypeSequence();
-					productionOrder.setDateStart(productionOrderStartDate);
-					productionOrder.updateDetailDates(productionOrderStartDate);// la fecha fin se calcula en este metodo
-					// se extrae la fecha calculada
-					productionOrderFinishDate = productionOrder.getDateFinish();
-					previousStartDate = productionOrderStartDate;
-				} else {
-					// si el valor de secuencia anterior es igual al actual se inician al mismo tiempo y se guarda el que finalice mas tarde para usarlo como inicio del proximo
-					if(sequence == productionOrder.getSequence()) {
-						productionOrder.setDateStart(previousStartDate);
-						productionOrder.updateDetailDates(previousStartDate);
-						Date currentFinishDate = productionOrder.getDateFinish();// se extrae la fecha calculada
-						if(currentFinishDate.after(productionOrderFinishDate)) {// si la actual orden finaliza despues q la que anterior, la reemplaza
-							productionOrderFinishDate = currentFinishDate;
-						}
-					} else {
-						Date productionOrderStartDate;
-						if(productionOrderFinishDate == null) {// si es la primera fecha en asignarse
-							productionOrderStartDate = productionPlanStartDate;
-						} else {
-							productionOrderStartDate = productionOrderFinishDate;// el inicio es al finalizar la ultima
-						}
-						productionOrder.setDateStart(productionOrderStartDate);
-						productionOrder.updateDetailDates(productionOrderStartDate);
-						productionOrderFinishDate = productionOrder.getDateFinish();// se extrae la fecha calculada
-						previousStartDate = productionOrderStartDate;
-					}
-				}
-				sequence = productionOrder.getSequence();
-			}
-			// se usa la ultima fecha como el fin de plan de produccion
-			productionPlanFinishDatebox.setValue(productionOrderFinishDate);
-		} else {
-			// se ponen en null los dates de las ordenes de prod
-			for(ProductionOrder productionOrder : productionOrderList) {
-				productionOrder.setDateStart(null);
-			}
-		}
-		productionOrderListModel = new ListModelList<ProductionOrder>(productionOrderList);
-		productionOrderGrid.setModel(productionOrderListModel);
-	}
-
 	private void sortProductionOrderListBySequence() {
 		Comparator<ProductionOrder> comp = new Comparator<ProductionOrder>() {
 			@Override
@@ -381,24 +173,6 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		Collections.sort(productionOrderList, comp);
 	}
 
-	/*
-	private Date getTimeboxDate() {
-		// devuelve la union entre la fecha del datebox y la hora del timebox
-		Date productionPlanStartDate = productionPlanStartDatebox.getValue();
-		Date productionPlanStartTime = productionPlanStartTimebox.getValue();
-		if(productionPlanStartTime!=null && productionPlanStartDate!=null) {
-			Calendar calStartDate = Calendar.getInstance();
-			calStartDate.setTime(productionPlanStartDate);
-			Calendar calTimebox = Calendar.getInstance();
-			calTimebox.setTime(productionPlanStartTimebox.getValue());
-			calStartDate.set(Calendar.HOUR_OF_DAY, calTimebox.get(Calendar.HOUR_OF_DAY));
-			calStartDate.set(Calendar.MINUTE, calTimebox.get(Calendar.MINUTE));
-			return calStartDate.getTime();
-		}
-		return null;
-	}
-	 */
-
 	@Listen("onClick = #productionPlanRequirementButton")
 	public void productionPlanRequirementButtonClick() {
 		Executions.getCurrent().setAttribute("selected_production_plan", currentProductionPlan);
@@ -408,40 +182,78 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 
 	@Listen("onProductionOrderStartDateboxChange = #productionOrderGrid")
 	public void doProductionOrderStartDateboxChange(ForwardEvent evt) {
+		if(isEditionAllowed() == false) {
+			alert("No se puede modificar, el plan esta " + currentProductionPlan.getCurrentStateType().getName() + ".");
+			refreshView();
+			return;
+		}
 		ProductionOrder data = (ProductionOrder) evt.getData();// obtiene el objeto pasado por parametro
 		Datebox element = (Datebox)evt.getOrigin().getTarget();
 		Date date = (Date)element.getValue();
 		// se busca el elemento Timebox para realizar la union
 		Cell cell = (Cell)element.getParent();
-		Timebox timebox = (Timebox)cell.getChildren().get(1);
-		data.setDateStart(getTimeboxDate(date, timebox.getValue()));
+		changeStartDates(false, cell, date, data);
 	}
 
 	@Listen("onProductionOrderStartTimeboxChange = #productionOrderGrid")
 	public void doProductionOrderStartTimeboxChange(ForwardEvent evt) {
+		if(isEditionAllowed() == false) {
+			alert("No se puede modificar, el plan esta " + currentProductionPlan.getCurrentStateType().getName() + ".");
+			refreshView();
+			return;
+		}
 		ProductionOrder data = (ProductionOrder) evt.getData();// obtiene el objeto pasado por parametro
 		Timebox element = (Timebox)evt.getOrigin().getTarget();
+		// si el datebox tiene valor null al cambiar el timebox, no se realiza ningun accion
+		Datebox datebox = (Datebox)element.getParent().getChildren().get(0);
+		if(datebox.getValue() ==  null) {
+			return;
+		}
 		Date time = (Date)element.getValue();
 		// se verifica que la hora este dentro del horario de trabajo
-		if(ProductionDateTimeHelper.isOutsideWorkingHours(element.getValue())) {
+		if(time!=null && ProductionDateTimeHelper.isOutsideWorkingHours(element.getValue())) {
 			alert("Error en la Hora. Debe seleccionar un horario entre las " + ProductionDateTimeHelper.getFormattedFirst() + " hs y las " + ProductionDateTimeHelper.getFormattedLast() + " hs");
-			// se regresa al valor original
-			element.setValue(data.getDateStart());
+			// se regresa al valor original si no es null
+			if(data.getDateStart() != null) {
+				element.setValue(data.getDateStart());
+			} else {
+				element.setValue(getFirstHourMinuteOfDay());
+			}
 			return;
 		}
 		// se busca el elemento Datebox para realizar la union
 		Cell cell = (Cell)element.getParent();
+		changeStartDates(true, cell, time, data);
+	}
+
+	private void changeStartDates(boolean isTimebox, Cell cell, Date date, ProductionOrder data) {
+		Date dateStart = null;
+		Timebox timebox = (Timebox)cell.getChildren().get(1);
 		Datebox datebox = (Datebox)cell.getChildren().get(0);
-		Date dateStart = getTimeboxDate(datebox.getValue(), time);
+		if(isTimebox) {
+			dateStart = getTimeboxDate(datebox.getValue(), date);
+		} else {
+			dateStart = getTimeboxDate(date, timebox.getValue());
+		}
 		data.setDateStart(dateStart);
 		data.updateDetailDates(dateStart);// calcula las demas fechas
 		changeFinishDatebox(cell, data.getDateFinish());
+		// si es null el dateStart se reinicia el timebox
+		if(dateStart == null) {
+			timebox.setValue(getFirstHourMinuteOfDay());
+			// se borra el valor del datebox
+			datebox.setValue(null);
+		}
+		// se actualiza el estado de la orden
+		updateProductionOrderState(data, cell);
+		// se actualizan las fechas del plan
+		updatePlanDateboxes();
 	}
 
 	private void changeFinishDatebox(Cell cell, Date date) {
 		// setea la fecha en el datebox finish
 		Row row = (Row)cell.getParent();
-		Datebox dateboxFinish = (Datebox)row.getChildren().get(3);
+		Datebox dateboxFinish = (Datebox)row.getChildren().get(2);
 		dateboxFinish.setValue(date);
 	}
 
@@ -457,5 +269,94 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 			return calStartDate.getTime();
 		}
 		return null;
+	}
+
+	public Date getTimeboxValue(Date startDate) {
+		if(startDate == null) {
+			return getFirstHourMinuteOfDay();
+		}
+		return startDate;
+	}
+
+	private Date getFirstHourMinuteOfDay() {
+		// devuelve el horario de inicio del dia
+		int hour = ProductionDateTimeHelper.getFirstHourOfDay();
+		int minute = ProductionDateTimeHelper.getFirstMinuteOfDay();
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		calendar.set(Calendar.HOUR_OF_DAY, hour);
+		calendar.set(Calendar.MINUTE, minute);
+		return calendar.getTime();
+	}
+
+	private void updateProductionOrderState(ProductionOrder productionOrder, Cell cell) {
+		ProductionOrderStateType stateType = getProductionOrderCurrentStateType(productionOrder);
+		// solo cambia si es diferente del guardado
+		if(!stateType.getName().equalsIgnoreCase(productionOrder.getCurrentStateType().getName())) {
+			productionOrder.setState(productionOrderStateRepository.save(new ProductionOrderState(stateType, new Date())));
+			Label labelState = (Label)cell.getParent().getChildren().get(7);
+			labelState.setValue(stateType.getName());
+		}
+	}
+
+	private void updatePlanDateboxes() {
+		productionPlanStartDatebox.setValue(getDateFromList(true, false));
+		productionPlanFinishDatebox.setValue(getDateFromList(false, false));
+		productionPlanStartRealDatebox.setValue(getDateFromList(true, true));
+		productionPlanFinishRealDatebox.setValue(getDateFromList(false, true));
+	}
+
+	public Date getDateFromList(boolean isStart, boolean isReal) {
+		Date date = null;
+		for(ProductionOrder each : productionOrderList) {
+			Date eachDate = null;
+			if(isStart) {
+				if(isReal) {
+					eachDate = each.getDateStartReal();
+				} else {
+					eachDate = each.getDateStart();
+				}
+			} else {
+				if(isReal) {
+					eachDate = each.getDateFinishReal();
+				} else {
+					eachDate = each.getDateFinish();
+				}
+			}
+			if(eachDate != null) {
+				if(date == null) {
+					date = eachDate;
+				} else {
+					if(isStart) {
+						if(eachDate.before(date)) {
+							date = eachDate;
+						}
+					} else {
+						if(eachDate.after(date)) {
+							date = eachDate;
+						}
+					}
+				}
+			}
+		}
+		return date;
+	}
+
+	private ProductionOrderStateType getProductionOrderCurrentStateType(ProductionOrder productionOrder) {
+		if(productionOrder.isReady()) {
+			return productionOrderStateTypeRepository.findFirstByName("Preparada");
+		} else {
+			return productionOrderStateTypeRepository.findFirstByName("Registrada");
+		}
+	}
+
+	private boolean isEditionAllowed() {
+		// verifica que no se encuentre en los estados "En Ejecucion""Finalizado""Cancelado""Suspendido", sino devuelve falso
+		ProductionPlanStateType currentStateType = currentProductionPlan.getCurrentStateType();
+		String state = currentStateType.getName();
+		if(state.equalsIgnoreCase("En Ejecucion") || state.equalsIgnoreCase("Finalizado") || state.equalsIgnoreCase("Cancelado")) {
+			return false;
+		}
+		return true;
 	}
 }

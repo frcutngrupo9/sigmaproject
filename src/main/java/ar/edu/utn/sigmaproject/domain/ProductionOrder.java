@@ -479,11 +479,26 @@ public class ProductionOrder implements Serializable, Cloneable {
 				each.setWorker(null);
 				each.setMachine(null);
 			}
-
 			if(each.getProcess().equals(changedDetail.getProcess())) {
 				startUpdating = true;
 				startDate = changedDetail.getDateFinish();
 			}
 		}
+	}
+
+	public boolean isReady() {
+		// devuelve true si todos los detalles tienen asignado las fechas, los empleados y las maquinas
+		for(ProductionOrderDetail each : getDetails()) {
+			if(each.getState() != ProcessState.Cancelado) {
+				MachineType machineType = each.getProcess().getType().getMachineType();
+				if (machineType!=null && each.getMachine()==null) {
+					return false;
+				}
+				if(each.getDateStart()==null || each.getWorker()==null) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 }

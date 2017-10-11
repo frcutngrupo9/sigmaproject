@@ -3,44 +3,32 @@
     <panel id="productionOrderCreationBlock" border="none">
         <panelchildren>
             <vlayout>
-            	<grid hflex="1" sclass="sigma-form">
-                    <columns>
-                        <column align="right"/>
-                        <column align="left"/>
-                        <column align="right"/>
-                        <column align="left"/>
-                        <column align="right"/>
-                        <column align="left"/>
-                    </columns>
-                    <rows>
-                    	<row>
-                            <label value="Plan de Produccion: "/>
-							<textbox id="productionPlanNameTextbox" width="100%"/>
-							<label value="Estado: "/>
-                            <textbox id="productionPlanStateTypeTextbox" width="180px"/>
-							<label value="Fecha Creacion: "/>
-							<datebox id="productionPlanCreationDatebox" buttonVisible="false" format="dd/MM/yyyy" width="110px"/>
-                        </row>
-                   </rows>
-                </grid>
+                <hbox hflex="1" pack="center">
+                	<label value="Plan de Produccion: "/>
+					<textbox id="productionPlanNameTextbox" disabled="true" width="110px"/>
+					<label value="Estado: "/>
+                    <textbox id="productionPlanStateTypeTextbox" disabled="true" width="110px"/>
+					<label value="Fecha Creacion: "/>
+					<datebox id="productionPlanCreationDatebox" disabled="true" buttonVisible="false" format="dd/MM/yyyy" width="110px"/>
+                </hbox>
                 <hbox hflex="1" pack="center">
 					<label value="Fecha Inicio Plan: "/>
-					<datebox id="productionPlanStartDatebox"  buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
+					<datebox id="productionPlanStartDatebox" disabled="true"  buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
 					<label value="Fecha Fin Plan: "/>
-					<datebox id="productionPlanFinishDatebox" buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
+					<datebox id="productionPlanFinishDatebox" disabled="true" buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
 					<label value="Fecha Real Inicio: "/>
-					<datebox id="productionPlanStartRealDatebox" buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
+					<datebox id="productionPlanStartRealDatebox" disabled="true" buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
 					<label value="Fecha Real Fin: "/>
-					<datebox id="productionPlanFinishRealDatebox" buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
+					<datebox id="productionPlanFinishRealDatebox" disabled="true" buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
 				</hbox>
     			<grid id="productionOrderGrid" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Listado Productos a Fabricar" colspan="15"/>
+						<auxheader label="Listado Productos a Fabricar" colspan="14"/>
 					</auxhead>
         			<columns>
         				<!-- <column width="40px" align="center"/> -->
         				<column label="Accion" align="center"/>
-        				<column label="Secuencia" align="center"/>
+        				<!-- <column label="Secuencia" align="center"/> -->
         				<column label="Fecha Inicio" align="center"/>
 		                <column label="Fecha Fin" align="center"/>
         				<column label="Foto" align="center"/>
@@ -64,10 +52,10 @@
 			            -->
 			            	<custom-attributes product_image="${r:getProductImage(each.product)}"/>
 			            	<button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})"  label="Abrir" disabled="${win_production_order_list$composer.isProductionPlanStateCancel()}"/>
-			            	<spinner value="${each.sequence}" constraint="no empty,min 1" forward="onChanging=productionOrderGrid.onEditProductionOrderSequence(${each})" width="60px"/>
+			            	<!-- <spinner value="${each.sequence}" constraint="no empty, min 1" forward="onChanging=productionOrderGrid.onEditProductionOrderSequence(${each})" width="60px"/> -->
 			                <cell>
 			                	<datebox value="${each.dateStart}" buttonVisible="true" format="d/M/yyyy" width="110px" disabled="false" forward="onChange=productionOrderGrid.onProductionOrderStartDateboxChange(${each})"/>
-								<timebox value="${each.dateStart}" format="HH:mm" width="70px" forward="onChange=productionOrderGrid.onProductionOrderStartTimeboxChange(${each})"/>
+								<timebox value="${win_production_order_list$composer.getTimeboxValue(each.dateStart)}" format="HH:mm" width="70px" forward="onChange=productionOrderGrid.onProductionOrderStartTimeboxChange(${each})"/>
 		                	</cell>
 		                    <datebox buttonVisible="false" format="dd/MM/yyyy HH:mm" value="${each.dateFinish}" disabled="true" width="110px"/>
 		                	<cell>
@@ -91,7 +79,7 @@
 	    			<button id="resetButton" label="Reset"/>
 	    			<hbox hflex="1" pack="center">
 	    				<button id="returnButton" label="Ir a Listado de Planes"/>
-	    				<button id="productionPlanRequirementButton" label="Ir a Plan de Requerimientos"/>
+	    				<button id="productionPlanRequirementButton" label="Ir a Requerimientos"/>
 					</hbox>
 				</hbox>
             </vlayout>

@@ -6,33 +6,25 @@
         		<hbox hflex="1" pack="center" align="center">
 	        		<image id="productImage"/>
 	        		<vbox hflex="1" pack="center" align="center">
-		        		<grid hflex="1" sclass="sigma-form">
-		                    <columns>
-		                        <column align="right"/>
-		                        <column align="left"/>
-		                        <column align="right"/>
-		                        <column align="left"/>
-		                    </columns>
-		                    <rows>
-		                    	<row>
-		                            <label value="Plan de Produccion: "/>
-									<textbox id="productionPlanNameTextbox"/>
-									<label value="Estado Plan: "/>
-		                            <textbox id="productionPlanStateTypeTextbox"/>
-		                        </row>
-		                   </rows>
-		                </grid>
-						<hbox hflex="1" pack="center" align="center">
+		                <hbox hflex="1" pack="center">
+		                	<label value="Plan de Produccion: "/>
+							<textbox id="productionPlanNameTextbox" disabled="true"/>
+							<label value="Estado Plan: "/>
+                            <textbox id="productionPlanStateTypeTextbox" disabled="true"/>
+                            <label value="Estado Orden: "/>
+                            <textbox id="productionOrderStateTypeTextbox" disabled="true"/>
+		                </hbox>
+						<hbox hflex="1" pack="center">
 							<label value="Inicio: "/>
 							<datebox buttonVisible="true" disabled="false" id="productionOrderStartDatebox" cols="12" format="dd-MM-yyyy"/>
 							<label value="Fin: "/>
 							<datebox buttonVisible="false" disabled="true" id="productionOrderFinishDatebox" cols="12" format="dd-MM-yyyy"/>
 							<label value="Codigo: "/>
-							<textbox id="productCodeTextbox" width="30px"/>
+							<textbox id="productCodeTextbox" disabled="true" width="30px"/>
 							<label value="Producto: "/>
-							<textbox id="productNameTextbox" width="370px"/>
+							<textbox id="productNameTextbox" disabled="true" width="370px"/>
 							<label value="Cantidad: "/>
-							<intbox id="productUnitsIntbox" width="30px"/>
+							<intbox id="productUnitsIntbox" disabled="true" width="30px"/>
 						</hbox>
 					</vbox>
 				</hbox>
@@ -128,50 +120,6 @@
 			    </hbox>
 			    <separator/>
 			    <separator/>
-			    <grid id="processTypeGrid" sizedByContent="true" span="true" if="false">
-        			<auxhead>
-						<auxheader colspan="6"/>
-					</auxhead>
-        			<columns>
-			            <column label="Secuencia" align="center"/>
-			            <column label="Proceso" align="left"/>
-			            <column label="Pieza/s" align="center"/>
-			            <column label="Tipo de Maquina" align="center"/>
-			            <column label="Asignar Empleado" align="center"/>
-			            <column label="Asignar Maquina" align="center"/>
-		            </columns>
-		            <template name="model">
-		                <row>
-			            	<label value="${each.sequence}"/>
-			            	<label value="${each.name}"/>
-			            	<cell>
-			            		<zk forEach="${win_production_order_creation$composer.getProcessTypePieceList(each)}">
-			            			<label value="${each.getName()} "/>
-			            		</zk>
-			            		 <!-- <label value="${each.getName()} " forEach="${win_production_order_creation$composer.getProcessTypePieceList(each)}"/> -->
-			            	</cell>
-			            	<label value="${win_production_order_creation$composer.getMachineTypeNameByProcessType(each)}"/>
-				            <combobox visible="true" hflex="1"
-				            	forward="onSelect=processTypeGrid.onEditProcessTypeWorker(${each}), onAfterRender=processTypeGrid.onCreateProcessTypeWorkerCombobox(${each})"
-	                        	model="${win_production_order_creation$composer.getProcessTypeWorkerListModel(each)}" readonly="true">
-			                	<template name="model">
-			                    	<comboitem label="${each.name}" />
-			                    </template>
-			                </combobox>
-		                    <cell>
-				            	<combobox visible="true" hflex="1" if="${win_production_order_creation$composer.isMachineNecessary(each)}"
-				            		forward="onSelect=processTypeGrid.onEditProcessTypeMachine(${each}), onAfterRender=processTypeGrid.onCreateProcessTypeMachineCombobox(${each})"
-	                        		model="${win_production_order_creation$composer.getMachineListModelByProcessType(each)}" readonly="true">
-			                        <template name="model">
-			                            <comboitem label="${each.name}" />
-			                        </template>
-			                    </combobox>
-			                    <label value="NO REQUIERE" if="${!win_production_order_creation$composer.isMachineNecessary(each)}"/>
-		                    </cell>
-						</row>
-		            </template>
-    			</grid>
-    			<separator/>
 			</vlayout>
         </panelchildren>
     </panel>

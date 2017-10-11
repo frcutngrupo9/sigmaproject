@@ -144,6 +144,51 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	}
 
 	public Date getDateStart() {
+
+		return updateDateStart();
+	}
+
+	private Date updateDateStart() {
+		// busca la fecha de inicio de la primer orden de produccion
+		ProductionOrder result = null;
+		for(ProductionOrder each : productionOrderList) {
+			if(result != null) {
+				Date date = result.getStartDateFromDetails();
+				if(date!=null && date.after(each.getStartDateFromDetails())) {
+					result = each;
+				}
+			} else {
+				result = each;
+			}
+		}
+		if(result != null) {
+			// actualiza la fecha del plan
+			dateStart = result.getStartDateFromDetails();
+			return dateStart;
+		}
+		dateStart = null;// si ninguna orden tiene fecha
+		return dateStart;
+	}
+
+	public Date getDateFinish() {
+		// busca la fecha de fin de la ultima orden de produccion
+		ProductionOrder result = null;
+		for(ProductionOrder each : productionOrderList) {
+			if(result != null) {
+				Date date = result.getFinishDateFromDetails();
+				if(date!=null && date.before(each.getFinishDateFromDetails())) {
+					result = each;
+				}
+			} else {
+				result = each;
+			}
+		}
+		if(result != null) {
+			// actualiza la fecha del plan
+			dateStart = result.getStartDateFromDetails();
+			return dateStart;
+		}
+		dateStart = null;// si ninguna orden tiene fecha
 		return dateStart;
 	}
 
