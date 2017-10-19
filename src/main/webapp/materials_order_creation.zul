@@ -55,8 +55,8 @@
                     <template name="model">
                         <listitem>
                             <listcell label="${each.description}"/>
-                        	<listcell label="${each.quantity}"/>
-                        	<listcell label="${each.quantityReceived}"/>
+                        	<listcell label="${each.quantity.intValue()}"/>
+                        	<listcell label="${each.quantityReceived.intValue()}"/>
                             <listcell>
                             	<button forward="onClick=materialsOrderDetailListbox.onRemoveDetail(${each})" image="/img/delete16x16.png"/>
                             </listcell>

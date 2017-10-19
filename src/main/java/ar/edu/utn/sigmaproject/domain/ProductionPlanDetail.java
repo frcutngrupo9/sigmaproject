@@ -15,13 +15,13 @@ public class ProductionPlanDetail implements Serializable, Cloneable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 	
 	@ManyToOne(targetEntity = ProductionPlan.class)
 	private ProductionPlan productionPlan = null;
 
 	@OneToOne
-	Order order;
+	private Order order;
 
 	public ProductionPlanDetail() {
 

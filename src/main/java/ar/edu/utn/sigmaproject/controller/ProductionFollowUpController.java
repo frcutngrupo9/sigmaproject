@@ -80,6 +80,7 @@ import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.StockMovementRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
+import ar.edu.utn.sigmaproject.util.ProductionDateTimeHelper;
 
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -474,9 +475,31 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 			// agregamos como cantidad finalizada el total
 			data.setQuantityFinished(new BigDecimal(data.getQuantityPiece()));
 			doublebox.setValue(data.getQuantityPiece());
-			// agregamos como fechas reales las previstas para q no sea necesario modificar si no hace falta
-			data.setDateStartReal(data.getDateStart());
-			data.setDateFinishReal(data.getDateFinish());
+			// si no existe valor previo se utilizan los valores estimados
+			Date dateStartReal = data.getDateStart();
+			Date dateFinishReal = data.getDateFinish();
+			int indexDetail = productionOrderDetailList.indexOf(data);
+			if(indexDetail > 0) {// si no es el primero
+				int indexPreviousDetail = indexDetail-1;
+				if(productionOrderDetailList.get(indexPreviousDetail).getState() == ProcessState.Cancelado) {
+					// si el anterior esta cancelado buscamos el anterior a ese y seguimos buscando hasta que econtremos uno no cancelado o nos salagamos de la lista
+					indexPreviousDetail = indexPreviousDetail - 1;
+					while(productionOrderDetailList.get(indexPreviousDetail).getState() == ProcessState.Cancelado) {
+						indexPreviousDetail = indexPreviousDetail - 1;
+						if(indexPreviousDetail < 0) {
+							break;
+						}
+					}
+				}
+				if(indexPreviousDetail >= 0) {// si no se sale de la lista
+					ProductionOrderDetail previousDetail = productionOrderDetailList.get(indexPreviousDetail);
+					dateStartReal = previousDetail.getDateFinishReal();
+					dateFinishReal = ProductionDateTimeHelper.getFinishDate(dateStartReal, data.getTimeTotal());// se calcula el final real en base al valor del inicio
+				}
+			}
+			// agregamos fechas reales para q no sea necesario modificar si no hace falta
+			data.setDateStartReal(dateStartReal);
+			data.setDateFinishReal(dateFinishReal);
 			dateboxStartReal.setValue(data.getDateStartReal());
 			dateboxFinishReal.setValue(data.getDateFinishReal());
 			dateboxStartReal.setDisabled(false);

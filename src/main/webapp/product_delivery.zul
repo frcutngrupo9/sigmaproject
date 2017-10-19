@@ -26,13 +26,14 @@
 		    	</grid>
 		    	<listbox id="orderDetailListbox" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Detalle del Pedido" colspan="6"/>
+						<auxheader label="Detalle del Pedido" colspan="7"/>
 					</auxhead>
         			<listhead>
         				<listheader label="Foto" align="center"/>
         				<listheader label="Cod. Producto"/>
 		                <listheader label="Nombre"/>
 		                <listheader label="Cantidad"/>
+		                <listheader label="Plan"/>
 		                <listheader label="Inicio Fabricacion"/>
 		                <listheader label="Fin Fabricacion"/>
 		            </listhead>
@@ -45,6 +46,7 @@
 		                	<listcell label="${each.getProduct().getCode()}"/>
 		                    <listcell label="${each.getProduct().getName()}"/>
 		                    <listcell label="${each.getUnits()}"/>
+		                    <listcell label="${productDeliveryWindow$composer.getPlanName(each)}"/>
 		                    <listcell label="${productDeliveryWindow$composer.getFormattedDateStart(each)}"/>
 		                    <listcell label="${productDeliveryWindow$composer.getFormattedDateFinish(each)}"/>
 						</listitem>

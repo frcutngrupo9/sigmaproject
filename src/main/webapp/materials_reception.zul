@@ -34,9 +34,9 @@
 		            <template name="model">
 		                <listitem>
 		                	<listcell label="${each.description}"/>
-                        	<listcell label="${each.quantity.doubleValue()}"/>
+                        	<listcell label="${each.quantity.intValue()}"/>
                         	<listcell>
-                        		<textbox value="${each.quantityReceived.doubleValue()}"  forward="onChanging=materialsOrderDetailListbox.onOrderDetailsChange(${each})"/>
+                        		<spinner constraint="no empty,min 0" forward="onChanging=materialsOrderDetailListbox.onOrderDetailsChange(${each})" value="${each.quantityReceived.intValue()}" width="70px"/>
                         	</listcell>
 						</listitem>
 		            </template>
