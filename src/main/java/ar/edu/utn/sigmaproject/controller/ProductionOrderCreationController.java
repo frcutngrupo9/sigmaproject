@@ -6,12 +6,15 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.zkoss.image.AImage;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
@@ -19,7 +22,6 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
-import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Combobox;
@@ -31,12 +33,11 @@ import org.zkoss.zul.Include;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Row;
+import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
-import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
@@ -49,6 +50,7 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.domain.Worker;
 import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
@@ -63,6 +65,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	Textbox productionPlanNameTextbox;
 	@Wire
 	Textbox productionPlanStateTypeTextbox;
+	@Wire
+	Textbox productionOrderStateTypeTextbox;
 	@Wire
 	Textbox productCodeTextbox;
 	@Wire
@@ -88,8 +92,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	@Wire
 	Listbox productionOrderRawMaterialListbox;
 	@Wire
-	Grid processTypeGrid;
-	@Wire
 	Button autoAssignButton;
 	@Wire
 	Image productImage;
@@ -97,6 +99,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	// services
 	@WireVariable
 	private ProductionOrderRepository productionOrderRepository;
+	@WireVariable
+	private ProductionOrderDetailRepository productionOrderDetailRepository;
 	@WireVariable
 	private ProductionOrderStateRepository productionOrderStateRepository;
 	@WireVariable
@@ -114,9 +118,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 	// list
 	private List<ProductionOrderDetail> productionOrderDetailList;
-	private List<Worker> workerList;
 	private List<Machine> machineList;
-	private List<ProcessType> processTypeList;
 
 	// list models
 	private ListModelList<ProductionOrderDetail> productionOrderDetailListModel;
@@ -151,11 +153,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		}
 		productImage.setContent(img);
 		sortProductionOrderDetailListByProcessTypeSequence();
-		productionPlanNameTextbox.setDisabled(true);
-		productNameTextbox.setDisabled(true);
-		productCodeTextbox.setDisabled(true);
-		productUnitsIntbox.setDisabled(true);
-		productionPlanStateTypeTextbox.setDisabled(true);
 		productionPlanNameTextbox.setText(currentProductionPlan.getName());
 		ProductionPlanStateType lastProductionPlanStateType = currentProductionPlan.getCurrentStateType();
 		if(lastProductionPlanStateType != null) {
@@ -163,10 +160,10 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		} else {
 			productionPlanStateTypeTextbox.setText("[Sin Estado]");
 		}
+		productionOrderStateTypeTextbox.setText(currentProductionOrder.getCurrentStateType().getName());
 		productNameTextbox.setText(currentProductionOrder.getProduct().getName());
 		productCodeTextbox.setText(currentProductionOrder.getProduct().getCode());
 		productUnitsIntbox.setValue(currentProductionOrder.getUnits());
-		workerList = workerRepository.findAll();
 		productionOrderStartDatebox.setValue(currentProductionOrder.getDateStart());
 		productionOrderFinishDatebox.setValue(currentProductionOrder.getDateFinish());
 		refreshProductionOrderDetailGridView();
@@ -174,7 +171,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		resetButton.setDisabled(false);
-		refreshProcessTypeGridView();
 	}
 
 	private void refreshProductionOrderDetailGridView() {
@@ -218,10 +214,12 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			alert("No se puede modificar porque el Plan de Produccion esta Cancelado, Lanzado, En Ejecucion o Finalizado.");
 			return;
 		}
-		if(currentProductionOrder.getCurrentStateType().getName().equalsIgnoreCase("Cancelada")) {
-			alert("No se puede modificar una Orden de Produccion Cancelada.");
+		String stateType = currentProductionOrder.getCurrentStateType().getName();
+		if(stateType.equalsIgnoreCase("Iniciada") || stateType.equalsIgnoreCase("Finalizada") || stateType.equalsIgnoreCase("Cancelada")) {
+			alert("No se puede modificar una Orden de Produccion " + stateType + ".");
 			return;
 		}
+		/*
 		for (ProductionOrderDetail productionOrderDetail : productionOrderDetailList) {
 			if (productionOrderDetail.getState() != ProcessState.Cancelado) {
 				if (productionOrderDetail.getWorker() == null) {
@@ -235,19 +233,26 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 						return;
 					}
 				}
+				if (productionOrderDetail.getDateStart() == null) {
+					Clients.showNotification("Existen Procesos sin Fecha Seleccionada", productionOrderDetailGrid);
+					return;
+				}
 			}
 		}
-		Date productionOrderDateStart = productionOrderStartDatebox.getValue();
-		if (productionOrderDateStart == null) {
-			Clients.showNotification("Debe Seleccionar Fecha de Inicio", productionOrderStartDatebox);
-			return;
-		}
+		 */
 		if(currentProductionOrder.getNumber() == 0) {
 			currentProductionOrder.setNumber(getNewProductionOrderNumber());
 		}
-		// la fecha inicio y fin se calcularon y agregaron a currentProductionOrder al modificar la fecha inicio
+		// la fecha inicio y fin de la orden se actualiza
+		currentProductionOrder.setDateStart(currentProductionOrder.getStartDateFromDetails());
+		currentProductionOrder.setDateFinish(currentProductionOrder.getFinishDateFromDetails());
 		// el estado de la orden debe cambiar automaticamente 
-		ProductionOrderStateType productionOrderStateType = productionOrderStateTypeRepository.findFirstByName("Preparada");
+		ProductionOrderStateType productionOrderStateType = null;
+		if(currentProductionOrder.isReady()) {
+			productionOrderStateType = productionOrderStateTypeRepository.findFirstByName("Preparada");
+		} else {
+			productionOrderStateType = productionOrderStateTypeRepository.findFirstByName("Registrada");
+		}
 		if(!productionOrderStateType.getName().equalsIgnoreCase(currentProductionOrder.getCurrentStateType().getName())) { // no se vuelve a grabar si es el mismo estado
 			ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateType, new Date());
 			productionOrderState = productionOrderStateRepository.save(productionOrderState);
@@ -259,7 +264,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		alert("Orden de Produccion Guardada.");
 	}
 
-	//"Registrado""Abastecido""Lanzado""En Ejecucion""Finalizado""Cancelado""Suspendido"
+	// Estados Orden de Produccion: "Registrada" "Preparada" "Iniciada" "Finalizada" "Cancelada"
+	// Estados Plan de Produccion: "Registrado""Abastecido""Lanzado""En Ejecucion""Finalizado""Cancelado""Suspendido"
 
 	@Listen("onClick = #cancelButton")
 	public void cancelButtonClick() {
@@ -275,13 +281,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		refreshView();
 	}
 
-	public String getMachineTypeNameByProcessType(ProcessType processType) {
-		if(processType.getMachineType() != null) {
-			return processType.getMachineType().getName();
-		}
-		return "NINGUNA";
-	}
-
 	public boolean isMachineNecessary(ProcessType processType) {
 		if(processType.getMachineType() != null) {
 			return true;
@@ -290,21 +289,95 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	}
 
 	public ListModelList<Machine> getMachineListModel(ProductionOrderDetail productionOrderDetail) {
-		List<Machine> list = new ArrayList<Machine>();
-		MachineType machineType = machineTypeRepository.findOne(productionOrderDetail.getProcess().getType().getMachineType().getId());
-		if (machineType != null) {
-			for (Machine machine : machineList) {
-				if (machineType.equals(machineTypeRepository.findOne(machine.getMachineType().getId()))) {
-					list.add(machine);
+		if (productionOrderDetail.getProcess().getType().getMachineType() == null || isProductionOrderDetailNotValid(productionOrderDetail)) {
+			return new ListModelList<>(new ArrayList<Machine>());
+		}
+		// devuelve las maquinas que no estan asignadas en el horario del proceso
+		return new ListModelList<>(getAvailableMachineList(productionOrderDetail));
+	}
+
+	private List<Machine> getAvailableMachineList(ProductionOrderDetail productionOrderDetail) {
+		// buscan solo las maquinas del mismo tipo
+		List<Machine> list = getMachineListByProcessType(productionOrderDetail.getProcess().getType());;
+		List<ProductionOrderDetail> overlappingDetails = getOverlappingDetails(productionOrderDetail);
+		// se remueven los detalles que no requieren maquina
+		List<ProductionOrderDetail> nullMachineTypeDetails = new ArrayList<ProductionOrderDetail>();
+		for(ProductionOrderDetail each : overlappingDetails) {
+			if(each.getProcess().getType().getMachineType() == null) {
+				nullMachineTypeDetails.add(each);
+			}
+		}
+		for(ProductionOrderDetail each : nullMachineTypeDetails) {
+			overlappingDetails.remove(each);
+		}
+		for(Machine each : getUnavailableMachineSet(overlappingDetails, productionOrderDetail.getProcess().getType())) {
+			list.remove(machineRepository.findOne(each.getId()));
+		}
+		return list;
+	}
+
+	private Set<Machine> getUnavailableMachineSet(List<ProductionOrderDetail> productionOrderDetailList, ProcessType processType) {
+		Set<Machine> machineSet = new HashSet<Machine>();
+		if(processType.getMachineType() != null) {
+			for(ProductionOrderDetail each : productionOrderDetailList) {
+				// se agregan solo las del mismo tipo
+				if(each.getProcess().getType().getMachineType().equals(machineTypeRepository.findOne(processType.getMachineType().getId()))) {
+					machineSet.add(each.getMachine());
 				}
 			}
 		}
-		return new ListModelList<>(list);
+		return machineSet;
+	}
+
+	private boolean isProductionOrderDetailNotValid(ProductionOrderDetail productionOrderDetail) {
+		// si esta cancelado o si tiene fechas en null no es valido
+		return productionOrderDetail.getState() == ProcessState.Cancelado || productionOrderDetail.getDateStart() == null || productionOrderDetail.getDateFinish() == null;
 	}
 
 	public ListModelList<Worker> getWorkerListModel(ProductionOrderDetail productionOrderDetail) {
-		// TODO: mostrar solo los empleados disponibles en los horarios del proceso
-		return new ListModelList<>(workerRepository.findAll());
+		// si esta cancelado o si tiene fechas en null, se devuelve una lista vacia
+		if(isProductionOrderDetailNotValid(productionOrderDetail)) {
+			return new ListModelList<>(new ArrayList<Worker>());
+		}
+		// devuelve los empleados disponibles en el horario del proceso
+		return new ListModelList<>(getAvailableWorkerList(productionOrderDetail));
+	}
+
+	private List<Worker> getAvailableWorkerList(ProductionOrderDetail productionOrderDetail) {
+		List<Worker> list = workerRepository.findAll();
+		// se eliminan de la lista los empleados que esten asignado a otros procesos en los mismos intervalos de tiempo del proceso actual
+		for(Worker each : getUnavailableWorkerSet(getOverlappingDetails(productionOrderDetail))) {
+			list.remove(workerRepository.findOne(each.getId()));
+		}
+		return list;
+	}
+
+	private Set<Worker> getUnavailableWorkerSet(List<ProductionOrderDetail> productionOrderDetailList) {
+		Set<Worker> workerSet = new HashSet<Worker>();
+		for(ProductionOrderDetail each : productionOrderDetailList) {
+			workerSet.add(each.getWorker());
+		}
+		return workerSet;
+	}
+
+	private List<ProductionOrderDetail> getOverlappingDetails(ProductionOrderDetail productionOrderDetail) {
+		Date start = productionOrderDetail.getDateStart();
+		Date finish = productionOrderDetail.getDateFinish();
+		List<ProductionOrderDetail> overlappingDetails = productionOrderDetailRepository.findByDateFinishAfterAndDateStartBefore(start, finish);
+		// se elimina de la lista el proceso actual
+		overlappingDetails.remove(productionOrderDetailRepository.findOne(productionOrderDetail.getId()));
+		// se crea una lista con los detalles de ordenes canceladas o finalizadas o sin worker para luego removerlos de la lista
+		List<ProductionOrderDetail> invalidDetails = new ArrayList<ProductionOrderDetail>();
+		for(ProductionOrderDetail each : overlappingDetails) {
+			if(each.getState() == ProcessState.Cancelado || each.getState() == ProcessState.Realizado || each.getWorker() == null) {
+				invalidDetails.add(each);
+			}
+		}
+		// se remueven los detalles invalidos de la lista
+		for(ProductionOrderDetail each : invalidDetails) {
+			overlappingDetails.remove(each);
+		}
+		return overlappingDetails;
 	}
 
 	@Listen("onCreateWorkerCombobox = #productionOrderDetailGrid")
@@ -354,7 +427,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		Worker workerSelected = (Worker)element.getSelectedItem().getValue();
 		data.setWorker(workerSelected);// cargamos al objeto el valor actualizado del elemento web
 		refreshProductionOrderDetailGridView();
-		refreshProcessTypeGridView();
 	}
 
 	@Listen("onEditProductionOrderDetailMachine = #productionOrderDetailGrid")
@@ -379,11 +451,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			}
 		}
 		refreshProductionOrderDetailGridView();
-		refreshProcessTypeGridView();
-	}
-
-	public ListModelList<Machine> getMachineListModelByProcessType(ProcessType processType) {
-		return new ListModelList<>(getMachineListByProcessType(processType));
 	}
 
 	private List<Machine> getMachineListByProcessType(ProcessType processType) {
@@ -401,142 +468,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		return list;
 	}
 
-	public ListModelList<Worker> getProcessTypeWorkerListModel(ProcessType processType) {
-		// TODO: debe buscar los empleados basandose en la disponibilidad de horarios, por lo que las fechas ya deberian estar seleccionadas
-		return new ListModelList<>(workerList);
-	}
-
-	@Listen("onEditProcessTypeWorker = #processTypeGrid")
-	public void doEditProcessTypeWorker(ForwardEvent evt) {
-		//selecciona el trabajador para todos los procesos que involucren ese tipo de proceso
-		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
-		Combobox element = (Combobox) evt.getOrigin().getTarget();// obtenemos el elemento web
-		Worker workerSelected = (Worker)element.getSelectedItem().getValue();
-		// asigna el trabajador a todos los detalles que necesitan ese tipo de proceso
-		for(ProductionOrderDetail each : productionOrderDetailList) {
-			if(each.getProcess().getType().equals(data)) {// comprueba si es el mismo tipo de proceso
-				each.setWorker(workerSelected);
-			}
-		}
-		refreshProcessTypeGridView();
-		// debe actualizar tambien la ProductionOrderDetailGridView para que los cambios sea aplicados en el otro grid
-		refreshProductionOrderDetailGridView();
-	}
-
-	@Listen("onCreateProcessTypeWorkerCombobox = #processTypeGrid")
-	public void doCreateProcessTypeWorkerCombobox(ForwardEvent evt) {// metodo utilizado para seleccionar el item del combobox luego de crearlo
-		//TODO: debe dejar seleccionado los empleados que esten seleccionados en esos procesos en los detalles de orden
-		// y en caso de que en un mismo tipo de proceso esten seleccionados mas de 1 empleado, mostrar la opcion mixto o custom
-		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
-		Combobox element = (Combobox) evt.getOrigin().getTarget();// obtenemos el elemento web
-		Worker worker = getProcessTypeWorker(data);
-		int value = -1;
-		if(worker != null) {
-			List<Comboitem> comboitemList = element.getItems();
-			for (int i = 0; i < comboitemList.size(); i++) {
-				Comboitem item = comboitemList.get(i);
-				if (item != null) {
-					Worker itemWorker = (Worker) item.getValue();
-					itemWorker = workerRepository.findOne(itemWorker.getId());// actualiza en base a la BD para poder hacer la comparacion
-					if (itemWorker.equals(workerRepository.findOne(worker.getId()))) {
-						value = i;
-					}
-				}
-			}
-		}
-		element.setSelectedIndex(value);
-	}
-
-	private Worker getProcessTypeWorker(ProcessType processType) {
-		// verifica si todos los detalles que tengan ese tipo de proceso estan asignados a algun trabajador
-		// en ese caso se devuelve el trabajador, caso contrario (no estan asignados todos, o estan asignados mas de 1 trabajador) se devuelve null
-		Worker prevWorker = null;
-		for(ProductionOrderDetail each : productionOrderDetailList) {
-			if(each.getProcess().getType() == processType) {
-				if(each.getWorker() != null) {
-					if(prevWorker == null) {//la primera vez carga el trabajador y no hace comparacion
-						prevWorker = each.getWorker();
-					} else {
-						if(!each.getWorker().equals(prevWorker)) {
-							return null;
-						}
-					}
-				} else {
-					return null;
-				}
-			}
-		}
-		return prevWorker;
-	}
-
-	@Listen("onEditProcessTypeMachine = #processTypeGrid")
-	public void doEditProcessTypeMachine(ForwardEvent evt) {
-		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
-		Combobox element = (Combobox) evt.getOrigin().getTarget();// obtenemos el elemento web
-		Machine machineSelected = (Machine)element.getSelectedItem().getValue();
-		// asigna la misma maquina a todos los detalles que sean del tipo de proceso
-		for(ProductionOrderDetail each : productionOrderDetailList) {
-			if(each.getProcess().getType().equals(data)) {
-				each.setMachine(machineSelected);
-			}
-		}
-		refreshProcessTypeGridView();
-		// debe actualizar tambien la ProductionOrderDetailGridView para que los cambios sea aplicados en el otro grid
-		refreshProductionOrderDetailGridView();
-	}
-
-	@Listen("onCreateProcessTypeMachineCombobox = #processTypeGrid")
-	public void doCreateProcessTypeMachineCombobox(ForwardEvent evt) {// metodo utilizado para seleccionar el item del combobox luego de crearlo
-		ProcessType data = (ProcessType) evt.getData();
-		Combobox element = (Combobox) evt.getOrigin().getTarget();// obtenemos el elemento web
-		int value = -1;
-		Machine machine = getProcessTypeMachine(data);
-		if(machine != null) {
-			List<Comboitem> comboitemList = element.getItems();
-			for (int i = 0; i < comboitemList.size(); i++) {
-				Comboitem item = comboitemList.get(i);
-				if (item != null) {
-					Machine itemMachine = (Machine) item.getValue();
-					itemMachine = machineRepository.findOne(itemMachine.getId());// actualiza en base a la BD para poder hacer la comparacion
-					if (itemMachine.equals(machineRepository.findOne(machine.getId()))) {
-						value = i;
-					}
-				}
-			}
-		}
-		element.setSelectedIndex(value);
-	}
-
-	private Machine getProcessTypeMachine(ProcessType processType) {
-		// verifica si todos los detalles que tengan ese tipo de proceso estan asignados a alguna maquina
-		// en ese caso se devuelve la maquina, caso contrario (no estan asignados todos, o estan asignados mas de 1 trabajador) se devuelve null
-		Machine prevMachine = null;
-		for(ProductionOrderDetail each : productionOrderDetailList) {
-			if(each.getProcess().getType() == processType) {
-				if(each.getMachine() != null) {
-					if(prevMachine == null) {//la primera vez carga la maquina y no hace comparacion
-						prevMachine = each.getMachine();
-					} else {
-						if(!each.getMachine().equals(prevMachine)) {// si no son todas iguales
-							return null;
-						}
-					}
-				} else {
-					return null;
-				}
-			}
-		}
-		return prevMachine;
-	}
-
-	private void refreshProcessTypeGridView() {
-		// la lista de procesos se crea en base a los tipos de procesos que incluye la orden
-		processTypeList = currentProductionOrder.getProcessTypeList();
-		sortProcessTypeListBySequence();
-		ListModelList<ProcessType> processTypeListModelList = new ListModelList<ProcessType>(processTypeList);
-		processTypeGrid.setModel(processTypeListModelList);
-	}
-
+	/*
 	private void sortProcessTypeListBySequence() {
 		Comparator<ProcessType> comp = new Comparator<ProcessType>() {
 			@Override
@@ -546,31 +478,37 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		};
 		Collections.sort(processTypeList, comp);
 	}
+	 */
 
 	@Listen("onClick = #autoAssignButton")
 	public void autoAssignButtonClick() {
+		// si no estan asignadas las fechas de los procesos se informa
+		if(productionOrderStartDatebox.getValue()==null || productionOrderFinishDatebox.getValue()==null) {
+			alert("Debe seleccionar las fechas de los procesos antes de asignar recursos.");
+			return;
+		}
 		// asigna la primer maquina o trabajador disponible a cada detalle
-		// solo si el detalle no es cancelado
 		Worker worker = null;
 		Machine machine = null;
-		if(workerList.size() > 0) {
-			worker = workerList.get(0);
-		}
 		for(ProductionOrderDetail each : productionOrderDetailList) {
 			if(each.getState() == ProcessState.Cancelado) {
 				each.setWorker(null);
 				each.setMachine(null);
-			} else {
-				List<Machine> list = getMachineListByProcessType(each.getProcess().getType());
-				if(list.size() > 0) {
-					machine = list.get(0);
+			} else {// si el detalle no es cancelado
+				List<Worker> availableWorkerList = getAvailableWorkerList(each);
+				List<Machine> availableMachineList = getAvailableMachineList(each);
+				//getMachineListByProcessType(each.getProcess().getType());
+				if(availableMachineList.size() > 0) {
+					machine = availableMachineList.get(0);
+				}
+				if(availableWorkerList.size() > 0) {
+					worker = availableWorkerList.get(0);
 				}
 				each.setWorker(worker);
 				each.setMachine(machine);
 			}
 		}
 		refreshProductionOrderDetailGridView();
-		refreshProcessTypeGridView();
 	}
 
 	@Listen("onChange = #productionOrderStartDatebox")
@@ -580,18 +518,18 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 	private void refreshProcessDates() {
 		Date startDate = getDateTimeStartWork(productionOrderStartDatebox.getValue());
-		// asigna el valor a la clase para que calcule todos los tiempos de los detalles automaticamente
+		// asigna el valor a la clase y hace que calcule todos los tiempos de los detalles
 		currentProductionOrder.setDateStart(startDate);
+		currentProductionOrder.updateDetailDates(startDate);
 		productionOrderDetailList = currentProductionOrder.getDetails();
 		sortProductionOrderDetailListByProcessTypeSequence();
 		productionOrderStartDatebox.setValue(currentProductionOrder.getDateStart());// modifica el valor del datebox para que contenga la hora de inicio
 		productionOrderFinishDatebox.setValue(currentProductionOrder.getDateFinish());
 		refreshProductionOrderDetailGridView();
-		refreshProcessTypeGridView();
 	}
 
 	private Date getDateTimeStartWork(Date startDate) {
-		// devuelve la union entre la fecha del datebox y la hora de inicio de trabajo
+		// devuelve la union entre la fecha del datebox y la hora de inicio del dia
 		if(startDate != null) {
 			Calendar calStartDate = Calendar.getInstance();
 			calStartDate.setTime(startDate);
@@ -629,29 +567,56 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		autoAssignButtonClick();
 	}
 
-	public List<Piece> getProcessTypePieceList(ProcessType processType) {
-		// devuelve la lista de piezas del processType
-		List<Piece> pieceList = new ArrayList<Piece>();
-		for(ProductionOrderDetail each : productionOrderDetailList) {
-			if(processType.equals(each.getProcess().getType())) {
-				pieceList.add(each.getProcess().getPiece());
-			}
-		}
-		return pieceList;
-	}
-
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Listen("onChangeProductionOrderDetailStartDate = #productionOrderDetailGrid")
 	public void doChangeProductionOrderDetailStartDate(ForwardEvent evt) {
-		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
-		Datebox element = (Datebox) evt.getOrigin().getTarget();// obtenemos el elemento web
-		data.setDateStart(element.getValue());
+		final ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
+		final Datebox element = (Datebox) evt.getOrigin().getTarget();// obtenemos el elemento web
+		// se verifica que la hora este dentro del horario de trabajo
+		if(ProductionDateTimeHelper.isOutsideWorkingHours(element.getValue())) {
+			alert("Error en la Hora. Debe seleccionar un horario entre las " + ProductionDateTimeHelper.getFormattedFirst() + " hs y las " + ProductionDateTimeHelper.getFormattedLast() + " hs");
+			// se regresa al valor original
+			element.setValue(data.getDateStart());
+			return;
+		}
+		// se envia el mensaje: se modificaran tiempos de los procesos posteriores para que no se superpongan
+		Messagebox.show("Los tiempos posteriores se modificaran, y los recursos asignados se removeran, desea continuar?", "Confirmar Modificacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+			public void onEvent(Event evt) throws InterruptedException {
+				if (evt.getName().equals("onOK")) {
+					changeProductionOrderDetailDates(data, element);
+				} else {
+					// si se cancela se regresa al valor original
+					element.setValue(data.getDateStart());
+				}
+			}
+		});
+	}
+
+	private void changeProductionOrderDetailDates(ProductionOrderDetail productionOrderDetail, Datebox datebox) {
+		changeDetailStartDate(productionOrderDetail, datebox);
+		// recalcula todos los tiempos de los procesos posteriores para que inicien en el final
+		changeRemainDetailsDate(productionOrderDetail);
+		// se hace refresh de la lista para q aparezcan los cambios
+		refreshProductionOrderDetailGridView();
+		// se actualizan los datebox de inicio y fin
+		productionOrderStartDatebox.setValue(productionOrderDetail.getProductionOrder().getStartDateFromDetails());
+		productionOrderFinishDatebox.setValue(productionOrderDetail.getProductionOrder().getFinishDateFromDetails());
+	}
+
+	private void changeDetailStartDate(ProductionOrderDetail detail, Datebox dateboxStart) {
+		detail.setDateStart(dateboxStart.getValue());
 		// cambia la fecha de fin tambien
-		Date finish = ProductionDateTimeHelper.getFinishDate(element.getValue(), data.getTimeTotal());
-		data.setDateFinish(finish);
+		Date finish = ProductionDateTimeHelper.getFinishDate(dateboxStart.getValue(), detail.getTimeTotal());
+		detail.setDateFinish(finish);
+		// se remueven las maquinas y empleados asignados, ya que puede ser que esten no disponibles para el nuevo horario
+		detail.setWorker(null);
+		detail.setMachine(null);
 		// cambia el valor del elemento con fecha fin
-		Row fila = (Row)element.getParent();
-		Datebox dateboxFinish = (Datebox) fila.getChildren().get(fila.getChildren().size()-7);
-		dateboxFinish.setValue(finish);
-		//TODO: recalcular todos los tiempos de los procesos posteriores para que inicien el final
+		//dateboxFinishSetValue(dateboxStart, finish); en lugar de cambiar el elemento se hace refresh de la lista
+	}
+
+	private void changeRemainDetailsDate(ProductionOrderDetail detail) {
+		ProductionOrder productionOrder = detail.getProductionOrder();
+		productionOrder.updateRemainDetailDates(detail);
 	}
 }

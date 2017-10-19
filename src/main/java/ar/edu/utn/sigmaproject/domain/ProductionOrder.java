@@ -29,36 +29,36 @@ public class ProductionOrder implements Serializable, Cloneable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 
 	@ManyToOne
-	ProductionPlan productionPlan;
+	private ProductionPlan productionPlan;
 
 	@ManyToOne
-	Product product;
+	private Product product;
 
 	@ManyToOne
-	Worker worker;
+	private Worker worker;
 
 	@OneToMany(orphanRemoval = true)
-	List<ProductionOrderState> states = new ArrayList<>();
+	private List<ProductionOrderState> states = new ArrayList<>();
 
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionOrder", targetEntity = ProductionOrderDetail.class)
 	@OrderColumn(name = "detail_index")
-	List<ProductionOrderDetail> details = new ArrayList<>();
+	private List<ProductionOrderDetail> details = new ArrayList<>();
 
-	Integer sequence = 0;
-	Integer number = 0;
-	Integer units = 0;
-	Date dateStart = null;
-	Date dateFinish = null;
-	Date dateStartReal = null;
-	Date dateFinishReal = null;
-	Date dateMaterialsWithdrawal = null;
-	ProductionOrderStateType currentStateType = null;
+	private Integer sequence = 0;
+	private Integer number = 0;
+	private Integer units = 0;
+	private Date dateStart = null;
+	private Date dateFinish = null;
+	private Date dateStartReal = null;
+	private Date dateFinishReal = null;
+	private Date dateMaterialsWithdrawal = null;
+	private ProductionOrderStateType currentStateType = null;
 
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionOrder", targetEntity = ProductionOrderMaterial.class)
-	List<ProductionOrderMaterial> productionOrderMaterials = new ArrayList<>();
+	private List<ProductionOrderMaterial> productionOrderMaterials = new ArrayList<>();
 
 	public ProductionOrder() {
 
@@ -131,7 +131,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 
 	public void setDateStart(Date dateStart) {
 		this.dateStart = dateStart;
-		updateDetailDates(dateStart);// se calculan las fechas de los detalles automaticamente
+		//updateDetailDates(dateStart);// se calculan las fechas de los detalles automaticamente
 	}
 
 	public Date getDateFinish() {
@@ -294,7 +294,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 		return list;
 	}
 
-	private void updateDetailDates(Date startDate) {
+	public void updateDetailDates(Date startDate) {
 		Date finishDate = null;
 		if(startDate != null) {
 			for(ProductionOrderDetail each : getDetails()) {
@@ -315,11 +315,16 @@ public class ProductionOrder implements Serializable, Cloneable {
 					each.setDateStartReal(null);
 					each.setDateFinishReal(null);
 				}
+				// se remueven las maquinas y empleados asignados, ya que puede ser que esten no disponibles para el nuevo horario
+				each.setWorker(null);
+				each.setMachine(null);
 			}
 		} else {
 			for(ProductionOrderDetail each : getDetails()) {
 				each.setDateStart(null);
 				each.setDateFinish(null);
+				each.setWorker(null);
+				each.setMachine(null);
 			}
 		}
 		setDateFinish(finishDate);// se usa la ultima fecha como el fin de la orden de produccion
@@ -370,10 +375,14 @@ public class ProductionOrder implements Serializable, Cloneable {
 	}
 
 	public Date getStartDateFromDetails() {
+		// solo si todos tienen fecha fin e inicio
 		Date date = null;
 		for(ProductionOrderDetail each : getDetails()) {
 			if(each.getState() != ProcessState.Cancelado) {
 				Date startDate = each.getDateStart();
+				if(each.getDateFinish() == null || startDate == null) {
+					return null;
+				}
 				if(startDate != null) {
 					if(date == null) {
 						date = startDate;
@@ -440,5 +449,56 @@ public class ProductionOrder implements Serializable, Cloneable {
 			percentComplete = (quantityFinished * 100) / quantityTotalNotCanceled;
 		}
 		return percentComplete + " %";
+	}
+
+	public void updateRemainDetailDates(ProductionOrderDetail changedDetail) {
+		// busca el detalle cambiado y modifica las fechas posteriores a el
+		boolean startUpdating = false;
+		Date finishDate = null;
+		Date startDate = null;
+		for(ProductionOrderDetail each : getDetails()) {
+			if(startUpdating) {
+				if(each.getState() != ProcessState.Cancelado) {// solo se calcula para los procesos que no esten cancelados
+					if(finishDate == null) {// si es la primera vez que ingresa
+						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, each.getTimeTotal());
+					} else {
+						// el inicio de la actual es al finalizar la ultima
+						startDate = finishDate;
+						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, each.getTimeTotal());
+					}
+					each.setDateStart(startDate);
+					each.setDateFinish(finishDate);
+				} else {
+					each.setDateStart(null);
+					each.setDateFinish(null);
+					// por las dudas borramos tambien las fechas reales
+					each.setDateStartReal(null);
+					each.setDateFinishReal(null);
+				}
+				// se remueven las maquinas y empleados asignados, ya que puede ser que esten no disponibles para los nuevos horarios
+				each.setWorker(null);
+				each.setMachine(null);
+			}
+			if(each.getProcess().equals(changedDetail.getProcess())) {
+				startUpdating = true;
+				startDate = changedDetail.getDateFinish();
+			}
+		}
+	}
+
+	public boolean isReady() {
+		// devuelve true si todos los detalles tienen asignado las fechas, los empleados y las maquinas
+		for(ProductionOrderDetail each : getDetails()) {
+			if(each.getState() != ProcessState.Cancelado) {
+				MachineType machineType = each.getProcess().getType().getMachineType();
+				if (machineType!=null && each.getMachine()==null) {
+					return false;
+				}
+				if(each.getDateStart()==null || each.getWorker()==null) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 }

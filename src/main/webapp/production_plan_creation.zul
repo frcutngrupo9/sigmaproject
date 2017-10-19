@@ -61,7 +61,7 @@
             			<column label="Fecha Necesidad" align="center"/>
             			<column label="Cliente" align="center"/>
            			 	<column label="Cantidad Productos Distintos" align="center"/>
-           			 	<column label="Quitar" width="120px" align="center"/>
+           			 	<column label="Accion" width="120px" align="center"/>
         			</columns>
         			<template name="model">
             			<row>
@@ -101,9 +101,10 @@
         			</template>
     			</listbox>
     			<hlayout>
-                    <button id="saveProductionPlanButton" label="Guardar Plan de Produccion"/>
-                    <button id="resetProductionPlanButton" label="Reset Plan de Produccion"/>
-                    <button id="deleteProductionPlanButton" label="Eliminar Plan de Produccion"/>
+                    <button id="saveProductionPlanButton" label="Guardar"/>
+                    <button id="resetProductionPlanButton" label="Reset"/>
+                    <button id="deleteProductionPlanButton" label="Eliminar"/>
+                    <button id="newProductionPlanButton" label="Nuevo"/>
                     <hbox pack="center" align="center" hflex="1">
 			        	<button id="returnButton" label="Ir a Listado"/>
 			        	<button id="returnToProductionButton" label="Ir a Produccion"/>

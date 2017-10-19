@@ -26,6 +26,7 @@ import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Spinner;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
@@ -241,7 +242,9 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 			}
 		}
 		if(currentMaterialsOrder.isTotallyReceived()) {
-			updateProductionPlanState(productionPlan);// actualiza el estado del plan a abastecido
+			if(productionPlan != null) {// solo se actualiza el estado si tiene plan asignado
+				updateProductionPlanState(productionPlan);// actualiza el estado del plan a abastecido
+			}
 		} else {
 			// crea otro pedido de materiales con las cantidades que aun no se recibieron en caso de que no se haya recibido completamente
 			alert("Se Creara un nuevo Pedido para los Materiales Faltantes.");
@@ -257,12 +260,14 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 	public void doOrderDetailsChange(ForwardEvent evt) {
 		MaterialsOrderDetail data = (MaterialsOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
 		InputEvent inputEvent = (InputEvent) evt.getOrigin();
+		Spinner origin = (Spinner)evt.getOrigin().getTarget();
 		String inputValue = inputEvent.getValue();
 		BigDecimal value = null;
 		if(inputValue == null || inputValue.equals("")) {
 			value = BigDecimal.ZERO;
 		} else {
-			value = new BigDecimal(inputValue);
+			origin.setValue(Integer.valueOf(inputEvent.getValue()));
+			value = new BigDecimal(origin.intValue());
 		}
 		data.setQuantityReceived(value);
 	}
