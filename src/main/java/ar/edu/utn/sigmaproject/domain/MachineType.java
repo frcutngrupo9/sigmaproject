@@ -23,19 +23,19 @@ public class MachineType implements Serializable, Cloneable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 
 	@Field
-	String name = "";
+	private String name = "";
 
 	@Field
-	String details = "";
+	private String details = "";
 
 	@Transient
-	Duration deteriorationTime;
+	private Duration deteriorationTime;
 
 	@Column
-	String deteriorationTimeInternal;
+	private String deteriorationTimeInternal;
 
 	public MachineType() {
 

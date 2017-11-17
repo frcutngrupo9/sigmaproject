@@ -32,22 +32,22 @@ public class Machine implements Serializable, Cloneable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@DocumentId
-	Long id;
+	private Long id;
 
 	@ManyToOne
-	MachineType machineType;
+	private MachineType machineType;
 
 	@Field
-	String name = "";
+	private String name = "";
 
 	@Field
-	Integer year = Calendar.getInstance().get(Calendar.YEAR);
+	private Integer year = Calendar.getInstance().get(Calendar.YEAR);
 
 	@Transient
-	Duration usedTime;
+	private Duration usedTime;
 
 	@Column
-	String usedTimeInternal;
+	private String usedTimeInternal;
 
 	public Machine() {
 
