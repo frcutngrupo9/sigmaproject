@@ -1,3 +1,27 @@
+/*
+ * The MIT License
+ *
+ * Copyright (C) 2017 SigmaProject.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package ar.edu.utn.sigmaproject.service;
 
 import java.util.Date;
@@ -10,17 +34,7 @@ import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 
 @Repository
 public interface ProductionOrderDetailRepository extends JpaRepository<ProductionOrderDetail, Long> {
-	
+
 	public List<ProductionOrderDetail> findByDateFinishAfterAndDateStartBefore(Date dateStart, Date dateFinish);
-	
-	/*
-	 * deberia crearse un metodo que busque los detalles que se superponen pero que solo busque en los planes u ordenes
-	 * que no estan finalizados o cancelados o que no tienen asignado un recurso
-	@Query("select u from ProductionOrderDetail u where u.dateFinish after %?1 and u.dateStart before %?2")
-	public List<ProductionOrderDetail> findOverlappingDetailDates(Date dateStart, Date dateFinish);
-	
-	@Query("SELECT p FROM ProductionOrderDetail p WHERE LOWER(p.lastName) = LOWER(:lastName)")
-    public List<ProductionOrderDetail> find(@Param("lastName") String lastName);
-    */
-	
+
 }

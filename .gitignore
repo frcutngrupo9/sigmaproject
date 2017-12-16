@@ -1,5 +1,4 @@
 .settings/
-src/main/java/ar/edu/utn/sigmaproject/persistence
 assembly/
 target/
 /data

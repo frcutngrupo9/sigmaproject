@@ -1,3 +1,27 @@
+<!--
+The MIT License
+
+Copyright (C) 2017 SigmaProject.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-->
+
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="win_production_order_list" title="Ordenes de Produccion" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductionOrderListController" sclass="sigma-content">
     <panel id="productionOrderCreationBlock" border="none">
@@ -44,12 +68,10 @@
 		            </columns>
 		            <template name="model">
 		                <row>
-		                <!--
-		                	<custom-attributes production_order_detail_list="${win_production_order_list$composer.getProductionOrderDetailList(each)}"/>
-			            	<detail open="false" fulfill="onOpen" visible="${win_production_order_list$composer.getProductionOrder(each) != null}">
+		                	<!-- <custom-attributes production_order_detail_list="${win_production_order_list$composer.getProductionOrderDetailList(each)}"/>
+			            	<detail open="false" fulfill="onOpen">
 			            		<include src="/production_order_processes.zul" production_order_detail_list="${production_order_detail_list}"/>
-			            	</detail>
-			            -->
+			            	</detail>-->
 			            	<custom-attributes product_image="${r:getProductImage(each.product)}"/>
 			            	<button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})"  label="Abrir" disabled="${win_production_order_list$composer.isProductionPlanStateCancel()}"/>
 			            	<!-- <spinner value="${each.sequence}" constraint="no empty, min 1" forward="onChanging=productionOrderGrid.onEditProductionOrderSequence(${each})" width="60px"/> -->
