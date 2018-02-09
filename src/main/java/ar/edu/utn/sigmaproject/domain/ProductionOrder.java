@@ -74,6 +74,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 	private Integer sequence = 0;
 	private Integer number = 0;
 	private Integer units = 0;
+	private Integer unitsFinish = 0;
 	private Date dateStart = null;
 	private Date dateFinish = null;
 	private Date dateStartReal = null;
@@ -147,6 +148,14 @@ public class ProductionOrder implements Serializable, Cloneable {
 
 	public void setUnits(Integer units) {
 		this.units = units;
+	}
+
+	public Integer getUnitsFinish() {
+		return unitsFinish;
+	}
+
+	public void setUnitsFinish(Integer unitsFinish) {
+		this.unitsFinish = unitsFinish;
 	}
 
 	public Date getDateStart() {

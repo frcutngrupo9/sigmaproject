@@ -41,4 +41,11 @@
             org.zkoss.image.Image getProductImage(ar.edu.utn.sigmaproject.domain.Product product)
         </function-signature>
     </function>
+    <function>
+        <name>getReportTypeListModelList</name>
+        <function-class>ar.edu.utn.sigmaproject.util.RenderElHelper</function-class>
+        <function-signature>
+            org.zkoss.zul.ListModelList.ListModelList getReportTypeListModelList()
+        </function-signature>
+    </function>
 </taglib>

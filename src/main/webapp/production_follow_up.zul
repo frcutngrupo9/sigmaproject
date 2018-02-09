@@ -45,10 +45,12 @@ THE SOFTWARE.
 				        			<textbox id="productionPlanStateTypeTextbox"/>
 		                        </row>
 		                        <row>
-		                            <label value="Producto: "/>
-									<textbox id="productNameTextbox" width="370px"/>
-									<label value="Cantidad: "/>
-									<intbox id="productUnitsIntbox" width="40px"/>
+		                            <cell colspan="2" align="right">
+		                            	<label value="Producto: "/>
+		                            </cell>
+		                            <cell colspan="2" align="left">
+										<textbox id="productNameTextbox" width="390px"/>
+									</cell>
 		                        </row>
 		                        <row>
 		                            <label value="Fecha Inicio Estimada: "/>
@@ -61,6 +63,12 @@ THE SOFTWARE.
 									<datebox buttonVisible="false" disabled="true" id="productionOrderRealStartDatebox" cols="12" format="dd-MM-yyyy HH:mm" width="110px"/>
 									<label value="Fecha Finalizacion Real: "/>
 									<datebox buttonVisible="false" disabled="true" id="productionOrderRealFinishDatebox" cols="12" format="dd-MM-yyyy HH:mm" width="110px"/>
+		                        </row>
+		                        <row>
+		                            <label value="Cantidad: "/>
+									<textbox id="productUnitsIntbox" width="40px"/>
+									<label value="Cantidad Finalizada: "/>
+									<intbox id="productUnitsFinishIntbox" width="40px"/>
 		                        </row>
 		                    </rows>
 		                </grid>

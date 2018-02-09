@@ -38,6 +38,7 @@ import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
 
 import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.domain.ReportType;
 
 public class RenderElHelper {
 
@@ -98,6 +99,10 @@ public class RenderElHelper {
 			return img;
 		}
 		return img;
+	}
+	
+	public static ListModelList<ReportType> getReportTypeListModelList() {
+		return new ListModelList<ReportType>(ReportType.getReportTypeList());
 	}
 
 }
