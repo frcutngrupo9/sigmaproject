@@ -25,9 +25,17 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRField;
 
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
@@ -42,10 +50,13 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zk.ui.util.Clients;
+import org.zkoss.zkex.zul.Jasperreport;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
+import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
@@ -54,6 +65,7 @@ import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
+import ar.edu.utn.sigmaproject.domain.ReportType;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
@@ -68,6 +80,12 @@ public class OrderListController extends SelectorComposer<Component> {
 	Grid orderGrid;
 	@Wire
 	Button newOrderButton;
+	@Wire
+	Listbox reportTypeListbox;
+	@Wire
+	Button clientOrdersReportButton;
+	@Wire
+	Jasperreport clientOrdersJasperreport;
 
 	// services
 	@WireVariable
@@ -195,5 +213,74 @@ public class OrderListController extends SelectorComposer<Component> {
 
 	public BigDecimal getSubTotal(int units, BigDecimal price) {
 		return price.multiply(new BigDecimal(units));
+	}
+
+	@Listen("onClick = #clientOrdersReportButton")
+	public void reportButtonClick() {
+		if(reportTypeListbox.getSelectedItem() != null) {
+			ReportType reportType = (ReportType)(reportTypeListbox.getSelectedItem().getValue());
+			String selectedReportType = reportType.getValue();
+			loadJasperreport(selectedReportType);
+		} else {
+			Clients.showNotification("Tipo de reporte no seleccionado");
+		}
+	}
+
+	private void loadJasperreport(String type) {
+		Map<String, Object> parameters;
+		parameters = new HashMap<String, Object>();
+		parameters.put("ReportTitle", "Reporte de Pedidos");
+		parameters.put("DataFile", "Productos pedidos por cliente");
+
+		// crea la lista que sera enviada al reporte
+		List<OrderDetail> orderDetailList = new ArrayList<OrderDetail>();
+		for(Order each : orderList) {
+			orderDetailList.addAll(each.getDetails());
+		}
+		
+		clientOrdersJasperreport.setSrc("/jasperreport/client_order_products.jasper");
+		clientOrdersJasperreport.setParameters(parameters);
+		clientOrdersJasperreport.setType(type);
+		clientOrdersJasperreport.setDatasource(new ClientOrdersReportDataSource(orderDetailList));
+	}
+}
+
+class ClientOrdersReportDataSource implements JRDataSource {
+
+	private List<OrderDetail> orderDetailList = new ArrayList<OrderDetail>();
+	private int index = -1;
+
+	public ClientOrdersReportDataSource(List<OrderDetail> orderDetailList) {
+		this.orderDetailList.addAll(orderDetailList);
+	}
+
+	public boolean next() throws JRException {
+		index++;
+		return (index < orderDetailList.size());
+	}
+
+	public Object getFieldValue(JRField field) throws JRException {
+		Object value = null;
+		String fieldName = field.getName();
+		if ("client_name".equals(fieldName)) {
+			value = orderDetailList.get(index).getOrder().getClient().getName();
+		} else if ("product_code".equals(fieldName)) {
+			value = orderDetailList.get(index).getProduct().getCode();
+		} else if ("product_name".equals(fieldName)) {
+			value = orderDetailList.get(index).getProduct().getDescription();
+		} else if ("product_units".equals(fieldName)) {
+			value = orderDetailList.get(index).getUnits();
+		} else if ("order_number".equals(fieldName)) {
+			value = orderDetailList.get(index).getOrder().getNumber();
+		} else if ("order_date".equals(fieldName)) {
+			Date date = orderDetailList.get(index).getOrder().getNeedDate();
+			if(date != null) {
+				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				value = dateFormat.format(date);
+			} else {
+				value = "";
+			}
+		}
+		return value;
 	}
 }

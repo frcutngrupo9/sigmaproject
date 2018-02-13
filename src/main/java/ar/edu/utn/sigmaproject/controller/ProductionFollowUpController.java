@@ -122,6 +122,8 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	@Wire
 	Intbox productUnitsIntbox;
 	@Wire
+	Intbox productUnitsFinishIntbox;
+	@Wire
 	Datebox productionOrderStartDatebox;
 	@Wire
 	Datebox productionOrderFinishDatebox;
@@ -226,6 +228,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		productionPlanNameTextbox.setDisabled(true);
 		productNameTextbox.setDisabled(true);
 		productUnitsIntbox.setDisabled(true);
+		productUnitsFinishIntbox.setDisabled(false);
 		productionPlanStateTypeTextbox.setDisabled(true);
 		productionPlanNameTextbox.setText(currentProductionPlan.getName());
 		ProductionPlanStateType lastProductionPlanStateType = currentProductionPlan.getCurrentStateType();
@@ -236,6 +239,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		}
 		productNameTextbox.setText(currentProductionOrder.getProduct().getName());
 		productUnitsIntbox.setValue(currentProductionOrder.getUnits());
+		productUnitsFinishIntbox.setValue(0);
 		productionOrderStartDatebox.setValue(currentProductionOrder.getDateStart());
 		productionOrderFinishDatebox.setValue(currentProductionOrder.getDateFinish());
 		productionOrderRealStartDatebox.setValue(currentProductionOrder.getDateStartReal());
@@ -270,6 +274,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		productionOrderMaterials.addAll(productionOrderRawMaterialList);
 		currentProductionOrder.setProductionOrderMaterials(productionOrderMaterials);
 		// el estado de la orden debe cambiar automaticamente a 3 estados: Preparada, Iniciada, Finalizada
+		// TODO si esta finalizada no se debe poder modificar.
 		ProductionOrderStateType newStateType = getProductionOrderStateType();
 		ProductionOrderStateType productionOrderStateType = null;
 		if(!lastStateType.equals(newStateType)) {// si el estado anterior es distindo del nuevo
@@ -279,6 +284,11 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 					alert("Se registrara el Retiro de Materiales de Stock.");
 					materialsWithdrawalAction();
 				}
+				// se actualiza el stock de productos
+				Product product = currentProductionOrder.getProduct();
+				// TODO: sumar las cantidades REALES que se produjeron
+				product.setStock(product.getStock() + currentProductionOrder.getUnits());
+				product = productRepository.save(product);
 			}
 			productionOrderStateType = newStateType;
 		}
@@ -286,6 +296,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		Date dateFinishReal = currentProductionOrder.getFinishRealDateFromDetails();
 		currentProductionOrder.setDateStartReal(dateStartReal);
 		currentProductionOrder.setDateFinishReal(dateFinishReal);
+		currentProductionOrder.setUnitsFinish(productUnitsFinishIntbox.getValue());
 		if(productionOrderStateType != null) {
 			ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateType, new Date());
 			productionOrderState = productionOrderStateRepository.save(productionOrderState);
@@ -346,8 +357,10 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 					orderRepository.save(order);
 				}
 			}
+			/*
 			// se modifica la cantidad en stock de los productos si el estado del plan es Finalizado
 			if(newProductionPlanStateType.getName().equalsIgnoreCase("Finalizado")) {
+				// TODO: Eliminar este metodo y hacer que el stock cambie al finalizar cada orden de produccion
 				for(ProductionOrder each : productionOrderList) {
 					Product product = each.getProduct();
 					// TODO: sumar las cantidades REALES que se produjeron
@@ -355,6 +368,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 					product = productRepository.save(product);
 				}
 			}
+			*/
 		}
 	}
 
