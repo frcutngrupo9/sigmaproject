@@ -29,10 +29,11 @@ THE SOFTWARE.
             <vlayout>
     			<grid id="productionOrderGrid" sizedByContent="true" span="true" emptyMessage="No existen Ordenes Preparadas.">
     				<auxhead>
-						<auxheader label="Ordenes Preparadas" colspan="13"/>
+						<auxheader label="Ordenes Preparadas" colspan="14"/>
 					</auxhead>
         			<columns>
         				<column label="Accion" align="center"/>
+        				<column label="Diagrama" align="center"/>
         				<column label="Plan de Produccion" align="center"/>
         				<column label="Secuencia" align="center"/>
         				<column label="Foto" align="center"/>
@@ -50,6 +51,7 @@ THE SOFTWARE.
 		                <row>
 		                	<custom-attributes product_image="${r:getProductImage(each.product)}"/>
 		                	<button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})"  label="Abrir"/>
+		                	<button forward="onClick=productionOrderGrid.onGanttProductionOrder(${each})"  label="Gantt"/>
 			            	<label value="${each.productionPlan.name}"/>
 			            	<label value="${each.sequence}" width="60px"/>
 			            	<cell>
