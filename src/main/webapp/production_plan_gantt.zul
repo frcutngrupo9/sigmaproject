@@ -23,15 +23,31 @@ THE SOFTWARE.
 -->
 
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
-<window id="win_production_order_gantt" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductionOrderGanttController" sclass="sigma-content">
+<window id="win_production_plan_gantt" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductionPlanGanttController" sclass="sigma-content">
     <panel id="productionOrderCreationBlock" border="none">
         <panelchildren>
             <vlayout>
-                <hbox hflex="1" pack="center">
+                <hbox hflex="1" pack="left">
+	                <label value="Plan de produccion: "/>
+	                <listbox id="productionPlanListbox" mold="select">
+						<template name="model">
+							<listitem>
+								<listcell value="${each}" label="${each.name}"/>
+							</listitem>
+						</template>
+					</listbox>
+					<separator/>
+					<label value="Combinacion de Colores: "/>
+					<listbox id="themeColorSelectListbox" mold="select">
+	                    <listitem label="Estilo 1" value="1" selected="true"/>
+	                    <listitem label="Estilo 2" value="2"/>
+	                    <listitem label="Estilo 3" value="3"/>
+                	</listbox>
+                	<separator/>
                 	<button id="cancelButton" label="Volver"/>
                 </hbox>
                 <hbox hflex="1" pack="center">
-                	<chart id="ganttChart" width="820" height="400" fgAlpha="255" paneColor="#ffffff"/>
+                	<chart id="ganttChart" width="850" height="400" fgAlpha="255" paneColor="#ffffff"/>
                 </hbox>
             </vlayout>
         </panelchildren>

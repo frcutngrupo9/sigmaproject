@@ -402,7 +402,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #cancelButton")
 	public void cancelButtonClick() {
-		Include include = (Include) Selectors.iterable(productionOrderDetailGrid.getPage(), "#mainInclude").iterator().next();
+		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/production_follow_up_list.zul");
 	}
 

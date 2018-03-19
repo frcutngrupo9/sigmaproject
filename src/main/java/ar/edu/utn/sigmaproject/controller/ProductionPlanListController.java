@@ -116,6 +116,14 @@ public class ProductionPlanListController extends SelectorComposer<Component> {
 		Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/requirement_plan_creation.zul");
 	}
+	
+	@Listen("onOpenGanttPlan = #productionPlanGrid")
+	public void goToGanttPlan(ForwardEvent evt) {
+		ProductionPlan productionPlan = (ProductionPlan) evt.getData();
+		Executions.getCurrent().setAttribute("selected_production_plan", productionPlan);
+		Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/production_plan_gantt.zul");
+	}
 
 	private List<ProductTotal> getProductTotalList(ProductionPlan productionPlan) {
 		List<ProductionPlanDetail> productionPlanDetailList = productionPlan.getPlanDetails();

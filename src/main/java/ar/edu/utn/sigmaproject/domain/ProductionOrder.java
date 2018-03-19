@@ -462,7 +462,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 		Collections.sort(details, comp);
 	}
 
-	public String getPercentComplete() {
+	public double getPercent() {
 		List<ProductionOrderDetail> productionOrderDetailList = getDetails();
 		int quantityFinished = 0;
 		int quantityCanceled = 0;
@@ -481,7 +481,11 @@ public class ProductionOrder implements Serializable, Cloneable {
 		} else {
 			percentComplete = (quantityFinished * 100) / quantityTotalNotCanceled;
 		}
-		return percentComplete + " %";
+		return percentComplete;
+	}
+	
+	public String getPercentComplete() {
+		return getPercent() + " %";
 	}
 
 	public void updateRemainDetailDates(ProductionOrderDetail changedDetail) {
