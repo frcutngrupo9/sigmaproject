@@ -39,8 +39,8 @@ THE SOFTWARE.
         				<column label="Foto" align="center"/>
         				<column label="Producto" align="center"/>
         				<column label="Cantidad" align="center"/>
-        				<column label="Inicio Estimado" align="center"/>
-		                <column label="Fin Estimado" align="center"/>
+        				<column label="Inicio" align="center"/>
+		                <column label="Fin" align="center"/>
 		                <column label="% Completo" align="center"/>
 		                <column label="Duracion Total" align="center"/>
 		                <column label="Duracion Unidad" align="center"/>

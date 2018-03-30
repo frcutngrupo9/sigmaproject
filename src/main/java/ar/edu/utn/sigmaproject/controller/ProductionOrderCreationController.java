@@ -32,9 +32,9 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import javax.xml.datatype.Duration;
 
@@ -54,12 +54,9 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
-import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zkex.zul.Jasperreport;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
-import org.zkoss.zul.Combobox;
-import org.zkoss.zul.Comboitem;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Image;
@@ -69,6 +66,7 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
@@ -81,7 +79,6 @@ import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderStateType;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
-import ar.edu.utn.sigmaproject.domain.ReportType;
 import ar.edu.utn.sigmaproject.domain.Worker;
 import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
@@ -329,45 +326,120 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		return false;
 	}
 
-	public ListModelList<Machine> getMachineListModel(ProductionOrderDetail productionOrderDetail) {
+	public ListModelList<Machine> getCompleteMachineListModel(ProductionOrderDetail productionOrderDetail) {
 		if (productionOrderDetail.getProcess().getType().getMachineType() == null || isProductionOrderDetailNotValid(productionOrderDetail)) {
 			return new ListModelList<>(new ArrayList<Machine>());
 		}
-		// devuelve las maquinas que no estan asignadas en el horario del proceso
-		return new ListModelList<>(getAvailableMachineList(productionOrderDetail));
+		// devuelve todas las maquinas del mismo tipo
+		return new ListModelList<>(getMachineListByProcessType(productionOrderDetail.getProcess().getType()));
 	}
-
-	private List<Machine> getAvailableMachineList(ProductionOrderDetail productionOrderDetail) {
-		// buscan solo las maquinas del mismo tipo
-		List<Machine> list = getMachineListByProcessType(productionOrderDetail.getProcess().getType());;
-		List<ProductionOrderDetail> overlappingDetails = getOverlappingDetails(productionOrderDetail);
-		// se remueven los detalles que no requieren maquina
-		List<ProductionOrderDetail> nullMachineTypeDetails = new ArrayList<ProductionOrderDetail>();
-		for(ProductionOrderDetail each : overlappingDetails) {
-			if(each.getProcess().getType().getMachineType() == null) {
-				nullMachineTypeDetails.add(each);
+	
+	private List<Machine> getMachineListByProcessType(ProcessType processType) {
+		List<Machine> list = new ArrayList<Machine>();
+		if(processType.getMachineType() != null) {
+			MachineType machineType = machineTypeRepository.findOne(processType.getMachineType().getId());
+			if (machineType != null) {
+				for (Machine machine : machineList) {
+					if (machineType.equals(machineTypeRepository.findOne(machine.getMachineType().getId()))) {
+						list.add(machine);
+					}
+				}
 			}
-		}
-		for(ProductionOrderDetail each : nullMachineTypeDetails) {
-			overlappingDetails.remove(each);
-		}
-		for(Machine each : getUnavailableMachineSet(overlappingDetails, productionOrderDetail.getProcess().getType())) {
-			list.remove(machineRepository.findOne(each.getId()));
 		}
 		return list;
 	}
 
-	private Set<Machine> getUnavailableMachineSet(List<ProductionOrderDetail> productionOrderDetailList, ProcessType processType) {
-		Set<Machine> machineSet = new HashSet<Machine>();
-		if(processType.getMachineType() != null) {
-			for(ProductionOrderDetail each : productionOrderDetailList) {
-				// se agregan solo las del mismo tipo
-				if(each.getProcess().getType().getMachineType().equals(machineTypeRepository.findOne(processType.getMachineType().getId()))) {
-					machineSet.add(each.getMachine());
+	public String getMachineAvailabilityDescription(Machine machine, ProductionOrderDetail productionOrderDetail) {
+		String availabilityText = "";
+		if (machine == null || productionOrderDetail == null) {
+			return availabilityText;
+		}
+		// devuelve el estado de la maquina
+		// se busca todos los detalles de las ordenes que esten superpuestas en horario y sean el mismo tipo de maquina
+		List<ProductionOrderDetail> machineOverlappingDetails = getMachineOverlappingDetails(productionOrderDetail);
+		// se elimina la orden actual y se busca en las restantes ordenes si la maquina parametro es la misma asignada
+		machineOverlappingDetails.remove(productionOrderDetailRepository.findOne(productionOrderDetail.getId()));
+		for(ProductionOrderDetail each : machineOverlappingDetails) {
+			if(machineRepository.findOne(each.getMachine().getId()).equals(machineRepository.findOne(machine.getId()))) {
+				String descriptionWhere = each.getProductionOrder().getProductionPlan().getName() + " orden " + each.getProductionOrder().getNumber() + " " + each.getProcess().getType().getName() + " " + each.getProcess().getPiece().getName();
+				// si es la primera vez
+				if(availabilityText.equals("")) {
+					availabilityText = "No Disponible (usada en " + descriptionWhere;
+				} else {
+					// si esta tambien en otra orden
+					availabilityText += ", " + descriptionWhere;
 				}
 			}
 		}
-		return machineSet;
+		// si encontro algun solapamiento
+		if(!availabilityText.equals("")) {
+			availabilityText += ")";
+		} else {
+			availabilityText = "Disponible";
+		}
+		return availabilityText;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Listen("onSelectMachineListbox = #productionOrderDetailGrid")
+	public void doSelectMachineListbox(ForwardEvent evt) {
+		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
+		Listbox element = (Listbox) evt.getOrigin().getTarget();// obtenemos el elemento web
+		Machine machineSelected = (Machine)element.getSelectedItem().getValue();
+		// comprueba que la maquina seleccionada no este ocupada en otra orden, en ese caso mostrar mensaje y volver al valor anterior, caso contrario asignar
+		if(isMachineAvailable(machineSelected, data)) {
+			data.setMachine(machineSelected);// cargamos al objeto el valor actualizado del elemento web
+			refreshProductionOrderDetailGridView();
+		} else {
+			//alert("Maquina no disponible en ese horario");
+			final Machine machineSelectedFinal = machineSelected;
+			final ProductionOrderDetail dataFinal = data;
+			// pregunta si se quiere asignar igual estando ocupada
+			Messagebox.show("La maquina no esta disponible en el horario seleccionado, desea asignarla de todas formas?", "Confirmar", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+				public void onEvent(Event evt) throws InterruptedException {
+					if (evt.getName().equals("onOK")) {
+						dataFinal.setMachine(machineSelectedFinal);// cargamos al objeto el valor actualizado del elemento web
+						refreshProductionOrderDetailGridView();
+						alert("Maquina asignada");
+					}
+				}
+			});
+		}
+	}
+
+	private boolean isMachineAvailable(Machine machine, ProductionOrderDetail productionOrderDetail) {
+		if (machine == null || productionOrderDetail == null) {
+			return false;
+		}
+		List<ProductionOrderDetail> machineOverlappingDetails = getMachineOverlappingDetails(productionOrderDetail);
+		// se busca en las restantes ordenes si la maquina parametro es la misma asignada
+		for(ProductionOrderDetail each : machineOverlappingDetails) {
+			if(machineRepository.findOne(each.getMachine().getId()).equals(machineRepository.findOne(machine.getId()))) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private List<ProductionOrderDetail> getMachineOverlappingDetails(ProductionOrderDetail productionOrderDetail) {
+		// busca todos los otros detalles existentes que sus horarios coincidan con el parametro y que requieran y tengan una maquina asignada
+		Date start = productionOrderDetail.getDateStart();
+		Date finish = productionOrderDetail.getDateFinish();
+		List<ProductionOrderDetail> overlappingDetails = productionOrderDetailRepository.findByDateFinishAfterAndDateStartBefore(start, finish);
+		// se elimina de la lista el proceso actual
+		overlappingDetails.remove(productionOrderDetailRepository.findOne(productionOrderDetail.getId()));
+		// se crea una lista con los detalles de ordenes canceladas o finalizadas o sin maquina para luego removerlos de la lista
+		List<ProductionOrderDetail> invalidDetails = new ArrayList<ProductionOrderDetail>();
+		for(ProductionOrderDetail each : overlappingDetails) {
+			if(each.getState() == ProcessState.Cancelado || each.getState() == ProcessState.Realizado || each.getProcess().getType().getMachineType() == null || each.getMachine() == null) {
+				invalidDetails.add(each);
+			}
+		}
+		// se remueven los detalles invalidos de la lista
+		for(ProductionOrderDetail each : invalidDetails) {
+			overlappingDetails.remove(each);
+		}
+		return overlappingDetails;
 	}
 
 	private boolean isProductionOrderDetailNotValid(ProductionOrderDetail productionOrderDetail) {
@@ -375,33 +447,58 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		return productionOrderDetail.getState() == ProcessState.Cancelado || productionOrderDetail.getDateStart() == null || productionOrderDetail.getDateFinish() == null;
 	}
 
-	public ListModelList<Worker> getWorkerListModel(ProductionOrderDetail productionOrderDetail) {
-		// si esta cancelado o si tiene fechas en null, se devuelve una lista vacia
-		if(isProductionOrderDetailNotValid(productionOrderDetail)) {
+	public ListModelList<Worker> getCompleteWorkerListModel(ProductionOrderDetail productionOrderDetail) {
+		if (isProductionOrderDetailNotValid(productionOrderDetail)) {
 			return new ListModelList<>(new ArrayList<Worker>());
 		}
-		// devuelve los empleados disponibles en el horario del proceso
-		return new ListModelList<>(getAvailableWorkerList(productionOrderDetail));
+		return new ListModelList<>(workerRepository.findAll());
 	}
 
-	private List<Worker> getAvailableWorkerList(ProductionOrderDetail productionOrderDetail) {
-		List<Worker> list = workerRepository.findAll();
-		// se eliminan de la lista los empleados que esten asignado a otros procesos en los mismos intervalos de tiempo del proceso actual
-		for(Worker each : getUnavailableWorkerSet(getOverlappingDetails(productionOrderDetail))) {
-			list.remove(workerRepository.findOne(each.getId()));
+	public String getWorkerAvailabilityDescription(Worker worker, ProductionOrderDetail productionOrderDetail) {
+		String availabilityText = "";
+		if (worker == null || productionOrderDetail == null) {
+			return availabilityText;
 		}
-		return list;
-	}
-
-	private Set<Worker> getUnavailableWorkerSet(List<ProductionOrderDetail> productionOrderDetailList) {
-		Set<Worker> workerSet = new HashSet<Worker>();
-		for(ProductionOrderDetail each : productionOrderDetailList) {
-			workerSet.add(each.getWorker());
+		// se busca todos los detalles de las ordenes que esten superpuestas en horario
+		List<ProductionOrderDetail> workerOverlappingDetails = getWorkerOverlappingDetails(productionOrderDetail);
+		// se busca en las restantes ordenes si la maquina parametro es la misma asignada
+		for(ProductionOrderDetail each : workerOverlappingDetails) {
+			if(workerRepository.findOne(each.getWorker().getId()).equals(workerRepository.findOne(worker.getId()))) {
+				String descriptionWhere = each.getProductionOrder().getProductionPlan().getName() + " orden " + each.getProductionOrder().getNumber() + " " + each.getProcess().getType().getName() + " " + each.getProcess().getPiece().getName();
+				// si es la primera vez
+				if(availabilityText.equals("")) {
+					availabilityText = "No Disponible (asignado a " + descriptionWhere;
+				} else {
+					// si esta tambien en otra orden
+					availabilityText += ", " + descriptionWhere;
+				}
+			}
 		}
-		return workerSet;
+		// si encontro algun solapamiento
+		if(!availabilityText.equals("")) {
+			availabilityText += ")";
+		} else {
+			availabilityText = "Disponible";
+		}
+		return availabilityText;
 	}
 
-	private List<ProductionOrderDetail> getOverlappingDetails(ProductionOrderDetail productionOrderDetail) {
+	private boolean isWorkerAvailable(Worker worker, ProductionOrderDetail productionOrderDetail) {
+		if (worker == null || productionOrderDetail == null) {
+			return false;
+		}
+		List<ProductionOrderDetail> workerOverlappingDetails = getWorkerOverlappingDetails(productionOrderDetail);
+		// se busca en las restantes ordenes si la maquina parametro es la misma asignada
+		for(ProductionOrderDetail each : workerOverlappingDetails) {
+			if(workerRepository.findOne(each.getWorker().getId()).equals(workerRepository.findOne(worker.getId()))) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private List<ProductionOrderDetail> getWorkerOverlappingDetails(ProductionOrderDetail productionOrderDetail) {
+		// busca todos los otros detalles existentes que sus horarios coincidan con el parametro y tengan un empleado asignado
 		Date start = productionOrderDetail.getDateStart();
 		Date finish = productionOrderDetail.getDateFinish();
 		List<ProductionOrderDetail> overlappingDetails = productionOrderDetailRepository.findByDateFinishAfterAndDateStartBefore(start, finish);
@@ -421,92 +518,30 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		return overlappingDetails;
 	}
 
-	@Listen("onCreateWorkerCombobox = #productionOrderDetailGrid")
-	public void doCreateWorkerCombobox(ForwardEvent evt) {// metodo utilizado para seleccionar el item del combobox luego de crearlo
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Listen("onSelectWorkerListbox = #productionOrderDetailGrid")
+	public void doSelectWorkerListbox(ForwardEvent evt) {
 		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
-		Combobox element = (Combobox) evt.getOrigin().getTarget();// obtenemos el elemento web
-		int value = -1;
-		if(data.getWorker() != null) {
-			for (int i = 0; i < element.getItems().size(); i++) {
-				Comboitem item = element.getItems().get(i);
-				if (item != null) {
-					Worker worker = (Worker) item.getValue();
-					worker = workerRepository.findOne(worker.getId());// actualiza en base a la BD para poder hacer la comparacion
-					if (worker.equals(workerRepository.findOne(data.getWorker().getId()))) {
-						value = i;
-					}
-				}
-			}
-		}
-		element.setSelectedIndex(value);
-	}
-
-	@Listen("onCreateMachineCombobox = #productionOrderDetailGrid")
-	public void doCreateMachineCombobox(ForwardEvent evt) {// metodo utilizado para seleccionar el item del combobox luego de crearlo
-		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
-		Combobox element = (Combobox) evt.getOrigin().getTarget();// obtenemos el elemento web
-		int value = -1;
-		if(data.getMachine() != null) {
-			for (int i = 0; i < element.getItems().size(); i++) {
-				Comboitem item = element.getItems().get(i);
-				if (item != null) {
-					Machine machine = (Machine) item.getValue();
-					machine = machineRepository.findOne(machine.getId());// actualiza en base a la BD para poder hacer la comparacion
-					if (machine.equals(machineRepository.findOne(data.getMachine().getId()))) {
-						value = i;
-					}
-				}
-			}
-		}
-		element.setSelectedIndex(value);
-	}
-
-	@Listen("onEditProductionOrderDetailWorker = #productionOrderDetailGrid")
-	public void doEditProductionOrderDetailWorker(ForwardEvent evt) {
-		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
-		Combobox element = (Combobox) evt.getOrigin().getTarget();// obtenemos el elemento web
+		Listbox element = (Listbox) evt.getOrigin().getTarget();// obtenemos el elemento web
 		Worker workerSelected = (Worker)element.getSelectedItem().getValue();
-		data.setWorker(workerSelected);// cargamos al objeto el valor actualizado del elemento web
-		refreshProductionOrderDetailGridView();
-	}
-
-	@Listen("onEditProductionOrderDetailMachine = #productionOrderDetailGrid")
-	public void doEditProductionOrderDetailMachine(ForwardEvent evt) {
-		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
-		Combobox element = (Combobox) evt.getOrigin().getTarget();// obtenemos el elemento web
-		Machine machineSelected = (Machine)element.getSelectedItem().getValue();
-		data.setMachine(machineSelected);// cargamos al objeto el valor actualizado del elemento web
-		// asigna la misma maquina a todos los detalles que necesitan ese tipo de maquina
-		for(ProductionOrderDetail each : productionOrderDetailList) {
-			if(!data.equals(each)) {// no modifica el mismo detalle
-				if(each.getProcess().getType().getMachineType() != null) {// comprueba si se necesita una maquina para el detalle
-					// si el detalle ya posee una maquina asignada, se la deja igual
-					if(each.getMachine() == null) {
-						MachineType machineTypeSelected = machineTypeRepository.findOne(machineSelected.getMachineType().getId());
-						MachineType machineTypeEach = machineTypeRepository.findOne(each.getProcess().getType().getMachineType().getId());
-						if(machineTypeEach.equals(machineTypeSelected)) {
-							each.setMachine(machineSelected);
-						}
+		// comprueba que la maquina seleccionada no este ocupada en otra orden, en ese caso mostrar mensaje y volver al valor anterior, caso contrario asignar
+		if(isWorkerAvailable(workerSelected, data)) {
+			data.setWorker(workerSelected);// cargamos al objeto el valor actualizado del elemento web
+			refreshProductionOrderDetailGridView();
+		} else {
+			final Worker workerSelectedFinal = workerSelected;
+			final ProductionOrderDetail dataFinal = data;
+			// pregunta si se quiere asignar igual estando ocupado
+			Messagebox.show("El empleado no esta disponible en el horario seleccionado, desea asignarlo de todas formas?", "Confirmar", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+				public void onEvent(Event evt) throws InterruptedException {
+					if (evt.getName().equals("onOK")) {
+						dataFinal.setWorker(workerSelectedFinal);// cargamos al objeto el valor actualizado del elemento web
+						refreshProductionOrderDetailGridView();
+						alert("Empleado asignado");
 					}
 				}
-			}
+			});
 		}
-		refreshProductionOrderDetailGridView();
-	}
-
-	private List<Machine> getMachineListByProcessType(ProcessType processType) {
-		List<Machine> list = new ArrayList<Machine>();
-		if(processType.getMachineType() != null) {
-			MachineType machineType = machineTypeRepository.findOne(processType.getMachineType().getId());
-			if (machineType != null) {
-				for (Machine machine : machineList) {
-					if (machineType.equals(machineTypeRepository.findOne(machine.getMachineType().getId()))) {
-						list.add(machine);
-					}
-				}
-			}
-		}
-		return list;
 	}
 
 	/*
@@ -536,16 +571,27 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 				each.setWorker(null);
 				each.setMachine(null);
 			} else {// si el detalle no es cancelado
-				List<Worker> availableWorkerList = getAvailableWorkerList(each);
-				List<Machine> availableMachineList = getAvailableMachineList(each);
-				//getMachineListByProcessType(each.getProcess().getType());
-				if(availableMachineList.size() > 0) {
-					machine = availableMachineList.get(0);
+				List<Worker> availableWorkerList = new ArrayList<Worker>();
+				for(Worker eachWorker : workerRepository.findAll()) {
+					if(isWorkerAvailable(eachWorker, each)) {
+						availableWorkerList.add(eachWorker);
+					}
 				}
 				if(availableWorkerList.size() > 0) {
 					worker = availableWorkerList.get(0);
 				}
 				each.setWorker(worker);
+				// recorre la lista de maquinas y solo agrega las que estan disponibles
+				List<Machine> availableMachineList = new ArrayList<Machine>();
+				for(Machine eachMachine : getMachineListByProcessType(each.getProcess().getType())) {
+					if(isMachineAvailable(eachMachine, each)) {
+						availableMachineList.add(eachMachine);
+					}
+				}
+				//getMachineListByProcessType(each.getProcess().getType());
+				if(availableMachineList.size() > 0) {
+					machine = availableMachineList.get(0);
+				}
 				each.setMachine(machine);
 			}
 		}
@@ -660,22 +706,33 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		ProductionOrder productionOrder = detail.getProductionOrder();
 		productionOrder.updateRemainDetailDates(detail);
 	}
-	
+
 	@Listen("onClick = #createReportButton")
 	public void reportButtonClick() {
-		if(reportTypeListbox.getSelectedItem() != null) {
-			ReportType reportType = (ReportType)(reportTypeListbox.getSelectedItem().getValue());
-			String selectedReportType = reportType.getValue();
-			loadJasperreport(selectedReportType);
-		} else {
-			Clients.showNotification("Tipo de reporte no seleccionado");
-		}
+		loadJasperreport();
 	}
 
-	private void loadJasperreport(String type) {
-		reportBlockJasperreport.setSrc("/jasperreport/production_order.jasper");
+	private void loadJasperreport() {
+		Map<String, Object> parameters;
+		parameters = new HashMap<String, Object>();
+		parameters.put("reportTitle", "Orden de Produccion");
+		parameters.put("productionPlanName", currentProductionPlan.getName());
+		parameters.put("productionOrderNumber", currentProductionOrder.getNumber());
+		parameters.put("productName", currentProductionOrder.getProduct().getDescription());
+
+		Executions.getCurrent().setAttribute("jr_datasource", new ProductionOrderReportDataSource(productionOrderDetailList));
+		Executions.getCurrent().setAttribute("return_page_name", "production_order_creation");
+		Map<String, Object> returnParameters = new HashMap<String, Object>();
+		returnParameters.put("selected_production_order", currentProductionOrder);
+		returnParameters.put("selected_production_plan", currentProductionPlan);
+		Executions.getCurrent().setAttribute("return_parameters", returnParameters);
+		Executions.getCurrent().setAttribute("report_src_name", "production_order");
+		Executions.getCurrent().setAttribute("report_parameters", parameters);
+		Window window = (Window)Executions.createComponents("/report_selection_modal.zul", null, null);
+		window.doModal();
+		/*reportBlockJasperreport.setSrc("/jasperreport/production_order.jasper");
 		reportBlockJasperreport.setType(type);
-		reportBlockJasperreport.setDatasource(new ProductionOrderReportDataSource(productionOrderDetailList));
+		reportBlockJasperreport.setDatasource(new ProductionOrderReportDataSource(productionOrderDetailList));*/
 	}
 }
 

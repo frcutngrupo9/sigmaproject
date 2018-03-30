@@ -22,18 +22,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 
-<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
-<div hflex="1" vflex="1" sclass="header">
-	<hbox hflex="1" vflex="1" align="center">
-		<image src="/img/logosigma.png" width="90px"/>
-		<div width="400px">
-			<label value="Sigma Project" style="color:black; font-weight: bold;" sclass="header-label"/>
-		</div>
-		
-		<hbox apply="ar.edu.utn.sigmaproject.controller.LogoutController" 
-			hflex="1" vflex="1" pack="end" align="end" >
-			<label value="${sessionScope.userCredential.name}" if="${not sessionScope.userCredential.anonymous}"/>
-			<label id="logout" value="Cerrar Sesion" if="${not sessionScope.userCredential.anonymous}" sclass="logout"/>
-		</hbox>
-	</hbox>
-</div>
+<window id="reportSelectionModalWindow" title="Generar Reporte" border="normal" width="500px"
+    apply="ar.edu.utn.sigmaproject.controller.ReportSelectionModalController"
+    position="center,center" closable="true"
+    action="show: slideDown;hide: slideUp">
+	<panel border="none">
+        <panelchildren>
+			<vlayout>
+		        <hbox pack="center" align="center" hflex="1">
+	                Seleccione el tipo de reporte: 
+					<listbox id="reportTypeListbox" mold="select" model="${r:getReportTypeListModelList()}">
+						<template name="model">
+							<listitem>
+								<listcell value="${each}" label="${each.label}"/>
+							</listitem>
+						</template>
+					</listbox>
+			    </hbox>
+			    <separator/>
+			    <hbox pack="center" align="center" hflex="1">
+                	<button id="acceptButton" label="Aceptar" hflex="1"/>
+                    <button id="cancelButton" label="Cancelar" hflex="1"/>
+                </hbox>
+		    </vlayout>
+        </panelchildren>
+    </panel>
+</window>

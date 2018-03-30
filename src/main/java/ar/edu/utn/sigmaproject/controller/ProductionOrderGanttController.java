@@ -24,6 +24,8 @@
 
 package ar.edu.utn.sigmaproject.controller;
 
+import java.util.Date;
+
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.MouseEvent;
@@ -75,7 +77,7 @@ public class ProductionOrderGanttController extends SelectorComposer<Component> 
 		ganttChart.setType("gantt");
 		ganttChart.setEngine(new GanttChartEngine());
 		ganttChart.setModel(getModel());
-		
+
 		String title = currentProductionOrder.getProductionPlan().getName() + ", Orden: " + currentProductionOrder.getNumber() + ", Producto: " + currentProductionOrder.getProduct().getDescription();
 		win_production_order_gantt.setTitle(title);
 	}
@@ -94,13 +96,58 @@ public class ProductionOrderGanttController extends SelectorComposer<Component> 
 
 	public GanttModel getModel() {
 		GanttModel ganttmodel = new GanttModel();
+		String processNamePrev = null;
+		String processName= null;
+		Date dateStart = null;
+		Date dateFinish = null;
+		
+		String processNamePrevReal = null;
+		String processNameReal= null;
+		Date dateStartReal = null;
+		Date dateFinishReal = null;
 		for(ProductionOrderDetail each : currentProductionOrder.getDetails()) {
 			if(each.getState() != ProcessState.Cancelado) {
-				ganttmodel.addValue("Programado", new GanttTask(each.getProcess().getType().getName(), each.getDateStart(), each.getDateFinish(), 0.0));
+				// si hay muchos procesos iguales para diferentes piezas, se los acumula y se muestran como 1 solo
+				processName = each.getProcess().getType().getName();
+				if(processNamePrev == null) {// primera vez
+					processNamePrev = processName;
+					dateStart = each.getDateStart();
+					dateFinish = each.getDateFinish();
+				}
+				if(processName.equalsIgnoreCase(processNamePrev)) {// si son iguales se guarda la fecha fin
+					dateFinish = each.getDateFinish();
+				} else {// si son diferentes se agrega el previo al gantt y se carga el nuevo como previo
+					ganttmodel.addValue("Programado", new GanttTask(processNamePrev, dateStart, dateFinish, 0.0));
+					processNamePrev = processName;
+					dateStart = each.getDateStart();
+					dateFinish = each.getDateFinish();
+				}
+				//ganttmodel.addValue("Programado", new GanttTask(each.getProcess().getType().getName(), each.getDateStart(), each.getDateFinish(), 0.0));
 				if(each.getDateStartReal() != null && each.getDateFinishReal() != null) {
-					ganttmodel.addValue("Real", new GanttTask(each.getProcess().getType().getName(), each.getDateStartReal(), each.getDateFinishReal(), 0.0));
+					processNameReal = each.getProcess().getType().getName();
+					if(processNamePrevReal == null) {// primera vez
+						processNamePrevReal = processNameReal;
+						dateStartReal = each.getDateStartReal();
+						dateFinishReal = each.getDateFinishReal();
+					}
+					if(processNameReal.equalsIgnoreCase(processNamePrevReal)) {// si son iguales se guarda la fecha fin
+						dateFinishReal = each.getDateFinishReal();
+					} else {// si son diferentes se agrega el previo al gantt y se carga el nuevo como previo
+						ganttmodel.addValue("Real", new GanttTask(processNamePrevReal, dateStartReal, dateFinishReal, 0.0));
+						processNamePrevReal = processNameReal;
+						dateStartReal = each.getDateStartReal();
+						dateFinishReal = each.getDateFinishReal();
+					}
+					//ganttmodel.addValue("Real", new GanttTask(each.getProcess().getType().getName(), each.getDateStartReal(), each.getDateFinishReal(), 0.0));
 				}
 			}
+		}
+		// si quedo algo
+		if(processNamePrev != null) {
+			ganttmodel.addValue("Programado", new GanttTask(processNamePrev, dateStart, dateFinish, 0.0));
+		}
+		if(processNamePrevReal != null) {
+			ganttmodel.addValue("Real", new GanttTask(processNamePrevReal, dateStartReal, dateFinishReal, 0.0));
 		}
 		return ganttmodel;
 	}

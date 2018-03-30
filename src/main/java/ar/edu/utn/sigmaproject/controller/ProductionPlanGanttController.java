@@ -153,7 +153,7 @@ public class ProductionPlanGanttController extends SelectorComposer<Component> {
 	public GanttModel getModel(ProductionPlan selectedPlan) {
 		GanttModel ganttmodel = new GanttModel();
 		for(ProductionOrder each : selectedPlan.getProductionOrderList()) {
-			String nameText = "Orden: " + each.getNumber() + " - " + each.getProduct().getName();
+			String nameText = "Orden: " + each.getNumber();
 			ganttmodel.addValue("Programado", new GanttTask(nameText, each.getDateStart(), each.getDateFinish(), 0.0));
 			if(each.getDateStartReal() != null) {
 				// si la orden tiene fecha real de inicio pero no fin real, la fecha fin real se calcula en base a la duracion del estimado

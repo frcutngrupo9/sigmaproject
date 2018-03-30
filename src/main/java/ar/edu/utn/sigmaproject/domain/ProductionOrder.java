@@ -363,7 +363,6 @@ public class ProductionOrder implements Serializable, Cloneable {
 		setDateFinish(finishDate);// se usa la ultima fecha como el fin de la orden de produccion
 	}
 
-
 	public Date getStartRealDateFromDetails() {
 		Date date = null;
 		for(ProductionOrderDetail each : getDetails()) {
@@ -483,7 +482,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 		}
 		return percentComplete;
 	}
-	
+
 	public String getPercentComplete() {
 		return getPercent() + " %";
 	}

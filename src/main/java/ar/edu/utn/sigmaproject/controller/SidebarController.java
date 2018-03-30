@@ -81,7 +81,7 @@ public class SidebarController extends SelectorComposer<Component> {
 				new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Pedido", "/order_creation.zul"))
 			)),
 			new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Produccion"), Arrays.asList(
-					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Gantt de Plan de Produccion", "/production_plan_gantt.zul")),
+					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Diagrama Gantt de Plan", "/production_plan_gantt.zul")),
 					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Avance de Produccion", "/production_follow_up_list.zul")),
 					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Planes de Produccion", "/production_plan_list.zul")),
 					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Plan de Produccion", "/production_plan_creation.zul"))
