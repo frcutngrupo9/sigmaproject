@@ -37,7 +37,7 @@ THE SOFTWARE.
 		    <separator/>
 		    <grid id="productionPlanGrid" mold="paging" pageSize="7" sizedByContent="true" span="true">
 		    	<auxhead>
-					<auxheader label="Planes de Produccion" colspan="8"/>
+					<auxheader label="Planes de Produccion" colspan="9"/>
 				</auxhead>
 		        <columns>
 		            <column label="Nombre" align="center"/>
@@ -48,6 +48,7 @@ THE SOFTWARE.
 		            <column label="Editar" align="center"/>
 		            <column label="Listado" align="center"/>
 		            <column label="Abrir" align="center"/>
+		            <column label="Diagrama" align="center"/>
 		        </columns>
 		        <template name="model">
 		            <row>
@@ -59,6 +60,7 @@ THE SOFTWARE.
 		                <button forward="onClick=productionPlanGrid.onEditProductionPlan(${each})"  image="/img/edit16x16.png"/>
 		                <button forward="onClick=productionPlanGrid.onGenerateProductionOrder(${each})" label="Ordenes de Produccion" />
 		                <button forward="onClick=productionPlanGrid.onOpenRequirementPlan(${each})" label="Requerimiento de Materiales" />
+		                <button forward="onClick=productionPlanGrid.onOpenGanttPlan(${each})" label="Gantt" />
 		            </row>
 		        </template>
 		    </grid>

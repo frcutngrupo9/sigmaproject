@@ -66,14 +66,14 @@ THE SOFTWARE.
 			            <column label="Fin" align="left"/>
 			            <column label="Pieza" align="center"/>
 			            <column label="Cantidad" align="center"/>
-			            <column label="Duracion x Producto" align="center"/>
-			            <column label="Duracion Total" align="center"/>
 			            <column label="Empleado" align="center"/>
 			            <column label="Maquina" align="center"/>
+			            <column label="Duracion x Producto" align="center"/>
+			            <column label="Duracion Total" align="center"/>
 		            </columns>
 		            <template name="model">
 		                <row>
-		                	<custom-attributes state_cancel="${win_production_order_creation$composer.isStateCancel(each.getState())}"/>
+		                	<custom-attributes state_cancel="${win_production_order_creation$composer.isStateCancel(each.getState())}" current_detail="${each}"/>
 			            	<checkbox disabled="false" checked="${state_cancel}" forward="onCheck=productionOrderDetailGrid.onEditProductionOrderDetailIsCanceled(${each})"/>
 			            	<label value="${each.process.type.sequence}"/>
 			            	<label value="${each.process.type.name}"/>
@@ -81,24 +81,54 @@ THE SOFTWARE.
 			            	<datebox buttonVisible="false" disabled="true" cols="12" format="dd/MM/yyyy HH:mm" value="${each.dateFinish}"/>
 			            	<label value="${each.process.getPiece().getName()}"/>
 			            	<label value="${each.quantityPiece}"/>
-			            	<label value="${r:getFormattedProcessTime(each.process.time)}"/>
-			            	<label value="${r:getFormattedProcessTime(each.getTimeTotal())}"/>
-			            	<combobox disabled="${state_cancel}" visible="true" hflex="1" forward="onSelect=productionOrderDetailGrid.onEditProductionOrderDetailWorker(${each}), onAfterRender=productionOrderDetailGrid.onCreateWorkerCombobox(${each})"
+			            	<bandbox value="${each.worker.name}" onClick="self.open()" readonly="true" buttonVisible="true" autodrop="false">
+		            			<bandpopup>
+		            			<listbox width="400px" span="false" sizedByContent="false"
+		            				model="${win_production_order_creation$composer.getCompleteWorkerListModel(each)}"
+		            				forward="onSelect=productionOrderDetailGrid.onSelectWorkerListbox(${each})">
+		            				<listhead>
+				                    	<listheader align="left"  hflex="min"/>
+				                        <listheader align="center"  hflex="max"/>
+				                    </listhead>
+									<template name="model">
+										<listitem>
+											<listcell label="${each.name}"/>
+											<listcell label="${win_production_order_creation$composer.getWorkerAvailabilityDescription(each, current_detail)}"/>
+										</listitem>
+									</template>
+								</listbox>
+		            			</bandpopup>
+		            		</bandbox>
+			            	<combobox if="false" disabled="${state_cancel}" visible="true" hflex="1" forward="onSelect=productionOrderDetailGrid.onEditProductionOrderDetailWorker(${each}), onAfterRender=productionOrderDetailGrid.onCreateWorkerCombobox(${each})"
 			            		model="${win_production_order_creation$composer.getWorkerListModel(each)}" readonly="true">
 			            		<template name="model">
 			            			<comboitem label="${each.name}" />
 			            		</template>
 			            	</combobox>
 			            	<cell>
-				            	<combobox disabled="${state_cancel}" visible="true" hflex="1" if="${win_production_order_creation$composer.isMachineNecessary(each.process.type)}"
-				            		forward="onSelect=productionOrderDetailGrid.onEditProductionOrderDetailMachine(${each}), onAfterRender=productionOrderDetailGrid.onCreateMachineCombobox(${each})"
-	                        		model="${win_production_order_creation$composer.getMachineListModel(each)}" readonly="true">
-			                        <template name="model">
-			                            <comboitem label="${each.name}" />
-			                        </template>
-			                    </combobox>
+			            		<bandbox disabled="${state_cancel}" if="${win_production_order_creation$composer.isMachineNecessary(each.process.type)}"
+			            			value="${each.machine.name}" onClick="self.open()" readonly="true" buttonVisible="true" autodrop="false">
+			            			<bandpopup>
+			            			<listbox width="400px" span="false" sizedByContent="false"
+			            				model="${win_production_order_creation$composer.getCompleteMachineListModel(each)}"
+			            				forward="onSelect=productionOrderDetailGrid.onSelectMachineListbox(${each})">
+			            				<listhead>
+					                    	<listheader align="left"  hflex="min"/>
+					                        <listheader align="center"  hflex="max"/>
+					                    </listhead>
+										<template name="model">
+											<listitem>
+												<listcell label="${each.name}"/>
+												<listcell label="${win_production_order_creation$composer.getMachineAvailabilityDescription(each, current_detail)}"/>
+											</listitem>
+										</template>
+									</listbox>
+			            			</bandpopup>
+			            		</bandbox>
 			                    <label value="NO REQUIERE" if="${!win_production_order_creation$composer.isMachineNecessary(each.process.type)}"/>
 		                    </cell>
+		                    <label value="${r:getFormattedProcessTime(each.process.time)}"/>
+			            	<label value="${r:getFormattedProcessTime(each.getTimeTotal())}"/>
 						</row>
 		            </template>
     			</grid>
@@ -137,25 +167,17 @@ THE SOFTWARE.
 				        </template>
 				    </listbox>
 			    </hbox>
-    			<hbox hflex="1" pack="left">
-				    <button id="saveButton" label="Guardar"/>
-				    <button id="resetButton" label="Reset"/>
-				    <button id="cancelButton" label="Volver"/>
-			    </hbox>
+			    <hlayout>
+	    			<hbox hflex="1" pack="left">
+					    <button id="saveButton" label="Guardar"/>
+					    <button id="resetButton" label="Reset"/>
+					    <button id="cancelButton" label="Volver"/>
+				    </hbox>
+				    <hbox hflex="1" pack="center">
+				    	<button id="createReportButton" label="Reporte"/>
+				    </hbox>
+			    </hlayout>
 			    <separator/>
-			    <separator/>
-			    <hbox>
-				    Seleccione el tipo de archivo del reporte: 
-					<listbox id="reportTypeListbox" mold="select" model="${r:getReportTypeListModelList()}">
-						<template name="model">
-							<listitem>
-								<listcell value="${each}" label="${each.label}"/>
-							</listitem>
-						</template>
-					</listbox>
-				    <button id="createReportButton" label="Reporte de Orden de Produccion"/>
-			    </hbox>
-				<jasperreport id="reportBlockJasperreport" height="360px"/>
 			    <separator/>
 			</vlayout>
         </panelchildren>

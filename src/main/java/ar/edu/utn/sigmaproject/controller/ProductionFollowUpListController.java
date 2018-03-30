@@ -107,4 +107,12 @@ public class ProductionFollowUpListController extends SelectorComposer<Component
 		Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/production_follow_up.zul");
 	}
+	
+	@Listen("onGanttProductionOrder = #productionOrderGrid")
+	public void doGanttProductionOrder(ForwardEvent evt) {
+		ProductionOrder productionOrder = (ProductionOrder) evt.getData();
+		Executions.getCurrent().setAttribute("selected_production_order", productionOrder);
+		Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/production_order_gantt.zul");
+	}
 }

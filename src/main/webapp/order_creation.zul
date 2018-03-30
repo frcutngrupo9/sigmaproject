@@ -145,12 +145,13 @@ THE SOFTWARE.
                     <button id="saveOrderButton" label="Guardar Pedido"/>
                     <button id="resetOrderButton" label="Reset Pedido"/>
                     <button id="deleteOrderButton" label="Eliminar Pedido"/>
+                    <separator/>
+                    <button id="jasperReportButton" label="Reporte"/>
                     <hbox pack="center" align="center" hflex="1">
 			        	<button id="newOrderButton" label="Nuevo Pedido"/>
 			        	<button id="returnButton" label="Volver a Listado"/>
 			        </hbox>
                 </hlayout>
-                <separator/>
                 <separator/>
             </vlayout>
         </panelchildren>

@@ -75,16 +75,6 @@ THE SOFTWARE.
 		        </template>
 		    </grid>
 		    <separator/>
-		    Seleccione el tipo de archivo del reporte: 
-			<listbox id="reportTypeListbox" mold="select" model="${r:getReportTypeListModelList()}">
-				<template name="model">
-					<listitem>
-						<listcell value="${each}" label="${each.label}"/>
-					</listitem>
-				</template>
-			</listbox>
-		    <button id="clientOrdersReportButton" label="Reporte de Pedidos por Cliente"/>
-			<jasperreport id="clientOrdersJasperreport" height="360px"/>
 		    <separator/>
         </panelchildren>
     </panel>

@@ -260,6 +260,7 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 			dateStart = getTimeboxDate(date, timebox.getValue());
 		}
 		data.setDateStart(dateStart);
+		data.sortDetailsByProcessTypeSequence();
 		data.updateDetailDates(dateStart);// calcula las demas fechas
 		changeFinishDatebox(cell, data.getDateFinish());
 		// si es null el dateStart se reinicia el timebox

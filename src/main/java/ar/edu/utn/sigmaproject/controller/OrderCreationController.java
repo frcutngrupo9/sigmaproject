@@ -27,7 +27,13 @@ package ar.edu.utn.sigmaproject.controller;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRField;
 
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
@@ -53,6 +59,7 @@ import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.Client;
 import ar.edu.utn.sigmaproject.domain.Order;
@@ -110,6 +117,8 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	Caption orderCaption;
 	@Wire
 	Button returnButton;
+	@Wire
+	Button jasperReportButton;
 
 	// services
 	@WireVariable
@@ -500,5 +509,83 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	public void newOrderButtonClick() {
 		currentOrder = null;
 		refreshViewOrder();
+	}
+
+	public double totalPrice(Order order) {
+		List<OrderDetail> order_detail_list = order.getDetails();
+		BigDecimal total_price = BigDecimal.ZERO;
+		for(OrderDetail order_detail : order_detail_list) {
+			if(order_detail.getPrice() != null) {
+				total_price = total_price.add(getSubTotal(order_detail.getUnits(), order_detail.getPrice()));
+			}
+		}
+		return total_price.doubleValue();
+	}
+
+	@Listen("onClick = #jasperReportButton")
+	public void jasperReportButtonClick() {
+		if(currentOrder == null) {
+			Clients.showNotification("No se guardo el pedido");
+		} else {
+			loadJasperreport();
+		}
+	}
+
+	private void loadJasperreport() {
+		Map<String, Object> parameters;
+		parameters = new HashMap<String, Object>();
+		parameters.put("reportTitle", "Pedido");
+		parameters.put("orderTotalPrice", totalPrice(currentOrder));
+		parameters.put("orderNumber", currentOrder.getNumber());
+		parameters.put("orderClientName", currentOrder.getClient().getName());
+		parameters.put("orderDate", currentOrder.getDate());
+		parameters.put("orderClientPhone", currentOrder.getClient().getPhone());
+
+		Executions.getCurrent().setAttribute("jr_datasource", new OrderReportDataSource(currentOrder.getDetails()));
+		Executions.getCurrent().setAttribute("return_page_name", "order_creation");
+		Map<String, Object> returnParameters = new HashMap<String, Object>();
+		returnParameters.put("selected_order", currentOrder);
+		Executions.getCurrent().setAttribute("return_parameters", returnParameters);
+		Executions.getCurrent().setAttribute("report_src_name", "order");
+		//Executions.getCurrent().setAttribute("report_type", type);
+		Executions.getCurrent().setAttribute("report_parameters", parameters);
+		//		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
+		//		include.setSrc("/report_viewer.zul");
+		Window window = (Window)Executions.createComponents("/report_selection_modal.zul", null, null);
+		window.doModal();
+	}
+}
+
+class OrderReportDataSource implements JRDataSource {
+
+	private List<OrderDetail> orderDetailList = new ArrayList<OrderDetail>();
+	private int index = -1;
+
+	public OrderReportDataSource(List<OrderDetail> orderDetailList) {
+		this.orderDetailList.addAll(orderDetailList);
+	}
+
+	public boolean next() throws JRException {
+		index++;
+		return (index < orderDetailList.size());
+	}
+
+	public Object getFieldValue(JRField field) throws JRException {
+		Object value = null;
+		String fieldName = field.getName();
+		if ("client_name".equals(fieldName)) {
+			value = orderDetailList.get(index).getOrder().getClient().getName();
+		} else if ("product_code".equals(fieldName)) {
+			value = orderDetailList.get(index).getProduct().getCode();
+		} else if ("product_name".equals(fieldName)) {
+			value = orderDetailList.get(index).getProduct().getDescription();
+		} else if ("product_units".equals(fieldName)) {
+			value = orderDetailList.get(index).getUnits();
+		} else if ("unit_price".equals(fieldName)) {
+			value = orderDetailList.get(index).getPrice().doubleValue();
+		} else if ("subtotal".equals(fieldName)) {
+			value = orderDetailList.get(index).getSubTotal().doubleValue();
+		}
+		return value;
 	}
 }

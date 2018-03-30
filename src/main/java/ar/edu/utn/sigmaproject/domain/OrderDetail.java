@@ -101,4 +101,8 @@ public class OrderDetail  implements Serializable, Cloneable {
 	public void setPrice(BigDecimal price) {
 		this.price = price;
 	}
+	
+	public BigDecimal getSubTotal() {
+		return getPrice().multiply(new BigDecimal(getUnits()));
+	}
 }
