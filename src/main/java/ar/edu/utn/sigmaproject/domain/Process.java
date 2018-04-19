@@ -25,6 +25,7 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -111,6 +112,7 @@ public class Process implements Serializable, Cloneable {
 	}
 
 	public Duration getTime() {
+		// devuelve el tiempo del proceso para 1 sola pieza
 		if (time == null && this.timeInternal != null) {
 			try {
 				this.time = DatatypeFactory.newInstance().newDuration(this.timeInternal);
@@ -128,6 +130,11 @@ public class Process implements Serializable, Cloneable {
 		} else {
 			this.timeInternal = null;
 		}
+	}
+	
+	public Duration getDurationTotal() {
+		// devuelve la duracion de este proceso para todo el producto ( ej el proceso armado de cajon, para una cajonera de varios cajones, se multiplica la duracion del proceso por la cantidad de la pieza)
+		return getTime().multiply(new BigDecimal(getPiece().getUnits()));
 	}
 
 	public boolean isClone() {

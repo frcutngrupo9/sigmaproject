@@ -60,6 +60,7 @@ THE SOFTWARE.
 		                <column label="Unids" align="center"/>
         				<column label="Cod" align="center"/>
         				<column label="Estado Orden" align="center"/>
+        				<column label="Nro Orden" align="center"/>
 		                <column label="% Completo" align="center"/>
 		                <column label="Duracion Total" align="center"/>
 		                <column label="Duracion Unidad" align="center"/>
@@ -88,6 +89,7 @@ THE SOFTWARE.
 		                	<label value="${each.units}"/>
 		                	<label value="${each.product.code}"/>
 		                    <label value="${each.getCurrentStateType().name}"/>
+		                    <label value="${each.number}"/>
 		                    <label value="${each.getPercentComplete()}"/>
 		                    <label value="${r:getFormattedTime(each.getDurationTotal())}"/>
 		                    <label value="${r:getFormattedTime(each.product.getDurationTotal())}"/>

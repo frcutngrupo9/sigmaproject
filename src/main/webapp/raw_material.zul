@@ -36,16 +36,16 @@ THE SOFTWARE.
 		            <listheader label="Madera" align="center"/>
 		            <listheader label="Nombre" align="center"/>
 		            <listheader label="Largo (L)" align="center"/>
-		            <listheader label="Espesor (E)" align="center"/>
 		            <listheader label="Ancho (A)" align="center"/>
+		            <listheader label="Espesor (E)" align="center"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
 		                <listcell label="${each.woodType.name}"/>
 		                <listcell label="${each.name}"/>
 		                <listcell label="${each.length} ${each.getLengthMeasureUnit().getShortName()}"/>
-		                <listcell label="${each.depth} ${each.getDepthMeasureUnit().getShortName()}"/>
 		                <listcell label="${each.width} ${each.getWidthMeasureUnit().getShortName()}"/>
+		                <listcell label="${each.depth} ${each.getDepthMeasureUnit().getShortName()}"/>
 		            </listitem>
 		        </template>
 		    </listbox>
@@ -77,10 +77,10 @@ THE SOFTWARE.
 		                    </hlayout>
 		                </row>
 		                <row>	
-		                    <label>Espesor:</label>
+		                    <label>Ancho:</label>
 		                    <hlayout>
-			                    <doublebox id="depthDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
-			                	<selectbox id="depthMeasureUnitSelectbox">
+			                    <doublebox id="widthDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
+			                	<selectbox id="widthMeasureUnitSelectbox">
 			                        <template name="model">
 			                            <label value="${each.name}" />
 			                        </template>
@@ -88,10 +88,10 @@ THE SOFTWARE.
 		                    </hlayout>
 		                </row>
 		                <row>	
-		                    <label>Ancho:</label>
+		                    <label>Espesor:</label>
 		                    <hlayout>
-			                    <doublebox id="widthDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
-			                	<selectbox id="widthMeasureUnitSelectbox">
+			                    <doublebox id="depthDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
+			                	<selectbox id="depthMeasureUnitSelectbox">
 			                        <template name="model">
 			                            <label value="${each.name}" />
 			                        </template>

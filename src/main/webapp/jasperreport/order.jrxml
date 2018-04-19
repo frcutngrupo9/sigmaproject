@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Presupuesto_A4" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="b1a7f3e6-2317-422a-a43e-cbcadc74cb3e">
-	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.zoom" value="1.5"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="reportTitle" class="java.lang.String"/>
@@ -24,6 +24,7 @@
 			</line>
 			<textField pattern="EEE, d MMM yyyy">
 				<reportElement x="390" y="51" width="165" height="19" uuid="fc211259-7ad4-4834-904f-5afa8dedcc70"/>
+				<box rightPadding="5"/>
 				<textElement textAlignment="Right">
 					<font fontName="Times New Roman"/>
 				</textElement>
@@ -31,6 +32,7 @@
 			</textField>
 			<staticText>
 				<reportElement x="327" y="0" width="228" height="50" uuid="46b3f5ce-006d-426f-8a04-f4eecffde6f1"/>
+				<box rightPadding="5"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial Black" size="24" isBold="false"/>
 					<paragraph spacingAfter="5"/>
@@ -39,13 +41,15 @@
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="36" width="140" height="14" uuid="3bdfb359-ae14-449b-a38a-47df616bee74"/>
+				<box leftPadding="5"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<text><![CDATA[Córdoba Capital - C.P. 5000]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="119" width="128" height="30" uuid="6c8731fb-c3c2-424b-b7ce-e5ae0e3761d4"/>
+				<reportElement x="0" y="119" width="140" height="30" uuid="6c8731fb-c3c2-424b-b7ce-e5ae0e3761d4"/>
+				<box rightPadding="7"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Times New Roman" isBold="true"/>
 				</textElement>
@@ -59,7 +63,8 @@
 				<textFieldExpression><![CDATA[$P{orderNumber}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="280" y="119" width="129" height="30" uuid="377b03a3-6863-4a31-b312-a6011c605484"/>
+				<reportElement x="280" y="119" width="140" height="30" uuid="377b03a3-6863-4a31-b312-a6011c605484"/>
+				<box rightPadding="7"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Times New Roman" isBold="true"/>
 				</textElement>
@@ -80,21 +85,16 @@
 				<textFieldExpression><![CDATA[$P{reportTitle}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="21" width="166" height="15" uuid="01954e38-c262-4afe-bb91-bad421a2eb27"/>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman"/>
-				</textElement>
-				<text><![CDATA[Maestro M. Lopez esq. Cruz Roja]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="0" y="149" width="128" height="30" uuid="b08cd914-8629-45ba-a0ca-c168fb94d512"/>
+				<reportElement x="0" y="149" width="140" height="30" uuid="b08cd914-8629-45ba-a0ca-c168fb94d512"/>
+				<box rightPadding="7"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Times New Roman" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Fecha Emisión:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="280" y="149" width="129" height="30" uuid="947509e6-64df-4c89-9ae4-de1aece0acc2"/>
+				<reportElement x="280" y="149" width="140" height="30" uuid="947509e6-64df-4c89-9ae4-de1aece0acc2"/>
+				<box rightPadding="7"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Times New Roman" isBold="true"/>
 				</textElement>

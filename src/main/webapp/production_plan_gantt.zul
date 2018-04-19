@@ -28,7 +28,7 @@ THE SOFTWARE.
         <panelchildren>
             <vlayout>
                 <hbox hflex="1" pack="left">
-	                <label value="Plan de produccion: "/>
+	                <label value="${labels.production_plan}: "/>
 	                <listbox id="productionPlanListbox" mold="select">
 						<template name="model">
 							<listitem>
@@ -44,10 +44,10 @@ THE SOFTWARE.
 	                    <listitem label="Estilo 3" value="3"/>
                 	</listbox>
                 	<separator/>
-                	<button id="cancelButton" label="Volver"/>
+                	<button id="cancelButton" label="${labels.return_text}"/>
                 </hbox>
                 <hbox hflex="1" pack="center">
-                	<chart id="ganttChart" width="850" height="400" fgAlpha="255" paneColor="#ffffff"/>
+                	<chart id="ganttChart" width="850" height="400" fgAlpha="255" dateFormat="dd-MM-yyyy" paneColor="#ffffff"/>
                 </hbox>
             </vlayout>
         </panelchildren>

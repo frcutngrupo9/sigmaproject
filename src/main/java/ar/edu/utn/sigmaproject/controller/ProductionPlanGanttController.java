@@ -24,9 +24,12 @@
 
 package ar.edu.utn.sigmaproject.controller;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.MouseEvent;
@@ -86,14 +89,14 @@ public class ProductionPlanGanttController extends SelectorComposer<Component> {
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
-		
+
 		ganttChartEngine = new GanttChartEngine();
 		productionPlanList = productionPlanRepository.findAll();
 		productionPlanListModel = new ListModelList<>(productionPlanList);
 		productionPlanListbox.setModel(productionPlanListModel);
 		if(!productionPlanList.isEmpty()) {
 			if(currentProductionPlan == null) {
-				currentProductionPlan = productionPlanList.get(0);
+				currentProductionPlan = productionPlanList.get(productionPlanList.size()-1);
 			} else {
 				currentProductionPlan = productionPlanRepository.findOne(currentProductionPlan.getId());
 			}
@@ -114,7 +117,7 @@ public class ProductionPlanGanttController extends SelectorComposer<Component> {
 			productionPlanListbox.setSelectedIndex(productionPlanListModel.indexOf(currentProductionPlan));
 		}
 	}
-	
+
 	@Listen("onClick = #cancelButton")
 	public void cancelButtonClick() {
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
@@ -131,7 +134,7 @@ public class ProductionPlanGanttController extends SelectorComposer<Component> {
 		ProductionPlan selectedPlan = productionPlanListbox.getSelectedItem().getValue();
 		loadGantt(selectedPlan);
 	}
-	
+
 	@Listen("onSelect = #themeColorSelectListbox")
 	public void doThemeColorSelectListboxSelect() {
 		if(themeColorSelectListbox.getSelectedItem() == null) {
@@ -152,21 +155,37 @@ public class ProductionPlanGanttController extends SelectorComposer<Component> {
 
 	public GanttModel getModel(ProductionPlan selectedPlan) {
 		GanttModel ganttmodel = new GanttModel();
-		for(ProductionOrder each : selectedPlan.getProductionOrderList()) {
-			String nameText = "Orden: " + each.getNumber();
-			ganttmodel.addValue("Programado", new GanttTask(nameText, each.getDateStart(), each.getDateFinish(), 0.0));
-			if(each.getDateStartReal() != null) {
-				// si la orden tiene fecha real de inicio pero no fin real, la fecha fin real se calcula en base a la duracion del estimado
-				if(each.getDateFinishReal() == null) {
-					Date estimatedDateFinishReal = getEstimatedDateFinishReal(each.getDateStart(), each.getDateFinish(), each.getDateStartReal());
-					double quantityComplete = each.getPercent() * 0.01;
-					ganttmodel.addValue("Real", new GanttTask(nameText, each.getDateStartReal(), estimatedDateFinishReal, quantityComplete));
-				} else {
-					ganttmodel.addValue("Real", new GanttTask(nameText, each.getDateStartReal(), each.getDateFinishReal(), 1.0));
+		// se ordena las ordenes por nro de orden
+		for(ProductionOrder each : sortProductionOrderListByNumber(selectedPlan.getProductionOrderList())) {
+			if(each.getDateStart() != null) {// por si aun no se asigno fecha a la orden
+				String nameText = "Orden: " + each.getNumber();
+				String programado = Labels.getLabel("scheduled");
+				String real = Labels.getLabel("actual");
+				ganttmodel.addValue(programado, new GanttTask(nameText, each.getDateStart(), each.getDateFinish(), 0.0));
+				if(each.getDateStartReal() != null) {
+					// si la orden tiene fecha real de inicio pero no fin real, la fecha fin real se calcula en base a la duracion del estimado
+					if(each.getDateFinishReal() == null) {
+						Date estimatedDateFinishReal = getEstimatedDateFinishReal(each.getDateStart(), each.getDateFinish(), each.getDateStartReal());
+						double quantityComplete = each.getPercent() * 0.01;
+						ganttmodel.addValue(real, new GanttTask(nameText, each.getDateStartReal(), estimatedDateFinishReal, quantityComplete));
+					} else {
+						ganttmodel.addValue(real, new GanttTask(nameText, each.getDateStartReal(), each.getDateFinishReal(), 1.0));
+					}
 				}
 			}
 		}
 		return ganttmodel;
+	}
+
+	public List<ProductionOrder> sortProductionOrderListByNumber(List<ProductionOrder> productionOrderList) {
+		Comparator<ProductionOrder> comp = new Comparator<ProductionOrder>() {
+			@Override
+			public int compare(ProductionOrder a, ProductionOrder b) {
+				return a.getNumber().compareTo(b.getNumber());
+			}
+		};
+		Collections.sort(productionOrderList, comp);
+		return productionOrderList;
 	}
 
 	private Date getEstimatedDateFinishReal(Date dateStart, Date dateFinish, Date dateStartReal) {

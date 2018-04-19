@@ -50,6 +50,9 @@ public class ProcessType implements Serializable, Cloneable {
 	@Field
 	@Column(unique = true)
 	String name = "";
+	
+	@Field
+	private String details = "";
 
 	@OneToMany
 	List<ProcessType> predecessorList = new ArrayList<>(); 
@@ -70,6 +73,13 @@ public class ProcessType implements Serializable, Cloneable {
 		this.name = name;
 		this.machineType = machineType;
 	}
+	
+	public ProcessType(Integer sequence, String name, String details, MachineType machineType) {
+		this.sequence = sequence;
+		this.name = name;
+		this.machineType = machineType;
+		this.details = details;
+	}
 
 	public Long getId() {
 		return id;
@@ -85,6 +95,14 @@ public class ProcessType implements Serializable, Cloneable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getDetails() {
+		return details;
+	}
+
+	public void setDetails(String details) {
+		this.details = details;
 	}
 
 	public MachineType getMachineType() {

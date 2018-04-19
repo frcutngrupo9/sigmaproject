@@ -100,14 +100,16 @@ public class SidebarController extends SelectorComposer<Component> {
 					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Pedidos de Materiales", "/materials_order_list.zul")),
 					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Pedido de Materiales", "/materials_order_creation.zul"))
 				)),
-			new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Clientes", "/client.zul")),
-			new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Materias Primas", "/raw_material.zul")),
-			new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Insumos", "/supply.zul")),
-			new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Maquinas", "/machine.zul")),
-			new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Herramientas", "/tool.zul")),
-			new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Procesos", "/process.zul")),
-			new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Empleados", "/worker.zul")),
-			new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Reportes", "/report.zul"))
+			new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "ABM"), Arrays.asList(
+					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Clientes", "/client.zul")),
+					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Materias Primas", "/raw_material.zul")),
+					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Insumos", "/supply.zul")),
+					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Maquinas", "/machine.zul")),
+					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Herramientas", "/tool.zul")),
+					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Procesos", "/process.zul")),
+					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Empleados", "/worker.zul"))
+				)),
+			new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Reportes y Estadisticas", "/report.zul"))
 		));
 		tree.setModel(new DefaultTreeModel<MenuTreeRow>(rootNode));
 		tree.addEventListener(Events.ON_CLICK, new EventListener<MouseEvent>() {

@@ -39,6 +39,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.xml.datatype.Duration;
@@ -78,6 +79,15 @@ public class Piece implements Serializable, Cloneable {
 	private boolean isGroup;
 	private Integer units = 0;
 
+	@ManyToOne(targetEntity = Piece.class)
+	private Piece pieceParent = null;
+
+	@OneToMany(orphanRemoval = false, cascade = CascadeType.PERSIST, mappedBy = "pieceParent", targetEntity = Piece.class)
+	private List<Piece> pieceGroupList = null;
+	
+	@Lob
+	private byte[] imageData = null;
+
 	private boolean isClone;
 
 	public Piece() {
@@ -110,10 +120,11 @@ public class Piece implements Serializable, Cloneable {
 	public Duration getDurationTotal() {
 		Duration durationTotal = null;
 		for(Process each : processes) {
+			Duration timePerProduct = each.getTime().multiply(new BigDecimal(getUnits()));
 			if(durationTotal == null) {
-				durationTotal = each.getTime();
+				durationTotal = timePerProduct;
 			} else {
-				durationTotal = durationTotal.add(each.getTime());
+				durationTotal = durationTotal.add(timePerProduct);
 			}
 
 		}
@@ -214,6 +225,35 @@ public class Piece implements Serializable, Cloneable {
 
 	public void setUnits(Integer units) {
 		this.units = units;
+	}
+
+	public Piece getPieceParent() {
+		return pieceParent;
+	}
+
+	public void setPieceParent(Piece pieceParent) {
+		this.pieceParent = pieceParent;
+	}
+
+	public List<Piece> getPieceGroupList() {
+		/*
+		// si no existe, crea uno vacio
+		if(pieceGroupList == null) {
+			pieceGroupList = new ArrayList<>();
+		}*/
+		return pieceGroupList;// debe ser nulo si isGroup es false
+	}
+
+	public void setPieceGroupList(List<Piece> pieceGroupList) {
+		this.pieceGroupList = pieceGroupList;
+	}
+
+	public byte[] getImageData() {
+		return imageData;
+	}
+
+	public void setImageData(byte[] imageData) {
+		this.imageData = imageData;
 	}
 
 	public boolean isClone() {

@@ -31,6 +31,8 @@ THE SOFTWARE.
 	        		<image id="productImage"/>
 	        		<vbox hflex="1" pack="center" align="center">
 		                <hbox hflex="1" pack="center">
+		                	<label value="Nro Orden: "/>
+                            <textbox id="productionOrderNumberTextbox" width="30px" disabled="true"/>
 		                	<label value="Plan de Produccion: "/>
 							<textbox id="productionPlanNameTextbox" disabled="true"/>
 							<label value="Estado Plan: "/>
@@ -127,8 +129,8 @@ THE SOFTWARE.
 			            		</bandbox>
 			                    <label value="NO REQUIERE" if="${!win_production_order_creation$composer.isMachineNecessary(each.process.type)}"/>
 		                    </cell>
-		                    <label value="${r:getFormattedProcessTime(each.process.time)}"/>
-			            	<label value="${r:getFormattedProcessTime(each.getTimeTotal())}"/>
+		                    <label value="${r:getFormattedProcessTime(each.process.getDurationTotal())}"/>
+			            	<label value="${r:getFormattedProcessTime(each.getDurationTotal())}"/>
 						</row>
 		            </template>
     			</grid>

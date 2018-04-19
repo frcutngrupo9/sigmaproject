@@ -25,6 +25,8 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,8 +80,20 @@ public class ProductionPlanListController extends SelectorComposer<Component> {
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		productionPlanList = productionPlanRepository.findAll();
+		// ordenamos la lista que para que aparezcan los planes mas recientes primeros
+		sortProductionPlansByDate();
 		productionPlanListModel = new ListModelList<ProductionPlan>(productionPlanList);
 		productionPlanGrid.setModel(productionPlanListModel);
+	}
+
+	public void sortProductionPlansByDate() {
+		Comparator<ProductionPlan> comp = new Comparator<ProductionPlan>() {
+			@Override
+			public int compare(ProductionPlan a, ProductionPlan b) {
+				return b.getDateCreation().compareTo(a.getDateCreation());
+			}
+		};
+		Collections.sort(productionPlanList, comp);
 	}
 
 	@Listen("onEditProductionPlan = #productionPlanGrid")
@@ -116,7 +130,7 @@ public class ProductionPlanListController extends SelectorComposer<Component> {
 		Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/requirement_plan_creation.zul");
 	}
-	
+
 	@Listen("onOpenGanttPlan = #productionPlanGrid")
 	public void goToGanttPlan(ForwardEvent evt) {
 		ProductionPlan productionPlan = (ProductionPlan) evt.getData();

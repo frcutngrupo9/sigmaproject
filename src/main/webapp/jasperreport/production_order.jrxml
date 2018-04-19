@@ -30,6 +30,7 @@
 			</line>
 			<textField pattern="EEE, d MMM yyyy">
 				<reportElement x="390" y="61" width="165" height="19" uuid="825eee50-b89f-4543-90c6-af94a1f82254"/>
+				<box rightPadding="5"/>
 				<textElement textAlignment="Right">
 					<font fontName="Times New Roman"/>
 				</textElement>
@@ -37,6 +38,7 @@
 			</textField>
 			<staticText>
 				<reportElement x="327" y="10" width="228" height="50" uuid="266ce9e6-afd9-42c5-832c-075f394baeb3"/>
+				<box rightPadding="5"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial Black" size="24" isBold="false"/>
 					<paragraph spacingAfter="5"/>
@@ -45,6 +47,7 @@
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="46" width="140" height="14" uuid="eeebef30-c9b7-466f-9c61-91fb2177983f"/>
+				<box leftPadding="5"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman"/>
 				</textElement>
@@ -71,7 +74,7 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Times New Roman" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Orden Producción:]]></text>
+				<text><![CDATA[N° Orden:]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="380" y="129" width="175" height="30" uuid="44888ce5-a0c9-4845-94fe-0c741884ed2f"/>
@@ -87,13 +90,6 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{reportTitle}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement x="0" y="31" width="166" height="15" uuid="a7530c94-e6d1-43a6-b541-c8191971fad3"/>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman"/>
-				</textElement>
-				<text><![CDATA[Maestro M. Lopez esq. Cruz Roja]]></text>
-			</staticText>
 			<textField>
 				<reportElement x="0" y="159" width="555" height="30" uuid="d90338aa-4d11-4b1b-9192-a58783348cc4"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
