@@ -24,117 +24,96 @@
 
 package ar.edu.utn.sigmaproject.controller;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.event.ForwardEvent;
+import org.zkoss.zk.ui.event.MouseEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
-import org.zkoss.zul.Grid;
+import org.zkoss.zul.Chart;
 import org.zkoss.zul.Include;
-import org.zkoss.zul.ListModelList;
+import org.zkoss.zul.PieModel;
+import org.zkoss.zul.SimplePieModel;
+import org.zkoss.zul.Vbox;
 
-import ar.edu.utn.sigmaproject.domain.ProductionOrder;
-import ar.edu.utn.sigmaproject.domain.ProductionPlan;
-import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
-import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
+import ar.edu.utn.sigmaproject.domain.OrderDetail;
+import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.domain.ProductTotal;
+import ar.edu.utn.sigmaproject.service.OrderDetailRepository;
+import ar.edu.utn.sigmaproject.service.ProductRepository;
 
 public class ReportController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
 	@Wire
-	Button generateReportButton;
+	Button productionOrderReportButton;
 	@Wire
-	Grid reportProductionPlanGrid; 
+	Chart productChart;
 
 	// services
 	@WireVariable
-	private ProductionPlanRepository productionPlanRepository;
+	private ProductRepository productRepository;
 	@WireVariable
-	private ProductionOrderRepository productionOrderRepository;
+	private OrderDetailRepository orderDetailRepository;
 
 	// list
-	private List<ProductionPlan> productionPlanList;
 
 	// list models
-	private ListModelList<ProductionPlan> productionPlanListModel;
+	PieModel productPieModel = null;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		reportProductionPlanGrid.setVisible(false);
-		productionPlanList = productionPlanRepository.findAll();
-		productionPlanListModel = new ListModelList<ProductionPlan>(productionPlanList);
-		reportProductionPlanGrid.setModel(productionPlanListModel);
+		productChart.setThreeD(true);
+		productChart.setModel(getProductPieModel());
 	}
 
-	@Listen("onClick = #generateReportButton")
-	public void generateReportButtonClick() {
-		reportProductionPlanGrid.setVisible(true);
-	}
-
-	public Date getDateStartReal(ProductionPlan productionPlan) {
-		List<ProductionOrder> productionOrderList = productionOrderRepository.findByProductionPlan(productionPlan);
-		// busca la primera fecha de inicio real de ordenes de produccion
-		Date date = null;
-		for(ProductionOrder each : productionOrderList) {
-			Date startRealDate = each.getDateStartReal();
-			if(startRealDate != null) {
-				if(date == null) {
-					date = startRealDate;
-				} else {
-					if(startRealDate.before(date)) {
-						date = startRealDate;
-					}
-				}
-			}
-		}
-		return date;
-	}
-
-	public String getDeviation(ProductionPlan productionPlan) {
-		Date dateStart = productionPlan.getDateStart();
-		if(dateStart == null) {
-			return "No hay Fecha Inicio";
-		}
-		Date dateStartReal = getDateStartReal(productionPlan);
-		if(dateStartReal == null) {
-			return "No hay Fecha Inicio Real";
-		}
-		if(dateStart.before(dateStartReal)) {
-			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-			String dateStartFormatted = dateFormat.format(dateStart);
-			String dateStartRealFormatted = dateFormat.format(dateStartReal);
-			if(dateStartFormatted.equals(dateStartRealFormatted)) {
-				return "Esta Puntual";
-			}
-			return "Esta Retrasado";
-		} else {
-			return "Esta Adelantado";
-		}
-	}
-
-	public String getFormattedDate(Date date) {
-		if(date == null) {
-			return "";
-		}
-		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		return dateFormat.format(date);
-	}
-
-	@Listen("onNavigateToProductionOrder = #reportProductionPlanGrid")
-	public void goToReportProductionOrder(ForwardEvent evt) {
-		ProductionPlan productionPlan = (ProductionPlan) evt.getData();
-		Executions.getCurrent().setAttribute("selected_production_plan", productionPlan);
-		Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
+	@Listen("onClick = #productionOrderReportButton")
+	public void productionOrderReportButtonClick() {
+		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/report_production_order.zul");
 	}
+
+	private PieModel getProductPieModel() {
+		if(productPieModel == null) {
+			productPieModel = new SimplePieModel();
+			for(ProductTotal each : getProductTotalOrders()) {
+				productPieModel.setValue(each.getProduct().getName(), each.getTotalUnits());
+			}
+		}
+		return productPieModel;
+	}
+
+	private List<ProductTotal> getProductTotalOrders() {
+		Map<Product, Integer> productTotalMap = new HashMap<Product, Integer>();
+		for(Product eachProduct : productRepository.findAll()) {
+			for(OrderDetail eachOrderDetail : orderDetailRepository.findByProduct(eachProduct)) {
+				Integer totalUnits = productTotalMap.get(eachProduct);
+				productTotalMap.put(eachProduct, (totalUnits == null) ? eachOrderDetail.getUnits() : totalUnits + eachOrderDetail.getUnits());
+			}
+		}
+		List<ProductTotal> list = new ArrayList<ProductTotal>();
+		for (Map.Entry<Product, Integer> entry : productTotalMap.entrySet()) {
+			Product product = entry.getKey();
+			Integer totalUnits = entry.getValue();
+			ProductTotal productTotal = new ProductTotal(product, totalUnits);
+			list.add(productTotal);
+		}
+		return list;
+	}
+
+	@Listen("onClick = #productChart")
+	public void ganttChartOnClick(MouseEvent event) {
+		productChart.setThreeD(!productChart.isThreeD());
+		productChart.setFgAlpha(productChart.isThreeD() ? 128 : 255);
+	}
+
 }

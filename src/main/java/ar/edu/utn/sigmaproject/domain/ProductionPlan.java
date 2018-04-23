@@ -25,6 +25,8 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -226,5 +228,45 @@ public class ProductionPlan  implements Serializable, Cloneable {
 
 	public void setProductionOrderList(List<ProductionOrder> productionOrderList) {
 		this.productionOrderList = productionOrderList;
+	}
+	
+	public String getDeviationText() {
+		Date dateStart = getDateStart();
+		if(dateStart == null) {
+			return "No hay Fecha Inicio";
+		}
+		Date dateStartReal = getDateStartReal();
+		if(dateStartReal == null) {
+			return "No hay Fecha Inicio Real";
+		}
+		if(dateStart.before(dateStartReal)) {
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			String dateStartFormatted = dateFormat.format(dateStart);
+			String dateStartRealFormatted = dateFormat.format(dateStartReal);
+			if(dateStartFormatted.equals(dateStartRealFormatted)) {
+				return "Esta Puntual";
+			}
+			return "Esta Retrasado";
+		} else {
+			return "Esta Adelantado";
+		}
+	}
+	
+	public Date getDateStartReal() {
+		// busca la primera fecha de inicio real de ordenes de produccion
+		Date date = null;
+		for(ProductionOrder each : productionOrderList) {
+			Date startRealDate = each.getDateStartReal();
+			if(startRealDate != null) {
+				if(date == null) {
+					date = startRealDate;
+				} else {
+					if(startRealDate.before(date)) {
+						date = startRealDate;
+					}
+				}
+			}
+		}
+		return date;
 	}
 }

@@ -24,12 +24,9 @@
 
 package ar.edu.utn.sigmaproject.controller;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
@@ -45,11 +42,7 @@ import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
 
-import ar.edu.utn.sigmaproject.domain.OrderDetail;
-import ar.edu.utn.sigmaproject.domain.Product;
-import ar.edu.utn.sigmaproject.domain.ProductTotal;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
-import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 
@@ -104,10 +97,6 @@ public class ProductionPlanListController extends SelectorComposer<Component> {
 		include.setSrc("/production_plan_creation.zul");
 	}
 
-	public String getQuantityOfProduct(ProductionPlan productionPlan) {
-		return getProductTotalList(productionPlan).size() + "";
-	}
-
 	@Listen("onClick = #newButton")
 	public void goToProductionPlanCreation() {
 		Executions.getCurrent().setAttribute("selected_production_plan", null);
@@ -137,24 +126,5 @@ public class ProductionPlanListController extends SelectorComposer<Component> {
 		Executions.getCurrent().setAttribute("selected_production_plan", productionPlan);
 		Include include = (Include) Selectors.iterable(evt.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/production_plan_gantt.zul");
-	}
-
-	private List<ProductTotal> getProductTotalList(ProductionPlan productionPlan) {
-		List<ProductionPlanDetail> productionPlanDetailList = productionPlan.getPlanDetails();
-		Map<Product, Integer> productTotalMap = new HashMap<Product, Integer>();
-		for(ProductionPlanDetail auxProductionPlanDetail : productionPlanDetailList) {
-			for(OrderDetail auxOrderDetail : auxProductionPlanDetail.getOrder().getDetails()) {
-				Integer totalUnits = productTotalMap.get(productRepository.findOne(auxOrderDetail.getProduct().getId()));
-				productTotalMap.put(productRepository.findOne(auxOrderDetail.getProduct().getId()), (totalUnits == null) ? auxOrderDetail.getUnits() : totalUnits + auxOrderDetail.getUnits());
-			}
-		}
-		List<ProductTotal> list = new ArrayList<ProductTotal>();
-		for (Map.Entry<Product, Integer> entry : productTotalMap.entrySet()) {
-			Product product = entry.getKey();
-			Integer totalUnits = entry.getValue();
-			ProductTotal productTotal = new ProductTotal(product, totalUnits);
-			list.add(productTotal);
-		}
-		return list;
 	}
 }

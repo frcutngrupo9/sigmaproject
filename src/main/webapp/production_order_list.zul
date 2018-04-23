@@ -27,23 +27,37 @@ THE SOFTWARE.
     <panel id="productionOrderCreationBlock" border="none">
         <panelchildren>
             <vlayout>
-                <hbox hflex="1" pack="center">
-                	<label value="Plan de Produccion: "/>
-					<textbox id="productionPlanNameTextbox" disabled="true" width="110px"/>
-					<label value="Estado: "/>
-                    <textbox id="productionPlanStateTypeTextbox" disabled="true" width="110px"/>
-					<label value="Fecha Creacion: "/>
-					<datebox id="productionPlanCreationDatebox" disabled="true" buttonVisible="false" format="dd/MM/yyyy" width="110px"/>
+                <hbox hflex="1">
+                	<hbox hflex="1" pack="center">
+	                	<label value="Plan de Produccion: "/>
+						<textbox id="productionPlanNameTextbox" disabled="true" width="110px"/>
+					</hbox>
+					<hbox hflex="1" pack="center">
+						<label value="Estado: "/>
+	                    <textbox id="productionPlanStateTypeTextbox" disabled="true" width="110px"/>
+                    </hbox>
+                    <hbox hflex="1" pack="center">
+						<label value="Fecha Creacion: "/>
+						<datebox id="productionPlanCreationDatebox" disabled="true" buttonVisible="false" format="dd/MM/yyyy" width="110px"/>
+					</hbox>
                 </hbox>
-                <hbox hflex="1" pack="center">
-					<label value="Fecha Inicio Plan: "/>
-					<datebox id="productionPlanStartDatebox" disabled="true"  buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
-					<label value="Fecha Fin Plan: "/>
-					<datebox id="productionPlanFinishDatebox" disabled="true" buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
-					<label value="Fecha Real Inicio: "/>
-					<datebox id="productionPlanStartRealDatebox" disabled="true" buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
-					<label value="Fecha Real Fin: "/>
-					<datebox id="productionPlanFinishRealDatebox" disabled="true" buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
+                <hbox hflex="1">
+					<hbox hflex="1" pack="center">
+						<label value="Fecha Inicio Plan: "/>
+						<datebox id="productionPlanStartDatebox" disabled="true"  buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
+					</hbox>
+					<hbox hflex="1" pack="center">
+						<label value="Fecha Fin Plan: "/>
+						<datebox id="productionPlanFinishDatebox" disabled="true" buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
+					</hbox>
+					<hbox hflex="1" pack="center">
+						<label value="Fecha Real Inicio: "/>
+						<datebox id="productionPlanStartRealDatebox" disabled="true" buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
+					</hbox>
+					<hbox hflex="1" pack="center">
+						<label value="Fecha Real Fin: "/>
+						<datebox id="productionPlanFinishRealDatebox" disabled="true" buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
+					</hbox>
 				</hbox>
     			<grid id="productionOrderGrid" sizedByContent="true" span="true">
     				<auxhead>

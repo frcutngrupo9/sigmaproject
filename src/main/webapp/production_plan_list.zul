@@ -55,7 +55,7 @@ THE SOFTWARE.
 		                <label value="${each.name}"/>
 		                <label value="${r:getFormattedDateTime(each.dateCreation)}"/>
 		                <label value="${each.planDetails.size()}"/>
-		                <label value="${win_production_plan_list$composer.getQuantityOfProduct(each)}"/>
+		                <label value="${each.getProductionOrderList().size()}"/>
 		                <label value="${each.getCurrentStateType().getName()}"/>
 		                <button forward="onClick=productionPlanGrid.onEditProductionPlan(${each})"  image="/img/edit16x16.png"/>
 		                <button forward="onClick=productionPlanGrid.onGenerateProductionOrder(${each})" label="Ordenes de Produccion" />
