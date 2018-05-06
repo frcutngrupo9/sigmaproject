@@ -38,7 +38,7 @@ THE SOFTWARE.
 			        	<listheader label="Producto" align="center"/>
 			        	<listheader label="Pieza" align="center"/>
 			            <listheader label="Longitud" align="center"/>
-			            <listheader label="Espesor" align="center"/>
+			            <listheader label="Espesor/altura" align="center"/>
 			            <listheader label="Ancho" align="center"/>
 			            <listheader label="Otras Medidas" align="center"/>
 			            <listheader label="Unidades" align="center"/>

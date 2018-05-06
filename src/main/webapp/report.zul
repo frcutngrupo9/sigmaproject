@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 
-<window id="reportAndStatisticsWindow" apply="ar.edu.utn.sigmaproject.controller.ReportController">
+<window id="reportWindow" apply="ar.edu.utn.sigmaproject.controller.ReportController">
 	<caption label="Reportes Y Estadisticas" style="text-align:center; font-weight: bold;"/>
 	<panel border="none">
         <panelchildren>
@@ -32,8 +32,8 @@ THE SOFTWARE.
             		<button id="productionOrderReportButton" label="Reporte Orden de Produccion"/>
             	</hbox>
                 <separator/>
-                <hbox hflex="1" vflex="1" pack="center">
-                	<chart id="productChart" type="pie" title="Productos mas pedidos" fgAlpha="128" width="800px" height="500"/>
+            	<hbox hflex="1" pack="center">
+            		<button id="showGraphicsModalButton" label="Mostrar Estadisticas"/>
             	</hbox>
             </vbox>
         </panelchildren>

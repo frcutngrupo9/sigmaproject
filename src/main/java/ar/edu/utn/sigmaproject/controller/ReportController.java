@@ -24,56 +24,31 @@
 
 package ar.edu.utn.sigmaproject.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.event.MouseEvent;
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
-import org.zkoss.zk.ui.select.annotation.WireVariable;
-import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
-import org.zkoss.zul.Chart;
 import org.zkoss.zul.Include;
-import org.zkoss.zul.PieModel;
-import org.zkoss.zul.SimplePieModel;
-import org.zkoss.zul.Vbox;
-
-import ar.edu.utn.sigmaproject.domain.OrderDetail;
-import ar.edu.utn.sigmaproject.domain.Product;
-import ar.edu.utn.sigmaproject.domain.ProductTotal;
-import ar.edu.utn.sigmaproject.service.OrderDetailRepository;
-import ar.edu.utn.sigmaproject.service.ProductRepository;
+import org.zkoss.zul.Window;
 
 public class ReportController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
 	@Wire
 	Button productionOrderReportButton;
-	@Wire
-	Chart productChart;
 
 	// services
-	@WireVariable
-	private ProductRepository productRepository;
-	@WireVariable
-	private OrderDetailRepository orderDetailRepository;
 
 	// list
 
 	// list models
-	PieModel productPieModel = null;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		productChart.setThreeD(true);
-		productChart.setModel(getProductPieModel());
 	}
 
 	@Listen("onClick = #productionOrderReportButton")
@@ -81,39 +56,16 @@ public class ReportController extends SelectorComposer<Component> {
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/report_production_order.zul");
 	}
-
-	private PieModel getProductPieModel() {
-		if(productPieModel == null) {
-			productPieModel = new SimplePieModel();
-			for(ProductTotal each : getProductTotalOrders()) {
-				productPieModel.setValue(each.getProduct().getName(), each.getTotalUnits());
-			}
-		}
-		return productPieModel;
+	
+	@Listen("onClick = #showGraphicsModalButton")
+	public void showGraphicsModalButtonOnClick() {
+		final Window win = (Window) Executions.createComponents("/graphics.zul", null, null);
+		win.setMaximizable(true);
+		win.setClosable(true);
+		win.setSizable(false);
+		win.setPosition("center,top");
+		win.doModal();
 	}
 
-	private List<ProductTotal> getProductTotalOrders() {
-		Map<Product, Integer> productTotalMap = new HashMap<Product, Integer>();
-		for(Product eachProduct : productRepository.findAll()) {
-			for(OrderDetail eachOrderDetail : orderDetailRepository.findByProduct(eachProduct)) {
-				Integer totalUnits = productTotalMap.get(eachProduct);
-				productTotalMap.put(eachProduct, (totalUnits == null) ? eachOrderDetail.getUnits() : totalUnits + eachOrderDetail.getUnits());
-			}
-		}
-		List<ProductTotal> list = new ArrayList<ProductTotal>();
-		for (Map.Entry<Product, Integer> entry : productTotalMap.entrySet()) {
-			Product product = entry.getKey();
-			Integer totalUnits = entry.getValue();
-			ProductTotal productTotal = new ProductTotal(product, totalUnits);
-			list.add(productTotal);
-		}
-		return list;
-	}
-
-	@Listen("onClick = #productChart")
-	public void ganttChartOnClick(MouseEvent event) {
-		productChart.setThreeD(!productChart.isThreeD());
-		productChart.setFgAlpha(productChart.isThreeD() ? 128 : 255);
-	}
 
 }
