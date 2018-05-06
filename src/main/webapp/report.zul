@@ -23,33 +23,19 @@ THE SOFTWARE.
 -->
 
 <window id="reportWindow" apply="ar.edu.utn.sigmaproject.controller.ReportController">
-	<caption label="Reportes" style="text-align:center; font-weight: bold;"/>
+	<caption label="Reportes Y Estadisticas" style="text-align:center; font-weight: bold;"/>
 	<panel border="none">
         <panelchildren>
-            <vlayout>
+            <vbox hflex="1" vflex="1">
+            	<separator/>
             	<hbox hflex="1" pack="center">
-            		<button id="generateReportButton" label="Generar Reporte"/>
+            		<button id="productionOrderReportButton" label="Reporte Orden de Produccion"/>
             	</hbox>
                 <separator/>
-                <grid id="reportProductionPlanGrid" mold="paging" pageSize="7" sizedByContent="true" span="true">
-			        <columns>
-			            <column label="Plan de Produccion" align="center"/>
-			            <column label="Fecha Inicio" align="center"/>
-			            <column label="Inicio Real" align="center"/>
-			            <column label="Informacion" align="center"/>
-			            <column label="Abrir" align="center"/>
-			        </columns>
-			        <template name="model">
-			            <row>
-			                <label value="${each.name}"/>
-			                <label value="${reportWindow$composer.getFormattedDate(each.dateStart)}"/>
-			                <label value="${reportWindow$composer.getFormattedDate(reportWindow$composer.getDateStartReal(each))}"/>
-			                <label value="${reportWindow$composer.getDeviation(each)}"/>
-			                <button forward="onClick=reportProductionPlanGrid.onNavigateToProductionOrder(${each})" label="Ordenes de Produccion" />
-			            </row>
-			        </template>
-			    </grid>
-            </vlayout>
+            	<hbox hflex="1" pack="center">
+            		<button id="showGraphicsModalButton" label="Mostrar Estadisticas"/>
+            	</hbox>
+            </vbox>
         </panelchildren>
     </panel>
 </window>

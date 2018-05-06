@@ -39,6 +39,7 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Grid;
+import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Paging;
@@ -68,6 +69,10 @@ public class ProcessController extends SelectorComposer<Component> {
 	Grid processTypeGrid;
 	@Wire
 	Textbox nameTextbox;
+	@Wire
+	Textbox detailsTextbox;
+	@Wire
+	Intbox sequenceIntbox;
 	@Wire
 	Combobox machineTypeCombobox;
 	@Wire
@@ -123,19 +128,49 @@ public class ProcessController extends SelectorComposer<Component> {
 			Clients.showNotification("Debe ingresar un nombre", nameTextbox);
 			return;
 		}
+		if(sequenceIntbox.getValue() <= 0){
+			Clients.showNotification("Debe ingresar un nro de secuencia mayor a cero", sequenceIntbox);
+			return;
+		}
 		String name = nameTextbox.getText();
+		String details = detailsTextbox.getText();
+		int sequence = sequenceIntbox.getValue();
 		MachineType machineType = null;
 		if(machineTypeCombobox.getSelectedItem() != null) {
 			machineType = machineTypeCombobox.getSelectedItem().getValue();
 		}
+		int prevSeq = -1;
 		if(currentProcessType == null) {
 			// nuevo
-			currentProcessType = new ProcessType(name, machineType);
+			prevSeq = sequence;
+			currentProcessType = new ProcessType(sequence, name, details, machineType);
 		} else {
 			// edicion
+			prevSeq = currentProcessType.getSequence();
 			currentProcessType.setName(name);
+			currentProcessType.setSequence(sequence);
 			currentProcessType.setMachineType(machineType);
 		}
+		// si la secuencia se superpone a otro proceso, se mueven las secuencias
+//		List<ProcessType> processTypelist = processTypeRepository.findAll();
+//		if(sequence <= getLastSequence() && prevSeq != sequence) {
+//			boolean movedForward = prevSeq < sequence;
+//			for(ProcessType each : processTypelist) {
+//				if(movedForward) {// se movio hacia adelante
+//					// a todos los procesos entre las 2 secuencias se les resta 1
+//					if(each.getSequence() > prevSeq && each.getSequence() <= sequence) {
+//						each.setSequence(each.getSequence() - 1);
+//					}
+//				} else {
+//					if(each.getSequence() >= sequence && each.getSequence() < prevSeq) {
+//						each.setSequence(each.getSequence() + 1);
+//					}
+//				}
+//			}
+//		} else {
+//			
+//		}
+
 		currentProcessType = processTypeRepository.save(currentProcessType);
 		sortingPagingHelper.reset();
 		currentProcessType = null;
@@ -184,15 +219,29 @@ public class ProcessController extends SelectorComposer<Component> {
 		if(currentProcessType == null) {// creando
 			processTypeGrid.setVisible(false);
 			nameTextbox.setValue(null);
+			detailsTextbox.setValue(null);
+			// se selecciona el ultimo nro de secuencia mas 1
+			sequenceIntbox.setValue(getLastSequence() + 1);
 			machineTypeCombobox.setSelectedIndex(-1);
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
 		} else {// editando
 			processTypeGrid.setVisible(true);
 			nameTextbox.setValue(currentProcessType.getName());
+			sequenceIntbox.setValue(currentProcessType.getSequence());
 			machineTypeCombobox.setSelectedIndex(machineTypeListModel.indexOf(currentProcessType.getMachineType()));
 			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
 		}
+	}
+
+	private int getLastSequence() {
+		int lastSequence = 0;
+		for(ProcessType each : processTypeRepository.findAll()) {
+			if(each.getSequence() >= lastSequence) {
+				lastSequence = each.getSequence();
+			}
+		}
+		return lastSequence;
 	}
 }

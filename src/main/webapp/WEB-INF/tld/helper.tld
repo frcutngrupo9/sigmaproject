@@ -42,6 +42,13 @@
         </function-signature>
     </function>
     <function>
+        <name>getPieceImage</name>
+        <function-class>ar.edu.utn.sigmaproject.util.RenderElHelper</function-class>
+        <function-signature>
+            org.zkoss.image.Image getPieceImage(ar.edu.utn.sigmaproject.domain.Piece piece)
+        </function-signature>
+    </function>
+    <function>
         <name>getReportTypeListModelList</name>
         <function-class>ar.edu.utn.sigmaproject.util.RenderElHelper</function-class>
         <function-signature>

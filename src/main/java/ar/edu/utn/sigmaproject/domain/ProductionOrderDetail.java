@@ -205,4 +205,9 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 	public void setProductionOrder(ProductionOrder productionOrder) {
 		this.productionOrder = productionOrder;
 	}
+	
+	public Duration getDurationTotal() {
+		// devuelve la duracion de este proceso para todo el detalle de la orden ( ej el proceso es armado de cajon, para una cajonera de varios cajones, se multiplica la duracion del proceso por la cantidad del total de piezas para la orden)
+		return getProcess().getTime().multiply(new BigDecimal(getQuantityPiece()));
+	}
 }

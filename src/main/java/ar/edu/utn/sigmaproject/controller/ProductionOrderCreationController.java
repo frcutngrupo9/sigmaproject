@@ -25,8 +25,6 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -35,12 +33,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.datatype.Duration;
-
-import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JRField;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.zkoss.image.AImage;
@@ -70,6 +62,7 @@ import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
+import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
@@ -88,6 +81,7 @@ import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.WorkerRepository;
 import ar.edu.utn.sigmaproject.util.ProductionDateTimeHelper;
+import ar.edu.utn.sigmaproject.util.ProductionOrderReportDataSource;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProductionOrderCreationController extends SelectorComposer<Component> {
@@ -99,6 +93,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	Textbox productionPlanStateTypeTextbox;
 	@Wire
 	Textbox productionOrderStateTypeTextbox;
+	@Wire
+	Textbox productionOrderNumberTextbox;
 	@Wire
 	Textbox productCodeTextbox;
 	@Wire
@@ -199,6 +195,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			productionPlanStateTypeTextbox.setText("[Sin Estado]");
 		}
 		productionOrderStateTypeTextbox.setText(currentProductionOrder.getCurrentStateType().getName());
+		productionOrderNumberTextbox.setText(currentProductionOrder.getNumber() + "");
 		productNameTextbox.setText(currentProductionOrder.getProduct().getName());
 		productCodeTextbox.setText(currentProductionOrder.getProduct().getCode());
 		productUnitsIntbox.setValue(currentProductionOrder.getUnits());
@@ -333,7 +330,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		// devuelve todas las maquinas del mismo tipo
 		return new ListModelList<>(getMachineListByProcessType(productionOrderDetail.getProcess().getType()));
 	}
-	
+
 	private List<Machine> getMachineListByProcessType(ProcessType processType) {
 		List<Machine> list = new ArrayList<Machine>();
 		if(processType.getMachineType() != null) {
@@ -350,34 +347,48 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	}
 
 	public String getMachineAvailabilityDescription(Machine machine, ProductionOrderDetail productionOrderDetail) {
-		String availabilityText = "";
 		if (machine == null || productionOrderDetail == null) {
-			return availabilityText;
+			return "";
 		}
 		// devuelve el estado de la maquina
 		// se busca todos los detalles de las ordenes que esten superpuestas en horario y sean el mismo tipo de maquina
-		List<ProductionOrderDetail> machineOverlappingDetails = getMachineOverlappingDetails(productionOrderDetail);
-		// se elimina la orden actual y se busca en las restantes ordenes si la maquina parametro es la misma asignada
-		machineOverlappingDetails.remove(productionOrderDetailRepository.findOne(productionOrderDetail.getId()));
+		Map<ProductionOrder, Map<Piece, List<ProcessType>>> productionOrderMap = getMachineProductionOrderMap(machine, getMachineOverlappingDetails(productionOrderDetail));
+		if(productionOrderMap != null) {
+			String availabilityText = "No Disponible ( usada en ";
+			availabilityText += getDescriptionWhere(productionOrderMap);
+			return availabilityText += ")";
+		} else {
+			return "Disponible";
+		}
+	}
+
+	private Map<ProductionOrder, Map<Piece, List<ProcessType>>> getMachineProductionOrderMap(Machine machine, List<ProductionOrderDetail> machineOverlappingDetails) {
+		Map<ProductionOrder, Map<Piece, List<ProcessType>>> productionOrderMap = null;
 		for(ProductionOrderDetail each : machineOverlappingDetails) {
 			if(machineRepository.findOne(each.getMachine().getId()).equals(machineRepository.findOne(machine.getId()))) {
-				String descriptionWhere = each.getProductionOrder().getProductionPlan().getName() + " orden " + each.getProductionOrder().getNumber() + " " + each.getProcess().getType().getName() + " " + each.getProcess().getPiece().getName();
-				// si es la primera vez
-				if(availabilityText.equals("")) {
-					availabilityText = "No Disponible (usada en " + descriptionWhere;
-				} else {
-					// si esta tambien en otra orden
-					availabilityText += ", " + descriptionWhere;
+				if(productionOrderMap == null) {
+					productionOrderMap = new HashMap<ProductionOrder, Map<Piece, List<ProcessType>>>();
 				}
+				Map<Piece, List<ProcessType>> pieceMap = productionOrderMap.get(each.getProductionOrder());
+				Piece piece = each.getProcess().getPiece();
+				ProductionOrder productionOrder = each.getProductionOrder();
+				List<ProcessType> processList = null;
+				if(pieceMap == null) {
+					pieceMap = new HashMap<Piece, List<ProcessType>>();
+					processList = new ArrayList<ProcessType>();
+					processList.add(each.getProcess().getType());
+				} else {
+					processList = pieceMap.get(piece);
+					if(processList == null) {
+						processList = new ArrayList<ProcessType>();
+					}
+					processList.add(each.getProcess().getType());
+				}
+				pieceMap.put(piece, processList);
+				productionOrderMap.put(productionOrder, pieceMap);
 			}
 		}
-		// si encontro algun solapamiento
-		if(!availabilityText.equals("")) {
-			availabilityText += ")";
-		} else {
-			availabilityText = "Disponible";
-		}
-		return availabilityText;
+		return productionOrderMap;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -455,32 +466,67 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	}
 
 	public String getWorkerAvailabilityDescription(Worker worker, ProductionOrderDetail productionOrderDetail) {
-		String availabilityText = "";
 		if (worker == null || productionOrderDetail == null) {
-			return availabilityText;
+			return "";
 		}
-		// se busca todos los detalles de las ordenes que esten superpuestas en horario
-		List<ProductionOrderDetail> workerOverlappingDetails = getWorkerOverlappingDetails(productionOrderDetail);
-		// se busca en las restantes ordenes si la maquina parametro es la misma asignada
+		Map<ProductionOrder, Map<Piece, List<ProcessType>>> productionOrderMap = getProductionOrderMap(worker, getWorkerOverlappingDetails(productionOrderDetail));
+		if(productionOrderMap != null) {
+			String availabilityText = "No Disponible ( asignado a ";
+			availabilityText += getDescriptionWhere(productionOrderMap);
+			return availabilityText += ")";
+		} else {
+			return "Disponible";
+		}
+	}
+
+	private Map<ProductionOrder, Map<Piece, List<ProcessType>>> getProductionOrderMap(Worker worker, List<ProductionOrderDetail> workerOverlappingDetails) {
+		Map<ProductionOrder, Map<Piece, List<ProcessType>>> productionOrderMap = null;
 		for(ProductionOrderDetail each : workerOverlappingDetails) {
 			if(workerRepository.findOne(each.getWorker().getId()).equals(workerRepository.findOne(worker.getId()))) {
-				String descriptionWhere = each.getProductionOrder().getProductionPlan().getName() + " orden " + each.getProductionOrder().getNumber() + " " + each.getProcess().getType().getName() + " " + each.getProcess().getPiece().getName();
-				// si es la primera vez
-				if(availabilityText.equals("")) {
-					availabilityText = "No Disponible (asignado a " + descriptionWhere;
-				} else {
-					// si esta tambien en otra orden
-					availabilityText += ", " + descriptionWhere;
+				if(productionOrderMap == null) {
+					productionOrderMap = new HashMap<ProductionOrder, Map<Piece, List<ProcessType>>>();
 				}
+				Map<Piece, List<ProcessType>> pieceMap = productionOrderMap.get(each.getProductionOrder());
+				Piece piece = each.getProcess().getPiece();
+				ProductionOrder productionOrder = each.getProductionOrder();
+				List<ProcessType> processList = null;
+				if(pieceMap == null) {
+					pieceMap = new HashMap<Piece, List<ProcessType>>();
+					processList = new ArrayList<ProcessType>();
+					processList.add(each.getProcess().getType());
+				} else {
+					processList = pieceMap.get(piece);
+					if(processList == null) {
+						processList = new ArrayList<ProcessType>();
+					}
+					processList.add(each.getProcess().getType());
+				}
+				pieceMap.put(piece, processList);
+				productionOrderMap.put(productionOrder, pieceMap);
 			}
 		}
-		// si encontro algun solapamiento
-		if(!availabilityText.equals("")) {
-			availabilityText += ")";
-		} else {
-			availabilityText = "Disponible";
+		return productionOrderMap;
+	}
+
+	private String getDescriptionWhere(Map<ProductionOrder, Map<Piece, List<ProcessType>>> productionOrderMap) {
+		String descriptionWhere = "";
+		for (Map.Entry<ProductionOrder, Map<Piece, List<ProcessType>>> entryProductionOrder : productionOrderMap.entrySet()) {
+			descriptionWhere += "Orden " + entryProductionOrder.getKey().getNumber();
+			for (Map.Entry<Piece, List<ProcessType>> entryPiece : entryProductionOrder.getValue().entrySet()) {
+				descriptionWhere += " " + entryPiece.getKey().getName();
+				boolean firstTime = true;
+				for(ProcessType eachProcessType : entryPiece.getValue()) {
+					if(firstTime) {
+						descriptionWhere += ": " + eachProcessType.getName();
+						firstTime = false;
+					} else {
+						descriptionWhere += ", " + eachProcessType.getName();
+					}
+				}
+				descriptionWhere += " ";
+			}
 		}
-		return availabilityText;
+		return descriptionWhere;
 	}
 
 	private boolean isWorkerAvailable(Worker worker, ProductionOrderDetail productionOrderDetail) {
@@ -733,83 +779,5 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		/*reportBlockJasperreport.setSrc("/jasperreport/production_order.jasper");
 		reportBlockJasperreport.setType(type);
 		reportBlockJasperreport.setDatasource(new ProductionOrderReportDataSource(productionOrderDetailList));*/
-	}
-}
-
-class ProductionOrderReportDataSource implements JRDataSource {
-
-	private List<ProductionOrderDetail> productionOrderDetailList = new ArrayList<ProductionOrderDetail>();
-	private int index = -1;
-
-	public ProductionOrderReportDataSource(List<ProductionOrderDetail> productionOrderDetailList) {
-		// agrega todos menos los detalles cancelados
-		for(ProductionOrderDetail each : productionOrderDetailList) {
-			if(each.getState() != ProcessState.Cancelado) {
-				this.productionOrderDetailList.add(each);
-			}
-		}
-	}
-
-	public boolean next() throws JRException {
-		index++;
-		return (index < productionOrderDetailList.size());
-	}
-
-	public Object getFieldValue(JRField field) throws JRException {
-		Object value = null;
-		String fieldName = field.getName();
-		if ("process_name".equals(fieldName)) {
-			value = productionOrderDetailList.get(index).getProcess().getType().getName();
-		} else if ("machine_name".equals(fieldName)) {
-			if(productionOrderDetailList.get(index).getProcess().getType().getMachineType() != null) {
-				if(productionOrderDetailList.get(index).getMachine() != null) {
-					value = productionOrderDetailList.get(index).getMachine().getName();
-				} else {
-					value = "No seleccionado";
-				}
-			} else {
-				value = "No requiere";
-			}
-		} else if ("worker_name".equals(fieldName)) {
-			if(productionOrderDetailList.get(index).getWorker() != null) {
-				value = productionOrderDetailList.get(index).getWorker().getName();
-			} else {
-				value = "No seleccionado";
-			}
-		} else if ("date_start".equals(fieldName)) {
-			Date date = productionOrderDetailList.get(index).getDateStart();
-			if(date != null) {
-				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-				value = dateFormat.format(date);
-			} else {
-				value = "No seleccionado";
-			}
-		} else if ("date_finish".equals(fieldName)) {
-			Date date = productionOrderDetailList.get(index).getDateFinish();
-			if(date != null) {
-				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-				value = dateFormat.format(date);
-			} else {
-				value = "No seleccionado";
-			}
-		} else if ("duration_total".equals(fieldName)) {
-			Duration time = productionOrderDetailList.get(index).getTimeTotal();
-			if(time != null) {
-				int hours = time.getHours();
-				int minutes = time.getMinutes();
-				while(minutes >= 60) {
-					hours = hours + 1;
-					minutes = minutes - 60;
-				}
-				value = String.format("%d hrs  %d min", hours, minutes);
-			} else {
-				value = "0 hrs 0 min";
-			}
-		} else if ("piece_name".equals(fieldName)) {
-			value = productionOrderDetailList.get(index).getProcess().getPiece().getName();
-		} else if ("piece_quantity".equals(fieldName)) {
-			value = productionOrderDetailList.get(index).getQuantityPiece();
-		}
-		return value;
 	}
 }

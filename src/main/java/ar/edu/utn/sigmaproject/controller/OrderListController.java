@@ -25,17 +25,11 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JRField;
 
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
@@ -50,12 +44,10 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
-import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
@@ -64,7 +56,6 @@ import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
-import ar.edu.utn.sigmaproject.domain.ReportType;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
@@ -116,8 +107,19 @@ public class OrderListController extends SelectorComposer<Component> {
 
 	private void refreshView() {
 		orderList = orderRepository.findAll();
+		sortOrdersByDate();
 		orderListModel = new ListModelList<Order>(orderList);
 		orderGrid.setModel(orderListModel);
+	}
+
+	public void sortOrdersByDate() {
+		Comparator<Order> comp = new Comparator<Order>() {
+			@Override
+			public int compare(Order a, Order b) {
+				return b.getDate().compareTo(a.getDate());
+			}
+		};
+		Collections.sort(orderList, comp);
 	}
 
 	@Listen("onClick = #newOrderButton")

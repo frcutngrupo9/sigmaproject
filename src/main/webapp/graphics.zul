@@ -1,0 +1,64 @@
+<!--
+The MIT License
+
+Copyright (C) 2017 SigmaProject.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-->
+
+<window id="graphicsWindow" apply="ar.edu.utn.sigmaproject.controller.GraphicsController">
+	<caption label="Estadisticas" style="text-align:center; font-weight: bold;"/>
+	<panel border="none">
+        <panelchildren>
+            <vbox hflex="1" vflex="1">
+            	<toolbar align="center" orient="horizontal">
+	                <toolbarbutton id="productPieChartButton" label="Productos Pedidos"/>
+	                <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+            		<toolbarbutton id="productLineChartButton" label="Productos por Mes"/>
+            		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+            		<toolbarbutton id="productBarChartButton" label="Productos por Cliente"/>
+				</toolbar>
+            	<hbox hflex="1" pack="center">
+					<hbox hflex="1" vflex="1" pack="center" align="center">
+						<label>Desde: </label>
+						<datebox id="fromDatebox" buttonVisible="true" cols="12" format="dd/MM/yyyy"/>
+						<button id="beginningOfTimeButton" label="Inicio"/>
+	                </hbox>
+	                <hbox hflex="1" vflex="1" pack="center" align="center">
+		                <label>Hasta: </label>
+		                <datebox id="toDatebox" buttonVisible="true" cols="12" format="dd/MM/yyyy"/>
+	            		<button id="endOfTimeButton" label="Fin"/>
+	                </hbox>
+	                <hbox hflex="1" vflex="1" pack="center" align="center">
+		                <label>3D: </label>
+		                <checkbox id="chart3dCheckbox"/>
+		                <space bar="true" style="vertical-align: middle; line-height: 0px;"/>
+		                <label>Transparencia: </label>
+		                <slider id="transparencySlider" orient="horizontal" maxpos="255"/>
+		                <space bar="true" style="vertical-align: middle; line-height: 0px;"/>
+	                </hbox>
+				</hbox>
+                <hbox hflex="1" vflex="1" pack="center">
+                	<chart id="productChart" width="1000px" height="500"/>
+            	</hbox>
+            	
+            </vbox>
+        </panelchildren>
+    </panel>
+</window>

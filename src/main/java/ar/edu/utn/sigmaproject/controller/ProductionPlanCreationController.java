@@ -245,14 +245,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			productionPlanState = productionPlanStateRepository.save(productionPlanState);
 			currentProductionPlan.setState(productionPlanState);
 			// cambia el estado de los pedidos
-			for(ProductionPlanDetail each : productionPlanDetailList) {
-				OrderStateType orderStateType = orderStateTypeRepository.findFirstByName("Planificado");
-				Order order = each.getOrder();
-				OrderState state = new OrderState(orderStateType, new Date());
-				state = orderStateRepository.save(state);
-				order.setState(state);
-				orderRepository.save(order);
-			}
+			setProductionPlanDetailStates("Planificado");
 			isNewProductionPlan = true;
 		} else { // se edita un plan
 			currentProductionPlan.setName(productionPlanName);
@@ -264,7 +257,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				currentProductionPlan.setState(productionPlanState);
 			}
 		}
-
 		currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
 		//TODO si no es nuevo pero se modificaron los detalles deberia actualizar las ordenes de produccion
 		if(isNewProductionPlan) {
@@ -273,26 +265,40 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			currentProductionPlan.getMaterialRequirements().addAll(materialRequirementList);
 			// crea ordenes de produccion
 			int sequence = 0;
+			List<ProductionOrder> productionOrderList = currentProductionPlan.getProductionOrderList();
 			for(ProductTotal each : getProductTotalList()) {
 				ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateTypeRepository.findFirstByName("Registrada"), new Date());
 				productionOrderState = productionOrderStateRepository.save(productionOrderState);
 				sequence += 1;
 				ProductionOrder productionOrder = new ProductionOrder(sequence, currentProductionPlan, each.getProduct(), each.getTotalUnits(), productionOrderState);
 				//  agrega los detalles
-				List<ProductionOrderDetail> details = createProductionOrderDetailList(productionOrder);
-				//				details = productionOrderDetailRepository.save(details);
-				productionOrder.setDetails(details);
+				productionOrder.setDetails(createProductionOrderDetailList(productionOrder));
 				// agrega los materiales a las ordenes de produccion
-				List<ProductionOrderMaterial> productionOrderMaterialList = createProductionOrderMaterialList(productionOrder);
-				productionOrder.setProductionOrderMaterials(productionOrderMaterialList);
-
-				//productionOrder = productionOrderRepository.save(productionOrder);
-				currentProductionPlan.getProductionOrderList().add(productionOrder);
+				productionOrder.setProductionOrderMaterials(createProductionOrderMaterialList(productionOrder));
+				productionOrderList.add(productionOrder);
 			}
 			currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
-		}
+		}/* else {
+			// si se agrego o cambio alguno de los pedidos
+			int currentProductionOrderListSize = currentProductionPlan.getProductionOrderList().size();
+			int savedProductionOrderListSize = (productionPlanRepository.findOne(currentProductionPlan.getId())).getProductionOrderList().size();
+			if(currentProductionOrderListSize - savedProductionOrderListSize == 0) {
+				
+			}
+		}*/
 		refreshViewProductionPlan();
 		alert("Plan guardado.");
+	}
+	
+	private void setProductionPlanDetailStates(String stateName) {
+		for(ProductionPlanDetail each : productionPlanDetailList) {
+			OrderStateType orderStateType = orderStateTypeRepository.findFirstByName(stateName);
+			Order order = each.getOrder();
+			OrderState state = new OrderState(orderStateType, new Date());
+			state = orderStateRepository.save(state);
+			order.setState(state);
+			orderRepository.save(order);
+		}
 	}
 
 	private List<ProductionOrderDetail> createProductionOrderDetailList(ProductionOrder productionOrder) {
@@ -303,7 +309,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				// por cada proceso hay que crear un detalle
 				Integer units = productionOrder.getUnits();
 				Integer quantityPiece = units * piece.getUnits();// cantidad total de la pieza
-				Duration timeTotal = process.getTime().multiply(units);// tiempo del proceso de las piezas del producto por las unidades del producto
+				Duration timeTotal = process.getDurationTotal().multiply(units);// tiempo del proceso de las piezas del producto por las unidades del producto
 				details.add(new ProductionOrderDetail(productionOrder, process, ProcessState.Pendiente, null, timeTotal, quantityPiece));
 			}
 		}

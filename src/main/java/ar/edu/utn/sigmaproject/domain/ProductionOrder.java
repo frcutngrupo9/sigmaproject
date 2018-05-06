@@ -282,9 +282,9 @@ public class ProductionOrder implements Serializable, Cloneable {
 		for(ProductionOrderDetail each : getDetails()) {
 			if(each.getState() != ProcessState.Cancelado) {// no suma si esta cancelado
 				if(duration == null) {// primera vez
-					duration = each.getTimeTotal();
+					duration = each.getDurationTotal();
 				} else {
-					duration = duration.add(each.getTimeTotal());
+					duration = duration.add(each.getDurationTotal());
 				}
 			}
 		}

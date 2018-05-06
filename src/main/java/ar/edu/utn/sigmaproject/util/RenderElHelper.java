@@ -37,6 +37,7 @@ import org.zkoss.image.Image;
 import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
 
+import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ReportType;
 
@@ -91,13 +92,21 @@ public class RenderElHelper {
 	}
 	
 	public static Image getProductImage(Product product) {
+		return getImage(product.getImageData());
+	}
+	
+	public static Image getPieceImage(Piece piece) {
+		return getImage(piece.getImageData());
+	}
+	
+	private static Image getImage(byte[] imageData) {
 		Image img = null;
-		try {
-			img = new AImage("", product.getImageData());
-		} catch (IOException exception) {}
-		if(img != null) {
+		if(imageData == null) {
 			return img;
 		}
+		try {
+			img = new AImage("", imageData);
+		} catch (IOException exception) {}
 		return img;
 	}
 	

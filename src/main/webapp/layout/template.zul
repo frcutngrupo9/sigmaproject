@@ -27,7 +27,7 @@ THE SOFTWARE.
         <north height="100px" border="none" >
             <include src="/layout/header.zul"/>
         </north>
-        <west width="260px" border="none" collapsible="true" splittable="true" minsize="300">
+        <west width="240px" border="none" collapsible="true" splittable="true" minsize="220">
             <include src="/layout/sidebar.zul"/>
         </west>
         <center id="mainContent" autoscroll="true" border="none" self="@insert(content)">

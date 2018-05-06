@@ -46,6 +46,7 @@ import org.zkoss.zk.ui.event.EventQueue;
 import org.zkoss.zk.ui.event.EventQueues;
 import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.event.InputEvent;
+import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -58,6 +59,7 @@ import org.zkoss.zul.Caption;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Doublebox;
+import org.zkoss.zul.Fileupload;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Image;
 import org.zkoss.zul.Include;
@@ -69,7 +71,10 @@ import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Selectbox;
 import org.zkoss.zul.Spinner;
+import org.zkoss.zul.Tab;
+import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Toolbarbutton;
 import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
@@ -94,8 +99,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	final Logger logger = LoggerFactory.getLogger(ProductCreationController.class);
 
 	@Wire
-	Component productCreationBlock;
-	@Wire
 	Textbox productNameTextbox;
 	@Wire
 	Textbox productDetailsTextbox;
@@ -104,9 +107,13 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@Wire
 	Button createPieceButton;
 	@Wire
-	Button resetPieceButton;
+	Toolbarbutton cancelPieceButton;
 	@Wire
-	Button deletePieceButton;
+	Toolbarbutton savePieceButton;
+	@Wire
+	Toolbarbutton resetPieceButton;
+	@Wire
+	Toolbarbutton deletePieceButton;
 	@Wire
 	Button saveProductButton;
 	@Wire
@@ -120,7 +127,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@Wire
 	Image productImage;
 	@Wire
-	Component pieceCreationBlock;
+	Tabbox pieceCreationBlock;
 	@Wire
 	Textbox pieceNameTextbox;
 	@Wire
@@ -144,10 +151,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@Wire
 	Intbox pieceUnitsByProductIntbox;
 	@Wire
-	Button cancelPieceButton;
-	@Wire
-	Component processCreationBlock;
-	@Wire
 	Listbox processListbox;
 	@Wire
 	Listbox pieceListbox;
@@ -163,6 +166,18 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	Button openRawMaterialListButton;
 	@Wire
 	Button openSupplyListButton;
+	@Wire
+	Grid pieceGrid;
+	@Wire
+	Image pieceImage;
+	@Wire
+	Button deletePieceImageButton;
+	@Wire
+	Button uploadPieceImageButton;
+	@Wire
+	Tab pieceTab;
+	@Wire
+	Tab processTab;
 
 	// services
 	@WireVariable
@@ -301,9 +316,14 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		currentPiece = null;
 		refreshViewProduct();
 		refreshViewPiece();
+		//TODO: que no de error si se elimino del producto una pieza que es usada en algun plan de produccion
+		// al momento de eliminar una pieza virificar si esta siendo usada en algun plan y si es asi, cambiar el isClone de la pieza a true
+		// hacer que no se muestren las piezas con iscloned true en la lista
 	}
 
-	public void doUploadProductPhoto(org.zkoss.image.AImage media) {
+	@Listen("onUpload = #uploadProductPhotoButton")
+	public void doUploadProductPhoto(UploadEvent event) {
+		org.zkoss.image.AImage media = (org.zkoss.image.AImage) event.getMedia();
 		if (media instanceof org.zkoss.image.Image) {
 			org.zkoss.image.Image img = media;
 			productImage.setHeight("225px");
@@ -337,7 +357,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		currentPiece = null;
 		refreshViewPiece();
 		pieceCreationBlock.setVisible(true);
-		processCreationBlock.setVisible(true);
 		scrollToPieceBlock();
 	}
 
@@ -345,8 +364,8 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		Clients.scrollIntoView(pieceCreationBlock);
 	}
 
-	@Listen("onClick = #finishProcessButton")
-	public void finishPiece() {
+	@Listen("onClick = #savePieceButton")
+	public void savePieceButtonClick() {
 		if(Strings.isBlank(pieceNameTextbox.getValue())) {
 			Clients.showNotification("Ingrese el Nombre de la Pieza", pieceNameTextbox);
 			return;
@@ -356,7 +375,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			return;
 		}
 		// comprobamos que no existan checkbox activados que no posean valores de duracion
-		for(int i = 1; i < processListbox.getChildren().size(); i++) { //empezamos en 1 para no recorrer el Listhead
+		for(int i = 2; i < processListbox.getChildren().size(); i++) { //empezamos en 2 para no recorrer los Listhead
 			Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
 			Spinner hoursSpinner = (Spinner)processListbox.getChildren().get(i).getChildren().get(3).getChildren().get(0);
 			Spinner minutesSpinner = (Spinner)processListbox.getChildren().get(i).getChildren().get(4).getChildren().get(0);
@@ -384,6 +403,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		String pieceSize = pieceSizeTextbox.getText();
 		Integer pieceUnits = pieceUnitsByProductIntbox.getValue();
 		boolean pieceIsGroup = pieceGroupCheckbox.isChecked();
+		org.zkoss.image.Image image = pieceImage.getContent();
 		if(currentPiece == null) { // se esta creando una pieza
 			currentPiece = new Piece(currentProduct, pieceName, pieceLength, lengthMeasureUnit, pieceDepth, depthMeasureUnit, pieceWidth, widthMeasureUnit, pieceSize, pieceIsGroup, pieceUnits);
 			// se agrega la pieza a todos los procesos
@@ -404,6 +424,11 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			currentPiece.setGroup(pieceIsGroup);
 		}
 		currentPiece.setProcesses(listboxProcessList);
+		if (image != null) {
+			currentPiece.setImageData(image.getByteData());
+		} else {
+			currentPiece.setImageData(null);
+		}
 		// actualizamos el view
 		currentPiece = null;
 		refreshViewPiece();
@@ -483,11 +508,11 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	}
 
 	private void refreshViewPiece() {
+		pieceTab.setSelected(true);
 		pieceListModel = new ListModelList<>(pieceList);
 		pieceListbox.setModel(pieceListModel);
 		if (currentPiece == null) {// nueva pieza
 			pieceCreationBlock.setVisible(false);
-			processCreationBlock.setVisible(false);
 			deletePieceButton.setDisabled(true);
 			pieceCopyButton.setDisabled(false);
 			// limpiar form pieza
@@ -505,9 +530,12 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			pieceSizeTextbox.setText("");
 			pieceUnitsByProductIntbox.setValue(0);
 			listboxProcessList = new ArrayList<Process>();
+			pieceImage.setHeight("0px");
+			pieceImage.setWidth("0px");
+			org.zkoss.image.Image img = null;
+			pieceImage.setContent(img);
 		} else { // se esta editando una pieza
 			pieceCreationBlock.setVisible(true);
-			processCreationBlock.setVisible(true);
 			deletePieceButton.setDisabled(false);
 			pieceCopyButton.setDisabled(true);
 			// cargar form pieza
@@ -537,6 +565,21 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			pieceSizeTextbox.setValue(currentPiece.getSize());
 			pieceUnitsByProductIntbox.setValue(currentPiece.getUnits());
 			listboxProcessList = currentPiece.getProcesses();// actualizamos la lista de procesos del Listbox con la lista de procesos obtenida de los procesos totales
+			org.zkoss.image.Image img = null;
+			if(currentPiece.getImageData() != null) {
+				try {
+					img = new AImage("", currentPiece.getImageData());
+				} catch (IOException exception) {
+					alert("IOException en Piece.getImageData");
+				}
+				pieceImage.setHeight("125px");
+				pieceImage.setWidth("125px");
+				pieceImage.setContent(img);
+			} else {
+				pieceImage.setHeight("0px");
+				pieceImage.setWidth("0px");
+				pieceImage.setContent(img);
+			}
 		}
 		refreshViewProcess();
 	}
@@ -689,20 +732,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		}
 	}
 
-	private void deletePiece(Piece piece) {
-		if(piece.getId() != null) {
-			Piece deletePiece = null;
-			for(Piece auxPiece:pieceList) {
-				if(auxPiece.getId().equals(piece.getId())) {
-					deletePiece = auxPiece;
-				}
-			}
-			if(deletePiece != null) {
-				pieceList.remove(deletePiece);// eliminamos la pieza
-			}
-		}
-	}
-
 	@Listen("onSelect = #pieceListbox")
 	public void selectPiece() {
 		if(pieceListModel.isSelectionEmpty()) {
@@ -729,7 +758,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		}
 		refreshViewPiece();
 		pieceCreationBlock.setVisible(true);
-		processCreationBlock.setVisible(true);
 	}
 
 	private Piece getOriginalPiece() {
@@ -771,22 +799,35 @@ public class ProductCreationController extends SelectorComposer<Component> {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Listen("onClick = #deletePieceButton")
-	public void deletePiece() {
+	public void deletePieceButtonClick() {
 		if(currentPiece != null) {
 			Messagebox.show("Esta seguro que desea eliminar la pieza " + currentPiece.getName() + "?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 				public void onEvent(Event evt) throws InterruptedException {
 					if (evt.getName().equals("onOK")) {
-						//eliminamos la pieza, los procesos tambien se eliminan en el metodo
-						deletePiece(currentPiece);
-						pieceListModel.remove(currentPiece);
-						pieceListbox.setModel(pieceListModel);
-						currentPiece = null;
-						refreshViewPiece();
-						alert("Pieza eliminada.");
+						//eliminamos la pieza
+						deletePiece();
 					}
 				}
 			});
 		}
+	}
+	
+	private void deletePiece() {
+		int index = -1;
+		for(Piece auxPiece:pieceList) {
+			if(auxPiece.getId().equals(currentPiece.getId())) {
+				index = pieceList.indexOf(auxPiece);
+				break;
+			}
+		}
+		if(index > -1) {
+			pieceList.remove(index);
+		}
+		pieceListModel = new ListModelList<>(pieceList);
+		pieceListbox.setModel(pieceListModel);
+		currentPiece = null;
+		refreshViewPiece();
+		alert("Pieza eliminada.");
 	}
 
 	@Listen("onClick = #resetProductButton")
@@ -839,7 +880,6 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	}
 
 	private void fillProcessCopy(Piece pieceCopy) {
-		processCreationBlock.setVisible(true);
 		List<Process> processListCopy = pieceCopy.getProcesses();
 		listboxProcessList = new ArrayList<Process>();
 		for(Process processCopy : processListCopy) {
@@ -868,5 +908,42 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	public void returnButtonClick() {
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/product_list.zul");
+	}
+
+	@Listen("onClick = #deletePieceImageButton")
+	public void deletePieceImageButtonClick() {
+		org.zkoss.image.Image img = pieceImage.getContent();
+		if(img != null) {// se borra solo  si hay una imagen
+			img = null;
+			pieceImage.setContent(img);
+			pieceImage.setHeight("0px");
+			pieceImage.setWidth("0px");
+		}
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Listen("onClick = #uploadPieceImageButton")
+	public void uploadPieceImageButtonClick() {
+		Fileupload.get(new EventListener() {
+			@Override
+			public void onEvent(Event event) throws Exception {
+				UploadEvent uploadEvent = (UploadEvent) event;
+				org.zkoss.util.media.Media media = uploadEvent.getMedia();
+				if (media instanceof org.zkoss.image.Image) {
+					org.zkoss.image.Image img = (org.zkoss.image.Image) media;
+					pieceImage.setHeight("115px");
+					pieceImage.setWidth("115px");
+					pieceImage.setContent(img);
+					processTabpanelClick();
+				} else {
+					Messagebox.show("No es una imagen: "+media, "Error", Messagebox.OK, Messagebox.ERROR);
+				}
+			}
+		});
+	}
+
+	@Listen("onClick = #processTab")
+	public void processTabpanelClick() {
+		processListbox.setModel(processTypeListModel);// se realiza pra que se re-renderice el scrollbar
 	}
 }

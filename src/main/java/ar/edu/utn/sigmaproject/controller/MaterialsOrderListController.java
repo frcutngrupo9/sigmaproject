@@ -24,6 +24,8 @@
 
 package ar.edu.utn.sigmaproject.controller;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -92,8 +94,19 @@ public class MaterialsOrderListController extends SelectorComposer<Component> {
 
 	private void refreshView() {
 		materialsOrderList = materialsOrderRepository.findAll();
+		sortMaterialsOrdersByDate();
 		materialsOrderListModel = new ListModelList<>(materialsOrderList);
 		materialsOrderGrid.setModel(materialsOrderListModel);
+	}
+
+	public void sortMaterialsOrdersByDate() {
+		Comparator<MaterialsOrder> comp = new Comparator<MaterialsOrder>() {
+			@Override
+			public int compare(MaterialsOrder a, MaterialsOrder b) {
+				return b.getDate().compareTo(a.getDate());
+			}
+		};
+		Collections.sort(materialsOrderList, comp);
 	}
 
 	@Listen("onClick = #newMaterialsOrderButton")

@@ -127,8 +127,8 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 	private void refreshView() {
 		if(currentProductionPlan != null) {
 			currentProductionPlan = productionPlanRepository.findOne(currentProductionPlan.getId());
-			productionOrderList = currentProductionPlan.getProductionOrderList();
-			sortProductionOrderListBySequence();
+			productionOrderList = sortProductionOrderListByNumber(currentProductionPlan.getProductionOrderList());
+			//sortProductionOrderListBySequence();
 			productionOrderListModel = new ListModelList<ProductionOrder>(productionOrderList);
 			productionOrderGrid.setModel(productionOrderListModel);
 			productionPlanNameTextbox.setText(currentProductionPlan.getName());
@@ -139,9 +139,19 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 			} else {
 				productionPlanStateTypeTextbox.setText("[Sin Estado]");
 			}
-
 			updatePlanDateboxes();
 		}
+	}
+	
+	public List<ProductionOrder> sortProductionOrderListByNumber(List<ProductionOrder> productionOrderList) {
+		Comparator<ProductionOrder> comp = new Comparator<ProductionOrder>() {
+			@Override
+			public int compare(ProductionOrder a, ProductionOrder b) {
+				return a.getNumber().compareTo(b.getNumber());
+			}
+		};
+		Collections.sort(productionOrderList, comp);
+		return productionOrderList;
 	}
 
 	@Listen("onEditProductionOrder = #productionOrderGrid")

@@ -211,6 +211,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			currentOrder.setClient(currentClient);
 			currentOrder.setNeedDate(order_need_date);
 			currentOrder.setNumber(order_number);
+			currentOrder.setDate(order_date);
 		}
 		OrderState orderState = new OrderState(orderStateType, new Date());
 		orderState = orderStateRepository.save(orderState);
@@ -338,7 +339,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			orderDetailList = currentOrder.getDetails();
 			orderStateTypeCombobox.setDisabled(false);
 		}
-		orderDatebox.setDisabled(true);// nunca se debe poder modificar la fecha de creacion del pedido
+		orderDatebox.setDisabled(false);// no se debe poder modificar la fecha de creacion del pedido (activado para pruebas)
 		currentOrderDetail = null;
 		refreshProductPopup();
 		refreshViewOrderDetail();

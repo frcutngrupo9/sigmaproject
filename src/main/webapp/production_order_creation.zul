@@ -31,6 +31,8 @@ THE SOFTWARE.
 	        		<image id="productImage"/>
 	        		<vbox hflex="1" pack="center" align="center">
 		                <hbox hflex="1" pack="center">
+		                	<label value="Nro Orden: "/>
+                            <textbox id="productionOrderNumberTextbox" width="30px" disabled="true"/>
 		                	<label value="Plan de Produccion: "/>
 							<textbox id="productionPlanNameTextbox" disabled="true"/>
 							<label value="Estado Plan: "/>
@@ -83,28 +85,22 @@ THE SOFTWARE.
 			            	<label value="${each.quantityPiece}"/>
 			            	<bandbox value="${each.worker.name}" onClick="self.open()" readonly="true" buttonVisible="true" autodrop="false">
 		            			<bandpopup>
-		            			<listbox width="400px" span="false" sizedByContent="false"
-		            				model="${win_production_order_creation$composer.getCompleteWorkerListModel(each)}"
-		            				forward="onSelect=productionOrderDetailGrid.onSelectWorkerListbox(${each})">
-		            				<listhead>
-				                    	<listheader align="left"  hflex="min"/>
-				                        <listheader align="center"  hflex="max"/>
-				                    </listhead>
-									<template name="model">
-										<listitem>
-											<listcell label="${each.name}"/>
-											<listcell label="${win_production_order_creation$composer.getWorkerAvailabilityDescription(each, current_detail)}"/>
-										</listitem>
-									</template>
-								</listbox>
+			            			<listbox width="400px" span="false" sizedByContent="false"
+			            				model="${win_production_order_creation$composer.getCompleteWorkerListModel(each)}"
+			            				forward="onSelect=productionOrderDetailGrid.onSelectWorkerListbox(${each})">
+			            				<listhead>
+					                    	<listheader align="left"  hflex="min"/>
+					                        <listheader align="center"  hflex="max"/>
+					                    </listhead>
+										<template name="model">
+											<listitem>
+												<listcell label="${each.name}"/>
+												<listcell label="${win_production_order_creation$composer.getWorkerAvailabilityDescription(each, current_detail)}"/>
+											</listitem>
+										</template>
+									</listbox>
 		            			</bandpopup>
 		            		</bandbox>
-			            	<combobox if="false" disabled="${state_cancel}" visible="true" hflex="1" forward="onSelect=productionOrderDetailGrid.onEditProductionOrderDetailWorker(${each}), onAfterRender=productionOrderDetailGrid.onCreateWorkerCombobox(${each})"
-			            		model="${win_production_order_creation$composer.getWorkerListModel(each)}" readonly="true">
-			            		<template name="model">
-			            			<comboitem label="${each.name}" />
-			            		</template>
-			            	</combobox>
 			            	<cell>
 			            		<bandbox disabled="${state_cancel}" if="${win_production_order_creation$composer.isMachineNecessary(each.process.type)}"
 			            			value="${each.machine.name}" onClick="self.open()" readonly="true" buttonVisible="true" autodrop="false">
@@ -127,8 +123,8 @@ THE SOFTWARE.
 			            		</bandbox>
 			                    <label value="NO REQUIERE" if="${!win_production_order_creation$composer.isMachineNecessary(each.process.type)}"/>
 		                    </cell>
-		                    <label value="${r:getFormattedProcessTime(each.process.time)}"/>
-			            	<label value="${r:getFormattedProcessTime(each.getTimeTotal())}"/>
+		                    <label value="${r:getFormattedProcessTime(each.process.getDurationTotal())}"/>
+			            	<label value="${r:getFormattedProcessTime(each.getDurationTotal())}"/>
 						</row>
 		            </template>
     			</grid>
