@@ -24,7 +24,19 @@ THE SOFTWARE.
 
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="win_product_creation" apply="ar.edu.utn.sigmaproject.controller.ProductCreationController" closable="false" sclass="sigma-content">
-	<caption id="productCaption"/>
+	<caption id="productCaption">
+		<toolbar align="end" orient="horizontal">
+            <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+            <toolbarbutton id="saveProductButton" label="Guardar Producto"/>
+            <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+            <toolbarbutton id="resetProductButton" label="Reset Producto"/>
+            <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+    		<toolbarbutton id="deleteProductButton" label="Eliminar Producto"/>
+    		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+    		<toolbarbutton id="returnButton" label="Volver a Listado"/>
+    		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+		</toolbar>
+	</caption>
     <panel id="productCreationBlock" border="none">
         <panelchildren>
             <vlayout>
@@ -73,14 +85,6 @@ THE SOFTWARE.
                     </rows>
                 </grid>
                 <hlayout style="margin: 4px">
-                    <button id="saveProductButton" label="Guardar Producto"/>
-                    <button id="resetProductButton" label="Reset Producto"/>
-                    <button id="deleteProductButton" label="Eliminar Producto"/>
-                    <hbox pack="center" align="center" hflex="1">
-			        	<button id="returnButton" label="Volver a Listado"/>
-			        </hbox>
-                </hlayout>
-                <hlayout style="margin: 4px">
 	                <button id="openSupplyListButton" label="Insumos"/>
                     <button id="openRawMaterialListButton" label="Materias Primas"/>
                 </hlayout>
@@ -99,7 +103,7 @@ THE SOFTWARE.
             			<listitem>
                 			<custom-attributes piece_image="${r:getPieceImage(each)}"/>
 			            	<listcell>
-				                <image if="${!empty piece_image}" content="${piece_image}" width="35px" height="35px"/>
+				                <image if="${!empty piece_image}" content="${piece_image}" height="${r:getPixelScaled(piece_image, 50, true)}px" width="${r:getPixelScaled(piece_image, 50, false)}px"/>
 				                <image if="${empty piece_image}" width="0px" height="0px"/>
 			                </listcell>
                 			<listcell label="${each.name}"/>
@@ -121,10 +125,15 @@ THE SOFTWARE.
 	            		<tab label="Procesos" closable="false" id="processTab"/>
 	            	</tabs>
 	            	<toolbar>
+	            		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
 	            		<toolbarbutton id="cancelPieceButton" label="Cancelar"/>
+	            		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
 	                    <toolbarbutton id="savePieceButton" label="Guardar Pieza"/>
+	                    <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
 	                    <toolbarbutton id="resetPieceButton" label="Reset Pieza"/>
+	                    <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
 	                    <toolbarbutton id="deletePieceButton" label="Eliminar Pieza"/>
+	                    <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
 					</toolbar>
 	                <tabpanels>
 	                	<tabpanel>

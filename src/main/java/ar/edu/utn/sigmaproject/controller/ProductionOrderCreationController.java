@@ -82,6 +82,7 @@ import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.WorkerRepository;
 import ar.edu.utn.sigmaproject.util.ProductionDateTimeHelper;
 import ar.edu.utn.sigmaproject.util.ProductionOrderReportDataSource;
+import ar.edu.utn.sigmaproject.util.RenderElHelper;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProductionOrderCreationController extends SelectorComposer<Component> {
@@ -177,8 +178,9 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			img = new AImage("", currentProductionOrder.getProduct().getImageData());
 		} catch (IOException exception) { }
 		if(img != null) {
-			productImage.setHeight("75px");
-			productImage.setWidth("75px");
+			int[] heightAndWidthArray = RenderElHelper.getHeightAndWidthScaled(img, 75);
+			productImage.setHeight(heightAndWidthArray[0] + "px");
+			productImage.setWidth(heightAndWidthArray[1] + "px");
 			productImage.setStyle("margin: 8px");
 		} else {
 			productImage.setHeight("0px");

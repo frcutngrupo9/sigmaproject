@@ -105,6 +105,7 @@ import ar.edu.utn.sigmaproject.service.StockMovementRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
 import ar.edu.utn.sigmaproject.util.ProductionDateTimeHelper;
+import ar.edu.utn.sigmaproject.util.RenderElHelper;
 
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -216,8 +217,9 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 
 		}
 		if(img != null) {
-			productImage.setHeight("175px");
-			productImage.setWidth("175px");
+			int[] heightAndWidthArray = RenderElHelper.getHeightAndWidthScaled(img, 175);
+			productImage.setHeight(heightAndWidthArray[0] + "px");
+			productImage.setWidth(heightAndWidthArray[1] + "px");
 			productImage.setStyle("margin: 8px");
 		} else {
 			productImage.setHeight("0px");

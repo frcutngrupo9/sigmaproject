@@ -28,11 +28,13 @@ THE SOFTWARE.
         <panelchildren>
             <vbox hflex="1" vflex="1">
             	<toolbar align="center" orient="horizontal">
+	                <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
 	                <toolbarbutton id="productPieChartButton" label="Productos Pedidos"/>
 	                <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
             		<toolbarbutton id="productLineChartButton" label="Productos por Mes"/>
             		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
             		<toolbarbutton id="productBarChartButton" label="Productos por Cliente"/>
+            		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
 				</toolbar>
             	<hbox hflex="1" pack="center">
 					<hbox hflex="1" vflex="1" pack="center" align="center">

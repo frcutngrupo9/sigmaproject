@@ -86,6 +86,7 @@ public class ProductListController extends SelectorComposer<Component> implement
 
 		Map<Integer, String> sortProperties = new HashMap<>();
 		sortProperties.put(0, "name");
+		sortProperties.put(1, "code");
 		new SortingPagingHelper<>(productRepository, productGrid, searchButton, searchTextbox, pager, sortProperties, this);
 
 		List<ProductCategory> productCategoryList = productCategoryRepository.findAll();

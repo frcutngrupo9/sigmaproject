@@ -91,6 +91,7 @@ import ar.edu.utn.sigmaproject.service.OrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductCategoryRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
+import ar.edu.utn.sigmaproject.util.RenderElHelper;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ProductCreationController extends SelectorComposer<Component> {
@@ -115,11 +116,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@Wire
 	Toolbarbutton deletePieceButton;
 	@Wire
-	Button saveProductButton;
-	@Wire
-	Button resetProductButton;
-	@Wire
-	Button deleteProductButton;
+	Toolbarbutton deleteProductButton;
 	@Wire
 	Button uploadProductPhotoButton;
 	@Wire
@@ -326,8 +323,9 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		org.zkoss.image.AImage media = (org.zkoss.image.AImage) event.getMedia();
 		if (media instanceof org.zkoss.image.Image) {
 			org.zkoss.image.Image img = media;
-			productImage.setHeight("225px");
-			productImage.setWidth("225px");
+			int[] heightAndWidth = RenderElHelper.getHeightAndWidthScaled(img, 255);
+			productImage.setHeight(heightAndWidth[0] + "px");
+			productImage.setWidth(heightAndWidth[1] + "px");
 			productImage.setStyle("margin: 8px");
 			productImage.setContent(img);
 			refreshViewPiece();// para que se pueda scrollear
@@ -366,6 +364,11 @@ public class ProductCreationController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #savePieceButton")
 	public void savePieceButtonClick() {
+		// comprueba si tiene procesos asignados
+		if(listboxProcessList.isEmpty()) {
+			Clients.showNotification("Debe agregar al menos 1 proceso");
+			return;
+		}
 		if(Strings.isBlank(pieceNameTextbox.getValue())) {
 			Clients.showNotification("Ingrese el Nombre de la Pieza", pieceNameTextbox);
 			return;
@@ -474,8 +477,9 @@ public class ProductCreationController extends SelectorComposer<Component> {
 
 			}
 			if(img != null) {
-				productImage.setHeight("225px");
-				productImage.setWidth("225px");
+				int[] heightAndWidth = RenderElHelper.getHeightAndWidthScaled(img, 255);
+				productImage.setHeight(heightAndWidth[0] + "px");
+				productImage.setWidth(heightAndWidth[1] + "px");
 				productImage.setStyle("margin: 8px");
 			} else {
 				productImage.setHeight("0px");
@@ -572,8 +576,9 @@ public class ProductCreationController extends SelectorComposer<Component> {
 				} catch (IOException exception) {
 					alert("IOException en Piece.getImageData");
 				}
-				pieceImage.setHeight("125px");
-				pieceImage.setWidth("125px");
+				int[] heightAndWidth = RenderElHelper.getHeightAndWidthScaled(img, 150);
+				pieceImage.setHeight(heightAndWidth[0] + "px");
+				pieceImage.setWidth(heightAndWidth[1] + "px");
 				pieceImage.setContent(img);
 			} else {
 				pieceImage.setHeight("0px");
@@ -931,8 +936,9 @@ public class ProductCreationController extends SelectorComposer<Component> {
 				org.zkoss.util.media.Media media = uploadEvent.getMedia();
 				if (media instanceof org.zkoss.image.Image) {
 					org.zkoss.image.Image img = (org.zkoss.image.Image) media;
-					pieceImage.setHeight("115px");
-					pieceImage.setWidth("115px");
+					int[] heightAndWidth = RenderElHelper.getHeightAndWidthScaled(img, 150);
+					pieceImage.setHeight(heightAndWidth[0] + "px");
+					pieceImage.setWidth(heightAndWidth[1] + "px");
 					pieceImage.setContent(img);
 					processTabpanelClick();
 				} else {

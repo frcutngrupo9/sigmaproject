@@ -107,8 +107,12 @@ public class GraphicsController extends SelectorComposer<Component> {
 	public void productChartOnClick(MouseEvent event) {
 		if(chartModel != null) {
 			//Clients.showNotification("tipo de model: " + chartModel.getClass().toString());
-			productChart.setThreeD(!productChart.isThreeD());
-			productChart.setFgAlpha(productChart.isThreeD() ? 128 : 255);
+			boolean threeD = !productChart.isThreeD();
+			int fgAlpha = threeD ? 128 : 255;
+			productChart.setThreeD(threeD);
+			productChart.setFgAlpha(fgAlpha);
+			chart3dCheckbox.setChecked(threeD);
+			transparencySlider.setCurpos(256 - fgAlpha);
 		}
 	}
 

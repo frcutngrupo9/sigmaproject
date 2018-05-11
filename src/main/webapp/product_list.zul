@@ -52,7 +52,7 @@ THE SOFTWARE.
 			            <row>
 			            	<custom-attributes product_image="${r:getProductImage(each)}"/>
 			            	<cell>
-				                <image if="${!empty product_image}" content="${product_image}" width="40px" height="40px"/>
+				                <image if="${!empty product_image}" content="${product_image}" height="${r:getPixelScaled(product_image, 50, true)}px" width="${r:getPixelScaled(product_image, 50, false)}px"/>
 				                <image if="${empty product_image}" width="0px" height="0px"/>
 			                </cell>
 			                <label value="${each.getCode()}"/>
