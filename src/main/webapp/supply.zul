@@ -39,6 +39,7 @@ THE SOFTWARE.
 		            <listheader label="Marca" align="center"/>
 		            <listheader label="Presentacion" align="center"/>
 		            <listheader label="Medida" align="center"/>
+		            <listheader label="Precio" align="center"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
@@ -48,6 +49,7 @@ THE SOFTWARE.
 		                <listcell label="${each.brand}"/>
 		                <listcell label="${each.presentation}"/>
 		                <listcell label="${each.measure}"/>
+		                <listcell label="${each.price}"/>
 		            </listitem>
 		        </template>
 		    </listbox>
@@ -88,6 +90,10 @@ THE SOFTWARE.
 			                <label>Medida:</label>
 			                <textbox id="measureTextbox" value="" hflex="1"/>
 			            </row>
+			            <row>
+                            <label value="Precio: "/>
+                            <doublebox id="priceDoublebox"  hflex="1"/>
+                        </row>
 			            <row>
 			                <cell colspan="2" style="text-align:center">
 			                    <hlayout>

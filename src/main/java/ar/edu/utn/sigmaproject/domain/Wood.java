@@ -75,7 +75,7 @@ public class Wood extends Item implements Cloneable {
 
 	}
 
-	public Wood(String name, BigDecimal length, MeasureUnit lengthMeasureUnit, BigDecimal depth, MeasureUnit depthMeasureUnit, BigDecimal width, MeasureUnit widthMeasureUnit, WoodType woodType, BigDecimal stock, BigDecimal stockMin, BigDecimal stockRepo) {
+	public Wood(String name, BigDecimal length, MeasureUnit lengthMeasureUnit, BigDecimal depth, MeasureUnit depthMeasureUnit, BigDecimal width, MeasureUnit widthMeasureUnit, WoodType woodType, BigDecimal stock, BigDecimal stockMin, BigDecimal stockRepo, BigDecimal price) {
 		this.name = name;
 		this.length = length;
 		this.lengthMeasureUnit = lengthMeasureUnit;
@@ -87,6 +87,7 @@ public class Wood extends Item implements Cloneable {
 		this.stock = stock;
 		this.stockMin = stockMin;
 		this.stockRepo = stockRepo;
+		this.price = price;
 	}
 
 	@Override

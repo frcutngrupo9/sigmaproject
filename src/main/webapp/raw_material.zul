@@ -38,6 +38,7 @@ THE SOFTWARE.
 		            <listheader label="Largo (L)" align="center"/>
 		            <listheader label="Ancho (A)" align="center"/>
 		            <listheader label="Espesor (E)" align="center"/>
+		            <listheader label="Precio" align="center"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
@@ -46,6 +47,7 @@ THE SOFTWARE.
 		                <listcell label="${each.length} ${each.getLengthMeasureUnit().getShortName()}"/>
 		                <listcell label="${each.width} ${each.getWidthMeasureUnit().getShortName()}"/>
 		                <listcell label="${each.depth} ${each.getDepthMeasureUnit().getShortName()}"/>
+		                <listcell label="${each.price}"/>
 		            </listitem>
 		        </template>
 		    </listbox>
@@ -106,6 +108,10 @@ THE SOFTWARE.
 		                        </template>
 		                    </combobox>
 		                </row>
+		                <row>
+                            <label value="Precio: "/>
+                            <doublebox id="priceDoublebox" width="50%"/>
+                        </row>
 		                <row>
 		                    <cell colspan="2" style="text-align:center">
 			                    <hlayout>

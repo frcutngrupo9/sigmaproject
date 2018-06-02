@@ -89,6 +89,8 @@ public class RawMaterialController extends SelectorComposer<Component> {
 	Grid rawMaterialTypeGrid;
 	@Wire
 	Combobox woodTypeCombobox;
+	@Wire
+	Doublebox priceDoublebox;
 
 	// services
 	@WireVariable
@@ -125,6 +127,11 @@ public class RawMaterialController extends SelectorComposer<Component> {
 		rawMaterialTypeListModel = new ListModelList<>(rawMaterialTypeList);
 		rawMaterialTypeListbox.setModel(rawMaterialTypeListModel);
 		currentWood = null;
+		refreshListModels();
+		refreshView();
+	}
+	
+	private void refreshListModels() {
 		MeasureUnitType measureUnitType = measureUnitTypeRepository.findFirstByName("Longitud");
 		measureUnitList = measureUnitRepository.findByType(measureUnitType);
 		lengthMeasureUnitListModel = new ListModelList<>(measureUnitList);
@@ -133,7 +140,6 @@ public class RawMaterialController extends SelectorComposer<Component> {
 		lengthMeasureUnitSelectbox.setModel(lengthMeasureUnitListModel);
 		depthMeasureUnitSelectbox.setModel(depthMeasureUnitListModel);
 		widthMeasureUnitSelectbox.setModel(widthMeasureUnitListModel);
-		refreshView();
 	}
 
 	@Listen("onClick = #searchButton")
@@ -181,8 +187,9 @@ public class RawMaterialController extends SelectorComposer<Component> {
 		BigDecimal width = BigDecimal.valueOf(widthDoublebox.doubleValue());
 		MeasureUnit widthMeasureUnit = widthMeasureUnitListModel.getElementAt(widthSelectedIndex);
 		WoodType woodType = woodTypeCombobox.getSelectedItem().getValue();
+		BigDecimal price = BigDecimal.valueOf(priceDoublebox.doubleValue());
 		if(currentWood == null)	{// si es nuevo
-			currentWood = new Wood(name, length, lengthMeasureUnit, depth, depthMeasureUnit, width, widthMeasureUnit, woodType, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+			currentWood = new Wood(name, length, lengthMeasureUnit, depth, depthMeasureUnit, width, widthMeasureUnit, woodType, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, price);
 		} else {
 			// si es una edicion
 			currentWood.setWoodType(woodType);
@@ -193,11 +200,13 @@ public class RawMaterialController extends SelectorComposer<Component> {
 			currentWood.setLengthMeasureUnit(lengthMeasureUnit);
 			currentWood.setDepthMeasureUnit(depthMeasureUnit);
 			currentWood.setWidthMeasureUnit(widthMeasureUnit);
+			currentWood.setPrice(price);
 		}
 		woodRepository.save(currentWood);
 		rawMaterialTypeList = woodRepository.findAll();
 		rawMaterialTypeListModel = new ListModelList<>(rawMaterialTypeList);
 		currentWood = null;
+		refreshListModels();
 		refreshView();
 	}
 
@@ -249,6 +258,7 @@ public class RawMaterialController extends SelectorComposer<Component> {
 			lengthDoublebox.setValue(null);
 			depthDoublebox.setValue(null);
 			widthDoublebox.setValue(null);
+			priceDoublebox.setValue(null);
 			// arrancamos con seleccion de metros x pulgada x pulgada
 			MeasureUnit lengthMeasureUnit = measureUnitRepository.findFirstByName("Metros");
 			MeasureUnit inchesMeasureUnit = measureUnitRepository.findFirstByName("Pulgadas");
@@ -281,6 +291,11 @@ public class RawMaterialController extends SelectorComposer<Component> {
 				widthMeasureUnitSelectbox.setSelectedIndex(widthMeasureUnitListModel.indexOf(widthMeasureUnit));
 			} else {
 				widthMeasureUnitSelectbox.setSelectedIndex(-1);
+			}
+			if(currentWood.getPrice() != null) {
+				priceDoublebox.setValue(currentWood.getPrice().doubleValue());
+			} else {
+				priceDoublebox.setValue(null);
 			}
 			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);

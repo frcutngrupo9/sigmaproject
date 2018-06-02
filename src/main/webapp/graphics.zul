@@ -35,8 +35,11 @@ THE SOFTWARE.
             		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
             		<toolbarbutton id="productBarChartButton" label="Productos por Cliente"/>
             		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+            		<toolbarbutton id="suppliesPieChartButton" label="Insumos Utilizados"/>
+            		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
 				</toolbar>
             	<hbox hflex="1" pack="center">
+            		<button id="productFilterButton" label="Filtro de Productos"/>
 					<hbox hflex="1" vflex="1" pack="center" align="center">
 						<label>Desde: </label>
 						<datebox id="fromDatebox" buttonVisible="true" cols="12" format="dd/MM/yyyy"/>
@@ -59,7 +62,6 @@ THE SOFTWARE.
                 <hbox hflex="1" vflex="1" pack="center">
                 	<chart id="productChart" width="1000px" height="500"/>
             	</hbox>
-            	
             </vbox>
         </panelchildren>
     </panel>

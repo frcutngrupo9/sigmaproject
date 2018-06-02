@@ -193,6 +193,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	// attributes
 	private Product currentProduct;
 	private Piece currentPiece;
+	private boolean pieceChanged;
 	private Piece clonedPiece;
 	@SuppressWarnings("rawtypes")
 	private EventQueue eq;
@@ -244,12 +245,13 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		eq = EventQueues.lookup("Piece Selection Queue", EventQueues.DESKTOP, true);
 		eq.subscribe(new EventListener() {
 			public void onEvent(Event event) throws Exception {
-				Piece value = (Piece)event.getData();
+				Piece value = (Piece) event.getData();
 				fillPieceCopy(value);
 			}
 		});
 		productCategoryListModel = new ListModelList<>(productCategoryRepository.findAll());
 		productCategoryCombobox.setModel(productCategoryListModel);
+		pieceChanged = false;
 	}
 
 	@Listen("onAfterRender = #productCategoryCombobox")
@@ -352,6 +354,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #createPieceButton")
 	public void newPieceButtonClick() {
+		pieceChanged = false;
 		currentPiece = null;
 		refreshViewPiece();
 		pieceCreationBlock.setVisible(true);
@@ -364,18 +367,26 @@ public class ProductCreationController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #savePieceButton")
 	public void savePieceButtonClick() {
+		savePiece();
+		// actualizamos el view
+		currentPiece = null;
+		refreshViewPiece();
+		pieceChanged = false;
+	}
+
+	private boolean savePiece() {
 		// comprueba si tiene procesos asignados
 		if(listboxProcessList.isEmpty()) {
 			Clients.showNotification("Debe agregar al menos 1 proceso");
-			return;
+			return false;
 		}
 		if(Strings.isBlank(pieceNameTextbox.getValue())) {
 			Clients.showNotification("Ingrese el Nombre de la Pieza", pieceNameTextbox);
-			return;
+			return false;
 		}
 		if(pieceUnitsByProductIntbox.getValue() == null || pieceUnitsByProductIntbox.getValue() <= 0) {
 			Clients.showNotification("La cantidad debe ser mayor a 0.", pieceUnitsByProductIntbox);
-			return;
+			return false;
 		}
 		// comprobamos que no existan checkbox activados que no posean valores de duracion
 		for(int i = 2; i < processListbox.getChildren().size(); i++) { //empezamos en 2 para no recorrer los Listhead
@@ -384,7 +395,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			Spinner minutesSpinner = (Spinner)processListbox.getChildren().get(i).getChildren().get(4).getChildren().get(0);
 			if(chkbox.isChecked() && hoursSpinner.intValue() == 0 && minutesSpinner.intValue() == 0) {
 				Clients.showNotification("Ingrese el Tiempo para el Proceso", minutesSpinner);
-				return;
+				return false;
 			}
 		}
 		String pieceName = pieceNameTextbox.getText().toUpperCase();
@@ -432,9 +443,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		} else {
 			currentPiece.setImageData(null);
 		}
-		// actualizamos el view
-		currentPiece = null;
-		refreshViewPiece();
+		return true;
 	}
 
 	private void refreshViewProduct() {
@@ -667,6 +676,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	//when user checks on the checkbox of each process on the list
 	@Listen("onProcessCheck = #processListbox")
 	public void doProcessCheck(ForwardEvent evt) {// se usa para eliminar o agregar el proceso a la lista
+		pieceChanged = true;
 		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
 		Checkbox cbox = (Checkbox)evt.getOrigin().getTarget();
 		if(cbox.isChecked()) {
@@ -694,6 +704,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 
 	@Listen("onProcessDetailsChange = #processListbox")
 	public void doProcessDetailsChange(ForwardEvent evt) {
+		pieceChanged = true;
 		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
 		Textbox origin = (Textbox)evt.getOrigin().getTarget();
 		InputEvent inputEvent = (InputEvent) evt.getOrigin();
@@ -704,6 +715,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 
 	@Listen("onProcessHoursChange = #processListbox")
 	public void doProcessHoursChange(ForwardEvent evt) {
+		pieceChanged = true;
 		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
 		Spinner origin = (Spinner)evt.getOrigin().getTarget();
 		InputEvent inputEvent = (InputEvent) evt.getOrigin();
@@ -720,6 +732,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 
 	@Listen("onProcessMinutesChange = #processListbox")
 	public void doProcessMinutesChange(ForwardEvent evt) {
+		pieceChanged = true;
 		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
 		Spinner origin = (Spinner)evt.getOrigin().getTarget();
 		InputEvent inputEvent = (InputEvent) evt.getOrigin();
@@ -737,19 +750,40 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		}
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Listen("onSelect = #pieceListbox")
 	public void selectPiece() {
 		if(pieceListModel.isSelectionEmpty()) {
 			//just in case for the no selection
 			currentPiece = null;
 		} else {
-			if(currentPiece == null) {// si no hay nada editandose
-				currentPiece = pieceListbox.getSelectedItem().getValue();
-				// se crea un clon de la pieza para reemplazar al currentPiece en caso de que se cancele o resetee la edicion
-				clonedPiece = (Piece) Piece.copy(currentPiece);
-				refreshViewPiece();
+			if(currentPiece != null) {// si no hay nada editandose
+				// si existen cambios a la pieza, se pregunta para guardar antes
+				if(pieceChanged) {
+					Messagebox.show("Desea guardar los cambios realizados a la pieza? ", "Confirmar Guardado", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+						public void onEvent(Event evt) throws InterruptedException {
+							if (evt.getName().equals("onOK")) {
+								if(savePiece() == false) {
+									// no se guardo la pieza
+									return;
+								}
+							}
+							selectPieceAndRefresh();
+						}
+					});
+					return;
+				}
 			}
+			selectPieceAndRefresh();
 		}
+	}
+
+	private void selectPieceAndRefresh() {
+		currentPiece = pieceListbox.getSelectedItem().getValue();
+		// se crea un clon de la pieza para reemplazar al currentPiece en caso de que se cancele o resetee la edicion
+		clonedPiece = (Piece) Piece.copy(currentPiece);
+		refreshViewPiece();
+		pieceChanged = false;
 		pieceListModel.clearSelection();
 		scrollToPieceBlock();
 	}
@@ -816,7 +850,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			});
 		}
 	}
-	
+
 	private void deletePiece() {
 		int index = -1;
 		for(Piece auxPiece:pieceList) {
@@ -951,5 +985,20 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	@Listen("onClick = #processTab")
 	public void processTabpanelClick() {
 		processListbox.setModel(processTypeListModel);// se realiza pra que se re-renderice el scrollbar
+	}
+
+	@Listen("onChanging = #pieceNameTextbox, #pieceLengthDoublebox, #pieceDepthDoublebox, #pieceWidthDoublebox, #pieceSizeTextbox, #pieceUnitsByProductIntbox")
+	public void pieceDetaisOnChanging() {
+		pieceChanged = true;
+	}
+	
+	@Listen("onSelect = #lengthMeasureUnitSelectbox, #depthMeasureUnitSelectbox, #widthMeasureUnitSelectbox")
+	public void pieceDetaisOnSelect() {
+		pieceChanged = true;
+	}
+	
+	@Listen("onCheck = #pieceGroupCheckbox")
+	public void pieceDetaisOnCheck() {
+		pieceChanged = true;
 	}
 }

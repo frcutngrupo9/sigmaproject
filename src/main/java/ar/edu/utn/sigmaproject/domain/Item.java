@@ -32,6 +32,7 @@ import org.hibernate.search.annotations.*;
 import javax.persistence.*;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 @AnalyzerDefs(value = {
@@ -62,6 +63,8 @@ public abstract class Item implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.TABLE)
 	private Long id;
+	
+	protected BigDecimal price = null;
 
 	public Long getId() {
 		return id;
@@ -69,6 +72,14 @@ public abstract class Item implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public BigDecimal getPrice() {
+		return price;
+	}
+
+	public void setPrice(BigDecimal price) {
+		this.price = price;
 	}
 
 	public abstract String getDescription();

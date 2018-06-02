@@ -72,7 +72,7 @@ public class SupplyType extends Item implements Serializable, Cloneable {
 
 	}
 
-	public SupplyType(String code, String description, String details, String brand, String presentation, String measure, BigDecimal stock, BigDecimal stockMin, BigDecimal stockRepo) {
+	public SupplyType(String code, String description, String details, String brand, String presentation, String measure, BigDecimal stock, BigDecimal stockMin, BigDecimal stockRepo, BigDecimal price) {
 		this.code = code;
 		this.description = description;
 		this.details = details;
@@ -85,6 +85,7 @@ public class SupplyType extends Item implements Serializable, Cloneable {
 		this.stock = stock;
 		this.stockMin = stockMin;
 		this.stockRepo = stockRepo;
+		this.price = price;
 	}
 
 	public String getCode() {

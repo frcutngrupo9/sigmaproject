@@ -25,9 +25,15 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.util.Date;
+import java.util.List;
 
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.CheckEvent;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.EventQueue;
+import org.zkoss.zk.ui.event.EventQueues;
 import org.zkoss.zk.ui.event.MouseEvent;
 import org.zkoss.zk.ui.event.ScrollEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -40,8 +46,10 @@ import org.zkoss.zul.ChartModel;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Slider;
+import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.Order;
+import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
@@ -82,71 +90,93 @@ public class GraphicsController extends SelectorComposer<Component> {
 	private ClientRepository clientRepository;
 
 	// list
+	private List<Product> filterProductList;
 
 	// list models
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
+		filterProductList = null;
 		chartHelper = new ChartHelper(orderDetailRepository, productRepository, orderRepository, clientRepository);
 		chartModel = null;
 		Order[] firstAndLastOrderArray = chartHelper.getFirstAndLastOrder();
 		dateFrom = firstAndLastOrderArray[0].getDate();
 		dateTo = firstAndLastOrderArray[1].getDate();
+		is3dChecked = true;
+		fgAlpha = 128;
+		addListeners();
+		refreshView();
 	}
 
-	private void setAllValues(String type, String title, boolean is3dChecked, int fgAlpha, ChartModel chartModel) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void addListeners() {
+		EventQueue eq = EventQueues.lookup("Product Filter Change Queue", EventQueues.DESKTOP, true);
+		eq.subscribe(new EventListener() {
+			public void onEvent(Event event) throws Exception {
+				filterProductList = (List<Product>) event.getData();
+				//Clients.alert("valor de title: " + title);
+				if(title != null) {
+					refreshChartModel();
+					refreshView();
+				}
+			}
+		});
+	}
+
+	private void setAllValues(String type, String title) {
 		this.type = type;
 		this.title = title;
-		this.is3dChecked = is3dChecked;
-		this.fgAlpha = fgAlpha;
-		this.chartModel = chartModel;
+		refreshChartModel();
 	}
 
-	@Listen("onClick = #productChart")
+	/*@Listen("onClick = #productChart")
 	public void productChartOnClick(MouseEvent event) {
 		if(chartModel != null) {
-			//Clients.showNotification("tipo de model: " + chartModel.getClass().toString());
-			boolean threeD = !productChart.isThreeD();
-			int fgAlpha = threeD ? 128 : 255;
-			productChart.setThreeD(threeD);
-			productChart.setFgAlpha(fgAlpha);
-			chart3dCheckbox.setChecked(threeD);
-			transparencySlider.setCurpos(256 - fgAlpha);
+			boolean threeD = !is3dChecked;
+			is3dChecked = threeD;
+			fgAlpha = threeD ? 128 : 255;
+			refreshView();
 		}
-	}
+	}*/
 
 	@Listen("onCheck = #chart3dCheckbox")
 	public void chart3dCheckboxOnCheck(CheckEvent event) {
+		is3dChecked = chart3dCheckbox.isChecked();
 		if(chartModel != null) {
-			is3dChecked = chart3dCheckbox.isChecked();
 			refreshView();
 		}
 	}
 
 	@Listen("onScroll = #transparencySlider")
 	public void transparencySliderOnScroll(ScrollEvent event) {
+		fgAlpha = 256 - transparencySlider.getCurpos();
 		if(chartModel != null) {
-			fgAlpha = 256 - transparencySlider.getCurpos();
 			refreshView();
 		}
 	}
 
 	@Listen("onClick = #productLineChartButton")
 	public void productLineChartButtonOnClick(MouseEvent event) {
-		setAllValues("line", "Productos por Mes", false, 255, chartHelper.getProductLineChartModel(dateFrom, dateTo));
+		setAllValues("line", "Productos por Mes");
 		refreshView();
 	}
 
 	@Listen("onClick = #productBarChartButton")
 	public void productBarChartButtonOnClick() {
-		setAllValues("bar", "Productos por Cliente", true, 255, chartHelper.getProductBarModel(dateFrom, dateTo));
+		setAllValues("bar", "Productos por Cliente");
 		refreshView();
 	}
 
 	@Listen("onClick = #productPieChartButton")
 	public void productPieChartButtonOnClick() {
-		setAllValues("pie", "Productos Pedidos", true, 128, chartHelper.getProductPieModel(dateFrom, dateTo));
+		setAllValues("pie", "Productos Pedidos");
+		refreshView();
+	}
+
+	@Listen("onClick = #suppliesPieChartButton")
+	public void suppliesPieChartButtonOnClick() {
+		setAllValues("pie", "Insumos Utilizados");
 		refreshView();
 	}
 
@@ -202,24 +232,40 @@ public class GraphicsController extends SelectorComposer<Component> {
 
 	private void refreshChartModel() {
 		// depende de cual chartType este seleccionado cambiamos el model
-		if(type.equalsIgnoreCase("line")) {
-			chartModel = chartHelper.getProductLineChartModel(dateFrom, dateTo);
-		} else if(type.equalsIgnoreCase("pie")) {
-			chartModel = chartHelper.getProductPieModel(dateFrom, dateTo);
-		} else if(type.equalsIgnoreCase("bar")) {
-			chartModel = chartHelper.getProductBarModel(dateFrom, dateTo);
+		if(title.equalsIgnoreCase("Productos por Mes")) {
+			chartModel = chartHelper.getProductLineChartModel(dateFrom, dateTo, filterProductList);
+		} else if(title.equalsIgnoreCase("Productos Pedidos")) {
+			chartModel = chartHelper.getProductPieModel(dateFrom, dateTo, filterProductList);
+		} else if(title.equalsIgnoreCase("Productos por Cliente")) {
+			chartModel = chartHelper.getProductBarModel(dateFrom, dateTo, filterProductList);
+		} else if(title.equalsIgnoreCase("Insumos Utilizados")) {
+			chartModel = chartHelper.getSuppliesPieModel(dateFrom, dateTo);
 		}
 	}
 
 	private void refreshView() {
 		chart3dCheckbox.setChecked(is3dChecked);
 		transparencySlider.setCurpos(256 - fgAlpha);
-		productChart.setType(type);
-		productChart.setTitle(title);
-		productChart.setThreeD(is3dChecked);
-		productChart.setFgAlpha(fgAlpha);
-		productChart.setModel(chartModel);
 		fromDatebox.setValue(dateFrom);
 		toDatebox.setValue(dateTo);
+		if(chartModel != null) {
+			productChart.setType(type);
+			productChart.setTitle(title);
+			productChart.setThreeD(is3dChecked);
+			productChart.setFgAlpha(fgAlpha);
+			productChart.setModel(chartModel);
+		}
+	}
+
+	@Listen("onClick = #productFilterButton")
+	public void productFilterButtonOnClick(MouseEvent event) {
+		Executions.getCurrent().setAttribute("filterProductList", filterProductList);
+		final Window win = (Window) Executions.createComponents("/product_filter.zul", null, null);
+		win.setMaximizable(false);
+		win.setMaximized(false);
+		win.setClosable(true);
+		win.setSizable(true);
+		win.setPosition("center");
+		win.doModal();
 	}
 }
