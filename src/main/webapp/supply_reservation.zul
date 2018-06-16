@@ -53,7 +53,7 @@ THE SOFTWARE.
 			                <label>Cantidad Reserva:</label>
 			                <cell hflex="1">
 				                <doublebox id="stockReservedDoublebox"/>
-				                <button id="completeButton" label="Completar"/>
+				                <button id="completeButton" label="{labels.complete}"/>
 			                </cell>
 			            </row>
 			            <row>
@@ -67,9 +67,9 @@ THE SOFTWARE.
 			        </rows>
 		    	</grid>
                 <hbox hflex="1" align="center" pack="center">
-                	<button id="saveButton" label="Guardar"/>
-                	<button id="cancelButton" label="Cancelar"/>
-			        <button id="resetButton" label="Reset"/>
+                	<button id="saveButton" label="${labels.save}"/>
+                    <button id="cancelButton" label="${labels.cancel}"/>
+                    <button id="resetButton" label="${labels.reset}"/>
                 </hbox>
             </vlayout>
         </panelchildren>

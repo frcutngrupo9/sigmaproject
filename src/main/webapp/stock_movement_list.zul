@@ -43,7 +43,7 @@ THE SOFTWARE.
         </grid>
         <paging id="pager" pageSize="10" sclass="sigma-paging"/>
         <separator/>
-        <button id="stockMovementButton" label="Crear Nuevo Comprobante de Stock"/>
+        <button id="stockMovementButton" label="Crear ${labels.new_text} Comprobante de Stock"/>
         <separator/>
     </panelchildren>
 </panel>

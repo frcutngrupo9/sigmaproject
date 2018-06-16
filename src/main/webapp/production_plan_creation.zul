@@ -35,7 +35,7 @@ THE SOFTWARE.
                     </columns>
                     <rows>
                     	<row>
-                            <label value="Estado: "/>
+                            <label value="${labels.state}: "/>
 		                    <combobox id="productionPlanStateTypeCombobox" width="25%" readonly="true">
 		                        <template name="model">
 		                            <comboitem label="${each.name}" value="${each}"/>
@@ -43,17 +43,17 @@ THE SOFTWARE.
 		                    </combobox>
                         </row>
                         <row>
-                            <label value="Nombre Plan de Produccion: "/>
+                            <label value="${labels.name} ${labels.production_plan}: "/>
 							<textbox id="productionPlanNameTextbox" width="25%"/>
                         </row>
                         <row>
-                            <label value="Agregar Pedido: "/>
+                            <label value="Agregar ${labels.order_plural}: "/>
                             <cell style="text-align:left">
 			                	<bandbox id="orderBandbox" buttonVisible = "true" autodrop = "true">
 			    					<bandpopup>
 			    						<listbox id="orderPopupListbox" width="500px" emptyMessage="No existen pedidos pendientes.">
 			    							<listhead>
-			    								<listheader label="Pedido" align="center"/>
+			    								<listheader label="${labels.order}" align="center"/>
 			    								<listheader label="Cliente" align="center"/>
 			    								<listheader label="Fecha" align="center"/>
 			    								<listheader label="Fecha Necesidad" align="center"/>
@@ -77,7 +77,7 @@ THE SOFTWARE.
                 </grid>
     			<grid id="productionPlanDetailGrid" mold="paging" pageSize="7">
     				<auxhead>
-						<auxheader label="Pedidos" colspan="6"/>
+						<auxheader label="${labels.order_plural}" colspan="6"/>
 					</auxhead>
         			<columns>
             			<column label="Nro" align="center"/>
@@ -101,12 +101,12 @@ THE SOFTWARE.
     			<separator/>
     			<listbox id="productTotalListbox" mold="paging" pageSize="7" visible="true" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Productos" colspan="5"/>
+						<auxheader label="${labels.product_plural}" colspan="5"/>
 					</auxhead>
         			<listhead>
         				<listheader label="Foto" align="center"/>
         				<listheader label="Codigo" align="center"/>
-            			<listheader label="Producto" align="center"/>
+            			<listheader label="${labels.product}" align="center"/>
             			<listheader label="Detalles" align="center"/>
             			<listheader label="Cantidad" align="center"/>
         			</listhead>
@@ -125,14 +125,14 @@ THE SOFTWARE.
         			</template>
     			</listbox>
     			<hlayout>
-                    <button id="saveProductionPlanButton" label="Guardar"/>
-                    <button id="resetProductionPlanButton" label="Reset"/>
-                    <button id="deleteProductionPlanButton" label="Eliminar"/>
-                    <button id="newProductionPlanButton" label="Nuevo"/>
+                    <button id="saveProductionPlanButton" label="${labels.save}"/>
+                    <button id="resetProductionPlanButton" label="${labels.reset}"/>
+                    <button id="deleteProductionPlanButton" label="${labels.delete}"/>
+                    <button id="newProductionPlanButton" label="${labels.new_text}"/>
                     <hbox pack="center" align="center" hflex="1">
-			        	<button id="returnButton" label="Ir a Listado"/>
-			        	<button id="returnToProductionButton" label="Ir a Produccion"/>
-			        	<button id="returnToRequirementPlanButton" label="Ir a Abastecimiento"/>
+			        	<button id="returnButton" label="${labels.go_to} ${labels.list} ${labels.production_plan}"/>
+			        	<button id="returnToProductionButton" label="${labels.go_to} ${labels.production_order}"/>
+			        	<button id="returnToRequirementPlanButton" label="${labels.go_to} Abastecimiento"/>
 			        </hbox>
                 </hlayout>
                 <separator/>

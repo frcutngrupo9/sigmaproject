@@ -23,7 +23,7 @@ THE SOFTWARE.
 -->
 
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
-<window id="win_production_order_creation" title="Orden de Produccion" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductionOrderCreationController" sclass="sigma-content">
+<window id="win_production_order_creation" title="${labels.production_order}" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductionOrderCreationController" sclass="sigma-content">
     <panel id="productionOrderCreationBlock" border="none">
         <panelchildren>
         	<vlayout>
@@ -33,11 +33,11 @@ THE SOFTWARE.
 		                <hbox hflex="1" pack="center">
 		                	<label value="Nro Orden: "/>
                             <textbox id="productionOrderNumberTextbox" width="30px" disabled="true"/>
-		                	<label value="Plan de Produccion: "/>
+		                	<label value="${labels.production_plan}: "/>
 							<textbox id="productionPlanNameTextbox" disabled="true"/>
-							<label value="Estado Plan: "/>
+							<label value="${labels.state} Plan: "/>
                             <textbox id="productionPlanStateTypeTextbox" disabled="true"/>
-                            <label value="Estado Orden: "/>
+                            <label value="${labels.state} Orden: "/>
                             <textbox id="productionOrderStateTypeTextbox" disabled="true"/>
 		                </hbox>
 						<hbox hflex="1" pack="center">
@@ -47,7 +47,7 @@ THE SOFTWARE.
 							<datebox buttonVisible="false" disabled="true" id="productionOrderFinishDatebox" cols="12" format="dd-MM-yyyy"/>
 							<label value="Codigo: "/>
 							<textbox id="productCodeTextbox" disabled="true" width="30px"/>
-							<label value="Producto: "/>
+							<label value="${labels.product}: "/>
 							<textbox id="productNameTextbox" disabled="true" width="370px"/>
 							<label value="Cantidad: "/>
 							<intbox id="productUnitsIntbox" disabled="true" width="30px"/>
@@ -132,45 +132,58 @@ THE SOFTWARE.
     			<hbox hflex="1" pack="center">
 				    <listbox id="productionOrderSupplyListbox" mold="paging" pageSize="7" sizedByContent="true" span="true" hflex="1">
 				    	<auxhead>
-							<auxheader label="Insumos" colspan="3"/>
+							<auxheader label="Insumos" colspan="4"/>
 						</auxhead>
 				        <listhead>
 				            <listheader label="Codigo" align="center"/>
 				            <listheader label="Descripcion" align="center"/>
 				            <listheader label="Cantidad" align="center"/>
+				            <listheader label="Costo" align="center"/>
 				        </listhead>
 				        <template name="model">
 				            <listitem>
 				                <listcell label="${each.item.code}"/>
 				                <listcell label="${each.item.description}"/>
 				                <listcell label="${each.quantity}"/>
+				                <listcell label="${each.item.price}"/>
 				            </listitem>
 				        </template>
+				        <listfoot>
+				            <listfooter></listfooter>
+				            <listfooter></listfooter>
+				            <listfooter><label id="productionOrderSupplyTotalPriceLabel"/></listfooter>
+				        </listfoot>
 				    </listbox>
 				    <listbox id="productionOrderRawMaterialListbox" mold="paging" pageSize="7" sizedByContent="true" span="true" hflex="1">
 				    	<auxhead>
-							<auxheader label="Materias Primas" colspan="2"/>
+							<auxheader label="Materias Primas" colspan="3"/>
 						</auxhead>
 				        <listhead>
 				            <listheader label="Materia Prima" align="center"/>
 				            <listheader label="Cantidad" align="center"/>
+				            <listheader label="Costo" align="center"/>
 				        </listhead>
 				        <template name="model">
 				            <listitem>
 				                <listcell label="${each.item.name}"/>
 				                <listcell label="${each.quantity}"/>
+				                <listcell label="${each.item.price}"/>
 				            </listitem>
 				        </template>
+				        <listfoot>
+				            <listfooter></listfooter>
+				            <listfooter><label id="productionOrderRawMaterialTotalPriceLabel"/></listfooter>
+				        </listfoot>
 				    </listbox>
 			    </hbox>
 			    <hlayout>
 	    			<hbox hflex="1" pack="left">
-					    <button id="saveButton" label="Guardar"/>
-					    <button id="resetButton" label="Reset"/>
-					    <button id="cancelButton" label="Volver"/>
+					    <button id="saveButton" label="${labels.save}"/>
+					    <button id="resetButton" label="${labels.reset}"/>
+					    <button id="cancelButton" label="${labels.return_text}"/>
 				    </hbox>
 				    <hbox hflex="1" pack="center">
-				    	<button id="createReportButton" label="Reporte"/>
+				    	<button id="createReportButton" label="${labels.generate_report}"/>
 				    </hbox>
 			    </hlayout>
 			    <separator/>

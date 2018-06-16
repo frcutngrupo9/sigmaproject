@@ -28,9 +28,9 @@ THE SOFTWARE.
         <panelchildren>
         	<vlayout>
 			    <hlayout>
-			        <label>Buscar:</label>
+			        <label>${labels.search}:</label>
 			        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
-			        <button id="searchButton" label="Buscar"/>
+			        <button id="searchButton" label="${labels.search}"/>
 			    </hlayout>
 			    <separator/>
 			    <listbox id="woodListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
@@ -39,7 +39,7 @@ THE SOFTWARE.
 					</auxhead>
 			        <listhead>
 			        	<listheader label="Madera" align="center"/>
-			            <listheader label="Nombre" align="center"/>
+			            <listheader label="${labels.name}" align="center"/>
 			            <listheader label="Medidas" align="center"/>
 			            <listheader label="Stock Total" align="center"/>
 			            <listheader label="Stock No Reservado" align="center"/>
@@ -76,7 +76,7 @@ THE SOFTWARE.
 		                    </combobox>
 			            </row>
 			        	<row>
-			                <label>Nombre:</label>
+			                <label>${labels.name}:</label>
 			                <textbox id="woodNameTextbox" disabled="true"/>
 			            </row>
 			            <row>
@@ -94,9 +94,9 @@ THE SOFTWARE.
 			            <row>
 			                <cell colspan="2" style="text-align:center">
 			                    <hlayout>
-			                        <button id="saveButton" label="Guardar"/>
-			                        <button id="cancelButton" label="Cancelar"/>
-			                        <button id="resetButton" label="Reset"/>
+			                        <button id="saveButton" label="${labels.save}"/>
+			                        <button id="cancelButton" label="${labels.cancel}"/>
+			                        <button id="resetButton" label="${labels.reset}"/>
 			                    </hlayout>
 			                </cell>
 			            </row>

@@ -80,8 +80,8 @@ THE SOFTWARE.
                     </template>
                 </listbox>
                 <hlayout>
-                    <button id="acceptProductMaterialButton" label="Aceptar"/>
-                    <button id="cancelProductMaterialButton" label="Cancelar"/>
+                    <button id="acceptProductMaterialButton" label="${labels.accept}"/>
+                    <button id="cancelProductMaterialButton" label="${labels.cancel}"/>
                 </hlayout>
             </vlayout>
         </panelchildren>

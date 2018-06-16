@@ -96,7 +96,7 @@ THE SOFTWARE.
 	            				<button id="allWorkersButton" label="Seleccionar Todos"/>
 		            			<listbox id="workerListbox" onClick="workerBandbox.close()" width="600px" span="true" sizedByContent="false">
 		            				<listhead>
-							            <listheader label="Nombre" align="center"/>
+							            <listheader label="${labels.name}" align="center"/>
 							            <listheader label="Fecha Ingreso" align="center"/>
 							        </listhead>
 							        <template name="model">
@@ -111,7 +111,7 @@ THE SOFTWARE.
             		</vbox>
             		<separator/>
             		<vbox align="center" pack="center" hflex="1" vflex="1">
-            			<button id="generateReportButton" label="Generar Reporte" vflex="1"/>
+            			<button id="generateReportButton" label="${labels.generate_report}" vflex="1"/>
             		</vbox>
             	</hbox>
             	<separator/>
@@ -148,7 +148,7 @@ THE SOFTWARE.
     			</grid>
     			<separator/>
     			<hbox hflex="1" pack="left">
-	    			<button id="returnButton" label="Volver"/>
+	    			<button id="returnButton" label="${labels.return_text}"/>
 				</hbox>
             </vlayout>
         </panelchildren>

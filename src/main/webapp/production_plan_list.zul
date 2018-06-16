@@ -27,26 +27,27 @@ THE SOFTWARE.
 	<panel border="none">
         <panelchildren>
 		    <hlayout>
-		        <label>Buscar:</label>
+		        <label>${labels.search}:</label>
 		        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
-		        <button id="searchButton" label="Buscar"/>
+		        <button id="searchButton" label="${labels.search}"/>
 		        <hbox pack="center" align="center" hflex="1">
-		        	<button id="newButton" label="Nuevo Plan de Produccion"/>
+		        	<button id="newButton" label="${labels.new_text} ${labels.production_plan}"/>
 		        </hbox>
 		    </hlayout>
 		    <separator/>
 		    <grid id="productionPlanGrid" mold="paging" pageSize="7" sizedByContent="true" span="true">
 		    	<auxhead>
-					<auxheader label="Planes de Produccion" colspan="9"/>
+					<auxheader label="Planes de Produccion" colspan="10"/>
 				</auxhead>
 		        <columns>
-		            <column label="Nombre" align="center"/>
+		            <column label="${labels.name}" align="center"/>
 		            <column label="Fecha Creacion" align="center"/>
-		            <column label="Cantidad Pedidos" align="center"/>
-		            <column label="Cantidad Productos" align="center"/>
+		            <column label="Cant. Pedidos" align="center"/>
+		            <column label="Cant. Productos" align="center"/>
+		            <column label="Fotos" align="center"/>
 		            <column label="Estado" align="center"/>
 		            <column label="Editar" align="center"/>
-		            <column label="Listado" align="center"/>
+		            <column label="${labels.list}" align="center"/>
 		            <column label="Abrir" align="center"/>
 		            <column label="Diagrama" align="center"/>
 		        </columns>
@@ -55,7 +56,16 @@ THE SOFTWARE.
 		                <label value="${each.name}"/>
 		                <label value="${r:getFormattedDateTime(each.dateCreation)}"/>
 		                <label value="${each.planDetails.size()}"/>
-		                <label value="${each.getProductionOrderList().size()}"/>
+		                <label value="${each.getProductList().size()}"/>
+		                <cell>
+			                <hbox pack="center" align="center" hflex="1">
+			            		<zk forEach="${each.getProductList()}">
+			            			<custom-attributes product_image="${r:getProductImage(each)}"/>
+			            			<image if="${!empty product_image}" content="${product_image}" height="${r:getPixelScaled(product_image, 35, true)}px" width="${r:getPixelScaled(product_image, 35, false)}px"/>
+			            			<image if="${empty product_image}" width="0px" height="0px"/>
+			            		</zk>
+		            		</hbox>
+		                </cell>
 		                <label value="${each.getCurrentStateType().getName()}"/>
 		                <button forward="onClick=productionPlanGrid.onEditProductionPlan(${each})"  image="/img/edit16x16.png"/>
 		                <button forward="onClick=productionPlanGrid.onGenerateProductionOrder(${each})" label="Ordenes de Produccion" />

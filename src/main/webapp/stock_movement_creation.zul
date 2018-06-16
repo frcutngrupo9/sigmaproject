@@ -48,9 +48,9 @@ THE SOFTWARE.
                 <combobox id="itemCombobox" buttonVisible="false" autodrop="true" autocomplete="false"/>
                 <label value="Cantidad: "/>
                 <intbox id="itemQuantityIntbox" constraint="no negative,no zero" width="36px"/>
-                <button id="saveStockMovementDetailButton" label="Grabar Detalle"/>
+                <button id="saveStockMovementDetailButton" label="${labels.save} Detalle"/>
                 <button id="clearStockMovementDetailButton" label="Limpiar Detalle"/>
-                <button id="cancelStockMovementDetailButton" label="Cancelar Edicion"/>
+                <button id="cancelStockMovementDetailButton" label="${labels.cancel} Edicion"/>
             </hbox>
             <listbox id="stockMovementListbox" mold="paging" pageSize="7">
                 <auxhead>
@@ -74,7 +74,7 @@ THE SOFTWARE.
             <separator/>
             <hlayout>
                 <button id="saveStockMovementButton" label="Emitir"/>
-                <button id="returnButton" label="Volver a Listado"/>
+                <button id="returnButton" label="${labels.return_text} a Listado"/>
             </hlayout>
         </vlayout>
     </panelchildren>

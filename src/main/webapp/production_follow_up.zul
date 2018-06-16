@@ -24,7 +24,7 @@ THE SOFTWARE.
 
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="win_production_follow_up" apply="ar.edu.utn.sigmaproject.controller.ProductionFollowUpController" width="95%" style="background:white">
-    <panel title="Avance de Produccion" id="productionOrderCreationBlock" border="rounded">
+    <panel title="${labels.production_progress}" id="productionOrderCreationBlock" border="rounded">
         <panelchildren>
         	<vlayout>
         		<hbox hflex="1" pack="center" align="center">
@@ -39,14 +39,14 @@ THE SOFTWARE.
 		                    </columns>
 		                    <rows>
 		                        <row>
-		                            <label value="Plan de Produccion: "/>
+		                            <label value="${labels.production_plan}: "/>
 				        			<textbox id="productionPlanNameTextbox"/>
-				        			<label value="Estado Plan: "/>
+				        			<label value="${labels.state} Plan: "/>
 				        			<textbox id="productionPlanStateTypeTextbox"/>
 		                        </row>
 		                        <row>
 		                            <cell colspan="1" align="right">
-		                            	<label value="Producto: "/>
+		                            	<label value="${labels.product}: "/>
 		                            </cell>
 		                            <cell colspan="3" align="left">
 										<textbox id="productNameTextbox" hflex="1"/>
@@ -74,9 +74,9 @@ THE SOFTWARE.
 		                </grid>
 		                <hbox hflex="1" pack="center" align="center">
 			                <button id="materialsWithdrawalButton" label="Retirar Materiales de Stock para Produccion"/>
-		                	<button id="saveButton" label="Guardar"/>
-						    <button id="resetButton" label="Reset"/>
-						    <button id="cancelButton" label="Volver"/>
+		                	<button id="saveButton" label="${labels.save}"/>
+		                	<button id="resetButton" label="${labels.reset}"/>
+						    <button id="cancelButton" label="${labels.return_text}"/>
 					    </hbox>
 	                </vbox>
                 </hbox>
@@ -139,7 +139,7 @@ THE SOFTWARE.
 			                <listcell label="${each.quantity}"/>
 			                <listcell>
 			                	<doublebox disabled="false" inplace="true" value="${each.quantityUsed}" forward="onChanging=productionOrderSupplyListbox.onEditUsedMaterial(${each})"/>
-			                	<button disabled="false" label="Completar" forward="onClick=productionOrderSupplyListbox.onCompleteUsedMaterial(${each})"/>
+			                	<button disabled="false" label="${labels.complete}" forward="onClick=productionOrderSupplyListbox.onCompleteUsedMaterial(${each})"/>
 			                </listcell>
 			                <listcell>
 			                	<textbox disabled="false" hflex="1" value="${each.observation}" forward="onChanging=productionOrderSupplyListbox.onEditUsedMaterialObservation(${each})"/>
@@ -164,7 +164,7 @@ THE SOFTWARE.
 			                <listcell label="${each.quantity}"/>
 			                <listcell>
 			                	<doublebox disabled="false" inplace="true" value="${each.quantityUsed}" forward="onChanging=productionOrderRawMaterialListbox.onEditUsedMaterial(${each})"/>
-			                	<button disabled="false" label="Completar" forward="onClick=productionOrderRawMaterialListbox.onCompleteUsedMaterial(${each})"/>
+			                	<button disabled="false" label="${labels.complete}" forward="onClick=productionOrderRawMaterialListbox.onCompleteUsedMaterial(${each})"/>
 			                </listcell>
 			                <listcell>
 			                	<textbox value="${each.observation}" disabled="false" hflex="1" forward="onChanging=productionOrderRawMaterialListbox.onEditUsedMaterialObservation(${each})"/>

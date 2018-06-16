@@ -28,7 +28,7 @@ THE SOFTWARE.
         <panelchildren>
             <vlayout>
                 <hbox hflex="1" pack="center">
-                	<button id="cancelButton" label="Volver"/>
+                	<button id="cancelButton" label="${labels.return_text}"/>
                 </hbox>
                 <hbox hflex="1" pack="center">
                 	<chart id="ganttChart" width="820" height="400" fgAlpha="255" paneColor="#ffffff"/>

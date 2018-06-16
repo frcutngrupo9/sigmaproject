@@ -25,14 +25,17 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.zkoss.image.AImage;
@@ -54,6 +57,7 @@ import org.zkoss.zul.Grid;
 import org.zkoss.zul.Image;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Intbox;
+import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
@@ -130,6 +134,10 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	Button createReportButton;
 	@Wire
 	Jasperreport reportBlockJasperreport;
+	@Wire
+	Label productionOrderSupplyTotalPriceLabel;
+	@Wire
+	Label productionOrderRawMaterialTotalPriceLabel;
 
 	// services
 	@WireVariable
@@ -169,7 +177,22 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		if(currentProductionPlan == null) {throw new RuntimeException("ProductionPlan not found");}
 		productionOrderDetailList = currentProductionOrder.getDetails();
 		machineList = machineRepository.findAll();
+		setTotalPrices();
 		refreshView();
+	}
+	
+	private void setTotalPrices() {
+		BigDecimal totalPriceSupply = currentProductionOrder.getTotalCostSupply();
+		BigDecimal totalPriceRawMaterial = currentProductionOrder.getTotalCostRawMaterial();
+		String totalPriceValue = "";
+		if(!totalPriceSupply.equals(new BigDecimal("0"))) {
+			totalPriceValue = "Total: " + totalPriceSupply.doubleValue() + " $";
+		}
+		productionOrderSupplyTotalPriceLabel.setValue(totalPriceValue);
+		if(!totalPriceRawMaterial.equals(new BigDecimal("0"))) {
+			totalPriceValue = "Total: " + totalPriceRawMaterial.doubleValue() + " $";
+		}
+		productionOrderRawMaterialTotalPriceLabel.setValue(totalPriceValue);
 	}
 
 	private void refreshView() {
@@ -575,6 +598,17 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		// comprueba que la maquina seleccionada no este ocupada en otra orden, en ese caso mostrar mensaje y volver al valor anterior, caso contrario asignar
 		if(isWorkerAvailable(workerSelected, data)) {
 			data.setWorker(workerSelected);// cargamos al objeto el valor actualizado del elemento web
+			// si el trabajador asignado es diferente al anterior, verificar si no es necesario maquina y si no lo es, cambiar el inicio al mismo inicio del proceso anterior
+			ProductionOrderDetail prevDetail = getFirstDetailOfProcess(data);
+			if(prevDetail != null) {
+				if(!prevDetail.getWorker().equals(workerSelected)) {
+					if(data.getProcess().getType().getMachineType() == null) {
+						data.setDateStart(prevDetail.getDateStart());
+						data.setDateFinish(ProductionDateTimeHelper.getFinishDate(prevDetail.getDateStart(), data.getTimeTotal()));
+					}
+				}
+			}
+			//recalculateDates();
 			refreshProductionOrderDetailGridView();
 		} else {
 			final Worker workerSelectedFinal = workerSelected;
@@ -590,6 +624,121 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 				}
 			});
 		}
+	}
+
+	/*private Map<ProcessType, Map<Worker, List<ProductionOrderDetail>>> getCompleteMap() {
+		//devuelve un map donde la llave son todos los tipos de procesos y el valor es otro map en el cual la llave es cada empleado asignados al tipo de proceso y el valor son todos los detalles a los que el empleado esta asignado
+		Map<ProcessType, Map<Worker, List<ProductionOrderDetail>>> completeMap = new HashMap<ProcessType, Map<Worker, List<ProductionOrderDetail>>>();
+		for(ProductionOrderDetail each : productionOrderDetailList) {
+			ProcessType processType = each.getProcess().getType();
+			Map<Worker, List<ProductionOrderDetail>> workerMap = completeMap.get(processType);
+			Worker worker = each.getWorker();
+			if(workerMap == null) {
+				workerMap = new HashMap<Worker, List<ProductionOrderDetail>>();
+				List<ProductionOrderDetail> list = new ArrayList<ProductionOrderDetail>();
+				list.add(each);
+				workerMap.put(worker, list);
+			} else {
+				List<ProductionOrderDetail> list = workerMap.get(worker);
+				if(list == null) {
+					list = new ArrayList<ProductionOrderDetail>();
+				} else {
+					list.add(each);
+				}
+				workerMap.put(worker, list);
+			}
+		}
+		return completeMap;
+	}*/
+
+	private Map<Worker, List<ProductionOrderDetail>> getWorkerMapByProcessType(ProcessType processType) {
+		//devuelve un map donde la llave son todos los empleados asignados al tipo de proceso y el valor son todos los detalles a los que el empleado esta asignado
+		Map<Worker, List<ProductionOrderDetail>> workerMap = new HashMap<Worker, List<ProductionOrderDetail>>();
+		for(ProductionOrderDetail each : productionOrderDetailList) {
+			if(each.getState() != ProcessState.Cancelado) {
+				if(each.getProcess().getType().equals(processType)) {
+					Worker worker = each.getWorker();
+					List<ProductionOrderDetail> list = workerMap.get(worker);
+					if(list == null) {
+						list = new ArrayList<ProductionOrderDetail>();
+					} else {
+						list.add(each);
+					}
+					workerMap.put(worker, list);
+				}
+			}
+		}
+		return workerMap;
+	}
+
+	private List<ProcessType> getProcessTypeList() {
+		// devuelve una lista de todos los tipos de proceso asignados a la orden
+		Set<ProcessType> processTypeSet = new HashSet<ProcessType>();
+		for(ProductionOrderDetail eachProductionOrderDetail : productionOrderDetailList) {
+			if(eachProductionOrderDetail.getState() != ProcessState.Cancelado) {
+				processTypeSet.add(eachProductionOrderDetail.getProcess().getType());// garantiza que los tipo de procesos no se repitan
+			}
+		}
+		List<ProcessType> list = new ArrayList<ProcessType>();
+		for (ProcessType eachProcessType : processTypeSet) {
+			list.add(eachProcessType);
+		}
+		return list;
+	}
+
+	private void recalculateDates() {
+		// recalcula las fechas de los procesos basandose en los empleados asignados de tal forma que los procesos que tengan distintos empleados asignados se ejecuten en paralelo
+		// si varios empleados estan asignados a diferentes piezas del mismo proceso, todos iniciaran al mismo tiempo, y el proximo proceso iniciara al finalizar el ultimo de los procesos anteriores
+		//por cada tipo de proceso hacemos un map con todos los empleados asignados, y por cada empleado, una lista con todos los detalles en los q se le asigno
+		Date startDateProcess = null;//inicio proceso
+		Date finishDateProcess = null;//fin proceso
+		for(ProcessType eachProcessType : getProcessTypeList()) {
+			if(startDateProcess == null) {//la primera vez
+				startDateProcess = getDateTimeStartWork(productionOrderStartDatebox.getValue());
+			} else {//al iniciar otro proceso la fecha de inicio es la fecha fin del anterior
+				startDateProcess = finishDateProcess;
+			}
+			for(Map.Entry<Worker, List<ProductionOrderDetail>> entry : getWorkerMapByProcessType(eachProcessType).entrySet()) {
+				Date startDate = startDateProcess;
+				Date finishDate = null;
+				Worker worker = entry.getKey();
+				List<ProductionOrderDetail> list = entry.getValue();
+				for(ProductionOrderDetail eachDetail : list) {
+					if(finishDate == null) {// si es la primera vez que ingresa
+						finishDate = ProductionDateTimeHelper.getFinishDate(startDateProcess, eachDetail.getTimeTotal());
+					} else {
+						// el inicio de la actual es al finalizar la ultima
+						startDate = finishDate;
+						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, eachDetail.getTimeTotal());
+					}
+					eachDetail.setDateStart(startDate);
+					eachDetail.setDateFinish(finishDate);
+					if(finishDateProcess==null || finishDate.after(finishDateProcess)) {//guardamos la ultima fecha de proceso q aparece
+						finishDateProcess = finishDate;
+					}
+				}
+			}
+		}
+	}
+
+	private ProductionOrderDetail getPreviousDetail(ProductionOrderDetail data) {
+		ProductionOrderDetail prevDetail = null;
+		int index = productionOrderDetailList.indexOf(data);
+		if(index > 0) {
+			prevDetail = productionOrderDetailList.get(index - 1);
+		}
+		return prevDetail;
+	}
+
+	private ProductionOrderDetail getFirstDetailOfProcess(ProductionOrderDetail data) {
+		// busca el primer detalle que sea del mismo proceso
+		ProductionOrderDetail currentDetail = null;
+		ProductionOrderDetail prevDetail = getPreviousDetail(data);
+		while(prevDetail!=null && prevDetail.getProcess().getType().equals(data.getProcess().getType())) {
+			currentDetail = prevDetail;
+			prevDetail = getPreviousDetail(prevDetail);
+		}
+		return currentDetail;
 	}
 
 	/*
@@ -608,7 +757,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	public void autoAssignButtonClick() {
 		// si no estan asignadas las fechas de los procesos se informa
 		if(productionOrderStartDatebox.getValue()==null || productionOrderFinishDatebox.getValue()==null) {
-			alert("Debe seleccionar las fechas de los procesos antes de asignar recursos.");
+			alert("Debe seleccionar las fecha de inicio antes de asignar recursos.");
 			return;
 		}
 		// asigna la primer maquina o trabajador disponible a cada detalle

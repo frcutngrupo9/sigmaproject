@@ -29,11 +29,11 @@ THE SOFTWARE.
             <vlayout>
                 <hbox hflex="1">
                 	<hbox hflex="1" pack="center">
-	                	<label value="Plan de Produccion: "/>
+	                	<label value="${labels.production_plan}: "/>
 						<textbox id="productionPlanNameTextbox" disabled="true" width="110px"/>
 					</hbox>
 					<hbox hflex="1" pack="center">
-						<label value="Estado: "/>
+						<label value="${labels.state}: "/>
 	                    <textbox id="productionPlanStateTypeTextbox" disabled="true" width="110px"/>
                     </hbox>
                     <hbox hflex="1" pack="center">
@@ -113,11 +113,11 @@ THE SOFTWARE.
 		            </template>
     			</grid>
 				<hbox hflex="1" pack="left">
-	    			<button id="saveButton" label="Guardar"/>
-	    			<button id="resetButton" label="Reset"/>
+	    			<button id="saveButton" label="${labels.save}"/>
+	    			<button id="resetButton" label="${labels.reset}"/>
 	    			<hbox hflex="1" pack="center">
-	    				<button id="returnButton" label="Ir a Listado de Planes"/>
-	    				<button id="productionPlanRequirementButton" label="Ir a Requerimientos"/>
+	    				<button id="returnButton" label="${labels.go_to} ${labels.list} ${labels.production_plan}"/>
+	    				<button id="productionPlanRequirementButton" label="${labels.go_to} Requerimientos"/>
 					</hbox>
 				</hbox>
             </vlayout>

@@ -41,8 +41,8 @@ THE SOFTWARE.
 			    </hbox>
 			    <separator/>
 			    <hbox pack="center" align="center" hflex="1">
-                	<button id="acceptButton" label="Aceptar" hflex="1"/>
-                    <button id="cancelButton" label="Cancelar" hflex="1"/>
+                	<button id="acceptButton" label="${labels.accept}" hflex="1"/>
+                    <button id="cancelButton" label="${labels.cancel}" hflex="1"/>
                 </hbox>
 		    </vlayout>
         </panelchildren>

@@ -221,4 +221,28 @@ public class Product extends Item implements Serializable, Cloneable {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public BigDecimal getCostMaterials() {
+		//devuelve el valor de todos las materias primas e insumos
+		BigDecimal materialsPrice = BigDecimal.ZERO;
+		for(ProductMaterial each : materials) {
+			materialsPrice = materialsPrice.add(each.getItem().getPrice());
+		}
+		return materialsPrice;
+	}
+	
+	public BigDecimal getCostWork() {
+		BigDecimal salary = new BigDecimal(200);
+		//devuelve el valor del tiempo total de produccion por el valor de la hora de trabajo
+		Duration durationTotal = getDurationTotal();
+		BigDecimal minutes = new BigDecimal(durationTotal.getMinutes()).divide(new BigDecimal(60));
+		BigDecimal seconds = new BigDecimal(durationTotal.getSeconds()).divide(new BigDecimal(600));
+		BigDecimal workTime = new BigDecimal(durationTotal.getHours()).add(minutes).add(seconds);
+		BigDecimal workPrice = workTime.multiply(salary);
+		return workPrice;
+	}
+	
+	public BigDecimal getCostTotal() {
+		return getCostMaterials().add(getCostWork());
+	}
 }

@@ -43,7 +43,7 @@ THE SOFTWARE.
             </template>
         </grid>
         <hbox width="100%" pack="center">
-            <button id="closeButton" label="Cerrar" />
+            <button id="closeButton" label="${labels.close}" />
         </hbox>
     </vlayout>
 </window>
