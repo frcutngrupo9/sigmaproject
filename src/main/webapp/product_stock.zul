@@ -27,14 +27,14 @@ THE SOFTWARE.
 	<panel border="none">
         <panelchildren>
 		    <hlayout>
-		        <label>Buscar:</label>
+		        <label>${labels.search}:</label>
 		        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
-		        <button id="searchButton" label="Buscar"/>
+		        <button id="searchButton" label="${labels.search}"/>
 		    </hlayout>
 		    <separator/>
 		    <listbox id="productListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
 		    	<auxhead>
-					<auxheader label="Productos" colspan="7"/>
+					<auxheader label="${labels.product_plural}" colspan="7"/>
 				</auxhead>
 		        <listhead>
 		            <listheader label="Foto" align="center"/>
@@ -96,9 +96,9 @@ THE SOFTWARE.
 			            <row>
 			                <cell colspan="2" style="text-align:center">
 			                    <hlayout>
-			                        <button id="saveButton" label="Guardar"/>
-			                        <button id="cancelButton" label="Cancelar"/>
-			                        <button id="resetButton" label="Reset"/>
+			                        <button id="saveButton" label="${labels.save}"/>
+			                        <button id="cancelButton" label="${labels.cancel}"/>
+			                        <button id="resetButton" label="${labels.reset}"/>
 			                    </hlayout>
 			                </cell>
 			            </row>

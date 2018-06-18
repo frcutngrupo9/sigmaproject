@@ -27,17 +27,17 @@ THE SOFTWARE.
 	<panel border="none">
         <panelchildren>
 		    <hlayout>
-		        <label>Buscar:</label>
+		        <label>${labels.search}:</label>
 		        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
-		        <button id="searchButton" label="Buscar"/>
+		        <button id="searchButton" label="${labels.search}"/>
 		        <hbox pack="center" align="center" hflex="1">
-		        	<button id="newOrderButton" label="Nuevo Pedido"/>
+		        	<button id="newOrderButton" label="${labels.new_text}"/>
 		        </hbox>
 		    </hlayout>
 		    <separator/>
 		    <grid id="orderGrid" mold="paging" pageSize="7">
 		    	<auxhead>
-					<auxheader label="Pedidos" colspan="10"/>
+					<auxheader label="${labels.order_plural}" colspan="10"/>
 				</auxhead>
 		        <columns>
 		            <column label="Numero" align="center" sort="auto(number)"/>

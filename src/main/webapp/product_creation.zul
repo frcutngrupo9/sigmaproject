@@ -27,13 +27,13 @@ THE SOFTWARE.
 	<caption id="productCaption">
 		<toolbar align="end" orient="horizontal">
             <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
-            <toolbarbutton id="saveProductButton" label="Guardar Producto"/>
+            <toolbarbutton id="saveProductButton" label="${labels.save_product}"/>
             <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
-            <toolbarbutton id="resetProductButton" label="Reset Producto"/>
+            <toolbarbutton id="resetProductButton" label="${labels.reset_product}"/>
             <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
-    		<toolbarbutton id="deleteProductButton" label="Eliminar Producto"/>
+    		<toolbarbutton id="deleteProductButton" label="${labels.delete_product}"/>
     		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
-    		<toolbarbutton id="returnButton" label="Volver a Listado"/>
+    		<toolbarbutton id="returnButton" label="${labels.return_to_list}"/>
     		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
 		</toolbar>
 	</caption>
@@ -63,7 +63,7 @@ THE SOFTWARE.
                             <textbox id="productCodeTextbox" width="25%" placeholder="Codigo del Producto"/>
                         </row>
                         <row>
-                            <label value="Nombre: "/>
+                            <label value="${labels.name}: "/>
                             <textbox id="productNameTextbox" width="50%" placeholder="Nombre del Producto"/>
                         </row>
                         <row>
@@ -126,7 +126,7 @@ THE SOFTWARE.
 	            	</tabs>
 	            	<toolbar>
 	            		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
-	            		<toolbarbutton id="cancelPieceButton" label="Cancelar"/>
+	            		<toolbarbutton id="cancelPieceButton" label="${labels.cancel}"/>
 	            		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
 	                    <toolbarbutton id="savePieceButton" label="Guardar Pieza"/>
 	                    <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
@@ -156,7 +156,7 @@ THE SOFTWARE.
 						                </cell>
 			                        </row>
 			                        <row>
-			                            <label value="Nombre:"/>
+			                            <label value="${labels.name}:"/>
 			                            <textbox id="pieceNameTextbox" value=""  width="50%" placeholder="Nombre de la Pieza"/>
 			                        </row>
 			                        <row>

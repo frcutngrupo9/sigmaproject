@@ -50,7 +50,7 @@ THE SOFTWARE.
                         <bandpopup>
                             <listbox id="itemPopupListbox" width="500px" sizedByContent="true" span="true">
                                 <listhead>
-                                    <listheader label="Materiales" align="center"/>
+                                    <listheader label="${labels.material_plural}" align="center"/>
                                 </listhead>
                                 <template name="model">
                                     <listitem>
@@ -62,16 +62,16 @@ THE SOFTWARE.
                     </bandbox>
                     <label value="Cantidad: "/>
                     <intbox id="materialUnitsIntbox" constraint="no negative" width="36px"/>
-                    <button id="saveDetailButton" label="Grabar Detalle"/>
-                    <button id="resetDetailButton" label="Reset Detalle"/>
-                    <button id="cancelDetailButton" label="Cancelar Edicion"/>
+                    <button id="saveDetailButton" label="${labels.save_detail}"/>
+                    <button id="resetDetailButton" label="${labels.reset_detail}"/>
+                    <button id="cancelDetailButton" label="${labels.cancel_edition}"/>
                 </hbox>
                 <listbox id="materialsOrderDetailListbox" mold="paging" pageSize="7" sizedByContent="true" span="true" style="margin: 4px">
                     <auxhead>
-                        <auxheader label="Materiales" colspan="4"/>
+                        <auxheader label="${labels.material_plural}" colspan="4"/>
                     </auxhead>
                     <listhead>
-                        <listheader label="Nombre"/>
+                        <listheader label="${labels.name}"/>
 	                    <listheader label="Cantidad" width="200px"/>
 	                    <listheader label="Cantidad Recibida" width="200px"/>
 	                    <listheader label="" width="120px"/>
@@ -88,11 +88,11 @@ THE SOFTWARE.
                     </template>
                 </listbox>
                 <hlayout style="margin: 4px">
-                    <button id="saveButton" label="Guardar Pedido"/>
-                    <button id="resetButton" label="Reset Pedido"/>
-                    <button id="deleteButton" label="Eliminar Pedido"/>
+                    <button id="saveButton" label="${labels.save}"/>
+                    <button id="resetButton" label="${labels.reset}"/>
+                    <button id="deleteButton" label="${labels.delete}"/>
                     <hbox pack="center" align="center" hflex="1">
-			        	<button id="returnButton" label="Volver a Listado"/>
+			        	<button id="returnButton" label="${labels.return_to_list}"/>
 			        </hbox>
                 </hlayout>
             </vlayout>

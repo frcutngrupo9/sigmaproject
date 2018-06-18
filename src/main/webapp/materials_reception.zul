@@ -51,7 +51,7 @@ THE SOFTWARE.
 						<auxheader label="Detalle del Pedido de Materiales" colspan="3"/>
 					</auxhead>
         			<listhead>
-        				<listheader label="Nombre"/>
+        				<listheader label="${labels.name}"/>
 	                    <listheader label="Cantidad Pedida"/>
 	                    <listheader label="Cantidad Recibida"/>
 		            </listhead>
@@ -82,9 +82,9 @@ THE SOFTWARE.
 			        </rows>
 		    	</grid>
                 <hbox hflex="1" align="center" pack="center">
-                	<button id="saveButton" label="Guardar"/>
-			        <button id="resetButton" label="Reset"/>
-			        <button id="cancelButton" label="Cancelar"/>
+                	<button id="saveButton" label="${labels.save}"/>
+			        <button id="resetButton" label="${labels.reset}"/>
+			        <button id="cancelButton" label="${labels.cancel}"/>
                 </hbox>
             </vlayout>
         </panelchildren>

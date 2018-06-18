@@ -50,10 +50,10 @@ THE SOFTWARE.
                     </bandbox>
                     <label value="Cantidad: "/>
                     <doublebox id="materialQuantityDoublebox" constraint="no negative" width="36px"/>
-                    <button id="saveMaterialButton" label="Agregar Insumo"/>
-                    <button id="resetMaterialButton" label="Reset Insumo"/>
-                    <button id="deleteMaterialButton" label="Eliminar Insumo"/>
-                    <button id="cancelMaterialButton" label="Cancelar Edicion"/>
+                    <button id="saveMaterialButton" label="${labels.add} Insumo"/>
+                    <button id="resetMaterialButton" label="${labels.reset} Insumo"/>
+                    <button id="deleteMaterialButton" label="${labels.delete} Insumo"/>
+                    <button id="cancelMaterialButton" label="${labels.cancel} Edicion"/>
                 </hlayout>
                 <separator/>
                 <listbox id="productMaterialListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">

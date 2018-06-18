@@ -30,9 +30,9 @@ THE SOFTWARE.
             <vbox hflex="1" vflex="1">
             	<toolbar align="center" orient="horizontal">
 	                <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
-	                <toolbarbutton id="acceptButton" label="Aceptar"/>
+	                <toolbarbutton id="acceptButton" label="${labels.accept}"/>
 	                <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
-            		<toolbarbutton id="cancelButton" label="Cancelar"/>
+            		<toolbarbutton id="cancelButton" label="${labels.cancel}"/>
             		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
 				</toolbar>
 				<hbox spacing="10px" hflex="1" vflex="true">
@@ -40,7 +40,7 @@ THE SOFTWARE.
 				        <listhead>
 				            <listheader label="Foto" width="60px" align="center"></listheader>
 				            <listheader label="Cod." hflex="min" align="center"></listheader>
-				            <listheader label="Nombre" hflex="1"></listheader>
+				            <listheader label="${labels.name}" hflex="1"></listheader>
 				            <listheader label="Precio" width="80px" align="center"></listheader>
 				        </listhead>
 				        <template name="model">
@@ -57,14 +57,14 @@ THE SOFTWARE.
 				        </template>
 				    </listbox>
 				    <vbox spacing="10px" width="54px" vflex="1" align="center" pack="center">
-				    	<button image="/img/rightarrow.png" orient="vertical" id="chooseAllButton" label="Agregar Todos" hflex="1"/>
-				    	<button image="/img/leftarrow.png" orient="vertical" dir="reverse" id="removeAllButton" label="Remover Todos" hflex="1"/>
+				    	<button image="/img/rightarrow.png" orient="vertical" id="chooseAllButton" label="${labels.add} Todos" hflex="1"/>
+				    	<button image="/img/leftarrow.png" orient="vertical" dir="reverse" id="removeAllButton" label="${labels.remove} Todos" hflex="1"/>
 				    </vbox>
 				    <listbox id="chosenListbox" hflex="1" height="350px" rows="6" emptyMessage="Vacio">
 				        <listhead>
 				            <listheader label="Foto" width="60px" align="center"></listheader>
 				            <listheader label="Cod." hflex="min" align="center"></listheader>
-				            <listheader label="Nombre" hflex="1"></listheader>
+				            <listheader label="${labels.name}" hflex="1"></listheader>
 				            <listheader label="Precio" width="80px" align="center"></listheader>
 				        </listhead>
 				        <template name="model">
