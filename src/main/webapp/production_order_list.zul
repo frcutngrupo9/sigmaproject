@@ -23,7 +23,7 @@ THE SOFTWARE.
 -->
 
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
-<window id="win_production_order_list" title="Ordenes de Produccion" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductionOrderListController" sclass="sigma-content">
+<window id="win_production_order_list" title="${labels.production_order_plural}" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductionOrderListController" sclass="sigma-content">
     <panel id="productionOrderCreationBlock" border="none">
         <panelchildren>
             <vlayout>
@@ -37,49 +37,49 @@ THE SOFTWARE.
 	                    <textbox id="productionPlanStateTypeTextbox" disabled="true" width="110px"/>
                     </hbox>
                     <hbox hflex="1" pack="center">
-						<label value="Fecha Creacion: "/>
-						<datebox id="productionPlanCreationDatebox" disabled="true" buttonVisible="false" format="dd/MM/yyyy" width="110px"/>
+						<label value="${labels.creation_date}: "/>
+						<datebox id="productionPlanCreationDatebox" disabled="true" buttonVisible="false" format="${labels.date_format}" width="110px"/>
 					</hbox>
                 </hbox>
                 <hbox hflex="1">
 					<hbox hflex="1" pack="center">
-						<label value="Fecha Inicio Plan: "/>
-						<datebox id="productionPlanStartDatebox" disabled="true"  buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
+						<label value="${labels.date_start_plan}: "/>
+						<datebox id="productionPlanStartDatebox" disabled="true"  buttonVisible="false" format="${labels.date_time_format}" width="110px"/>
 					</hbox>
 					<hbox hflex="1" pack="center">
-						<label value="Fecha Fin Plan: "/>
-						<datebox id="productionPlanFinishDatebox" disabled="true" buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
+						<label value="${labels.date_finish_plan}: "/>
+						<datebox id="productionPlanFinishDatebox" disabled="true" buttonVisible="false" format="${labels.date_time_format}" width="110px"/>
 					</hbox>
 					<hbox hflex="1" pack="center">
-						<label value="Fecha Real Inicio: "/>
-						<datebox id="productionPlanStartRealDatebox" disabled="true" buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
+						<label value="${labels.date_start_actual}: "/>
+						<datebox id="productionPlanStartRealDatebox" disabled="true" buttonVisible="false" format="${labels.date_time_format}" width="110px"/>
 					</hbox>
 					<hbox hflex="1" pack="center">
-						<label value="Fecha Real Fin: "/>
-						<datebox id="productionPlanFinishRealDatebox" disabled="true" buttonVisible="false" format="dd/MM/yyyy HH:mm" width="110px"/>
+						<label value="${labels.date_finish_actual}: "/>
+						<datebox id="productionPlanFinishRealDatebox" disabled="true" buttonVisible="false" format="${labels.date_time_format}" width="110px"/>
 					</hbox>
 				</hbox>
     			<grid id="productionOrderGrid" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Listado Productos a Fabricar" colspan="14"/>
+						<auxheader label="${labels.products_to_be_manufactured_list}" colspan="14"/>
 					</auxhead>
         			<columns>
         				<!-- <column width="40px" align="center"/> -->
-        				<column label="Accion" align="center"/>
-        				<!-- <column label="Secuencia" align="center"/> -->
-        				<column label="Fecha Inicio" align="center"/>
-		                <column label="Fecha Fin" align="center"/>
-        				<column label="Foto" align="center"/>
-        				<column label="Producto" align="center"/>
-		                <column label="Unids" align="center"/>
-        				<column label="Cod" align="center"/>
-        				<column label="Estado Orden" align="center"/>
-        				<column label="Nro Orden" align="center"/>
-		                <column label="% Completo" align="center"/>
-		                <column label="Duracion Total" align="center"/>
-		                <column label="Duracion Unidad" align="center"/>
-		                <column label="Fecha Inicio Real" align="center"/>
-		                <column label="Fecha Fin Real" align="center"/>
+        				<column label="${labels.action}" align="center"/>
+        				<!-- <column label="${labels.sequence}" align="center"/> -->
+        				<column label="${labels.date_start}" align="center"/>
+		                <column label="${labels.date_finish}" align="center"/>
+        				<column label="${labels.image}" align="center"/>
+        				<column label="${labels.product}" align="center"/>
+		                <column label="${labels.unit_plural_short}" align="center"/>
+        				<column label="${labels.code_short}" align="center"/>
+        				<column label="${labels.state_production_order}" align="center"/>
+        				<column label="${labels.production_order_number_short}" align="center"/>
+		                <column label="${labels.percent_completed}" align="center"/>
+		                <column label="${labels.duration_total}" align="center"/>
+		                <column label="${labels.unit_duration}" align="center"/>
+		                <column label="${labels.date_start_actual}" align="center"/>
+		                <column label="${labels.date_finish_actual}" align="center"/>
 		            </columns>
 		            <template name="model">
 		                <row>
@@ -88,13 +88,13 @@ THE SOFTWARE.
 			            		<include src="/production_order_processes.zul" production_order_detail_list="${production_order_detail_list}"/>
 			            	</detail>-->
 			            	<custom-attributes product_image="${r:getProductImage(each.product)}"/>
-			            	<button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})"  label="Abrir" disabled="${win_production_order_list$composer.isProductionPlanStateCancel()}"/>
+			            	<button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})" label="${labels.open}" disabled="${win_production_order_list$composer.isProductionPlanStateCancel()}"/>
 			            	<!-- <spinner value="${each.sequence}" constraint="no empty, min 1" forward="onChanging=productionOrderGrid.onEditProductionOrderSequence(${each})" width="60px"/> -->
 			                <cell>
-			                	<datebox value="${each.dateStart}" buttonVisible="true" format="d/M/yyyy" width="110px" disabled="false" forward="onChange=productionOrderGrid.onProductionOrderStartDateboxChange(${each})"/>
-								<timebox value="${win_production_order_list$composer.getTimeboxValue(each.dateStart)}" format="HH:mm" width="70px" forward="onChange=productionOrderGrid.onProductionOrderStartTimeboxChange(${each})"/>
+			                	<datebox value="${each.dateStart}" buttonVisible="true" format="${labels.date_format_short}" width="110px" disabled="false" forward="onChange=productionOrderGrid.onProductionOrderStartDateboxChange(${each})"/>
+								<timebox value="${win_production_order_list$composer.getTimeboxValue(each.dateStart)}" format="${labels.time_format}" width="70px" forward="onChange=productionOrderGrid.onProductionOrderStartTimeboxChange(${each})"/>
 		                	</cell>
-		                    <datebox buttonVisible="false" format="dd/MM/yyyy HH:mm" value="${each.dateFinish}" disabled="true" width="110px"/>
+		                    <datebox buttonVisible="false" format="${labels.date_time_format}" value="${each.dateFinish}" disabled="true" width="110px"/>
 		                	<cell>
 				                <image if="${!empty product_image}" content="${product_image}" height="${r:getPixelScaled(product_image, 50, true)}px" width="${r:getPixelScaled(product_image, 50, false)}px"/>
 				                <image if="${empty product_image}" width="0px" height="0px"/>
@@ -116,8 +116,8 @@ THE SOFTWARE.
 	    			<button id="saveButton" label="${labels.save}"/>
 	    			<button id="resetButton" label="${labels.reset}"/>
 	    			<hbox hflex="1" pack="center">
-	    				<button id="returnButton" label="${labels.go_to} ${labels.list} ${labels.production_plan}"/>
-	    				<button id="productionPlanRequirementButton" label="${labels.go_to} Requerimientos"/>
+	    				<button id="returnButton" label="${labels.go_to_production_plan_list}"/>
+	    				<button id="productionPlanRequirementButton" label="${labels.go_to_requirements}"/>
 					</hbox>
 				</hbox>
             </vlayout>

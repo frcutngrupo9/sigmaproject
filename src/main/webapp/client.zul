@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 
-<window id="win_client" title="Clientes" closable="false" apply="ar.edu.utn.sigmaproject.controller.ClientController" sclass="sigma-content">
+<window id="win_client" title="${labels.client_plural}" closable="false" apply="ar.edu.utn.sigmaproject.controller.ClientController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
 		    <hlayout>
@@ -34,10 +34,10 @@ THE SOFTWARE.
 		    <listbox id="clientListbox">
 		        <listhead>
 		            <listheader label="${labels.name}" align="center"/>
-		            <listheader label="Telefono" align="center"/>
-		            <listheader label="Email" align="center"/>
-		            <listheader label="Direccion" align="center"/>
-		            <listheader label="Detalles" align="center"/>
+		            <listheader label="${labels.phone}" align="center"/>
+		            <listheader label="${labels.email}" align="center"/>
+		            <listheader label="${labels.address}" align="center"/>
+		            <listheader label="${labels.detail_plural}" align="center"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
@@ -67,19 +67,19 @@ THE SOFTWARE.
 		                    <textbox id="nameTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>	
-		                    <label>Telefono:</label>
+		                    <label>${each.phone}:</label>
 		                    <textbox id="phoneTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>   
-		                    <label>Email:</label>
+		                    <label>${each.email}:</label>
 		                    <textbox id="emailTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>	
-		                    <label>Direccion:</label>
+		                    <label>${each.address}:</label>
 		                    <textbox id="addressTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>   
-		                    <label>Detalles:</label>
+		                    <label>${each.detail_plural}:</label>
 		                    <textbox id="detailsTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>

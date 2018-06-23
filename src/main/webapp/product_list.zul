@@ -23,7 +23,7 @@ THE SOFTWARE.
 -->
 
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
-<window id="win_product_list" title="Listado de Productos" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductListController" sclass="sigma-content">
+<window id="win_product_list" title="${labels.product_list}" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductListController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
 		    <vlayout>
@@ -32,7 +32,7 @@ THE SOFTWARE.
 			        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
 			        <button id="searchButton" label="${labels.search}"/>
 			        <hbox pack="center" align="center" hflex="1">
-			        	<button id="newProductButton" label="${labels.new_text} ${labels.product}"/>
+			        	<button id="newProductButton" label="${labels.new_product}"/>
 			        </hbox>
 			    </hlayout>
 			    <separator/>
@@ -41,12 +41,12 @@ THE SOFTWARE.
 						<auxheader label="${labels.product_plural}" colspan="6"/>
 					</auxhead>
 			        <columns>
-			        	<column label="Foto" align="center"/>
-			            <column label="Codigo" align="center"/>
-			            <column label="Nombre" align="center"/>
-			            <column label="Categoria" align="center"/>
-			            <column label="Precio" align="center"/>
-			            <column label="Editar" align="center"/>
+			        	<column label="${labels.image}" align="center"/>
+			            <column label="${labels.code}" align="center"/>
+			            <column label="${labels.name}" align="center"/>
+			            <column label="${labels.category}" align="center"/>
+			            <column label="${labels.price}" align="center"/>
+			            <column label="${labels.edit}" align="center"/>
 			        </columns>
 			        <template name="model">
 			            <row>

@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 
-<window id="reportSelectionModalWindow" title="Generar Reporte" border="normal" width="500px"
+<window id="reportSelectionModalWindow" title="${labels.generate_report}" border="normal" width="500px"
     apply="ar.edu.utn.sigmaproject.controller.ReportSelectionModalController"
     position="center,center" closable="true"
     action="show: slideDown;hide: slideUp">
@@ -30,7 +30,7 @@ THE SOFTWARE.
         <panelchildren>
 			<vlayout>
 		        <hbox pack="center" align="center" hflex="1">
-	                Seleccione el tipo de reporte: 
+	                ${labels.select_report_type}: 
 					<listbox id="reportTypeListbox" mold="select" model="${r:getReportTypeListModelList()}">
 						<template name="model">
 							<listitem>

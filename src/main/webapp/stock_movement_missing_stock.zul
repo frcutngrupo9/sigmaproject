@@ -22,16 +22,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 
-<window id="missingStockWin" title="Stock insuficiente" width="500px" border="normal"
+<window id="missingStockWin" title="${labels.stock_insufficient}" width="500px" border="normal"
         apply="ar.edu.utn.sigmaproject.controller.InvalidStockController">
     <vlayout>
-        <label value="No se puede emitir el comprobante debido a que algunos detalles hacen referencia a items sin stock suficiente"/>
+        <label value="${labels.cannot_emit_stock_movement}"/>
         <grid model="${arg.invalidDetails}">
             <columns>
-                <column label="Descripción" align="center" />
-                <column label="Egreso ingresado" align="center" />
-                <column label="Stock actual" align="center" />
-                <column label="Diferencia" align="center" />
+                <column label="${labels.description}" align="center" />
+                <column label="${labels.out_entered}" align="center" />
+                <column label="${labels.stock_current}" align="center" />
+                <column label="${labels.difference}" align="center" />
             </columns>
             <template name="model">
                 <row>

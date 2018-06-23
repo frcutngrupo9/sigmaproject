@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 
-<window id="win_machine" title="Maquinas" closable="false" apply="ar.edu.utn.sigmaproject.controller.MachineController" sclass="sigma-content">
+<window id="win_machine" title="${labels.machine_plural}" closable="false" apply="ar.edu.utn.sigmaproject.controller.MachineController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
 		    <hlayout>
@@ -34,8 +34,8 @@ THE SOFTWARE.
 		    <listbox id="machineTypeListbox">
 		        <listhead>
 		            <listheader label="${labels.name}" align="center"/>
-		            <listheader label="Detalles" align="center"/>
-		            <listheader label="Tiempo de deterioro" align="center"/>
+		            <listheader label="${labels.detail_plural}" align="center"/>
+		            <listheader label="${labels.deterioration_time}" align="center"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
@@ -63,18 +63,14 @@ THE SOFTWARE.
 		                    <textbox id="nameTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>	
-		                    <label>Detalles:</label>
+		                    <label>${labels.detail_plural}:</label>
 		                    <textbox id="detailsTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>   
-		                    <label>Tiempo de Deterioro:</label>
+		                    <label>${labels.deterioration_time}:</label>
 		                    <hlayout>
-		                    	<intbox id="deteriorationTimeIntboxYears" width="26px"/>
-		                    	<label value="(Anios)"/>
-		                    	<intbox id="deteriorationTimeIntboxDays" width="26px"/>
-		                    	<label value="(Dias)"/>
 		                    	<intbox id="deteriorationTimeIntboxHours" width="36px"/>
-		                    	<label value="(Horas)"/>
+		                    	<label value="(${labels.hours})"/>
 		                    </hlayout>
 		                </row>
 		                <row>

@@ -26,11 +26,11 @@ THE SOFTWARE.
     <panelchildren>
         <grid id="stockMovementGrid" sizedByContent="true" span="true">
             <auxhead>
-                <auxheader label="Comprobantes de Stock de Insumos" colspan="3"/>
+                <auxheader label="${labels.stock_movement_supplies}" colspan="3"/>
             </auxhead>
             <columns>
-                <column label="Fecha" align="center"/>
-                <column label="Tipo" align="center"/>
+                <column label="${labels.date}" align="center"/>
+                <column label="${labels.type}" align="center"/>
                 <column label=""/>
             </columns>
             <template name="model">
@@ -43,7 +43,7 @@ THE SOFTWARE.
         </grid>
         <paging id="pager" pageSize="10" sclass="sigma-paging"/>
         <separator/>
-        <button id="stockMovementButton" label="Crear ${labels.new_text} Comprobante de Stock"/>
+        <button id="stockMovementButton" label="${labels.new_stock_movement}"/>
         <separator/>
     </panelchildren>
 </panel>

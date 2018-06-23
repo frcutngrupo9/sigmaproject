@@ -47,17 +47,17 @@ THE SOFTWARE.
 							<textbox id="productionPlanNameTextbox" width="25%"/>
                         </row>
                         <row>
-                            <label value="Agregar ${labels.order_plural}: "/>
+                            <label value="${labels.add_orders}: "/>
                             <cell style="text-align:left">
 			                	<bandbox id="orderBandbox" buttonVisible = "true" autodrop = "true">
 			    					<bandpopup>
-			    						<listbox id="orderPopupListbox" width="500px" emptyMessage="No existen pedidos pendientes.">
+			    						<listbox id="orderPopupListbox" width="500px" emptyMessage="${labels.empty_order_selection_list}.">
 			    							<listhead>
 			    								<listheader label="${labels.order}" align="center"/>
-			    								<listheader label="Cliente" align="center"/>
-			    								<listheader label="Fecha" align="center"/>
-			    								<listheader label="Fecha Necesidad" align="center"/>
-			    								<listheader label="Productos Distintos" align="center"/>
+			    								<listheader label="${labels.client}" align="center"/>
+			    								<listheader label="${labels.date}" align="center"/>
+			    								<listheader label="${labels.order_need_date}" align="center"/>
+			    								<listheader label="${labels.different_products}" align="center"/>
 			    							</listhead>
 			    							<template name="model">
 			    								<listitem>
@@ -80,12 +80,12 @@ THE SOFTWARE.
 						<auxheader label="${labels.order_plural}" colspan="6"/>
 					</auxhead>
         			<columns>
-            			<column label="Nro" align="center"/>
-            			<column label="Fecha Creacion" align="center"/>
-            			<column label="Fecha Necesidad" align="center"/>
-            			<column label="Cliente" align="center"/>
-           			 	<column label="Cantidad Productos Distintos" align="center"/>
-           			 	<column label="Accion" width="120px" align="center"/>
+            			<column label="${labels.number_short}" align="center"/>
+            			<column label="${labels.creation_date}" align="center"/>
+            			<column label="${labels.order_need_date}" align="center"/>
+            			<column label="${labels.client}" align="center"/>
+           			 	<column label="${labels.quantity_different_products}" align="center"/>
+           			 	<column label="${labels.action}" width="120px" align="center"/>
         			</columns>
         			<template name="model">
             			<row>
@@ -104,11 +104,11 @@ THE SOFTWARE.
 						<auxheader label="${labels.product_plural}" colspan="5"/>
 					</auxhead>
         			<listhead>
-        				<listheader label="Foto" align="center"/>
-        				<listheader label="Codigo" align="center"/>
+        				<listheader label="${labels.image}" align="center"/>
+        				<listheader label="${labels.code}" align="center"/>
             			<listheader label="${labels.product}" align="center"/>
-            			<listheader label="Detalles" align="center"/>
-            			<listheader label="Cantidad" align="center"/>
+            			<listheader label="${labels.detail_plural}" align="center"/>
+            			<listheader label="${labels.quantity}" align="center"/>
         			</listhead>
         			<template name="model">
             			<listitem>
@@ -130,9 +130,9 @@ THE SOFTWARE.
                     <button id="deleteProductionPlanButton" label="${labels.delete}"/>
                     <button id="newProductionPlanButton" label="${labels.new_text}"/>
                     <hbox pack="center" align="center" hflex="1">
-			        	<button id="returnButton" label="${labels.go_to} ${labels.list} ${labels.production_plan}"/>
-			        	<button id="returnToProductionButton" label="${labels.go_to} ${labels.production_order}"/>
-			        	<button id="returnToRequirementPlanButton" label="${labels.go_to} Abastecimiento"/>
+			        	<button id="returnButton" label="${labels.go_to_production_plan_list}"/>
+			        	<button id="returnToProductionButton" label="${labels.go_to_production_order}"/>
+			        	<button id="returnToRequirementPlanButton" label="${labels.go_to_requirements}"/>
 			        </hbox>
                 </hlayout>
                 <separator/>

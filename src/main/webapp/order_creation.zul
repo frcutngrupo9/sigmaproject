@@ -43,17 +43,17 @@ THE SOFTWARE.
 		                    </combobox>
                         </row>
                         <row>
-                            <label value="Numero de Pedido: "/>
+                            <label value="${labels.order_number}: "/>
                     		<intbox id="orderNumberIntbox" constraint="no negative" width="25%"/>
                         </row>
                         <row>
-                            <label value="Cliente: "/>
+                            <label value="${labels.client}: "/>
 		                    <bandbox id="clientBandbox" buttonVisible = "true" autodrop = "true" width="25%">
 		                        <bandpopup>
 		                            <listbox id="clientPopupListbox" width="200px">
 		                                <listhead>
-		                                    <listheader label="Cliente"/>
-		                                    <listheader label="Email"/>
+		                                    <listheader label="${labels.client}"/>
+		                                    <listheader label="${labels.email}"/>
 		                                </listhead>
 		                                <template name="model">
 		                                    <listitem>
@@ -66,17 +66,17 @@ THE SOFTWARE.
 		                    </bandbox>
                         </row>
                         <row>
-                            <label value="Fecha Creacion: "/>
-                    		<datebox id="orderDatebox" cols="12" format="dd-MM-yyyy" width="25%"/>
+                            <label value="${labels.creation_date}: "/>
+                    		<datebox id="orderDatebox" cols="12" format="${labels.date_format_dash}" width="25%"/>
                         </row>
                         <row>
-                            <label value="Fecha Necesidad: "/>
-                    		<datebox id="orderNeedDatebox" cols="12" format="dd-MM-yyyy" width="25%"/>
+                            <label value="${labels.order_need_date}: "/>
+                    		<datebox id="orderNeedDatebox" cols="12" format="${labels.date_format_dash}" width="25%"/>
                         </row>
                    </rows>
                 </grid>
                 <hbox hflex="1" style="margin: 4px">
-                	<label value="Seleccionar Producto: "/>
+                	<label value="${labels.select_product}: "/>
                     <bandbox id="productBandbox" buttonVisible="true" autodrop="true">
                         <bandpopup>
                         	<listbox id="productPopupListbox" width="500px" height="250px" sizedByContent="true" span="true">
@@ -97,25 +97,25 @@ THE SOFTWARE.
                         	</listbox>
                         </bandpopup>
                     </bandbox>
-                    <label value="Cantidad: "/>
+                    <label value="${labels.quantity}: "/>
                     <intbox id="productUnitsIntbox" constraint="no negative" width="36px"/>
-                    <label value="Precio Unitario: "/>
+                    <label value="${labels.unit_price}: "/>
                     <doublebox id="productPriceDoublebox" constraint="no negative" format=",###.##" width="77px"/>
                     <button id="saveOrderDetailButton" label="${labels.save_detail}"/>
                     <button id="resetOrderDetailButton" label="${labels.reset_detail}"/>
                     <button id="cancelOrderDetailButton" label="${labels.cancel_edition}"/>
                 </hbox>
-                <listbox id="orderDetailListbox" mold="paging" pageSize="7" sizedByContent="true" span="true" style="margin: 4px" emptyMessage="Debe Agregar Detalles.">
+                <listbox id="orderDetailListbox" mold="paging" pageSize="7" sizedByContent="true" span="true" style="margin: 4px" emptyMessage="${labels.empty_detail_list}.">
                     <auxhead>
                         <auxheader label="${labels.product_plural}" colspan="6"/>
                     </auxhead>
                     <listhead>
                     	<listheader label="${labels.image}" align="center"/>
                         <listheader label="${labels.name}" align="center"/>
-                        <listheader label="Unidades" align="center"/>
-                        <listheader label="Importe Unitario" align="center"/>
-                        <listheader label="Subtotal" align="center"/>
-                        <listheader label="Quitar" align="center"/>
+                        <listheader label="${labels.unit_plural}" align="center"/>
+                        <listheader label="${labels.unit_amount}" align="center"/>
+                        <listheader label="${labels.subtotal}" align="center"/>
+                        <listheader label="${labels.remove}" align="center"/>
                     </listhead>
                     <template name="model">
                         <listitem>
@@ -146,7 +146,7 @@ THE SOFTWARE.
                     <button id="resetOrderButton" label="${labels.reset_order}"/>
                     <button id="deleteOrderButton" label="${labels.delete_order}"/>
                     <separator/>
-                    <button id="jasperReportButton" label="Reporte"/>
+                    <button id="jasperReportButton" label="${labels.report}"/>
                     <hbox pack="center" align="center" hflex="1">
 			        	<button id="newOrderButton" label="${labels.new_order}"/>
 			        	<button id="returnButton" label="${labels.return_to_list}"/>

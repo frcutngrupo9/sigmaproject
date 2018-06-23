@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 
-<window id="win_supply" title="Insumos" closable="false" apply="ar.edu.utn.sigmaproject.controller.SupplyController" sclass="sigma-content">
+<window id="win_supply" title="${labels.supply_plural}" closable="false" apply="ar.edu.utn.sigmaproject.controller.SupplyController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
 		    <hlayout>
@@ -33,13 +33,13 @@ THE SOFTWARE.
 		    <separator/>
 		    <listbox id="supplyTypeListbox" sizedByContent="true" span="true">
 		        <listhead>
-		            <listheader label="Codigo" align="center"/>
-		            <listheader label="Descripcion" align="center"/>
-		            <listheader label="Detalles" align="center"/>
-		            <listheader label="Marca" align="center"/>
-		            <listheader label="Presentacion" align="center"/>
-		            <listheader label="Medida" align="center"/>
-		            <listheader label="Precio" align="center"/>
+		            <listheader label="${labels.code}" align="center"/>
+		            <listheader label="${labels.description}" align="center"/>
+		            <listheader label="${labels.detail_plural}" align="center"/>
+		            <listheader label="${labels.brand}" align="center"/>
+		            <listheader label="${labels.presentation}" align="center"/>
+		            <listheader label="${labels.measure}" align="center"/>
+		            <listheader label="${labels.price}" align="center"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
@@ -67,31 +67,31 @@ THE SOFTWARE.
 		            </columns>
 			        <rows>
 			            <row>
-			                <label>Codigo:</label>
+			                <label>${labels.code}:</label>
 			                <textbox id="codeTextbox" value="" hflex="1"/>
 			            </row>
 			            <row>
-			                <label>Descripcion:</label>
+			                <label>${labels.description}:</label>
 			                <textbox id="descriptionTextbox" value="" hflex="1"/>
 			            </row>
 			            <row>
-			                <label>Detalles:</label>
+			                <label>${labels.detail_plural}:</label>
 			                <textbox id="detailsTextbox" value="" hflex="1"/>
 			            </row>
 			            <row>
-			                <label>Marca:</label>
+			                <label>${labels.brand}:</label>
 			                <textbox id="brandTextbox" value="" hflex="1"/>
 			            </row>
 			            <row>
-			                <label>Presentacion:</label>
+			                <label>${labels.presentation}:</label>
 			                <textbox id="presentationTextbox" value="" hflex="1"/>
 			            </row>
 			            <row>
-			                <label>Medida:</label>
+			                <label>${labels.measure}:</label>
 			                <textbox id="measureTextbox" value="" hflex="1"/>
 			            </row>
 			            <row>
-                            <label value="Precio: "/>
+                            <label value="${labels.price}: "/>
                             <doublebox id="priceDoublebox"  hflex="1"/>
                         </row>
 			            <row>

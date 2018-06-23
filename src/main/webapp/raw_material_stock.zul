@@ -23,7 +23,7 @@ THE SOFTWARE.
 -->
 
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
-<window id="win_raw_material_stock" title="Stock de Materia Prima" closable="false" apply="ar.edu.utn.sigmaproject.controller.RawMaterialStockController" sclass="sigma-content">
+<window id="win_raw_material_stock" title="${labels.raw_material_stock}" closable="false" apply="ar.edu.utn.sigmaproject.controller.RawMaterialStockController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
         	<vlayout>
@@ -35,17 +35,17 @@ THE SOFTWARE.
 			    <separator/>
 			    <listbox id="woodListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
 			    	<auxhead>
-						<auxheader label="Materia Prima" colspan="8"/>
+						<auxheader label="${labels.raw_material}" colspan="8"/>
 					</auxhead>
 			        <listhead>
-			        	<listheader label="Madera" align="center"/>
+			        	<listheader label="${labels.wood}" align="center"/>
 			            <listheader label="${labels.name}" align="center"/>
-			            <listheader label="Medidas" align="center"/>
-			            <listheader label="Stock Total" align="center"/>
-			            <listheader label="Stock No Reservado" align="center"/>
-			            <listheader label="Stock Reservado" align="center"/>
-			            <listheader label="Stock Minimo" align="center"/>
-			            <listheader label="Stock Reposicion" align="center"/>
+			            <listheader label="${labels.measure_plural}" align="center"/>
+			            <listheader label="${labels.stock_total}" align="center"/>
+			            <listheader label="${labels.stock_not_reserved}" align="center"/>
+			            <listheader label="${labels.stock_reserved}" align="center"/>
+			            <listheader label="${labels.stock_minimum}" align="center"/>
+			            <listheader label="${labels.stock_replenishment}" align="center"/>
 			        </listhead>
 			        <template name="model">
 			            <listitem>
@@ -68,7 +68,7 @@ THE SOFTWARE.
 		            </columns>
 			        <rows>
 			        	<row>
-			                <label>Madera:</label>
+			                <label>${labels.wood}:</label>
 			                <combobox id="woodTypeCombobox" readonly="true">
 		                        <template name="model">
 		                            <comboitem label="${each.name}" value="${each}"/>
@@ -80,15 +80,15 @@ THE SOFTWARE.
 			                <textbox id="woodNameTextbox" disabled="true"/>
 			            </row>
 			            <row>
-			                <label>Stock Actual:</label>
+			                <label>${labels.stock_current}:</label>
 			                <doublebox id="stockDoublebox" value="0" width="100px"/>
 			            </row>
 			            <row>
-			                <label>Stock Minimo:</label>
+			                <label>${labels.stock_minimum}:</label>
 			                <doublebox id="stockMinDoublebox" value="0" width="100px"/>
 			            </row>
 			            <row>
-			                <label>Stock Reposicion:</label>
+			                <label>${labels.stock_replenishment}:</label>
 			                <doublebox id="stockRepoDoublebox" value="0" width="100px"/>
 			            </row>
 			            <row>
@@ -105,15 +105,15 @@ THE SOFTWARE.
 			    <separator/>
 			    <listbox id="woodReservedListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
 			    	<auxhead>
-						<auxheader label="Reservas" colspan="6"/>
+						<auxheader label="${labels.reservation_plural}" colspan="6"/>
 					</auxhead>
 			        <listhead>
-			            <listheader label="Plan de Produccion" align="center"/>
-			            <listheader label="Madera" align="center"/>
-			            <listheader label="Descripcion" align="center"/>
-			            <listheader label="Cantidad Reservada" align="center"/>
-			            <listheader label="Cantidad Retirada" align="center"/>
-			            <listheader label="Cantidad Necesaria Total" align="center"/>
+			            <listheader label="${labels.production_plan}" align="center"/>
+			            <listheader label="${labels.wood}" align="center"/>
+			            <listheader label="${labels.description}" align="center"/>
+			            <listheader label="${labels.quantity_reserved}" align="center"/>
+			            <listheader label="${labels.quantity_withdrawn}" align="center"/>
+			            <listheader label="${labels.quantity_necessary}" align="center"/>
 			        </listhead>
 			        <template name="model">
 			            <listitem>

@@ -23,7 +23,7 @@ THE SOFTWARE.
 -->
 
 <window id="rawMaterialReservationWindow" apply="ar.edu.utn.sigmaproject.controller.RawMaterialReservationController" width="75%" position="center,center" closable="true" action="show: slideDown;hide: slideUp">
-	<caption label="Reserva de Materias Prima" style="text-align:center; font-weight: bold;"/>
+	<caption label="${labels.raw_material_reservation}" style="text-align:center; font-weight: bold;"/>
 	<panel border="rounded">
         <panelchildren>
             <vlayout>
@@ -38,24 +38,24 @@ THE SOFTWARE.
 		            </columns>
 			        <rows>
 			            <row>
-			                <label>Madera:</label>
+			                <label>${labels.wood}:</label>
 			                <textbox id="woodTypeTextbox" value="" hflex="1"/>
-			                <label>Materia Prima:</label>
+			                <label>${labels.raw_material}:</label>
 			                <textbox id="descriptionTextbox" value="" hflex="1"/>
-			                <label>Stock Actual:</label>
+			                <label>${labels.stock_current}:</label>
 			                <doublebox id="stockDoublebox" hflex="1"/>
 			            </row>
 			            <row>
-			                <label>Stock Disponible:</label>
+			                <label>${labels.stock_available}:</label>
 			                <doublebox id="stockAvailableDoublebox" hflex="1"/>
-			                <label>Cantidad Necesaria:</label>
+			                <label>${labels.quantity_necessary}:</label>
 			                <doublebox id="quantityDoublebox" hflex="1"/>
-			                <label>Cantidad Faltante:</label>
+			                <label>${labels.quantity_missing}:</label>
 			                <doublebox id="stockMissingDoublebox" hflex="1"/>
 			            </row>
 			            <row>
 			            	<cell colspan="2" />
-			            	<label>Cantidad Reserva:</label>
+			            	<label>${labels.quantity_reservation}:</label>
 			            	<doublebox id="stockReservedDoublebox" hflex="1"/>
 			            	<button id="completeButton" label="${labels.complete}"/>
 			            	<cell colspan="1" />

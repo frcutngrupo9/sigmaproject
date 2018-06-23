@@ -33,17 +33,17 @@ THE SOFTWARE.
 		    <separator/>
 		    <listbox id="processTypeListbox">
 		        <listhead>
-		            <listheader label="Secuencia" align="center" hflex="min"/>
+		            <listheader label="${labels.sequence}" align="center" hflex="min"/>
 		            <listheader label="${labels.name}" align="center" hflex="min"/>
-		            <listheader label="Detalles" align="center" hflex="max"/>
-		            <listheader label="Maquina Necesaria" align="center" hflex="max"/>
+		            <listheader label="${labels.detail_plural}" align="center" hflex="max"/>
+		            <listheader label="${labels.machine_necessary}" align="center" hflex="max"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
 		                <listcell label="${each.sequence}"/>
 		                <listcell label="${each.name}"/>
 		                <listcell label="${empty each.details ? '' : each.details}"/>
-		                <listcell label="${empty each.machineType.name ? 'Ninguna' : each.machineType.name}"/>
+		                <listcell label="${empty each.machineType.name ? '${labels.none}' : each.machineType.name}"/>
 		            </listitem>
 		        </template>
 		    </listbox>
@@ -66,15 +66,15 @@ THE SOFTWARE.
 			                <textbox id="nameTextbox" hflex="1"/>
 			            </row>
 			            <row>
-			                <label>Detalles:</label>
+			                <label>${labels.detail_plural}:</label>
 			                <textbox id="detailsTextbox" hflex="1"/>
 			            </row>
 			            <row>
-			                <label>Secuencia:</label>
+			                <label>${labels.sequence}:</label>
 			                <intbox id="sequenceIntbox" hflex="1"/>
 			            </row>
 			            <row>
-			                <label>Maquina Necesaria:</label>
+			                <label>${labels.machine_necessary}:</label>
 			                <combobox id="machineTypeCombobox">
 		                        <template name="model">
 		                            <comboitem label="${each.name}" />

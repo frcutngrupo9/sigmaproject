@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 
-<window id="win_product_category" title="Categorias Producto" closable="false" apply="ar.edu.utn.sigmaproject.controller.WorkerController" sclass="sigma-content">
+<window id="win_product_category" title="${labels.product_categories}" closable="false" apply="ar.edu.utn.sigmaproject.controller.WorkerController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
 		    <hlayout>

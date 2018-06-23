@@ -23,7 +23,7 @@ THE SOFTWARE.
 -->
 
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
-<window id="win_product_stock" title="Stock de Productos" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductStockController" sclass="sigma-content">
+<window id="win_product_stock" title="${labels.product_stock}" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductStockController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
 		    <hlayout>
@@ -37,13 +37,13 @@ THE SOFTWARE.
 					<auxheader label="${labels.product_plural}" colspan="7"/>
 				</auxhead>
 		        <listhead>
-		            <listheader label="Foto" align="center"/>
-		            <listheader label="Codigo" align="center"/>
-		            <listheader label="Descripcion" align="center"/>
-		            <listheader label="Stock Actual" align="center"/>
-		            <listheader label="Stock Minimo" align="center"/>
-		            <listheader label="Stock Reposicion" align="center"/>
-		            <listheader label="Cantidad Entregada" align="center"/>
+		            <listheader label="${labels.image}" align="center"/>
+		            <listheader label="${labels.code}" align="center"/>
+		            <listheader label="${labels.product}" align="center"/>
+		            <listheader label="${labels.stock_current}" align="center"/>
+		            <listheader label="${labels.stock_minimum}" align="center"/>
+		            <listheader label="${labels.stock_replenishment}" align="center"/>
+		            <listheader label="${labels.quantity_delivered}" align="center"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
@@ -64,7 +64,7 @@ THE SOFTWARE.
 		    <vlayout>
 		        <separator/>
 		        <hbox>
-		            <button id="newProvisionOrderButton" label="Nuevo Pedido Para Productos con bajo stock" visible="false"/>
+		            <button id="newProvisionOrderButton" label="${labels.new_provision_order}" visible="false"/>
 		        </hbox>
 		        <separator/>
 				<grid id="productExistenceGrid" width="400px" sclass="sigma-form" visible="false">
@@ -74,23 +74,23 @@ THE SOFTWARE.
 		            </columns>
 			        <rows>
 			            <row>
-			                <label>Codigo:</label>
+			                <label>${labels.code}:</label>
 			                <textbox id="codeTextbox" value="" hflex="1"/>
 			            </row>
 			            <row>
-			                <label>Descripcion:</label>
+			                <label>${labels.product}:</label>
 			                <textbox id="nameTextbox" value="" hflex="1"/>
 			            </row>
 			            <row>
-			                <label>Stock Actual:</label>
+			                <label>${labels.stock_current}:</label>
 			                <intbox id="stockIntbox" value="0" width="150px" hflex="1"/>
 			            </row>
 			            <row>
-			                <label>Stock Minimo:</label>
+			                <label>${labels.stock_minimum}:</label>
 			                <intbox id="stockMinIntbox" value="0" width="150px" hflex="1"/>
 			            </row>
 			            <row>
-			                <label>Stock Reposicion:</label>
+			                <label>${labels.stock_replenishment}:</label>
 			                <intbox id="stockRepoIntbox" value="0" width="150px" hflex="1"/>
 			            </row>
 			            <row>

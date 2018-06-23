@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 
-<window id="win_tool" title="Herramientas" closable="false" apply="ar.edu.utn.sigmaproject.controller.ToolController" sclass="sigma-content">
+<window id="win_tool" title="${labels.tool_plural}" closable="false" apply="ar.edu.utn.sigmaproject.controller.ToolController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
 	        <hlayout>
@@ -34,9 +34,9 @@ THE SOFTWARE.
 		    <listbox id="toolTypeListbox" sizedByContent="true" span="true">
 		        <listhead>
 		            <listheader label="${labels.name}" align="center"/>
-		            <listheader label="Descripcion" align="center"/>
-		            <listheader label="Detalles" align="center"/>
-		            <listheader label="Marca" align="center"/>
+		            <listheader label="${labels.description}" align="center"/>
+		            <listheader label="${labels.detail_plural}" align="center"/>
+		            <listheader label="${labels.brand}" align="center"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
@@ -65,15 +65,15 @@ THE SOFTWARE.
 		                    <textbox id="nameTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>	
-		                    <label>Descripcion:</label>
+		                    <label>${labels.description}:</label>
 		                    <textbox id="descriptionTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>	
-		                    <label>Detalles:</label>
+		                    <label>${labels.detail_plural}:</label>
 		                    <textbox id="detailsTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>	
-		                    <label>Marca:</label>
+		                    <label>${labels.brand}:</label>
 		                    <textbox id="brandTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>

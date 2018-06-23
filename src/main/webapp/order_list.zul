@@ -23,7 +23,7 @@ THE SOFTWARE.
 -->
 
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
-<window id="win_order_list" title="Lista de Pedidos" closable="false" apply="ar.edu.utn.sigmaproject.controller.OrderListController" sclass="sigma-content">
+<window id="win_order_list" title="${labels.order_list}" closable="false" apply="ar.edu.utn.sigmaproject.controller.OrderListController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
 		    <hlayout>
@@ -40,16 +40,16 @@ THE SOFTWARE.
 					<auxheader label="${labels.order_plural}" colspan="10"/>
 				</auxhead>
 		        <columns>
-		            <column label="Numero" align="center" sort="auto(number)"/>
-		            <column label="Cliente" align="center" sort="auto(client.name)"/>
-		            <column label="Fecha Creacion" align="center"/>
-		            <column label="Fecha Necesidad" align="center"/>
-		            <column label="Cant. Productos" align="center"/>
-		            <column label="Estado" align="center" sort="auto(currentStateType.name)"/>
-		            <column label="Importe Total" align="center"/>
-		            <column label="Editar" width="120px" align="center"/>
-		            <column label="Cancelar" width="120px" align="center"/>
-		            <column label="Accion" align="center"/>
+		            <column label="${labels.number}" align="center" sort="auto(number)"/>
+		            <column label="${labels.client}" align="center" sort="auto(client.name)"/>
+		            <column label="${labels.creation_date}" align="center"/>
+		            <column label="${labels.order_need_date}" align="center"/>
+		            <column label="${labels.quantity_product}" align="center"/>
+		            <column label="${labels.state}" align="center" sort="auto(currentStateType.name)"/>
+		            <column label="${labels.total_amount}" align="center"/>
+		            <column label="${labels.edit}" width="120px" align="center"/>
+		            <column label="${labels.cancel}" width="120px" align="center"/>
+		            <column label="${labels.action}" align="center"/>
 		        </columns>
 		        <template name="model">
 		            <row>
@@ -70,7 +70,7 @@ THE SOFTWARE.
 		                <label value="${win_order_list$composer.totalPrice(each)} $"/>
 		                <button forward="onClick=orderGrid.onEditOrder(${each})"  image="/img/edit16x16.png"/>
 		                <button disabled="${win_order_list$composer.isStateCancel(each) or win_order_list$composer.isStateDelivered(each) or win_order_list$composer.isStateFinish(each)}" forward="onClick=orderGrid.onCancelOrder(${each})"  image="/img/delete16x16.png"/>
-		                <button disabled="${win_order_list$composer.isStateCancel(each) or win_order_list$composer.isStateNotFinished(each)}" label="Entregar" forward="onClick=orderGrid.onDeliverOrder(${each})"/>
+		                <button disabled="${win_order_list$composer.isStateCancel(each) or win_order_list$composer.isStateNotFinished(each)}" label="${labels.deliver}" forward="onClick=orderGrid.onDeliverOrder(${each})"/>
 		            </row>
 		        </template>
 		    </grid>

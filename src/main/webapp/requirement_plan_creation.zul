@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 
-<window id="win_requirement_plan_creation" title="Plan de Requerimiento de Materiales" closable="false" apply="ar.edu.utn.sigmaproject.controller.RequirementPlanCreationController" sclass="sigma-content">
+<window id="win_requirement_plan_creation" title="${labels.requirement_plan}" closable="false" apply="ar.edu.utn.sigmaproject.controller.RequirementPlanCreationController" sclass="sigma-content">
     <panel id="requirementPlanCreationBlock" border="none">
         <panelchildren>
             <vlayout>
@@ -33,40 +33,40 @@ THE SOFTWARE.
                     </columns>
                     <rows>
                     	<row>
-                            <label value="${labels.name} ${labels.production_plan}: "/>
+                            <label value="${labels.name_production_plan}: "/>
 							<textbox id="productionPlanNameTextbox" width="25%"/>
                         </row>
                         <row>
-                            <label value="Fecha Creacion ${labels.production_plan}: "/>
+                            <label value="${labels.production_plan_creation_date}: "/>
 							<datebox id="productionPlanCreationDatebox" cols="12" format="dd-MM-yyyy" width="25%"/>
                         </row>
                         <row>
-                            <label value="${labels.state} ${labels.production_plan}: "/>
+                            <label value="${labels.state_plan}: "/>
 							<textbox id="productionPlanStateTextbox" width="25%"/>
                         </row>
                     </rows>
                 </grid>
                 <hbox pack="center" align="center" hflex="1">
-		        	<button id="materialsOrderCreationButton" label="Generar Pedido de Materiales Faltantes"/>
-		        	<button id="allRequirementReservationButton" label="Reservar Todo"/>
+		        	<button id="materialsOrderCreationButton" label="${labels.generate_materials_order}"/>
+		        	<button id="allRequirementReservationButton" label="${labels.reserve_all}"/>
 		        	<separator/>
 		        	<separator/>
-		        	<button id="returnToProductionButton" label="${labels.go_to} Produccion"/>
-		        	<button id="returnButton" label="${labels.go_to} ${labels.list}"/>
+		        	<button id="returnToProductionButton" label="${labels.go_to_production}"/>
+		        	<button id="returnButton" label="${labels.go_to_list}"/>
 		        </hbox>
                 <separator/>
     			<listbox id="rawMaterialRequirementListbox" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Requerimiento de Materias Primas" colspan="7"/>
+						<auxheader label="${labels.requirement_raw_materials}" colspan="7"/>
 					</auxhead>
         			<listhead>
-        				<listheader label="Materia Prima"/>
-		                <listheader label="Stock Total"/>
-		                <listheader label="Cantidad Necesaria"/>
-		                <listheader label="Cantidad Reservada"/>
-		                <listheader label="Cantidad Disponible"/>
-		                <listheader label="Esta Abastecido?"/>
-		                <listheader label="Generar Reserva"/>
+        				<listheader label="${labels.raw_material}"/>
+		                <listheader label="${labels.stock_total}"/>
+		                <listheader label="${labels.quantity_necessary}"/>
+		                <listheader label="${labels.quantity_reserved}"/>
+		                <listheader label="${labels.stock_available}"/>
+		                <listheader label="${labels.is_fulfilled}?"/>
+		                <listheader label="${labels.generate_reservation}"/>
 		            </listhead>
 		            <template name="model">
 		                <listitem>
@@ -76,8 +76,8 @@ THE SOFTWARE.
 		                    <listcell label="${win_requirement_plan_creation$composer.getMaterialStockReserved(each).doubleValue()}"/>
 		                    <listcell label="${each.item.getStockAvailable().doubleValue()}"/>
 		                    <listcell>
-		                    	<label value="Si" if="${win_requirement_plan_creation$composer.isMaterialRequirementFulfilled(each)}"/>
-			                    <label value="Faltan ${win_requirement_plan_creation$composer.getMaterialStockMissing(each).doubleValue()}" if="${!win_requirement_plan_creation$composer.isMaterialRequirementFulfilled(each)}"/>
+		                    	<label value="${labels.yes}" if="${win_requirement_plan_creation$composer.isMaterialRequirementFulfilled(each)}"/>
+			                    <label value="${labels.missing} ${win_requirement_plan_creation$composer.getMaterialStockMissing(each).doubleValue()}" if="${!win_requirement_plan_creation$composer.isMaterialRequirementFulfilled(each)}"/>
 			                </listcell>
 			                <listcell>
 			                    <button label="${labels.reserve}" forward="onClick=rawMaterialRequirementListbox.onClickReservation(${each})"/>
@@ -88,17 +88,17 @@ THE SOFTWARE.
     			<separator/>
     			<listbox id="supplyRequirementListbox" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Requerimiento de Insumos" colspan="8"/>
+						<auxheader label="${labels.requirement_supplies}" colspan="8"/>
 					</auxhead>
         			<listhead>
-        				<listheader label="Insumo"/>
-		            	<listheader label="Codigo"/>
-		                <listheader label="Stock Total"/>
-		                <listheader label="Cantidad Necesaria"/>
-		                <listheader label="Cantidad Reservada"/>
-		                <listheader label="Cantidad Disponible"/>
-		                <listheader label="Esta Abastecido?"/>
-		                <listheader label="Generar Reserva"/>
+        				<listheader label="${labels.supply}"/>
+		            	<listheader label="${labels.code}"/>
+		                <listheader label="${labels.stock_total}"/>
+		                <listheader label="${labels.quantity_necessary}"/>
+		                <listheader label="${labels.quantity_reserved}"/>
+		                <listheader label="${labels.stock_available}"/>
+		                <listheader label="${labels.is_fulfilled}?"/>
+		                <listheader label="${labels.generate_reservation}"/>
 		            </listhead>
 		            <template name="model">
 		                <listitem>
@@ -109,8 +109,8 @@ THE SOFTWARE.
 		                    <listcell label="${win_requirement_plan_creation$composer.getMaterialStockReserved(each).doubleValue()}"/>
 		                    <listcell label="${each.item.getStockAvailable().doubleValue()}"/>
 		                    <listcell>
-			                    <label value="Si" if="${win_requirement_plan_creation$composer.isMaterialRequirementFulfilled(each)}"/>
-			                    <label value="Faltan ${win_requirement_plan_creation$composer.getMaterialStockMissing(each).doubleValue()}" if="${!win_requirement_plan_creation$composer.isMaterialRequirementFulfilled(each)}"/>
+			                    <label value="${labels.yes}" if="${win_requirement_plan_creation$composer.isMaterialRequirementFulfilled(each)}"/>
+			                    <label value="${labels.missing} ${win_requirement_plan_creation$composer.getMaterialStockMissing(each).doubleValue()}" if="${!win_requirement_plan_creation$composer.isMaterialRequirementFulfilled(each)}"/>
 			                </listcell>
 			                <listcell>
 			                    <button label="${labels.reserve}" forward="onClick=supplyRequirementListbox.onClickReservation(${each})"/>

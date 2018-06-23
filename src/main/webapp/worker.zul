@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 
-<window id="win_worker" title="Empleados" closable="false" apply="ar.edu.utn.sigmaproject.controller.WorkerController" sclass="sigma-content">
+<window id="win_worker" title="${labels.worker_plural}" closable="false" apply="ar.edu.utn.sigmaproject.controller.WorkerController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
 	        <hlayout>
@@ -34,7 +34,7 @@ THE SOFTWARE.
 		    <listbox id="workerListbox">
 		        <listhead>
 		            <listheader label="${labels.name}" align="center"/>
-		            <listheader label="Fecha Ingreso" align="center"/>
+		            <listheader label="${labels.date_employed}" align="center"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
@@ -61,8 +61,8 @@ THE SOFTWARE.
 			                <textbox id="nameTextbox" value="" hflex="1"/>
 			            </row>
 			            <row>
-			                <label>Fecha Ingreso:</label>
-			                <datebox id="dateEmployedDatebox" cols="12" format="dd-MM-yyyy" constraint="no future"/>
+			                <label>${labels.date_employed}:</label>
+			                <datebox id="dateEmployedDatebox" cols="12" format="${labels.date_format_dash}" constraint="no future"/>
 			            </row>
 			            <row>
 			                <cell colspan="2" style="text-align:center">

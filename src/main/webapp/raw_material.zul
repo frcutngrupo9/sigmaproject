@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 
-<window id="win_raw_material" title="Materias Primas" closable="false" apply="ar.edu.utn.sigmaproject.controller.RawMaterialController" sclass="sigma-content">
+<window id="win_raw_material" title="${labels.raw_material_plural}" closable="false" apply="ar.edu.utn.sigmaproject.controller.RawMaterialController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
 		    <hlayout>
@@ -33,20 +33,20 @@ THE SOFTWARE.
 		    <separator/>
 		    <listbox id="rawMaterialTypeListbox"  mold="paging" pageSize="7">
 		        <listhead>
-		            <listheader label="Madera" align="center"/>
+		            <listheader label="${labels.wood}" align="center"/>
 		            <listheader label="${labels.name}" align="center"/>
-		            <listheader label="Largo (L)" align="center"/>
-		            <listheader label="Ancho (A)" align="center"/>
-		            <listheader label="Espesor (E)" align="center"/>
-		            <listheader label="Precio" align="center"/>
+		            <listheader label="${labels.width}" align="center"/>
+		            <listheader label="${labels.depth}" align="center"/>
+		            <listheader label="${labels.length}" align="center"/>
+		            <listheader label="${labels.price}" align="center"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
 		                <listcell label="${each.woodType.name}"/>
 		                <listcell label="${each.name}"/>
-		                <listcell label="${each.length} ${each.getLengthMeasureUnit().getShortName()}"/>
 		                <listcell label="${each.width} ${each.getWidthMeasureUnit().getShortName()}"/>
 		                <listcell label="${each.depth} ${each.getDepthMeasureUnit().getShortName()}"/>
+		                <listcell label="${each.length} ${each.getLengthMeasureUnit().getShortName()}"/>
 		                <listcell label="${each.price}"/>
 		            </listitem>
 		        </template>
@@ -68,20 +68,9 @@ THE SOFTWARE.
 		                    <textbox id="nameTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>	
-		                    <label>Largo:</label>
+		                    <label>${labels.width}:</label>
 		                    <hlayout>
-			                    <doublebox id="lengthDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
-			                	<selectbox id="lengthMeasureUnitSelectbox">
-			                        <template name="model">
-			                            <label value="${each.name}" />
-			                        </template>
-			                    </selectbox>
-		                    </hlayout>
-		                </row>
-		                <row>	
-		                    <label>Ancho:</label>
-		                    <hlayout>
-			                    <doublebox id="widthDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
+			                    <doublebox id="widthDoublebox" value="0" format="#.###" constraint="no negative: ${each.constraint_no_negative}."/>
 			                	<selectbox id="widthMeasureUnitSelectbox">
 			                        <template name="model">
 			                            <label value="${each.name}" />
@@ -90,9 +79,9 @@ THE SOFTWARE.
 		                    </hlayout>
 		                </row>
 		                <row>	
-		                    <label>Espesor:</label>
+		                    <label>${labels.depth}:</label>
 		                    <hlayout>
-			                    <doublebox id="depthDoublebox" value="0" format="#.###" constraint="no negative: No puede ser valor negativo."/>
+			                    <doublebox id="depthDoublebox" value="0" format="#.###" constraint="no negative: ${each.constraint_no_negative}."/>
 			                	<selectbox id="depthMeasureUnitSelectbox">
 			                        <template name="model">
 			                            <label value="${each.name}" />
@@ -101,7 +90,18 @@ THE SOFTWARE.
 		                    </hlayout>
 		                </row>
 		                <row>	
-		                    <label>Tipo Madera:</label>
+		                    <label>${each.length}:</label>
+		                    <hlayout>
+			                    <doublebox id="lengthDoublebox" value="0" format="#.###" constraint="no negative: ${each.constraint_no_negative}."/>
+			                	<selectbox id="lengthMeasureUnitSelectbox">
+			                        <template name="model">
+			                            <label value="${each.name}" />
+			                        </template>
+			                    </selectbox>
+		                    </hlayout>
+		                </row>
+		                <row>	
+		                    <label>${labels.wood}:</label>
 		                    <combobox id="woodTypeCombobox" readonly="true">
 		                        <template name="model">
 		                            <comboitem label="${each.name}" value="${each}"/>
@@ -109,7 +109,7 @@ THE SOFTWARE.
 		                    </combobox>
 		                </row>
 		                <row>
-                            <label value="Precio: "/>
+                            <label value="${labels.price}: "/>
                             <doublebox id="priceDoublebox" width="50%"/>
                         </row>
 		                <row>

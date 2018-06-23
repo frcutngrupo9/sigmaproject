@@ -23,7 +23,7 @@ THE SOFTWARE.
 -->
 
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
-<window id="win_production_plan_list" title="Planes de Produccion" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductionPlanListController" sclass="sigma-content">
+<window id="win_production_plan_list" title="${labels.production_plan_list}" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductionPlanListController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
 		    <hlayout>
@@ -37,19 +37,19 @@ THE SOFTWARE.
 		    <separator/>
 		    <grid id="productionPlanGrid" mold="paging" pageSize="7" sizedByContent="true" span="true">
 		    	<auxhead>
-					<auxheader label="Planes de Produccion" colspan="10"/>
+					<auxheader label="${labels.production_plan_plural}" colspan="10"/>
 				</auxhead>
 		        <columns>
 		            <column label="${labels.name}" align="center"/>
-		            <column label="Fecha Creacion" align="center"/>
-		            <column label="Cant. Pedidos" align="center"/>
-		            <column label="Cant. Productos" align="center"/>
-		            <column label="Fotos" align="center"/>
-		            <column label="Estado" align="center"/>
-		            <column label="Editar" align="center"/>
+		            <column label="${labels.creation_date}" align="center"/>
+		            <column label="${labels.quantity_order}" align="center"/>
+		            <column label="${labels.quantity_product}" align="center"/>
+		            <column label="${labels.image}" align="center"/>
+		            <column label="${labels.state}" align="center"/>
+		            <column label="${labels.edit}" align="center"/>
 		            <column label="${labels.list}" align="center"/>
-		            <column label="Abrir" align="center"/>
-		            <column label="Diagrama" align="center"/>
+		            <column label="${labels.open}" align="center"/>
+		            <column label="${labels.diagram}" align="center"/>
 		        </columns>
 		        <template name="model">
 		            <row>
@@ -68,9 +68,9 @@ THE SOFTWARE.
 		                </cell>
 		                <label value="${each.getCurrentStateType().getName()}"/>
 		                <button forward="onClick=productionPlanGrid.onEditProductionPlan(${each})"  image="/img/edit16x16.png"/>
-		                <button forward="onClick=productionPlanGrid.onGenerateProductionOrder(${each})" label="Ordenes de Produccion" />
-		                <button forward="onClick=productionPlanGrid.onOpenRequirementPlan(${each})" label="Requerimiento de Materiales" />
-		                <button forward="onClick=productionPlanGrid.onOpenGanttPlan(${each})" label="Gantt" />
+		                <button forward="onClick=productionPlanGrid.onGenerateProductionOrder(${each})" label="${labels.production_order_plural}" />
+		                <button forward="onClick=productionPlanGrid.onOpenRequirementPlan(${each})" label="${labels.materials_requirement}" />
+		                <button forward="onClick=productionPlanGrid.onOpenGanttPlan(${each})" label="${labels.gantt}" />
 		            </row>
 		        </template>
 		    </grid>

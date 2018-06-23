@@ -24,7 +24,7 @@ THE SOFTWARE.
 
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="materialsOrderDeliveryWindow" apply="ar.edu.utn.sigmaproject.controller.MaterialsReceptionController" width="75%" position="center,center" closable="true" action="show: slideDown;hide: slideUp">
-	<caption label="Recepcion del Pedido de Materiales" style="text-align:center; font-weight: bold;"/>
+	<caption label="${labels.materials_order_reception}" style="text-align:center; font-weight: bold;"/>
 	<panel border="rounded">
         <panelchildren>
             <vlayout>
@@ -39,21 +39,21 @@ THE SOFTWARE.
 		            </columns>
 			        <rows>
 			            <row>
-			                <label>Numero: </label>
+			                <label>${labels.number}: </label>
 			                <intbox id="materialsOrderNumberIntbox" width="40px"/>
-			                <label>Fecha Creacion: </label>
+			                <label>${labels.creation_date}: </label>
 			                <textbox id="materialsOrderCreationDateTextbox" width="160px"/>
 			            </row>
 			        </rows>
 		    	</grid>
 		    	<listbox id="materialsOrderDetailListbox" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Detalle del Pedido de Materiales" colspan="3"/>
+						<auxheader label="${labels.materials_order_detail_list}" colspan="3"/>
 					</auxhead>
         			<listhead>
         				<listheader label="${labels.name}"/>
-	                    <listheader label="Cantidad Pedida"/>
-	                    <listheader label="Cantidad Recibida"/>
+	                    <listheader label="${labels.quantity_requested}"/>
+	                    <listheader label="${labels.quantity_received}"/>
 		            </listhead>
 		            <template name="model">
 		                <listitem>
@@ -72,11 +72,11 @@ THE SOFTWARE.
 		            </columns>
 			        <rows>
 			            <row>
-			                <label>Recibido el </label>
-			                <datebox id="receptionDatebox" buttonVisible="true" format="dd/MM/yyyy" constraint="no future" width="160px"/>
+			                <label>${labels.received_on} </label>
+			                <datebox id="receptionDatebox" buttonVisible="true" format="${labels.date_format}" constraint="no future" width="160px"/>
 			            </row>
 			            <row>
-			                <label>Numero de Comprobante </label>
+			                <label>${labels.receipt_number} </label>
 			                <textbox id="receiptNumberTextbox" width="160px"/>
 			            </row>
 			        </rows>

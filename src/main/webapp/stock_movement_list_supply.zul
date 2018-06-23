@@ -22,6 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 
-<window id="win_stock_movement_list" title="Comprobantes de Stock de Insumos" closable="false" apply="ar.edu.utn.sigmaproject.controller.StockMovementSupplyListController" sclass="sigma-content">
+<window id="win_stock_movement_list" title="${labels.stock_movement_supplies}" closable="false" apply="ar.edu.utn.sigmaproject.controller.StockMovementSupplyListController" sclass="sigma-content">
     <include id="included" src="stock_movement_list.zul"/>
 </window>

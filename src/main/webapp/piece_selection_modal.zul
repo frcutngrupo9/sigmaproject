@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 
-<window id="modalDialog" title="Seleccion de Pieza" border="normal" width="900px"
+<window id="modalDialog" title="${labels.piece_selection}" border="normal" width="900px"
     apply="ar.edu.utn.sigmaproject.controller.PieceSelectionModalController"
     position="center,center" closable="true"
     action="show: slideDown;hide: slideUp">
@@ -37,11 +37,11 @@ THE SOFTWARE.
 			        <listhead>
 			        	<listheader label="${labels.product}" align="center"/>
 			        	<listheader label="${labels.piece}" align="center"/>
-			            <listheader label="Longitud" align="center"/>
-			            <listheader label="Espesor/altura" align="center"/>
-			            <listheader label="Ancho" align="center"/>
-			            <listheader label="Otras Medidas" align="center"/>
-			            <listheader label="Unidades" align="center"/>
+			            <listheader label="${labels.length}" align="center"/>
+			            <listheader label="${labels.width}" align="center"/>
+			            <listheader label="${labels.depth}" align="center"/>
+			            <listheader label="${labels.other_sizes}" align="center"/>
+			            <listheader label="${labels.unit_plural}" align="center"/>
 			        </listhead>
 			        <template name="model">
 			            <listitem>

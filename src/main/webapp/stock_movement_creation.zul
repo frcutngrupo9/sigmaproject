@@ -33,32 +33,32 @@ THE SOFTWARE.
                 </columns>
                 <rows>
                     <row>
-                        <label value="Fecha: "/>
-                        <datebox id="datebox" width="30%" format="dd/MM/yyyy" constraint="no future"/>
+                        <label value="${labels.date}: "/>
+                        <datebox id="datebox" width="30%" format="${labels.date_format}" constraint="no future"/>
                     </row>
                     <row>
-                        <label value="Tipo: "/>
-                        <radio id="in" label="Ingreso" radiogroup="typeRadiogroup"/>
-                        <radio id="out" label="Egreso" radiogroup="typeRadiogroup"/>
+                        <label value="${labels.type}: "/>
+                        <radio id="in" label="${labels.in}" radiogroup="typeRadiogroup"/>
+                        <radio id="out" label="${labels.out}" radiogroup="typeRadiogroup"/>
                     </row>
                 </rows>
             </grid>
             <hbox id="detailEditHbox" hflex="1" style="margin: 4px">
-                <label value="Seleccionar: "/>
+                <label value="${labels.select}: "/>
                 <combobox id="itemCombobox" buttonVisible="false" autodrop="true" autocomplete="false"/>
-                <label value="Cantidad: "/>
+                <label value="${labels.quantity}: "/>
                 <intbox id="itemQuantityIntbox" constraint="no negative,no zero" width="36px"/>
-                <button id="saveStockMovementDetailButton" label="${labels.save} Detalle"/>
-                <button id="clearStockMovementDetailButton" label="Limpiar Detalle"/>
-                <button id="cancelStockMovementDetailButton" label="${labels.cancel} Edicion"/>
+                <button id="saveStockMovementDetailButton" label="${labels.detail_save}"/>
+                <button id="clearStockMovementDetailButton" label="${labels.detail_clear}"/>
+                <button id="cancelStockMovementDetailButton" label="${labels.cancel_edition}"/>
             </hbox>
             <listbox id="stockMovementListbox" mold="paging" pageSize="7">
                 <auxhead>
-                    <auxheader label="Detalles" colspan="3"/>
+                    <auxheader label="${labels.detail_plural}" colspan="3"/>
                 </auxhead>
                 <listhead sizable="true">
-                    <listheader label="Producto"/>
-                    <listheader label="Cantidad" width="200px"/>
+                    <listheader label="${labels.product}"/>
+                    <listheader label="${labels.quantity}" width="200px"/>
                     <listheader label="" width="120px"/>
                 </listhead>
                 <template name="model">
@@ -73,8 +73,8 @@ THE SOFTWARE.
             </listbox>
             <separator/>
             <hlayout>
-                <button id="saveStockMovementButton" label="Emitir"/>
-                <button id="returnButton" label="${labels.return_text} a Listado"/>
+                <button id="saveStockMovementButton" label="${labels.emit}"/>
+                <button id="returnButton" label="${labels.return_to_list}"/>
             </hlayout>
         </vlayout>
     </panelchildren>

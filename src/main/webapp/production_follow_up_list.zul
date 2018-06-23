@@ -23,34 +23,34 @@ THE SOFTWARE.
 -->
 
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
-<window title="${labels.list} ${labels.production_progress}" id="win_production_follow_up_list" apply="ar.edu.utn.sigmaproject.controller.ProductionFollowUpListController" closable="false" sclass="sigma-content">
+<window title="${labels.production_progress_list}" id="win_production_follow_up_list" apply="ar.edu.utn.sigmaproject.controller.ProductionFollowUpListController" closable="false" sclass="sigma-content">
     <panel id="productionOrderCreationBlock" border="none">
         <panelchildren>
             <vlayout>
-    			<grid id="productionOrderGrid" sizedByContent="true" span="true" emptyMessage="No existen Ordenes Preparadas.">
+    			<grid id="productionOrderGrid" sizedByContent="true" span="true" emptyMessage="${labels.empty_production_progress_list}.">
     				<auxhead>
-						<auxheader label="Ordenes Preparadas" colspan="13"/>
+						<auxheader label="${labels.production_orders_prepared}" colspan="13"/>
 					</auxhead>
         			<columns>
-        				<column label="Accion" align="center"/>
-        				<column label="Diagrama" align="center"/>
+        				<column label="${labels.action}" align="center"/>
+        				<column label="${labels.diagram}" align="center"/>
         				<column label="${labels.production_plan}" align="center"/>
-        				<column label="Foto" align="center"/>
+        				<column label="${labels.image}" align="center"/>
         				<column label="${labels.product}" align="center"/>
-        				<column label="Cantidad" align="center"/>
-        				<column label="Inicio" align="center"/>
-		                <column label="Fin" align="center"/>
-		                <column label="% Completo" align="center"/>
-		                <column label="Duracion Total" align="center"/>
-		                <column label="Duracion Unidad" align="center"/>
-		                <column label="Inicio Real" align="center"/>
-		                <column label="Fin Real" align="center"/>
+        				<column label="${labels.quantity}" align="center"/>
+        				<column label="${labels.start}" align="center"/>
+		                <column label="${labels.finish}" align="center"/>
+		                <column label="${labels.percent_completed}" align="center"/>
+		                <column label="${labels.total_duration}" align="center"/>
+		                <column label="${labels.unit_duration}" align="center"/>
+		                <column label="${labels.start_real}" align="center"/>
+		                <column label="${labels.finish_real}" align="center"/>
 		            </columns>
 		            <template name="model">
 		                <row>
 		                	<custom-attributes product_image="${r:getProductImage(each.product)}"/>
-		                	<button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})"  label="Abrir"/>
-		                	<button forward="onClick=productionOrderGrid.onGanttProductionOrder(${each})"  label="Gantt"/>
+		                	<button forward="onClick=productionOrderGrid.onEditProductionOrder(${each})"  label="${labels.open}"/>
+		                	<button forward="onClick=productionOrderGrid.onGanttProductionOrder(${each})"  label="${labels.gantt}"/>
 			            	<label value="${each.productionPlan.name}"/>
 			            	<cell>
 				                <image if="${!empty product_image}" content="${product_image}" height="${r:getPixelScaled(product_image, 50, true)}px" width="${r:getPixelScaled(product_image, 50, false)}px"/>

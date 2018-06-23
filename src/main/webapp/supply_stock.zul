@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 
-<window id="win_supply_stock" title="Stock de Insumos" closable="false" apply="ar.edu.utn.sigmaproject.controller.SupplyStockController" sclass="sigma-content">
+<window id="win_supply_stock" title="${labels.supply_stock}" closable="false" apply="ar.edu.utn.sigmaproject.controller.SupplyStockController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
         	<vlayout>
@@ -34,17 +34,17 @@ THE SOFTWARE.
 			    <separator/>
 			    <listbox id="supplyTypeListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
 			    	<auxhead>
-						<auxheader label="Insumos" colspan="8"/>
+						<auxheader label="${labels.supply_plural}" colspan="8"/>
 					</auxhead>
 			        <listhead>
-			            <listheader label="Codigo" align="center"/>
-			            <listheader label="Descripcion" align="center"/>
-			            <listheader label="Medidas" align="center"/>
-			            <listheader label="Stock Total" align="center"/>
-			            <listheader label="Stock No Reservado" align="center"/>
-			            <listheader label="Stock Reservado" align="center"/>
-			            <listheader label="Stock Minimo" align="center"/>
-			            <listheader label="Stock Reposicion" align="center"/>
+			            <listheader label="${labels.code}" align="center"/>
+			            <listheader label="${labels.description}" align="center"/>
+			            <listheader label="${labels.measure_plural}" align="center"/>
+			            <listheader label="${labels.stock_current}" align="center"/>
+			            <listheader label="${labels.stock_not_reserved}" align="center"/>
+			            <listheader label="${labels.stock_reserved}" align="center"/>
+			            <listheader label="${labels.stock_minimum}" align="center"/>
+			            <listheader label="${labels.stock_replenishment}" align="center"/>
 			        </listhead>
 			        <template name="model">
 			            <listitem>
@@ -66,27 +66,27 @@ THE SOFTWARE.
 		            </columns>
 			        <rows>
 			            <row>
-			                <label>Codigo:</label>
+			                <label>${labels.code}:</label>
 			                <textbox id="codeTextbox" value="" hflex="1"/>
 			            </row>
 			            <row>
-			                <label>Descripcion:</label>
+			                <label>${labels.description}:</label>
 			                <textbox id="nameTextbox" value="" hflex="1"/>
 			            </row>
 			            <row>
-			                <label>Medidas:</label>
+			                <label>${labels.measure_plural}:</label>
 			                <textbox id="measureTextbox" value="" hflex="1"/>
 			            </row>
 			            <row>
-			                <label>Stock Actual:</label>
+			                <label>${labels.stock_current}:</label>
 			                <doublebox id="stockDoublebox" value="0" width="100px"/>
 			            </row>
 			            <row>
-			                <label>Stock Minimo:</label>
+			                <label>${labels.stock_minimum}:</label>
 			                <doublebox id="stockMinDoublebox" value="0" width="100px"/>
 			            </row>
 			            <row>
-			                <label>Stock Reposicion:</label>
+			                <label>${labels.stock_replenishment}:</label>
 			                <doublebox id="stockRepoDoublebox" value="0" width="100px"/>
 			            </row>
 			            <row>
@@ -103,15 +103,15 @@ THE SOFTWARE.
 			    <separator/>
 			    <listbox id="supplyReservedListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
 			    	<auxhead>
-						<auxheader label="Reservas" colspan="6"/>
+						<auxheader label="${labels.reservation_plural}" colspan="6"/>
 					</auxhead>
 			        <listhead>
-			            <listheader label="Plan de Produccion" align="center"/>
-			            <listheader label="Codigo" align="center"/>
-			            <listheader label="Descripcion" align="center"/>
-			            <listheader label="Cantidad Reservada" align="center"/>
-			            <listheader label="Cantidad Retirada" align="center"/>
-			            <listheader label="Cantidad Necesaria Total" align="center"/>
+			            <listheader label="${labels.production_plan}" align="center"/>
+			            <listheader label="${labels.code}" align="center"/>
+			            <listheader label="${labels.description}" align="center"/>
+			            <listheader label="${labels.quantity_reserved}" align="center"/>
+			            <listheader label="${labels.quantity_withdrawn}" align="center"/>
+			            <listheader label="${labels.quantity_necessary}" align="center"/>
 			        </listhead>
 			        <template name="model">
 			            <listitem>
