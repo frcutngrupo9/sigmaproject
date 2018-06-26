@@ -90,7 +90,7 @@ THE SOFTWARE.
 		                    </hlayout>
 		                </row>
 		                <row>	
-		                    <label>${each.length}:</label>
+		                    <label>${labels.length}:</label>
 		                    <hlayout>
 			                    <doublebox id="lengthDoublebox" value="0" format="#.###" constraint="no negative: ${each.constraint_no_negative}."/>
 			                	<selectbox id="lengthMeasureUnitSelectbox">

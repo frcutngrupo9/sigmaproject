@@ -35,17 +35,17 @@ THE SOFTWARE.
                     </columns>
                     <rows>
                         <row>
-                            <label value="${each.number}: "/>
+                            <label value="${labels.number}: "/>
                     		<intbox id="materialsOrderNumberIntbox" constraint="no negative" width="25%"/>
                         </row>
                         <row>
-                            <label value="${each.creation_date}: "/>
+                            <label value="${labels.creation_date}: "/>
                     		<datebox id="materialsOrderDatebox" cols="12" format="dd-MM-yyyy" width="25%"/>
                         </row>
                    </rows>
                 </grid>
                 <hbox hflex="1" style="margin: 4px">
-                	<label value="${each.select_material}: "/>
+                	<label value="${labels.select_material}: "/>
                     <bandbox id="materialsBandbox" buttonVisible="true" autodrop="true">
                         <bandpopup>
                             <listbox id="itemPopupListbox" width="500px" sizedByContent="true" span="true">
@@ -66,13 +66,13 @@ THE SOFTWARE.
                     <button id="resetDetailButton" label="${labels.reset_detail}"/>
                     <button id="cancelDetailButton" label="${labels.cancel_edition}"/>
                 </hbox>
-                <listbox id="materialsOrderDetailListbox" mold="paging" pageSize="7" sizedByContent="true" span="true" style="margin: 4px">
+                <listbox id="materialsOrderDetailListbox" mold="paging" pageSize="7" sizedByContent="true" span="true" style="margin: 4px" emptyMessage="${labels.empty_text}.">
                     <auxhead>
                         <auxheader label="${labels.material_plural}" colspan="4"/>
                     </auxhead>
                     <listhead>
                         <listheader label="${labels.name}"/>
-	                    <listheader label="${labels.quantity}" width="200px"/>
+	                    <listheader label="${labels.quantity_requested}" width="200px"/>
 	                    <listheader label="${labels.quantity_received}" width="200px"/>
 	                    <listheader label="" width="120px"/>
                     </listhead>

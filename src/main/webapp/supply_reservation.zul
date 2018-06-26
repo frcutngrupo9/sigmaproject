@@ -53,7 +53,7 @@ THE SOFTWARE.
 			                <label>${labels.quantity_reservation}:</label>
 			                <cell hflex="1">
 				                <doublebox id="stockReservedDoublebox"/>
-				                <button id="completeButton" label="{labels.complete}"/>
+				                <button id="completeButton" label="${labels.complete}"/>
 			                </cell>
 			            </row>
 			            <row>

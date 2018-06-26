@@ -229,10 +229,21 @@ public class ProcessController extends SelectorComposer<Component> {
 			processTypeGrid.setVisible(true);
 			nameTextbox.setValue(currentProcessType.getName());
 			sequenceIntbox.setValue(currentProcessType.getSequence());
-			machineTypeCombobox.setSelectedIndex(machineTypeListModel.indexOf(currentProcessType.getMachineType()));
+			machineTypeCombobox.setSelectedIndex(getSelectedIndex(currentProcessType.getMachineType()));
 			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
 		}
+	}
+	
+	private int getSelectedIndex(MachineType machineType) {
+		int index = 0;
+		for(MachineType each: machineTypeList) {
+			if(each.getId() == machineType.getId()) {
+				return index;
+			}
+			index++;
+		}
+		return -1;
 	}
 
 	private int getLastSequence() {

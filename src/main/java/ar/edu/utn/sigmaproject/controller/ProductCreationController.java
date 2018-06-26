@@ -760,13 +760,16 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			if(currentPiece != null) {// si no hay nada editandose
 				// si existen cambios a la pieza, se pregunta para guardar antes
 				if(pieceChanged) {
-					Messagebox.show("Desea guardar los cambios realizados a la pieza? ", "Confirmar Guardado", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+					Messagebox.show("Desea guardar los cambios realizados a la pieza? ", "Confirmar Guardado", Messagebox.OK | Messagebox.NO | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 						public void onEvent(Event evt) throws InterruptedException {
 							if (evt.getName().equals("onOK")) {
 								if(savePiece() == false) {
 									// no se guardo la pieza
 									return;
 								}
+							} else if(evt.getName().equals("onCancel")) {
+								//no se guarda ni se cambia de pieza
+								return;
 							}
 							selectPieceAndRefresh();
 						}

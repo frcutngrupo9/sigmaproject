@@ -43,7 +43,7 @@ THE SOFTWARE.
 		                <listcell label="${each.sequence}"/>
 		                <listcell label="${each.name}"/>
 		                <listcell label="${empty each.details ? '' : each.details}"/>
-		                <listcell label="${empty each.machineType.name ? '${labels.none}' : each.machineType.name}"/>
+		                <listcell label="${empty each.machineType.name ? labels.none : each.machineType.name}"/>
 		            </listitem>
 		        </template>
 		    </listbox>

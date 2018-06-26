@@ -67,19 +67,19 @@ THE SOFTWARE.
 		                    <textbox id="nameTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>	
-		                    <label>${each.phone}:</label>
+		                    <label>${labels.phone}:</label>
 		                    <textbox id="phoneTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>   
-		                    <label>${each.email}:</label>
+		                    <label>${labels.email}:</label>
 		                    <textbox id="emailTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>	
-		                    <label>${each.address}:</label>
+		                    <label>${labels.address}:</label>
 		                    <textbox id="addressTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>   
-		                    <label>${each.detail_plural}:</label>
+		                    <label>${labels.detail_plural}:</label>
 		                    <textbox id="detailsTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>

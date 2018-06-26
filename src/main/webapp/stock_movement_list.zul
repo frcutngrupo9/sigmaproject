@@ -36,7 +36,7 @@ THE SOFTWARE.
             <template name="model">
                 <row>
                     <label value="${each.date}"/>
-                    <label value="${each.sign == 1 ? 'Ingreso' : 'Egreso'}"/>
+                    <label value="${each.sign == 1 ? labels.in : labels.out}"/>
                     <button forward="onClick=stockMovementGrid.onSelectStoveMovement(${each})"  image="/img/Search16x16.png"/>
                 </row>
             </template>

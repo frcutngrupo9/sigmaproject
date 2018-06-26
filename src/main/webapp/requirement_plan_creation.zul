@@ -38,7 +38,7 @@ THE SOFTWARE.
                         </row>
                         <row>
                             <label value="${labels.production_plan_creation_date}: "/>
-							<datebox id="productionPlanCreationDatebox" cols="12" format="dd-MM-yyyy" width="25%"/>
+							<datebox id="productionPlanCreationDatebox" cols="12" format="${labels.date_format}" width="25%"/>
                         </row>
                         <row>
                             <label value="${labels.state_plan}: "/>
@@ -80,7 +80,7 @@ THE SOFTWARE.
 			                    <label value="${labels.missing} ${win_requirement_plan_creation$composer.getMaterialStockMissing(each).doubleValue()}" if="${!win_requirement_plan_creation$composer.isMaterialRequirementFulfilled(each)}"/>
 			                </listcell>
 			                <listcell>
-			                    <button label="${labels.reserve}" forward="onClick=rawMaterialRequirementListbox.onClickReservation(${each})"/>
+			                    <button disabled="${win_requirement_plan_creation$composer.isMaterialRequirementFulfilled(each)}" label="${labels.reserve}" forward="onClick=rawMaterialRequirementListbox.onClickReservation(${each})"/>
 			                </listcell>
 						</listitem>
 		            </template>
@@ -113,7 +113,7 @@ THE SOFTWARE.
 			                    <label value="${labels.missing} ${win_requirement_plan_creation$composer.getMaterialStockMissing(each).doubleValue()}" if="${!win_requirement_plan_creation$composer.isMaterialRequirementFulfilled(each)}"/>
 			                </listcell>
 			                <listcell>
-			                    <button label="${labels.reserve}" forward="onClick=supplyRequirementListbox.onClickReservation(${each})"/>
+			                    <button label="${labels.reserve}" forward="onClick=supplyRequirementListbox.onClickReservation(${each})" disabled="${win_requirement_plan_creation$composer.isMaterialRequirementFulfilled(each)}"/>
 			                </listcell>
 						</listitem>
 		            </template>

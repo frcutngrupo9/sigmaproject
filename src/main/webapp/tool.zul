@@ -31,7 +31,7 @@ THE SOFTWARE.
 		        <button id="searchButton" label="${labels.search}"/>
 		    </hlayout>
 		    <separator/>
-		    <listbox id="toolTypeListbox" sizedByContent="true" span="true">
+		    <listbox id="toolTypeListbox" sizedByContent="true" span="true" emptyMessage="${labels.empty_text}.">
 		        <listhead>
 		            <listheader label="${labels.name}" align="center"/>
 		            <listheader label="${labels.description}" align="center"/>
