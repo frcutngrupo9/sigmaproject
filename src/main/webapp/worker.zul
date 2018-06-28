@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="win_worker" title="${labels.worker_plural}" closable="false" apply="ar.edu.utn.sigmaproject.controller.WorkerController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
@@ -39,7 +40,7 @@ THE SOFTWARE.
 		        <template name="model">
 		            <listitem>
 		                <listcell label="${each.name}"/>
-		                <listcell label="${each.dateEmployed}"/>
+		                <listcell label="${r:getFormattedDate(each.dateEmployed)}"/>
 		            </listitem>
 		        </template>
 		    </listbox>
@@ -62,7 +63,7 @@ THE SOFTWARE.
 			            </row>
 			            <row>
 			                <label>${labels.date_employed}:</label>
-			                <datebox id="dateEmployedDatebox" cols="12" format="${labels.date_format_dash}" constraint="no future"/>
+			                <datebox id="dateEmployedDatebox" cols="12" format="${labels.date_format}" constraint="no future"/>
 			            </row>
 			            <row>
 			                <cell colspan="2" style="text-align:center">

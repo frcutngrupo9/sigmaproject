@@ -67,11 +67,11 @@ THE SOFTWARE.
                         </row>
                         <row>
                             <label value="${labels.creation_date}: "/>
-                    		<datebox id="orderDatebox" cols="12" format="${labels.date_format_dash}" width="25%"/>
+                    		<datebox id="orderDatebox" cols="12" format="${labels.date_format}" width="25%"/>
                         </row>
                         <row>
                             <label value="${labels.order_need_date}: "/>
-                    		<datebox id="orderNeedDatebox" cols="12" format="${labels.date_format_dash}" width="25%"/>
+                    		<datebox id="orderNeedDatebox" cols="12" format="${labels.date_format}" width="25%"/>
                         </row>
                    </rows>
                 </grid>

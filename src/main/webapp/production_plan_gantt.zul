@@ -47,7 +47,7 @@ THE SOFTWARE.
                 	<button id="cancelButton" label="${labels.cancel}"/>
                 </hbox>
                 <hbox hflex="1" pack="center">
-                	<chart id="ganttChart" width="850" height="400" fgAlpha="255" dateFormat="${labels.date_format_dash}" paneColor="#ffffff"/>
+                	<chart id="ganttChart" width="850" height="400" fgAlpha="255" dateFormat="${labels.date_format}" paneColor="#ffffff"/>
                 </hbox>
             </vlayout>
         </panelchildren>
