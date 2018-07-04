@@ -55,4 +55,11 @@
             org.zkoss.zul.ListModelList.ListModelList getReportTypeListModelList()
         </function-signature>
     </function>
+    <function>
+        <name>getPixelScaled</name>
+        <function-class>ar.edu.utn.sigmaproject.util.RenderElHelper</function-class>
+        <function-signature>
+            int getPixelScaled(org.zkoss.image.Image img, int maxValue, boolean isHeight)
+        </function-signature>
+    </function>
 </taglib>

@@ -118,14 +118,18 @@ public class MachineStockController extends SelectorComposer<Component> {
 		sortProperties.put(3, "machineType");
 		sortProperties.put(4, "year");
 		sortingPagingHelper = new SortingPagingHelper<>(machineRepository, machineListbox, searchButton, searchTextbox, pager, sortProperties);
-		machineTypeList = machineTypeRepository.findAll();
-		machineTypeListModel = new ListModelList<>(machineTypeList);
-		machineTypeCombobox.setModel(machineTypeListModel);
+		currentMachine = null;
+		refreshListModel();
+		refreshView();
+	}
+	
+	private void refreshListModel() {
 		machineList = machineRepository.findAll();
 		machineListModel = new ListModelList<>(machineList);
 		machineListbox.setModel(machineListModel);
-		currentMachine = null;
-		refreshView();
+		machineTypeList = machineTypeRepository.findAll();
+		machineTypeListModel = new ListModelList<>(machineTypeList);
+		machineTypeCombobox.setModel(machineTypeListModel);
 	}
 
 	@Listen("onClick = #searchButton")
@@ -163,8 +167,7 @@ public class MachineStockController extends SelectorComposer<Component> {
 			resetButton.setDisabled(true);
 		} else {// editar
 			machineGrid.setVisible(true);
-			machineTypeListModel.addToSelection(currentMachine.getMachineType());
-			machineTypeCombobox.setModel(machineTypeListModel);
+			machineTypeCombobox.setSelectedIndex(getSelectedIndex(currentMachine.getMachineType()));
 			nameTextbox.setValue(currentMachine.getName());
 			yearIntbox.setValue(currentMachine.getYear());
 			if(currentMachine.getUsedTime() != null) {
@@ -177,6 +180,17 @@ public class MachineStockController extends SelectorComposer<Component> {
 			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
 		}
+	}
+	
+	private int getSelectedIndex(MachineType machineType) {
+		int index = 0;
+		for(MachineType each: machineTypeList) {
+			if(each.getId() == machineType.getId()) {
+				return index;
+			}
+			index++;
+		}
+		return -1;
 	}
 
 	@Listen("onClick = #newButton")

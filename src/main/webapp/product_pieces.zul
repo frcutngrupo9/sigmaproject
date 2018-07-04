@@ -28,9 +28,9 @@ THE SOFTWARE.
         <columns>
         	<column width="40px" />
             <column label="Pieza" align="center"/>
+            <column label="Alto" align="center"/>
+            <column label="Profundidad" align="center"/>
             <column label="Largo" align="center"/>
-            <column label="Espesor" align="center"/>
-            <column label="Ancho" align="center"/>
             <column label="Otras Medidas" align="center"/>
             <column label="Unidades" align="center"/>
         </columns>

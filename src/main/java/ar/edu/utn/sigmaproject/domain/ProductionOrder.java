@@ -25,6 +25,7 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -536,5 +537,25 @@ public class ProductionOrder implements Serializable, Cloneable {
 			}
 		}
 		return true;
+	}
+
+	public BigDecimal getTotalCostSupply() {
+		BigDecimal materialsPrice = BigDecimal.ZERO;
+		for(ProductionOrderMaterial each : getProductionOrderSupplies()) {
+			if(each.getItem().getPrice() != null) {
+				materialsPrice = materialsPrice.add(each.getItem().getPrice());
+			}
+		}
+		return materialsPrice;
+	}
+
+	public BigDecimal getTotalCostRawMaterial() {
+		BigDecimal materialsPrice = BigDecimal.ZERO;
+		for(ProductionOrderMaterial each : getProductionOrderRawMaterials()) {
+			if(each.getItem().getPrice() != null) {
+				materialsPrice = materialsPrice.add(each.getItem().getPrice());
+			}
+		}
+		return materialsPrice;
 	}
 }

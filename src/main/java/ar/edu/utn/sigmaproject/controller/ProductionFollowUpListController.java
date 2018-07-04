@@ -25,6 +25,8 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
@@ -96,8 +98,19 @@ public class ProductionFollowUpListController extends SelectorComposer<Component
 				}
 			}
 		}
+		sortProductionOrdersByPlan();
 		productionOrderListModel = new ListModelList<ProductionOrder>(productionOrderList);
 		productionOrderGrid.setModel(productionOrderListModel);
+	}
+	
+	public void sortProductionOrdersByPlan() {
+		Comparator<ProductionOrder> comp = new Comparator<ProductionOrder>() {
+			@Override
+			public int compare(ProductionOrder a, ProductionOrder b) {
+				return b.getProductionPlan().getDateCreation().compareTo(a.getProductionPlan().getDateCreation());
+			}
+		};
+		Collections.sort(productionOrderList, comp);
 	}
 
 	@Listen("onEditProductionOrder = #productionOrderGrid")

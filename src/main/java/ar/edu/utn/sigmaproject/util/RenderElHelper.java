@@ -110,6 +110,30 @@ public class RenderElHelper {
 		return img;
 	}
 	
+	public static int getPixelScaled(org.zkoss.image.Image img, int maxValue, boolean isHeight) {
+		if(isHeight) {
+			return getHeightAndWidthScaled(img, maxValue)[0];
+		} else {
+			return getHeightAndWidthScaled(img, maxValue)[1];
+		}
+	}
+	
+	public static int[] getHeightAndWidthScaled(org.zkoss.image.Image img, int maxValue) {
+		int[] heightAndWidthArray = new int[2];
+		int height = img.getHeight();
+		int width = img.getWidth();
+		Double heightScaled = (double)maxValue;
+		Double widthScaled = (double)maxValue;
+		if(height > width) {
+			widthScaled = ((double)width * (double)maxValue) / (double)height;
+		} else if (height < width) {
+			heightScaled = ((double)height * (double)maxValue) / (double)width;
+		}
+		heightAndWidthArray[0] = heightScaled.intValue();
+		heightAndWidthArray[1] = widthScaled.intValue();
+		return heightAndWidthArray;
+	}
+	
 	public static ListModelList<ReportType> getReportTypeListModelList() {
 		return new ListModelList<ReportType>(ReportType.getReportTypeList());
 	}

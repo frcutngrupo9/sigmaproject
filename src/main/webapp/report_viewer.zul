@@ -27,7 +27,7 @@ THE SOFTWARE.
         <panelchildren>
             <vlayout>
             	<hbox hflex="1" pack="center">
-            		<button id="cancelButton" label="Volver"/>
+            		<button id="cancelButton" label="${labels.return_text}"/>
             	</hbox>
                 <separator/>
                 <jasperreport id="viewJasperreport"  height="440px"/>

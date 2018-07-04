@@ -36,6 +36,7 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Paging;
@@ -72,6 +73,8 @@ public class SupplyController extends SelectorComposer<Component> {
 	Textbox presentationTextbox;
 	@Wire
 	Textbox measureTextbox;
+	@Wire
+	Doublebox priceDoublebox;
 	@Wire
 	Button saveButton;
 	@Wire
@@ -126,9 +129,10 @@ public class SupplyController extends SelectorComposer<Component> {
 		String brand = brandTextbox.getText();
 		String presentation = presentationTextbox.getText();
 		String measure = measureTextbox.getText();
+		BigDecimal price = BigDecimal.valueOf(priceDoublebox.doubleValue());
 		if(currentSupplyType == null) {
 			// es un nuevo insumo
-			currentSupplyType = new SupplyType(code, description, details, brand, presentation, measure, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+			currentSupplyType = new SupplyType(code, description, details, brand, presentation, measure, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, price);
 		} else {
 			// es una edicion
 			currentSupplyType.setCode(code);
@@ -137,6 +141,7 @@ public class SupplyController extends SelectorComposer<Component> {
 			currentSupplyType.setBrand(brand);
 			currentSupplyType.setPresentation(presentation);
 			currentSupplyType.setMeasure(measure);
+			currentSupplyType.setPrice(price);
 		}
 		currentSupplyType = supplyTypeRepository.save(currentSupplyType);
 		sortingPagingHelper.reset();
@@ -193,7 +198,8 @@ public class SupplyController extends SelectorComposer<Component> {
 			measureTextbox.setValue(null);
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
-		}else {// editando
+			priceDoublebox.setValue(null);
+		} else {// editando
 			supplyTypeGrid.setVisible(true);
 			codeTextbox.setValue(currentSupplyType.getCode());
 			descriptionTextbox.setValue(currentSupplyType.getDescription());
@@ -203,6 +209,11 @@ public class SupplyController extends SelectorComposer<Component> {
 			measureTextbox.setValue(currentSupplyType.getMeasure());
 			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
+			if(currentSupplyType.getPrice() != null) {
+				priceDoublebox.setValue(currentSupplyType.getPrice().doubleValue());
+			} else {
+				priceDoublebox.setValue(null);
+			}
 		}
 	}
 }

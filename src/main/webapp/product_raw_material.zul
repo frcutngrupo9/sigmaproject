@@ -23,65 +23,65 @@ THE SOFTWARE.
 -->
 
 <window id="productRawMaterialWindow" apply="ar.edu.utn.sigmaproject.controller.ProductRawMaterialController" width="75%" position="center,center" closable="true" action="show: slideDown;hide: slideUp">
-	<caption label="Materias Prima de Producto" style="text-align:center; font-weight: bold;"/>
+	<caption label="${labels.product_raw_materials}" style="text-align:center; font-weight: bold;"/>
 	<panel border="none">
         <panelchildren>
             <vlayout>
                 <hlayout>
                 	<separator/>
-                    <label value="Materia Prima: "/>
-                    <bandbox id="materialBandbox" buttonVisible = "true" autodrop = "true">
+                    <label value="${labels.raw_material}: "/>
+                    <bandbox id="materialBandbox" buttonVisible="true" autodrop="true">
                         <bandpopup>
                             <listbox id="materialPopupListbox" width="500px">
                                 <listhead>
-                                    <listheader label="Nombre" align="center"/>
-                                    <listheader label="Largo (L)" align="center"/>
-						            <listheader label="Espesor (E)" align="center"/>
-						            <listheader label="Ancho (A)" align="center"/>
+                                    <listheader label="${labels.name}" align="center"/>
+						            <listheader label="${labels.width}" align="center"/>
+						            <listheader label="${labels.depth}" align="center"/>
+						            <listheader label="${labels.length}" align="center"/>
                                 </listhead>
                                 <template name="model">
                                     <listitem>
                                         <listcell label="${each.name}"/>
+                                        <listcell label="${each.width.doubleValue()} ${each.getWidthMeasureUnit().getShortName()}"/>
+                                        <listcell label="${each.depth.doubleValue()} ${each.getDepthMeasureUnit().getShortName()}"/>
                                         <listcell label="${each.length.doubleValue()} ${each.getLengthMeasureUnit().getShortName()}"/>
-						                <listcell label="${each.depth.doubleValue()} ${each.getDepthMeasureUnit().getShortName()}"/>
-						                <listcell label="${each.width.doubleValue()} ${each.getWidthMeasureUnit().getShortName()}"/>
                                     </listitem>
                                 </template>
                             </listbox>
                         </bandpopup>
                     </bandbox>
-                    <label value="Cantidad: "/>
+                    <label value="${labels.quantity}: "/>
                     <doublebox id="materialQuantityDoublebox" constraint="no negative" width="36px"/>
-                    <button id="saveMaterialButton" label="Agregar Materia Prima"/>
-                    <button id="resetMaterialButton" label="Reset Materia Prima"/>
-                    <button id="deleteMaterialButton" label="Eliminar Materia Prima"/>
-                    <button id="cancelMaterialButton" label="Cancelar Edicion"/>
+                    <button id="saveMaterialButton" label="${labels.add_raw_material}"/>
+                    <button id="resetMaterialButton" label="${labels.reset_raw_material}"/>
+                    <button id="deleteMaterialButton" label="${labels.delete_raw_material}"/>
+                    <button id="cancelMaterialButton" label="${labels.cancel_edition}"/>
                 </hlayout>
                 <separator/>
                 <listbox id="productMaterialListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
                     <auxhead>
-                        <auxheader label="Materias Prima" colspan="5"/>
+                        <auxheader label="${labels.raw_material_plural}" colspan="5"/>
                     </auxhead>
                     <listhead>
-			            <listheader label="Nombre" align="center"/>
-			            <listheader label="Largo (L)" align="center"/>
-			            <listheader label="Espesor (E)" align="center"/>
-			            <listheader label="Ancho (A)" align="center"/>
-			            <listheader label="Cantidad" align="center"/>
+			            <listheader label="${labels.name}" align="center"/>
+			            <listheader label="${labels.width}" align="center"/>
+			            <listheader label="${labels.depth}" align="center"/>
+			            <listheader label="${labels.length}" align="center"/>
+			            <listheader label="${labels.quantity}" align="center"/>
                     </listhead>
                     <template name="model">
                         <listitem>
 			                <listcell label="${each.getItem().name}"/>
-			                <listcell label="${each.getItem().length.doubleValue()} ${each.getItem().getLengthMeasureUnit().getShortName()}"/>
-			                <listcell label="${each.getItem().depth.doubleValue()} ${each.getItem().getDepthMeasureUnit().getShortName()}"/>
 			                <listcell label="${each.getItem().width.doubleValue()} ${each.getItem().getWidthMeasureUnit().getShortName()}"/>
+			                <listcell label="${each.getItem().depth.doubleValue()} ${each.getItem().getDepthMeasureUnit().getShortName()}"/>
+			                <listcell label="${each.getItem().length.doubleValue()} ${each.getItem().getLengthMeasureUnit().getShortName()}"/>
 			                <listcell label="${each.quantity}"/>
                         </listitem>
                     </template>
                 </listbox>
                 <hlayout>
-                	<button id="acceptProductMaterialButton" label="Aceptar"/>
-                    <button id="cancelProductMaterialButton" label="Cancelar"/>
+                	<button id="acceptProductMaterialButton" label="${labels.accept}"/>
+                    <button id="cancelProductMaterialButton" label="${labels.cancel}"/>
                 </hlayout>
             </vlayout>
         </panelchildren>

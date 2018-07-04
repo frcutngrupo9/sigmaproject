@@ -37,6 +37,7 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Doublebox;
+import org.zkoss.zul.Grid;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
@@ -58,6 +59,8 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 	Textbox searchTextbox;
 	@Wire
 	Listbox woodListbox;
+	@Wire
+	Grid woodCreationGrid;
 	@Wire
 	Textbox woodNameTextbox;
 	@Wire
@@ -138,6 +141,7 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		if(currentWood == null) {// nuevo
+			woodCreationGrid.setVisible(false);
 			woodTypeListModel.addToSelection(woodTypeRepository.findFirstByName("Pino"));
 			woodTypeCombobox.setModel(woodTypeListModel);
 			woodNameTextbox.setText("");
@@ -150,7 +154,8 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 			stockMinDoublebox.setDisabled(false);
 			stockRepoDoublebox.setDisabled(false);
 			resetButton.setDisabled(true);
-		}else {// editar
+		} else {// editar
+			woodCreationGrid.setVisible(true);
 			woodTypeCombobox.setSelectedIndex(woodTypeListModel.indexOf(currentWood.getWoodType()));
 			woodNameTextbox.setText(currentWood.getName());
 			stockDoublebox.setValue(currentWood.getStock().doubleValue());

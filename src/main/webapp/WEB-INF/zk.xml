@@ -27,4 +27,8 @@ THE SOFTWARE.
     <listener>
         <listener-class>ar.edu.utn.sigmaproject.desktop.SigmaDesktopInit</listener-class>
     </listener>
+    <library-property>
+	    <name>org.zkoss.zul.nativebar</name>
+	    <value>true</value>
+	</library-property>
 </zk>

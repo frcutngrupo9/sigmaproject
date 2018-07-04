@@ -25,6 +25,8 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.*;
 
@@ -38,6 +40,10 @@ public class MeasureUnitType implements Serializable, Cloneable {
 
 	@Column(unique = true)
 	String name = "";
+	
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "type", targetEntity = MeasureUnit.class)
+	@OrderColumn(name = "detail_index")
+	private List<MeasureUnit> list = new ArrayList<>();
 
 	public MeasureUnitType() {
 
@@ -61,5 +67,13 @@ public class MeasureUnitType implements Serializable, Cloneable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public List<MeasureUnit> getList() {
+		return list;
+	}
+
+	public void setList(List<MeasureUnit> list) {
+		this.list = list;
 	}
 }

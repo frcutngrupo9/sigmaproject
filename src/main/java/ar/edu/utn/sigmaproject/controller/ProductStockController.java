@@ -69,8 +69,6 @@ public class ProductStockController extends SelectorComposer<Component> {
 	@Wire
 	Intbox stockMinIntbox;
 	@Wire
-	Intbox stockRepoIntbox;
-	@Wire
 	Button saveButton;
 	@Wire
 	Button cancelButton;
@@ -156,7 +154,6 @@ public class ProductStockController extends SelectorComposer<Component> {
 			nameTextbox.setValue(null);
 			stockIntbox.setValue(null);
 			stockMinIntbox.setValue(null);
-			stockRepoIntbox.setValue(null);
 			saveButton.setDisabled(true);
 			cancelButton.setDisabled(true);
 			resetButton.setDisabled(true);
@@ -167,10 +164,8 @@ public class ProductStockController extends SelectorComposer<Component> {
 			nameTextbox.setValue(currentProduct.getName());
 			int stock = currentProduct.getStock();
 			int stock_min = currentProduct.getStockMin();
-			int stock_repo = currentProduct.getStockRepo();
 			stockIntbox.setValue(stock);
 			stockMinIntbox.setValue(stock_min);
-			stockRepoIntbox.setValue(stock_repo);
 			saveButton.setDisabled(false);
 			cancelButton.setDisabled(false);
 			resetButton.setDisabled(false);
@@ -182,7 +177,6 @@ public class ProductStockController extends SelectorComposer<Component> {
 	public void saveButtonClick() {
 		currentProduct.setStock(stockIntbox.intValue());
 		currentProduct.setStockMin(stockMinIntbox.intValue());
-		currentProduct.setStockRepo(stockRepoIntbox.intValue());
 		productRepository.save(currentProduct);
 		productList = productRepository.findAll();
 		productListModel = new ListModelList<>(productList);
@@ -199,7 +193,7 @@ public class ProductStockController extends SelectorComposer<Component> {
 
 	public int getQuantityDelivered(Product product) {
 		// suma la cantidad entregada del producto
-		// busca en los pedidos entregados los que contien el producto
+		// busca en los pedidos entregados los que contienen el producto
 		OrderStateType stateType = orderStateTypeRepository.findFirstByName("Entregado");
 		List<Order> orderList = orderRepository.findByCurrentStateType(stateType);
 		int number = 0;

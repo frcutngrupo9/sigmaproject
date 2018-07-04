@@ -22,21 +22,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 
-<window id="win_tool" title="Herramientas" closable="false" apply="ar.edu.utn.sigmaproject.controller.ToolController" sclass="sigma-content">
+<window id="win_tool" title="${labels.tool_plural}" closable="false" apply="ar.edu.utn.sigmaproject.controller.ToolController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
 	        <hlayout>
-		        <label>Buscar:</label>
+		        <label>${labels.search}:</label>
 		        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
-		        <button id="searchButton" label="Buscar"/>
+		        <button id="searchButton" label="${labels.search}"/>
 		    </hlayout>
 		    <separator/>
-		    <listbox id="toolTypeListbox" sizedByContent="true" span="true">
+		    <listbox id="toolTypeListbox" sizedByContent="true" span="true" emptyMessage="${labels.empty_text}.">
 		        <listhead>
-		            <listheader label="Nombre" align="center"/>
-		            <listheader label="Descripcion" align="center"/>
-		            <listheader label="Detalles" align="center"/>
-		            <listheader label="Marca" align="center"/>
+		            <listheader label="${labels.name}" align="center"/>
+		            <listheader label="${labels.description}" align="center"/>
+		            <listheader label="${labels.detail_plural}" align="center"/>
+		            <listheader label="${labels.brand}" align="center"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
@@ -51,7 +51,7 @@ THE SOFTWARE.
 		    <vlayout>
 		        <separator/>
 		        <hbox>
-		            <button id="newButton" label="Nuevo"/>
+		            <button id="newButton" label="${labels.new_text}"/>
 		        </hbox>
 		        <separator/>
 		        <grid id="toolTypeGrid" width="400px" sclass="sigma-form" visible="false">
@@ -61,28 +61,28 @@ THE SOFTWARE.
 		            </columns>
 		            <rows>
 		                <row>	
-		                    <label>Nombre:</label>
+		                    <label>${labels.name}:</label>
 		                    <textbox id="nameTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>	
-		                    <label>Descripcion:</label>
+		                    <label>${labels.description}:</label>
 		                    <textbox id="descriptionTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>	
-		                    <label>Detalles:</label>
+		                    <label>${labels.detail_plural}:</label>
 		                    <textbox id="detailsTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>	
-		                    <label>Marca:</label>
+		                    <label>${labels.brand}:</label>
 		                    <textbox id="brandTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>
 							<cell colspan="2" style="text-align:center">
 			                    <hlayout>
-			                        <button id="saveButton" label="Guardar"/>
-			                        <button id="cancelButton" label="Cancelar"/>
-			                        <button id="resetButton" label="Reset"/>
-			                        <button id="deleteButton" label="Eliminar"/>
+			                        <button id="saveButton" label="${labels.save}"/>
+			                        <button id="cancelButton" label="${labels.cancel}"/>
+			                        <button id="resetButton" label="${labels.reset}"/>
+			                        <button id="deleteButton" label="${labels.delete}"/>
 			                    </hlayout>
 			                </cell>
 		                </row>

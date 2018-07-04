@@ -22,22 +22,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 
-<window id="win_client" title="Clientes" closable="false" apply="ar.edu.utn.sigmaproject.controller.ClientController" sclass="sigma-content">
+<window id="win_client" title="${labels.client_plural}" closable="false" apply="ar.edu.utn.sigmaproject.controller.ClientController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
 		    <hlayout>
-		        <label>Buscar:</label>
+		        <label>${labels.search}:</label>
 		        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
-		        <button id="searchButton" label="Buscar"/>
+		        <button id="searchButton" label="${labels.search}"/>
 		    </hlayout>
 		    <separator/>
 		    <listbox id="clientListbox">
 		        <listhead>
-		            <listheader label="Nombre" align="center"/>
-		            <listheader label="Telefono" align="center"/>
-		            <listheader label="Email" align="center"/>
-		            <listheader label="Direccion" align="center"/>
-		            <listheader label="Detalles" align="center"/>
+		            <listheader label="${labels.name}" align="center"/>
+		            <listheader label="${labels.phone}" align="center"/>
+		            <listheader label="${labels.email}" align="center"/>
+		            <listheader label="${labels.address}" align="center"/>
+		            <listheader label="${labels.detail_plural}" align="center"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
@@ -53,7 +53,7 @@ THE SOFTWARE.
 		    <vlayout>
 		        <separator/>
 		        <hbox>
-		            <button id="newButton" label="Nuevo"/>
+		            <button id="newButton" label="${labels.new_text}"/>
 		        </hbox>
 		        <separator/>
 		        <grid id="clientGrid" width="400px" sclass="sigma-form" visible="false">
@@ -63,32 +63,32 @@ THE SOFTWARE.
 		            </columns>
 		            <rows>
 		                <row>	
-		                    <label>Nombre:</label>
+		                    <label>${labels.name}:</label>
 		                    <textbox id="nameTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>	
-		                    <label>Telefono:</label>
+		                    <label>${labels.phone}:</label>
 		                    <textbox id="phoneTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>   
-		                    <label>Email:</label>
+		                    <label>${labels.email}:</label>
 		                    <textbox id="emailTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>	
-		                    <label>Direccion:</label>
+		                    <label>${labels.address}:</label>
 		                    <textbox id="addressTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>   
-		                    <label>Detalles:</label>
+		                    <label>${labels.detail_plural}:</label>
 		                    <textbox id="detailsTextbox" value="" hflex="1"/>
 		                </row>
 		                <row>
 							<cell colspan="2" style="text-align:center">
 			                    <hlayout>
-			                        <button id="saveButton" label="Guardar"/>
-			                        <button id="cancelButton" label="Cancelar"/>
-			                        <button id="resetButton" label="Reset"/>
-			                        <button id="deleteButton" label="Eliminar"/>
+			                        <button id="saveButton" label="${labels.save}"/>
+			                        <button id="cancelButton" label="${labels.cancel}"/>
+			                        <button id="resetButton" label="${labels.reset}"/>
+			                        <button id="deleteButton" label="${labels.delete}"/>
 			                    </hlayout>
 			                </cell>
 		                </row>

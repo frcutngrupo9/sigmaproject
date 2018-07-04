@@ -24,7 +24,19 @@ THE SOFTWARE.
 
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="win_product_creation" apply="ar.edu.utn.sigmaproject.controller.ProductCreationController" closable="false" sclass="sigma-content">
-	<caption id="productCaption"/>
+	<caption id="productCaption">
+		<toolbar align="end" orient="horizontal">
+            <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+            <toolbarbutton id="saveProductButton" label="${labels.save_product}"/>
+            <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+            <toolbarbutton id="resetProductButton" label="${labels.reset_product}"/>
+            <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+    		<toolbarbutton id="deleteProductButton" label="${labels.delete_product}"/>
+    		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+    		<toolbarbutton id="returnButton" label="${labels.return_to_list}"/>
+    		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+		</toolbar>
+	</caption>
     <panel id="productCreationBlock" border="none">
         <panelchildren>
             <vlayout>
@@ -35,31 +47,31 @@ THE SOFTWARE.
                     </columns>
                     <rows>
                         <row>
-                            <label value="Foto: "/>
+                            <label value="${labels.image}: "/>
                             <cell>
                             	<hbox align="center">
 		                            <image id="productImage"/>
 		                            <vbox pack="center" align="center">
-		                            	<button id="uploadProductPhotoButton" label="Cambiar Foto" upload="true"/>
-	                        			<button id="deleteProductPhotoButton" label="Eliminar Foto"/>
+		                            	<button id="uploadProductPhotoButton" label="${labels.image_change}" upload="true"/>
+	                        			<button id="deleteProductPhotoButton" label="${labels.image_delete}"/>
 	                        		</vbox>
                         		</hbox>
                         	</cell>
                         </row>
                         <row>
-                            <label value="Codigo: "/>
-                            <textbox id="productCodeTextbox" width="25%" placeholder="Codigo del Producto"/>
+                            <label value="${labels.code}: "/>
+                            <textbox id="productCodeTextbox" width="25%" placeholder="${labels.product_code_placeholder}"/>
                         </row>
                         <row>
-                            <label value="Nombre: "/>
-                            <textbox id="productNameTextbox" width="50%" placeholder="Nombre del Producto"/>
+                            <label value="${labels.name}: "/>
+                            <textbox id="productNameTextbox" width="50%" placeholder="${labels.product_name_placeholder}"/>
                         </row>
                         <row>
-                            <label value="Detalles: "/>
+                            <label value="${labels.detail_plural}: "/>
                             <textbox id="productDetailsTextbox" width="50%" rows="3" height="100px" />
                         </row>
                         <row>
-                            <label value="Categoria: "/>
+                            <label value="${labels.category}: "/>
                             <combobox id="productCategoryCombobox">
                                 <template name="model">
                                     <comboitem label="${each.name}" />
@@ -67,39 +79,31 @@ THE SOFTWARE.
                             </combobox>
                         </row>
                         <row>
-                            <label value="Precio: "/>
-                            <doublebox id="productPriceDoublebox" width="50%" placeholder="Precio del Producto"/>
+                            <label value="${labels.price}: "/>
+                            <doublebox id="productPriceDoublebox" width="50%" placeholder="${labels.product_price_placeholder}"/>
                         </row>
                     </rows>
                 </grid>
                 <hlayout style="margin: 4px">
-                    <button id="saveProductButton" label="Guardar Producto"/>
-                    <button id="resetProductButton" label="Reset Producto"/>
-                    <button id="deleteProductButton" label="Eliminar Producto"/>
-                    <hbox pack="center" align="center" hflex="1">
-			        	<button id="returnButton" label="Volver a Listado"/>
-			        </hbox>
+	                <button id="openSupplyListButton" label="${labels.supply_plural}"/>
+                    <button id="openRawMaterialListButton" label="${labels.raw_material_plural}"/>
                 </hlayout>
-                <hlayout style="margin: 4px">
-	                <button id="openSupplyListButton" label="Insumos"/>
-                    <button id="openRawMaterialListButton" label="Materias Primas"/>
-                </hlayout>
-    			<listbox id="pieceListbox" style="margin: 4px" emptyMessage="No existen piezas">
+    			<listbox id="pieceListbox" style="margin: 4px" emptyMessage="${labels.empty_piece_list}">
     				<auxhead>
-						<auxheader label="Piezas" colspan="5"/>
+						<auxheader label="${labels.piece_plural}" colspan="5"/>
 					</auxhead>
         			<listhead>
             			<listheader width="60px" align="center"/>
-            			<listheader label="Nombre Pieza" align="center"/>
-            			<listheader label="Unidades por Producto" align="center"/>
-            			<listheader label="Cantidad de Procesos" align="center"/>
-            			<listheader label="Duracion Total" align="center"/>
+            			<listheader label="${labels.piece}" align="center"/>
+            			<listheader label="${labels.units_by_product}" align="center"/>
+            			<listheader label="${labels.quantity_of_processes}" align="center"/>
+            			<listheader label="${labels.total_duration}" align="center"/>
         			</listhead>
         			<template name="model">
             			<listitem>
                 			<custom-attributes piece_image="${r:getPieceImage(each)}"/>
 			            	<listcell>
-				                <image if="${!empty piece_image}" content="${piece_image}" width="35px" height="35px"/>
+				                <image if="${!empty piece_image}" content="${piece_image}" height="${r:getPixelScaled(piece_image, 50, true)}px" width="${r:getPixelScaled(piece_image, 50, false)}px"/>
 				                <image if="${empty piece_image}" width="0px" height="0px"/>
 			                </listcell>
                 			<listcell label="${each.name}"/>
@@ -110,21 +114,25 @@ THE SOFTWARE.
         			</template>
     			</listbox>
     			<hlayout style="margin: 4px">
-	                <button id="createPieceButton" label="Agregar Nueva Pieza"/>
-	                <button id="pieceCopyButton" label="Copiar Otra Pieza"/>
+	                <button id="createPieceButton" label="${labels.new_piece}"/>
+	                <button id="pieceCopyButton" label="${labels.copy_piece}"/>
                 </hlayout>
                 <separator/>
-            
 	            <tabbox id="pieceCreationBlock" width="98%" visible="true">
 	            	<tabs>
-	            		<tab label="Pieza" closable="false" id="pieceTab"/>
-	            		<tab label="Procesos" closable="false" id="processTab"/>
+	            		<tab label="${labels.piece}" closable="false" id="pieceTab"/>
+	            		<tab label="${labels.process_plural}" closable="false" id="processTab"/>
 	            	</tabs>
 	            	<toolbar>
-	            		<toolbarbutton id="cancelPieceButton" label="Cancelar"/>
-	                    <toolbarbutton id="savePieceButton" label="Guardar Pieza"/>
-	                    <toolbarbutton id="resetPieceButton" label="Reset Pieza"/>
-	                    <toolbarbutton id="deletePieceButton" label="Eliminar Pieza"/>
+	            		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+	            		<toolbarbutton id="cancelPieceButton" label="${labels.cancel}"/>
+	            		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+	                    <toolbarbutton id="savePieceButton" label="${labels.save_piece}"/>
+	                    <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+	                    <toolbarbutton id="resetPieceButton" label="${labels.reset_piece}"/>
+	                    <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+	                    <toolbarbutton id="deletePieceButton" label="${labels.delete_piece}"/>
+	                    <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
 					</toolbar>
 	                <tabpanels>
 	                	<tabpanel>
@@ -135,31 +143,31 @@ THE SOFTWARE.
 			                    </columns>
 			                    <rows>
 			                        <row>
-			                            <label value="Foto: "/>
+			                            <label value="${labels.image}: "/>
 			                            <cell>
 			                            	<hbox align="center">
 							                    <image id="pieceImage"/>
 							                    <vbox pack="center">
-								                    <button id="uploadPieceImageButton" label="Cambiar Foto" upload="true"/>
-									                <button id="deletePieceImageButton" label="Eliminar Foto"/>
+								                    <button id="uploadPieceImageButton" label="${labels.image_change}" upload="true"/>
+									                <button id="deletePieceImageButton" label="${labels.image_delete}"/>
 								                </vbox>
 							                </hbox>
 						                </cell>
 			                        </row>
 			                        <row>
-			                            <label value="Nombre:"/>
-			                            <textbox id="pieceNameTextbox" value=""  width="50%" placeholder="Nombre de la Pieza"/>
+			                            <label value="${labels.name}:"/>
+			                            <textbox id="pieceNameTextbox" value=""  width="50%" placeholder="${labels.piece_name_placeholder}"/>
 			                        </row>
 			                        <row>
-			                            <label value="Unidades por Producto:"/>
+			                            <label value="${labels.units_by_product}:"/>
 			                            <intbox id="pieceUnitsByProductIntbox" value="0" width="150px"/>
 			                        </row>
 			                        <row>
-			                            <label value="La pieza es conjunto de otras?:"/>
+			                            <label value="${labels.is_piece_group}?:"/>
 			                            <checkbox id="pieceGroupCheckbox" checked="false"/>
 			                        </row>
 			                        <row>
-			                            <label value="Longitud:"/>
+			                            <label value="${labels.length}:"/>
 			                            <hbox>
 				                            <doublebox id="pieceLengthDoublebox" width="150px" format="#.###"/>
 				                            <selectbox id="lengthMeasureUnitSelectbox">
@@ -170,7 +178,7 @@ THE SOFTWARE.
 					                    </hbox>
 			                        </row>
 			                        <row>
-			                            <label value="Espesor/Altura:"/>
+			                            <label value="${labels.depth}:"/>
 			                            <hbox>
 				                            <doublebox id="pieceDepthDoublebox" width="150px" format="#.###"/>
 				                            <selectbox id="depthMeasureUnitSelectbox">
@@ -181,7 +189,7 @@ THE SOFTWARE.
 					                    </hbox>
 			                        </row>
 			                        <row>
-			                            <label value="Ancho:"/>
+			                            <label value="${labels.width}:"/>
 			                            <hbox>
 				                            <doublebox id="pieceWidthDoublebox" width="150px" format="#.###"/>
 				                            <selectbox id="widthMeasureUnitSelectbox">
@@ -192,7 +200,7 @@ THE SOFTWARE.
 					                    </hbox>
 			                        </row>
 			                        <row>
-			                            <label value="Otras Medidas:"/>
+			                            <label value="${labels.other_sizes}:"/>
 			                            <textbox id="pieceSizeTextbox" width="50%"/>
 			                        </row>
 			                    </rows>
@@ -202,14 +210,14 @@ THE SOFTWARE.
 			                <listbox id="processListbox" hflex="1">
 						        <auxhead>
 						            <auxheader colspan="3" rowspan="1" />
-						            <auxheader label="Duracion por Pieza" colspan="2" rowspan="1" />
+						            <auxheader label="${labels.duration_by_piece}" colspan="2" rowspan="1" />
 						        </auxhead>
 			                	<listhead>
 			            			<listheader width="30px"/>
-			            			<listheader label="Nombre"/>
-			            			<listheader label="Detalles" width="450px"/>
-			            			<listheader label="Horas" width="100px"/>
-			            			<listheader label="Minutos" width="100px"/>
+			            			<listheader label="${labels.name}"/>
+			            			<listheader label="${labels.detail_plural}" width="450px"/>
+			            			<listheader label="${labels.hours}" width="100px"/>
+			            			<listheader label="${labels.minutes}" width="100px"/>
 			        			</listhead>
 								<template name="model">
 			                        <listitem>

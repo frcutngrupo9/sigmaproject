@@ -152,7 +152,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
-					<font fontName="Times New Roman" size="10" isBold="true"/>
+					<font fontName="Times New Roman" size="10" isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[Proceso]]></text>
 			</staticText>
@@ -166,7 +166,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="true"/>
+					<font fontName="Times New Roman" size="10" isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[Máquina]]></text>
 			</staticText>
@@ -180,9 +180,9 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="true"/>
+					<font fontName="Times New Roman" size="10" isBold="true" isUnderline="true"/>
 				</textElement>
-				<text><![CDATA[Fecha Inicio]]></text>
+				<text><![CDATA[Inicio]]></text>
 			</staticText>
 			<staticText>
 				<reportElement positionType="Float" mode="Opaque" x="320" y="0" width="60" height="30" forecolor="#000000" backcolor="#FFFFFF" uuid="d5f1b6a4-76c4-4d4c-9b31-8dba329e7910"/>
@@ -194,9 +194,9 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="true"/>
+					<font fontName="Times New Roman" size="10" isBold="true" isUnderline="true"/>
 				</textElement>
-				<text><![CDATA[Fecha Fin]]></text>
+				<text><![CDATA[Fin]]></text>
 			</staticText>
 			<staticText>
 				<reportElement positionType="Float" mode="Opaque" x="380" y="0" width="70" height="30" forecolor="#000000" backcolor="#FFFFFF" uuid="697c3b43-eff6-4a60-9c8a-745c2c498481"/>
@@ -208,7 +208,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="true"/>
+					<font fontName="Times New Roman" size="10" isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[Duración]]></text>
 			</staticText>
@@ -222,7 +222,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="true"/>
+					<font fontName="Times New Roman" size="10" isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[Pieza]]></text>
 			</staticText>
@@ -236,7 +236,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="true"/>
+					<font fontName="Times New Roman" size="10" isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[Cantidad]]></text>
 			</staticText>

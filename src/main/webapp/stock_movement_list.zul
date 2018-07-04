@@ -24,26 +24,26 @@ THE SOFTWARE.
 
 <panel border="none">
     <panelchildren>
-        <grid id="stockMovementGrid" sizedByContent="true" span="true">
+        <grid id="stockMovementGrid" sizedByContent="true" span="true" emptyMessage="${labels.empty_text}.">
             <auxhead>
-                <auxheader label="Comprobantes de Stock de Insumos" colspan="3"/>
+                <auxheader label="${labels.stock_movement_supplies}" colspan="3"/>
             </auxhead>
             <columns>
-                <column label="Fecha" align="center"/>
-                <column label="Tipo" align="center"/>
+                <column label="${labels.date}" align="center"/>
+                <column label="${labels.type}" align="center"/>
                 <column label=""/>
             </columns>
             <template name="model">
                 <row>
                     <label value="${each.date}"/>
-                    <label value="${each.sign == 1 ? 'Ingreso' : 'Egreso'}"/>
+                    <label value="${each.sign == 1 ? labels.in : labels.out}"/>
                     <button forward="onClick=stockMovementGrid.onSelectStoveMovement(${each})"  image="/img/Search16x16.png"/>
                 </row>
             </template>
         </grid>
         <paging id="pager" pageSize="10" sclass="sigma-paging"/>
         <separator/>
-        <button id="stockMovementButton" label="Crear Nuevo Comprobante de Stock"/>
+        <button id="stockMovementButton" label="${labels.new_stock_movement}"/>
         <separator/>
     </panelchildren>
 </panel>

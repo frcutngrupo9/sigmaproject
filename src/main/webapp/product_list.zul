@@ -23,36 +23,36 @@ THE SOFTWARE.
 -->
 
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
-<window id="win_product_list" title="Listado de Productos" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductListController" sclass="sigma-content">
+<window id="win_product_list" title="${labels.product_list}" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductListController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
 		    <vlayout>
 			    <hlayout>
-			        <label>Buscar:</label>
+			        <label>${labels.search}:</label>
 			        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
-			        <button id="searchButton" label="Buscar"/>
+			        <button id="searchButton" label="${labels.search}"/>
 			        <hbox pack="center" align="center" hflex="1">
-			        	<button id="newProductButton" label="Nuevo Producto"/>
+			        	<button id="newProductButton" label="${labels.new_product}"/>
 			        </hbox>
 			    </hlayout>
 			    <separator/>
 			    <grid id="productGrid" sizedByContent="true" span="true">
 			    	<auxhead>
-						<auxheader label="Productos" colspan="6"/>
+						<auxheader label="${labels.product_plural}" colspan="6"/>
 					</auxhead>
 			        <columns>
-			        	<column label="Foto" align="center"/>
-			            <column label="Codigo" align="center"/>
-			            <column label="Nombre" align="center"/>
-			            <column label="Categoria" align="center"/>
-			            <column label="Precio" align="center"/>
-			            <column label="Editar" align="center"/>
+			        	<column label="${labels.image}" align="center"/>
+			            <column label="${labels.code}" align="center"/>
+			            <column label="${labels.name}" align="center"/>
+			            <column label="${labels.category}" align="center"/>
+			            <column label="${labels.price}" align="center"/>
+			            <column label="${labels.edit}" align="center"/>
 			        </columns>
 			        <template name="model">
 			            <row>
 			            	<custom-attributes product_image="${r:getProductImage(each)}"/>
 			            	<cell>
-				                <image if="${!empty product_image}" content="${product_image}" width="40px" height="40px"/>
+				                <image if="${!empty product_image}" content="${product_image}" height="${r:getPixelScaled(product_image, 50, true)}px" width="${r:getPixelScaled(product_image, 50, false)}px"/>
 				                <image if="${empty product_image}" width="0px" height="0px"/>
 			                </cell>
 			                <label value="${each.getCode()}"/>

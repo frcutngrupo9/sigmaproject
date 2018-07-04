@@ -32,6 +32,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
 import org.zkoss.lang.Strings;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -79,10 +80,6 @@ public class MachineController extends SelectorComposer<Component> {
 	@Wire
 	Textbox detailsTextbox;
 	@Wire
-	Intbox deteriorationTimeIntboxYears;
-	@Wire
-	Intbox deteriorationTimeIntboxDays;
-	@Wire
 	Intbox deteriorationTimeIntboxHours;
 
 	// services
@@ -122,12 +119,10 @@ public class MachineController extends SelectorComposer<Component> {
 		}
 		String name = nameTextbox.getText().toUpperCase();
 		String details = detailsTextbox.getText();
-		Integer years = deteriorationTimeIntboxYears.intValue();
-		Integer days = deteriorationTimeIntboxDays.intValue();
 		Integer hours = deteriorationTimeIntboxHours.intValue();
 		Duration duration = null;
 		try {
-			duration = DatatypeFactory.newInstance().newDuration(true, years, 0, days, hours, 0, 0);
+			duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, 0, hours, 0, 0);
 		} catch (DatatypeConfigurationException e) {
 			System.out.println("Error en finalizar maquina, en convertir a duracion: " + e.toString());
 		}
@@ -193,12 +188,8 @@ public class MachineController extends SelectorComposer<Component> {
 			machineTypeGrid.setVisible(true);
 			nameTextbox.setValue(currentMachineType.getName());
 			if(currentMachineType.getDeteriorationTime() == null) {
-				deteriorationTimeIntboxYears.setValue(null);
-				deteriorationTimeIntboxDays.setValue(null);
 				deteriorationTimeIntboxHours.setValue(null);
 			} else {
-				deteriorationTimeIntboxYears.setValue(currentMachineType.getDeteriorationTime().getYears());
-				deteriorationTimeIntboxDays.setValue(currentMachineType.getDeteriorationTime().getDays());
 				deteriorationTimeIntboxHours.setValue(currentMachineType.getDeteriorationTime().getHours());
 			}
 			detailsTextbox.setValue(currentMachineType.getDetails());
@@ -209,7 +200,7 @@ public class MachineController extends SelectorComposer<Component> {
 
 	public String getFormattedTime(Duration time) {
 		if(time != null) {
-			return String.format("A\u00f1os: %d Horas: %d Minutos: %d", time.getYears(), time.getHours(), time.getMinutes());
+			return String.format(Labels.getLabel("hours") + ": %d " + Labels.getLabel("minutes") + ": %d", time.getHours(), time.getMinutes());
 		} else {
 			return "";
 		}

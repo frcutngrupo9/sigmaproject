@@ -24,7 +24,7 @@ THE SOFTWARE.
 
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="productDeliveryWindow" apply="ar.edu.utn.sigmaproject.controller.ProductDeliveryController" width="75%" position="center,center" closable="true" action="show: slideDown;hide: slideUp">
-	<caption label="Entrega del Pedido" style="text-align:center; font-weight: bold;"/>
+	<caption label="${labels.order_delivery}" style="text-align:center; font-weight: bold;"/>
 	<panel border="rounded">
         <panelchildren>
             <vlayout>
@@ -39,27 +39,27 @@ THE SOFTWARE.
 		            </columns>
 			        <rows>
 			            <row>
-			                <label>Nro. de Pedido: </label>
+			                <label>${labels.order_number}: </label>
 			                <intbox id="orderNumberIntbox" width="40px"/>
-			                <label>Cliente: </label>
+			                <label>${labels.client}: </label>
 			                <textbox id="clientNameTextbox" hflex="1"/>
-			                <label>Fecha Necesidad: </label>
+			                <label>${labels.order_need_date}: </label>
 			                <textbox id="needDateTextbox" width="90px"/>
 			            </row>
 			        </rows>
 		    	</grid>
 		    	<listbox id="orderDetailListbox" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="Detalle del Pedido" colspan="7"/>
+						<auxheader label="${labels.order_detail_list}" colspan="7"/>
 					</auxhead>
         			<listhead>
-        				<listheader label="Foto" align="center"/>
-        				<listheader label="Cod. Producto"/>
-		                <listheader label="Nombre"/>
-		                <listheader label="Cantidad"/>
-		                <listheader label="Plan"/>
-		                <listheader label="Inicio Fabricacion"/>
-		                <listheader label="Fin Fabricacion"/>
+        				<listheader label="${labels.image}" align="center"/>
+        				<listheader label="${labels.product_code}"/>
+		                <listheader label="${labels.name}"/>
+		                <listheader label="${labels.quantity}"/>
+		                <listheader label="${labels.production_plan}"/>
+		                <listheader label="${labels.production_start}"/>
+		                <listheader label="${labels.production_finish}"/>
 		            </listhead>
 		            <template name="model">
 		                <listitem>
@@ -83,15 +83,15 @@ THE SOFTWARE.
 		            </columns>
 			        <rows>
 			            <row>
-			                <label>Entregado el </label>
-			                <datebox id="deliveryDatebox" buttonVisible="true" format="dd/MM/yyyy" constraint="no future" width="160px"/>
+			                <label>${labels.delivered_on} </label>
+			                <datebox id="deliveryDatebox" buttonVisible="true" format="${labels.date_format}" constraint="no future" width="160px"/>
 			            </row>
 			        </rows>
 		    	</grid>
                 <hbox hflex="1" align="center" pack="center">
-                	<button id="saveButton" label="Guardar"/>
-			        <button id="resetButton" label="Reset"/>
-			        <button id="cancelButton" label="Cancelar"/>
+                	<button id="saveButton" label="${labels.save}"/>
+			        <button id="resetButton" label="${labels.reset}"/>
+			        <button id="cancelButton" label="${labels.cancel}"/>
                 </hbox>
             </vlayout>
         </panelchildren>

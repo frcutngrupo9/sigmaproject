@@ -22,28 +22,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 
-<window id="win_process" title="Procesos" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProcessController" sclass="sigma-content">
+<window id="win_process" title="${labels.process_plural}" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProcessController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
 		    <hlayout>
-		        <label>Buscar:</label>
+		        <label>${labels.search}:</label>
 		        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
-		        <button id="searchButton" label="Buscar"/>
+		        <button id="searchButton" label="${labels.search}"/>
 		    </hlayout>
 		    <separator/>
 		    <listbox id="processTypeListbox">
 		        <listhead>
-		            <listheader label="Secuencia" align="center" hflex="min"/>
-		            <listheader label="Nombre" align="center" hflex="min"/>
-		            <listheader label="Detalles" align="center" hflex="max"/>
-		            <listheader label="Maquina Necesaria" align="center" hflex="max"/>
+		            <listheader label="${labels.sequence}" align="center" hflex="min"/>
+		            <listheader label="${labels.name}" align="center" hflex="min"/>
+		            <listheader label="${labels.detail_plural}" align="center" hflex="max"/>
+		            <listheader label="${labels.machine_necessary}" align="center" hflex="max"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
 		                <listcell label="${each.sequence}"/>
 		                <listcell label="${each.name}"/>
 		                <listcell label="${empty each.details ? '' : each.details}"/>
-		                <listcell label="${empty each.machineType.name ? 'Ninguna' : each.machineType.name}"/>
+		                <listcell label="${empty each.machineType.name ? labels.none : each.machineType.name}"/>
 		            </listitem>
 		        </template>
 		    </listbox>
@@ -52,7 +52,7 @@ THE SOFTWARE.
 		    <vlayout>
 		        <separator/>
 		        <hbox>
-		            <button id="newButton" label="Nuevo"/>
+		            <button id="newButton" label="${labels.new_text}"/>
 		        </hbox>
 		        <separator/>
 				<grid id="processTypeGrid" width="400px" sclass="sigma-form" visible="false">
@@ -62,19 +62,19 @@ THE SOFTWARE.
 		            </columns>
 			        <rows>
 			            <row>
-			                <label>Nombre:</label>
+			                <label>${labels.name}:</label>
 			                <textbox id="nameTextbox" hflex="1"/>
 			            </row>
 			            <row>
-			                <label>Detalles:</label>
+			                <label>${labels.detail_plural}:</label>
 			                <textbox id="detailsTextbox" hflex="1"/>
 			            </row>
 			            <row>
-			                <label>Secuencia:</label>
+			                <label>${labels.sequence}:</label>
 			                <intbox id="sequenceIntbox" hflex="1"/>
 			            </row>
 			            <row>
-			                <label>Maquina Necesaria:</label>
+			                <label>${labels.machine_necessary}:</label>
 			                <combobox id="machineTypeCombobox">
 		                        <template name="model">
 		                            <comboitem label="${each.name}" />
@@ -84,10 +84,10 @@ THE SOFTWARE.
 			            <row>
 			                <cell colspan="2" style="text-align:center">
 			                    <hlayout>
-			                        <button id="saveButton" label="Guardar"/>
-			                        <button id="cancelButton" label="Cancelar"/>
-			                        <button id="resetButton" label="Reset"/>
-			                        <button id="deleteButton" label="Eliminar"/>
+			                        <button id="saveButton" label="${labels.save}"/>
+			                        <button id="cancelButton" label="${labels.cancel}"/>
+			                        <button id="resetButton" label="${labels.reset}"/>
+			                        <button id="deleteButton" label="${labels.delete}"/>
 			                    </hlayout>
 			                </cell>
 			            </row>

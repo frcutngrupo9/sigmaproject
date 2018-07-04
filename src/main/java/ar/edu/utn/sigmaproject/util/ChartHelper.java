@@ -39,10 +39,13 @@ import org.zkoss.zul.SimpleCategoryModel;
 import org.zkoss.zul.SimplePieModel;
 
 import ar.edu.utn.sigmaproject.domain.Client;
+import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.domain.ProductMaterial;
 import ar.edu.utn.sigmaproject.domain.ProductTotal;
+import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
@@ -63,12 +66,33 @@ public class ChartHelper {
 		this.clientRepository = clientRepository;
 	}
 
-	public PieModel getProductPieModel(Date dateFrom, Date dateTo) {
+	public PieModel getProductPieModel(Date dateFrom, Date dateTo, List<Product> filterProductList) {
 		PieModel productPieModel = new SimplePieModel();
-		for(ProductTotal each : getProductTotalOrders(dateFrom, dateTo)) {
+		for(ProductTotal each : getFilteredProductTotalList(getProductTotalOrders(dateFrom, dateTo), filterProductList)) {
 			productPieModel.setValue(each.getProduct().getName(), each.getTotalUnits());
 		}
 		return productPieModel;
+	}
+	
+	private List<ProductTotal> getFilteredProductTotalList(List<ProductTotal> productTotalList, List<Product> filterProductList) {
+		if(filterProductList != null) {
+			List<ProductTotal> productTotalRemoveList = new ArrayList<ProductTotal>();
+			// verifica que todos los de la lista se encuentren en la lista de filtro caso contrario se remueven
+			for(ProductTotal eachProductTotal : productTotalList) {
+				boolean isInFilter = false;
+				for(Product eachProductFilter : filterProductList) {
+					if(eachProductTotal.getProduct().equals(eachProductFilter)) {
+						isInFilter = true;
+						break;
+					}
+				}
+				if(isInFilter == false) {
+					productTotalRemoveList.add(eachProductTotal);
+				}
+			}
+			productTotalList.removeAll(productTotalRemoveList);
+		}
+		return productTotalList;
 	}
 
 	public List<ProductTotal> getProductTotalOrders(Date dateFrom, Date dateTo) {
@@ -89,7 +113,28 @@ public class ChartHelper {
 		return list;
 	}
 
-	public CategoryModel getProductLineChartModel(Date firstOrderDate, Date lastOrderDate) {
+	private List<Product> getFilteredProductList(List<Product> productList, List<Product> filterProductList) {
+		if(filterProductList != null) {
+			List<Product> productRemoveList = new ArrayList<Product>();
+			// verifica que todos los de la lista se encuentren en la lista de filtro caso contrario se remueven
+			for(Product eachProduct : productList) {
+				boolean isInFilter = false;
+				for(Product eachProductFilter : filterProductList) {
+					if(eachProduct.equals(eachProductFilter)) {
+						isInFilter = true;
+						break;
+					}
+				}
+				if(isInFilter == false) {
+					productRemoveList.add(eachProduct);
+				}
+			}
+			productList.removeAll(productRemoveList);
+		}
+		return productList;
+	}
+
+	public CategoryModel getProductLineChartModel(Date firstOrderDate, Date lastOrderDate, List<Product> filterProductList) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(firstOrderDate);
 		int searchStartYear = calendar.get(Calendar.YEAR);
@@ -99,7 +144,7 @@ public class ChartHelper {
 		int searchFinishYear = calendar.get(Calendar.YEAR);
 		int searchFinishMonth = calendar.get(Calendar.MONTH);
 		CategoryModel  model = new SimpleCategoryModel();
-		for(Product eachProduct : getProductList()) {
+		for(Product eachProduct : getFilteredProductList(getProductList(), filterProductList)) {
 			for(int year=searchStartYear; year <=searchFinishYear; year++) {
 				int startMonth;
 				if(year == searchStartYear) {
@@ -131,7 +176,7 @@ public class ChartHelper {
 		DateFormat dateFormat = new SimpleDateFormat("MMM");
 		return dateFormat.format(date);
 	}
-	
+
 	public Order[] getFirstAndLastOrder() {
 		Order[] orderArray = new Order[2];
 		for(Order each : orderRepository.findAll()) {
@@ -190,11 +235,11 @@ public class ChartHelper {
 		return (totalUnits == null) ? 0 : totalUnits;
 	}
 
-	public CategoryModel getProductBarModel(Date dateFrom, Date dateTo) {
+	public CategoryModel getProductBarModel(Date dateFrom, Date dateTo, List<Product> filterProductList) {
 		CategoryModel model = new SimpleCategoryModel();
 		for(Client eachClient : clientRepository.findAll()) {
 			// por cada cliente recorremos todos los productos de sus pedidos
-			for(ProductTotal eachProductTotal : getProductTotalByClient(eachClient, dateFrom, dateTo)) {
+			for(ProductTotal eachProductTotal : getFilteredProductTotalList(getProductTotalByClient(eachClient, dateFrom, dateTo), filterProductList)) {
 				model.setValue(eachProductTotal.getProduct().getName(), eachClient.getName(), eachProductTotal.getTotalUnits());
 			}
 		}
@@ -210,13 +255,47 @@ public class ChartHelper {
 			}
 		}
 		List<ProductTotal> list = new ArrayList<ProductTotal>();
-		for (Map.Entry<Product, Integer> entry : productTotalMap.entrySet()) {
+		for(Map.Entry<Product, Integer> entry : productTotalMap.entrySet()) {
 			Product product = entry.getKey();
 			Integer totalUnits = entry.getValue();
 			ProductTotal productTotal = new ProductTotal(product, totalUnits);
 			list.add(productTotal);
 		}
 		return list;
+	}
+
+	//	private Map<MaterialRequirement, Integer> getSuppliesTotalMap() {
+	//		Map<MaterialRequirement, Integer> suppliesTotalMap = new HashMap<MaterialRequirement, Integer>();
+	//		for(MaterialRequirement each : materialRequirementRepository.findAll()) {
+	//			if(each.getType() == MaterialType.Supply) {
+	//				Integer totalUnits = suppliesTotalMap.get(each);
+	//				suppliesTotalMap.put(each, (totalUnits == null) ? each.getQuantity().intValue() : totalUnits + each.getQuantity().intValue());
+	//			}
+	//		}
+	//		return suppliesTotalMap;
+	//	}
+
+	private Map<SupplyType, Integer> getSuppliesTotalMap(Date dateFrom, Date dateTo) {
+		Map<SupplyType, Integer> suppliesTotalMap = new HashMap<SupplyType, Integer>();
+		for(ProductTotal each : getProductTotalOrders(dateFrom, dateTo)) {
+			for(ProductMaterial eachMaterial : each.getProduct().getMaterials()) {
+				if(eachMaterial.getType() == MaterialType.Supply) {
+					SupplyType supplyType = (SupplyType) eachMaterial.getItem();
+					Integer currentUnits = eachMaterial.getQuantity().intValue() * each.getTotalUnits();
+					Integer totalUnits = suppliesTotalMap.get(supplyType);
+					suppliesTotalMap.put(supplyType, (totalUnits == null) ? currentUnits : totalUnits + currentUnits);
+				}
+			}
+		}
+		return suppliesTotalMap;
+	}
+
+	public PieModel getSuppliesPieModel(Date dateFrom, Date dateTo) {
+		PieModel pieModel = new SimplePieModel();
+		for(Map.Entry<SupplyType, Integer> entry : getSuppliesTotalMap(dateFrom, dateTo).entrySet()) {
+			pieModel.setValue(entry.getKey().getDescription(), entry.getValue());
+		}
+		return pieModel;
 	}
 
 }

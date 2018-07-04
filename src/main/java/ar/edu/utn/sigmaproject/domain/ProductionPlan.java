@@ -269,4 +269,12 @@ public class ProductionPlan  implements Serializable, Cloneable {
 		}
 		return date;
 	}
+	
+	public List<Product> getProductList() {
+		List<Product> productList = new ArrayList<Product>();
+		for(ProductionOrder each : productionOrderList) {
+			productList.add(each.getProduct());
+		}
+		return productList;
+	}
 }

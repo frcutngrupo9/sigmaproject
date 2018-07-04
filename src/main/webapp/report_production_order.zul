@@ -24,25 +24,24 @@ THE SOFTWARE.
 
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="reportProductionOrderWindow" apply="ar.edu.utn.sigmaproject.controller.ReportProductionOrderController">
-	<caption label="Reportes" style="text-align:center; font-weight: bold;"/>
+	<caption label="${labels.report_plural}" style="text-align:center; font-weight: bold;"/>
 	<panel border="none">
         <panelchildren>
             <vlayout>
             	<separator/>
             	<hbox pack="center" align="center" width="100%">
             		<vbox  align="center" hflex="1">
-            			<label value="Plan de Produccion: "/>
-            			<bandbox id="productionPlanBandbox" value="Seleccionar"  onClick="self.open()" readonly="true" buttonVisible="true" autodrop="false">
+            			<label value="${labels.production_plan}: "/>
+            			<bandbox id="productionPlanBandbox" value="selectSeleccionar"  onClick="self.open()" readonly="true" buttonVisible="true" autodrop="false">
 	            			<bandpopup>
 		            			<listbox id="productionPlanListbox" onClick="productionPlanBandbox.close()"
-		            			width="600px" span="false" sizedByContent="false" emptyMessage="No existen Planes.">
+		            			width="600px" span="false" sizedByContent="false" emptyMessage="${labels.empty_production_plan_list}.">
 		            				<listhead>
-				                        <listheader label="Plan de Produccion" hflex="min" align="center"/>
-							            <listheader label="Fecha Inicio" align="center"/>
-							            <listheader label="Inicio Real" align="center"/>
-							            <listheader label="Cantidad Pedidos" align="center"/>
-		            					<listheader label="Cantidad Productos" align="center"/>
-							            <listheader label="Informacion" align="center"/>
+				                        <listheader label="${labels.production_plan}" hflex="min" align="center"/>
+							            <listheader label="${labels.date_start}" align="center"/>
+							            <listheader label="${labels.start_real}" align="center"/>
+							            <listheader label="${labels.quantity_order}" align="center"/>
+		            					<listheader label="${labels.quantity_product}" align="center"/>
 				                    </listhead>
 									<template name="model">
 										<listitem>
@@ -51,7 +50,6 @@ THE SOFTWARE.
 							                <listcell label="${r:getFormattedDate(each.getDateStartReal())}"/>
 							                <listcell label="${each.planDetails.size()}"/>
 		               						<listcell label="${each.getProductionOrderList().size()}"/>
-							                <listcell label="${each.getDeviationText()}"/>
 										</listitem>
 									</template>
 								</listbox>
@@ -60,18 +58,18 @@ THE SOFTWARE.
             		</vbox>
             		<separator/>
             		<vbox align="center" hflex="1">
-            			<label value="Orden de Produccion: "/>
-            			<bandbox id="productionOrderBandbox" value="Seleccionar" onClick="self.open()" readonly="true" buttonVisible="true" autodrop="false">
+            			<label value="${labels.production_order}: "/>
+            			<bandbox id="productionOrderBandbox" value="${labels.select}" onClick="self.open()" readonly="true" buttonVisible="true" autodrop="false">
 	            			<bandpopup>
-		            			<listbox id="productionOrderListbox" onClick="productionOrderBandbox.close()" width="600px" span="true" sizedByContent="false" emptyMessage="Debe Seleccionar un Plan.">
+		            			<listbox id="productionOrderListbox" onClick="productionOrderBandbox.close()" width="600px" span="true" sizedByContent="false" emptyMessage="${labels.must_select_production_plan}.">
 		            				<listhead>
-				                        <listheader label="Nro" hflex="min" align="center"/>
-				        				<listheader label="Producto" hflex="max" align="center"/>
-						                <listheader label="Unids" hflex="min" align="center"/>
-						                <listheader label="Fecha Inicio" hflex="min" align="center"/>
-						                <listheader label="Fecha Inicio Real" hflex="min" align="center"/>
-						                <listheader label="Fecha Fin" hflex="min" align="center"/>
-						                <listheader label="Fecha Fin Real" hflex="min" align="center"/>
+				                        <listheader label="${labels.number_short}" hflex="min" align="center"/>
+				        				<listheader label="${labels.product}" hflex="max" align="center"/>
+						                <listheader label="${labels.unit_plural_short}" hflex="min" align="center"/>
+						                <listheader label="${labels.date_start}" hflex="min" align="center"/>
+						                <listheader label="${labels.date_start_actual}" hflex="min" align="center"/>
+						                <listheader label="${labels.date_finish}" hflex="min" align="center"/>
+						                <listheader label="${labels.date_finish_actual}" hflex="min" align="center"/>
 				                    </listhead>
 									<template name="model">
 										<listitem>
@@ -90,14 +88,14 @@ THE SOFTWARE.
             		</vbox>
             		<separator/>
             		<vbox align="center" pack="center" hflex="1">
-            			<label value="Empleado: "/>
-            			<bandbox id="workerBandbox" value="Todos" onClick="self.open()" readonly="true" buttonVisible="true" autodrop="false">
+            			<label value="${labels.worker}: "/>
+            			<bandbox id="workerBandbox" value="${labels.all}" onClick="self.open()" readonly="true" buttonVisible="true" autodrop="false">
 	            			<bandpopup>
-	            				<button id="allWorkersButton" label="Seleccionar Todos"/>
+	            				<button id="allWorkersButton" label="${labels.select_all}"/>
 		            			<listbox id="workerListbox" onClick="workerBandbox.close()" width="600px" span="true" sizedByContent="false">
 		            				<listhead>
-							            <listheader label="Nombre" align="center"/>
-							            <listheader label="Fecha Ingreso" align="center"/>
+							            <listheader label="${labels.name}" align="center"/>
+							            <listheader label="${labels.date_employed}" align="center"/>
 							        </listhead>
 							        <template name="model">
 							            <listitem>
@@ -111,22 +109,22 @@ THE SOFTWARE.
             		</vbox>
             		<separator/>
             		<vbox align="center" pack="center" hflex="1" vflex="1">
-            			<button id="generateReportButton" label="Generar Reporte" vflex="1"/>
+            			<button id="generateReportButton" label="${labels.generate_report}" vflex="1"/>
             		</vbox>
             	</hbox>
             	<separator/>
-    			<grid id="productionOrderDetailGrid" sizedByContent="false" span="true" emptyMessage="Debe Seleccionar una Orden.">
+    			<grid id="productionOrderDetailGrid" sizedByContent="false" span="true" emptyMessage="${labels.must_select_production_order}.">
         			<columns>
-			            <column label="Secuencia" hflex="min" align="center"/>
-			            <column label="Proceso" hflex="max" align="left"/>
-			            <column label="Inicio" hflex="max" align="left"/>
-			            <column label="Fin" hflex="max" align="left"/>
-			            <column label="Pieza" hflex="max" align="center"/>
-			            <column label="Cantidad" hflex="min" align="center"/>
-			            <column label="Empleado" hflex="max" align="center"/>
-			            <column label="Maquina" hflex="max" align="center"/>
-			            <column label="Duracion x Producto" hflex="min" align="center"/>
-			            <column label="Duracion Total" hflex="min" align="center"/>
+			            <column label="${labels.sequence}" hflex="min" align="center"/>
+			            <column label="${labels.process}" hflex="max" align="left"/>
+			            <column label="${labels.start}" hflex="max" align="left"/>
+			            <column label="${labels.finish}" hflex="max" align="left"/>
+			            <column label="${labels.piece}" hflex="max" align="center"/>
+			            <column label="${labels.quantity}" hflex="min" align="center"/>
+			            <column label="${labels.worker}" hflex="max" align="center"/>
+			            <column label="${labels.machine}" hflex="max" align="center"/>
+			            <column label="${labels.duration_by_product}" hflex="min" align="center"/>
+			            <column label="${labels.duration_total}" hflex="min" align="center"/>
 		            </columns>
 		            <template name="model">
 		                <row>
@@ -139,7 +137,7 @@ THE SOFTWARE.
 			            	<label value="${each.worker.name}"/>
 			            	<cell>
 			            		<label value="${each.machine.name}" if="${each.process.type.getMachineType() != null}"/>
-			                    <label value="NO REQUIERE" if="${each.process.type.getMachineType() == null}"/>
+			                    <label value="${labels.not_necessary}" if="${each.process.type.getMachineType() == null}"/>
 		                    </cell>
 		                    <label value="${r:getFormattedProcessTime(each.process.getDurationTotal())}"/>
 			            	<label value="${r:getFormattedProcessTime(each.getDurationTotal())}"/>
@@ -148,7 +146,7 @@ THE SOFTWARE.
     			</grid>
     			<separator/>
     			<hbox hflex="1" pack="left">
-	    			<button id="returnButton" label="Volver"/>
+	    			<button id="returnButton" label="${labels.return_text}"/>
 				</hbox>
             </vlayout>
         </panelchildren>

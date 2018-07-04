@@ -22,21 +22,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 
-<window id="win_machine_stock" title="Listado de Maquinas" closable="false" apply="ar.edu.utn.sigmaproject.controller.MachineStockController" sclass="sigma-content">
+<window id="win_machine_stock" title="${labels.machine_list}" closable="false" apply="ar.edu.utn.sigmaproject.controller.MachineStockController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
 		    <hlayout>
-		        <label>Buscar:</label>
+		        <label>${labels.search}:</label>
 		        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
-		        <button id="searchButton" label="Buscar"/>
+		        <button id="searchButton" label="${labels.search}"/>
 		    </hlayout>
 		    <separator/>
 		    <listbox id="machineListbox">
 		        <listhead>
-		            <listheader label="Nombre" align="center"/>
-		            <listheader label="Tipo Maquina" align="center"/>
-		            <listheader label="Modelo" align="center"/>
-		            <listheader label="Tiempo de Uso" align="center"/>
+		            <listheader label="${labels.name}" align="center"/>
+		            <listheader label="${labels.machine_type}" align="center"/>
+		            <listheader label="${labels.model}" align="center"/>
+		            <listheader label="${labels.usage_time}" align="center"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
@@ -51,7 +51,7 @@ THE SOFTWARE.
 		    <vlayout>
 		        <separator/>
 		        <hbox>
-		            <button id="newButton" label="Nuevo"/>
+		            <button id="newButton" label="${labels.new_text}"/>
 		        </hbox>
 		        <separator/>
 		        <grid id="machineGrid" width="400px" sclass="sigma-form" visible="false">
@@ -61,7 +61,7 @@ THE SOFTWARE.
 		            </columns>
 		            <rows>
 		            	<row>
-		            		<label>Tipo Maquina:</label>
+		            		<label>${labels.machine_type}:</label>
 			                <combobox id="machineTypeCombobox" hflex="1" readonly="true">
 		                        <template name="model">
 		                            <comboitem label="${each.name}" value="${each}"/>
@@ -69,29 +69,29 @@ THE SOFTWARE.
 		                    </combobox>
 		            	</row>
 		                <row>
-		                    <label>Nombre:</label>
+		                    <label>${labels.name}:</label>
 		                    <textbox id="nameTextbox" hflex="1"/>
 		                </row>
 		                <row>
-		                    <label>Modelo:</label>
+		                    <label>${labels.model}:</label>
 		                    <intbox id="yearIntbox" hflex="1"/>
 		                </row>
 		                <row>
-		                    <label>Tiempo de uso:</label>
+		                    <label>${labels.usage_time}:</label>
 		                    <hbox>
 		                    	<intbox id="usedTimeIntboxHours" width="36px"/>
-		                    	<label value="(Horas)"/>
+		                    	<label value="(${labels.hours})"/>
 		                    	<intbox id="usedTimeIntboxMinutes" width="36px"/>
-		                    	<label value="(Minutos)"/>
+		                    	<label value="(${labels.minutes})"/>
 		                    </hbox>
 		                </row>
 		                <row>
 							<cell colspan="2" style="text-align:center">
 			                    <hlayout>
-			                        <button id="saveButton" label="Guardar"/>
-			                        <button id="cancelButton" label="Cancelar"/>
-			                        <button id="resetButton" label="Reset"/>
-			                        <button id="deleteButton" label="Eliminar"/>
+			                        <button id="saveButton" label="${labels.save}"/>
+			                        <button id="cancelButton" label="${labels.cancel}"/>
+			                        <button id="resetButton" label="${labels.reset}"/>
+			                        <button id="deleteButton" label="${labels.delete}"/>
 			                    </hlayout>
 			                </cell>
 		                </row>

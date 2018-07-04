@@ -23,49 +23,49 @@ THE SOFTWARE.
 -->
 
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
-<window id="win_materials_order_list" title="Lista de Pedidos de Materiales" closable="false" apply="ar.edu.utn.sigmaproject.controller.MaterialsOrderListController" sclass="sigma-content">
+<window id="win_materials_order_list" title="${labels.materials_order_list}" closable="false" apply="ar.edu.utn.sigmaproject.controller.MaterialsOrderListController" sclass="sigma-content">
 	<panel border="none">
         <panelchildren>
 		    <hlayout>
-		        <label>Buscar:</label>
+		        <label>${labels.search}:</label>
 		        <textbox id="searchTextbox" forward="onOK=searchButton.onClick"/>
-		        <button id="searchButton" label="Buscar"/>
+		        <button id="searchButton" label="${labels.search}"/>
 		        <hbox pack="center" align="center" hflex="1">
-		        	<button id="newMaterialsOrderButton" label="Nuevo Pedido de Materiales"/>
+		        	<button id="newMaterialsOrderButton" label="${labels.new_materials_order}"/>
 		        </hbox>
 		    </hlayout>
 		    <separator/>
-		    <grid id="materialsOrderGrid" mold="paging" pageSize="7">
+		    <grid id="materialsOrderGrid" mold="paging" pageSize="7" emptyMessage="${labels.empty_text}.">
 		    	<auxhead>
-					<auxheader label="Pedidos de Materiales" colspan="8"/>
+					<auxheader label="${labels.materials_order_plural}" colspan="8"/>
 				</auxhead>
 		        <columns>
-		            <column label="Numero" align="center" sort="auto(number)"/>
-		            <column label="Plan de Produccion" align="center"/>
-		            <column label="Fecha Creacion" align="center"/>
-		            <column label="Fecha Recepcion" align="center"/>
-		            <column label="Recepcion Completa?" align="center"/>
-		            <column label="Materiales Diferentes" align="center"/>
-		            <column label="Detalles" width="120px" align="center"/>
-		            <column label="Accion" align="center"/>
+		            <column label="${labels.number}" align="center" sort="auto(number)"/>
+		            <column label="${labels.production_plan}" align="center"/>
+		            <column label="${labels.creation_date}" align="center"/>
+		            <column label="${labels.reception_date}" align="center"/>
+		            <column label="${labels.totally_received}?" align="center"/>
+		            <column label="${labels.differents_materials}" align="center"/>
+		            <column label="${labels.detail_plural}" width="120px" align="center"/>
+		            <column label="${labels.action}" align="center"/>
 		        </columns>
 		        <template name="model">
 		            <row>
-		            	<custom-attributes text_no="No" text_si="Si"/>
+		            	<custom-attributes text_no="${labels.no}" text_si="${labels.yes}"/>
 		                <label value="${each.number}"/>
 		                <cell>
 		                	<label value="${each.productionPlan.name}" if="${!empty each.productionPlan}"/>
-                			<label value="Sin Plan" if="${empty each.productionPlan}"/>
+                			<label value="${labels.no_plan}" if="${empty each.productionPlan}"/>
 		                </cell>
 		                <label value="${r:getFormattedDateTime(each.date)}"/>
 		                <label value="${r:getFormattedDate(each.dateReception)}"/>
 		                <cell>
 		                	<label value="${each.isTotallyReceived() ? text_si : text_no}" if="${!empty each.dateReception}"/>
-                			<label value="Sin Recibir" if="${empty each.dateReception}"/>
+                			<label value="${labels.no_received}" if="${empty each.dateReception}"/>
 		                </cell>
 		                <label value="${each.details.size()}"/>
 		                <button forward="onClick=materialsOrderGrid.onEditMaterialsOrder(${each})"  image="/img/Search16x16.png"/>
-		                <button disabled="${!empty each.dateReception}" label="Recibir" forward="onClick=materialsOrderGrid.onMaterialsOrderReception(${each})"/>
+		                <button disabled="${!empty each.dateReception}" label="${labels.receive}" forward="onClick=materialsOrderGrid.onMaterialsOrderReception(${each})"/>
 		            </row>
 		        </template>
 		    </grid>

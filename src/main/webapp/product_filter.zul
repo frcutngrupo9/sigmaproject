@@ -1,0 +1,87 @@
+<!--
+The MIT License
+
+Copyright (C) 2017 SigmaProject.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-->
+
+<?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
+<window width="80%" height="70%" id="productFilterWindow" apply="ar.edu.utn.sigmaproject.controller.ProductFilterController">
+	<caption label="${labels.select_products_to_show}" style="text-align:center; font-weight: bold;"/>
+	<panel border="none">
+        <panelchildren>
+            <vbox hflex="1" vflex="1">
+            	<toolbar align="center" orient="horizontal">
+	                <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+	                <toolbarbutton id="acceptButton" label="${labels.accept}"/>
+	                <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+            		<toolbarbutton id="cancelButton" label="${labels.cancel}"/>
+            		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+				</toolbar>
+				<hbox spacing="10px" hflex="1" vflex="true">
+	            	<listbox id="candidateListbox" hflex="1" height="350px" rows="6" emptyMessage="">
+				        <listhead>
+				            <listheader label="${labels.image}" width="60px" align="center"></listheader>
+				            <listheader label="${labels.code}" hflex="min" align="center"></listheader>
+				            <listheader label="${labels.name}" hflex="1"></listheader>
+				            <listheader label="${labels.price}" width="80px" align="center"></listheader>
+				        </listhead>
+				        <template name="model">
+				            <listitem>
+				            	<custom-attributes product_image="${r:getProductImage(each)}"/>
+				            	<listcell>
+					                <image if="${!empty product_image}" content="${product_image}" height="${r:getPixelScaled(product_image, 50, true)}px" width="${r:getPixelScaled(product_image, 50, false)}px"/>
+					                <image if="${empty product_image}" width="0px" height="0px"/>
+				                </listcell>
+				                <listcell label="${each.getCode()}"/>
+				                <listcell label="${each.getName()}"/>
+				                <listcell label="${each.getPrice().doubleValue()} $"/>
+				            </listitem>
+				        </template>
+				    </listbox>
+				    <vbox spacing="10px" width="54px" vflex="1" align="center" pack="center">
+				    	<button image="/img/rightarrow.png" orient="vertical" id="chooseAllButton" label="${labels.add_all}" hflex="1"/>
+				    	<button image="/img/leftarrow.png" orient="vertical" dir="reverse" id="removeAllButton" label="${labels.remove_all}" hflex="1"/>
+				    </vbox>
+				    <listbox id="chosenListbox" hflex="1" height="350px" rows="6" emptyMessage="${labels.empty}">
+				        <listhead>
+				            <listheader label="${labels.image}" width="60px" align="center"></listheader>
+				            <listheader label="${labels.code}" hflex="min" align="center"></listheader>
+				            <listheader label="${labels.name}" hflex="1"></listheader>
+				            <listheader label="${labels.price}" width="80px" align="center"></listheader>
+				        </listhead>
+				        <template name="model">
+				            <listitem>
+				            	<custom-attributes product_image="${r:getProductImage(each)}"/>
+				            	<listcell>
+					                <image if="${!empty product_image}" content="${product_image}" height="${r:getPixelScaled(product_image, 50, true)}px" width="${r:getPixelScaled(product_image, 50, false)}px"/>
+					                <image if="${empty product_image}" width="0px" height="0px"/>
+				                </listcell>
+				                <listcell label="${each.getCode()}"/>
+				                <listcell label="${each.getName()}"/>
+				                <listcell label="${each.getPrice().doubleValue()} $"/>
+				            </listitem>
+				        </template>
+				    </listbox>
+			    </hbox>
+            </vbox>
+        </panelchildren>
+    </panel>
+</window>
