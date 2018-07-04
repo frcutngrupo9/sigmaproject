@@ -133,7 +133,7 @@ public class RawMaterialController extends SelectorComposer<Component> {
 	
 	private void refreshListModels() {
 		MeasureUnitType measureUnitType = measureUnitTypeRepository.findFirstByName("Longitud");
-		measureUnitList = measureUnitRepository.findByType(measureUnitType);
+		measureUnitList = measureUnitType.getList();
 		lengthMeasureUnitListModel = new ListModelList<>(measureUnitList);
 		depthMeasureUnitListModel = new ListModelList<>(measureUnitList);
 		widthMeasureUnitListModel = new ListModelList<>(measureUnitList);

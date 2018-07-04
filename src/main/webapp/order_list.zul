@@ -35,7 +35,7 @@ THE SOFTWARE.
 		        </hbox>
 		    </hlayout>
 		    <separator/>
-		    <grid id="orderGrid" mold="paging" pageSize="7">
+		    <grid id="orderGrid" mold="paging" pageSize="7" emptyMessage="${labels.empty_text}.">
 		    	<auxhead>
 					<auxheader label="${labels.order_plural}" colspan="10"/>
 				</auxhead>

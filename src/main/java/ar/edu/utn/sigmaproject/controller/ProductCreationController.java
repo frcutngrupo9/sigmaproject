@@ -221,7 +221,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		processTypeListModel = new ListModelList<>(processTypeList);
 		processListbox.setModel(processTypeListModel);
 		MeasureUnitType measureUnitType = measureUnitTypeRepository.findFirstByName("Longitud");
-		List<MeasureUnit> measureUnitList = measureUnitRepository.findByType(measureUnitType);
+		List<MeasureUnit> measureUnitList = measureUnitType.getList();
 		lengthMeasureUnitListModel = new ListModelList<>(measureUnitList);
 		depthMeasureUnitListModel = new ListModelList<>(measureUnitList);
 		widthMeasureUnitListModel = new ListModelList<>(measureUnitList);
@@ -281,7 +281,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		if(productCategory == null) {
 			productCategory = productCategoryCombobox.getSelectedItem().getValue();
 		}
-		String productName = productNameTextbox.getText().toUpperCase();
+		String productName = productNameTextbox.getText();//.toUpperCase();
 		String productDetails = productDetailsTextbox.getText();
 		String productCode = productCodeTextbox.getText();
 		BigDecimal productPrice = new BigDecimal(productPriceDoublebox.doubleValue());

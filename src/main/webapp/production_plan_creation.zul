@@ -75,7 +75,7 @@ THE SOFTWARE.
                         </row>
                    </rows>
                 </grid>
-    			<grid id="productionPlanDetailGrid" mold="paging" pageSize="7">
+    			<grid id="productionPlanDetailGrid" mold="paging" pageSize="7" emptyMessage="${labels.empty_text}.">
     				<auxhead>
 						<auxheader label="${labels.order_plural}" colspan="6"/>
 					</auxhead>

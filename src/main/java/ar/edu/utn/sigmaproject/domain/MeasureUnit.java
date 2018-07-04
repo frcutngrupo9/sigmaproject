@@ -43,7 +43,7 @@ public class MeasureUnit implements Serializable, Cloneable {
 	String name = "";
 	String shortName = "";
 
-	@ManyToOne
+	@ManyToOne(targetEntity = MeasureUnitType.class)
 	MeasureUnitType type;
 
 	public MeasureUnit() {

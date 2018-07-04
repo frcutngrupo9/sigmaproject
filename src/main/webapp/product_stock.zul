@@ -34,7 +34,7 @@ THE SOFTWARE.
 		    <separator/>
 		    <listbox id="productListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
 		    	<auxhead>
-					<auxheader label="${labels.product_plural}" colspan="7"/>
+					<auxheader label="${labels.product_plural}" colspan="6"/>
 				</auxhead>
 		        <listhead>
 		            <listheader label="${labels.image}" align="center"/>
@@ -42,7 +42,6 @@ THE SOFTWARE.
 		            <listheader label="${labels.product}" align="center"/>
 		            <listheader label="${labels.stock_current}" align="center"/>
 		            <listheader label="${labels.stock_minimum}" align="center"/>
-		            <listheader label="${labels.stock_replenishment}" align="center"/>
 		            <listheader label="${labels.quantity_delivered}" align="center"/>
 		        </listhead>
 		        <template name="model">
@@ -56,7 +55,6 @@ THE SOFTWARE.
 		                <listcell label="${each.name}"/>
 		                <listcell label="${each.stock}"/>
 		                <listcell label="${each.stockMin}"/>
-		                <listcell label="${each.stockRepo}"/>
 		                <listcell label="${win_product_stock$composer.getQuantityDelivered(each)}"/>
 		            </listitem>
 		        </template>
@@ -88,10 +86,6 @@ THE SOFTWARE.
 			            <row>
 			                <label>${labels.stock_minimum}:</label>
 			                <intbox id="stockMinIntbox" value="0" width="150px" hflex="1"/>
-			            </row>
-			            <row>
-			                <label>${labels.stock_replenishment}:</label>
-			                <intbox id="stockRepoIntbox" value="0" width="150px" hflex="1"/>
 			            </row>
 			            <row>
 			                <cell colspan="2" style="text-align:center">

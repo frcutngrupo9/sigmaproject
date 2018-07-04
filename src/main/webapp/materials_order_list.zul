@@ -35,7 +35,7 @@ THE SOFTWARE.
 		        </hbox>
 		    </hlayout>
 		    <separator/>
-		    <grid id="materialsOrderGrid" mold="paging" pageSize="7">
+		    <grid id="materialsOrderGrid" mold="paging" pageSize="7" emptyMessage="${labels.empty_text}.">
 		    	<auxhead>
 					<auxheader label="${labels.materials_order_plural}" colspan="8"/>
 				</auxhead>

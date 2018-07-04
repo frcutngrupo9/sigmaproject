@@ -159,15 +159,15 @@ public class RepositoryHelper {
 	}
 
 	private void addMeasureUnitsIfNeeded(String measureUnitTypeName, List<List<String>> definitions) {
-		MeasureUnitType lengthMeasureUnitType = measureUnitTypeRepository.findFirstByName(measureUnitTypeName);
-		if (lengthMeasureUnitType == null) {
-			MeasureUnitType measureUnitType = new MeasureUnitType(measureUnitTypeName);
-			measureUnitTypeRepository.save(measureUnitType);
+		MeasureUnitType measureUnitType = measureUnitTypeRepository.findFirstByName(measureUnitTypeName);
+		if (measureUnitType == null) {
+			measureUnitType = new MeasureUnitType(measureUnitTypeName);
 			List<MeasureUnit> measureUnitToInsert = new ArrayList<>();
 			for (List<String> definition : definitions) {
 				measureUnitToInsert.add(new MeasureUnit(definition.get(0), definition.get(1), measureUnitType));
 			}
-			measureUnitRepository.save(measureUnitToInsert);
+			measureUnitType.getList().addAll(measureUnitToInsert);
+			measureUnitTypeRepository.save(measureUnitType);
 		}
 	}
 
@@ -213,42 +213,33 @@ public class RepositoryHelper {
 	private void generateMachineType() {
 		if (machineTypeRepository.count() == 0) {
 			List<MachineType> list = new ArrayList<>();
-			list.add(new MachineType("Garlopa", "", null));
-			list.add(new MachineType("Cepilladora", "", null));
-			list.add(new MachineType("Escuadradora", "", null));
-			list.add(new MachineType("Escopladora", "", null));
-			list.add(new MachineType("Tupi", "", null));
-			list.add(new MachineType("Sierra Sin Fin", "", null));
-			list.add(new MachineType("Lijadora", "", null));
-			list.add(new MachineType("Caladora", "", null));
-			list.add(new MachineType("Taladro", "", null));
+			list.add(new MachineType("Escuadradora", "Utilizado para efectuar cortes lineales a escuadra.", null));
+			list.add(new MachineType("Sierra sin fin", "Utilizado para realizar los cortes curvos.", null));
+			list.add(new MachineType("Cepilladora", "Utilizado para efectuar las operaciones de planear, cantear y embatientar una pieza de trabajo.", null));
+			list.add(new MachineType("Escopleadora", "", null));
+			list.add(new MachineType("Tupi", "Utilizado para redondear y a la vez dar varias formas a la madera.", null));
+			list.add(new MachineType("Lijadora de banda", "Utilizado para lijar piezas de trabajo planas y con sus dispositivos se pueden lijar piezas curvas", null));
 			machineTypeRepository.save(list);
 		}
 	}
 
 
 	private void generateProcessType() {
-		// TODO: agregar las 3 etapas - (Corte) (Armado) (Terminacion)
 		if (processTypeRepository.count() == 0) {
 			generateMachineType();
 			List<ProcessType> list = new ArrayList<>();
-			list.add(new ProcessType(1, "Trazado de Madera", null));
-			list.add(new ProcessType(2, "Garlopeado", machineTypeRepository.findFirstByName("Garlopa")));
-			list.add(new ProcessType(3, "Cepillado", machineTypeRepository.findFirstByName("Cepilladora")));
-			list.add(new ProcessType(4, "Cortado de Ancho", machineTypeRepository.findFirstByName("Escuadradora")));
-			list.add(new ProcessType(5, "Cortado de Largo", machineTypeRepository.findFirstByName("Escuadradora")));
-			list.add(new ProcessType(6, "Cortado Curvo", machineTypeRepository.findFirstByName("Sierra Sin Fin")));
-			list.add(new ProcessType(7, "Escoplado", machineTypeRepository.findFirstByName("Escopladora")));
-			list.add(new ProcessType(8, "Espigado", machineTypeRepository.findFirstByName("Tupi")));
-			list.add(new ProcessType(9, "Hacer Molduras", machineTypeRepository.findFirstByName("Tupi")));
-			list.add(new ProcessType(10, "Hacer Canal", machineTypeRepository.findFirstByName("Tupi")));
-			list.add(new ProcessType(11, "Replanado", null));
-			list.add(new ProcessType(12, "Masillado", null));
-			list.add(new ProcessType(13, "Clavado", null));
-			list.add(new ProcessType(14, "Lijado", machineTypeRepository.findFirstByName("Lijadora")));
-			list.add(new ProcessType(15, "Armado", null));
-
+			list.add(new ProcessType(1, "Trazado de Madera", "Trazar maderas para el posterior cortado.", null));
+			list.add(new ProcessType(2, "Cortado de Madera", "Cortar maderas en las medidas trazadas.", machineTypeRepository.findFirstByName("Escuadradora")));
+			list.add(new ProcessType(3, "Cortado Curvo", machineTypeRepository.findFirstByName("Sierra sin fin")));
+			list.add(new ProcessType(4, "Cepillado", machineTypeRepository.findFirstByName("Cepilladora")));
+			list.add(new ProcessType(5, "Escoplado", machineTypeRepository.findFirstByName("Escopleadora")));
+			list.add(new ProcessType(6, "Espigado", machineTypeRepository.findFirstByName("Tupi")));
+			list.add(new ProcessType(7, "Hacer Molduras", machineTypeRepository.findFirstByName("Tupi")));
+			list.add(new ProcessType(8, "Acanalado", machineTypeRepository.findFirstByName("Tupi")));
+			list.add(new ProcessType(9, "Lijado", machineTypeRepository.findFirstByName("Lijadora de banda")));
+			list.add(new ProcessType(10, "Ensamblado", "Unir diferentes piezas con tornillos, engrapado, pegamento, clavos, etc.", null));
 			processTypeRepository.save(list);
+
 		}
 	}
 
@@ -272,9 +263,8 @@ public class RepositoryHelper {
 			list.add(new ProductCategory("Cama"));
 			list.add(new ProductCategory("Marco"));
 			list.add(new ProductCategory("Mesa"));
-			//			list.add(new ProductCategory("Respaldo"));se usa cama
+			list.add(new ProductCategory("Respaldo"));
 			list.add(new ProductCategory("Silla"));
-			//			list.add(new ProductCategory("Sillon"));se usa silla
 			productCategoryRepository.save(list);
 		}
 	}
@@ -305,31 +295,32 @@ public class RepositoryHelper {
 	private void generateSupplyType() {
 		if (supplyTypeRepository.count() == 0) {
 			List<SupplyType> list = new ArrayList<>();
-			list.add(new SupplyType("1", "INSUMO 1", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-			list.add(new SupplyType("2", "INSUMO 2", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-			list.add(new SupplyType("3", "INSUMO 3", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-			list.add(new SupplyType("4", "INSUMO 4", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-			list.add(new SupplyType("5", "INSUMO 5", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-			//			list.add(new SupplyType("15", "Tornillo Autoperforante Hexagonal Punta Mecha 14x4".toUpperCase(), "", "", "", "14x4", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-			//			list.add(new SupplyType("16", "Tornillo Fix Autoperforante 3x35".toUpperCase(), "", "", "", "3x35", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-			//			list.add(new SupplyType("26", "Arandela Plana Zincada 5/16".toUpperCase(), "", "", "", "5/16", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-			//			list.add(new SupplyType("27", "Arandela Plana Zincada 1/4".toUpperCase(), "", "", "", "1/4", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
-			//			list.add(new SupplyType("34", "Tuerca Zincada Alta 7/16".toUpperCase(), "", "", "", "7/16", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20")));
+			list.add(new SupplyType("1", "INSUMO 1", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("0")));
+			list.add(new SupplyType("2", "INSUMO 2", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("0")));
+			list.add(new SupplyType("3", "INSUMO 3", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("0")));
+			list.add(new SupplyType("4", "INSUMO 4", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("0")));
+			list.add(new SupplyType("5", "INSUMO 5", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("0")));
 			supplyTypeRepository.save(list);
 		}
 	}
+
+	/*
+	 * width=Largo
+	 * depth=Profundidad/Ancho
+	 * length=Alto/Espesor
+	 * Wood(name, length, lengthMeasureUnit, depth, depthMeasureUnit, width, widthMeasureUnit, woodType, stock, stockMin, stockRepo, price)
+	 */
 
 	private void generateWood() {
 		if (woodRepository.count() == 0) {
 			List<Wood> list = new ArrayList<>();
 			generateWoodType();
 			WoodType woodType = woodTypeRepository.findFirstByName("Pino");
-
 			generateMeasureUnitTypeList();
 			//  las tablas vienen en distintos largos, 2,40mts, 3,00mts, 3,60mts y 4,20mts. el ancho x espesor que usan (en pulgadas) 1x3, 1x4, 1x5, 1x6, 1x8, 1,5x6, 2x4, 2x6, 3x3, 3x6, 4x4
 			MeasureUnit pulgadas = measureUnitRepository.findFirstByName("Pulgadas");
 			MeasureUnit metros = measureUnitRepository.findFirstByName("Metros");
-			List<List<String>> definitions = Arrays.asList(
+			List<List<String>> listLengthAndDepth = Arrays.asList(
 					Arrays.asList("1", "3"),
 					Arrays.asList("1", "4"),
 					Arrays.asList("1", "5"),
@@ -342,17 +333,47 @@ public class RepositoryHelper {
 					Arrays.asList("3", "6"),
 					Arrays.asList("4", "4")
 					);
-
-			for (List<String> definition : definitions) {
-				String espesor = definition.get(0);
-				String ancho = definition.get(1);
-				list.add(new Wood("Tabla " + espesor + "x" + ancho + " x 2.40mts", new BigDecimal("2.40"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas, woodType, new BigDecimal("50"), new BigDecimal("10"), new BigDecimal("20")));
-				list.add(new Wood("Tabla " + espesor + "x" + ancho + " x 3.00mts", new BigDecimal("3.00"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas, woodType, new BigDecimal("50"), new BigDecimal("10"), new BigDecimal("20")));
-				list.add(new Wood("Tabla " + espesor + "x" + ancho + " x 3.60mts", new BigDecimal("3.60"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas, woodType, new BigDecimal("50"), new BigDecimal("10"), new BigDecimal("20")));
-				list.add(new Wood("Tabla " + espesor + "x" + ancho + " x 4.20mts", new BigDecimal("4.20"), metros, new BigDecimal(espesor), pulgadas, new BigDecimal(ancho), pulgadas, woodType, new BigDecimal("50"), new BigDecimal("10"), new BigDecimal("20")));
+			List<String> listWidth = Arrays.asList("2.40", "3.00", "3.60", "4.20");
+			for (List<String> each : listLengthAndDepth) {
+				String length = each.get(0);
+				String depth = each.get(1);
+				for (String width : listWidth) {
+					BigDecimal price = getWoodPrice(new BigDecimal(length), pulgadas, new BigDecimal(depth), pulgadas, new BigDecimal(width), metros, woodType);
+					list.add(new Wood("Tabla " + length + "x" + depth + " x " + width + "mts", new BigDecimal(length), pulgadas, new BigDecimal(depth), pulgadas, new BigDecimal(width), metros, woodType, new BigDecimal("50"), new BigDecimal("10"), new BigDecimal("20"), price));
+				}
 			}
 			woodRepository.save(list);
 		}
+	}
+
+	private BigDecimal getWoodPrice(BigDecimal length, MeasureUnit lengthMeasureUnit, BigDecimal depth, MeasureUnit depthMeasureUnit, BigDecimal width, MeasureUnit widthMeasureUnit, WoodType woodType) {
+		// calcula los metros cubicos y el valor
+		BigDecimal lengthMeters = convertToMeters(length, lengthMeasureUnit);
+		BigDecimal depthMeters = convertToMeters(depth, depthMeasureUnit);
+		BigDecimal widthMeters = convertToMeters(width, widthMeasureUnit);
+		BigDecimal cubicMeters = lengthMeters.multiply(depthMeters).multiply(widthMeters);
+		String price = "0";
+		if(woodType.getName().equalsIgnoreCase("Pino")) {
+			price = "8350";
+		}
+		BigDecimal cubicMeterPrice = new BigDecimal(price);
+		return cubicMeters.multiply(cubicMeterPrice);
+	}
+
+	private BigDecimal convertToMeters(BigDecimal measure, MeasureUnit measureUnit) {
+		//devuelve el measure convertido a metros
+		if(measureUnit.getName().equalsIgnoreCase("Pulgadas")) {
+			//pulgadas a centimetros
+			BigDecimal cm = measure.multiply(new BigDecimal("2.54"));
+			//centimetros a metros
+			return cm.divide(new BigDecimal("100"));
+		} else if (measureUnit.getName().equalsIgnoreCase("Centimetros")) {
+			return measure.divide(new BigDecimal("100"));
+		} else if (measureUnit.getName().equalsIgnoreCase("Milimetros")) {
+			return measure.divide(new BigDecimal("1000"));
+		}
+		// si ya esta en metros, se devuelve sin modificar
+		return measure;
 	}
 
 	private void generateMachine() {
@@ -378,69 +399,31 @@ public class RepositoryHelper {
 		if (productRepository.count() == 0) {
 			generateProductCategory();
 			List<Product> list = new ArrayList<>();
-			list.add(new Product("1", "Mesa patas 4x4 rectas de 1.20x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("840")));
-			//			list.add(new Product("2", "Mesa patas 4x4 rectas de 1.40x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("956")));
-			//			list.add(new Product("3", "Mesa patas 4x4 rectas de 1.60x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1045")));
-			//			list.add(new Product("4", "Mesa patas 4x4 rectas de 1.80x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1150")));
-			list.add(new Product("5", "Mesa patas 4x4 rectas de 2.00x0.90mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1360")));
-			//			list.add(new Product("6", "Mesa patas Reina Ana de 1.20x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("956")));
-			//			list.add(new Product("7", "Mesa patas Reina Ana de 1.40x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1045")));
-			//			list.add(new Product("8", "Mesa patas Reina Ana de 1.60x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1150")));
-			//			list.add(new Product("9", "Mesa patas Reina Ana de 1.80x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1255")));
-			//			list.add(new Product("10", "Mesa patas Reina Ana de 2.00x0.90mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1449")));
-			list.add(new Product("11", "Mesa patas 3x3 tapa de 1\" de 1.20x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("609")));
-			//			list.add(new Product("12", "Mesa patas 3x3 tapa de 1\" de 1.40x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("693")));
-			//			list.add(new Product("13", "Mesa patas 3x3 tapa de 1\" de 1.60x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("756")));
-			//			list.add(new Product("14", "Mesa patas 3x3 tapa de 1\" de 1.80x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("872")));
-			list.add(new Product("15", "Mesa redonda pata central de 1.00mts de di\u00e1metro".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("872")));
-			//			list.add(new Product("16", "Mesa redonda pata central de 1.20mts de di\u00e1metro".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1061")));
-			//			list.add(new Product("17", "Mesa redonda pata central de 1.40mts de di\u00e1metro".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1239")));
-			//			list.add(new Product("18", "Mesa redonda patas Reina Ana de 1.00mts de di\u00e1metro".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1019")));
-			//			list.add(new Product("19", "Mesa redonda patas Reina Ana de 1.20mts de di\u00e1metro".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1208")));
-			//			list.add(new Product("20", "Mesa redonda patas Reina Ana de 1.40mts de di\u00e1metro".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1371")));
-			list.add(new Product("21", "Mesa de living patas 3x3 rectas de 0.60x0.45mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("378")));
-			//			list.add(new Product("22", "Mesa de living patas 4x4 rectas de 0.90x0.60mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("588")));
-			//			list.add(new Product("23", "Mesa de living patas 4x4 rectas de 1.00x0.70mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("678")));
-			//			list.add(new Product("24", "Mesa de living patas 4x4 rectas de 1.20x0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("798")));
-			//			list.add(new Product("25", "Mesa de living Reina Ana 0.90x0.60 tapa de 1\" con regrueso".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("390")));
-			//			list.add(new Product("26", "Dressoir patas rectas de 0.90x0.45mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("483")));
-			//			list.add(new Product("27", "Dressoir patas Reina Ana de 0.90x0.45mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("567")));
-			//			list.add(new Product("28", "Banqueta alta sin respaldo de 0.30mts de di\u00e1metro".toUpperCase(), "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("177")));
-			list.add(new Product("29", "Banqueta alta  con respaldo de 0.30mts de di\u00e1metro".toUpperCase(), "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("226")));
-			//			list.add(new Product("30", "Banqueta alta con respaldo omega".toUpperCase(), "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("294")));
-			//			list.add(new Product("31", "Silla de campo resp. c/ tablero o varillas".toUpperCase(), "", productCategoryRepository.findFirstByName("Silla"), new BigDecimal("252")));
-			list.add(new Product("32", "Silla Omega respaldo inclinado patas rectas".toUpperCase(), "", productCategoryRepository.findFirstByName("Silla"), new BigDecimal("231")));
-			//			list.add(new Product("33", "Cama Omega de 0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("399")));
-			list.add(new Product("34", "Cama Omega de 1.40mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("704")));
-			//			list.add(new Product("35", "Cama Mexicana X patas 2x4 de 0.80mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("667")));
-			list.add(new Product("36", "Cama Mexicana X patas 2x4 de 1.40mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("1045")));
-			//			list.add(new Product("37", "Cama Monterrey c/curva patas 4x4 de 080cm".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("1050")));
-			//			list.add(new Product("38", "Cama Monterrey resp. c/ X o Curva patas 4x4 de 1.40mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("1292")));
-			list.add(new Product("39", "Respaldo para Somier Mexicano X patas 2x4 de 1.50mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("798")));
-			//			list.add(new Product("40", "Respaldo para Somier Monterrey X o Curvo de 1.50mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("1029")));
-			//			list.add(new Product("41", "Respaldos Mexicanos X para Marineras".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("578")));
-			//			list.add(new Product("42", "Cucheta Mexicana X fija y desmontable".toUpperCase(), "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("1271")));
-			//			list.add(new Product("43", "Marco de espejo".toUpperCase(), "", productCategoryRepository.findFirstByName("Marco"), new BigDecimal("189")));
-			//			list.add(new Product("44", "Sillon Hamaca grande".toUpperCase(), "", productCategoryRepository.findFirstByName("Silla"), new BigDecimal("504")));
-			//			list.add(new Product("45", "Dresoir de 3 cajones con estante".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("536")));
-			list.add(new Product("46", "Dresoir de 2 cajones con estante".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("431")));
-			list.add(new Product("47", "Mesa de l\u00e1mpara con 1 cajon".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("284")));
-			//			list.add(new Product("48", "Mesa de l\u00e1mpara con 2 cajones", "".toUpperCase(), productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("347")));
-			//			list.add(new Product("49", "Mesa de bar de 70x70 pata 3x3 tapa de 1\"".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("473")));
-			//			list.add(new Product("50", "Mesa de bar de 80x80 pata  3x3 tapa de 1\"".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("525")));
-			list.add(new Product("51", "Chiffonier de 1,45x0,70x0,40 mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cajonera"), new BigDecimal("1245")));
-			list.add(new Product("52", "C\u00f3moda de 1,00x0,90x0,40 mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Cajonera"), new BigDecimal("1197")));
-			list.add(new Product("53", "Mesa de luz de 0,70x0,50x0,40 mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("473")));
-			list.add(new Product("54", "Biblioteca de 0,30 mts con estantes".toUpperCase(), "", productCategoryRepository.findFirstByName("Biblioteca"), new BigDecimal("546")));
-			//			list.add(new Product("55", "Biblioteca de 0,30 mts con 4 cajones y estantes".toUpperCase(), "", productCategoryRepository.findFirstByName("Biblioteca"), new BigDecimal("756")));
-			//			list.add(new Product("56", "Biblioteca de 0,60 mts con estantes".toUpperCase(), "", productCategoryRepository.findFirstByName("Biblioteca"), new BigDecimal("756")));
-			//			list.add(new Product("57", "Biblioteca de 0,60 mts con 4 cajones y estantes".toUpperCase(), "", productCategoryRepository.findFirstByName("Biblioteca"), new BigDecimal("1024")));
-			//			list.add(new Product("58", "Sillon Romano de un cuerpo".toUpperCase(), "", productCategoryRepository.findFirstByName("Silla"), new BigDecimal("321")));
-			//			list.add(new Product("59", "Sillon Romano de dos cuerpos".toUpperCase(), "", productCategoryRepository.findFirstByName("Silla"), new BigDecimal("483")));
-			//			list.add(new Product("60", "Banquito recto o redondo chico".toUpperCase(), "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("153")));
-			list.add(new Product("61", "Sillon punta de cama Reina Ana 1,00 mts".toUpperCase(), "", productCategoryRepository.findFirstByName("Silla"), new BigDecimal("380")));
-
+			list.add(new Product("2", "Mesa patas 4x4 rectas de 1.40x0.80mts", "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("956")));
+			list.add(new Product("23", "Mesa de living patas 4x4 rectas de 1.00x0.70mts", "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("678")));
+			list.add(new Product("28", "Taburete bajo estilo r\u00fastico", "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("177")));
+			list.add(new Product("32", "Silla omega respaldo inclinado patas rectas", "", productCategoryRepository.findFirstByName("Silla"), new BigDecimal("231")));
+			list.add(new Product("34", "Cama omega de 1.40mts", "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("704")));
+			list.add(new Product("36", "Cama sill\u00f3n", "", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("1045")));
+			list.add(new Product("53", "Mesa de luz de 0,70x0,50x0,40 mts", "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("473")));
+			list.add(new Product("54", "Biblioteca de 0,30 mts con estantes", "", productCategoryRepository.findFirstByName("Biblioteca"), new BigDecimal("546")));
+			list.add(new Product("60", "Banco cuadrado chico", "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("153")));
 			productRepository.save(list);
 		}
 	}
 }
+
+/* 
+\u00e1 -> á
+\u00e9 -> é
+\u00ed -> í
+\u00f3 -> ó
+\u00fa -> ú
+\u00c1 -> Á
+\u00c9 -> É
+\u00cd -> Í
+\u00d3 -> Ó
+\u00da -> Ú
+\u00f1 -> ñ
+\u00d1 -> Ñ
+ */

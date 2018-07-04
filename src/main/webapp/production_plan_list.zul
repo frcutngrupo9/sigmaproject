@@ -35,7 +35,7 @@ THE SOFTWARE.
 		        </hbox>
 		    </hlayout>
 		    <separator/>
-		    <grid id="productionPlanGrid" mold="paging" pageSize="7" sizedByContent="true" span="true">
+		    <grid id="productionPlanGrid" mold="paging" pageSize="7" sizedByContent="true" span="true" emptyMessage="${labels.empty_text}.">
 		    	<auxhead>
 					<auxheader label="${labels.production_plan_plural}" colspan="10"/>
 				</auxhead>

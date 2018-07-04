@@ -24,7 +24,7 @@ THE SOFTWARE.
 
 <panel border="none">
     <panelchildren>
-        <grid id="stockMovementGrid" sizedByContent="true" span="true">
+        <grid id="stockMovementGrid" sizedByContent="true" span="true" emptyMessage="${labels.empty_text}.">
             <auxhead>
                 <auxheader label="${labels.stock_movement_supplies}" colspan="3"/>
             </auxhead>
