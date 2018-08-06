@@ -558,4 +558,25 @@ public class ProductionOrder implements Serializable, Cloneable {
 		}
 		return materialsPrice;
 	}
+	
+	public BigDecimal getCostMaterials() {
+		//devuelve el valor de todos las materias primas e insumos
+		BigDecimal materialsPrice = BigDecimal.ZERO;
+		for(ProductionOrderMaterial each : productionOrderMaterials) {
+			materialsPrice = materialsPrice.add(each.getItem().getPrice());
+		}
+		return materialsPrice;
+	}
+	
+	public BigDecimal getCostWork() {
+		BigDecimal cost = BigDecimal.ZERO;
+		for(ProductionOrderDetail each : details) {
+			cost = cost.add(each.getCost());
+		}
+		return cost;
+	}
+	
+	public BigDecimal getCostTotal() {
+		return getCostMaterials().add(getCostWork());
+	}
 }

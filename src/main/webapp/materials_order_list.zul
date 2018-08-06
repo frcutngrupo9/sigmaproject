@@ -51,7 +51,7 @@ THE SOFTWARE.
 		        </columns>
 		        <template name="model">
 		            <row>
-		            	<custom-attributes text_no="${labels.no}" text_si="${labels.yes}"/>
+		            	<custom-attributes text_no="${labels.no}" text_yes="${labels.yes}"/>
 		                <label value="${each.number}"/>
 		                <cell>
 		                	<label value="${each.productionPlan.name}" if="${!empty each.productionPlan}"/>
@@ -60,7 +60,7 @@ THE SOFTWARE.
 		                <label value="${r:getFormattedDateTime(each.date)}"/>
 		                <label value="${r:getFormattedDate(each.dateReception)}"/>
 		                <cell>
-		                	<label value="${each.isTotallyReceived() ? text_si : text_no}" if="${!empty each.dateReception}"/>
+		                	<label value="${each.isTotallyReceived() ? text_yes : text_no}" if="${!empty each.dateReception}"/>
                 			<label value="${labels.no_received}" if="${empty each.dateReception}"/>
 		                </cell>
 		                <label value="${each.details.size()}"/>

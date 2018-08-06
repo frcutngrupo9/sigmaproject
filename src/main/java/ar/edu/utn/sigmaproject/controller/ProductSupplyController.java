@@ -93,6 +93,7 @@ public class ProductSupplyController extends ProductMaterialController {
 	protected void refreshView() {
 		productMaterialListModel = new ListModelList<ProductMaterial>(productMaterialList);
 		productMaterialListbox.setModel(productMaterialListModel);
+		refreshTotalCostLabel();
 		if (currentProductMaterial == null) {
 			materialBandbox.setDisabled(false);
 			materialBandbox.setValue("");

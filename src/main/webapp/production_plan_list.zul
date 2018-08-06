@@ -37,7 +37,7 @@ THE SOFTWARE.
 		    <separator/>
 		    <grid id="productionPlanGrid" mold="paging" pageSize="7" sizedByContent="true" span="true" emptyMessage="${labels.empty_text}.">
 		    	<auxhead>
-					<auxheader label="${labels.production_plan_plural}" colspan="10"/>
+					<auxheader label="${labels.production_plan_plural}" colspan="11"/>
 				</auxhead>
 		        <columns>
 		            <column label="${labels.name}" align="center"/>
@@ -46,6 +46,7 @@ THE SOFTWARE.
 		            <column label="${labels.quantity_product}" align="center"/>
 		            <column label="${labels.image}" align="center"/>
 		            <column label="${labels.state}" align="center"/>
+		            <column label="${labels.cost}" align="center"/>
 		            <column label="${labels.edit}" align="center"/>
 		            <column label="${labels.list}" align="center"/>
 		            <column label="${labels.open}" align="center"/>
@@ -67,6 +68,7 @@ THE SOFTWARE.
 		            		</hbox>
 		                </cell>
 		                <label value="${each.getCurrentStateType().getName()}"/>
+		                <label value="${each.getCostTotal().doubleValue()} $"/>
 		                <button forward="onClick=productionPlanGrid.onEditProductionPlan(${each})"  image="/img/edit16x16.png"/>
 		                <button forward="onClick=productionPlanGrid.onGenerateProductionOrder(${each})" label="${labels.production_order_plural}" />
 		                <button forward="onClick=productionPlanGrid.onOpenRequirementPlan(${each})" label="${labels.materials_requirement}" />

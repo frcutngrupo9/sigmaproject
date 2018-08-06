@@ -37,12 +37,14 @@ THE SOFTWARE.
                                     <listheader label="${labels.description}" align="center"/>
                                     <listheader label="${labels.detail_plural}" align="center"/>
                                     <listheader label="${labels.measure}" align="center"/>
+                                    <listheader label="${labels.cost}" align="center"/>
                                 </listhead>
                                 <template name="model">
                                     <listitem>
                                         <listcell label="${each.description}"/>
                                         <listcell label="${each.details}"/>
                                         <listcell label="${each.measure}"/>
+                                        <listcell label="${each.price.doubleValue()} $"/>
                                     </listitem>
                                 </template>
                             </listbox>
@@ -58,7 +60,7 @@ THE SOFTWARE.
                 <separator/>
                 <listbox id="productMaterialListbox" mold="paging" pageSize="7" sizedByContent="true" span="true">
                     <auxhead>
-                        <auxheader label="${labels.supply_plural}" colspan="6"/>
+                        <auxheader label="${labels.supply_plural}" colspan="7"/>
                     </auxhead>
                     <listhead>
 			            <listheader label="${labels.description}" align="center"/>
@@ -67,6 +69,7 @@ THE SOFTWARE.
 			            <listheader label="${labels.presentation}" align="center"/>
 			            <listheader label="${labels.measure}" align="center"/>
 			            <listheader label="${labels.quantity}" align="center"/>
+			            <listheader label="${labels.cost}" align="center"/>
                     </listhead>
                     <template name="model">
                         <listitem>
@@ -75,9 +78,19 @@ THE SOFTWARE.
 			                <listcell label="${each.getItem().brand}"/>
 			                <listcell label="${each.getItem().presentation}"/>
 			                <listcell label="${each.getItem().measure}"/>
-			                <listcell label="${each.quantity}"/>
+			                <listcell label="${each.quantity.doubleValue()}"/>
+			                <listcell label="${each.getItem().price.multiply(each.quantity).doubleValue()} $"/>
                         </listitem>
                     </template>
+                    <listfoot>
+			            <listfooter></listfooter>
+			            <listfooter></listfooter>
+			            <listfooter></listfooter>
+			            <listfooter></listfooter>
+			            <listfooter></listfooter>
+			            <listfooter></listfooter>
+			            <listfooter><label value="${labels.total_cost}: "/><label id="totalCostLabel"/><label value=" $"/></listfooter>
+			        </listfoot>
                 </listbox>
                 <hlayout>
                     <button id="acceptProductMaterialButton" label="${labels.accept}"/>

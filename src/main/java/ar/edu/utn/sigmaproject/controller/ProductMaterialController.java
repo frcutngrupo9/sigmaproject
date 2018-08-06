@@ -38,6 +38,7 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Doublebox;
+import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
@@ -72,6 +73,8 @@ public abstract class ProductMaterialController extends SelectorComposer<Compone
 	Button deleteMaterialButton;
 	@Wire
 	Button cancelMaterialButton;
+	@Wire
+	Label totalCostLabel;
 
 	// attributes
 	protected Item currentMaterial;
@@ -171,5 +174,20 @@ public abstract class ProductMaterialController extends SelectorComposer<Compone
 		Textbox target = (Bandbox)event.getTarget();
 		target.setText(event.getValue());
 		filterItems();
+	}
+
+	protected void refreshTotalCostLabel() {
+		BigDecimal totalCost = getTotalCost();
+		totalCostLabel.setValue(totalCost.doubleValue() + "");
+	}
+
+	private BigDecimal getTotalCost() {
+		BigDecimal totalCost = new BigDecimal("0");
+		for(ProductMaterial each : productMaterialList) {
+			if(each.getItem().getPrice() != null) {
+				totalCost = totalCost.add(each.getItem().getPrice().multiply(each.getQuantity()));
+			}
+		}
+		return totalCost;
 	}
 }

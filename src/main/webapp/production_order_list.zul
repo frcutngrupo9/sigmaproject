@@ -61,7 +61,7 @@ THE SOFTWARE.
 				</hbox>
     			<grid id="productionOrderGrid" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="${labels.products_to_be_manufactured_list}" colspan="14"/>
+						<auxheader label="${labels.products_to_be_manufactured_list}" colspan="17"/>
 					</auxhead>
         			<columns>
         				<!-- <column width="40px" align="center"/> -->
@@ -80,6 +80,9 @@ THE SOFTWARE.
 		                <column label="${labels.unit_duration}" align="center"/>
 		                <column label="${labels.date_start_actual}" align="center"/>
 		                <column label="${labels.date_finish_actual}" align="center"/>
+		                <column label="${labels.cost_materials}" align="center"/>
+			            <column label="${labels.cost_work}" align="center"/>
+			            <column label="${labels.total_cost}" align="center"/>
 		            </columns>
 		            <template name="model">
 		                <row>
@@ -109,6 +112,9 @@ THE SOFTWARE.
 		                    <label value="${r:getFormattedTime(each.product.getDurationTotal())}"/>
 		                    <label value="${each.dateStartReal}"/>
 		                    <label value="${each.dateFinishReal}"/>
+		                    <label value="${each.getCostMaterials().doubleValue()} $"/>
+			                <label value="${each.getCostWork().doubleValue()} $"/>
+			                <label value="${each.getCostTotal().doubleValue()} $"/>
 						</row>
 		            </template>
     			</grid>

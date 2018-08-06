@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.zkoss.image.AImage;
 import org.zkoss.lang.Strings;
+import org.zkoss.zk.ui.AbstractComponent;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
@@ -54,6 +55,7 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
+import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Caption;
 import org.zkoss.zul.Checkbox;
@@ -64,6 +66,7 @@ import org.zkoss.zul.Grid;
 import org.zkoss.zul.Image;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Intbox;
+import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
@@ -85,12 +88,14 @@ import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductCategory;
 import ar.edu.utn.sigmaproject.domain.ProductMaterial;
+import ar.edu.utn.sigmaproject.domain.WorkHour;
 import ar.edu.utn.sigmaproject.service.MeasureUnitRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitTypeRepository;
 import ar.edu.utn.sigmaproject.service.OrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductCategoryRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
+import ar.edu.utn.sigmaproject.service.WorkHourRepository;
 import ar.edu.utn.sigmaproject.util.RenderElHelper;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -175,6 +180,8 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	Tab pieceTab;
 	@Wire
 	Tab processTab;
+	@Wire
+	Label totalCostLabel;
 
 	// services
 	@WireVariable
@@ -189,6 +196,8 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	private ProductCategoryRepository productCategoryRepository;
 	@WireVariable
 	private OrderDetailRepository orderDetailRepository;
+	@WireVariable
+	private WorkHourRepository workHourRepository;
 
 	// attributes
 	private Product currentProduct;
@@ -197,6 +206,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	private Piece clonedPiece;
 	@SuppressWarnings("rawtypes")
 	private EventQueue eq;
+	private WorkHour workHourDefault;
 
 	// list
 	private List<Piece> pieceList;
@@ -213,13 +223,19 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	private ListModelList<MeasureUnit> depthMeasureUnitListModel;
 	private ListModelList<MeasureUnit> widthMeasureUnitListModel;
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		processTypeList = processTypeRepository.findAll();
 		processTypeListModel = new ListModelList<>(processTypeList);
 		processListbox.setModel(processTypeListModel);
+		workHourDefault = workHourRepository.findFirstByRole("Operario");
+		if(workHourDefault == null) {
+			List<WorkHour> workHourList = workHourRepository.findAll();
+			if(workHourList.isEmpty() == false) {
+				workHourDefault = workHourList.get(0);// si no esta vacio se asigna el primer elemento de la lista
+			}
+		}
 		MeasureUnitType measureUnitType = measureUnitTypeRepository.findFirstByName("Longitud");
 		List<MeasureUnit> measureUnitList = measureUnitType.getList();
 		lengthMeasureUnitListModel = new ListModelList<>(measureUnitList);
@@ -230,6 +246,18 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		widthMeasureUnitSelectbox.setModel(widthMeasureUnitListModel);
 		currentProduct = (Product) Executions.getCurrent().getAttribute("selected_product");
 		currentPiece = null;
+		createListeners();
+		productCategoryListModel = new ListModelList<>(productCategoryRepository.findAll());
+		productCategoryCombobox.setModel(productCategoryListModel);
+		pieceChanged = false;
+	}
+
+	public ListModelList<WorkHour> getWorkHourListModel() {
+		return new ListModelList<WorkHour>(workHourRepository.findAll());
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void createListeners() {
 		// listener para cuando se modifique el producto al agregar materias primas o insumos
 		eq = EventQueues.lookup("Product Change Queue", EventQueues.DESKTOP, true);
 		eq.subscribe(new EventListener() {
@@ -249,14 +277,19 @@ public class ProductCreationController extends SelectorComposer<Component> {
 				fillPieceCopy(value);
 			}
 		});
-		productCategoryListModel = new ListModelList<>(productCategoryRepository.findAll());
-		productCategoryCombobox.setModel(productCategoryListModel);
-		pieceChanged = false;
 	}
 
 	@Listen("onAfterRender = #productCategoryCombobox")
 	public void productCategoryComboboxSelection() {// se hace refresh despues de q se renderizo el combobox para que se le pueda setear un valor seleccionado
 		refreshViewProduct();
+		refreshViewPiece();
+	}
+	
+	@Listen("onClick = #newProductButton")
+	public void newProductButtonClick() {
+		currentProduct = null;
+		refreshViewProduct();
+		currentPiece = null;
 		refreshViewPiece();
 	}
 
@@ -284,7 +317,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		String productName = productNameTextbox.getText();//.toUpperCase();
 		String productDetails = productDetailsTextbox.getText();
 		String productCode = productCodeTextbox.getText();
-		BigDecimal productPrice = new BigDecimal(productPriceDoublebox.doubleValue());
+		BigDecimal productPrice = new BigDecimal(productPriceDoublebox.doubleValue());int nro = 5;BigDecimal.valueOf(nro);
 		org.zkoss.image.Image image = productImage.getContent();
 		List<ProductMaterial> productMaterialList = new ArrayList<ProductMaterial>();
 		productMaterialList.addAll(supplyList);
@@ -367,11 +400,12 @@ public class ProductCreationController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #savePieceButton")
 	public void savePieceButtonClick() {
-		savePiece();
-		// actualizamos el view
-		currentPiece = null;
-		refreshViewPiece();
-		pieceChanged = false;
+		if(savePiece()) {
+			// actualizamos el view
+			currentPiece = null;
+			refreshViewPiece();
+			pieceChanged = false;
+		}
 	}
 
 	private boolean savePiece() {
@@ -524,6 +558,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		pieceTab.setSelected(true);
 		pieceListModel = new ListModelList<>(pieceList);
 		pieceListbox.setModel(pieceListModel);
+		refreshTotalCostLabel();
 		if (currentPiece == null) {// nueva pieza
 			pieceCreationBlock.setVisible(false);
 			deletePieceButton.setDisabled(true);
@@ -630,6 +665,23 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		}
 	}
 
+	public String getProcessWorkHour(ProcessType processType) {
+		Process aux = getProcessFromListbox(processType);
+		String role = "No existen Roles";
+		if(workHourDefault != null) {
+			role = workHourDefault.getRole();
+		}
+		if(aux == null) {
+			return role;
+		} else {
+			if(aux.getWorkHour() == null) {
+				return role;
+			} else {
+				return aux.getWorkHour().getRole();
+			}
+		}
+	}
+
 	public boolean isProcessCheck(ProcessType processType) {
 		Process aux = getProcessFromListbox(processType);
 		if(aux == null) {
@@ -641,9 +693,8 @@ public class ProductCreationController extends SelectorComposer<Component> {
 
 	private Process getProcessFromListbox(ProcessType processType) {
 		if(listboxProcessList != null) {
-			ProcessType processTypeAux = processTypeRepository.findOne(processType.getId());
 			for(Process process : listboxProcessList) {
-				if(processTypeRepository.findOne(process.getType().getId()).equals(processTypeAux)) {
+				if(process.getType().getId().equals(processType.getId())) {
 					return process;
 				}
 			}
@@ -658,8 +709,9 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		}
 	}
 
-	private void addProcessToListbox(ProcessType processType) {
+	private Process addProcessToListbox(ProcessType processType) {
 		Process aux = getProcessFromListbox(processType);
+		Process process = null;
 		if(aux != null) {
 			System.out.println("deberia estar en null: " + aux.getType().getId());// porque se esta agregando
 		} else {
@@ -669,8 +721,10 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			} catch (DatatypeConfigurationException e) {
 				System.out.println("Error en convertir a duracion: " + e.toString());
 			}
-			listboxProcessList.add(new Process(currentPiece, processType, "", duration));
+			process = new Process(currentPiece, processType, "", duration, workHourDefault);
+			listboxProcessList.add(process);
 		}
+		return process;
 	}
 
 	//when user checks on the checkbox of each process on the list
@@ -679,27 +733,45 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		pieceChanged = true;
 		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
 		Checkbox cbox = (Checkbox)evt.getOrigin().getTarget();
+		Process process = null;
 		if(cbox.isChecked()) {
-			addProcessToListbox(data);
+			process = addProcessToListbox(data);
 		} else {
 			deleteProcessFromListbox(data);
 		}
 		Listcell listcell = (Listcell)cbox.getParent();
 		Listitem listitem = (Listitem)listcell.getParent();
-		doProcessLineVisible(cbox.isChecked(), listitem);
+		doProcessLineVisible(cbox.isChecked(), listitem, process);
 	}
 
-	private void doProcessLineVisible(boolean visible, Listitem listitem) {
+	private void doProcessLineVisible(boolean visible, Listitem listitem, Process process) {
 		// se hacen visibles o invisibles todos los elementos de la fila
-		Listcell listcell = (Listcell)listitem.getChildren().get(listitem.getChildren().size()-3);
-		Textbox textboxProcessDetails = (Textbox)listcell.getChildren().get(0);// el unico children debe ser el elemento
-		listcell = (Listcell)listitem.getChildren().get(listitem.getChildren().size()-2);
-		Spinner spinnerProcessHours = (Spinner)listcell.getChildren().get(0);
-		listcell = (Listcell)listitem.getChildren().get(listitem.getChildren().size()-1);
-		Spinner spinnerProcessMinutes = (Spinner)listcell.getChildren().get(0);
-		textboxProcessDetails.setVisible(visible);
-		spinnerProcessHours.setVisible(visible);
-		spinnerProcessMinutes.setVisible(visible);
+		for(int i = 2; i < listitem.getChildren().size(); i++) {//inicia en 2 para no afectar al checkbox y al nombre del proceso
+			Listcell listcell = (Listcell) listitem.getChildren().get(i);
+			AbstractComponent abstractComponent = (AbstractComponent) listcell.getChildren().get(0);// el unico children debe ser el elemento
+			abstractComponent.setVisible(visible);
+			// se limpian los valores si se hace visible
+			if(visible == true) {
+				updateProcessValues(abstractComponent);
+			}
+		}
+	}
+
+	private void updateProcessValues(AbstractComponent abstractComponent) {
+		System.out.println("------------ instanceof " + abstractComponent.getClass().getCanonicalName());
+		if(abstractComponent instanceof Bandbox) {
+			Bandbox bandboxProcessWorkHour = (Bandbox) abstractComponent;
+			bandboxProcessWorkHour.setValue(workHourDefault.getRole());
+			return;
+		} else if(abstractComponent instanceof Textbox) { 
+			Textbox textboxProcessDetails = (Textbox) abstractComponent;
+			textboxProcessDetails.setValue("");
+			return;
+		} else if(abstractComponent instanceof Spinner) {
+			Spinner spinnerProcessHours = (Spinner) abstractComponent;
+			spinnerProcessHours.setValue(0);
+			return;
+		}
 	}
 
 	@Listen("onProcessDetailsChange = #processListbox")
@@ -748,6 +820,20 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			}
 			process.setTime(duration);
 		}
+	}
+
+	@Listen("onProcessWorkHourChange = #processListbox")
+	public void doProcessWorkHourChange(ForwardEvent evt) {
+		pieceChanged = true;
+		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
+		Listbox element = (Listbox) evt.getOrigin().getTarget();// obtenemos el elemento web
+		WorkHour workHour = (WorkHour)element.getSelectedItem().getValue();
+		Process process = getProcessFromListbox(data);
+		process.setWorkHour(workHour);
+		// modificamos el componente web para que muestre la seleccion realizada
+		Bandbox bandbox = (Bandbox)element.getParent().getParent();
+		bandbox.setText(workHour.getRole());
+		bandbox.close();
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -925,7 +1011,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		List<Process> processListCopy = pieceCopy.getProcesses();
 		listboxProcessList = new ArrayList<Process>();
 		for(Process processCopy : processListCopy) {
-			listboxProcessList.add(new Process(null, processTypeRepository.findOne(processCopy.getType().getId()), processCopy.getDetails(), processCopy.getTime()));
+			listboxProcessList.add(new Process(null, processTypeRepository.findOne(processCopy.getType().getId()), processCopy.getDetails(), processCopy.getTime(), processCopy.getWorkHour()));
 		}
 		refreshViewProcess();
 	}
@@ -994,14 +1080,27 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	public void pieceDetaisOnChanging() {
 		pieceChanged = true;
 	}
-	
+
 	@Listen("onSelect = #lengthMeasureUnitSelectbox, #depthMeasureUnitSelectbox, #widthMeasureUnitSelectbox")
 	public void pieceDetaisOnSelect() {
 		pieceChanged = true;
 	}
-	
+
 	@Listen("onCheck = #pieceGroupCheckbox")
 	public void pieceDetaisOnCheck() {
 		pieceChanged = true;
+	}
+	
+	protected void refreshTotalCostLabel() {
+		BigDecimal totalCost = getTotalCost();
+		totalCostLabel.setValue(totalCost.doubleValue() + "");
+	}
+
+	private BigDecimal getTotalCost() {
+		BigDecimal totalCost = new BigDecimal("0");
+		for(Piece each : pieceList) {
+			totalCost = totalCost.add(each.getCost());
+		}
+		return totalCost;
 	}
 }

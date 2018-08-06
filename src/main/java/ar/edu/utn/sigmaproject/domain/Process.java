@@ -62,6 +62,9 @@ public class Process implements Serializable, Cloneable {
 	@Transient
 	private Duration time;
 
+	@ManyToOne
+	private WorkHour workHour = null;
+
 	@Column
 	private String timeInternal;
 
@@ -71,11 +74,12 @@ public class Process implements Serializable, Cloneable {
 
 	}
 
-	public Process(Piece piece, ProcessType processType, String details, Duration time) {
+	public Process(Piece piece, ProcessType processType, String details, Duration time, WorkHour workHour) {
 		this.piece = piece;
 		this.type = processType;
 		this.details = details;
 		this.setTime(time);
+		this.workHour = workHour;
 		isClone = false;
 	}
 
@@ -131,10 +135,21 @@ public class Process implements Serializable, Cloneable {
 			this.timeInternal = null;
 		}
 	}
-	
-	public Duration getDurationTotal() {
-		// devuelve la duracion de este proceso para todo el producto ( ej el proceso armado de cajon, para una cajonera de varios cajones, se multiplica la duracion del proceso por la cantidad de la pieza)
-		return getTime().multiply(new BigDecimal(getPiece().getUnits()));
+
+	public WorkHour getWorkHour() {
+		return workHour;
+	}
+
+	public void setWorkHour(WorkHour workHour) {
+		this.workHour = workHour;
+	}
+
+	public String getTimeInternal() {
+		return timeInternal;
+	}
+
+	public void setTimeInternal(String timeInternal) {
+		this.timeInternal = timeInternal;
 	}
 
 	public boolean isClone() {
@@ -143,5 +158,25 @@ public class Process implements Serializable, Cloneable {
 
 	public void setClone(boolean isClone) {
 		this.isClone = isClone;
+	}
+
+	public BigDecimal getCost() {
+		// calcula el costo de todos los procesos
+		BigDecimal cost = BigDecimal.ZERO;
+		//no se calcula si el rol es null
+		if(getWorkHour() != null) {
+			// el costo de cada proceso es el tiempo total en horas multiplicado por el costo por hora del rol
+			int hours = getTime().getHours();
+			int minutes = getTime().getMinutes();
+			while(minutes >= 60) {
+				minutes -= 60;
+				hours += 1;
+			}
+			// sumamos el decimal minutos a la hora
+			BigDecimal minutesToHour = (new BigDecimal(minutes)).divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_EVEN);
+			BigDecimal durationTotal = (new BigDecimal(hours)).add(minutesToHour);
+			cost = cost.add(durationTotal.multiply(getWorkHour().getPrice()));
+		}
+		return cost;
 	}
 }

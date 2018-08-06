@@ -84,7 +84,7 @@ public class Piece implements Serializable, Cloneable {
 
 	@OneToMany(orphanRemoval = false, cascade = CascadeType.PERSIST, mappedBy = "pieceParent", targetEntity = Piece.class)
 	private List<Piece> pieceGroupList = null;
-	
+
 	@Lob
 	private byte[] imageData = null;
 
@@ -254,6 +254,15 @@ public class Piece implements Serializable, Cloneable {
 
 	public void setImageData(byte[] imageData) {
 		this.imageData = imageData;
+	}
+
+	public BigDecimal getCost() {
+		// calcula el costo de todos los procesos
+		BigDecimal cost = BigDecimal.ZERO;
+		for(Process each : processes) {
+			cost = cost.add(each.getCost().multiply(new BigDecimal(units)));
+		}
+		return cost;
 	}
 
 	public boolean isClone() {

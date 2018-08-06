@@ -93,6 +93,7 @@ public class ProductRawMaterialController extends ProductMaterialController {
 	protected void refreshView() {
 		productMaterialListModel = new ListModelList<>(productMaterialList);
 		productMaterialListbox.setModel(productMaterialListModel);
+		refreshTotalCostLabel();
 		if (currentProductMaterial == null) {
 			// borramos el text de la materia prima
 			// deseleccionamos la tabla y borramos la cantidad
@@ -111,7 +112,7 @@ public class ProductRawMaterialController extends ProductMaterialController {
 			cancelMaterialButton.setDisabled(false);
 		}
 	}
-
+	
 	@Override
 	protected void refreshMaterialPopup() {// el popup se actualiza en base a la lista
 		materialPopupListbox.clearSelection();
