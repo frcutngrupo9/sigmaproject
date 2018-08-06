@@ -25,6 +25,7 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -276,5 +277,29 @@ public class ProductionPlan  implements Serializable, Cloneable {
 			productList.add(each.getProduct());
 		}
 		return productList;
+	}
+	
+	public BigDecimal getCostMaterials() {
+		BigDecimal cost = BigDecimal.ZERO;
+		for(ProductionOrder each : productionOrderList) {
+			cost = cost.add(each.getCostMaterials());
+		}
+		return cost;
+	}
+	
+	public BigDecimal getCostWork() {
+		BigDecimal cost = BigDecimal.ZERO;
+		for(ProductionOrder each : productionOrderList) {
+			cost = cost.add(each.getCostWork());
+		}
+		return cost;
+	}
+	
+	public BigDecimal getCostTotal() {
+		BigDecimal cost = BigDecimal.ZERO;
+		for(ProductionOrder each : productionOrderList) {
+			cost = cost.add(each.getCostTotal());
+		}
+		return cost;
 	}
 }

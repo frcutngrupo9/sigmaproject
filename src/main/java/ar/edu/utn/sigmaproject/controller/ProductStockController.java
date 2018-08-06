@@ -67,7 +67,7 @@ public class ProductStockController extends SelectorComposer<Component> {
 	@Wire
 	Intbox stockIntbox;
 	@Wire
-	Intbox stockMinIntbox;
+	Intbox stockMaxIntbox;
 	@Wire
 	Button saveButton;
 	@Wire
@@ -153,7 +153,7 @@ public class ProductStockController extends SelectorComposer<Component> {
 			codeTextbox.setValue(null);
 			nameTextbox.setValue(null);
 			stockIntbox.setValue(null);
-			stockMinIntbox.setValue(null);
+			stockMaxIntbox.setValue(null);
 			saveButton.setDisabled(true);
 			cancelButton.setDisabled(true);
 			resetButton.setDisabled(true);
@@ -163,9 +163,9 @@ public class ProductStockController extends SelectorComposer<Component> {
 			codeTextbox.setValue(currentProduct.getCode());
 			nameTextbox.setValue(currentProduct.getName());
 			int stock = currentProduct.getStock();
-			int stock_min = currentProduct.getStockMin();
+			int stock_max = currentProduct.getStockMax();
 			stockIntbox.setValue(stock);
-			stockMinIntbox.setValue(stock_min);
+			stockMaxIntbox.setValue(stock_max);
 			saveButton.setDisabled(false);
 			cancelButton.setDisabled(false);
 			resetButton.setDisabled(false);
@@ -176,7 +176,7 @@ public class ProductStockController extends SelectorComposer<Component> {
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
 		currentProduct.setStock(stockIntbox.intValue());
-		currentProduct.setStockMin(stockMinIntbox.intValue());
+		currentProduct.setStockMax(stockMaxIntbox.intValue());
 		productRepository.save(currentProduct);
 		productList = productRepository.findAll();
 		productListModel = new ListModelList<>(productList);

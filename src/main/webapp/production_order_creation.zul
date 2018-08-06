@@ -70,7 +70,7 @@ THE SOFTWARE.
 			            <column label="${labels.quantity}" align="center"/>
 			            <column label="${labels.worker}" align="center"/>
 			            <column label="${labels.machine}" align="center"/>
-			            <column label="${labels.duration_by_product}" align="center"/>
+			            <column label="${labels.duration_by_piece}" align="center"/>
 			            <column label="${labels.duration_total}" align="center"/>
 		            </columns>
 		            <template name="model">
@@ -123,7 +123,7 @@ THE SOFTWARE.
 			            		</bandbox>
 			                    <label value="${labels.not_necessary}" if="${!win_production_order_creation$composer.isMachineNecessary(each.process.type)}"/>
 		                    </cell>
-		                    <label value="${r:getFormattedProcessTime(each.process.getDurationTotal())}"/>
+		                    <label value="${r:getFormattedProcessTime(each.process.getTime())}"/>
 			            	<label value="${r:getFormattedProcessTime(each.getDurationTotal())}"/>
 						</row>
 		            </template>
@@ -151,7 +151,8 @@ THE SOFTWARE.
 				        <listfoot>
 				            <listfooter></listfooter>
 				            <listfooter></listfooter>
-				            <listfooter><label id="productionOrderSupplyTotalPriceLabel"/></listfooter>
+				            <listfooter></listfooter>
+				            <listfooter><label value="${labels.total_cost}: "/><label id="productionOrderSupplyTotalPriceLabel"/><label value=" $"/></listfooter>
 				        </listfoot>
 				    </listbox>
 				    <listbox id="productionOrderRawMaterialListbox" mold="paging" pageSize="7" sizedByContent="true" span="true" hflex="1">
@@ -172,7 +173,8 @@ THE SOFTWARE.
 				        </template>
 				        <listfoot>
 				            <listfooter></listfooter>
-				            <listfooter><label id="productionOrderRawMaterialTotalPriceLabel"/></listfooter>
+				            <listfooter></listfooter>
+				            <listfooter><label value="${labels.total_cost}: "/><label id="productionOrderRawMaterialTotalPriceLabel"/><label value=" $"/></listfooter>
 				        </listfoot>
 				    </listbox>
 			    </hbox>

@@ -309,7 +309,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				// por cada proceso hay que crear un detalle
 				Integer units = productionOrder.getUnits();
 				Integer quantityPiece = units * piece.getUnits();// cantidad total de la pieza
-				Duration timeTotal = process.getDurationTotal().multiply(units);// tiempo del proceso de las piezas del producto por las unidades del producto
+				Duration timeTotal = process.getTime().multiply(quantityPiece);// tiempo del proceso de las piezas por el total de las piezas
 				details.add(new ProductionOrderDetail(productionOrder, process, ProcessState.Pendiente, null, timeTotal, quantityPiece));
 			}
 		}

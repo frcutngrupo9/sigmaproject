@@ -38,7 +38,7 @@ THE SOFTWARE.
 			    <separator/>
 			    <grid id="productGrid" sizedByContent="true" span="true">
 			    	<auxhead>
-						<auxheader label="${labels.product_plural}" colspan="6"/>
+						<auxheader label="${labels.product_plural}" colspan="9"/>
 					</auxhead>
 			        <columns>
 			        	<column label="${labels.image}" align="center"/>
@@ -46,6 +46,9 @@ THE SOFTWARE.
 			            <column label="${labels.name}" align="center"/>
 			            <column label="${labels.category}" align="center"/>
 			            <column label="${labels.price}" align="center"/>
+			            <column label="${labels.cost_materials}" align="center"/>
+			            <column label="${labels.cost_work}" align="center"/>
+			            <column label="${labels.total_cost}" align="center"/>
 			            <column label="${labels.edit}" align="center"/>
 			        </columns>
 			        <template name="model">
@@ -59,6 +62,9 @@ THE SOFTWARE.
 			                <label value="${each.getName()}"/>
 			                <label value="${each.getCategory().getName()}"/>
 			                <label value="${each.getPrice().doubleValue()} $"/>
+			                <label value="${each.getCostMaterials().doubleValue()} $"/>
+			                <label value="${each.getCostWork().doubleValue()} $"/>
+			                <label value="${each.getCostTotal().doubleValue()} $"/>
 			                <button forward="onClick=productGrid.onEditProduct(${each})" image="/img/edit16x16.png"/>
 			            </row>
 			        </template>

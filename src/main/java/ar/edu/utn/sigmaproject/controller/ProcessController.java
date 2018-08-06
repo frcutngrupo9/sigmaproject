@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.zkoss.lang.Strings;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -36,8 +37,8 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
+import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Button;
-import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
@@ -74,7 +75,9 @@ public class ProcessController extends SelectorComposer<Component> {
 	@Wire
 	Intbox sequenceIntbox;
 	@Wire
-	Combobox machineTypeCombobox;
+	Bandbox machineTypeBandbox;
+	@Wire
+	Listbox machineTypeListbox;
 	@Wire
 	Button saveButton;
 	@Wire
@@ -92,6 +95,7 @@ public class ProcessController extends SelectorComposer<Component> {
 
 	// attributes
 	private ProcessType currentProcessType;
+	private MachineType selectedMachineType;
 	private SortingPagingHelper<ProcessType> sortingPagingHelper;
 
 	// list
@@ -105,13 +109,14 @@ public class ProcessController extends SelectorComposer<Component> {
 		super.doAfterCompose(comp);
 		machineTypeList = machineTypeRepository.findAll();
 		machineTypeListModel = new ListModelList<>(machineTypeList);
-		machineTypeCombobox.setModel(machineTypeListModel);
+		machineTypeListbox.setModel(machineTypeListModel);
 		Map<Integer, String> sortProperties = new HashMap<>();
-		sortProperties.put(0, "id");
+		sortProperties.put(0, "sequence");
 		sortProperties.put(1, "name");
 		sortProperties.put(2, "machineType");
 		sortingPagingHelper = new SortingPagingHelper<>(processTypeRepository, processTypeListbox, searchButton, searchTextbox, pager, sortProperties);
 		currentProcessType = null;
+		selectedMachineType = null;
 		refreshView();
 	}
 
@@ -128,53 +133,93 @@ public class ProcessController extends SelectorComposer<Component> {
 			Clients.showNotification("Debe ingresar un nombre", nameTextbox);
 			return;
 		}
-		if(sequenceIntbox.getValue() <= 0){
+		Integer sequence = sequenceIntbox.getValue();
+		boolean isOverlapped = false;
+		if(sequence == null || sequence <= 0) {
 			Clients.showNotification("Debe ingresar un nro de secuencia mayor a cero", sequenceIntbox);
 			return;
 		}
 		String name = nameTextbox.getText();
 		String details = detailsTextbox.getText();
-		int sequence = sequenceIntbox.getValue();
-		MachineType machineType = null;
-		if(machineTypeCombobox.getSelectedItem() != null) {
-			machineType = machineTypeCombobox.getSelectedItem().getValue();
-		}
-		int prevSeq = -1;
+		MachineType machineType = selectedMachineType;
+		List<ProcessType> processTypelist = processTypeRepository.findAll();
 		if(currentProcessType == null) {
 			// nuevo
-			prevSeq = sequence;
+			if(sequence > getLastSequence() + 1) {
+				sequence = getLastSequence() + 1;// no deja que se la secuencia sea mayor q el ultimo mas 1
+			}
 			currentProcessType = new ProcessType(sequence, name, details, machineType);
+			// si el nro de secuencia es igual a otro, se lo sustituye y se corren ese y las otras secuencias a continuacion
+			if(sequence>0 && sequence<=getLastSequence()) {
+				Clients.showNotification("El nro de secuencia es igual al de otro proceso, se sustituira el mismo y ordenaran las restantes");
+				isOverlapped = true;
+			}
 		} else {
 			// edicion
-			prevSeq = currentProcessType.getSequence();
+			if(sequence > getLastSequence()) {// como se esta modificando la ultima secuencia es el maximo
+				sequence = getLastSequence();// no deja que se la secuencia sea mayor q el ultimo mas 1
+			}
+			if(sequence != currentProcessType.getSequence()) {// si el nro de secuencia se modifico
+				Clients.showNotification("El nro de secuencia es igual al de otro proceso, se sustituira el mismo y ordenaran las restantes");
+				isOverlapped = true;
+			}
 			currentProcessType.setName(name);
 			currentProcessType.setSequence(sequence);
 			currentProcessType.setMachineType(machineType);
 		}
-		// si la secuencia se superpone a otro proceso, se mueven las secuencias
-//		List<ProcessType> processTypelist = processTypeRepository.findAll();
-//		if(sequence <= getLastSequence() && prevSeq != sequence) {
-//			boolean movedForward = prevSeq < sequence;
-//			for(ProcessType each : processTypelist) {
-//				if(movedForward) {// se movio hacia adelante
-//					// a todos los procesos entre las 2 secuencias se les resta 1
-//					if(each.getSequence() > prevSeq && each.getSequence() <= sequence) {
-//						each.setSequence(each.getSequence() - 1);
-//					}
-//				} else {
-//					if(each.getSequence() >= sequence && each.getSequence() < prevSeq) {
-//						each.setSequence(each.getSequence() + 1);
-//					}
-//				}
-//			}
-//		} else {
-//			
-//		}
-
-		currentProcessType = processTypeRepository.save(currentProcessType);
+		if(isOverlapped) {
+			refreshSequences(currentProcessType, processTypelist);
+		} else {
+			processTypeRepository.save(currentProcessType);
+		}
 		sortingPagingHelper.reset();
 		currentProcessType = null;
 		refreshView();
+	}
+
+	private void refreshSequences(ProcessType processToMove, List<ProcessType> processTypelist) {
+		if(processToMove.getId() != null) {// si es una edicion
+			processTypelist.remove(getProcessIndex(processToMove, processTypelist));
+		}
+		int newIndex = processToMove.getSequence() - 1;
+		processTypelist.add(newIndex, processToMove);
+		updateAllSequences(processTypelist);
+	}
+
+	private void updateAllSequences(List<ProcessType> processTypelist) {
+		for(int i = 0; i < processTypelist.size(); i++) {
+			ProcessType each = processTypelist.get(i);
+			each.setSequence(i + 1);
+			processTypeRepository.save(each);
+		}
+	}
+
+	private int getProcessIndex(ProcessType processType, List<ProcessType> processTypelist) {
+		for(int i = 0; i < processTypelist.size(); i++) {
+			ProcessType each = processTypelist.get(i);
+			if(each.getId() == processType.getId()) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	private void arrangeSequence(int oldSequence, int newSequence, List<ProcessType> processTypelist) {
+		if(oldSequence > newSequence) {
+			for(int i = newSequence-1; i < oldSequence; i++) {
+				ProcessType each = processTypelist.get(i);
+				each.setSequence(each.getSequence() + 1);
+				processTypeRepository.save(each);
+			}
+		} else if (oldSequence == newSequence) {
+			return;
+		} else if (oldSequence < newSequence) {
+			for(int i = oldSequence; i < newSequence-1; i++) {
+				ProcessType each = processTypelist.get(i);
+				each.setSequence(each.getSequence() - 1);
+				processTypeRepository.save(each);
+			}
+		}
 	}
 
 	@Listen("onClick = #cancelButton")
@@ -191,6 +236,7 @@ public class ProcessController extends SelectorComposer<Component> {
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
 		processTypeRepository.delete(currentProcessType);
+		updateAllSequences(processTypeRepository.findAll());
 		sortingPagingHelper.reset();
 		currentProcessType = null;
 		refreshView();
@@ -212,7 +258,7 @@ public class ProcessController extends SelectorComposer<Component> {
 
 	private void refreshView() {
 		processTypeListbox.clearSelection();
-		sortingPagingHelper.reset();;// se actualiza la lista
+		sortingPagingHelper.reset();// se actualiza la lista
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		newButton.setDisabled(false);
@@ -222,37 +268,48 @@ public class ProcessController extends SelectorComposer<Component> {
 			detailsTextbox.setValue(null);
 			// se selecciona el ultimo nro de secuencia mas 1
 			sequenceIntbox.setValue(getLastSequence() + 1);
-			machineTypeCombobox.setSelectedIndex(-1);
+			selectedMachineType = null;
+			machineTypeBandbox.setValue(getMachineTypeName(selectedMachineType));
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
 		} else {// editando
 			processTypeGrid.setVisible(true);
 			nameTextbox.setValue(currentProcessType.getName());
 			sequenceIntbox.setValue(currentProcessType.getSequence());
-			machineTypeCombobox.setSelectedIndex(getSelectedIndex(currentProcessType.getMachineType()));
+			selectedMachineType = currentProcessType.getMachineType();
+			machineTypeBandbox.setValue(getMachineTypeName(selectedMachineType));
 			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
 		}
 	}
-	
-	private int getSelectedIndex(MachineType machineType) {
-		int index = 0;
-		for(MachineType each: machineTypeList) {
-			if(each.getId() == machineType.getId()) {
-				return index;
-			}
-			index++;
+
+	private String getMachineTypeName(MachineType machineType) {
+		if(machineType != null) {
+			return machineType.getName();
 		}
-		return -1;
+		return Labels.getLabel("none");
 	}
 
 	private int getLastSequence() {
-		int lastSequence = 0;
-		for(ProcessType each : processTypeRepository.findAll()) {
-			if(each.getSequence() >= lastSequence) {
-				lastSequence = each.getSequence();
-			}
+		return processTypeRepository.findAll().size();
+	}
+
+	@Listen("onClick = #noneButton")
+	public void noneButtonClick() {
+		selectedMachineType = null;
+		machineTypeBandbox.close();
+		machineTypeBandbox.setValue(getMachineTypeName(selectedMachineType));
+	}
+
+	@Listen("onSelect = #machineTypeListbox")
+	public void machineTypeListboxSelect() {
+		if(machineTypeListbox.getSelectedItem() == null) {
+			//just in case for the no selection
+			selectedMachineType = null;
+		} else {
+			selectedMachineType = machineTypeListbox.getSelectedItem().getValue();
+			machineTypeBandbox.setValue(getMachineTypeName(selectedMachineType));
 		}
-		return lastSequence;
+		machineTypeListbox.clearSelection();
 	}
 }

@@ -60,7 +60,7 @@ THE SOFTWARE.
 				    	<button image="/img/rightarrow.png" orient="vertical" id="chooseAllButton" label="${labels.add_all}" hflex="1"/>
 				    	<button image="/img/leftarrow.png" orient="vertical" dir="reverse" id="removeAllButton" label="${labels.remove_all}" hflex="1"/>
 				    </vbox>
-				    <listbox id="chosenListbox" hflex="1" height="350px" rows="6" emptyMessage="${labels.empty}">
+				    <listbox id="chosenListbox" hflex="1" height="350px" rows="6" emptyMessage="${labels.empty_text}">
 				        <listhead>
 				            <listheader label="${labels.image}" width="60px" align="center"></listheader>
 				            <listheader label="${labels.code}" hflex="min" align="center"></listheader>

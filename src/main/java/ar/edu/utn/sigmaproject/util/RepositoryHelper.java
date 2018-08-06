@@ -51,6 +51,7 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.domain.Wood;
 import ar.edu.utn.sigmaproject.domain.WoodType;
+import ar.edu.utn.sigmaproject.domain.WorkHour;
 import ar.edu.utn.sigmaproject.domain.Worker;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.MachineRepository;
@@ -66,6 +67,7 @@ import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
 import ar.edu.utn.sigmaproject.service.WoodTypeRepository;
+import ar.edu.utn.sigmaproject.service.WorkHourRepository;
 import ar.edu.utn.sigmaproject.service.WorkerRepository;
 
 @Component
@@ -106,6 +108,9 @@ public class RepositoryHelper {
 
 	@Autowired
 	private WorkerRepository workerRepository;
+	
+	@Autowired
+	private WorkHourRepository workHourRepository;
 
 	@Autowired
 	private SupplyTypeRepository supplyTypeRepository;
@@ -130,45 +135,10 @@ public class RepositoryHelper {
 		generateWood();
 		generateClient();
 		generateWorker();
+		generateWorkHour();
 		generateSupplyType();
 		generateMachine();
 		hibernateSearchReIndex();
-	}
-
-	private void generateMeasureUnitTypeList() {
-		addMeasureUnitsIfNeeded("Longitud", Arrays.asList(
-				Arrays.asList("Metros", "M"),
-				Arrays.asList("Centimetros", "Cm"),
-				Arrays.asList("Milimetros", "Mm"),
-				Arrays.asList("Pulgadas", "Pul")
-				));
-		addMeasureUnitsIfNeeded("Tiempo", Arrays.asList(
-				Arrays.asList("Minutos", "Min"),
-				Arrays.asList("Horas", "Hr"),
-				Arrays.asList("Dias", "D")
-				));
-		addMeasureUnitsIfNeeded("Masa", Arrays.asList(
-				Arrays.asList("Kilogramos", "Kg"),
-				Arrays.asList("Gramos", "Gr"),
-				Arrays.asList("Litros", "L"),
-				Arrays.asList("Mililitros", "Ml")
-				));
-		addMeasureUnitsIfNeeded("Cantidad", Arrays.asList(
-				Arrays.asList("Unidad", "Unid")
-				));
-	}
-
-	private void addMeasureUnitsIfNeeded(String measureUnitTypeName, List<List<String>> definitions) {
-		MeasureUnitType measureUnitType = measureUnitTypeRepository.findFirstByName(measureUnitTypeName);
-		if (measureUnitType == null) {
-			measureUnitType = new MeasureUnitType(measureUnitTypeName);
-			List<MeasureUnit> measureUnitToInsert = new ArrayList<>();
-			for (List<String> definition : definitions) {
-				measureUnitToInsert.add(new MeasureUnit(definition.get(0), definition.get(1), measureUnitType));
-			}
-			measureUnitType.getList().addAll(measureUnitToInsert);
-			measureUnitTypeRepository.save(measureUnitType);
-		}
 	}
 
 	private void generateProductionPlanStateTypes() {
@@ -282,7 +252,7 @@ public class RepositoryHelper {
 	}
 
 	private void generateWorker() {
-		if (workerRepository.count() == 0) {
+		if(workerRepository.count() == 0) {
 			List<Worker> list = new ArrayList<>();
 			list.add(new Worker("EMPLEADO 1", null));
 			list.add(new Worker("EMPLEADO 2", null));
@@ -291,17 +261,64 @@ public class RepositoryHelper {
 			workerRepository.save(list);
 		}
 	}
+	
+	private void generateWorkHour() {
+		if(workHourRepository.count() == 0) {
+			List<WorkHour> list = new ArrayList<>();
+			list.add(new WorkHour("Operario", new BigDecimal("180")));
+			list.add(new WorkHour("General", new BigDecimal("145")));
+			list.add(new WorkHour("Control", new BigDecimal("120")));
+			workHourRepository.save(list);
+		}
+		
+	}
 
 	private void generateSupplyType() {
-		if (supplyTypeRepository.count() == 0) {
+		if(supplyTypeRepository.count() == 0) {
 			List<SupplyType> list = new ArrayList<>();
-			list.add(new SupplyType("1", "INSUMO 1", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("0")));
-			list.add(new SupplyType("2", "INSUMO 2", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("0")));
-			list.add(new SupplyType("3", "INSUMO 3", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("0")));
-			list.add(new SupplyType("4", "INSUMO 4", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("0")));
-			list.add(new SupplyType("5", "INSUMO 5", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("0")));
+			list.add(new SupplyType("1", "INSUMO 1", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("9.87")));
+			list.add(new SupplyType("2", "INSUMO 2", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("7.77")));
+			list.add(new SupplyType("3", "INSUMO 3", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("5.52")));
+			list.add(new SupplyType("4", "INSUMO 4", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("3.14")));
+			list.add(new SupplyType("5", "INSUMO 5", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("1.61")));
 			supplyTypeRepository.save(list);
 		}
+	}
+	
+	private void addMeasureUnits(String measureUnitTypeName, List<List<String>> definitions) {
+		MeasureUnitType measureUnitType = measureUnitTypeRepository.findFirstByName(measureUnitTypeName);
+		if (measureUnitType == null) {
+			measureUnitType = new MeasureUnitType(measureUnitTypeName);
+			List<MeasureUnit> measureUnitToInsert = new ArrayList<>();
+			for (List<String> definition : definitions) {
+				measureUnitToInsert.add(new MeasureUnit(definition.get(0), definition.get(1), measureUnitType));
+			}
+			measureUnitType.getList().addAll(measureUnitToInsert);
+			measureUnitTypeRepository.save(measureUnitType);
+		}
+	}
+	
+	private void generateMeasureUnitTypeList() {
+		addMeasureUnits("Longitud", Arrays.asList(
+				Arrays.asList("Metros", "M"),
+				Arrays.asList("Centimetros", "Cm"),
+				Arrays.asList("Milimetros", "Mm"),
+				Arrays.asList("Pulgadas", "Pulg")
+				));
+		addMeasureUnits("Tiempo", Arrays.asList(
+				Arrays.asList("Minutos", "Min"),
+				Arrays.asList("Horas", "Hr"),
+				Arrays.asList("Dias", "D")
+				));
+		addMeasureUnits("Masa", Arrays.asList(
+				Arrays.asList("Kilogramos", "Kg"),
+				Arrays.asList("Gramos", "Gr"),
+				Arrays.asList("Litros", "L"),
+				Arrays.asList("Mililitros", "Ml")
+				));
+		addMeasureUnits("Cantidad", Arrays.asList(
+				Arrays.asList("Unidad", "Unid")
+				));
 	}
 
 	/*
@@ -361,14 +378,15 @@ public class RepositoryHelper {
 	}
 
 	private BigDecimal convertToMeters(BigDecimal measure, MeasureUnit measureUnit) {
+		BigDecimal bd100 = new BigDecimal("100");
 		//devuelve el measure convertido a metros
 		if(measureUnit.getName().equalsIgnoreCase("Pulgadas")) {
 			//pulgadas a centimetros
 			BigDecimal cm = measure.multiply(new BigDecimal("2.54"));
 			//centimetros a metros
-			return cm.divide(new BigDecimal("100"));
+			return cm.divide(bd100);
 		} else if (measureUnit.getName().equalsIgnoreCase("Centimetros")) {
-			return measure.divide(new BigDecimal("100"));
+			return measure.divide(bd100);
 		} else if (measureUnit.getName().equalsIgnoreCase("Milimetros")) {
 			return measure.divide(new BigDecimal("1000"));
 		}

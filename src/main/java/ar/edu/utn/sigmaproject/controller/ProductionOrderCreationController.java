@@ -180,19 +180,12 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		setTotalPrices();
 		refreshView();
 	}
-	
+
 	private void setTotalPrices() {
 		BigDecimal totalPriceSupply = currentProductionOrder.getTotalCostSupply();
 		BigDecimal totalPriceRawMaterial = currentProductionOrder.getTotalCostRawMaterial();
-		String totalPriceValue = "";
-		if(!totalPriceSupply.equals(new BigDecimal("0"))) {
-			totalPriceValue = "Total: " + totalPriceSupply.doubleValue() + " $";
-		}
-		productionOrderSupplyTotalPriceLabel.setValue(totalPriceValue);
-		if(!totalPriceRawMaterial.equals(new BigDecimal("0"))) {
-			totalPriceValue = "Total: " + totalPriceRawMaterial.doubleValue() + " $";
-		}
-		productionOrderRawMaterialTotalPriceLabel.setValue(totalPriceValue);
+		productionOrderSupplyTotalPriceLabel.setValue(totalPriceSupply.doubleValue() + "");
+		productionOrderRawMaterialTotalPriceLabel.setValue(totalPriceRawMaterial.doubleValue() + "");
 	}
 
 	private void refreshView() {
@@ -362,7 +355,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			MachineType machineType = machineTypeRepository.findOne(processType.getMachineType().getId());
 			if (machineType != null) {
 				for (Machine machine : machineList) {
-					if (machineType.equals(machineTypeRepository.findOne(machine.getMachineType().getId()))) {
+					if (machineType.getId() == machine.getMachineType().getId()) {
 						list.add(machine);
 					}
 				}
@@ -390,27 +383,30 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	private Map<ProductionOrder, Map<Piece, List<ProcessType>>> getMachineProductionOrderMap(Machine machine, List<ProductionOrderDetail> machineOverlappingDetails) {
 		Map<ProductionOrder, Map<Piece, List<ProcessType>>> productionOrderMap = null;
 		for(ProductionOrderDetail each : machineOverlappingDetails) {
-			if(machineRepository.findOne(each.getMachine().getId()).equals(machineRepository.findOne(machine.getId()))) {
-				if(productionOrderMap == null) {
-					productionOrderMap = new HashMap<ProductionOrder, Map<Piece, List<ProcessType>>>();
-				}
-				Map<Piece, List<ProcessType>> pieceMap = productionOrderMap.get(each.getProductionOrder());
-				Piece piece = each.getProcess().getPiece();
-				ProductionOrder productionOrder = each.getProductionOrder();
-				List<ProcessType> processList = null;
-				if(pieceMap == null) {
-					pieceMap = new HashMap<Piece, List<ProcessType>>();
-					processList = new ArrayList<ProcessType>();
-					processList.add(each.getProcess().getType());
-				} else {
-					processList = pieceMap.get(piece);
-					if(processList == null) {
-						processList = new ArrayList<ProcessType>();
+			// no se considera si el detalle pertenece a la misma orden actual
+			if(each.getProductionOrder().getId() != currentProductionOrder.getId()) {
+				if(each.getMachine().getId() == machine.getId()) {
+					if(productionOrderMap == null) {
+						productionOrderMap = new HashMap<ProductionOrder, Map<Piece, List<ProcessType>>>();
 					}
-					processList.add(each.getProcess().getType());
+					Map<Piece, List<ProcessType>> pieceMap = productionOrderMap.get(each.getProductionOrder());
+					Piece piece = each.getProcess().getPiece();
+					ProductionOrder productionOrder = each.getProductionOrder();
+					List<ProcessType> processList = null;
+					if(pieceMap == null) {
+						pieceMap = new HashMap<Piece, List<ProcessType>>();
+						processList = new ArrayList<ProcessType>();
+						processList.add(each.getProcess().getType());
+					} else {
+						processList = pieceMap.get(piece);
+						if(processList == null) {
+							processList = new ArrayList<ProcessType>();
+						}
+						processList.add(each.getProcess().getType());
+					}
+					pieceMap.put(piece, processList);
+					productionOrderMap.put(productionOrder, pieceMap);
 				}
-				pieceMap.put(piece, processList);
-				productionOrderMap.put(productionOrder, pieceMap);
 			}
 		}
 		return productionOrderMap;
@@ -450,7 +446,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		List<ProductionOrderDetail> machineOverlappingDetails = getMachineOverlappingDetails(productionOrderDetail);
 		// se busca en las restantes ordenes si la maquina parametro es la misma asignada
 		for(ProductionOrderDetail each : machineOverlappingDetails) {
-			if(machineRepository.findOne(each.getMachine().getId()).equals(machineRepository.findOne(machine.getId()))) {
+			if(each.getMachine().getId() == machine.getId()) {
 				return false;
 			}
 		}
@@ -507,27 +503,30 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	private Map<ProductionOrder, Map<Piece, List<ProcessType>>> getProductionOrderMap(Worker worker, List<ProductionOrderDetail> workerOverlappingDetails) {
 		Map<ProductionOrder, Map<Piece, List<ProcessType>>> productionOrderMap = null;
 		for(ProductionOrderDetail each : workerOverlappingDetails) {
-			if(workerRepository.findOne(each.getWorker().getId()).equals(workerRepository.findOne(worker.getId()))) {
-				if(productionOrderMap == null) {
-					productionOrderMap = new HashMap<ProductionOrder, Map<Piece, List<ProcessType>>>();
-				}
-				Map<Piece, List<ProcessType>> pieceMap = productionOrderMap.get(each.getProductionOrder());
-				Piece piece = each.getProcess().getPiece();
-				ProductionOrder productionOrder = each.getProductionOrder();
-				List<ProcessType> processList = null;
-				if(pieceMap == null) {
-					pieceMap = new HashMap<Piece, List<ProcessType>>();
-					processList = new ArrayList<ProcessType>();
-					processList.add(each.getProcess().getType());
-				} else {
-					processList = pieceMap.get(piece);
-					if(processList == null) {
-						processList = new ArrayList<ProcessType>();
+			// no se considera si el detalle pertenece a la misma orden actual
+			if(each.getProductionOrder().getId() != currentProductionOrder.getId()) {
+				if(each.getWorker().getId() == worker.getId()) {
+					if(productionOrderMap == null) {
+						productionOrderMap = new HashMap<ProductionOrder, Map<Piece, List<ProcessType>>>();
 					}
-					processList.add(each.getProcess().getType());
+					Map<Piece, List<ProcessType>> pieceMap = productionOrderMap.get(each.getProductionOrder());
+					Piece piece = each.getProcess().getPiece();
+					ProductionOrder productionOrder = each.getProductionOrder();
+					List<ProcessType> processList = null;
+					if(pieceMap == null) {
+						pieceMap = new HashMap<Piece, List<ProcessType>>();
+						processList = new ArrayList<ProcessType>();
+						processList.add(each.getProcess().getType());
+					} else {
+						processList = pieceMap.get(piece);
+						if(processList == null) {
+							processList = new ArrayList<ProcessType>();
+						}
+						processList.add(each.getProcess().getType());
+					}
+					pieceMap.put(piece, processList);
+					productionOrderMap.put(productionOrder, pieceMap);
 				}
-				pieceMap.put(piece, processList);
-				productionOrderMap.put(productionOrder, pieceMap);
 			}
 		}
 		return productionOrderMap;
@@ -561,7 +560,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		List<ProductionOrderDetail> workerOverlappingDetails = getWorkerOverlappingDetails(productionOrderDetail);
 		// se busca en las restantes ordenes si la maquina parametro es la misma asignada
 		for(ProductionOrderDetail each : workerOverlappingDetails) {
-			if(workerRepository.findOne(each.getWorker().getId()).equals(workerRepository.findOne(worker.getId()))) {
+			if(each.getWorker().getId() == worker.getId()) {
 				return false;
 			}
 		}
@@ -595,11 +594,11 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		ProductionOrderDetail data = (ProductionOrderDetail) evt.getData();// obtenemos el objeto pasado por parametro
 		Listbox element = (Listbox) evt.getOrigin().getTarget();// obtenemos el elemento web
 		Worker workerSelected = (Worker)element.getSelectedItem().getValue();
-		// comprueba que la maquina seleccionada no este ocupada en otra orden, en ese caso mostrar mensaje y volver al valor anterior, caso contrario asignar
+		// comprueba que la seleccion no este ocupada en otra orden, en ese caso mostrar mensaje y volver al valor anterior, caso contrario asignar
 		if(isWorkerAvailable(workerSelected, data)) {
 			data.setWorker(workerSelected);// cargamos al objeto el valor actualizado del elemento web
 			// si el trabajador asignado es diferente al anterior, verificar si no es necesario maquina y si no lo es, cambiar el inicio al mismo inicio del proceso anterior
-			ProductionOrderDetail prevDetail = getFirstDetailOfProcess(data);
+			/*ProductionOrderDetail prevDetail = getFirstDetailOfProcess(data);
 			if(prevDetail != null) {
 				if(!prevDetail.getWorker().equals(workerSelected)) {
 					if(data.getProcess().getType().getMachineType() == null) {
@@ -607,8 +606,9 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 						data.setDateFinish(ProductionDateTimeHelper.getFinishDate(prevDetail.getDateStart(), data.getTimeTotal()));
 					}
 				}
-			}
+			}*/
 			//recalculateDates();
+			//assignAllDates();
 			refreshProductionOrderDetailGridView();
 		} else {
 			final Worker workerSelectedFinal = workerSelected;
@@ -686,6 +686,66 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		return list;
 	}
 
+	private void assignAllDates() {
+		// hacemos una lista de todos los empleados asignados actualmente
+		// por cada empleado ordenamos todas las fechas de sus procesos en secuencia
+		// ordenamos todos los procesos en base a las fechas establecidas
+		Date finishDate = null;
+		Date startDate = getDateTimeStartWork(productionOrderStartDatebox.getValue());
+		for(Map.Entry<Worker, List<ProductionOrderDetail>> entry : getWorkerMap().entrySet()) {
+			//Worker worker = entry.getKey();
+			List<ProductionOrderDetail> list = entry.getValue();
+			sortListBySequence(list);
+			for(ProductionOrderDetail eachDetail : list) {
+				if(eachDetail.getState() != ProcessState.Cancelado) {// solo se calcula para los procesos que no esten cancelados
+					if(finishDate == null) {// si es la primera vez que ingresa
+						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, eachDetail.getTimeTotal());
+					} else {
+						// el inicio de la actual es al finalizar la ultima
+						startDate = finishDate;
+						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, eachDetail.getTimeTotal());
+					}
+					eachDetail.setDateStart(startDate);
+					eachDetail.setDateFinish(finishDate);
+				} else {
+					eachDetail.setDateStart(null);
+					eachDetail.setDateFinish(null);
+					// por las dudas borramos tambien las fechas reales
+					eachDetail.setDateStartReal(null);
+					eachDetail.setDateFinishReal(null);
+				}
+			}
+		}
+	}
+
+	public void sortListBySequence(List<ProductionOrderDetail> details) {
+		Comparator<ProductionOrderDetail> comp = new Comparator<ProductionOrderDetail>() {
+			@Override
+			public int compare(ProductionOrderDetail a, ProductionOrderDetail b) {
+				return a.getProcess().getType().getSequence().compareTo(b.getProcess().getType().getSequence());
+			}
+		};
+		Collections.sort(details, comp);
+	}
+
+	private Map<Worker, List<ProductionOrderDetail>> getWorkerMap() {
+		// devuelve un map que por cada empleado contiene el listado de todos los procesos asignados a el
+		Map<Worker, List<ProductionOrderDetail>> workerMap = new HashMap<Worker, List<ProductionOrderDetail>>();
+		for(ProductionOrderDetail each : productionOrderDetailList) {
+			if(each.getState() != ProcessState.Cancelado) {
+				Worker worker = each.getWorker();
+				List<ProductionOrderDetail> list = workerMap.get(worker);
+				if(list == null) {
+					list = new ArrayList<ProductionOrderDetail>();
+				} else {
+					list.add(each);
+				}
+				workerMap.put(worker, list);
+			}
+		}
+		return workerMap;
+	}
+
 	private void recalculateDates() {
 		// recalcula las fechas de los procesos basandose en los empleados asignados de tal forma que los procesos que tengan distintos empleados asignados se ejecuten en paralelo
 		// si varios empleados estan asignados a diferentes piezas del mismo proceso, todos iniciaran al mismo tiempo, y el proximo proceso iniciara al finalizar el ultimo de los procesos anteriores
@@ -723,11 +783,20 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 
 	private ProductionOrderDetail getPreviousDetail(ProductionOrderDetail data) {
 		ProductionOrderDetail prevDetail = null;
-		int index = productionOrderDetailList.indexOf(data);
+		int index = getIndex(data);
 		if(index > 0) {
 			prevDetail = productionOrderDetailList.get(index - 1);
 		}
 		return prevDetail;
+	}
+
+	private int getIndex(ProductionOrderDetail data) {
+		for(int i=0; i<productionOrderDetailList.size(); i++) {
+			if(productionOrderDetailList.get(i).getId() == data.getId()) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	private ProductionOrderDetail getFirstDetailOfProcess(ProductionOrderDetail data) {

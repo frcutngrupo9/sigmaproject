@@ -63,6 +63,7 @@ public class Product extends Item implements Serializable, Cloneable {
 	private Integer stock = 0;
 	private Integer stockMin = 0;
 	private Integer stockRepo = 0;
+	private Integer stockMax = 0;
 
 	@ManyToOne
 	private ProductCategory category;
@@ -160,6 +161,14 @@ public class Product extends Item implements Serializable, Cloneable {
 		this.stockRepo = stockRepo;
 	}
 
+	public Integer getStockMax() {
+		return stockMax;
+	}
+
+	public void setStockMax(Integer stockMax) {
+		this.stockMax = stockMax;
+	}
+
 	public byte[] getImageData() {
 		return imageData;
 	}
@@ -218,7 +227,7 @@ public class Product extends Item implements Serializable, Cloneable {
 
 	@Override
 	public List<MaterialReserved> getMaterialReservedList() {
-		// TODO Auto-generated method stub
+		// metodo no usado pero implementado porque hereda de item (se usa en materiales)
 		return null;
 	}
 	
@@ -232,14 +241,11 @@ public class Product extends Item implements Serializable, Cloneable {
 	}
 	
 	public BigDecimal getCostWork() {
-		BigDecimal salary = new BigDecimal(200);
-		//devuelve el valor del tiempo total de produccion por el valor de la hora de trabajo
-		Duration durationTotal = getDurationTotal();
-		BigDecimal minutes = new BigDecimal(durationTotal.getMinutes()).divide(new BigDecimal(60));
-		BigDecimal seconds = new BigDecimal(durationTotal.getSeconds()).divide(new BigDecimal(600));
-		BigDecimal workTime = new BigDecimal(durationTotal.getHours()).add(minutes).add(seconds);
-		BigDecimal workPrice = workTime.multiply(salary);
-		return workPrice;
+		BigDecimal cost = BigDecimal.ZERO;
+		for(Piece each : pieces) {
+			cost = cost.add(each.getCost());
+		}
+		return cost;
 	}
 	
 	public BigDecimal getCostTotal() {

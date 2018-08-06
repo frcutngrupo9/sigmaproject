@@ -47,7 +47,7 @@ THE SOFTWARE.
 		            </listitem>
 		        </template>
 		    </listbox>
-		    <paging id="pager" pageSize="10" sclass="sigma-paging"/>
+		    <paging id="pager" pageSize="15" sclass="sigma-paging"/>
 		    <separator/>
 		    <vlayout>
 		        <separator/>
@@ -75,11 +75,18 @@ THE SOFTWARE.
 			            </row>
 			            <row>
 			                <label>${labels.machine_necessary}:</label>
-			                <combobox id="machineTypeCombobox">
-		                        <template name="model">
-		                            <comboitem label="${each.name}" />
-		                        </template>
-		                    </combobox>
+			                <bandbox id="machineTypeBandbox" onClick="self.open()" readonly="true" buttonVisible="true" autodrop="false" hflex="1">
+		            			<bandpopup>
+		            				<button id="noneButton" label="${labels.none}"/>
+			            			<listbox id="machineTypeListbox" onClick="machineTypeBandbox.close()" width="200px" span="true" sizedByContent="false">
+								        <template name="model">
+								            <listitem>
+								                <listcell label="${each.name}"/>
+								            </listitem>
+										</template>
+									</listbox>
+		            			</bandpopup>
+		            		</bandbox>
 			            </row>
 			            <row>
 			                <cell colspan="2" style="text-align:center">
