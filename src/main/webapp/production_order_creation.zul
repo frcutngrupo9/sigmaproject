@@ -24,6 +24,17 @@ THE SOFTWARE.
 
 <?taglib uri="/WEB-INF/tld/helper.tld" prefix="r"?>
 <window id="win_production_order_creation" title="${labels.production_order}" closable="false" apply="ar.edu.utn.sigmaproject.controller.ProductionOrderCreationController" sclass="sigma-content">
+    <caption>
+	    <toolbar align="end" orient="horizontal">
+	        <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+	        <toolbarbutton id="saveButton" label="${labels.save}"/>
+	        <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+		    <toolbarbutton id="resetButton" label="${labels.reset}"/>
+		    <space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+		    <toolbarbutton id="cancelButton" label="${labels.return_text}"/>
+			<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+		</toolbar>
+	</caption>
     <panel id="productionOrderCreationBlock" border="none">
         <panelchildren>
         	<vlayout>
@@ -70,8 +81,8 @@ THE SOFTWARE.
 			            <column label="${labels.quantity}" align="center"/>
 			            <column label="${labels.worker}" align="center"/>
 			            <column label="${labels.machine}" align="center"/>
-			            <column label="${labels.duration_by_piece}" align="center"/>
-			            <column label="${labels.duration_total}" align="center"/>
+			            <column width="150px" label="${labels.duration_by_piece}" align="center"/>
+			            <column width="150px" label="${labels.duration_total}" align="center"/>
 		            </columns>
 		            <template name="model">
 		                <row>
@@ -79,8 +90,8 @@ THE SOFTWARE.
 			            	<checkbox disabled="false" checked="${state_cancel}" forward="onCheck=productionOrderDetailGrid.onEditProductionOrderDetailIsCanceled(${each})"/>
 			            	<label value="${each.process.type.sequence}"/>
 			            	<label value="${each.process.type.name}"/>
-			            	<datebox buttonVisible="true" disabled="${state_cancel}" cols="12" format="${labels.date_time_format}" value="${each.dateStart}" forward="onChange=productionOrderDetailGrid.onChangeProductionOrderDetailStartDate(${each})"/>
-			            	<datebox buttonVisible="false" disabled="true" cols="12" format="${labels.date_time_format}" value="${each.dateFinish}"/>
+			            	<datebox width="150px" buttonVisible="true" disabled="${state_cancel}" cols="12" format="${labels.date_time_format}" value="${each.dateStart}" forward="onChange=productionOrderDetailGrid.onChangeProductionOrderDetailStartDate(${each})"/>
+			            	<datebox width="140px" buttonVisible="false" disabled="true" cols="12" format="${labels.date_time_format}" value="${each.dateFinish}"/>
 			            	<label value="${each.process.getPiece().getName()}"/>
 			            	<label value="${each.quantityPiece}"/>
 			            	<bandbox value="${each.worker.name}" onClick="self.open()" readonly="true" buttonVisible="true" autodrop="false">
@@ -179,11 +190,6 @@ THE SOFTWARE.
 				    </listbox>
 			    </hbox>
 			    <hlayout>
-	    			<hbox hflex="1" pack="left">
-					    <button id="saveButton" label="${labels.save}"/>
-					    <button id="resetButton" label="${labels.reset}"/>
-					    <button id="cancelButton" label="${labels.return_text}"/>
-				    </hbox>
 				    <hbox hflex="1" pack="center">
 				    	<button id="createReportButton" label="${labels.generate_report}"/>
 				    </hbox>

@@ -76,8 +76,8 @@ THE SOFTWARE.
         				<column label="${labels.state_production_order}" align="center"/>
         				<column label="${labels.production_order_number_short}" align="center"/>
 		                <column label="${labels.percent_completed}" align="center"/>
-		                <column label="${labels.duration_total}" align="center"/>
-		                <column label="${labels.unit_duration}" align="center"/>
+		                <column width="150px" label="${labels.duration_total}" align="center"/>
+		                <column width="150px" label="${labels.unit_duration}" align="center"/>
 		                <column label="${labels.date_start_actual}" align="center"/>
 		                <column label="${labels.date_finish_actual}" align="center"/>
 		                <column label="${labels.cost_materials}" align="center"/>
@@ -95,9 +95,9 @@ THE SOFTWARE.
 			            	<!-- <spinner value="${each.sequence}" constraint="no empty, min 1" forward="onChanging=productionOrderGrid.onEditProductionOrderSequence(${each})" width="60px"/> -->
 			                <cell>
 			                	<datebox value="${each.dateStart}" buttonVisible="true" format="${labels.date_format_short}" width="110px" disabled="false" forward="onChange=productionOrderGrid.onProductionOrderStartDateboxChange(${each})"/>
-								<timebox value="${win_production_order_list$composer.getTimeboxValue(each.dateStart)}" format="${labels.time_format}" width="70px" forward="onChange=productionOrderGrid.onProductionOrderStartTimeboxChange(${each})"/>
+								<timebox value="${win_production_order_list$composer.getTimeboxValue(each.dateStart)}" format="${labels.time_format}" width="90px" forward="onChange=productionOrderGrid.onProductionOrderStartTimeboxChange(${each})"/>
 		                	</cell>
-		                    <datebox buttonVisible="false" format="${labels.date_time_format}" value="${each.dateFinish}" disabled="true" width="110px"/>
+		                    <datebox buttonVisible="false" format="${labels.date_time_format}" value="${each.dateFinish}" disabled="true" width="140px"/>
 		                	<cell>
 				                <image if="${!empty product_image}" content="${product_image}" height="${r:getPixelScaled(product_image, 50, true)}px" width="${r:getPixelScaled(product_image, 50, false)}px"/>
 				                <image if="${empty product_image}" width="0px" height="0px"/>

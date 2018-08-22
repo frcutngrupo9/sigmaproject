@@ -50,7 +50,7 @@ THE SOFTWARE.
                             <label value="${labels.client}: "/>
 		                    <bandbox id="clientBandbox" buttonVisible = "true" autodrop = "true" width="25%">
 		                        <bandpopup>
-		                            <listbox id="clientPopupListbox" width="200px">
+		                            <listbox id="clientPopupListbox" width="300px"  sizedByContent="true">
 		                                <listhead>
 		                                    <listheader label="${labels.client}"/>
 		                                    <listheader label="${labels.email}"/>

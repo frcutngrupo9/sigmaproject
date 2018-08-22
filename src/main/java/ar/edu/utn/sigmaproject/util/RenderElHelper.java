@@ -47,11 +47,16 @@ public class RenderElHelper {
 		if(time != null) {
 			int hours = time.getHours();
 			int minutes = time.getMinutes();
+			int seconds = time.getSeconds();
+			while(seconds >= 60) {
+				seconds -= 60;
+				minutes += 1;
+			}
 			while(minutes >= 60) {
 				minutes -= 60;
 				hours += 1;
 			}
-			return String.format("%d Hrs, %d Min", hours, minutes);
+			return String.format("%d Hrs, %d Min, %d Seg", hours, minutes, seconds);
 		}
 		return "";
 	}
@@ -60,11 +65,16 @@ public class RenderElHelper {
 		if(time != null) {
 			int hours = time.getHours();
 			int minutes = time.getMinutes();
+			int seconds = time.getSeconds();
+			while(seconds >= 60) {
+				seconds -= 60;
+				minutes += 1;
+			}
 			while(minutes >= 60) {
 				hours = hours + 1;
 				minutes = minutes - 60;
 			}
-			return String.format("%d hrs  %d min", hours, minutes);
+			return String.format("%d hrs  %d min %d seg", hours, minutes, seconds);
 		} else {
 			return "0 hrs 0 min";
 		}

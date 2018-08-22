@@ -276,11 +276,11 @@ public class RepositoryHelper {
 	private void generateSupplyType() {
 		if(supplyTypeRepository.count() == 0) {
 			List<SupplyType> list = new ArrayList<>();
-			list.add(new SupplyType("1", "INSUMO 1", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("9.87")));
-			list.add(new SupplyType("2", "INSUMO 2", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("7.77")));
-			list.add(new SupplyType("3", "INSUMO 3", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("5.52")));
-			list.add(new SupplyType("4", "INSUMO 4", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("3.14")));
-			list.add(new SupplyType("5", "INSUMO 5", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("1.61")));
+			list.add(new SupplyType("1", "INSUMO 1", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("9,87")));
+			list.add(new SupplyType("2", "INSUMO 2", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("7,77")));
+			list.add(new SupplyType("3", "INSUMO 3", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("5,52")));
+			list.add(new SupplyType("4", "INSUMO 4", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("3,14")));
+			list.add(new SupplyType("5", "INSUMO 5", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("1,61")));
 			supplyTypeRepository.save(list);
 		}
 	}

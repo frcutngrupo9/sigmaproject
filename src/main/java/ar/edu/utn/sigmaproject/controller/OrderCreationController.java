@@ -67,6 +67,7 @@ import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
@@ -176,7 +177,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	}
 
 	@Listen("onClick = #saveOrderButton")
-	public void saveOrder() {
+	public void saveOrderButtonClick() {
 		// TODO agregar comprobacion para ver si todavia no se guardo un detalle activo
 		if(currentClient == null) {
 			Clients.showNotification("Seleccionar Cliente", clientBandbox);
@@ -199,6 +200,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		} else {
 			orderStateType = null;
 		}
+		boolean isDeliverAvailable = true;
 		if(currentOrder == null) { // es un pedido nuevo
 			// creamos el nuevo pedido
 			currentOrder = new Order(currentClient, order_number, order_date, order_need_date);
@@ -207,12 +209,28 @@ public class OrderCreationController extends SelectorComposer<Component> {
 				orderDetail.setOrder(currentOrder);
 			}
 			currentOrder.getDetails().addAll(orderDetailList);
+			// si existe stock suficiente para satisfacer el pedido y no hay pedidos finalizados que requieran ese stock, se informa y se realiza la entrega directamente
+			for(OrderDetail orderDetail : orderDetailList) {
+				if(!existStockAvailable(orderDetail.getProduct(), orderDetail.getUnits())) {
+					isDeliverAvailable = false;
+					break;
+				}
+			}
 		} else { // se edita un pedido
 			currentOrder.setClient(currentClient);
 			currentOrder.setNeedDate(order_need_date);
 			currentOrder.setNumber(order_number);
 			currentOrder.setDate(order_date);
 		}
+		if(isDeliverAvailable) {
+			// se pregunta si se quiere entregar el pedido directamente ya que existe stock disponible
+			showMessagebox(orderStateType);
+		} else {
+			saveOrder(orderStateType);
+		}
+	}
+
+	private void saveOrder(OrderStateType orderStateType) {
 		OrderState orderState = new OrderState(orderStateType, new Date());
 		orderState = orderStateRepository.save(orderState);
 		currentOrder.setState(orderState);
@@ -220,6 +238,45 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		currentOrder = orderRepository.findOne(currentOrder.getId());// se recupera de la bd para que tenga los detalles actualizados
 		refreshViewOrder();
 		alert("Pedido guardado.");
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void showMessagebox(final OrderStateType currentOrderStateType) {
+		// pregunta si se quiere asignar igual estando ocupado
+		Messagebox.show("Existe stock disponible para realizar la entrega inmediata, desea entregar el stock existente?", "Confirmar", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+			public void onEvent(Event evt) throws InterruptedException {
+				if (evt.getName().equals("onOK")) {
+					// modifica la cantidad en stock
+					for(OrderDetail each : currentOrder.getDetails()) {
+						Product product = each.getProduct();
+						product.setStock(product.getStock() - each.getUnits());
+						product = productRepository.save(product);
+					}
+					saveOrder(orderStateTypeRepository.findFirstByName("Entregado"));
+				} else {
+					saveOrder(currentOrderStateType);
+				}
+			}
+		});
+	}
+
+	private boolean existStockAvailable(Product product, Integer units) {
+		// si para el producto y la cantidad existe stock que no posee un pedido correlativo finalizado, se devuelve verdadero
+		int quantityFinished = 0;
+		OrderStateType stateType = orderStateTypeRepository.findFirstByName("Finalizado");
+		List<Order> orderList = orderRepository.findByCurrentStateType(stateType);
+		for(Order each : orderList) {
+			for(OrderDetail eachDetail : each.getDetails()) {
+				if(eachDetail.getProduct().getId() == product.getId()) {
+					quantityFinished += eachDetail.getUnits();
+				}
+			}
+		}
+		int stockAvailable = product.getStock() - quantityFinished;
+		if(stockAvailable >= units) {
+			return true;
+		}
+		return false;
 	}
 
 	@Listen("onClick = #resetOrderButton")
@@ -315,6 +372,8 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			orderCaption.setLabel("Edicion de Pedido");
 			OrderStateType orderCurrentStateType = currentOrder.getCurrentStateType();
 			if(orderCurrentStateType != null) {
+				orderStateTypeList = orderStateTypeRepository.findAll();
+				orderStateTypeListModel = new ListModelList<OrderStateType>(orderStateTypeList);
 				orderStateTypeListModel.addToSelection(orderStateTypeRepository.findOne(orderCurrentStateType.getId()));
 				orderStateTypeCombobox.setModel(orderStateTypeListModel);
 				// solo se puede grabar si esta en estado Creado o Cancelado

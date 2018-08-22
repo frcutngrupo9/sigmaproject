@@ -223,7 +223,7 @@ THE SOFTWARE.
 			                	<custom-attributes work_hour_list_model="${win_product_creation$composer.getWorkHourListModel()}"/>
 						        <auxhead>
 						            <auxheader colspan="3" rowspan="1" />
-						            <auxheader label="${labels.duration_by_piece}" colspan="2" rowspan="1" />
+						            <auxheader label="${labels.duration_by_piece}" colspan="3" rowspan="1" />
 						            <auxheader colspan="1" rowspan="1" />
 						        </auxhead>
 			                	<listhead>
@@ -232,6 +232,7 @@ THE SOFTWARE.
 			            			<listheader label="${labels.detail_plural}" width="450px"/>
 			            			<listheader label="${labels.hours}" width="100px"/>
 			            			<listheader label="${labels.minutes}" width="100px"/>
+			            			<listheader label="${labels.seconds}" width="100px"/>
 			            			<listheader label="${labels.role}" width="190px"/>
 			        			</listhead>
 								<template name="model">
@@ -251,6 +252,9 @@ THE SOFTWARE.
 			                            </listcell>
 			                            <listcell>
 			                                <spinner constraint="no empty, min 0 max 59" visible="${process_checked}" forward="onChanging=processListbox.onProcessMinutesChange(${each})" value="${win_product_creation$composer.getProcessMinutes(each)}" width="70px"/>
+			                            </listcell>
+			                            <listcell>
+			                                <spinner constraint="no empty, min 0 max 59" visible="${process_checked}" forward="onChanging=processListbox.onProcessSecondsChange(${each})" value="${win_product_creation$composer.getProcessSeconds(each)}" width="70px"/>
 			                            </listcell>
 			                            <listcell>
 			                                <bandbox visible="${process_checked}" readonly="true" buttonVisible="true" autodrop="false"

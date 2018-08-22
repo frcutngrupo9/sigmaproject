@@ -69,7 +69,7 @@ THE SOFTWARE.
 		                <label value="${each.getCurrentStateType().getName()}"/>
 		                <label value="${win_order_list$composer.totalPrice(each)} $"/>
 		                <button forward="onClick=orderGrid.onEditOrder(${each})"  image="/img/edit16x16.png"/>
-		                <button disabled="${win_order_list$composer.isStateCancel(each) or win_order_list$composer.isStateDelivered(each) or win_order_list$composer.isStateFinish(each)}" forward="onClick=orderGrid.onCancelOrder(${each})"  image="/img/delete16x16.png"/>
+		                <button disabled="${win_order_list$composer.isStateCancel(each) or win_order_list$composer.isStateDelivered(each)}" forward="onClick=orderGrid.onCancelOrder(${each})"  image="/img/delete16x16.png"/>
 		                <button disabled="${win_order_list$composer.isStateCancel(each) or win_order_list$composer.isStateNotFinished(each)}" label="${labels.deliver}" forward="onClick=orderGrid.onDeliverOrder(${each})"/>
 		            </row>
 		        </template>

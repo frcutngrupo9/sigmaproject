@@ -43,8 +43,7 @@ public class ProductionDateTimeHelper {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(startDate);
 		// primero se comprueba que la fecha de inicio se encuentre dentro del horario
-		if(cal.get(Calendar.HOUR_OF_DAY) < firstHourOfDay ||
-				cal.get(Calendar.HOUR_OF_DAY) >= lastHourOfDay) {
+		if(cal.get(Calendar.HOUR_OF_DAY) < firstHourOfDay || cal.get(Calendar.HOUR_OF_DAY) >= lastHourOfDay) {
 			return null;
 		} else {// si esta dentro del horario en horas pero no en minutos
 			if(firstMinuteOfDay!=0 || lastMinuteOfDay!=0) {//si estan configurados minutos en el horario
@@ -64,6 +63,11 @@ public class ProductionDateTimeHelper {
 		if(time != null) {
 			int hours = time.getHours();
 			int minutes = time.getMinutes();// puede ser que los minutos sean mayor que 60, ya que se realizaron multiplicaciones sobre time
+			int seconds = time.getSeconds();
+			while(seconds >= 60) {
+				seconds -= 60;
+				minutes += 1;
+			}
 			while(minutes >= 60) {// se vuelven los minutos a menos de 60
 				minutes -= 60;
 				hours += 1;
@@ -102,6 +106,11 @@ public class ProductionDateTimeHelper {
 					cal.set(Calendar.MILLISECOND, 0);
 
 				}
+			}
+			// agrega los segundos
+			if(seconds > 0) {
+				cal.add(Calendar.SECOND, seconds);
+				// no se considera  cambiar el dia si los segundo superan el horario de finalizacion
 			}
 			return cal.getTime();
 		}

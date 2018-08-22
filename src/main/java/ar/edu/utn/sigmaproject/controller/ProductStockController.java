@@ -158,12 +158,15 @@ public class ProductStockController extends SelectorComposer<Component> {
 			cancelButton.setDisabled(true);
 			resetButton.setDisabled(true);
 			newProvisionOrderButton.setDisabled(false);
-		}else {// editando o creando
+		} else {// editando o creando
 			productExistenceGrid.setVisible(true);
 			codeTextbox.setValue(currentProduct.getCode());
 			nameTextbox.setValue(currentProduct.getName());
 			int stock = currentProduct.getStock();
-			int stock_max = currentProduct.getStockMax();
+			int stock_max = 0;
+			if(currentProduct.getStockMax() != null) {
+				stock_max = currentProduct.getStockMax();
+			}
 			stockIntbox.setValue(stock);
 			stockMaxIntbox.setValue(stock_max);
 			saveButton.setDisabled(false);
@@ -199,7 +202,7 @@ public class ProductStockController extends SelectorComposer<Component> {
 		int number = 0;
 		for(Order each : orderList) {
 			for(OrderDetail eachDetail : each.getDetails()) {
-				if(eachDetail.getProduct().equals(product)) {
+				if(eachDetail.getProduct().getId() == product.getId()) {
 					number += eachDetail.getUnits();
 				}
 			}

@@ -664,6 +664,15 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			return aux.getTime().getMinutes();
 		}
 	}
+	
+	public Integer getProcessSeconds(ProcessType processType) {
+		Process aux = getProcessFromListbox(processType);
+		if(aux == null) {
+			return 0;
+		} else {
+			return aux.getTime().getSeconds();
+		}
+	}
 
 	public String getProcessWorkHour(ProcessType processType) {
 		Process aux = getProcessFromListbox(processType);
@@ -795,7 +804,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		Process process = getProcessFromListbox(data);
 		Duration duration = null;
 		try {
-			duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, 0, origin.intValue(), process.getTime().getMinutes(), 0);
+			duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, 0, origin.intValue(), process.getTime().getMinutes(), process.getTime().getSeconds());
 		} catch (DatatypeConfigurationException e) {
 			System.out.println("Error en convertir a duracion: " + e.toString());
 		}
@@ -814,7 +823,27 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			Process process = getProcessFromListbox(data);
 			Duration duration = null;
 			try {
-				duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, 0, process.getTime().getHours(), origin.intValue(), 0);
+				duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, 0, process.getTime().getHours(), origin.intValue(), process.getTime().getSeconds());
+			} catch (DatatypeConfigurationException e) {
+				System.out.println("Error en convertir a duracion: " + e.toString());
+			}
+			process.setTime(duration);
+		}
+	}
+	
+	@Listen("onProcessSecondsChange = #processListbox")
+	public void doProcessSecondsChange(ForwardEvent evt) {
+		pieceChanged = true;
+		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
+		Spinner origin = (Spinner)evt.getOrigin().getTarget();
+		InputEvent inputEvent = (InputEvent) evt.getOrigin();
+		String inputValue = inputEvent.getValue();
+		if(inputValue.compareTo("") != 0) {
+			origin.setValue(Integer.valueOf(inputEvent.getValue()));
+			Process process = getProcessFromListbox(data);
+			Duration duration = null;
+			try {
+				duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, 0, process.getTime().getHours(), process.getTime().getMinutes(), origin.intValue());
 			} catch (DatatypeConfigurationException e) {
 				System.out.println("Error en convertir a duracion: " + e.toString());
 			}
