@@ -38,6 +38,9 @@ import net.sf.jasperreports.engine.JRField;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.EventQueue;
+import org.zkoss.zk.ui.event.EventQueues;
 import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -67,6 +70,7 @@ import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.domain.ProductMaterial;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
@@ -134,6 +138,8 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	private OrderStateTypeRepository orderStateTypeRepository;
 
 	// attributes
+	@SuppressWarnings("rawtypes")
+	private EventQueue eq;
 	private Order currentOrder;
 	private OrderDetail currentOrderDetail;
 	private Product currentProduct;
@@ -166,7 +172,35 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		currentOrderDetail = null;
 		currentProduct = null;
 		currentClient = null;
+		createListener();
 		refreshViewOrder();
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void createListener() {
+		// listener para cuando se agregue un cliente
+		eq = EventQueues.lookup("Client Update Queue", EventQueues.DESKTOP, true);
+		eq.subscribe(new EventListener() {
+			public void onEvent(Event event) throws Exception {
+				if(event.getName().equals("onClientUpdate")) {
+					Client clientCreated = (Client) event.getData();
+					currentClient = clientCreated;
+					clientPopupList = clientRepository.findAll();
+					clientPopupListModel = new ListModelList<Client>(clientPopupList);
+					clientPopupListbox.setModel(clientPopupListModel);
+					clientBandbox.setValue(clientCreated.getName());
+					clientBandbox.close();
+				}
+			}
+		});
+	}
+	
+	@Listen("onClick = #newClientButton")
+	public void newClientButtonClick() {
+		final Window win = (Window) Executions.createComponents("/client_creation.zul", null, null);
+		win.setSizable(false);
+		win.setPosition("center");
+		win.doModal();
 	}
 
 	@Listen("onSelect = #clientPopupListbox")
@@ -217,6 +251,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 				}
 			}
 		} else { // se edita un pedido
+			isDeliverAvailable = false;
 			currentOrder.setClient(currentClient);
 			currentOrder.setNeedDate(order_need_date);
 			currentOrder.setNumber(order_number);
@@ -305,11 +340,11 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	@Listen("onOK = #productUnitsIntbox")
 	public void productUnitsIntboxOnOK() {
 		// se ejecuta al presionar la tecla enter dentro del Intbox
-		saveOrderDetail();
+		saveOrderDetailButtonClick();
 	}
 
 	@Listen("onClick = #saveOrderDetailButton")
-	public void saveOrderDetail() {
+	public void saveOrderDetailButtonClick() {
 		if(productUnitsIntbox.getValue()==null || productUnitsIntbox.getValue().intValue()<=0){
 			Clients.showNotification("Ingresar Cantidad del Producto", productUnitsIntbox);
 			return;

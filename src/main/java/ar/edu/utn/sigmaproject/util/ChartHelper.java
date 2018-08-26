@@ -24,6 +24,7 @@
 
 package ar.edu.utn.sigmaproject.util;
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
+import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 
 public class ChartHelper {
 
@@ -57,6 +59,7 @@ public class ChartHelper {
 	private ProductRepository productRepository;
 	private OrderRepository orderRepository;
 	private ClientRepository clientRepository;
+	private SupplyTypeRepository supplyTypeRepository;
 
 	public ChartHelper(OrderDetailRepository orderDetailRepository,
 			ProductRepository productRepository, OrderRepository orderRepository, ClientRepository clientRepository) {
@@ -73,7 +76,7 @@ public class ChartHelper {
 		}
 		return productPieModel;
 	}
-	
+
 	private List<ProductTotal> getFilteredProductTotalList(List<ProductTotal> productTotalList, List<Product> filterProductList) {
 		if(filterProductList != null) {
 			List<ProductTotal> productTotalRemoveList = new ArrayList<ProductTotal>();
@@ -99,8 +102,9 @@ public class ChartHelper {
 		Map<Product, Integer> productTotalMap = new HashMap<Product, Integer>();
 		for(Product eachProduct : productRepository.findAll()) {
 			for(OrderDetail eachOrderDetail : orderDetailRepository.findByProductAndOrderDateAfterAndOrderDateBefore(eachProduct, dateFrom, dateTo)) {
-				Integer totalUnits = productTotalMap.get(eachProduct);
-				productTotalMap.put(eachProduct, (totalUnits == null) ? eachOrderDetail.getUnits() : totalUnits + eachOrderDetail.getUnits());
+				Product product = productRepository.findOne(eachProduct.getId());
+				Integer totalUnits = productTotalMap.get(product);
+				productTotalMap.put(product, (totalUnits == null) ? eachOrderDetail.getUnits() : totalUnits + eachOrderDetail.getUnits());
 			}
 		}
 		List<ProductTotal> list = new ArrayList<ProductTotal>();
@@ -134,13 +138,54 @@ public class ChartHelper {
 		return productList;
 	}
 
-	public CategoryModel getProductLineChartModel(Date firstOrderDate, Date lastOrderDate, List<Product> filterProductList) {
+	public CategoryModel getCostLineChartModel(Date firstOrderDate, Date lastOrderDate) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(firstOrderDate);
+		calendar.add(Calendar.MONTH, -1);
 		int searchStartYear = calendar.get(Calendar.YEAR);
 		int searchStartMonth = calendar.get(Calendar.MONTH);
 		calendar.clear();
 		calendar.setTime(lastOrderDate);
+		calendar.add(Calendar.MONTH, 1);
+		int searchFinishYear = calendar.get(Calendar.YEAR);
+		int searchFinishMonth = calendar.get(Calendar.MONTH);
+		CategoryModel  model = new SimpleCategoryModel();
+		for(int year=searchStartYear; year <=searchFinishYear; year++) {
+			int startMonth;
+			if(year == searchStartYear) {
+				startMonth = searchStartMonth;
+			} else {
+				startMonth = 1;
+			}
+			int finishMonth;
+			if(year == searchFinishYear) {
+				finishMonth = searchFinishMonth;
+			} else {
+				finishMonth = 12;
+			}
+			String yearSubstring = year + "";
+			yearSubstring = yearSubstring.substring(2);
+			// recorre la lista de meses
+			for(int eachMonth=startMonth; eachMonth<=finishMonth; eachMonth++) {
+				model.setValue("Costos Totales", monthNameByNumber(eachMonth) + " " + yearSubstring, monthCost(year, eachMonth, 1));
+				model.setValue("Costos Mano de Obra", monthNameByNumber(eachMonth) + " " + yearSubstring, monthCost(year, eachMonth, 2));
+				model.setValue("Costos Materiales", monthNameByNumber(eachMonth) + " " + yearSubstring, monthCost(year, eachMonth, 3));
+				//model.setValue("Costos Insumos", monthNameByNumber(eachMonth) + " " + yearSubstring, monthCost(year, eachMonth, 4));
+				//model.setValue("Costos Materias Primas", monthNameByNumber(eachMonth) + " " + yearSubstring, monthCost(year, eachMonth, 5));
+			}
+		}
+		return model;
+	}
+
+	public CategoryModel getProductLineChartModel(Date firstOrderDate, Date lastOrderDate, List<Product> filterProductList) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(firstOrderDate);
+		calendar.add(Calendar.MONTH, -1);
+		int searchStartYear = calendar.get(Calendar.YEAR);
+		int searchStartMonth = calendar.get(Calendar.MONTH);
+		calendar.clear();
+		calendar.setTime(lastOrderDate);
+		calendar.add(Calendar.MONTH, 1);
 		int searchFinishYear = calendar.get(Calendar.YEAR);
 		int searchFinishMonth = calendar.get(Calendar.MONTH);
 		CategoryModel  model = new SimpleCategoryModel();
@@ -177,7 +222,7 @@ public class ChartHelper {
 		return dateFormat.format(date);
 	}
 
-	public Order[] getFirstAndLastOrder() {
+	public Date[] getFirstAndLastOrderDates() {
 		Order[] orderArray = new Order[2];
 		for(Order each : orderRepository.findAll()) {
 			if(each.getDate() != null) {
@@ -197,19 +242,64 @@ public class ChartHelper {
 				}
 			}
 		}
-		return orderArray;
+		// restamos o sumamos 1 dia a cada fecha para que aparezcan todos los productos en el filtro
+		Date[] dateArray = new Date[2];
+		dateArray[0] = getDate1DayBeforeOrAfter(orderArray[0].getDate(), false);
+		dateArray[1] = getDate1DayBeforeOrAfter(orderArray[1].getDate(), true);
+		return dateArray;
+	}
+
+	private Date getDate1DayBeforeOrAfter(Date date, boolean addDay) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		if(addDay) {
+			cal.add(Calendar.DAY_OF_MONTH, 1);
+		} else {
+			cal.add(Calendar.DAY_OF_MONTH, -1);
+		}
+		return cal.getTime();
 	}
 
 	private List<Product> getProductList() {
 		List<Product> productList = new ArrayList<Product>();
 		// devuelve solo los productos que existan en al menos 1 pedido
-		Order[] orderArray = getFirstAndLastOrder();
-		for(ProductTotal eachProductTotal : getProductTotalOrders(orderArray[0].getDate(), orderArray[1].getDate())) {
+		Date[] orderArray = getFirstAndLastOrderDates();
+		for(ProductTotal eachProductTotal : getProductTotalOrders(orderArray[0], orderArray[1])) {
 			if(eachProductTotal.getTotalUnits() != 0) {
-				productList.add(eachProductTotal.getProduct());
+				Product product = productRepository.findOne(eachProductTotal.getProduct().getId());
+				productList.add(product);
 			}
 		}
 		return productList;
+	}
+
+	private Double monthCost(int eachYear, int eachMonth, int costType) {
+		// el costType se refiere a si es costo total, de mano de obra, de materiales, de insumos o de materias primas: 1, 2, 3, 4 o 5
+		BigDecimal cost = BigDecimal.ZERO;
+		// devuelve el costo de todos los pedidos del mes
+		Calendar calendar = Calendar.getInstance();
+		// recorre todos los pedidos y acumula el costo de los que se encuentren en el mes
+		for(Order eachOrder : orderRepository.findAll()) {
+			calendar.clear();
+			calendar.setTime(eachOrder.getDate());
+			// verifica que el mes sea el requerido
+			if(calendar.get(Calendar.YEAR) == eachYear && calendar.get(Calendar.MONTH) == eachMonth) {
+				for(OrderDetail eachOrderDetail : eachOrder.getDetails()) {
+					if(costType == 1) {//costo total
+						cost = cost.add(eachOrderDetail.getProduct().getCostTotal().multiply(new BigDecimal(eachOrderDetail.getUnits())));
+					} else if(costType == 2) {//costo de mano de obra
+						cost = cost.add(eachOrderDetail.getProduct().getCostWork().multiply(new BigDecimal(eachOrderDetail.getUnits())));
+					} else if(costType == 3) {//costo de materiales
+						cost = cost.add(eachOrderDetail.getProduct().getCostMaterials().multiply(new BigDecimal(eachOrderDetail.getUnits())));
+					} else if(costType == 4) {//costo de insumos
+						cost = cost.add(eachOrderDetail.getProduct().getCostSupplies().multiply(new BigDecimal(eachOrderDetail.getUnits())));
+					} else if(costType == 5) {//costo de materias primas
+						cost = cost.add(eachOrderDetail.getProduct().getCostWoods().multiply(new BigDecimal(eachOrderDetail.getUnits())));
+					}
+				}
+			}
+		}
+		return cost.doubleValue();
 	}
 
 	private Integer monthUnits(int eachYear, int eachMonth, Product eachProduct) {
@@ -225,8 +315,9 @@ public class ChartHelper {
 				// verifica si el producto se encuentra en el pedido
 				for(OrderDetail eachOrderDetail : eachOrder.getDetails()) {
 					if(eachOrderDetail.getProduct().equals(eachProduct)) {
-						Integer totalUnits = productTotalMap.get(eachProduct);
-						productTotalMap.put(eachProduct, (totalUnits == null) ? eachOrderDetail.getUnits() : totalUnits + eachOrderDetail.getUnits());
+						Product product = productRepository.findOne(eachProduct.getId());
+						Integer totalUnits = productTotalMap.get(product);
+						productTotalMap.put(product, (totalUnits == null) ? eachOrderDetail.getUnits() : totalUnits + eachOrderDetail.getUnits());
 					}
 				}
 			}
@@ -250,8 +341,9 @@ public class ChartHelper {
 		Map<Product, Integer> productTotalMap = new HashMap<Product, Integer>();
 		for(Order eachOrder : orderRepository.findByClientAndDateAfterAndDateBefore(eachClient, dateFrom, dateTo)) {
 			for(OrderDetail eachOrderDetail : eachOrder.getDetails()) {
-				Integer totalUnits = productTotalMap.get(eachOrderDetail.getProduct());
-				productTotalMap.put(eachOrderDetail.getProduct(), (totalUnits == null) ? eachOrderDetail.getUnits() : totalUnits + eachOrderDetail.getUnits());
+				Product product = productRepository.findOne(eachOrderDetail.getProduct().getId());
+				Integer totalUnits = productTotalMap.get(product);
+				productTotalMap.put(product, (totalUnits == null) ? eachOrderDetail.getUnits() : totalUnits + eachOrderDetail.getUnits());
 			}
 		}
 		List<ProductTotal> list = new ArrayList<ProductTotal>();
@@ -281,6 +373,7 @@ public class ChartHelper {
 			for(ProductMaterial eachMaterial : each.getProduct().getMaterials()) {
 				if(eachMaterial.getType() == MaterialType.Supply) {
 					SupplyType supplyType = (SupplyType) eachMaterial.getItem();
+					supplyType = supplyTypeRepository.findOne(supplyType.getId());
 					Integer currentUnits = eachMaterial.getQuantity().intValue() * each.getTotalUnits();
 					Integer totalUnits = suppliesTotalMap.get(supplyType);
 					suppliesTotalMap.put(supplyType, (totalUnits == null) ? currentUnits : totalUnits + currentUnits);

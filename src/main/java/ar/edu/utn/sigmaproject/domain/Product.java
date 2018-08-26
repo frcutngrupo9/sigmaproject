@@ -240,6 +240,30 @@ public class Product extends Item implements Serializable, Cloneable {
 		return materialsPrice;
 	}
 	
+	public BigDecimal getCostSupplies() {
+		//devuelve el valor de los insumos
+		BigDecimal materialsPrice = BigDecimal.ZERO;
+		for(ProductMaterial each : materials) {
+			Item item = each.getItem();
+			if(item instanceof SupplyType) {
+				materialsPrice = materialsPrice.add(item.getPrice());
+			}
+		}
+		return materialsPrice;
+	}
+	
+	public BigDecimal getCostWoods() {
+		//devuelve el valor de los insumos
+		BigDecimal materialsPrice = BigDecimal.ZERO;
+		for(ProductMaterial each : materials) {
+			Item item = each.getItem();
+			if (item instanceof Wood) {
+				materialsPrice = materialsPrice.add(item.getPrice());
+			}
+		}
+		return materialsPrice;
+	}
+	
 	public BigDecimal getCostWork() {
 		BigDecimal cost = BigDecimal.ZERO;
 		for(Piece each : pieces) {

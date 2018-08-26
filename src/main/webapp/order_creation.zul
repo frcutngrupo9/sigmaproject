@@ -50,10 +50,13 @@ THE SOFTWARE.
                             <label value="${labels.client}: "/>
 		                    <bandbox id="clientBandbox" buttonVisible = "true" autodrop = "true" width="25%">
 		                        <bandpopup>
-		                            <listbox id="clientPopupListbox" width="300px"  sizedByContent="true">
+		                            <hbox pack="center" align="center" width="300px">
+		                            	<button id="newClientButton" label="${labels.new_text}"/>
+		                            </hbox>
+		                            <listbox id="clientPopupListbox" width="300px">
 		                                <listhead>
-		                                    <listheader label="${labels.client}"/>
-		                                    <listheader label="${labels.email}"/>
+		                                    <listheader label="${labels.client}" width="120px"/>
+		                                    <listheader label="${labels.email}" hflex="1"/>
 		                                </listhead>
 		                                <template name="model">
 		                                    <listitem>
