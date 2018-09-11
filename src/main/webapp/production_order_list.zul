@@ -44,19 +44,19 @@ THE SOFTWARE.
                 <hbox hflex="1">
 					<hbox hflex="1" pack="center">
 						<label value="${labels.date_start_plan}: "/>
-						<datebox id="productionPlanStartDatebox" disabled="true"  buttonVisible="false" format="${labels.date_time_format}" width="110px"/>
+						<datebox id="productionPlanStartDatebox" disabled="true"  buttonVisible="false" format="${labels.date_time_format}" width="130px"/>
 					</hbox>
 					<hbox hflex="1" pack="center">
 						<label value="${labels.date_finish_plan}: "/>
-						<datebox id="productionPlanFinishDatebox" disabled="true" buttonVisible="false" format="${labels.date_time_format}" width="110px"/>
+						<datebox id="productionPlanFinishDatebox" disabled="true" buttonVisible="false" format="${labels.date_time_format}" width="130px"/>
 					</hbox>
 					<hbox hflex="1" pack="center">
 						<label value="${labels.date_start_actual}: "/>
-						<datebox id="productionPlanStartRealDatebox" disabled="true" buttonVisible="false" format="${labels.date_time_format}" width="110px"/>
+						<datebox id="productionPlanStartRealDatebox" disabled="true" buttonVisible="false" format="${labels.date_time_format}" width="130px"/>
 					</hbox>
 					<hbox hflex="1" pack="center">
 						<label value="${labels.date_finish_actual}: "/>
-						<datebox id="productionPlanFinishRealDatebox" disabled="true" buttonVisible="false" format="${labels.date_time_format}" width="110px"/>
+						<datebox id="productionPlanFinishRealDatebox" disabled="true" buttonVisible="false" format="${labels.date_time_format}" width="130px"/>
 					</hbox>
 				</hbox>
     			<grid id="productionOrderGrid" sizedByContent="true" span="true">

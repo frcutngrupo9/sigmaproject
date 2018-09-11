@@ -48,7 +48,6 @@ import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Slider;
 import org.zkoss.zul.Window;
 
-import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderDetailRepository;
@@ -180,10 +179,16 @@ public class GraphicsController extends SelectorComposer<Component> {
 		setAllValues("pie", "Insumos Utilizados");
 		refreshView();
 	}
-	
+
 	@Listen("onClick = #monthCostChartButton")
 	public void monthCostChartButtonOnClick() {
 		setAllValues("line", "Costos por Mes");
+		refreshView();
+	}
+
+	@Listen("onClick = #productCostChartButton")
+	public void productCostChartButtonOnClick() {
+		setAllValues("bar", "Costos por Producto");
 		refreshView();
 	}
 
@@ -249,6 +254,8 @@ public class GraphicsController extends SelectorComposer<Component> {
 			chartModel = chartHelper.getSuppliesPieModel(dateFrom, dateTo);
 		} else if(title.equalsIgnoreCase("Costos por Mes")) {
 			chartModel = chartHelper.getCostLineChartModel(dateFrom, dateTo);
+		} else if(title.equalsIgnoreCase("Costos por Producto")) {
+			chartModel = chartHelper.getCostBarChartModel(dateFrom, dateTo, filterProductList);
 		}
 	}
 

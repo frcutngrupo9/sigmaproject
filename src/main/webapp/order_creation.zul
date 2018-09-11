@@ -150,6 +150,7 @@ THE SOFTWARE.
                     <button id="deleteOrderButton" label="${labels.delete_order}"/>
                     <separator/>
                     <button id="jasperReportButton" label="${labels.report}"/>
+                    <button id="deliveryNoteReportButton" label="Remito"/>
                     <hbox pack="center" align="center" hflex="1">
 			        	<button id="newOrderButton" label="${labels.new_order}"/>
 			        	<button id="returnButton" label="${labels.return_to_list}"/>

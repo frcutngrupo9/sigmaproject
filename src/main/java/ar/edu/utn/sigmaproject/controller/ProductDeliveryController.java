@@ -79,6 +79,8 @@ public class ProductDeliveryController extends SelectorComposer<Component> {
 	@Wire
 	Datebox deliveryDatebox;
 	@Wire
+	Textbox numberBillTextbox;
+	@Wire
 	Button saveButton;
 	@Wire
 	Button cancelButton;
@@ -133,6 +135,7 @@ public class ProductDeliveryController extends SelectorComposer<Component> {
 		}
 		needDateTextbox.setText(needDateString);
 		deliveryDatebox.setValue(null);
+		numberBillTextbox.setValue(null);
 	}
 
 	@Listen("onClick = #cancelButton")
@@ -151,11 +154,17 @@ public class ProductDeliveryController extends SelectorComposer<Component> {
 			Clients.showNotification("Debe seleccionar una fecha de entrega del pedido.", deliveryDatebox);
 			return;
 		}
+		if(numberBillTextbox.getValue() == null || numberBillTextbox.getValue().equals("")) {
+			Clients.showNotification("Debe ingresar un numero de factura.", numberBillTextbox);
+			return;
+		}
 		Date deliveryDate = deliveryDatebox.getValue();
+		String numberBill = numberBillTextbox.getValue();
 		OrderStateType stateTypeEntregado = orderStateTypeRepository.findFirstByName("Entregado");
 		OrderState orderState = new OrderState(stateTypeEntregado, deliveryDate);
 		orderState = orderStateRepository.save(orderState);
 		currentOrder.setState(orderState);
+		currentOrder.setNumberBill(numberBill);
 		currentOrder = orderRepository.save(currentOrder);
 		// modifica la cantidad en stock
 		for(OrderDetail each : currentOrder.getDetails()) {
@@ -172,10 +181,12 @@ public class ProductDeliveryController extends SelectorComposer<Component> {
 	public String getFormattedDateStart(OrderDetail orderDetail) {
 		// devuelve la fecha de inicio real de la produccion
 		ProductionOrder productionOrder = getCorrelativeProductionOrder(currentOrder, orderDetail.getProduct());// busca la orden de produccion que tiene el mismo producto del detalle
-		Date date = productionOrder.getDateStartReal();
-		if(date != null) {
-			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-			return dateFormat.format(date);
+		if(productionOrder != null) {
+			Date date = productionOrder.getDateStartReal();
+			if(date != null) {
+				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+				return dateFormat.format(date);
+			}
 		}
 		return "";
 	}
@@ -183,10 +194,12 @@ public class ProductDeliveryController extends SelectorComposer<Component> {
 	public String getFormattedDateFinish(OrderDetail orderDetail) {
 		// devuelve la fecha de finalizacion real de la produccion
 		ProductionOrder productionOrder = getCorrelativeProductionOrder(currentOrder, orderDetail.getProduct());// busca la orden de produccion que tiene el mismo producto del detalle
-		Date date = productionOrder.getDateFinishReal();
-		if(date != null) {
-			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-			return dateFormat.format(date);
+		if(productionOrder != null) {
+			Date date = productionOrder.getDateFinishReal();
+			if(date != null) {
+				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+				return dateFormat.format(date);
+			}
 		}
 		return "";
 	}
@@ -198,7 +211,7 @@ public class ProductDeliveryController extends SelectorComposer<Component> {
 		ProductionOrder productionOrder = productionOrderRepository.findByProductionPlanAndProduct(productionPlan, product);
 		return productionOrder;
 	}
-	
+
 	public String getPlanName(OrderDetail orderDetail) {
 		ProductionOrder productionOrder = getCorrelativeProductionOrder(currentOrder, orderDetail.getProduct());// busca la orden de produccion que tiene el mismo producto del detalle
 		if(productionOrder != null) {

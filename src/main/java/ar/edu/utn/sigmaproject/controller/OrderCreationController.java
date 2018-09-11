@@ -124,6 +124,8 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	Button returnButton;
 	@Wire
 	Button jasperReportButton;
+	@Wire
+	Button deliveryNoteReportButton;
 
 	// services
 	@WireVariable
@@ -194,7 +196,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			}
 		});
 	}
-	
+
 	@Listen("onClick = #newClientButton")
 	public void newClientButtonClick() {
 		final Window win = (Window) Executions.createComponents("/client_creation.zul", null, null);
@@ -281,13 +283,15 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		Messagebox.show("Existe stock disponible para realizar la entrega inmediata, desea entregar el stock existente?", "Confirmar", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 			public void onEvent(Event evt) throws InterruptedException {
 				if (evt.getName().equals("onOK")) {
+					/*
 					// modifica la cantidad en stock
 					for(OrderDetail each : currentOrder.getDetails()) {
 						Product product = each.getProduct();
 						product.setStock(product.getStock() - each.getUnits());
 						product = productRepository.save(product);
 					}
-					saveOrder(orderStateTypeRepository.findFirstByName("Entregado"));
+					 */
+					saveOrder(orderStateTypeRepository.findFirstByName("Finalizado"));
 				} else {
 					saveOrder(currentOrderStateType);
 				}
@@ -403,6 +407,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			orderDetailList = new ArrayList<OrderDetail>();
 			deleteOrderButton.setDisabled(true);
 			orderStateTypeCombobox.setDisabled(true);
+			deliveryNoteReportButton.setDisabled(true);
 		} else {// editar pedido
 			orderCaption.setLabel("Edicion de Pedido");
 			OrderStateType orderCurrentStateType = currentOrder.getCurrentStateType();
@@ -420,6 +425,11 @@ public class OrderCreationController extends SelectorComposer<Component> {
 				} else {
 					saveOrderButton.setDisabled(false);
 					deleteOrderButton.setDisabled(false);
+				}
+				if(orderCurrentStateType.getName().equalsIgnoreCase("Entregado")) {
+					deliveryNoteReportButton.setDisabled(false);
+				} else {
+					deliveryNoteReportButton.setDisabled(true);
 				}
 			} else {
 				orderStateTypeCombobox.setSelectedIndex(-1);
@@ -615,6 +625,29 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			}
 		}
 		return total_price.doubleValue();
+	}
+
+	@Listen("onClick = #deliveryNoteReportButton")
+	public void deliveryNoteReportButtonClick() {
+		loadDeliveryNoteJasperreport();
+	}
+
+	private void loadDeliveryNoteJasperreport() {
+		Map<String, Object> parameters;
+		parameters = new HashMap<String, Object>();
+		parameters.put("orderClientName", currentOrder.getClient().getName());
+		parameters.put("orderClientAddress", currentOrder.getClient().getAddress());
+		parameters.put("orderClientPhone", currentOrder.getClient().getPhone());
+
+		Executions.getCurrent().setAttribute("jr_datasource", new OrderReportDataSource(currentOrder.getDetails()));
+		Executions.getCurrent().setAttribute("return_page_name", "order_creation");
+		Map<String, Object> returnParameters = new HashMap<String, Object>();
+		returnParameters.put("selected_order", currentOrder);
+		Executions.getCurrent().setAttribute("return_parameters", returnParameters);
+		Executions.getCurrent().setAttribute("report_src_name", "delivery_note");
+		Executions.getCurrent().setAttribute("report_parameters", parameters);
+		Window window = (Window)Executions.createComponents("/report_selection_modal.zul", null, null);
+		window.doModal();
 	}
 
 	@Listen("onClick = #jasperReportButton")

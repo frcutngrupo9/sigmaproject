@@ -82,7 +82,13 @@ THE SOFTWARE.
                         </row>
                         <row>
                             <label value="${labels.price}: "/>
-                            <doublebox id="productPriceDoublebox" width="50%" placeholder="${labels.product_price_placeholder}"/>
+                            <cell>
+                            	<hbox>
+	                            	<doublebox id="productPriceDoublebox" width="150px" placeholder="${labels.product_price_placeholder}"/>
+	                            	<separator/>
+	                            	<button id="profitPercentagePriceButton" label="Generar Precio por Porcentaje Ganancia"/>
+                            	</hbox>
+                            </cell>
                         </row>
                     </rows>
                 </grid>

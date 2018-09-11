@@ -95,6 +95,7 @@ import ar.edu.utn.sigmaproject.service.OrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductCategoryRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
+import ar.edu.utn.sigmaproject.service.SettingsRepository;
 import ar.edu.utn.sigmaproject.service.WorkHourRepository;
 import ar.edu.utn.sigmaproject.util.RenderElHelper;
 
@@ -198,6 +199,8 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	private OrderDetailRepository orderDetailRepository;
 	@WireVariable
 	private WorkHourRepository workHourRepository;
+	@WireVariable
+	private SettingsRepository settingsRepository;
 
 	// attributes
 	private Product currentProduct;
@@ -284,7 +287,23 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		refreshViewProduct();
 		refreshViewPiece();
 	}
-	
+
+	@Listen("onClick = #profitPercentagePriceButton")
+	public void profitPercentagePriceButtonClick() {
+		if(currentProduct != null) {
+			if(currentProduct.getCostTotal() != BigDecimal.ZERO) {
+				BigDecimal totalCost = currentProduct.getCostTotal();
+				BigDecimal costPercent = (settingsRepository.findAll().get(0).getPercentProfit().multiply(totalCost)).divide(new BigDecimal(100));
+				BigDecimal generatedPrice = totalCost.add(costPercent);
+				productPriceDoublebox.setValue(generatedPrice.setScale(2, BigDecimal.ROUND_HALF_EVEN).doubleValue());
+			} else {
+				Clients.showNotification("El producto debe contener costos");
+			}
+		} else {
+			Clients.showNotification("El producto debe estar guardado");
+		}
+	}
+
 	@Listen("onClick = #newProductButton")
 	public void newProductButtonClick() {
 		currentProduct = null;
@@ -317,7 +336,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		String productName = productNameTextbox.getText();//.toUpperCase();
 		String productDetails = productDetailsTextbox.getText();
 		String productCode = productCodeTextbox.getText();
-		BigDecimal productPrice = new BigDecimal(productPriceDoublebox.doubleValue());int nro = 5;BigDecimal.valueOf(nro);
+		BigDecimal productPrice = new BigDecimal(productPriceDoublebox.doubleValue());
 		org.zkoss.image.Image image = productImage.getContent();
 		List<ProductMaterial> productMaterialList = new ArrayList<ProductMaterial>();
 		productMaterialList.addAll(supplyList);
@@ -427,7 +446,8 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			Checkbox chkbox = (Checkbox)processListbox.getChildren().get(i).getChildren().get(0).getChildren().get(0);
 			Spinner hoursSpinner = (Spinner)processListbox.getChildren().get(i).getChildren().get(3).getChildren().get(0);
 			Spinner minutesSpinner = (Spinner)processListbox.getChildren().get(i).getChildren().get(4).getChildren().get(0);
-			if(chkbox.isChecked() && hoursSpinner.intValue() == 0 && minutesSpinner.intValue() == 0) {
+			Spinner secondsSpinner = (Spinner)processListbox.getChildren().get(i).getChildren().get(5).getChildren().get(0);
+			if(chkbox.isChecked() && hoursSpinner.intValue() == 0 && minutesSpinner.intValue() == 0 && secondsSpinner.intValue() == 0) {
 				Clients.showNotification("Ingrese el Tiempo para el Proceso", minutesSpinner);
 				return false;
 			}
@@ -664,7 +684,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			return aux.getTime().getMinutes();
 		}
 	}
-	
+
 	public Integer getProcessSeconds(ProcessType processType) {
 		Process aux = getProcessFromListbox(processType);
 		if(aux == null) {
@@ -830,7 +850,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			process.setTime(duration);
 		}
 	}
-	
+
 	@Listen("onProcessSecondsChange = #processListbox")
 	public void doProcessSecondsChange(ForwardEvent evt) {
 		pieceChanged = true;
@@ -1119,7 +1139,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	public void pieceDetaisOnCheck() {
 		pieceChanged = true;
 	}
-	
+
 	protected void refreshTotalCostLabel() {
 		BigDecimal totalCost = getTotalCost();
 		totalCostLabel.setValue(totalCost.doubleValue() + "");

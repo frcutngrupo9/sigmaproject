@@ -40,7 +40,7 @@ import org.zkoss.zul.SimpleCategoryModel;
 import org.zkoss.zul.SimplePieModel;
 
 import ar.edu.utn.sigmaproject.domain.Client;
-import ar.edu.utn.sigmaproject.domain.MaterialType;
+import ar.edu.utn.sigmaproject.domain.Item;
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.Product;
@@ -51,7 +51,6 @@ import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
-import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 
 public class ChartHelper {
 
@@ -59,7 +58,6 @@ public class ChartHelper {
 	private ProductRepository productRepository;
 	private OrderRepository orderRepository;
 	private ClientRepository clientRepository;
-	private SupplyTypeRepository supplyTypeRepository;
 
 	public ChartHelper(OrderDetailRepository orderDetailRepository,
 			ProductRepository productRepository, OrderRepository orderRepository, ClientRepository clientRepository) {
@@ -337,6 +335,23 @@ public class ChartHelper {
 		return model;
 	}
 
+	public CategoryModel getCostBarChartModel(Date dateFrom, Date dateTo, List<Product> filterProductList) {
+		CategoryModel model = new SimpleCategoryModel();
+		List<Product> productList;
+		if(filterProductList==null || filterProductList.isEmpty()) {
+			productList = productRepository.findAll();
+		} else {
+			productList = filterProductList;
+		}
+		for(Product eachProduct : productList) {
+			if(eachProduct.getCostTotal() != BigDecimal.ZERO) {
+				model.setValue("Ingreso", eachProduct.getName(), eachProduct.getPrice().doubleValue());
+				model.setValue("Costo", eachProduct.getName(), eachProduct.getCostTotal().doubleValue());
+			}
+		}
+		return model;
+	}
+
 	private List<ProductTotal> getProductTotalByClient(Client eachClient, Date dateFrom, Date dateTo) {
 		Map<Product, Integer> productTotalMap = new HashMap<Product, Integer>();
 		for(Order eachOrder : orderRepository.findByClientAndDateAfterAndDateBefore(eachClient, dateFrom, dateTo)) {
@@ -371,9 +386,10 @@ public class ChartHelper {
 		Map<SupplyType, Integer> suppliesTotalMap = new HashMap<SupplyType, Integer>();
 		for(ProductTotal each : getProductTotalOrders(dateFrom, dateTo)) {
 			for(ProductMaterial eachMaterial : each.getProduct().getMaterials()) {
-				if(eachMaterial.getType() == MaterialType.Supply) {
+				Item item = eachMaterial.getItem();
+				if(item instanceof SupplyType) {
 					SupplyType supplyType = (SupplyType) eachMaterial.getItem();
-					supplyType = supplyTypeRepository.findOne(supplyType.getId());
+					//supplyType = supplyTypeRepository.findOne(supplyType.getId());
 					Integer currentUnits = eachMaterial.getQuantity().intValue() * each.getTotalUnits();
 					Integer totalUnits = suppliesTotalMap.get(supplyType);
 					suppliesTotalMap.put(supplyType, (totalUnits == null) ? currentUnits : totalUnits + currentUnits);
