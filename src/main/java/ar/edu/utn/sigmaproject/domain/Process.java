@@ -168,13 +168,19 @@ public class Process implements Serializable, Cloneable {
 			// el costo de cada proceso es el tiempo total en horas multiplicado por el costo por hora del rol
 			int hours = getTime().getHours();
 			int minutes = getTime().getMinutes();
+			int seconds = getTime().getSeconds();
+			while(seconds >= 60) {
+				seconds -= 60;
+				minutes += 1;
+			}
 			while(minutes >= 60) {
 				minutes -= 60;
 				hours += 1;
 			}
+			BigDecimal secondsToHour = (new BigDecimal(seconds)).divide(new BigDecimal(3600), 2, BigDecimal.ROUND_HALF_EVEN);
 			// sumamos el decimal minutos a la hora
 			BigDecimal minutesToHour = (new BigDecimal(minutes)).divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_EVEN);
-			BigDecimal durationTotal = (new BigDecimal(hours)).add(minutesToHour);
+			BigDecimal durationTotal = (new BigDecimal(hours)).add(minutesToHour).add(secondsToHour);
 			cost = cost.add(durationTotal.multiply(getWorkHour().getPrice()));
 		}
 		return cost;

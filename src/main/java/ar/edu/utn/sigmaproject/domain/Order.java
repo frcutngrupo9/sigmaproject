@@ -60,6 +60,7 @@ public class Order implements Serializable, Cloneable {
 	private Date date = new Date();
 	private Date needDate = new Date();
 	private OrderStateType currentStateType = null;
+	private String numberBill = "";
 
 	public Order() {
 
@@ -153,7 +154,15 @@ public class Order implements Serializable, Cloneable {
 	public void setNeedDate(Date needDate) {
 		this.needDate = needDate;
 	}
-	
+
+	public String getNumberBill() {
+		return numberBill;
+	}
+
+	public void setNumberBill(String numberBill) {
+		this.numberBill = numberBill;
+	}
+
 	public List<Product> getProductList() {
 		List<Product> productList = new ArrayList<Product>();
 		for(OrderDetail each : details) {

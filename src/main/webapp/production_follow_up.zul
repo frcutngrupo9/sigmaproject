@@ -54,15 +54,15 @@ THE SOFTWARE.
 		                        </row>
 		                        <row>
 		                            <label value="${labels.date_start_scheduled}: "/>
-									<datebox buttonVisible="false" disabled="true" id="productionOrderStartDatebox" cols="12" format="${labels.date_time_format}" width="110px"/>
+									<datebox buttonVisible="false" disabled="true" id="productionOrderStartDatebox" cols="12" format="${labels.date_time_format}" width="130px"/>
 									<label value="${labels.date_finish_scheduled}: "/>
-									<datebox buttonVisible="false" disabled="true" id="productionOrderFinishDatebox" cols="12" format="${labels.date_time_format}" width="110px"/>
+									<datebox buttonVisible="false" disabled="true" id="productionOrderFinishDatebox" cols="12" format="${labels.date_time_format}" width="130px"/>
 		                        </row>
 		                        <row>
 		                            <label value="${labels.date_start_actual}: "/>
-									<datebox buttonVisible="false" disabled="true" id="productionOrderRealStartDatebox" cols="12" format="${labels.date_time_format}" width="110px"/>
+									<datebox buttonVisible="false" disabled="true" id="productionOrderRealStartDatebox" cols="12" format="${labels.date_time_format}" width="130px"/>
 									<label value="${labels.date_finish_actual}: "/>
-									<datebox buttonVisible="false" disabled="true" id="productionOrderRealFinishDatebox" cols="12" format="${labels.date_time_format}" width="110px"/>
+									<datebox buttonVisible="false" disabled="true" id="productionOrderRealFinishDatebox" cols="12" format="${labels.date_time_format}" width="130px"/>
 		                        </row>
 		                        <row>
 		                            <label value="${labels.quantity}: "/>
@@ -104,10 +104,10 @@ THE SOFTWARE.
 		                	<custom-attributes state_cancel="${win_production_follow_up$composer.isStateCancel(each.getState())}"/>
 		                	<checkbox visible="${!state_cancel}" disabled="${state_cancel}" checked="${state_finish}" forward="onCheck=productionOrderDetailGrid.onEditProductionOrderDetailIsFinished(${each})"/>
 			            	<label value="${each.process.type.name}"/>
-			            	<datebox buttonVisible="false" disabled="true" cols="12" format="${labels.date_time_format}" value="${each.dateStart}"/>
-			            	<datebox buttonVisible="false" disabled="true" cols="12" format="${labels.date_time_format}" value="${each.dateFinish}"/>
-			            	<datebox buttonVisible="true" disabled="${!state_finish}" visible="true" cols="12" format="${labels.date_time_format}" value="${each.dateStartReal}" forward="onChange=productionOrderDetailGrid.onChangeProductionOrderDetailDateStartReal(${each})"/>
-			            	<datebox buttonVisible="true" disabled="${!state_finish}" visible="true" cols="12" format="${labels.date_time_format}" value="${each.dateFinishReal}" forward="onChange=productionOrderDetailGrid.onChangeProductionOrderDetailDateFinishReal(${each})"/>
+			            	<datebox width="130px" buttonVisible="false" disabled="true" cols="12" format="${labels.date_time_format}" value="${each.dateStart}"/>
+			            	<datebox width="130px" buttonVisible="false" disabled="true" cols="12" format="${labels.date_time_format}" value="${each.dateFinish}"/>
+			            	<datebox width="150px" buttonVisible="true" disabled="${!state_finish}" visible="true" cols="12" format="${labels.date_time_format}" value="${each.dateStartReal}" forward="onChange=productionOrderDetailGrid.onChangeProductionOrderDetailDateStartReal(${each})"/>
+			            	<datebox width="150px" buttonVisible="true" disabled="${!state_finish}" visible="true" cols="12" format="${labels.date_time_format}" value="${each.dateFinishReal}" forward="onChange=productionOrderDetailGrid.onChangeProductionOrderDetailDateFinishReal(${each})"/>
 			            	<label value="${each.process.getPiece().getName()}"/>
 			            	<label value="${r:getFormattedProcessTime(each.getTimeTotal())}"/>
 			            	<label value="${each.getWorker().getName()}"/>

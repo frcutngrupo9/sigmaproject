@@ -48,7 +48,6 @@ import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Slider;
 import org.zkoss.zul.Window;
 
-import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderDetailRepository;
@@ -78,6 +77,7 @@ public class GraphicsController extends SelectorComposer<Component> {
 	private ChartModel chartModel;
 	private Date dateFrom;
 	private Date dateTo;
+	private Date[] firstAndLastDates;
 
 	// services
 	@WireVariable
@@ -100,9 +100,9 @@ public class GraphicsController extends SelectorComposer<Component> {
 		filterProductList = null;
 		chartHelper = new ChartHelper(orderDetailRepository, productRepository, orderRepository, clientRepository);
 		chartModel = null;
-		Order[] firstAndLastOrderArray = chartHelper.getFirstAndLastOrder();
-		dateFrom = firstAndLastOrderArray[0].getDate();
-		dateTo = firstAndLastOrderArray[1].getDate();
+		firstAndLastDates = chartHelper.getFirstAndLastOrderDates();
+		dateFrom = firstAndLastDates[0];
+		dateTo = firstAndLastDates[1];
 		is3dChecked = true;
 		fgAlpha = 128;
 		addListeners();
@@ -157,7 +157,7 @@ public class GraphicsController extends SelectorComposer<Component> {
 	}
 
 	@Listen("onClick = #productLineChartButton")
-	public void productLineChartButtonOnClick(MouseEvent event) {
+	public void productLineChartButtonOnClick() {
 		setAllValues("line", "Productos por Mes");
 		refreshView();
 	}
@@ -177,6 +177,18 @@ public class GraphicsController extends SelectorComposer<Component> {
 	@Listen("onClick = #suppliesPieChartButton")
 	public void suppliesPieChartButtonOnClick() {
 		setAllValues("pie", "Insumos Utilizados");
+		refreshView();
+	}
+
+	@Listen("onClick = #monthCostChartButton")
+	public void monthCostChartButtonOnClick() {
+		setAllValues("line", "Costos por Mes");
+		refreshView();
+	}
+
+	@Listen("onClick = #productCostChartButton")
+	public void productCostChartButtonOnClick() {
+		setAllValues("bar", "Costos por Producto");
 		refreshView();
 	}
 
@@ -215,7 +227,7 @@ public class GraphicsController extends SelectorComposer<Component> {
 	@Listen("onClick = #beginningOfTimeButton")
 	public void beginningOfTimeButtonOnClick() {
 		if(chartModel != null) {
-			dateFrom = chartHelper.getFirstAndLastOrder()[0].getDate();
+			dateFrom = firstAndLastDates[0];
 			refreshChartModel();
 			refreshView();
 		}
@@ -224,7 +236,7 @@ public class GraphicsController extends SelectorComposer<Component> {
 	@Listen("onClick = #endOfTimeButton")
 	public void endOfTimeButtonOnClick() {
 		if(chartModel != null) {
-			dateTo = chartHelper.getFirstAndLastOrder()[1].getDate();
+			dateTo = firstAndLastDates[1];
 			refreshChartModel();
 			refreshView();
 		}
@@ -240,6 +252,10 @@ public class GraphicsController extends SelectorComposer<Component> {
 			chartModel = chartHelper.getProductBarModel(dateFrom, dateTo, filterProductList);
 		} else if(title.equalsIgnoreCase("Insumos Utilizados")) {
 			chartModel = chartHelper.getSuppliesPieModel(dateFrom, dateTo);
+		} else if(title.equalsIgnoreCase("Costos por Mes")) {
+			chartModel = chartHelper.getCostLineChartModel(dateFrom, dateTo);
+		} else if(title.equalsIgnoreCase("Costos por Producto")) {
+			chartModel = chartHelper.getCostBarChartModel(dateFrom, dateTo, filterProductList);
 		}
 	}
 

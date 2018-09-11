@@ -80,11 +80,15 @@ THE SOFTWARE.
 			        <columns>
 		                <column hflex="max" align="right"/>
 		                <column hflex="max" align="left"/>
+		                <column hflex="max" align="right"/>
+		                <column hflex="max" align="left"/>
 		            </columns>
 			        <rows>
 			            <row>
 			                <label>${labels.delivered_on} </label>
 			                <datebox id="deliveryDatebox" buttonVisible="true" format="${labels.date_format}" constraint="no future" width="160px"/>
+			                <label>Numero Factura: </label>
+			                <textbox id="numberBillTextbox" width="160px"/>
 			            </row>
 			        </rows>
 		    	</grid>

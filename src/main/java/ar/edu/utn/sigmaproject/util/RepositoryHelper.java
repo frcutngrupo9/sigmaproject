@@ -48,6 +48,7 @@ import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductCategory;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderStateType;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
+import ar.edu.utn.sigmaproject.domain.Settings;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.domain.Wood;
 import ar.edu.utn.sigmaproject.domain.WoodType;
@@ -64,6 +65,7 @@ import ar.edu.utn.sigmaproject.service.ProductCategoryRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
+import ar.edu.utn.sigmaproject.service.SettingsRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
 import ar.edu.utn.sigmaproject.service.WoodTypeRepository;
@@ -108,7 +110,7 @@ public class RepositoryHelper {
 
 	@Autowired
 	private WorkerRepository workerRepository;
-	
+
 	@Autowired
 	private WorkHourRepository workHourRepository;
 
@@ -120,6 +122,9 @@ public class RepositoryHelper {
 
 	@Autowired
 	private MachineRepository machineRepository;
+
+	@Autowired
+	private SettingsRepository settingsRepository;
 
 	@Autowired
 	private EntityManager entityManager;
@@ -138,7 +143,16 @@ public class RepositoryHelper {
 		generateWorkHour();
 		generateSupplyType();
 		generateMachine();
+		generateSettings();
 		hibernateSearchReIndex();
+	}
+
+	private void generateSettings() {
+		if (settingsRepository.count() == 0) {
+			Settings settings = new Settings();
+			settings.setPercentProfit(new BigDecimal(25));
+			settingsRepository.save(settings);
+		}
 	}
 
 	private void generateProductionPlanStateTypes() {
@@ -183,12 +197,11 @@ public class RepositoryHelper {
 	private void generateMachineType() {
 		if (machineTypeRepository.count() == 0) {
 			List<MachineType> list = new ArrayList<>();
-			list.add(new MachineType("Escuadradora", "Utilizado para efectuar cortes lineales a escuadra.", null));
+			list.add(new MachineType("Escuadradora", "Utilizado para dar largo y ancho de la madera.", null));
 			list.add(new MachineType("Sierra sin fin", "Utilizado para realizar los cortes curvos.", null));
-			list.add(new MachineType("Cepilladora", "Utilizado para efectuar las operaciones de planear, cantear y embatientar una pieza de trabajo.", null));
-			list.add(new MachineType("Escopleadora", "", null));
-			list.add(new MachineType("Tupi", "Utilizado para redondear y a la vez dar varias formas a la madera.", null));
-			list.add(new MachineType("Lijadora de banda", "Utilizado para lijar piezas de trabajo planas y con sus dispositivos se pueden lijar piezas curvas", null));
+			list.add(new MachineType("Cepilladora", "Utilizado para dar el grosor a la cara de la madera.", null));
+			list.add(new MachineType("Tupi", "Utilizado para realizar fresado, canales y espigas a la madera.", null));
+			list.add(new MachineType("Lijadora", "Utilizado para lijar la superficie de la madera", null));
 			machineTypeRepository.save(list);
 		}
 	}
@@ -201,13 +214,12 @@ public class RepositoryHelper {
 			list.add(new ProcessType(1, "Trazado de Madera", "Trazar maderas para el posterior cortado.", null));
 			list.add(new ProcessType(2, "Cortado de Madera", "Cortar maderas en las medidas trazadas.", machineTypeRepository.findFirstByName("Escuadradora")));
 			list.add(new ProcessType(3, "Cortado Curvo", machineTypeRepository.findFirstByName("Sierra sin fin")));
-			list.add(new ProcessType(4, "Cepillado", machineTypeRepository.findFirstByName("Cepilladora")));
-			list.add(new ProcessType(5, "Escoplado", machineTypeRepository.findFirstByName("Escopleadora")));
+			list.add(new ProcessType(4, "Lijado", machineTypeRepository.findFirstByName("Lijadora")));
+			list.add(new ProcessType(5, "Cepillado", machineTypeRepository.findFirstByName("Cepilladora")));
 			list.add(new ProcessType(6, "Espigado", machineTypeRepository.findFirstByName("Tupi")));
 			list.add(new ProcessType(7, "Hacer Molduras", machineTypeRepository.findFirstByName("Tupi")));
 			list.add(new ProcessType(8, "Acanalado", machineTypeRepository.findFirstByName("Tupi")));
-			list.add(new ProcessType(9, "Lijado", machineTypeRepository.findFirstByName("Lijadora de banda")));
-			list.add(new ProcessType(10, "Ensamblado", "Unir diferentes piezas con tornillos, engrapado, pegamento, clavos, etc.", null));
+			list.add(new ProcessType(9, "Ensamblado", "Unir diferentes piezas con tornillos, engrapado, pegamento, clavos, etc.", null));
 			processTypeRepository.save(list);
 
 		}
@@ -231,9 +243,7 @@ public class RepositoryHelper {
 			list.add(new ProductCategory("Biblioteca"));
 			list.add(new ProductCategory("Cajonera"));
 			list.add(new ProductCategory("Cama"));
-			list.add(new ProductCategory("Marco"));
 			list.add(new ProductCategory("Mesa"));
-			list.add(new ProductCategory("Respaldo"));
 			list.add(new ProductCategory("Silla"));
 			productCategoryRepository.save(list);
 		}
@@ -261,7 +271,7 @@ public class RepositoryHelper {
 			workerRepository.save(list);
 		}
 	}
-	
+
 	private void generateWorkHour() {
 		if(workHourRepository.count() == 0) {
 			List<WorkHour> list = new ArrayList<>();
@@ -270,21 +280,30 @@ public class RepositoryHelper {
 			list.add(new WorkHour("Control", new BigDecimal("120")));
 			workHourRepository.save(list);
 		}
-		
+
 	}
 
 	private void generateSupplyType() {
 		if(supplyTypeRepository.count() == 0) {
 			List<SupplyType> list = new ArrayList<>();
-			list.add(new SupplyType("1", "INSUMO 1", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("9.87")));
-			list.add(new SupplyType("2", "INSUMO 2", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("7.77")));
-			list.add(new SupplyType("3", "INSUMO 3", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("5.52")));
-			list.add(new SupplyType("4", "INSUMO 4", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("3.14")));
-			list.add(new SupplyType("5", "INSUMO 5", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("1.61")));
+			list.add(new SupplyType("1", "Lija al Agua", "Lijado fino prelustrado", "Szumik", "", "Unidad", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("11")));
+			list.add(new SupplyType("2", "Adhesivo Vinilico", "Encolado de piezas para su union", "Lencisa", "Envase", "5 Kg", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("316")));
+			list.add(new SupplyType("3", "Pintura Asfáltica", "Lustrado de muebles", "Szumik", "Lata", "18Lts", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("1200")));
+			list.add(new SupplyType("4", "Bulon Camero", "Di\u00e1metro 8 mm - Largo 110 mm", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("9")));
+			list.add(new SupplyType("5", "Tuerca", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("1.5")));
+			list.add(new SupplyType("6", "Arandela", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("1.15")));
+			list.add(new SupplyType("7", "Clavo", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("1")));
+			/*
+			list.add(new SupplyType("1", "INSUMO 1", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("9,87")));
+			list.add(new SupplyType("2", "INSUMO 2", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("7,77")));
+			list.add(new SupplyType("3", "INSUMO 3", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("5,52")));
+			list.add(new SupplyType("4", "INSUMO 4", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("3,14")));
+			list.add(new SupplyType("5", "INSUMO 5", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("1,61")));
+			 */
 			supplyTypeRepository.save(list);
 		}
 	}
-	
+
 	private void addMeasureUnits(String measureUnitTypeName, List<List<String>> definitions) {
 		MeasureUnitType measureUnitType = measureUnitTypeRepository.findFirstByName(measureUnitTypeName);
 		if (measureUnitType == null) {
@@ -297,7 +316,7 @@ public class RepositoryHelper {
 			measureUnitTypeRepository.save(measureUnitType);
 		}
 	}
-	
+
 	private void generateMeasureUnitTypeList() {
 		addMeasureUnits("Longitud", Arrays.asList(
 				Arrays.asList("Metros", "M"),
@@ -416,7 +435,30 @@ public class RepositoryHelper {
 	private void generateProduct() {
 		if (productRepository.count() == 0) {
 			generateProductCategory();
+			Product product = null;
 			List<Product> list = new ArrayList<>();
+			product = new Product("1", "C\u00f3moda 4 Cajones 1 Puerta", "Medidas: Ancho: 105cm - Profundidad: 45cm – Alto: 100cm", productCategoryRepository.findFirstByName("Cajonera"), new BigDecimal("2300"));
+			product.setStockMax(15);
+			list.add(product);
+			product = new Product("2", "Cama 1 Plaza", "Medidas: Ancho: 90cm - Profundidad: 200cm – Alto: 36cm", productCategoryRepository.findFirstByName("Cama"), new BigDecimal("940"));
+			product.setStockMax(20);
+			list.add(product);
+			product = new Product("3", "Biblioteca 4 Estantes", "Medidas: Ancho: 100cm - Profundidad: 25cm – Alto: 175cm", productCategoryRepository.findFirstByName("Biblioteca"), new BigDecimal("1100"));
+			product.setStockMax(10);
+			list.add(product);
+			product = new Product("4", "Mesa Maciza Pata Recta", "Medidas: Ancho: 140cm - Profundidad: 80cm – Alto: 80cm", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("1250"));
+			product.setStockMax(15);
+			list.add(product);
+			product = new Product("5", "Silla", "Medidas: Ancho: 40cm - Profundidad: 38cm – Alto: 95cm", productCategoryRepository.findFirstByName("Silla"), new BigDecimal("250"));
+			product.setStockMax(150);
+			list.add(product);
+			product = new Product("6", "Mesa De Luz 1 Caj\u00f3n", "Medidas: Ancho: 49cm - Profundidad: 41cm – Alto: 63cm", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("915"));
+			product.setStockMax(40);
+			list.add(product);
+			product = new Product("7", "Banco Mediano", "Medidas: Ancho: 30cm - Profundidad: 30cm – Alto: 60cm", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("320"));
+			product.setStockMax(100);
+			list.add(product);
+			/*
 			list.add(new Product("2", "Mesa patas 4x4 rectas de 1.40x0.80mts", "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("956")));
 			list.add(new Product("23", "Mesa de living patas 4x4 rectas de 1.00x0.70mts", "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("678")));
 			list.add(new Product("28", "Taburete bajo estilo r\u00fastico", "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("177")));
@@ -426,6 +468,7 @@ public class RepositoryHelper {
 			list.add(new Product("53", "Mesa de luz de 0,70x0,50x0,40 mts", "", productCategoryRepository.findFirstByName("Mesa"), new BigDecimal("473")));
 			list.add(new Product("54", "Biblioteca de 0,30 mts con estantes", "", productCategoryRepository.findFirstByName("Biblioteca"), new BigDecimal("546")));
 			list.add(new Product("60", "Banco cuadrado chico", "", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("153")));
+			 */
 			productRepository.save(list);
 		}
 	}

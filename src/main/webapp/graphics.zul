@@ -35,7 +35,13 @@ THE SOFTWARE.
             		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
             		<toolbarbutton id="productBarChartButton" label="Productos por Cliente"/>
             		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+            		<!--
             		<toolbarbutton id="suppliesPieChartButton" label="Insumos Utilizados"/>
+            		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+            		-->
+            		<toolbarbutton id="monthCostChartButton" label="Costos por Mes"/>
+            		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
+            		<toolbarbutton id="productCostChartButton" label="Costos por Producto"/>
             		<space bar="true" style="vertical-align: middle; line-height: 20px;"/>
 				</toolbar>
             	<hbox hflex="1" pack="center">

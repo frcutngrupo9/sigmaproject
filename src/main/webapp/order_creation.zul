@@ -50,10 +50,13 @@ THE SOFTWARE.
                             <label value="${labels.client}: "/>
 		                    <bandbox id="clientBandbox" buttonVisible = "true" autodrop = "true" width="25%">
 		                        <bandpopup>
-		                            <listbox id="clientPopupListbox" width="200px">
+		                            <hbox pack="center" align="center" width="300px">
+		                            	<button id="newClientButton" label="${labels.new_text}"/>
+		                            </hbox>
+		                            <listbox id="clientPopupListbox" width="300px">
 		                                <listhead>
-		                                    <listheader label="${labels.client}"/>
-		                                    <listheader label="${labels.email}"/>
+		                                    <listheader label="${labels.client}" width="120px"/>
+		                                    <listheader label="${labels.email}" hflex="1"/>
 		                                </listhead>
 		                                <template name="model">
 		                                    <listitem>
@@ -147,6 +150,7 @@ THE SOFTWARE.
                     <button id="deleteOrderButton" label="${labels.delete_order}"/>
                     <separator/>
                     <button id="jasperReportButton" label="${labels.report}"/>
+                    <button id="deliveryNoteReportButton" label="Remito"/>
                     <hbox pack="center" align="center" hflex="1">
 			        	<button id="newOrderButton" label="${labels.new_order}"/>
 			        	<button id="returnButton" label="${labels.return_to_list}"/>

@@ -38,6 +38,9 @@ import net.sf.jasperreports.engine.JRField;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.EventQueue;
+import org.zkoss.zk.ui.event.EventQueues;
 import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -67,6 +70,8 @@ import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.domain.ProductMaterial;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
@@ -119,6 +124,8 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	Button returnButton;
 	@Wire
 	Button jasperReportButton;
+	@Wire
+	Button deliveryNoteReportButton;
 
 	// services
 	@WireVariable
@@ -133,6 +140,8 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	private OrderStateTypeRepository orderStateTypeRepository;
 
 	// attributes
+	@SuppressWarnings("rawtypes")
+	private EventQueue eq;
 	private Order currentOrder;
 	private OrderDetail currentOrderDetail;
 	private Product currentProduct;
@@ -165,7 +174,35 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		currentOrderDetail = null;
 		currentProduct = null;
 		currentClient = null;
+		createListener();
 		refreshViewOrder();
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void createListener() {
+		// listener para cuando se agregue un cliente
+		eq = EventQueues.lookup("Client Update Queue", EventQueues.DESKTOP, true);
+		eq.subscribe(new EventListener() {
+			public void onEvent(Event event) throws Exception {
+				if(event.getName().equals("onClientUpdate")) {
+					Client clientCreated = (Client) event.getData();
+					currentClient = clientCreated;
+					clientPopupList = clientRepository.findAll();
+					clientPopupListModel = new ListModelList<Client>(clientPopupList);
+					clientPopupListbox.setModel(clientPopupListModel);
+					clientBandbox.setValue(clientCreated.getName());
+					clientBandbox.close();
+				}
+			}
+		});
+	}
+
+	@Listen("onClick = #newClientButton")
+	public void newClientButtonClick() {
+		final Window win = (Window) Executions.createComponents("/client_creation.zul", null, null);
+		win.setSizable(false);
+		win.setPosition("center");
+		win.doModal();
 	}
 
 	@Listen("onSelect = #clientPopupListbox")
@@ -176,7 +213,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	}
 
 	@Listen("onClick = #saveOrderButton")
-	public void saveOrder() {
+	public void saveOrderButtonClick() {
 		// TODO agregar comprobacion para ver si todavia no se guardo un detalle activo
 		if(currentClient == null) {
 			Clients.showNotification("Seleccionar Cliente", clientBandbox);
@@ -199,6 +236,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		} else {
 			orderStateType = null;
 		}
+		boolean isDeliverAvailable = true;
 		if(currentOrder == null) { // es un pedido nuevo
 			// creamos el nuevo pedido
 			currentOrder = new Order(currentClient, order_number, order_date, order_need_date);
@@ -207,12 +245,29 @@ public class OrderCreationController extends SelectorComposer<Component> {
 				orderDetail.setOrder(currentOrder);
 			}
 			currentOrder.getDetails().addAll(orderDetailList);
+			// si existe stock suficiente para satisfacer el pedido y no hay pedidos finalizados que requieran ese stock, se informa y se realiza la entrega directamente
+			for(OrderDetail orderDetail : orderDetailList) {
+				if(!existStockAvailable(orderDetail.getProduct(), orderDetail.getUnits())) {
+					isDeliverAvailable = false;
+					break;
+				}
+			}
 		} else { // se edita un pedido
+			isDeliverAvailable = false;
 			currentOrder.setClient(currentClient);
 			currentOrder.setNeedDate(order_need_date);
 			currentOrder.setNumber(order_number);
 			currentOrder.setDate(order_date);
 		}
+		if(isDeliverAvailable) {
+			// se pregunta si se quiere entregar el pedido directamente ya que existe stock disponible
+			showMessagebox(orderStateType);
+		} else {
+			saveOrder(orderStateType);
+		}
+	}
+
+	private void saveOrder(OrderStateType orderStateType) {
 		OrderState orderState = new OrderState(orderStateType, new Date());
 		orderState = orderStateRepository.save(orderState);
 		currentOrder.setState(orderState);
@@ -220,6 +275,47 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		currentOrder = orderRepository.findOne(currentOrder.getId());// se recupera de la bd para que tenga los detalles actualizados
 		refreshViewOrder();
 		alert("Pedido guardado.");
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void showMessagebox(final OrderStateType currentOrderStateType) {
+		// pregunta si se quiere asignar igual estando ocupado
+		Messagebox.show("Existe stock disponible para realizar la entrega inmediata, desea entregar el stock existente?", "Confirmar", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+			public void onEvent(Event evt) throws InterruptedException {
+				if (evt.getName().equals("onOK")) {
+					/*
+					// modifica la cantidad en stock
+					for(OrderDetail each : currentOrder.getDetails()) {
+						Product product = each.getProduct();
+						product.setStock(product.getStock() - each.getUnits());
+						product = productRepository.save(product);
+					}
+					 */
+					saveOrder(orderStateTypeRepository.findFirstByName("Finalizado"));
+				} else {
+					saveOrder(currentOrderStateType);
+				}
+			}
+		});
+	}
+
+	private boolean existStockAvailable(Product product, Integer units) {
+		// si para el producto y la cantidad existe stock que no posee un pedido correlativo finalizado, se devuelve verdadero
+		int quantityFinished = 0;
+		OrderStateType stateType = orderStateTypeRepository.findFirstByName("Finalizado");
+		List<Order> orderList = orderRepository.findByCurrentStateType(stateType);
+		for(Order each : orderList) {
+			for(OrderDetail eachDetail : each.getDetails()) {
+				if(eachDetail.getProduct().getId() == product.getId()) {
+					quantityFinished += eachDetail.getUnits();
+				}
+			}
+		}
+		int stockAvailable = product.getStock() - quantityFinished;
+		if(stockAvailable >= units) {
+			return true;
+		}
+		return false;
 	}
 
 	@Listen("onClick = #resetOrderButton")
@@ -248,11 +344,11 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	@Listen("onOK = #productUnitsIntbox")
 	public void productUnitsIntboxOnOK() {
 		// se ejecuta al presionar la tecla enter dentro del Intbox
-		saveOrderDetail();
+		saveOrderDetailButtonClick();
 	}
 
 	@Listen("onClick = #saveOrderDetailButton")
-	public void saveOrderDetail() {
+	public void saveOrderDetailButtonClick() {
 		if(productUnitsIntbox.getValue()==null || productUnitsIntbox.getValue().intValue()<=0){
 			Clients.showNotification("Ingresar Cantidad del Producto", productUnitsIntbox);
 			return;
@@ -311,10 +407,13 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			orderDetailList = new ArrayList<OrderDetail>();
 			deleteOrderButton.setDisabled(true);
 			orderStateTypeCombobox.setDisabled(true);
+			deliveryNoteReportButton.setDisabled(true);
 		} else {// editar pedido
 			orderCaption.setLabel("Edicion de Pedido");
 			OrderStateType orderCurrentStateType = currentOrder.getCurrentStateType();
 			if(orderCurrentStateType != null) {
+				orderStateTypeList = orderStateTypeRepository.findAll();
+				orderStateTypeListModel = new ListModelList<OrderStateType>(orderStateTypeList);
 				orderStateTypeListModel.addToSelection(orderStateTypeRepository.findOne(orderCurrentStateType.getId()));
 				orderStateTypeCombobox.setModel(orderStateTypeListModel);
 				// solo se puede grabar si esta en estado Creado o Cancelado
@@ -326,6 +425,11 @@ public class OrderCreationController extends SelectorComposer<Component> {
 				} else {
 					saveOrderButton.setDisabled(false);
 					deleteOrderButton.setDisabled(false);
+				}
+				if(orderCurrentStateType.getName().equalsIgnoreCase("Entregado")) {
+					deliveryNoteReportButton.setDisabled(false);
+				} else {
+					deliveryNoteReportButton.setDisabled(true);
 				}
 			} else {
 				orderStateTypeCombobox.setSelectedIndex(-1);
@@ -521,6 +625,29 @@ public class OrderCreationController extends SelectorComposer<Component> {
 			}
 		}
 		return total_price.doubleValue();
+	}
+
+	@Listen("onClick = #deliveryNoteReportButton")
+	public void deliveryNoteReportButtonClick() {
+		loadDeliveryNoteJasperreport();
+	}
+
+	private void loadDeliveryNoteJasperreport() {
+		Map<String, Object> parameters;
+		parameters = new HashMap<String, Object>();
+		parameters.put("orderClientName", currentOrder.getClient().getName());
+		parameters.put("orderClientAddress", currentOrder.getClient().getAddress());
+		parameters.put("orderClientPhone", currentOrder.getClient().getPhone());
+
+		Executions.getCurrent().setAttribute("jr_datasource", new OrderReportDataSource(currentOrder.getDetails()));
+		Executions.getCurrent().setAttribute("return_page_name", "order_creation");
+		Map<String, Object> returnParameters = new HashMap<String, Object>();
+		returnParameters.put("selected_order", currentOrder);
+		Executions.getCurrent().setAttribute("return_parameters", returnParameters);
+		Executions.getCurrent().setAttribute("report_src_name", "delivery_note");
+		Executions.getCurrent().setAttribute("report_parameters", parameters);
+		Window window = (Window)Executions.createComponents("/report_selection_modal.zul", null, null);
+		window.doModal();
 	}
 
 	@Listen("onClick = #jasperReportButton")

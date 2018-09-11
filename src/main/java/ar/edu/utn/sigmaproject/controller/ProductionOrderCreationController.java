@@ -33,6 +33,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -68,6 +69,7 @@ import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.ProcessState;
+import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
@@ -79,6 +81,7 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.domain.Worker;
 import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
+import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderDetailRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
 import ar.edu.utn.sigmaproject.service.ProductionOrderStateRepository;
@@ -112,12 +115,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	Datebox productionOrderStartDatebox;
 	@Wire
 	Datebox productionOrderFinishDatebox;
-	@Wire
-	Button saveButton;
-	@Wire
-	Button cancelButton;
-	@Wire
-	Button resetButton;
 	@Wire
 	Button generateDetailsButton;
 	@Wire
@@ -154,6 +151,8 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	private MachineTypeRepository machineTypeRepository;
 	@WireVariable
 	private WorkerRepository workerRepository;
+	@WireVariable
+	private ProcessTypeRepository processTypeRepository;
 
 	// atributes
 	private ProductionOrder currentProductionOrder;
@@ -221,9 +220,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		productionOrderFinishDatebox.setValue(currentProductionOrder.getDateFinish());
 		refreshProductionOrderDetailGridView();
 		refreshProductionOrderOrderSupplyAndRawMaterialListbox();
-		saveButton.setDisabled(false);
-		cancelButton.setDisabled(false);
-		resetButton.setDisabled(false);
 	}
 
 	private void refreshProductionOrderDetailGridView() {
@@ -446,8 +442,11 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		List<ProductionOrderDetail> machineOverlappingDetails = getMachineOverlappingDetails(productionOrderDetail);
 		// se busca en las restantes ordenes si la maquina parametro es la misma asignada
 		for(ProductionOrderDetail each : machineOverlappingDetails) {
-			if(each.getMachine().getId() == machine.getId()) {
-				return false;
+			// no se considera si el detalle pertenece a la misma orden actual
+			if(each.getProductionOrder().getId() != currentProductionOrder.getId()) {
+				if(each.getMachine().getId() == machine.getId()) {
+					return false;
+				}
 			}
 		}
 		return true;
@@ -560,8 +559,11 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		List<ProductionOrderDetail> workerOverlappingDetails = getWorkerOverlappingDetails(productionOrderDetail);
 		// se busca en las restantes ordenes si la maquina parametro es la misma asignada
 		for(ProductionOrderDetail each : workerOverlappingDetails) {
-			if(each.getWorker().getId() == worker.getId()) {
-				return false;
+			// no se considera si el detalle pertenece a la misma orden actual
+			if(each.getProductionOrder().getId() != currentProductionOrder.getId()) {
+				if(each.getWorker().getId() == worker.getId()) {
+					return false;
+				}
 			}
 		}
 		return true;
@@ -603,12 +605,13 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 				if(!prevDetail.getWorker().equals(workerSelected)) {
 					if(data.getProcess().getType().getMachineType() == null) {
 						data.setDateStart(prevDetail.getDateStart());
-						data.setDateFinish(ProductionDateTimeHelper.getFinishDate(prevDetail.getDateStart(), data.getTimeTotal()));
+						data.setDateFinish(ProductionDateTimeHelper.getFinishDate(prevDetail.getDateStart(), data.getDurationTotal()));
 					}
 				}
 			}*/
 			//recalculateDates();
 			//assignAllDates();
+			setAllDates();
 			refreshProductionOrderDetailGridView();
 		} else {
 			final Worker workerSelectedFinal = workerSelected;
@@ -661,6 +664,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 					List<ProductionOrderDetail> list = workerMap.get(worker);
 					if(list == null) {
 						list = new ArrayList<ProductionOrderDetail>();
+						list.add(each);
 					} else {
 						list.add(each);
 					}
@@ -686,24 +690,117 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		return list;
 	}
 
+	private void setAllDates() {
+		// recorre todos los procesos, por cada proceso recorre cada empleado y asigna la fechas a uno de ellos
+		// al siguiente empleado se verifica si tiene una maquina distinta o no se requiere maquina y en base a eso se asigna la fecha del inicio del proceso la misma que la del empleado anterior
+		// si alguna maquina es igual a otra, la pieza se realiza al finalizar el ultimo proceso del otro empleado
+		// por cada proceso se obtiene cual es la ultima fecha de finalizacion, la cual sera el incio del proximo proceso
+		sortListBySequence(productionOrderDetailList);
+		Date startDate = getDateTimeStartWork(productionOrderStartDatebox.getValue());
+		Date finishDateLast = null;
+		for(Map.Entry<ProcessType, List<ProductionOrderDetail>> entryProcessType : getProcessTypeMap().entrySet()) {// tipos de proceso
+			ProcessType currentProcessType = entryProcessType.getKey();
+			List<ProductionOrderDetail> listProcessType = entryProcessType.getValue();
+			// por cada lista de detalles de tipo de proceso sacamos un  map con los empleados y los detalles asignados a cada uno
+			if(finishDateLast != null) {
+				startDate = finishDateLast;
+				finishDateLast = null;
+			}
+			if(currentProcessType.getMachineType() == null) {// si el proceso no necesita maquina
+				for(Map.Entry<Worker, List<ProductionOrderDetail>> entryWorker : getWorkerMap(listProcessType).entrySet()) {// empleados
+					List<ProductionOrderDetail> listWorker = entryWorker.getValue();
+					Date startDateWorker = startDate;
+					Date finishDateWorker = null;
+					// al primer empleado asignamos los tiempos y al resto vemos si posee maquina igual a los demas y si es asi se lo pone despues, sino se lo pone al comienzo
+					// a menos que los que tengan maquinas diferentes terminen despues de lo que terminan los demas procesos, en ese caso se pone a continuacion de ellos
+					for(ProductionOrderDetail eachDetail : listWorker) {
+						if(eachDetail.getState() != ProcessState.Cancelado) {// solo se calcula para los procesos que no esten cancelados
+							if(finishDateWorker == null) {// si es la primera vez que ingresa
+								finishDateWorker = ProductionDateTimeHelper.getFinishDate(startDateWorker, eachDetail.getDurationTotal());
+							} else {
+								// el inicio de la actual es al finalizar la ultima
+								startDateWorker = finishDateWorker;
+								finishDateWorker = ProductionDateTimeHelper.getFinishDate(startDateWorker, eachDetail.getDurationTotal());
+							}
+							eachDetail.setDateStart(startDateWorker);
+							eachDetail.setDateFinish(finishDateWorker);
+							if(finishDateLast==null || finishDateWorker.after(finishDateLast)) {
+								finishDateLast = finishDateWorker;
+							}
+						} else {
+							eachDetail.setDateStart(null);
+							eachDetail.setDateFinish(null);
+							// por las dudas borramos tambien las fechas reales
+							eachDetail.setDateStartReal(null);
+							eachDetail.setDateFinishReal(null);
+						}
+					}
+				}
+			} else {// si el proceso necesita maquina
+				Date finishDate = null;
+				for(ProductionOrderDetail eachDetail : listProcessType) {
+					if(eachDetail.getState() != ProcessState.Cancelado) {// solo se calcula para los procesos que no esten cancelados
+						if(finishDate == null) {// si es la primera vez que ingresa
+							finishDate = ProductionDateTimeHelper.getFinishDate(startDate, eachDetail.getDurationTotal());
+						} else {
+							// el inicio de la actual es al finalizar la ultima
+							startDate = finishDate;
+							finishDate = ProductionDateTimeHelper.getFinishDate(startDate, eachDetail.getDurationTotal());
+						}
+						eachDetail.setDateStart(startDate);
+						eachDetail.setDateFinish(finishDate);
+						finishDateLast = finishDate;
+					} else {
+						eachDetail.setDateStart(null);
+						eachDetail.setDateFinish(null);
+						// por las dudas borramos tambien las fechas reales
+						eachDetail.setDateStartReal(null);
+						eachDetail.setDateFinishReal(null);
+					}
+				}
+			}
+		}
+	}
+
+	private Map<ProcessType, List<ProductionOrderDetail>> getProcessTypeMap() {
+		// devuelve un map que por cada tipo de proceso contiene un listado de los detalles que lo incluyen
+		Map<ProcessType, List<ProductionOrderDetail>> processTypeMap = new LinkedHashMap<ProcessType, List<ProductionOrderDetail>>();
+		for(ProductionOrderDetail each : productionOrderDetailList) {
+			if(each.getState() != ProcessState.Cancelado) {
+				ProcessType processType = each.getProcess().getType();
+				processType = processTypeRepository.findOne(processType.getId());
+				List<ProductionOrderDetail> list = processTypeMap.get(processType);
+				if(list == null) {
+					list = new ArrayList<ProductionOrderDetail>();
+					list.add(each);
+				} else {
+					list.add(each);
+				}
+				processTypeMap.put(processType, list);
+			}
+		}
+		return processTypeMap;
+	}
+
 	private void assignAllDates() {
 		// hacemos una lista de todos los empleados asignados actualmente
 		// por cada empleado ordenamos todas las fechas de sus procesos en secuencia
 		// ordenamos todos los procesos en base a las fechas establecidas
-		Date finishDate = null;
-		Date startDate = getDateTimeStartWork(productionOrderStartDatebox.getValue());
-		for(Map.Entry<Worker, List<ProductionOrderDetail>> entry : getWorkerMap().entrySet()) {
+		for(Map.Entry<Worker, List<ProductionOrderDetail>> entry : getWorkerMap(productionOrderDetailList).entrySet()) {
 			//Worker worker = entry.getKey();
+			//System.out.println("- - - -  - - - - - - - - -  - - - -  recorriendo worker: " + worker.getName());
 			List<ProductionOrderDetail> list = entry.getValue();
 			sortListBySequence(list);
+			Date startDate = getDateTimeStartWork(productionOrderStartDatebox.getValue());
+			Date finishDate = null;
 			for(ProductionOrderDetail eachDetail : list) {
 				if(eachDetail.getState() != ProcessState.Cancelado) {// solo se calcula para los procesos que no esten cancelados
 					if(finishDate == null) {// si es la primera vez que ingresa
-						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, eachDetail.getTimeTotal());
+						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, eachDetail.getDurationTotal());
 					} else {
 						// el inicio de la actual es al finalizar la ultima
 						startDate = finishDate;
-						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, eachDetail.getTimeTotal());
+						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, eachDetail.getDurationTotal());
 					}
 					eachDetail.setDateStart(startDate);
 					eachDetail.setDateFinish(finishDate);
@@ -728,15 +825,17 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		Collections.sort(details, comp);
 	}
 
-	private Map<Worker, List<ProductionOrderDetail>> getWorkerMap() {
+	private Map<Worker, List<ProductionOrderDetail>> getWorkerMap(List<ProductionOrderDetail> detailList) {
 		// devuelve un map que por cada empleado contiene el listado de todos los procesos asignados a el
-		Map<Worker, List<ProductionOrderDetail>> workerMap = new HashMap<Worker, List<ProductionOrderDetail>>();
-		for(ProductionOrderDetail each : productionOrderDetailList) {
+		Map<Worker, List<ProductionOrderDetail>> workerMap = new LinkedHashMap<Worker, List<ProductionOrderDetail>>();
+		for(ProductionOrderDetail each : detailList) {
 			if(each.getState() != ProcessState.Cancelado) {
 				Worker worker = each.getWorker();
+				worker = workerRepository.findOne(worker.getId());
 				List<ProductionOrderDetail> list = workerMap.get(worker);
 				if(list == null) {
 					list = new ArrayList<ProductionOrderDetail>();
+					list.add(each);
 				} else {
 					list.add(each);
 				}
@@ -765,11 +864,11 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 				List<ProductionOrderDetail> list = entry.getValue();
 				for(ProductionOrderDetail eachDetail : list) {
 					if(finishDate == null) {// si es la primera vez que ingresa
-						finishDate = ProductionDateTimeHelper.getFinishDate(startDateProcess, eachDetail.getTimeTotal());
+						finishDate = ProductionDateTimeHelper.getFinishDate(startDateProcess, eachDetail.getDurationTotal());
 					} else {
 						// el inicio de la actual es al finalizar la ultima
 						startDate = finishDate;
-						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, eachDetail.getTimeTotal());
+						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, eachDetail.getDurationTotal());
 					}
 					eachDetail.setDateStart(startDate);
 					eachDetail.setDateFinish(finishDate);
@@ -959,7 +1058,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	private void changeDetailStartDate(ProductionOrderDetail detail, Datebox dateboxStart) {
 		detail.setDateStart(dateboxStart.getValue());
 		// cambia la fecha de fin tambien
-		Date finish = ProductionDateTimeHelper.getFinishDate(dateboxStart.getValue(), detail.getTimeTotal());
+		Date finish = ProductionDateTimeHelper.getFinishDate(dateboxStart.getValue(), detail.getDurationTotal());
 		detail.setDateFinish(finish);
 		// se remueven las maquinas y empleados asignados, ya que puede ser que esten no disponibles para el nuevo horario
 		detail.setWorker(null);

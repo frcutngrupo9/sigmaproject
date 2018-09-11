@@ -75,13 +75,18 @@ public class ProductionOrderReportDataSource implements JRDataSource {
 			if(time != null) {
 				int hours = time.getHours();
 				int minutes = time.getMinutes();
+				int seconds = time.getSeconds();
+				while(seconds >= 60) {
+					seconds -= 60;
+					minutes += 1;
+				}
 				while(minutes >= 60) {
 					hours = hours + 1;
 					minutes = minutes - 60;
 				}
-				value = String.format("%d hrs  %d min", hours, minutes);
+				value = String.format("%d hrs  %d min  %d seg", hours, minutes);
 			} else {
-				value = "0 hrs 0 min";
+				value = "0 hrs 0 min 0 seg";
 			}
 		} else if ("piece_name".equals(fieldName)) {
 			value = productionOrderDetailList.get(index).getProcess().getPiece().getName();

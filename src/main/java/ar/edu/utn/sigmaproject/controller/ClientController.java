@@ -38,11 +38,13 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Paging;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Client;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
+import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -83,6 +85,8 @@ public class ClientController extends SelectorComposer<Component> {
 	// services
 	@WireVariable
 	private ClientRepository clientRepository;
+	@WireVariable
+	private OrderRepository orderRepository;
 
 	// atributes
 	@SuppressWarnings("unused")
@@ -144,6 +148,11 @@ public class ClientController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
+		// busca si el cliente esta agregado a algun pedido y se cancela la eliminacion en ese caso
+		if(orderRepository.findByClient(currentClient).isEmpty() == false) {
+			Messagebox.show("No se puede eliminar, el cliente se encuentra asignado a 1 o mas pedidos.", "Informacion", Messagebox.OK, Messagebox.ERROR);
+			return;
+		}
 		clientRepository.delete(currentClient);
 		currentClient = null;
 		refreshView();

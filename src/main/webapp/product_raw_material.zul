@@ -32,9 +32,9 @@ THE SOFTWARE.
                     <label value="${labels.raw_material}: "/>
                     <bandbox id="materialBandbox" buttonVisible="true" autodrop="true">
                         <bandpopup>
-                            <listbox id="materialPopupListbox" width="500px">
+                            <listbox id="materialPopupListbox" width="600px">
                                 <listhead>
-                                    <listheader label="${labels.name}" align="center"/>
+                                    <listheader label="${labels.name}" align="center" width="140px"/>
 						            <listheader label="${labels.width}" align="center"/>
 						            <listheader label="${labels.depth}" align="center"/>
 						            <listheader label="${labels.length}" align="center"/>

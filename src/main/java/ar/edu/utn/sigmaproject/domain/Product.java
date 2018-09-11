@@ -230,16 +230,40 @@ public class Product extends Item implements Serializable, Cloneable {
 		// metodo no usado pero implementado porque hereda de item (se usa en materiales)
 		return null;
 	}
-	
+
 	public BigDecimal getCostMaterials() {
 		//devuelve el valor de todos las materias primas e insumos
 		BigDecimal materialsPrice = BigDecimal.ZERO;
 		for(ProductMaterial each : materials) {
-			materialsPrice = materialsPrice.add(each.getItem().getPrice());
+			materialsPrice = materialsPrice.add(each.getCost());
 		}
 		return materialsPrice;
 	}
-	
+
+	public BigDecimal getCostSupplies() {
+		//devuelve el valor de los insumos
+		BigDecimal materialsPrice = BigDecimal.ZERO;
+		for(ProductMaterial each : materials) {
+			Item item = each.getItem();
+			if(item instanceof SupplyType) {
+				materialsPrice = materialsPrice.add(each.getCost());
+			}
+		}
+		return materialsPrice;
+	}
+
+	public BigDecimal getCostWoods() {
+		//devuelve el valor de los insumos
+		BigDecimal materialsPrice = BigDecimal.ZERO;
+		for(ProductMaterial each : materials) {
+			Item item = each.getItem();
+			if (item instanceof Wood) {
+				materialsPrice = materialsPrice.add(each.getCost());
+			}
+		}
+		return materialsPrice;
+	}
+
 	public BigDecimal getCostWork() {
 		BigDecimal cost = BigDecimal.ZERO;
 		for(Piece each : pieces) {
@@ -247,7 +271,7 @@ public class Product extends Item implements Serializable, Cloneable {
 		}
 		return cost;
 	}
-	
+
 	public BigDecimal getCostTotal() {
 		return getCostMaterials().add(getCostWork());
 	}

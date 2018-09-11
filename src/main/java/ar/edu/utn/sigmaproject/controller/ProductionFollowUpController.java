@@ -241,7 +241,11 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		}
 		productNameTextbox.setText(currentProductionOrder.getProduct().getName());
 		productUnitsIntbox.setValue(currentProductionOrder.getUnits());
-		productUnitsFinishIntbox.setValue(0);
+		if(currentProductionOrder.getUnitsFinish() == null || currentProductionOrder.getUnitsFinish() == 0) {
+			productUnitsFinishIntbox.setValue(currentProductionOrder.getUnits());
+		} else {
+			productUnitsFinishIntbox.setValue(currentProductionOrder.getUnitsFinish());
+		}
 		productionOrderStartDatebox.setValue(currentProductionOrder.getDateStart());
 		productionOrderFinishDatebox.setValue(currentProductionOrder.getDateFinish());
 		productionOrderRealStartDatebox.setValue(currentProductionOrder.getDateStartReal());
@@ -370,7 +374,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 					product = productRepository.save(product);
 				}
 			}
-			*/
+			 */
 		}
 	}
 

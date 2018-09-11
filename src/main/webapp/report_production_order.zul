@@ -139,7 +139,7 @@ THE SOFTWARE.
 			            		<label value="${each.machine.name}" if="${each.process.type.getMachineType() != null}"/>
 			                    <label value="${labels.not_necessary}" if="${each.process.type.getMachineType() == null}"/>
 		                    </cell>
-		                    <label value="${r:getFormattedProcessTime(each.process.getDurationTotal())}"/>
+		                    <label value="${r:getFormattedProcessTime(each.process.getTime())}"/>
 			            	<label value="${r:getFormattedProcessTime(each.getDurationTotal())}"/>
 						</row>
 		            </template>

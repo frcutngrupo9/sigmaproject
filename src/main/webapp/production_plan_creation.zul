@@ -90,7 +90,7 @@ THE SOFTWARE.
         			<template name="model">
             			<row>
                 			<label value="${each.getOrder().getNumber()}"/>
-                			<label value="${r:getFormattedDateTime(each.getOrder().getDate())}"/>
+                			<label value="${r:getFormattedDate(each.getOrder().getDate())}"/>
                 			<label value="${r:getFormattedDate(each.getOrder().getNeedDate())}"/>
                 			<label value="${each.getOrder().getClient().getName()}"/>
                 			<label value="${each.getOrder().getDetails().size()}"/>
