@@ -52,5 +52,4 @@ public class ProductTotal {
 	public void setTotalUnits(Integer totalUnits) {
 		this.totalUnits = totalUnits;
 	}
-
 }

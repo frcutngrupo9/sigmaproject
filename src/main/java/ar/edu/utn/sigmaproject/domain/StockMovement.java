@@ -25,18 +25,21 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import javax.persistence.*;
+
+import org.hibernate.search.annotations.Indexed;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Entity
+@Indexed
 public class StockMovement implements Serializable {
-
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.TABLE)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	private Date date;

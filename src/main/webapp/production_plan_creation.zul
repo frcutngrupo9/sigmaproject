@@ -114,7 +114,7 @@ THE SOFTWARE.
             			<listitem>
                 			<custom-attributes product_image="${r:getProductImage(each.getProduct())}"/>
                 			<listcell>
-                            	<image if="${!empty product_image}" content="${product_image}" width="30px" height="30px"/>
+                            	<image if="${!empty product_image}" content="${product_image}" height="${r:getPixelScaled(product_image, 30, true)}px" width="${r:getPixelScaled(product_image, 30, false)}px"/>
 				                <image if="${empty product_image}" width="0px" height="0px"/>
                             </listcell>
                 			<listcell label="${each.getProduct().getCode()}"/>

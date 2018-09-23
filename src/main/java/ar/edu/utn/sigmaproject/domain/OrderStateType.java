@@ -28,20 +28,23 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
+import org.hibernate.search.annotations.Indexed;
+
 @Entity
+@Indexed
 public class OrderStateType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 
 	@Column(unique = true)
-	String name = "";
-	String details = "";
+	private String name = "";
+
+	private String details = "";
 
 	public OrderStateType() {
-
 	}
 
 	public OrderStateType(String name, String details) {

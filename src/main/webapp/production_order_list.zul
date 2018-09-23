@@ -110,8 +110,8 @@ THE SOFTWARE.
 		                    <label value="${each.getPercentComplete()}"/>
 		                    <label value="${r:getFormattedTime(each.getDurationTotal())}"/>
 		                    <label value="${r:getFormattedTime(each.product.getDurationTotal())}"/>
-		                    <label value="${each.dateStartReal}"/>
-		                    <label value="${each.dateFinishReal}"/>
+		                    <label value="${r:getFormattedDateTimeSecond(each.dateStartReal)}"/>
+		                    <label value="${r:getFormattedDateTimeSecond(each.dateFinishReal)}"/>
 		                    <label value="${each.getCostMaterials().doubleValue()} $"/>
 			                <label value="${each.getCostWork().doubleValue()} $"/>
 			                <label value="${each.getCostTotal().doubleValue()} $"/>

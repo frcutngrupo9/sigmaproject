@@ -32,24 +32,25 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import org.hibernate.search.annotations.Indexed;
+
 @Entity
+@Indexed
 public class ProductionOrderStateType implements Serializable, Cloneable {
+	private static final long serialVersionUID = 1L;
 	//	Generada o No Iniciada,
 	//	Iniciada,
 	//	Finalizada,
 	//	Cancelada;
 
-	private static final long serialVersionUID = 1L;
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 
 	@Column(unique = true)
-	String name = "";
+	private String name = "";
 
 	public ProductionOrderStateType() {
-
 	}
 
 	public ProductionOrderStateType(String name) {

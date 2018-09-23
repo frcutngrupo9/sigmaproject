@@ -33,22 +33,24 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
+import org.hibernate.search.annotations.Indexed;
+
 @Entity
+@Indexed
 public class ProductionPlanDetail implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	@ManyToOne(targetEntity = ProductionPlan.class)
-	private ProductionPlan productionPlan = null;
 
 	@OneToOne
 	private Order order;
 
-	public ProductionPlanDetail() {
+	@ManyToOne(targetEntity = ProductionPlan.class)
+	private ProductionPlan productionPlan = null;
 
+	public ProductionPlanDetail() {
 	}
 
 	public ProductionPlanDetail(ProductionPlan productionPlan, Order order) {
@@ -80,4 +82,3 @@ public class ProductionPlanDetail implements Serializable, Cloneable {
 		this.productionPlan = productionPlan;
 	}
 }
-

@@ -221,7 +221,6 @@ public class RepositoryHelper {
 			list.add(new ProcessType(8, "Acanalado", machineTypeRepository.findFirstByName("Tupi")));
 			list.add(new ProcessType(9, "Ensamblado", "Unir diferentes piezas con tornillos, engrapado, pegamento, clavos, etc.", null));
 			processTypeRepository.save(list);
-
 		}
 	}
 

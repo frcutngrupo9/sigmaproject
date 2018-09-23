@@ -31,22 +31,23 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-@Entity
-public class User implements Serializable, Cloneable {
+import org.hibernate.search.annotations.Indexed;
 
+@Entity
+@Indexed
+public class User implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 
-	String account = "";
-	String email = "";
-	String fullName = "";
-	String hash = "";
+	private String account = "";
+	private String email = "";
+	private String fullName = "";
+	private String hash = "";
 
 	public User() {
-
 	}
 
 	public User(String account, String hash, String fullName,String email) {

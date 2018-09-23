@@ -31,39 +31,24 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
-@Indexed
-@Analyzer(definition = "edge_ngram")
 @Entity
+@Indexed
 public class Client implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@DocumentId
-	Long id;
+	private Long id;
 
-	@Field
-	String name = "";
-
-	@Field
-	String phone = "";
-
-	@Field
-	String email = "";
-
-	@Field
-	String address = "";
-
-	@Field
-	String details = "";
+	private String name = "";
+	private String phone = "";
+	private String email = "";
+	private String address = "";
+	private String details = "";
 
 	public Client() {
-
 	}
 
 	public Client(String name, String phone, String email, String address, String details) {

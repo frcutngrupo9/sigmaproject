@@ -30,23 +30,24 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import org.hibernate.search.annotations.Indexed;
+
 @Entity
+@Indexed
 public class MeasureUnitType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 
 	@Column(unique = true)
-	String name = "";
-	
+	private String name = "";
+
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "type", targetEntity = MeasureUnit.class)
-	@OrderColumn(name = "detail_index")
 	private List<MeasureUnit> list = new ArrayList<>();
 
 	public MeasureUnitType() {
-
 	}
 
 	public MeasureUnitType(String name) {

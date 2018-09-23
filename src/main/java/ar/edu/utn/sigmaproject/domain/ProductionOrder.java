@@ -43,12 +43,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderColumn;
 import javax.xml.datatype.Duration;
+
+import org.hibernate.search.annotations.Indexed;
 
 import ar.edu.utn.sigmaproject.util.ProductionDateTimeHelper;
 
 @Entity
+@Indexed
 public class ProductionOrder implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
@@ -56,8 +58,17 @@ public class ProductionOrder implements Serializable, Cloneable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(targetEntity = ProductionPlan.class)
 	private ProductionPlan productionPlan;
+
+	@OneToMany(orphanRemoval = true)
+	private List<ProductionOrderState> states = new ArrayList<>();
+
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionOrder", targetEntity = ProductionOrderDetail.class)
+	private List<ProductionOrderDetail> details = new ArrayList<>();
+
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionOrder", targetEntity = ProductionOrderMaterial.class)
+	private List<ProductionOrderMaterial> productionOrderMaterials = new ArrayList<>();
 
 	@ManyToOne
 	private Product product;
@@ -65,12 +76,8 @@ public class ProductionOrder implements Serializable, Cloneable {
 	@ManyToOne
 	private Worker worker;
 
-	@OneToMany(orphanRemoval = true)
-	private List<ProductionOrderState> states = new ArrayList<>();
-
-	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionOrder", targetEntity = ProductionOrderDetail.class)
-	@OrderColumn(name = "detail_index")
-	private List<ProductionOrderDetail> details = new ArrayList<>();
+	@ManyToOne
+	private ProductionOrderStateType currentStateType = null;
 
 	private Integer sequence = 0;
 	private Integer number = 0;
@@ -81,13 +88,8 @@ public class ProductionOrder implements Serializable, Cloneable {
 	private Date dateStartReal = null;
 	private Date dateFinishReal = null;
 	private Date dateMaterialsWithdrawal = null;
-	private ProductionOrderStateType currentStateType = null;
-
-	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionOrder", targetEntity = ProductionOrderMaterial.class)
-	private List<ProductionOrderMaterial> productionOrderMaterials = new ArrayList<>();
 
 	public ProductionOrder() {
-
 	}
 
 	public ProductionOrder(Integer sequence, ProductionPlan productionPlan, Product product, Integer units, ProductionOrderState state) {
@@ -558,7 +560,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 		}
 		return materialsPrice;
 	}
-	
+
 	public BigDecimal getCostMaterials() {
 		//devuelve el valor de todos las materias primas e insumos
 		BigDecimal materialsPrice = BigDecimal.ZERO;
@@ -567,7 +569,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 		}
 		return materialsPrice;
 	}
-	
+
 	public BigDecimal getCostWork() {
 		BigDecimal cost = BigDecimal.ZERO;
 		for(ProductionOrderDetail each : details) {
@@ -575,7 +577,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 		}
 		return cost;
 	}
-	
+
 	public BigDecimal getCostTotal() {
 		return getCostMaterials().add(getCostWork());
 	}

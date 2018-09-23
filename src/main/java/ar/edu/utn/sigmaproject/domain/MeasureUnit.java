@@ -32,22 +32,24 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.search.annotations.Indexed;
+
 @Entity
+@Indexed
 public class MeasureUnit implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
-
-	String name = "";
-	String shortName = "";
+	private Long id;
 
 	@ManyToOne(targetEntity = MeasureUnitType.class)
-	MeasureUnitType type;
+	private MeasureUnitType type;
+
+	private String name = "";
+	private String shortName = "";
 
 	public MeasureUnit() {
-
 	}
 
 	public MeasureUnit(String name, String shortName, MeasureUnitType measureUnitType) {

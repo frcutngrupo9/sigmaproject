@@ -28,8 +28,12 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
+import org.hibernate.search.annotations.Indexed;
+
 @Entity
+@Indexed
 public class ProductCategory implements Serializable, Cloneable {
+	private static final long serialVersionUID = 1L;
 	//	Armario,
 	//	Biblioteca,
 	//	Comoda,
@@ -40,17 +44,14 @@ public class ProductCategory implements Serializable, Cloneable {
 	//	Silla,
 	//	Sillon;
 
-	private static final long serialVersionUID = 1L;
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 
 	@Column(unique = true)
-	String name = "";
+	private String name = "";
 
 	public ProductCategory() {
-
 	}
 
 	public ProductCategory(String name) {

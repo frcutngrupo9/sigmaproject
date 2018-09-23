@@ -56,7 +56,6 @@ import org.zkoss.zul.Window;
 import ar.edu.utn.sigmaproject.domain.Item;
 import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.MaterialReserved;
-import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.MaterialsOrder;
 import ar.edu.utn.sigmaproject.domain.MaterialsOrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
@@ -295,11 +294,11 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 						quantityReservation = stockAvailable;
 					}
 					if(item instanceof SupplyType) {
-						currentMaterialReserved = new MaterialReserved(item, MaterialType.Supply, each, quantityReservation);
+						currentMaterialReserved = new MaterialReserved(item, each, quantityReservation);
 						SupplyType supplyType = (SupplyType) each.getItem();
 						supplyType.getSuppliesReserved().add(currentMaterialReserved);
 					} else if (item instanceof Wood) {
-						currentMaterialReserved = new MaterialReserved(item, MaterialType.Wood, each, quantityReservation);
+						currentMaterialReserved = new MaterialReserved(item, each, quantityReservation);
 						Wood wood = (Wood) each.getItem();
 						wood.getWoodsReserved().add(currentMaterialReserved);
 					}

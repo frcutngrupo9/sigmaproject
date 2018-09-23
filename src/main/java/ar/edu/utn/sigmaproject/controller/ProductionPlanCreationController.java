@@ -57,7 +57,6 @@ import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Item;
 import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
-import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.OrderState;
@@ -76,8 +75,6 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
-import ar.edu.utn.sigmaproject.domain.SupplyType;
-import ar.edu.utn.sigmaproject.domain.Wood;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
@@ -283,13 +280,13 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			int currentProductionOrderListSize = currentProductionPlan.getProductionOrderList().size();
 			int savedProductionOrderListSize = (productionPlanRepository.findOne(currentProductionPlan.getId())).getProductionOrderList().size();
 			if(currentProductionOrderListSize - savedProductionOrderListSize == 0) {
-				
+
 			}
 		}*/
 		refreshViewProductionPlan();
 		alert("Plan guardado.");
 	}
-	
+
 	private void setProductionPlanDetailStates(String stateName) {
 		for(ProductionPlanDetail each : productionPlanDetailList) {
 			OrderStateType orderStateType = orderStateTypeRepository.findFirstByName(stateName);
@@ -343,11 +340,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				if(auxMaterialRequirement != null) {// la materia prima si se encuentra agregada, sumamos sus cantidades
 					auxMaterialRequirement.setQuantity(auxMaterialRequirement.getQuantity().add(productMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
 				} else {// la materia prima no se encuentra, se la agrega
-					if(item instanceof SupplyType) {
-						list.add(new MaterialRequirement(item, MaterialType.Supply, productionPlan, productMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
-					} else if (item instanceof Wood) {
-						list.add(new MaterialRequirement(item, MaterialType.Wood, productionPlan, productMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
-					}
+					list.add(new MaterialRequirement(item, productionPlan, productMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
 				}
 			}
 		}
@@ -479,7 +472,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/requirement_plan_creation.zul");
 	}
-	
+
 	@Listen("onClick = #newProductionPlanButton")
 	public void newProductionPlanButtonClick() {
 		currentProductionPlan = null;

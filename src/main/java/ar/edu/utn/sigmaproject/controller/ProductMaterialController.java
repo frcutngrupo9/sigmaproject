@@ -45,7 +45,6 @@ import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Item;
-import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductMaterial;
 
@@ -92,7 +91,6 @@ public abstract class ProductMaterialController extends SelectorComposer<Compone
 	protected abstract void refreshView();
 	protected abstract void refreshMaterialPopup();
 	protected abstract void filterItems();
-	protected abstract MaterialType getMaterialType();
 
 	@Listen("onOK = #materialPopupListbox")
 	public void materialPopupListboxOK() {
@@ -154,7 +152,7 @@ public abstract class ProductMaterialController extends SelectorComposer<Compone
 		}
 		double rawMaterialQuantity = materialQuantityDoublebox.getValue();
 		if(currentProductMaterial == null) { // es nuevo
-			currentProductMaterial = new ProductMaterial(currentProduct, getMaterialType(), currentMaterial, BigDecimal.valueOf(rawMaterialQuantity));
+			currentProductMaterial = new ProductMaterial(currentProduct, currentMaterial, BigDecimal.valueOf(rawMaterialQuantity));
 			productMaterialList.add(currentProductMaterial);
 		} else { // se edita
 			currentProductMaterial.setItem(currentMaterial);;

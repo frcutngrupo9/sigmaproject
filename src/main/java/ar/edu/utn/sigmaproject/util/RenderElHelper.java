@@ -101,6 +101,14 @@ public class RenderElHelper {
 		return "";
 	}
 	
+	public static String getFormattedDateTimeSecond(Date date) {
+		if(date != null) {
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+			return dateFormat.format(date);
+		}
+		return "";
+	}
+	
 	public static Image getProductImage(Product product) {
 		return getImage(product.getImageData());
 	}

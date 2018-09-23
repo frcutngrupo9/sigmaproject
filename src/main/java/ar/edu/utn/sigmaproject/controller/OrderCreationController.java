@@ -77,6 +77,7 @@ import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
+import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class OrderCreationController extends SelectorComposer<Component> {
@@ -138,6 +139,8 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	private OrderStateRepository orderStateRepository;
 	@WireVariable
 	private OrderStateTypeRepository orderStateTypeRepository;
+	@WireVariable
+	private ProductionPlanRepository productionPlanRepository;
 
 	// attributes
 	@SuppressWarnings("rawtypes")
@@ -546,6 +549,10 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	@Listen("onClick = #deleteOrderButton")
 	public void deleteOrder() {
 		if(currentOrder != null) {
+			if(productionPlanRepository.findByPlanDetailsOrder(currentOrder) != null) {
+				Messagebox.show("No se puede eliminar, el pedido se encuentra asignado a un plan de produccion.", "Informacion", Messagebox.OK, Messagebox.ERROR);
+				return;
+			}
 			Messagebox.show("Esta seguro que desea eliminar el pedido?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 				public void onEvent(Event evt) throws InterruptedException {
 					if(evt.getName().equals("onOK")) {

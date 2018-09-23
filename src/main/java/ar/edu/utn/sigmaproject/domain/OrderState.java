@@ -34,22 +34,24 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.search.annotations.Indexed;
+
 @Entity
+@Indexed
 public class OrderState implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 
 	@ManyToOne(optional = false)
-	OrderStateType type;
+	private OrderStateType type;
 
 	@Column(nullable = false)
-	Date date = new Date();
+	private Date date = new Date();
 
 	public OrderState() {
-
 	}
 
 	public OrderState(OrderStateType orderStateType, Date date) {

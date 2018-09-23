@@ -25,27 +25,29 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import javax.persistence.*;
+
+import org.hibernate.search.annotations.Indexed;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Entity
+@Indexed
 public class StockMovementDetail implements Serializable {
-
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.TABLE)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
+	@ManyToOne(optional = false)
+	private Item item;
 
 	@ManyToOne(targetEntity = StockMovement.class)
 	private StockMovement stockMovement = null;
 
 	private String description = "";
-
 	private BigDecimal quantity = BigDecimal.ZERO;
-
-	@ManyToOne(optional = false)
-	private Item item;
 
 	public Long getId() {
 		return id;

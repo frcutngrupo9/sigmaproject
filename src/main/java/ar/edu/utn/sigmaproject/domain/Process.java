@@ -27,7 +27,6 @@ package ar.edu.utn.sigmaproject.domain;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -37,10 +36,12 @@ import javax.persistence.Transient;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
+import org.hibernate.search.annotations.Indexed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Entity
+@Indexed
 public class Process implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
@@ -54,24 +55,20 @@ public class Process implements Serializable, Cloneable {
 	@ManyToOne(targetEntity = Piece.class)
 	private Piece piece = null;
 
-	@ManyToOne
-	private ProcessType type;
-
-	private String details = "";
-
 	@Transient
 	private Duration time;
 
 	@ManyToOne
+	private ProcessType type;
+
+	@ManyToOne
 	private WorkHour workHour = null;
 
-	@Column
+	private String details = "";
 	private String timeInternal;
-
 	private boolean isClone;
 
 	public Process() {
-
 	}
 
 	public Process(Piece piece, ProcessType processType, String details, Duration time, WorkHour workHour) {

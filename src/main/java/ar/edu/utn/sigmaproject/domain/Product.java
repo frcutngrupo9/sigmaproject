@@ -24,21 +24,22 @@
 
 package ar.edu.utn.sigmaproject.domain;
 
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.xml.datatype.Duration;
+
+import org.hibernate.search.annotations.Indexed;
 
 @Entity
 @Indexed
-@Analyzer(definition = "edge_ngram")
 public class Product extends Item implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
@@ -51,28 +52,20 @@ public class Product extends Item implements Serializable, Cloneable {
 	@Lob
 	private byte[] imageData = new byte[0];
 
-	@Field
+	@ManyToOne
+	private ProductCategory category;
+
 	private String name = "";
-
-	@Field
 	private String details = "";
-
-	@Field
 	private String code = "";
-
 	private Integer stock = 0;
 	private Integer stockMin = 0;
 	private Integer stockRepo = 0;
 	private Integer stockMax = 0;
-
-	@ManyToOne
-	private ProductCategory category;
-
 	private BigDecimal price = BigDecimal.ZERO;
 	private boolean isClone;
 
 	public Product() {
-
 	}
 
 	public Product(String code , String name, String details, ProductCategory category, BigDecimal price) {
@@ -112,7 +105,7 @@ public class Product extends Item implements Serializable, Cloneable {
 	public List<ProductMaterial> getSupplies() {
 		List<ProductMaterial> supplies = new ArrayList<>();
 		for(ProductMaterial each : materials) {
-			if(each.getType() == MaterialType.Supply) {
+			if(each.getItem() instanceof SupplyType) {
 				supplies.add(each);
 			}
 		}
@@ -122,7 +115,7 @@ public class Product extends Item implements Serializable, Cloneable {
 	public List<ProductMaterial> getRawMaterials() {
 		List<ProductMaterial> rawMaterials = new ArrayList<>();
 		for(ProductMaterial each : materials) {
-			if(each.getType() == MaterialType.Wood) {
+			if(each.getItem() instanceof Wood) {
 				rawMaterials.add(each);
 			}
 		}

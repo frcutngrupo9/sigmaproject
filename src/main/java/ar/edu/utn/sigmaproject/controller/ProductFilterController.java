@@ -68,12 +68,19 @@ public class ProductFilterController extends SelectorComposer<Component> {
 
 	private List<Product> chosenProductList;
 	private List<Product> candidateProductList;
+	private List<Product> possibleProductList;
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		candidateProductList = productRepository.findAll();
+		List<Product> possibleProductListParameter = (List<Product>) Executions.getCurrent().getAttribute("possibleProductList");
+		if(possibleProductListParameter != null) {
+			possibleProductList = possibleProductListParameter;
+		} else {
+			possibleProductList = productRepository.findAll();
+		}
+		candidateProductList = possibleProductList;
 		chosenProductList = new ArrayList<Product>();
 		List<Product> chosenProductListAttribute = (List<Product>) Executions.getCurrent().getAttribute("filterProductList");
 		if(chosenProductListAttribute != null) {
@@ -84,7 +91,7 @@ public class ProductFilterController extends SelectorComposer<Component> {
 	}
 
 	private List<Product> removeProducts(List<Product> chosenProductListAttribute) {
-		List<Product> list = productRepository.findAll();
+		List<Product> list = possibleProductList;
 		for(Product each : chosenProductListAttribute) {
 			list.remove(each);
 		}
@@ -99,7 +106,7 @@ public class ProductFilterController extends SelectorComposer<Component> {
 	@Listen("onClick = #removeAllButton")
 	public void removeAllButtonOnClick() {
 		if(!chosenProductList.isEmpty()) {
-			candidateProductList = productRepository.findAll();
+			candidateProductList = possibleProductList;
 			chosenProductList = new ArrayList<Product>();
 			refreshView();
 		}
@@ -107,7 +114,7 @@ public class ProductFilterController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #chooseAllButton")
 	public void chooseAllButtonOnClick() {
-		chosenProductList = productRepository.findAll();
+		chosenProductList = possibleProductList;
 		candidateProductList = new ArrayList<Product>();
 		refreshView();
 	}

@@ -57,7 +57,6 @@ import org.zkoss.zul.Window;
 import ar.edu.utn.sigmaproject.domain.Item;
 import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.MaterialReserved;
-import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.MaterialsOrder;
 import ar.edu.utn.sigmaproject.domain.MaterialsOrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
@@ -244,11 +243,7 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 					quantityReservation = requirement.getQuantity();
 				}
 				if(reserved == null) {// no existe reserva, se crea la reserva y por la cantidad recibida
-					if(item instanceof SupplyType) {
-						reserved = new MaterialReserved(item, MaterialType.Supply, requirement, quantityReservation);
-					} else if (item instanceof Wood) {
-						reserved = new MaterialReserved(item, MaterialType.Wood, requirement, quantityReservation);
-					}
+					reserved = new MaterialReserved(item, requirement, quantityReservation);
 					item.getMaterialReservedList().add(reserved);
 				} else {// existe reserva, se suma la cantidad recibida a la actual
 					// si la cantidad sin reservar es menos a la cantidad recibida, se suma solo la cantidad sin reservar, esto puede pasar si ingresaron materiales y se reservaron sin recibir los materiales del pedido

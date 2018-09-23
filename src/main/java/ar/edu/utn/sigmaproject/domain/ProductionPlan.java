@@ -37,10 +37,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderColumn;
+
+import org.hibernate.search.annotations.Indexed;
 
 @Entity
+@Indexed
 public class ProductionPlan  implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
@@ -52,7 +55,6 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	private List<ProductionOrder> productionOrderList = new ArrayList<>();
 
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionPlan", targetEntity = ProductionPlanDetail.class)
-	@OrderColumn(name = "detail_index")
 	private List<ProductionPlanDetail> planDetails = new ArrayList<>();
 
 	@OneToMany(orphanRemoval = true)
@@ -61,13 +63,14 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionPlan", targetEntity = MaterialRequirement.class)
 	private List<MaterialRequirement> materialRequirements = new ArrayList<>();
 
+	@ManyToOne
+	private ProductionPlanStateType currentStateType = null;
+
 	private String name = "";
 	private Date dateCreation = null;
 	private Date dateStart = null;
-	private ProductionPlanStateType currentStateType = null;
 
 	public ProductionPlan() {
-
 	}
 
 	public ProductionPlan(String name) {
@@ -128,7 +131,7 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	public List<MaterialRequirement> getRawMaterialRequirements() {
 		List<MaterialRequirement> rawMaterialRequirements = new ArrayList<>();
 		for(MaterialRequirement each : materialRequirements) {
-			if(each.getType() == MaterialType.Wood) {
+			if(each.getItem() instanceof Wood) {
 				rawMaterialRequirements.add(each);
 			}
 		}
@@ -138,7 +141,7 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	public List<MaterialRequirement> getSupplyRequirements() {
 		List<MaterialRequirement> supplyRequirements = new ArrayList<>();
 		for(MaterialRequirement each : materialRequirements) {
-			if(each.getType() == MaterialType.Supply) {
+			if(each.getItem() instanceof SupplyType) {
 				supplyRequirements.add(each);
 			}
 		}
@@ -230,7 +233,7 @@ public class ProductionPlan  implements Serializable, Cloneable {
 	public void setProductionOrderList(List<ProductionOrder> productionOrderList) {
 		this.productionOrderList = productionOrderList;
 	}
-	
+
 	public String getDeviationText() {
 		Date dateStart = getDateStart();
 		if(dateStart == null) {
@@ -252,7 +255,7 @@ public class ProductionPlan  implements Serializable, Cloneable {
 			return "Esta Adelantado";
 		}
 	}
-	
+
 	public Date getDateStartReal() {
 		// busca la primera fecha de inicio real de ordenes de produccion
 		Date date = null;
@@ -270,7 +273,7 @@ public class ProductionPlan  implements Serializable, Cloneable {
 		}
 		return date;
 	}
-	
+
 	public List<Product> getProductList() {
 		List<Product> productList = new ArrayList<Product>();
 		for(ProductionOrder each : productionOrderList) {
@@ -278,7 +281,7 @@ public class ProductionPlan  implements Serializable, Cloneable {
 		}
 		return productList;
 	}
-	
+
 	public BigDecimal getCostMaterials() {
 		BigDecimal cost = BigDecimal.ZERO;
 		for(ProductionOrder each : productionOrderList) {
@@ -286,7 +289,7 @@ public class ProductionPlan  implements Serializable, Cloneable {
 		}
 		return cost;
 	}
-	
+
 	public BigDecimal getCostWork() {
 		BigDecimal cost = BigDecimal.ZERO;
 		for(ProductionOrder each : productionOrderList) {
@@ -294,7 +297,7 @@ public class ProductionPlan  implements Serializable, Cloneable {
 		}
 		return cost;
 	}
-	
+
 	public BigDecimal getCostTotal() {
 		BigDecimal cost = BigDecimal.ZERO;
 		for(ProductionOrder each : productionOrderList) {
