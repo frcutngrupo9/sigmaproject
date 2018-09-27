@@ -24,6 +24,8 @@
 
 package ar.edu.utn.sigmaproject.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -35,5 +37,6 @@ import ar.edu.utn.sigmaproject.domain.ProductCategory;
 public interface ProductRepository extends SearchableRepository<Product, Long> {
 
 	public Page<Product> findAllByCategory(ProductCategory productCategory, Pageable page);
+	public List<Product> findByCategory(ProductCategory productCategory);
 
 }

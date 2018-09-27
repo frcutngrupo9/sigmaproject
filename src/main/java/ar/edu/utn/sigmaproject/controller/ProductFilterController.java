@@ -80,7 +80,8 @@ public class ProductFilterController extends SelectorComposer<Component> {
 		} else {
 			possibleProductList = productRepository.findAll();
 		}
-		candidateProductList = possibleProductList;
+		candidateProductList = new ArrayList<Product>();
+		candidateProductList.addAll(possibleProductList);
 		chosenProductList = new ArrayList<Product>();
 		List<Product> chosenProductListAttribute = (List<Product>) Executions.getCurrent().getAttribute("filterProductList");
 		if(chosenProductListAttribute != null) {
@@ -91,7 +92,8 @@ public class ProductFilterController extends SelectorComposer<Component> {
 	}
 
 	private List<Product> removeProducts(List<Product> chosenProductListAttribute) {
-		List<Product> list = possibleProductList;
+		List<Product> list = new ArrayList<Product>();
+		list.addAll(possibleProductList);
 		for(Product each : chosenProductListAttribute) {
 			list.remove(each);
 		}
@@ -106,7 +108,8 @@ public class ProductFilterController extends SelectorComposer<Component> {
 	@Listen("onClick = #removeAllButton")
 	public void removeAllButtonOnClick() {
 		if(!chosenProductList.isEmpty()) {
-			candidateProductList = possibleProductList;
+			candidateProductList = new ArrayList<Product>();
+			candidateProductList.addAll(possibleProductList);
 			chosenProductList = new ArrayList<Product>();
 			refreshView();
 		}
@@ -114,7 +117,8 @@ public class ProductFilterController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #chooseAllButton")
 	public void chooseAllButtonOnClick() {
-		chosenProductList = possibleProductList;
+		chosenProductList = new ArrayList<Product>();
+		chosenProductList.addAll(possibleProductList);
 		candidateProductList = new ArrayList<Product>();
 		refreshView();
 	}

@@ -70,6 +70,9 @@ public class ProductionOrder implements Serializable, Cloneable {
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "productionOrder", targetEntity = ProductionOrderMaterial.class)
 	private List<ProductionOrderMaterial> productionOrderMaterials = new ArrayList<>();
 
+	@OneToMany(orphanRemoval = true)
+	private List<Replanning> replanningList = new ArrayList<>();
+
 	@ManyToOne
 	private Product product;
 
@@ -580,5 +583,104 @@ public class ProductionOrder implements Serializable, Cloneable {
 
 	public BigDecimal getCostTotal() {
 		return getCostMaterials().add(getCostWork());
+	}
+
+	public List<Replanning> getReplanningList() {
+		return replanningList;
+	}
+
+	public void setReplanningList(List<Replanning> replanningList) {
+		this.replanningList = replanningList;
+	}
+
+	public void setReplanning(Replanning replanning) {
+		if(existReplanning(replanning) == false) {
+			addReplanning(replanning);
+		} else {
+			modifyReplanning(replanning);
+		}
+	}
+
+	private boolean existReplanning(Replanning replanning) {
+		//verifica si se encuentra ya en la lista
+		for(Replanning each : replanningList) {
+			if(each.getId() == replanning.getId()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void addReplanning(Replanning replanning) {
+		// agrega la replanificacion a la lista y cambia las fechas de los detalles para que incien en la reanudacion
+		replanningList.add(replanning);
+		modifyReplanning(replanning);
+	}
+
+	private void modifyReplanning(Replanning replanning) {
+		// cambia la fecha de la replanificacion
+		ProductionOrderDetail detail = getDetailFromList(replanning.getProductionOrderDetail());
+		Date dateStart = replanning.getDateResumption();
+		detail.setDateStart(dateStart);
+		detail.setDateFinish(ProductionDateTimeHelper.getFinishDate(dateStart, detail.getTimeTotal()));
+		updateRemainDetailDatesAndNotClearResources(detail);
+	}
+
+	public void deleteReplanning(Replanning replanning) {
+		int index = -1;
+		for(Replanning each : replanningList) {
+			if(each.getId() == replanning.getId()) {
+				index = replanningList.indexOf(each);
+			}
+		}
+		if(index > -1) {
+			replanningList.remove(index);
+		}
+		ProductionOrderDetail detail = getDetailFromList(replanning.getProductionOrderDetail());
+		Date dateStart = replanning.getDateInterruption();
+		detail.setDateStart(dateStart);
+		detail.setDateFinish(ProductionDateTimeHelper.getFinishDate(dateStart, detail.getTimeTotal()));
+		updateRemainDetailDatesAndNotClearResources(detail);
+	}
+	
+	private ProductionOrderDetail getDetailFromList(ProductionOrderDetail productionOrderDetail) {
+		for(ProductionOrderDetail each : getDetails()) {
+			if(productionOrderDetail.getId() == each.getId()) {
+				return each;
+			}
+		}
+		return null;
+	}
+
+	public void updateRemainDetailDatesAndNotClearResources(ProductionOrderDetail changedDetail) {
+		// busca el detalle cambiado y modifica las fechas posteriores a el
+		boolean startUpdating = false;
+		Date finishDate = null;
+		Date startDate = null;
+		for(ProductionOrderDetail each : getDetails()) {
+			if(startUpdating) {
+				if(each.getState() != ProcessState.Cancelado) {// solo se calcula para los procesos que no esten cancelados
+					if(finishDate == null) {// si es la primera vez que ingresa
+						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, each.getTimeTotal());
+					} else {
+						// el inicio de la actual es al finalizar la ultima
+						startDate = finishDate;
+						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, each.getTimeTotal());
+					}
+					each.setDateStart(startDate);
+					each.setDateFinish(finishDate);
+				} else {
+					each.setDateStart(null);
+					each.setDateFinish(null);
+					// por las dudas borramos tambien las fechas reales
+					each.setDateStartReal(null);
+					each.setDateFinishReal(null);
+				}
+			}
+			if(each.getProcess().equals(changedDetail.getProcess())) {
+				startUpdating = true;
+				startDate = changedDetail.getDateFinish();
+			}
+		}
 	}
 }

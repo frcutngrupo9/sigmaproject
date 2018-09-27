@@ -194,15 +194,18 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 		currentMaterialsOrder.setDateReception(receptionDate);
 		currentMaterialsOrder.setReceiptNumber(receiptNumber);
 		currentMaterialsOrder = materialsOrderRepository.save(currentMaterialsOrder);
+		String observation = "Para el plan: " + currentMaterialsOrder.getProductionPlan().getName();
 		// crea stock movement con las cantidades recibidas
 		StockMovement stockMovementSupply = new StockMovement();
 		stockMovementSupply.setSign((short) 1);// signo de ingreso a stock
 		stockMovementSupply.setDate(new Date());
 		stockMovementSupply.setType(StockMovementType.Supply);
+		stockMovementSupply.setObservation(observation);
 		StockMovement stockMovementWood = new StockMovement();
 		stockMovementWood.setSign((short) 1);// signo de ingreso a stock
 		stockMovementWood.setDate(new Date());
 		stockMovementWood.setType(StockMovementType.Wood);
+		stockMovementWood.setObservation(observation);
 		// modifica la cantidad en stock y se agrega los stock movement details
 		for(MaterialsOrderDetail each : currentMaterialsOrder.getDetails()) {
 			Item item = each.getItem();

@@ -73,6 +73,7 @@ THE SOFTWARE.
 		                    </rows>
 		                </grid>
 		                <hbox hflex="1" pack="center" align="center">
+			                <button id="replanningButton" label="${labels.replanning}"/>
 			                <button id="materialsWithdrawalButton" label="${labels.materials_withdrawal}"/>
 		                	<button id="saveButton" label="${labels.save}"/>
 		                	<button id="resetButton" label="${labels.reset}"/>

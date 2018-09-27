@@ -1,4 +1,4 @@
-package ar.edu.utn.sigmaproject.domain;
+package ar.edu.utn.sigmaproject.util;
 
 import java.util.Arrays;
 import java.util.List;

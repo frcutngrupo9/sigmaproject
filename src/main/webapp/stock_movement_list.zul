@@ -26,17 +26,19 @@ THE SOFTWARE.
     <panelchildren>
         <grid id="stockMovementGrid" sizedByContent="true" span="true" emptyMessage="${labels.empty_text}.">
             <auxhead>
-                <auxheader label="${labels.stock_movement_supplies}" colspan="3"/>
+                <auxheader label="${labels.stock_movement_supplies}" colspan="4"/>
             </auxhead>
             <columns>
                 <column label="${labels.date}" align="center"/>
                 <column label="${labels.type}" align="center"/>
+                <column label="${labels.observation_plural}" align="center"/>
                 <column label=""/>
             </columns>
             <template name="model">
                 <row>
                     <label value="${each.date}"/>
                     <label value="${each.sign == 1 ? labels.in : labels.out}"/>
+                    <label value="${each.observation}"/>
                     <button forward="onClick=stockMovementGrid.onSelectStoveMovement(${each})"  image="/img/Search16x16.png"/>
                 </row>
             </template>

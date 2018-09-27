@@ -32,7 +32,7 @@ THE SOFTWARE.
             	<hbox pack="center" align="center" width="100%">
             		<vbox  align="center" hflex="1">
             			<label value="${labels.production_plan}: "/>
-            			<bandbox id="productionPlanBandbox" value="selectSeleccionar"  onClick="self.open()" readonly="true" buttonVisible="true" autodrop="false">
+            			<bandbox id="productionPlanBandbox"  onClick="self.open()" readonly="true" buttonVisible="true" autodrop="false">
 	            			<bandpopup>
 		            			<listbox id="productionPlanListbox" onClick="productionPlanBandbox.close()"
 		            			width="600px" span="false" sizedByContent="false" emptyMessage="${labels.empty_production_plan_list}.">
@@ -59,7 +59,7 @@ THE SOFTWARE.
             		<separator/>
             		<vbox align="center" hflex="1">
             			<label value="${labels.production_order}: "/>
-            			<bandbox id="productionOrderBandbox" value="${labels.select}" onClick="self.open()" readonly="true" buttonVisible="true" autodrop="false">
+            			<bandbox id="productionOrderBandbox" onClick="self.open()" readonly="true" buttonVisible="true" autodrop="false">
 	            			<bandpopup>
 		            			<listbox id="productionOrderListbox" onClick="productionOrderBandbox.close()" width="600px" span="true" sizedByContent="false" emptyMessage="${labels.must_select_production_plan}.">
 		            				<listhead>

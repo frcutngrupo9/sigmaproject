@@ -39,7 +39,6 @@ import org.zkoss.zul.ListModelList;
 
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Product;
-import ar.edu.utn.sigmaproject.domain.ReportType;
 
 public class RenderElHelper {
 

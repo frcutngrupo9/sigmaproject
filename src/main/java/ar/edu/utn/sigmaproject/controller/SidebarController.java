@@ -109,6 +109,7 @@ public class SidebarController extends SelectorComposer<Component> {
 					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Procesos", "/process.zul")),
 					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Costos Mano de Obra", "/work_hour_list.zul")),
 					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Empleados", "/worker.zul")),
+					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Categorias Producto", "/product_category_list.zul")),
 					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Ajustes", "/settings_creation.zul"))
 				)),
 			new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Reportes y Estadisticas", "/report.zul"))

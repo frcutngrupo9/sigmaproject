@@ -24,35 +24,42 @@
 
 package ar.edu.utn.sigmaproject.domain;
 
-import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Date;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
 import org.hibernate.search.annotations.Indexed;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 @Entity
 @Indexed
-public class StockMovement implements Serializable {
+public class Replanning implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, updatable = false)
-	private StockMovementType type;
+	@OneToOne
+	private ProductionOrderDetail productionOrderDetail = null;
 
-	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "stockMovement", targetEntity = StockMovementDetail.class)
-	private List<StockMovementDetail> details = new ArrayList<>();
+	private String cause = "";
+	private Date dateInterruption = null;
+	private Date dateResumption = null;
 
-	// default is "in"
-	private Short sign = 1;
-	private Date date;
-	private String observation = "";
+	public Replanning() {
+	}
+
+	public Replanning(String cause, Date dateInterruption, Date dateResumption, ProductionOrderDetail productionOrderDetail) {
+		this.cause = cause;
+		this.dateInterruption = dateInterruption;
+		this.dateResumption = dateResumption;
+		this.productionOrderDetail = productionOrderDetail;
+	}
 
 	public Long getId() {
 		return id;
@@ -62,43 +69,35 @@ public class StockMovement implements Serializable {
 		this.id = id;
 	}
 
-	public Date getDate() {
-		return date;
+	public ProductionOrderDetail getProductionOrderDetail() {
+		return productionOrderDetail;
 	}
 
-	public void setDate(Date date) {
-		this.date = date;
+	public void setProductionOrderDetail(ProductionOrderDetail productionOrderDetail) {
+		this.productionOrderDetail = productionOrderDetail;
 	}
 
-	public Short getSign() {
-		return sign;
+	public String getCause() {
+		return cause;
 	}
 
-	public void setSign(Short sign) {
-		this.sign = sign;
+	public void setCause(String cause) {
+		this.cause = cause;
 	}
 
-	public StockMovementType getType() {
-		return type;
+	public Date getDateInterruption() {
+		return dateInterruption;
 	}
 
-	public void setType(StockMovementType type) {
-		this.type = type;
+	public void setDateInterruption(Date dateInterruption) {
+		this.dateInterruption = dateInterruption;
 	}
 
-	public List<StockMovementDetail> getDetails() {
-		return details;
+	public Date getDateResumption() {
+		return dateResumption;
 	}
 
-	public void setDetails(List<StockMovementDetail> details) {
-		this.details = details;
-	}
-
-	public String getObservation() {
-		return observation;
-	}
-
-	public void setObservation(String observation) {
-		this.observation = observation;
+	public void setDateResumption(Date dateResumption) {
+		this.dateResumption = dateResumption;
 	}
 }
