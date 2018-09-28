@@ -50,6 +50,7 @@ import ar.edu.utn.sigmaproject.domain.ProductionOrderStateType;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.domain.Settings;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
+import ar.edu.utn.sigmaproject.domain.UserType;
 import ar.edu.utn.sigmaproject.domain.Wood;
 import ar.edu.utn.sigmaproject.domain.WoodType;
 import ar.edu.utn.sigmaproject.domain.WorkHour;
@@ -67,6 +68,7 @@ import ar.edu.utn.sigmaproject.service.ProductionOrderStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProductionPlanStateTypeRepository;
 import ar.edu.utn.sigmaproject.service.SettingsRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
+import ar.edu.utn.sigmaproject.service.UserTypeRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
 import ar.edu.utn.sigmaproject.service.WoodTypeRepository;
 import ar.edu.utn.sigmaproject.service.WorkHourRepository;
@@ -125,6 +127,9 @@ public class RepositoryHelper {
 
 	@Autowired
 	private SettingsRepository settingsRepository;
+	
+	@Autowired
+	private UserTypeRepository userTypeRepository;
 
 	@Autowired
 	private EntityManager entityManager;
@@ -144,7 +149,22 @@ public class RepositoryHelper {
 		generateSupplyType();
 		generateMachine();
 		generateSettings();
+		generateUserType();
 		hibernateSearchReIndex();
+	}
+	
+	private void generateUserType() {
+		if (userTypeRepository.count() == 0) {
+			List<UserType> list = new ArrayList<>();
+			list.add(new UserType("Admin", ""));
+			list.add(new UserType("Gerente General", ""));
+			list.add(new UserType("Jefe de Ventas", ""));
+			list.add(new UserType("Jefe de Produccion", ""));
+			list.add(new UserType("Encargado de Ventas", ""));
+			list.add(new UserType("Encargado de Compras", ""));
+			list.add(new UserType("Jefe de Personal", ""));
+			userTypeRepository.save(list);
+		}
 	}
 
 	private void generateSettings() {
