@@ -33,28 +33,30 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.search.annotations.Indexed;
+
 @Entity
+@Indexed
 public class MaterialsOrderDetail implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	@ManyToOne(optional = false)
 	private Item item;
-	
+
 	@ManyToOne(targetEntity = MaterialsOrder.class)
 	private MaterialsOrder materialsOrder = null;
-	
+
 	private String description = "";
 	private BigDecimal quantity = BigDecimal.ZERO;
 	private BigDecimal quantityReceived = BigDecimal.ZERO;
 
 	public MaterialsOrderDetail() {
-		
 	}
-	
+
 	public MaterialsOrderDetail(MaterialsOrder materialsOrder, Item item, String description, BigDecimal quantity) {
 		this.materialsOrder = materialsOrder;
 		this.item = item;

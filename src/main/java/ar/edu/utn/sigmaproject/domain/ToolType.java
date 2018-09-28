@@ -24,40 +24,30 @@
 
 package ar.edu.utn.sigmaproject.domain;
 
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
+import java.io.Serializable;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.io.Serializable;
+
+import org.hibernate.search.annotations.Indexed;
 
 @Entity
 @Indexed
-@Analyzer(definition = "edge_ngram")
 public class ToolType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 
-	@Field
-	String name = "";
-
-	@Field
-	String description = "";
-
-	@Field
-	String details = "";
-
-	@Field
-	String brand = "";
+	private String name = "";
+	private String description = "";
+	private String details = "";
+	private String brand = "";
 
 	public ToolType() {
-
 	}
 
 	public ToolType(String name, String description, String details, String brand) {

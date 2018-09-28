@@ -33,43 +33,27 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
-@Indexed
-@Analyzer(definition = "edge_ngram")
 @Entity
+@Indexed
 public class SupplyType extends Item implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	@Field
-	String code = "";
-
-	@Field
-	String description = "";
-
-	@Field
-	String details = "";
-
-	@Field
-	String brand = "";
-
-	@Field
-	String presentation = "";
-
-	@Field
-	String measure = "";
-
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "item", targetEntity = MaterialReserved.class)
-	List<MaterialReserved> suppliesReserved = new ArrayList<>();
+	private List<MaterialReserved> suppliesReserved = new ArrayList<>();
 
-	BigDecimal stock = BigDecimal.ZERO;
-	BigDecimal stockMin = BigDecimal.ZERO;
-	BigDecimal stockRepo = BigDecimal.ZERO;
+	private String code = "";
+	private String description = "";
+	private String details = "";
+	private String brand = "";
+	private String presentation = "";
+	private String measure = "";
+	private BigDecimal stock = BigDecimal.ZERO;
+	private BigDecimal stockMin = BigDecimal.ZERO;
+	private BigDecimal stockRepo = BigDecimal.ZERO;
 
 	public SupplyType() {
-
 	}
 
 	public SupplyType(String code, String description, String details, String brand, String presentation, String measure, BigDecimal stock, BigDecimal stockMin, BigDecimal stockRepo, BigDecimal price) {
@@ -175,7 +159,7 @@ public class SupplyType extends Item implements Serializable, Cloneable {
 	public void setStockRepo(BigDecimal stockRepo) {
 		this.stockRepo = stockRepo;
 	}
-	
+
 	public BigDecimal getStockAvailable() {
 		// devuelve la diferencia entre el stock total y el total reservado
 		BigDecimal stockTotal = getStock();

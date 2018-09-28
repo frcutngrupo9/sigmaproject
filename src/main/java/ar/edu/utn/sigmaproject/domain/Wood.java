@@ -33,46 +33,37 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.IndexedEmbedded;
 
-@Indexed
-@Analyzer(definition = "edge_ngram")
 @Entity
+@Indexed
 public class Wood extends Item implements Cloneable {
 	private static final long serialVersionUID = 1L;
 
-	@IndexedEmbedded
-	@ManyToOne
-	WoodType woodType;
-
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "item", targetEntity = MaterialReserved.class)
-	List<MaterialReserved> woodsReserved = new ArrayList<>();
-	
-	@ManyToOne
-	MeasureUnit lengthMeasureUnit;
+	private List<MaterialReserved> woodsReserved = new ArrayList<>();
 
 	@ManyToOne
-	MeasureUnit depthMeasureUnit;
+	private WoodType woodType;
 
 	@ManyToOne
-	MeasureUnit widthMeasureUnit;
+	private MeasureUnit lengthMeasureUnit;
 
-	@Field
-	String name = "";
+	@ManyToOne
+	private MeasureUnit depthMeasureUnit;
 
-	BigDecimal length = BigDecimal.ZERO;
-	BigDecimal depth = BigDecimal.ZERO;
-	BigDecimal width = BigDecimal.ZERO;
+	@ManyToOne
+	private MeasureUnit widthMeasureUnit;
 
-	BigDecimal stock = BigDecimal.ZERO;
-	BigDecimal stockMin = BigDecimal.ZERO;
-	BigDecimal stockRepo = BigDecimal.ZERO;
+	private String name = "";
+	private BigDecimal length = BigDecimal.ZERO;
+	private BigDecimal depth = BigDecimal.ZERO;
+	private BigDecimal width = BigDecimal.ZERO;
+	private BigDecimal stock = BigDecimal.ZERO;
+	private BigDecimal stockMin = BigDecimal.ZERO;
+	private BigDecimal stockRepo = BigDecimal.ZERO;
 
 	public Wood() {
-
 	}
 
 	public Wood(String name, BigDecimal length, MeasureUnit lengthMeasureUnit, BigDecimal depth, MeasureUnit depthMeasureUnit, BigDecimal width, MeasureUnit widthMeasureUnit, WoodType woodType, BigDecimal stock, BigDecimal stockMin, BigDecimal stockRepo, BigDecimal price) {
@@ -205,7 +196,7 @@ public class Wood extends Item implements Cloneable {
 		}
 		return aux;
 	}
-	
+
 	public BigDecimal getStockAvailable() {
 		// devuelve la diferencia entre el stock total y el total reservado
 		BigDecimal stockTotal = getStock();

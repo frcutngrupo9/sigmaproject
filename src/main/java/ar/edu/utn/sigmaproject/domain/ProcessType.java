@@ -28,57 +28,56 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
 @Entity
 @Indexed
-@Analyzer(definition = "edge_ngram")
 public class ProcessType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 
-	@ManyToOne
-	MachineType machineType;
-
-	@Field
 	@Column(unique = true)
-	String name = "";
-	
-	@Field
-	private String details = "";
+	private String name = "";
 
 	@OneToMany
-	List<ProcessType> predecessorList = new ArrayList<>(); 
-	
-	Integer sequence = null;
+	private List<ProcessType> predecessorList = new ArrayList<>(); 
+
+	@ManyToOne
+	private MachineType machineType;
+
+	private String details = "";
+	private Integer sequence = null;
 
 	public ProcessType() {
-
 	}
 
 	public ProcessType(String name, MachineType machineType) {
 		this.name = name;
 		this.machineType = machineType;
 	}
-	
+
 	public ProcessType(Integer sequence, String name, MachineType machineType) {
 		this.sequence = sequence;
 		this.name = name;
 		this.machineType = machineType;
 	}
-	
+
 	public ProcessType(Integer sequence, String name, String details, MachineType machineType) {
 		this.sequence = sequence;
 		this.name = name;
-		this.machineType = machineType;
 		this.details = details;
+		this.machineType = machineType;
 	}
 
 	public Long getId() {

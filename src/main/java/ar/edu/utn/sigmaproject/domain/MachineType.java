@@ -24,21 +24,23 @@
 
 package ar.edu.utn.sigmaproject.domain;
 
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Field;
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Transient;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.Duration;
+
 import org.hibernate.search.annotations.Indexed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
-
-import javax.persistence.*;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.Duration;
-
 @Entity
 @Indexed
-@Analyzer(definition = "edge_ngram")
 public class MachineType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
@@ -49,20 +51,16 @@ public class MachineType implements Serializable, Cloneable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Field
-	private String name = "";
-
-	@Field
-	private String details = "";
-
 	@Transient
 	private Duration deteriorationTime;
 
 	@Column
 	private String deteriorationTimeInternal;
 
-	public MachineType() {
+	private String name = "";
+	private String details = "";
 
+	public MachineType() {
 	}
 
 	public MachineType(String name, String details, Duration deteriorationTime) {

@@ -317,10 +317,12 @@ public class ProductionOrderListController extends SelectorComposer<Component> {
 		// devuelve el horario de inicio del dia
 		int hour = ProductionDateTimeHelper.getFirstHourOfDay();
 		int minute = ProductionDateTimeHelper.getFirstMinuteOfDay();
+		int second = 0;
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
 		calendar.set(Calendar.HOUR_OF_DAY, hour);
 		calendar.set(Calendar.MINUTE, minute);
+		calendar.set(Calendar.SECOND, second);
 		return calendar.getTime();
 	}
 

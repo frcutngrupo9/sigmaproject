@@ -41,7 +41,7 @@ import org.zkoss.zul.Include;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Window;
 
-import ar.edu.utn.sigmaproject.domain.ReportType;
+import ar.edu.utn.sigmaproject.util.ReportType;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ReportSelectionModalController extends SelectorComposer<Component> {

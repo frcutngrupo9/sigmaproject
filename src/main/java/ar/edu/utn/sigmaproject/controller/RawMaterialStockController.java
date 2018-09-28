@@ -25,6 +25,7 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.zkoss.zk.ui.Component;
@@ -43,7 +44,6 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.MaterialReserved;
-import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.MeasureUnit;
 import ar.edu.utn.sigmaproject.domain.Wood;
 import ar.edu.utn.sigmaproject.domain.WoodType;
@@ -110,11 +110,21 @@ public class RawMaterialStockController extends SelectorComposer<Component> {
 		woodList = woodRepository.findAll();
 		woodListModel = new ListModelList<>(woodList);
 		woodListbox.setModel(woodListModel);
-		woodReservedList = materialReservedRepository.findAllByType(MaterialType.Wood);
+		woodReservedList = getReservedList();
 		woodReservedListModel = new ListModelList<>(woodReservedList);
 		woodReservedListbox.setModel(woodReservedListModel);
 		currentWood = null;
 		refreshView();
+	}
+
+	private List<MaterialReserved> getReservedList() {
+		List<MaterialReserved> list = new ArrayList<MaterialReserved>();
+		for(MaterialReserved each : materialReservedRepository.findAll()) {
+			if(each.getItem() instanceof Wood) {
+				list.add(each);
+			}
+		}
+		return list;
 	}
 
 	@Listen("onClick = #searchButton")

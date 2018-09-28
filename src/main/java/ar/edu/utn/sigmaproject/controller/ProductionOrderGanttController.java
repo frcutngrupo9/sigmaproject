@@ -24,8 +24,14 @@
 
 package ar.edu.utn.sigmaproject.controller;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.MouseEvent;
@@ -46,6 +52,7 @@ import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.util.GanttChartEngine;
+import ar.edu.utn.sigmaproject.util.ProductionDateTimeHelper;
 
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -101,11 +108,14 @@ public class ProductionOrderGanttController extends SelectorComposer<Component> 
 		Date dateStart = null;
 		Date dateFinish = null;
 		
+		String planificado = Labels.getLabel("scheduled");
+		String real = Labels.getLabel("actual");
+
 		String processNamePrevReal = null;
 		String processNameReal= null;
 		Date dateStartReal = null;
 		Date dateFinishReal = null;
-		for(ProductionOrderDetail each : currentProductionOrder.getDetails()) {
+		for(ProductionOrderDetail each : sortProductionOrderDetailListByProcessTypeSequence(currentProductionOrder.getDetails())) {
 			if(each.getState() != ProcessState.Cancelado) {
 				// si hay muchos procesos iguales para diferentes piezas, se los acumula y se muestran como 1 solo
 				processName = each.getProcess().getType().getName();
@@ -117,12 +127,18 @@ public class ProductionOrderGanttController extends SelectorComposer<Component> 
 				if(processName.equalsIgnoreCase(processNamePrev)) {// si son iguales se guarda la fecha fin
 					dateFinish = each.getDateFinish();
 				} else {// si son diferentes se agrega el previo al gantt y se carga el nuevo como previo
-					ganttmodel.addValue("Programado", new GanttTask(processNamePrev, dateStart, dateFinish, 0.0));
+					// si la fecha de inico y fin son 2 dias diferentes, se los corta en el tiempo que no se trabaja
+					if(areTheSameDay(dateStart, dateFinish)) {
+						ganttmodel.addValue(planificado, new GanttTask(processNamePrev, dateStart, dateFinish, 0.0));
+					} else {
+						ganttmodel.addValue(planificado, new GanttTask(processNamePrev + "(1)", dateStart, ProductionDateTimeHelper.getLastHourOfDay(dateStart), 0.0));
+						ganttmodel.addValue(planificado, new GanttTask(processNamePrev + "(2)", ProductionDateTimeHelper.getFirstHourOfDay(dateFinish), dateFinish, 0.0));
+					}
 					processNamePrev = processName;
 					dateStart = each.getDateStart();
 					dateFinish = each.getDateFinish();
 				}
-				//ganttmodel.addValue("Programado", new GanttTask(each.getProcess().getType().getName(), each.getDateStart(), each.getDateFinish(), 0.0));
+				//ganttmodel.addValue(planificado, new GanttTask(each.getProcess().getType().getName(), each.getDateStart(), each.getDateFinish(), 0.0));
 				if(each.getDateStartReal() != null && each.getDateFinishReal() != null) {
 					processNameReal = each.getProcess().getType().getName();
 					if(processNamePrevReal == null) {// primera vez
@@ -133,23 +149,61 @@ public class ProductionOrderGanttController extends SelectorComposer<Component> 
 					if(processNameReal.equalsIgnoreCase(processNamePrevReal)) {// si son iguales se guarda la fecha fin
 						dateFinishReal = each.getDateFinishReal();
 					} else {// si son diferentes se agrega el previo al gantt y se carga el nuevo como previo
-						ganttmodel.addValue("Real", new GanttTask(processNamePrevReal, dateStartReal, dateFinishReal, 0.0));
+						if(areTheSameDay(dateStartReal, dateFinishReal)) {
+							ganttmodel.addValue(real, new GanttTask(processNamePrevReal, dateStartReal, dateFinishReal, 0.0));
+						} else {
+							ganttmodel.addValue(real, new GanttTask(processNamePrevReal + "(1)", dateStartReal, ProductionDateTimeHelper.getLastHourOfDay(dateStartReal), 0.0));
+							ganttmodel.addValue(real, new GanttTask(processNamePrevReal + "(2)", ProductionDateTimeHelper.getFirstHourOfDay(dateFinishReal), dateFinishReal, 0.0));
+						}
 						processNamePrevReal = processNameReal;
 						dateStartReal = each.getDateStartReal();
 						dateFinishReal = each.getDateFinishReal();
 					}
-					//ganttmodel.addValue("Real", new GanttTask(each.getProcess().getType().getName(), each.getDateStartReal(), each.getDateFinishReal(), 0.0));
+					//ganttmodel.addValue(real, new GanttTask(each.getProcess().getType().getName(), each.getDateStartReal(), each.getDateFinishReal(), 0.0));
 				}
 			}
 		}
 		// si quedo algo
 		if(processNamePrev != null) {
-			ganttmodel.addValue("Programado", new GanttTask(processNamePrev, dateStart, dateFinish, 0.0));
+			if(areTheSameDay(dateStart, dateFinish)) {
+				ganttmodel.addValue(planificado, new GanttTask(processNamePrev, dateStart, dateFinish, 0.0));
+			} else {
+				ganttmodel.addValue(planificado, new GanttTask(processNamePrev + "(1)", dateStart, ProductionDateTimeHelper.getLastHourOfDay(dateStart), 0.0));
+				ganttmodel.addValue(planificado, new GanttTask(processNamePrev + "(2)", ProductionDateTimeHelper.getFirstHourOfDay(dateFinish), dateFinish, 0.0));
+			}
 		}
 		if(processNamePrevReal != null) {
-			ganttmodel.addValue("Real", new GanttTask(processNamePrevReal, dateStartReal, dateFinishReal, 0.0));
+			if(areTheSameDay(dateStartReal, dateFinishReal)) {
+				ganttmodel.addValue(real, new GanttTask(processNamePrevReal, dateStartReal, dateFinishReal, 0.0));
+			} else {
+				ganttmodel.addValue(real, new GanttTask(processNamePrevReal + "(1)", dateStartReal, ProductionDateTimeHelper.getLastHourOfDay(dateStartReal), 0.0));
+				ganttmodel.addValue(real, new GanttTask(processNamePrevReal + "(2)", ProductionDateTimeHelper.getFirstHourOfDay(dateFinishReal), dateFinishReal, 0.0));
+			}
 		}
 		return ganttmodel;
 	}
 
+	private boolean areTheSameDay(Date dateStart, Date dateFinish) {
+		Calendar dateStartCalendar = Calendar.getInstance();
+		dateStartCalendar.setTime(dateStart);
+		Calendar dateFinishCalendar = Calendar.getInstance();
+		dateFinishCalendar.setTime(dateFinish);
+		if(dateStartCalendar.get(Calendar.DAY_OF_YEAR) == dateFinishCalendar.get(Calendar.DAY_OF_YEAR)) {
+			return true;
+		}
+		return false;
+	}
+
+	private List<ProductionOrderDetail> sortProductionOrderDetailListByProcessTypeSequence(List<ProductionOrderDetail> listParameter) {
+		List<ProductionOrderDetail> list = new ArrayList<ProductionOrderDetail>();
+		list.addAll(listParameter);
+		Comparator<ProductionOrderDetail> comp = new Comparator<ProductionOrderDetail>() {
+			@Override
+			public int compare(ProductionOrderDetail a, ProductionOrderDetail b) {
+				return a.getProcess().getType().getSequence().compareTo(b.getProcess().getType().getSequence());
+			}
+		};
+		Collections.sort(list, comp);
+		return list;
+	}
 }

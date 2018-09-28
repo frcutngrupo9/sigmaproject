@@ -45,7 +45,6 @@ import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.MaterialReserved;
-import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.Wood;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.WoodRepository;
@@ -159,7 +158,7 @@ public class RawMaterialReservationController extends SelectorComposer<Component
 		}
 		BigDecimal stockReserved = BigDecimal.valueOf(stockReservedDoublebox.getValue());
 		if(currentWoodReserved == null) {
-			currentWoodReserved = new MaterialReserved(currentWood, MaterialType.Wood, currentRawMaterialRequirement, stockReserved);
+			currentWoodReserved = new MaterialReserved(currentWood, currentRawMaterialRequirement, stockReserved);
 			currentWood.getWoodsReserved().add(currentWoodReserved);
 		} else {
 			currentWoodReserved.setStockReserved(stockReserved);

@@ -36,9 +36,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderColumn;
+
+import org.hibernate.search.annotations.Indexed;
 
 @Entity(name = "Orders")
+@Indexed
 public class Order implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
@@ -46,24 +48,24 @@ public class Order implements Serializable, Cloneable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
-	private Client client;
-
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "order", targetEntity = OrderDetail.class)
-	@OrderColumn(name = "detail_index")
 	private List<OrderDetail> details = new ArrayList<>();
 
 	@OneToMany(orphanRemoval = true)
 	private List<OrderState> states = new ArrayList<>();
 
+	@ManyToOne
+	private Client client;
+
+	@ManyToOne
+	private OrderStateType currentStateType = null;
+
 	private Integer number = 0;
 	private Date date = new Date();
 	private Date needDate = new Date();
-	private OrderStateType currentStateType = null;
 	private String numberBill = "";
 
 	public Order() {
-
 	}
 
 	public Order(Client client, Integer number, Date date, Date needDate) {

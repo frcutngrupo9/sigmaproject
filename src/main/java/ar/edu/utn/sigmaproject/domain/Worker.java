@@ -24,34 +24,29 @@
 
 package ar.edu.utn.sigmaproject.domain;
 
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
+import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.io.Serializable;
-import java.util.Date;
+
+import org.hibernate.search.annotations.Indexed;
 
 @Entity
 @Indexed
-@Analyzer(definition = "edge_ngram")
 public class Worker  implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 
-	@Field
-	String name = "";
-
-	Date dateEmployed = new Date();
+	private String name = "";
+	private Date dateEmployed = new Date();
 
 	public Worker() {
-
 	}
 
 	public Worker(String name, Date dateEmployed) {

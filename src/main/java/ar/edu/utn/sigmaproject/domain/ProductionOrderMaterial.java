@@ -33,28 +33,30 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.search.annotations.Indexed;
+
 @Entity
+@Indexed
 public class ProductionOrderMaterial implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
-	
-	@ManyToOne(targetEntity = ProductionOrder.class)
-	private ProductionOrder productionOrder = null;
-	
+	private Long id;
+
 	@ManyToOne(optional = false)
 	private Item item;
 
-	BigDecimal quantity = BigDecimal.ZERO;
-	BigDecimal quantityUsed = BigDecimal.ZERO;
-	String observation = "";
-	
-	public ProductionOrderMaterial() {
+	@ManyToOne(targetEntity = ProductionOrder.class)
+	private ProductionOrder productionOrder = null;
 
+	private BigDecimal quantity = BigDecimal.ZERO;
+	private BigDecimal quantityUsed = BigDecimal.ZERO;
+	private String observation = "";
+
+	public ProductionOrderMaterial() {
 	}
-	
+
 	public ProductionOrderMaterial(ProductionOrder productionOrder, Item item, BigDecimal quantity) {
 		this.productionOrder = productionOrder;
 		this.item = item;

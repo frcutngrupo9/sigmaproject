@@ -35,6 +35,9 @@ import org.zkoss.image.AImage;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.EventQueue;
+import org.zkoss.zk.ui.event.EventQueues;
 import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -60,6 +63,7 @@ import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Row;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.Item;
 import ar.edu.utn.sigmaproject.domain.Machine;
@@ -82,6 +86,7 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
+import ar.edu.utn.sigmaproject.domain.Replanning;
 import ar.edu.utn.sigmaproject.domain.StockMovement;
 import ar.edu.utn.sigmaproject.domain.StockMovementDetail;
 import ar.edu.utn.sigmaproject.domain.StockMovementType;
@@ -203,7 +208,20 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		currentProductionOrder = (ProductionOrder) Executions.getCurrent().getAttribute("selected_production_order");
 		if(currentProductionOrder == null) {throw new RuntimeException("ProductionOrder not found");}
 		currentProductionPlan = currentProductionOrder.getProductionPlan();
+		createListener();
 		refreshView();
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void createListener() {
+		EventQueue<Event> eq = EventQueues.lookup("Replanning Update Queue", EventQueues.DESKTOP, true);
+		eq.subscribe(new EventListener() {
+			public void onEvent(Event event) throws Exception {
+				if(event.getName().equals("onReplanningUpdate")) {
+					refreshView();
+				}
+			}
+		});
 	}
 
 	private void refreshView() {
@@ -541,9 +559,15 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 					dateFinishReal = ProductionDateTimeHelper.getFinishDate(dateStartReal, data.getTimeTotal());// se calcula el final real en base al valor del inicio
 				}
 			}
-			// agregamos fechas reales para q no sea necesario modificar si no hace falta
-			data.setDateStartReal(dateStartReal);
-			data.setDateFinishReal(dateFinishReal);
+			// si el proceso fue replanificado, en lugar de seguir las fechas reales del proceso anterior, se asignan las fechas planificadas
+			if(isDetailReplanned(data)) {
+				data.setDateStartReal(data.getDateStart());
+				data.setDateFinishReal(data.getDateFinish());
+			} else {
+				// agregamos fechas reales para q no sea necesario modificar si no hace falta
+				data.setDateStartReal(dateStartReal);
+				data.setDateFinishReal(dateFinishReal);
+			}
 			dateboxStartReal.setValue(data.getDateStartReal());
 			dateboxFinishReal.setValue(data.getDateFinishReal());
 			dateboxStartReal.setDisabled(false);
@@ -557,6 +581,16 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 			dateboxStartReal.setDisabled(true);
 			dateboxFinishReal.setDisabled(true);
 		}
+	}
+
+	private boolean isDetailReplanned(ProductionOrderDetail data) {
+		// busca en las replanificaciones si aparece el detalle que viene por parametro
+		for(Replanning each : currentProductionOrder.getReplanningList()) {
+			if(each.getProductionOrderDetail().getId() == data.getId()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Listen("onEditUsedMaterial = #productionOrderSupplyListbox, #productionOrderRawMaterialListbox")
@@ -614,16 +648,19 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		// buscamos los materiales necesarios para esta orden y luego vemos cuales son las reservas para dichos materiales y disminuimos su cantidad tanto en la reserva como en el stock
 		Product product = currentProductionOrder.getProduct();
 		Integer units = currentProductionOrder.getUnits();
+		String observation = "Para el plan: " + currentProductionOrder.getProductionPlan().getName() + ", nro de orden: " + currentProductionOrder.getNumber();
 
 		// crea stock movement con las cantidades retiradas
 		StockMovement stockMovementSupply = new StockMovement();
 		stockMovementSupply.setSign((short) -1);// signo de egreso de stock
 		stockMovementSupply.setDate(new Date());
 		stockMovementSupply.setType(StockMovementType.Supply);
+		stockMovementSupply.setObservation(observation);
 		StockMovement stockMovementWood = new StockMovement();
 		stockMovementWood.setSign((short) -1);// signo de egreso de stock
 		stockMovementWood.setDate(new Date());
 		stockMovementWood.setType(StockMovementType.Wood);
+		stockMovementWood.setObservation(observation);
 
 		for(ProductMaterial each : product.getMaterials()) {
 			// la cantidad total a restar de la orden, es la cantidad de materiales del producto, por la cantidad de unidades del producto
@@ -715,5 +752,15 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 			}
 		}
 		return null;
+	}
+
+	@Listen("onClick = #replanningButton")
+	public void replanningButtonClick() {
+		// muestra la ventana dondde se puede agregar la replanificacion
+		Executions.getCurrent().setAttribute("selected_production_order", currentProductionOrder);
+		final Window win = (Window) Executions.createComponents("/replanning_list.zul", null, null);
+		win.setSizable(false);
+		win.setPosition("center");
+		win.doModal();
 	}
 }

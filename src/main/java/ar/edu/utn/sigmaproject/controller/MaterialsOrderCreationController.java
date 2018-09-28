@@ -309,9 +309,13 @@ public class MaterialsOrderCreationController extends SelectorComposer<Component
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Listen("onClick = #deleteOrderButton")
+	@Listen("onClick = #deleteButton")
 	public void deleteOrder() {
 		if(currentMaterialsOrder != null) {
+			if(currentMaterialsOrder.getProductionPlan() != null) {
+				Messagebox.show("No se puede eliminar, el pedido de materiales se encuentra asignado a un plan de produccion.", "Informacion", Messagebox.OK, Messagebox.ERROR);
+				return;
+			}
 			Messagebox.show("Esta seguro que desea eliminar el pedido?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 				public void onEvent(Event evt) throws InterruptedException {
 					if(evt.getName().equals("onOK")) {

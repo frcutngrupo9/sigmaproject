@@ -40,7 +40,6 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.Item;
-import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductMaterial;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
@@ -134,10 +133,5 @@ public class ProductSupplyController extends ProductMaterialController {
 		}
 		materialPopupListModel = new ListModelList<>(someItems);
 		materialPopupListbox.setModel(materialPopupListModel);
-	}
-
-	@Override
-	protected MaterialType getMaterialType() {
-		return MaterialType.Supply;
 	}
 }

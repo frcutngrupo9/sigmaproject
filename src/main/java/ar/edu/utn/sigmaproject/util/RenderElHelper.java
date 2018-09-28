@@ -39,7 +39,6 @@ import org.zkoss.zul.ListModelList;
 
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Product;
-import ar.edu.utn.sigmaproject.domain.ReportType;
 
 public class RenderElHelper {
 
@@ -96,6 +95,14 @@ public class RenderElHelper {
 	public static String getFormattedDateTime(Date date) {
 		if(date != null) {
 			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+			return dateFormat.format(date);
+		}
+		return "";
+	}
+	
+	public static String getFormattedDateTimeSecond(Date date) {
+		if(date != null) {
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 			return dateFormat.format(date);
 		}
 		return "";

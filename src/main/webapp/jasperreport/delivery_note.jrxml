@@ -22,12 +22,12 @@
 				<reportElement x="0" y="118" width="555" height="1" uuid="70436d23-b352-4ee8-8a99-c0e132fa0b1f"/>
 			</line>
 			<textField pattern="EEE, d MMM yyyy">
-				<reportElement x="367" y="51" width="188" height="19" uuid="fc211259-7ad4-4834-904f-5afa8dedcc70"/>
+				<reportElement x="367" y="75" width="188" height="19" uuid="fc211259-7ad4-4834-904f-5afa8dedcc70"/>
 				<box rightPadding="5"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Times New Roman"/>
+					<font fontName="Times New Roman" size="14"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(new java.text.SimpleDateFormat("EEEEE, dd 'de' MMMMM 'de' yyyy",new Locale("es", "ES"))).format(new Date())]]></textFieldExpression>
+				<textFieldExpression><![CDATA[(new java.text.SimpleDateFormat("dd/MM/yyyy",new Locale("es", "ES"))).format(new Date())]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="0" y="40" width="280" height="50" uuid="46b3f5ce-006d-426f-8a04-f4eecffde6f1"/>
@@ -107,7 +107,7 @@
 				<text><![CDATA[REMITO]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="314" y="51" width="53" height="19" uuid="6a1087ca-02f6-4869-857e-14af2c8c25e6"/>
+				<reportElement x="314" y="75" width="53" height="19" uuid="6a1087ca-02f6-4869-857e-14af2c8c25e6"/>
 				<box rightPadding="5"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Arial" size="12" isBold="false"/>

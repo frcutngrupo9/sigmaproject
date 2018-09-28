@@ -45,7 +45,6 @@ import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.MaterialReserved;
-import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.service.ProductionPlanRepository;
 import ar.edu.utn.sigmaproject.service.SupplyTypeRepository;
@@ -160,7 +159,7 @@ public class SupplyReservationController extends SelectorComposer<Component> {
 		}
 		BigDecimal stockReserved = BigDecimal.valueOf(stockReservedDoublebox.getValue());
 		if(currentSupplyReserved == null) {
-			currentSupplyReserved = new MaterialReserved(supplyType, MaterialType.Supply, currentSupplyRequirement, stockReserved);
+			currentSupplyReserved = new MaterialReserved(supplyType, currentSupplyRequirement, stockReserved);
 			supplyType.getSuppliesReserved().add(currentSupplyReserved);
 		} else {
 			currentSupplyReserved.setStockReserved(stockReserved);
