@@ -119,6 +119,11 @@ public class Order implements Serializable, Cloneable {
 		}
 		return null;
 	}
+	
+	public void setPreviousState() {
+		// busca el estado anterior al actual y lo asigna como el nuevo estado
+		
+	}
 
 	public void setState(OrderState state) {
 		currentStateType = state.getType();
