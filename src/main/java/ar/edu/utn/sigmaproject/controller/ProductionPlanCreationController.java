@@ -53,6 +53,7 @@ import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Item;
@@ -141,7 +142,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	private List<Order> orderPopupList;
 	private List<ProductionPlanDetail> productionPlanDetailList;
 	private List<ProductTotal> productTotalList;
-	private List<ProductionPlanStateType> productionPlanStateTypeList;
 
 	// list models
 	private ListModelList<Order> orderPopupListModel;
@@ -157,10 +157,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 
 		productTotalList = new ArrayList<ProductTotal>();
 		currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
-
-		productionPlanStateTypeList = productionPlanStateTypeRepository.findAll();
-		productionPlanStateTypeListModel = new ListModelList<ProductionPlanStateType>(productionPlanStateTypeList);
-		productionPlanStateTypeCombobox.setModel(productionPlanStateTypeListModel);
 
 		refreshViewProductionPlan();
 		refreshProductTotalListbox();
@@ -204,7 +200,14 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 
 	@Listen("onClick = #deleteProductionPlanButton")
 	public void deleteProductionPlan() {
+		// no se puede eliminar el plan si ya esta abastecido, parcialmente abastecido o iniciado
+		// si se elimina, se deben volver los pedidos a su estado anterior
 		if(currentProductionPlan != null) {
+			if(!currentProductionPlan.getCurrentStateType().getName().equals("Registrado")) {
+				Messagebox.show("No se puede eliminar, el plan se encuentra en un estado posterior a registrado.", "Informacion", Messagebox.OK, Messagebox.ERROR);
+				return;
+			}
+			setProductionPlanDetailStates("Creado");
 			productionPlanRepository.delete(currentProductionPlan);
 			currentProductionPlan = null;
 			refreshViewProductionPlan();
@@ -396,6 +399,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 
 	private void refreshViewProductionPlan() {
 		refreshOrder();
+		productionPlanStateTypeListModel = new ListModelList<ProductionPlanStateType>(productionPlanStateTypeRepository.findAll());
 		if (currentProductionPlan == null) {// nuevo plan de produccion
 			productionPlanCaption.setLabel("Creacion de Plan de Produccion");
 			productionPlanStateTypeListModel.addToSelection(productionPlanStateTypeRepository.findFirstByName("Registrado"));

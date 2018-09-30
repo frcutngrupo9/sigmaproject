@@ -40,7 +40,13 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Window;
 
+import ar.edu.utn.sigmaproject.domain.Piece;
+import ar.edu.utn.sigmaproject.domain.Process;
+import ar.edu.utn.sigmaproject.domain.Product;
+import ar.edu.utn.sigmaproject.domain.User;
+import ar.edu.utn.sigmaproject.domain.UserType;
 import ar.edu.utn.sigmaproject.domain.WorkHour;
+import ar.edu.utn.sigmaproject.service.ProductRepository;
 import ar.edu.utn.sigmaproject.service.WorkHourRepository;
 
 public class WorkHourListController extends SelectorComposer<Component> {
@@ -51,6 +57,8 @@ public class WorkHourListController extends SelectorComposer<Component> {
 
 	@WireVariable
 	private WorkHourRepository workHourRepository;
+	@WireVariable
+	private ProductRepository productRepository;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
@@ -98,13 +106,30 @@ public class WorkHourListController extends SelectorComposer<Component> {
 		win.doModal();
 	}
 
+	private boolean isWorkHourAssigned(WorkHour workHour) {
+		for(Product eachProduct : productRepository.findAll()) {
+			for(Piece eachPiece : eachProduct.getPieces()) {
+				for(Process eachProcess : eachPiece.getProcesses()) {
+					if(eachProcess.getWorkHour().getId() == workHour.getId()) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Listen("onDeleteWorkHour = #workHourListbox")
 	public void deleteButtonClick(final ForwardEvent ForwEvt) {
+		final WorkHour workHour = (WorkHour) ForwEvt.getData();
+		if(isWorkHourAssigned(workHour)) {
+			Messagebox.show("No se puede eliminar, el rol se encuentra asignado a uno o mas procesos.", "Informacion", Messagebox.OK, Messagebox.ERROR);
+			return;
+		}
 		Messagebox.show("Desea eliminar?", "Confirmar", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 			public void onEvent(Event evt) throws InterruptedException {
 				if (evt.getName().equals("onOK")) {
-					WorkHour workHour = (WorkHour) ForwEvt.getData();
 					workHourRepository.delete(workHour);
 					refreshView();
 				}

@@ -326,19 +326,29 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 
 	protected void updateProductionPlanState(ProductionPlan productionPlan) {
 		boolean isCompleted = isAllReservationsFulfilled(productionPlan);
-		ProductionPlanStateType stateTypeAbastecido = productionPlanStateTypeRepository.findFirstByName("Abastecido");
-		ProductionPlanStateType stateTypeRegistrado = productionPlanStateTypeRepository.findFirstByName("Registrado");
-		ProductionPlanStateType currentStateType = productionPlanStateTypeRepository.findOne(productionPlan.getCurrentStateType().getId());
+		boolean isPartiallyCompleted = isPartiallyFulfilled(productionPlan);
+		//System.out.println("--------------------------------------------------- isPartiallyFulfilled: " + isPartiallyCompleted);
+		String stateTypeParcialmenteAbastecido = "Parcialmente Abastecido";
+		String stateTypeAbastecido = "Abastecido";
+		String stateTypeRegistrado = "Registrado";
+		ProductionPlanStateType currentStateType = productionPlan.getCurrentStateType();
 		ProductionPlanState productionPlanState = null;
 		if(isCompleted) {
-			// solo se actualiza el estado a abastecido si el estado anterior era Registrado
-			if(currentStateType.equals(stateTypeRegistrado)) {
-				productionPlanState = new ProductionPlanState(stateTypeAbastecido, new Date());
+			// solo se actualiza el estado a abastecido si el estado anterior era Registrado o Parcialmente Abastecido
+			if(currentStateType.getName().equals(stateTypeRegistrado) || currentStateType.getName().equals(stateTypeParcialmenteAbastecido)) {
+				productionPlanState = new ProductionPlanState(productionPlanStateTypeRepository.findFirstByName(stateTypeAbastecido), new Date());
 			}
 		} else {// si dejo de estar abastecido
-			// solo se actualiza el estado a Registrado si el estado anterior era abastecido
-			if(currentStateType.equals(stateTypeAbastecido)) {
-				productionPlanState = new ProductionPlanState(stateTypeRegistrado, new Date());
+			if(isPartiallyCompleted) {
+				// solo se actualiza el estado a Parcialmente Abastecido si el estado anterior era abastecido o Registrado
+				if(currentStateType.getName().equals(stateTypeAbastecido) || currentStateType.getName().equals(stateTypeRegistrado)) {
+					productionPlanState = new ProductionPlanState(productionPlanStateTypeRepository.findFirstByName(stateTypeParcialmenteAbastecido), new Date());
+				}
+			} else {
+				// solo se actualiza el estado a Registrado si el estado anterior era abastecido o Parcialmente Abastecido
+				if(currentStateType.getName().equals(stateTypeAbastecido) || currentStateType.getName().equals(stateTypeParcialmenteAbastecido)) {
+					productionPlanState = new ProductionPlanState(productionPlanStateTypeRepository.findFirstByName(stateTypeRegistrado), new Date());
+				} 
 			}
 		}
 		if(productionPlanState != null) {
@@ -346,6 +356,21 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 			productionPlan.setState(productionPlanState);
 			productionPlan = productionPlanRepository.save(productionPlan);
 		}
+	}
+
+	private boolean isPartiallyFulfilled(ProductionPlan productionPlan) {
+		// recorre todos los requerimientos para ver si estan todos abastecidos
+		for(MaterialRequirement each : productionPlan.getMaterialRequirements()) {
+			BigDecimal stockReserved = BigDecimal.ZERO;
+			MaterialReserved reservation = getMaterialReserved(each);
+			if(reservation != null) {// se encontro reserva
+				stockReserved = reservation.getStockReserved().add(each.getQuantityWithdrawn());// se suma la cantidad que se retiro para produccion
+			}
+			if(each.getQuantity().subtract(stockReserved).compareTo(BigDecimal.ZERO) == 0) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private boolean isAllReservationsFulfilled(ProductionPlan productionPlan) {

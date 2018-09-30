@@ -179,6 +179,7 @@ public class RepositoryHelper {
 		if (productionPlanStateTypeRepository.count() == 0) {
 			List<ProductionPlanStateType> list = new ArrayList<>();
 			list.add(new ProductionPlanStateType("Registrado", null));
+			list.add(new ProductionPlanStateType("Parcialmente Abastecido", null));
 			list.add(new ProductionPlanStateType("Abastecido", null));
 			list.add(new ProductionPlanStateType("Lanzado", null));
 			list.add(new ProductionPlanStateType("En Ejecucion", null));
