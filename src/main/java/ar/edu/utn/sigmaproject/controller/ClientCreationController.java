@@ -24,8 +24,6 @@
 
 package ar.edu.utn.sigmaproject.controller;
 
-import java.math.BigDecimal;
-
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
@@ -37,18 +35,15 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
-import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.Client;
-import ar.edu.utn.sigmaproject.domain.WorkHour;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
-import ar.edu.utn.sigmaproject.service.WorkHourRepository;
 
 public class ClientCreationController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
-	
+
 	@Wire
 	Window clientCreationWindow;
 	@Wire
