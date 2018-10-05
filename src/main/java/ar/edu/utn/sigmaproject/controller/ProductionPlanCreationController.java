@@ -53,11 +53,11 @@ import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.Item;
 import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
-import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.Order;
 import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.OrderState;
@@ -76,8 +76,6 @@ import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
-import ar.edu.utn.sigmaproject.domain.SupplyType;
-import ar.edu.utn.sigmaproject.domain.Wood;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateTypeRepository;
@@ -144,7 +142,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	private List<Order> orderPopupList;
 	private List<ProductionPlanDetail> productionPlanDetailList;
 	private List<ProductTotal> productTotalList;
-	private List<ProductionPlanStateType> productionPlanStateTypeList;
 
 	// list models
 	private ListModelList<Order> orderPopupListModel;
@@ -160,10 +157,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 
 		productTotalList = new ArrayList<ProductTotal>();
 		currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
-
-		productionPlanStateTypeList = productionPlanStateTypeRepository.findAll();
-		productionPlanStateTypeListModel = new ListModelList<ProductionPlanStateType>(productionPlanStateTypeList);
-		productionPlanStateTypeCombobox.setModel(productionPlanStateTypeListModel);
 
 		refreshViewProductionPlan();
 		refreshProductTotalListbox();
@@ -207,7 +200,14 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 
 	@Listen("onClick = #deleteProductionPlanButton")
 	public void deleteProductionPlan() {
+		// no se puede eliminar el plan si ya esta abastecido, parcialmente abastecido o iniciado
+		// si se elimina, se deben volver los pedidos a su estado anterior
 		if(currentProductionPlan != null) {
+			if(!currentProductionPlan.getCurrentStateType().getName().equals("Registrado")) {
+				Messagebox.show("No se puede eliminar, el plan se encuentra en un estado posterior a registrado.", "Informacion", Messagebox.OK, Messagebox.ERROR);
+				return;
+			}
+			setProductionPlanDetailStates("Creado");
 			productionPlanRepository.delete(currentProductionPlan);
 			currentProductionPlan = null;
 			refreshViewProductionPlan();
@@ -283,13 +283,13 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			int currentProductionOrderListSize = currentProductionPlan.getProductionOrderList().size();
 			int savedProductionOrderListSize = (productionPlanRepository.findOne(currentProductionPlan.getId())).getProductionOrderList().size();
 			if(currentProductionOrderListSize - savedProductionOrderListSize == 0) {
-				
+
 			}
 		}*/
 		refreshViewProductionPlan();
 		alert("Plan guardado.");
 	}
-	
+
 	private void setProductionPlanDetailStates(String stateName) {
 		for(ProductionPlanDetail each : productionPlanDetailList) {
 			OrderStateType orderStateType = orderStateTypeRepository.findFirstByName(stateName);
@@ -343,11 +343,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				if(auxMaterialRequirement != null) {// la materia prima si se encuentra agregada, sumamos sus cantidades
 					auxMaterialRequirement.setQuantity(auxMaterialRequirement.getQuantity().add(productMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
 				} else {// la materia prima no se encuentra, se la agrega
-					if(item instanceof SupplyType) {
-						list.add(new MaterialRequirement(item, MaterialType.Supply, productionPlan, productMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
-					} else if (item instanceof Wood) {
-						list.add(new MaterialRequirement(item, MaterialType.Wood, productionPlan, productMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
-					}
+					list.add(new MaterialRequirement(item, productionPlan, productMaterial.getQuantity().multiply(new BigDecimal(productTotal.getTotalUnits()))));
 				}
 			}
 		}
@@ -403,6 +399,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 
 	private void refreshViewProductionPlan() {
 		refreshOrder();
+		productionPlanStateTypeListModel = new ListModelList<ProductionPlanStateType>(productionPlanStateTypeRepository.findAll());
 		if (currentProductionPlan == null) {// nuevo plan de produccion
 			productionPlanCaption.setLabel("Creacion de Plan de Produccion");
 			productionPlanStateTypeListModel.addToSelection(productionPlanStateTypeRepository.findFirstByName("Registrado"));
@@ -479,7 +476,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/requirement_plan_creation.zul");
 	}
-	
+
 	@Listen("onClick = #newProductionPlanButton")
 	public void newProductionPlanButtonClick() {
 		currentProductionPlan = null;

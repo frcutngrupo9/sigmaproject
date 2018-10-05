@@ -44,7 +44,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.xml.datatype.Duration;
 
+import org.hibernate.search.annotations.Indexed;
+
 @Entity
+@Indexed
 public class Piece implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
@@ -58,40 +61,34 @@ public class Piece implements Serializable, Cloneable {
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "piece", targetEntity = Process.class)
 	private List<Process> processes = new ArrayList<>();
 
-	private String name = "";
-
-	private BigDecimal length = BigDecimal.ZERO;
-
-	@ManyToOne
-	private MeasureUnit lengthMeasureUnit;
-
-	private BigDecimal depth = BigDecimal.ZERO;
-
-	@ManyToOne
-	private MeasureUnit depthMeasureUnit;
-
-	private BigDecimal width = BigDecimal.ZERO;
-
-	@ManyToOne
-	private MeasureUnit widthMeasureUnit;
-
-	private String size = "";
-	private boolean isGroup;
-	private Integer units = 0;
+	@OneToMany(orphanRemoval = false, cascade = CascadeType.PERSIST, mappedBy = "pieceParent", targetEntity = Piece.class)
+	private List<Piece> pieceGroupList = null;
 
 	@ManyToOne(targetEntity = Piece.class)
 	private Piece pieceParent = null;
 
-	@OneToMany(orphanRemoval = false, cascade = CascadeType.PERSIST, mappedBy = "pieceParent", targetEntity = Piece.class)
-	private List<Piece> pieceGroupList = null;
-
 	@Lob
 	private byte[] imageData = null;
 
+	@ManyToOne
+	private MeasureUnit lengthMeasureUnit;
+
+	@ManyToOne
+	private MeasureUnit depthMeasureUnit;
+
+	@ManyToOne
+	private MeasureUnit widthMeasureUnit;
+
+	private String name = "";
+	private BigDecimal length = BigDecimal.ZERO;
+	private BigDecimal depth = BigDecimal.ZERO;
+	private BigDecimal width = BigDecimal.ZERO;
+	private String size = "";
+	private boolean isGroup;
+	private Integer units = 0;
 	private boolean isClone;
 
 	public Piece() {
-
 	}
 
 	public Piece(Product product, String name, BigDecimal length, MeasureUnit lengthMeasureUnit, BigDecimal depth, MeasureUnit depthMeasureUnit, BigDecimal width, MeasureUnit widthMeasureUnit, String size, boolean isGroup, Integer units) {
@@ -302,5 +299,4 @@ public class Piece implements Serializable, Cloneable {
 		}
 		return obj;
 	}
-
 }

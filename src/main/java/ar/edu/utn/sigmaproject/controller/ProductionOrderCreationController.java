@@ -987,6 +987,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			calStartDate.setTime(startDate);
 			calStartDate.set(Calendar.HOUR_OF_DAY, ProductionDateTimeHelper.getFirstHourOfDay());
 			calStartDate.set(Calendar.MINUTE, ProductionDateTimeHelper.getFirstMinuteOfDay());
+			calStartDate.set(Calendar.SECOND, 0);
 			return calStartDate.getTime();
 		}
 		return null;

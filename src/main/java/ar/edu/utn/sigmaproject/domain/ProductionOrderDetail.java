@@ -24,6 +24,7 @@
 
 package ar.edu.utn.sigmaproject.domain;
 
+import org.hibernate.search.annotations.Indexed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +37,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
 @Entity
+@Indexed
 public class ProductionOrderDetail implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
@@ -45,7 +47,17 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
+	@Transient
+	private Duration timeTotal;
+
+	@Column
+	private String timeTotalInternal;
+
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, updatable = true)
+	private ProcessState state;
+
 	@ManyToOne(targetEntity = ProductionOrder.class)
 	private ProductionOrder productionOrder = null;
 
@@ -55,30 +67,17 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 	@ManyToOne
 	private Machine machine;
 
-	@Transient
-	private Duration timeTotal;
-
-	@Column
-	private String timeTotalInternal;
+	@ManyToOne
+	private Worker worker = null;
 
 	private Integer quantityPiece = 0;
-
 	private BigDecimal quantityFinished = BigDecimal.ZERO;
-
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, updatable = true)
-	private ProcessState state;
-
 	private Date dateStart = null;
 	private Date dateFinish = null;
 	private Date dateStartReal = null;
 	private Date dateFinishReal = null;
 
-	@ManyToOne
-	private Worker worker = null;
-
 	public ProductionOrderDetail() {
-
 	}
 
 	public ProductionOrderDetail(ProductionOrder productionOrder, Process process, ProcessState state, Machine machine, Duration timeTotal, Integer quantityPiece) {
@@ -205,12 +204,12 @@ public class ProductionOrderDetail implements Serializable, Cloneable {
 	public void setProductionOrder(ProductionOrder productionOrder) {
 		this.productionOrder = productionOrder;
 	}
-	
+
 	public Duration getDurationTotal() {
 		// devuelve la duracion de este proceso para todo el detalle de la orden ( ej el proceso es armado de cajon, para una cajonera de varios cajones, se multiplica la duracion del proceso por la cantidad del total de piezas para la orden)
 		return getProcess().getTime().multiply(new BigDecimal(getQuantityPiece()));
 	}
-	
+
 	public BigDecimal getCost() {
 		return process.getCost().multiply(new BigDecimal(quantityPiece));
 	}

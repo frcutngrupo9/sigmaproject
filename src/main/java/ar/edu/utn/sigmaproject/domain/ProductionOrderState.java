@@ -29,23 +29,24 @@ import java.util.Date;
 
 import javax.persistence.*;
 
-@Entity
-public class ProductionOrderState implements Serializable, Cloneable {
+import org.hibernate.search.annotations.Indexed;
 
+@Entity
+@Indexed
+public class ProductionOrderState implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
-	
-	@ManyToOne
-	ProductionOrderStateType productionOrderStateType;
+	private Long id;
 
 	@Column(nullable = false)
-	Date date = new Date();
+	private Date date = new Date();
+
+	@ManyToOne
+	private ProductionOrderStateType productionOrderStateType;
 
 	public ProductionOrderState() {
-
 	}
 
 	public ProductionOrderState(ProductionOrderStateType productionOrderStateType, Date date) {

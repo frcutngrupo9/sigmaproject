@@ -33,24 +33,27 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.search.annotations.Indexed;
+
 @Entity
+@Indexed
 public class OrderDetail  implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	@ManyToOne(targetEntity = Order.class)
 	private Order order = null;
 
 	@ManyToOne
 	private Product product;
+
 	private Integer units = 0;
 	private BigDecimal price = BigDecimal.ZERO;
 
 	public OrderDetail() {
-
 	}
 
 	public OrderDetail(Order order, Product product, Integer units, BigDecimal price) {
@@ -101,7 +104,7 @@ public class OrderDetail  implements Serializable, Cloneable {
 	public void setPrice(BigDecimal price) {
 		this.price = price;
 	}
-	
+
 	public BigDecimal getSubTotal() {
 		return getPrice().multiply(new BigDecimal(getUnits()));
 	}

@@ -40,7 +40,6 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.Item;
-import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductMaterial;
 import ar.edu.utn.sigmaproject.domain.Wood;
@@ -112,7 +111,7 @@ public class ProductRawMaterialController extends ProductMaterialController {
 			cancelMaterialButton.setDisabled(false);
 		}
 	}
-	
+
 	@Override
 	protected void refreshMaterialPopup() {// el popup se actualiza en base a la lista
 		materialPopupListbox.clearSelection();
@@ -139,8 +138,4 @@ public class ProductRawMaterialController extends ProductMaterialController {
 		materialPopupListbox.setModel(materialPopupListModel);
 	}
 
-	@Override
-	protected MaterialType getMaterialType() {
-		return MaterialType.Wood;
-	}
 }

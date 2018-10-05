@@ -24,46 +24,29 @@
 
 package ar.edu.utn.sigmaproject.domain;
 
-import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
-import org.apache.lucene.analysis.ngram.EdgeNGramFilterFactory;
-import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
-import org.hibernate.search.annotations.*;
-
-import javax.persistence.*;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
-@AnalyzerDefs(value = {
-		@AnalyzerDef(name = "edge_ngram",
-				tokenizer = @TokenizerDef(
-						factory = StandardTokenizerFactory.class
-				),
-				filters = {
-						@TokenFilterDef(factory = LowerCaseFilterFactory.class),
-						@TokenFilterDef(
-								factory = EdgeNGramFilterFactory.class,
-								params = {
-										@org.hibernate.search.annotations.Parameter(name = "maxGramSize", value = "25")
-								}),
-				}),
-		@AnalyzerDef(name = "standard",
-				tokenizer = @TokenizerDef(
-						factory = StandardTokenizerFactory.class
-				),
-				filters = {
-						@TokenFilterDef(factory = LowerCaseFilterFactory.class)
-				})
-})
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+
+import org.hibernate.search.annotations.Indexed;
+
 @Entity
+@Indexed
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Item implements Serializable {
+	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.TABLE)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	protected BigDecimal price = null;
 
 	public Long getId() {
@@ -83,7 +66,7 @@ public abstract class Item implements Serializable {
 	}
 
 	public abstract String getDescription();
-	
+
 	public abstract List<MaterialReserved> getMaterialReservedList();
 
 	@Override

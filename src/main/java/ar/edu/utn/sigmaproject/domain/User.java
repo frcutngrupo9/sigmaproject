@@ -25,31 +25,38 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
+import org.hibernate.search.annotations.Indexed;
 
 @Entity
+@Indexed
 public class User implements Serializable, Cloneable {
-
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 
-	String account = "";
-	String email = "";
-	String fullName = "";
-	String hash = "";
+	@OneToMany
+	private List<UserType> userTypeList = new ArrayList<>();
+
+	private String account = "";
+	private String email = "";
+	private String fullName = "";
+	private String hash = "";
 
 	public User() {
-
 	}
 
-	public User(String account, String hash, String fullName,String email) {
+	public User(String account, String hash, String fullName, String email) {
 		this.account = account;
 		this.fullName = fullName;
 		this.hash = hash;
@@ -90,5 +97,36 @@ public class User implements Serializable, Cloneable {
 
 	public void setHash(String hash) {
 		this.hash = hash;
+	}
+
+	public List<UserType> getUserTypeList() {
+		return userTypeList;
+	}
+
+	public void setUserTypeList(List<UserType> userTypeList) {
+		this.userTypeList = userTypeList;
+	}
+
+	public boolean containsType(String userTypeName) {
+		for(UserType each : userTypeList) {
+			if(each.getName().equalsIgnoreCase(userTypeName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public String getTypeString() {
+		String type = "";
+		boolean firstTime = true;
+		for(UserType each : userTypeList) {
+			if(firstTime) {
+				firstTime = false;
+			} else {
+				type = type + ", ";
+			}
+			type = type + each.getName();
+		}
+		return type;
 	}
 }

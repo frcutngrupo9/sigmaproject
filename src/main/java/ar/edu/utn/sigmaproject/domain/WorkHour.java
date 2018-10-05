@@ -32,7 +32,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import org.hibernate.search.annotations.Indexed;
+
 @Entity
+@Indexed
 public class WorkHour implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
@@ -41,11 +44,9 @@ public class WorkHour implements Serializable, Cloneable {
 	private Long id;
 
 	private String role = "";
-
 	private BigDecimal price = null;
 
 	public WorkHour() {
-
 	}
 
 	public WorkHour(String role, BigDecimal price) {
@@ -76,5 +77,4 @@ public class WorkHour implements Serializable, Cloneable {
 	public void setPrice(BigDecimal price) {
 		this.price = price;
 	}
-
 }

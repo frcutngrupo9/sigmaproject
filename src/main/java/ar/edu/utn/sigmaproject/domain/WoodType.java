@@ -24,38 +24,28 @@
 
 package ar.edu.utn.sigmaproject.domain;
 
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.ContainedIn;
-import org.hibernate.search.annotations.Field;
+import java.io.Serializable;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 import org.hibernate.search.annotations.Indexed;
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-
-@Indexed
-@Analyzer(definition = "edge_ngram")
 @Entity
+@Indexed
 public class WoodType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 
-	@Field
-	String name = "";
-
-	@Field
-	String details = "";
-
-	@ContainedIn
-	@OneToMany(mappedBy = "woodType")
-	Set<Wood> woods = new HashSet<>();
+	private String name = "";
+	private String details = "";
 
 	public WoodType() {
-
 	}
 
 	public WoodType(String name, String details) {

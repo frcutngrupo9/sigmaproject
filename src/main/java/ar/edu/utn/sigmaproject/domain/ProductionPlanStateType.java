@@ -28,20 +28,23 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
+import org.hibernate.search.annotations.Indexed;
+
 @Entity
+@Indexed
 public class ProductionPlanStateType implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private Long id;
 
 	@Column(unique = true)
-	String name = "";// "Registrado""Abastecido""Lanzado""En Produccion""Finalizado""Cancelado"
-	String details = "";
+	private String name = "";// "Registrado""Parcialmente Abastecido""Abastecido""Lanzado""En Produccion""Finalizado""Cancelado"
+
+	private String details = "";
 
 	public ProductionPlanStateType() {
-
 	}
 
 	public ProductionPlanStateType(String name, String details) {

@@ -35,6 +35,13 @@
         </function-signature>
     </function>
     <function>
+        <name>getFormattedDateTimeSecond</name>
+        <function-class>ar.edu.utn.sigmaproject.util.RenderElHelper</function-class>
+        <function-signature>
+            java.lang.String getFormattedDateTimeSecond(java.util.Date date)
+        </function-signature>
+    </function>
+    <function>
         <name>getProductImage</name>
         <function-class>ar.edu.utn.sigmaproject.util.RenderElHelper</function-class>
         <function-signature>

@@ -174,18 +174,40 @@ public class ProductionDateTimeHelper {
 		}
 		return false;
 	}
-	
+
 	public static String getFormattedFirst() {
 		if(firstMinuteOfDay == 0) {
 			return firstHourOfDay + "";
 		}
 		return firstHourOfDay + " : " + firstMinuteOfDay;
 	}
-	
+
 	public static String getFormattedLast() {
 		if(lastMinuteOfDay == 0) {
 			return lastHourOfDay + "";
 		}
 		return lastHourOfDay + " : " + lastMinuteOfDay;
+	}
+
+	public static Date getFirstHourOfDay(Date dateFinish) {
+		// devuelve el date en la misma fecha pero con la hora de inicio del dia de trabajo
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(dateFinish);
+		cal.set(Calendar.HOUR_OF_DAY, firstHourOfDay);
+		cal.set(Calendar.MINUTE, firstMinuteOfDay);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		return cal.getTime();
+	}
+
+	public static Date getLastHourOfDay(Date dateStart) {
+		// devuelve el date en la misma fecha pero con la hora de fin del dia del trabajo
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(dateStart);
+		cal.set(Calendar.HOUR_OF_DAY, lastHourOfDay);
+		cal.set(Calendar.MINUTE, lastMinuteOfDay);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		return cal.getTime();
 	}
 }

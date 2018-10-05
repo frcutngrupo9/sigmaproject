@@ -84,7 +84,7 @@ public class ProductionOrderReportDataSource implements JRDataSource {
 					hours = hours + 1;
 					minutes = minutes - 60;
 				}
-				value = String.format("%d hrs  %d min  %d seg", hours, minutes);
+				value = String.format("%d hrs  %d min  %d seg", hours, minutes, seconds);
 			} else {
 				value = "0 hrs 0 min 0 seg";
 			}

@@ -37,16 +37,12 @@ import javax.persistence.Transient;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Entity
 @Indexed
-@Analyzer(definition = "edge_ngram")
 public class Machine implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
@@ -55,17 +51,7 @@ public class Machine implements Serializable, Cloneable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@DocumentId
 	private Long id;
-
-	@ManyToOne
-	private MachineType machineType;
-
-	@Field
-	private String name = "";
-
-	@Field
-	private Integer year = Calendar.getInstance().get(Calendar.YEAR);
 
 	@Transient
 	private Duration usedTime;
@@ -73,8 +59,13 @@ public class Machine implements Serializable, Cloneable {
 	@Column
 	private String usedTimeInternal;
 
-	public Machine() {
+	@ManyToOne
+	private MachineType machineType;
 
+	private String name = "";
+	private Integer year = Calendar.getInstance().get(Calendar.YEAR);
+
+	public Machine() {
 	}
 
 	public Machine(MachineType machineType, String name, Integer year, Duration usedTime) {

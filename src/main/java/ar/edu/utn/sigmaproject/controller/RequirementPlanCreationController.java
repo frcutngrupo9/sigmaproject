@@ -56,7 +56,6 @@ import org.zkoss.zul.Window;
 import ar.edu.utn.sigmaproject.domain.Item;
 import ar.edu.utn.sigmaproject.domain.MaterialRequirement;
 import ar.edu.utn.sigmaproject.domain.MaterialReserved;
-import ar.edu.utn.sigmaproject.domain.MaterialType;
 import ar.edu.utn.sigmaproject.domain.MaterialsOrder;
 import ar.edu.utn.sigmaproject.domain.MaterialsOrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
@@ -153,28 +152,49 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 		});
 	}
 
-	private void updateProductionPlanState() {
-		// recorre todos los requerimientos para ver si estan todos abastecidos
-		boolean isCompleted = true;
+	private boolean isCompleted() {
 		for(MaterialRequirement each : currentProductionPlan.getMaterialRequirements()) {
 			if(!isMaterialRequirementFulfilled(each)) {
-				isCompleted = false;
-				break;
+				return false;
 			}
 		}
-		ProductionPlanStateType stateTypeAbastecido = productionPlanStateTypeRepository.findFirstByName("Abastecido");
-		ProductionPlanStateType stateTypeRegistrado = productionPlanStateTypeRepository.findFirstByName("Registrado");
-		ProductionPlanStateType currentStateType = productionPlanStateTypeRepository.findOne(currentProductionPlan.getCurrentStateType().getId());
+		return true;
+	}
+
+	private boolean isPartiallyCompleted() {
+		for(MaterialRequirement each : currentProductionPlan.getMaterialRequirements()) {
+			if(isMaterialRequirementFulfilled(each)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void updateProductionPlanState() {
+		// recorre todos los requerimientos para ver si estan todos abastecidos
+		boolean isPartiallyCompleted = isPartiallyCompleted();
+		boolean isCompleted = isCompleted();
+		String stateTypeAbastecido = "Abastecido";
+		String stateTypeParcialmenteAbastecido = "Parcialmente Abastecido";
+		String stateTypeRegistrado = "Registrado";
+		ProductionPlanStateType currentStateType = currentProductionPlan.getCurrentStateType();
 		ProductionPlanState productionPlanState = null;
 		if(isCompleted) {
-			// solo se actualiza el estado a abastecido si el estado anterior era Registrado
-			if(currentStateType.equals(stateTypeRegistrado)) {
-				productionPlanState = new ProductionPlanState(stateTypeAbastecido, new Date());
+			// solo se actualiza el estado a abastecido si el estado anterior era Registrado o Parcialmente Abastecido
+			if(currentStateType.getName().equals(stateTypeRegistrado) || currentStateType.getName().equals(stateTypeParcialmenteAbastecido)) {
+				productionPlanState = new ProductionPlanState(productionPlanStateTypeRepository.findFirstByName(stateTypeAbastecido), new Date());
 			}
-		} else {// si dejo de estar abastecido
-			// solo se actualiza el estado a Registrado si el estado anterior era abastecido
-			if(currentStateType.equals(stateTypeAbastecido)) {
-				productionPlanState = new ProductionPlanState(stateTypeRegistrado, new Date());
+		} else {// si no esta abastecido
+			if(isPartiallyCompleted) {
+				// solo se actualiza el estado a Parcialmente Abastecido si el estado anterior era abastecido o Registrado
+				if(currentStateType.getName().equals(stateTypeAbastecido) || currentStateType.getName().equals(stateTypeRegistrado)) {
+					productionPlanState = new ProductionPlanState(productionPlanStateTypeRepository.findFirstByName(stateTypeParcialmenteAbastecido), new Date());
+				}
+			} else {
+				// solo se actualiza el estado a Registrado si el estado anterior era abastecido o Parcialmente Abastecido
+				if(currentStateType.getName().equals(stateTypeAbastecido) || currentStateType.getName().equals(stateTypeParcialmenteAbastecido)) {
+					productionPlanState = new ProductionPlanState(productionPlanStateTypeRepository.findFirstByName(stateTypeRegistrado), new Date());
+				} 
 			}
 		}
 		if(productionPlanState != null) {
@@ -246,7 +266,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Listen("onClick = #allRequirementReservationButton")
 	public void allRequirementReservationButtonClick() {
-		if(!currentProductionPlan.getCurrentStateType().getName().equalsIgnoreCase("Registrado")) {
+		if(!currentProductionPlan.getCurrentStateType().getName().equalsIgnoreCase("Registrado") && !currentProductionPlan.getCurrentStateType().getName().equalsIgnoreCase("Parcialmente Abastecido")) {
 			Clients.showNotification("Imposible reservar, el Plan ya fue Abastecido.");
 			return;
 		}
@@ -295,11 +315,11 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 						quantityReservation = stockAvailable;
 					}
 					if(item instanceof SupplyType) {
-						currentMaterialReserved = new MaterialReserved(item, MaterialType.Supply, each, quantityReservation);
+						currentMaterialReserved = new MaterialReserved(item, each, quantityReservation);
 						SupplyType supplyType = (SupplyType) each.getItem();
 						supplyType.getSuppliesReserved().add(currentMaterialReserved);
 					} else if (item instanceof Wood) {
-						currentMaterialReserved = new MaterialReserved(item, MaterialType.Wood, each, quantityReservation);
+						currentMaterialReserved = new MaterialReserved(item, each, quantityReservation);
 						Wood wood = (Wood) each.getItem();
 						wood.getWoodsReserved().add(currentMaterialReserved);
 					}
@@ -360,7 +380,7 @@ public class RequirementPlanCreationController extends SelectorComposer<Componen
 	@Listen("onClick = #materialsOrderCreationButton")
 	public void materialsOrderCreationButtonClick() {
 		// busca todos los materiales para los que no existe suficiente stock y hace un pedido por el stock faltante de cada uno de ellos
-		if(!currentProductionPlan.getCurrentStateType().getName().equalsIgnoreCase("Registrado")) {
+		if(!currentProductionPlan.getCurrentStateType().getName().equalsIgnoreCase("Registrado") && !currentProductionPlan.getCurrentStateType().getName().equalsIgnoreCase("Parcialmente Abastecido")) {
 			Clients.showNotification("Imposible Generar Pedido, el Plan ya fue Abastecido.");
 			return;
 		}

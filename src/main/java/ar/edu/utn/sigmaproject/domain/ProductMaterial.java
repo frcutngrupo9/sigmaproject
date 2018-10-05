@@ -27,43 +27,37 @@ package ar.edu.utn.sigmaproject.domain;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.search.annotations.Indexed;
+
 @Entity
+@Indexed
 public class ProductMaterial implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
-
-	@ManyToOne(targetEntity = Product.class)
-	private Product product = null;
+	private Long id;
 
 	@ManyToOne(optional = false)
 	private Item item;
 
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, updatable = false)
-	private MaterialType type;
+	@ManyToOne(targetEntity = Product.class)
+	private Product product = null;
 
-	BigDecimal quantity = BigDecimal.ZERO;
+	private BigDecimal quantity = BigDecimal.ZERO;
 	boolean isClone;
 
 	public ProductMaterial() {
-
 	}
 
-	public ProductMaterial(Product product, MaterialType type, Item item, BigDecimal quantity) {
+	public ProductMaterial(Product product, Item item, BigDecimal quantity) {
 		this.product = product;
-		this.type = type;
 		this.item = item;
 		this.quantity = quantity;
 		isClone = false;
@@ -91,14 +85,6 @@ public class ProductMaterial implements Serializable, Cloneable {
 
 	public void setItem(Item item) {
 		this.item = item;
-	}
-
-	public MaterialType getType() {
-		return type;
-	}
-
-	public void setType(MaterialType type) {
-		this.type = type;
 	}
 
 	public BigDecimal getQuantity() {
