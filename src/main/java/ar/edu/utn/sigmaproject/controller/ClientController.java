@@ -41,6 +41,7 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Paging;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zk.ui.event.Event;
 
 import ar.edu.utn.sigmaproject.domain.Client;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
@@ -153,9 +154,18 @@ public class ClientController extends SelectorComposer<Component> {
 			Messagebox.show("No se puede eliminar, el cliente se encuentra asignado a 1 o mas pedidos.", "Informacion", Messagebox.OK, Messagebox.ERROR);
 			return;
 		}
-		clientRepository.delete(currentClient);
-		currentClient = null;
-		refreshView();
+                Messagebox.show("Esta seguro que quiere eliminar el cliente?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+				public void onEvent(Event evt) throws InterruptedException {
+					if (evt.getName().equals("onOK")) {
+						clientRepository.delete(currentClient);
+                                                currentClient = null;
+                                                refreshView();
+                                                
+						alert("Cliente eliminado.");
+					}
+				}
+			});
+		
 	}
 
 	@Listen("onSelect = #clientListbox")
