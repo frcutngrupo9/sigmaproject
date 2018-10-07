@@ -42,6 +42,8 @@ import org.zkoss.zul.Grid;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Paging;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zul.Messagebox;
 
 import ar.edu.utn.sigmaproject.domain.Worker;
 import ar.edu.utn.sigmaproject.service.WorkerRepository;
@@ -142,10 +144,19 @@ public class WorkerController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
-		workerRepository.delete(currentWorker);
-		sortingPagingHelper.reset();
-		currentWorker = null;
-		refreshView();
+                Messagebox.show("Esta seguro que quiere eliminar el empleado?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+				public void onEvent(Event evt) throws InterruptedException {
+					if (evt.getName().equals("onOK")) {
+						workerRepository.delete(currentWorker);
+                                                sortingPagingHelper.reset();
+                                                currentWorker = null;
+                                                refreshView();
+                                                
+						alert("Empleado eliminado.");
+					}
+				}
+			});
+		
 	}
 
 	@Listen("onSelect = #workerListbox")

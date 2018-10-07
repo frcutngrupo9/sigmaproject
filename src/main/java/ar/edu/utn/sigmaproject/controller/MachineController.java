@@ -46,6 +46,8 @@ import org.zkoss.zul.Intbox;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Paging;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zul.Messagebox;
 
 import ar.edu.utn.sigmaproject.domain.MachineType;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
@@ -152,10 +154,19 @@ public class MachineController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
-		machineTypeRepository.delete(currentMachineType);
-		sortingPagingHelper.reset();
-		currentMachineType = null;
-		refreshView();
+             Messagebox.show("Esta seguro que quiere eliminar la maquina?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+				public void onEvent(Event evt) throws InterruptedException {
+					if (evt.getName().equals("onOK")) {
+						machineTypeRepository.delete(currentMachineType);
+                                                sortingPagingHelper.reset();
+                                                currentMachineType = null;
+                                                refreshView();
+                                                
+						alert("Maquina eliminada.");
+					}
+				}
+			});
+		
 	}
 
 	@Listen("onSelect = #machineTypeListbox")

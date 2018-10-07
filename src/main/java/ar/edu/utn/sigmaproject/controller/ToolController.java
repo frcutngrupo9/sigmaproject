@@ -39,6 +39,8 @@ import org.zkoss.zul.Grid;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Paging;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zul.Messagebox;
 
 import ar.edu.utn.sigmaproject.domain.ToolType;
 import ar.edu.utn.sigmaproject.service.ToolTypeRepository;
@@ -143,10 +145,19 @@ public class ToolController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
-		toolTypeRepository.delete(currentToolType);
-		sortingPagingHelper.reset();
-		currentToolType = null;
-		refreshView();
+                Messagebox.show("Esta seguro que quiere eliminar este tipo?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+				public void onEvent(Event evt) throws InterruptedException {
+					if (evt.getName().equals("onOK")) {
+						toolTypeRepository.delete(currentToolType);
+                                                sortingPagingHelper.reset();
+                                                currentToolType = null;
+                                                refreshView();
+                                                
+						alert("Tipo eliminado.");
+					}
+				}
+			});
+		
 	}
 
 	@Listen("onSelect = #toolTypeListbox")
