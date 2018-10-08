@@ -51,6 +51,7 @@ import org.zkoss.zul.Messagebox;
 
 import ar.edu.utn.sigmaproject.domain.MachineType;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
+import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
 import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -87,7 +88,8 @@ public class MachineController extends SelectorComposer<Component> {
 	// services
 	@WireVariable
 	private MachineTypeRepository machineTypeRepository;
-
+        @WireVariable
+        private ProcessTypeRepository processTypeRepository;
 	// atributes
 	private MachineType currentMachineType;
 	SortingPagingHelper<MachineType> sortingPagingHelper;
@@ -154,6 +156,10 @@ public class MachineController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
+             if(processTypeRepository.findByMachineType(currentMachineType).isEmpty() == false) {
+			Messagebox.show("No se puede eliminar, la maquina se encuentra asignada a 1 o mas procesos.", "Informacion", Messagebox.OK, Messagebox.ERROR);
+			return;
+		}
              Messagebox.show("Esta seguro que quiere eliminar la maquina?", "Confirmar Eliminacion", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
 				public void onEvent(Event evt) throws InterruptedException {
 					if (evt.getName().equals("onOK")) {

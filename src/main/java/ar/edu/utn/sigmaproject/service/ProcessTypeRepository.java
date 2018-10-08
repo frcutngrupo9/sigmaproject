@@ -24,11 +24,14 @@
 
 package ar.edu.utn.sigmaproject.service;
 
+import ar.edu.utn.sigmaproject.domain.MachineType;
 import org.springframework.stereotype.Repository;
 
 import ar.edu.utn.sigmaproject.domain.ProcessType;
+import java.util.List;
 
 @Repository
 public interface ProcessTypeRepository extends SearchableRepository<ProcessType, Long> {
+    public List<ProcessType> findByMachineType(MachineType machine);
 
 }
