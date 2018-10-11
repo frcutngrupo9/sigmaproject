@@ -174,7 +174,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		if(currentProductionOrder == null) {throw new RuntimeException("ProductionOrder not found");}
 		currentProductionPlan = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
 		if(currentProductionPlan == null) {throw new RuntimeException("ProductionPlan not found");}
-		productionOrderDetailList = currentProductionOrder.getDetails();
 		machineList = machineRepository.findAll();
 		setTotalPrices();
 		refreshView();
@@ -203,7 +202,9 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			productImage.setStyle("margin: 0px");
 		}
 		productImage.setContent(img);
-		sortProductionOrderDetailListByProcessTypeSequence();
+		currentProductionOrder.sortDetailsByProcessTypeSequence();
+		productionOrderDetailList = currentProductionOrder.getDetails();
+		//sortProductionOrderDetailListByProcessTypeSequence();
 		productionPlanNameTextbox.setText(currentProductionPlan.getName());
 		ProductionPlanStateType lastProductionPlanStateType = currentProductionPlan.getCurrentStateType();
 		if(lastProductionPlanStateType != null) {
@@ -609,9 +610,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 					}
 				}
 			}*/
-			//recalculateDates();
-			//assignAllDates();
-			setAllDates();
+			//setAllDates();
 			refreshProductionOrderDetailGridView();
 		} else {
 			final Worker workerSelectedFinal = workerSelected;
@@ -629,68 +628,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		}
 	}
 
-	/*private Map<ProcessType, Map<Worker, List<ProductionOrderDetail>>> getCompleteMap() {
-		//devuelve un map donde la llave son todos los tipos de procesos y el valor es otro map en el cual la llave es cada empleado asignados al tipo de proceso y el valor son todos los detalles a los que el empleado esta asignado
-		Map<ProcessType, Map<Worker, List<ProductionOrderDetail>>> completeMap = new HashMap<ProcessType, Map<Worker, List<ProductionOrderDetail>>>();
-		for(ProductionOrderDetail each : productionOrderDetailList) {
-			ProcessType processType = each.getProcess().getType();
-			Map<Worker, List<ProductionOrderDetail>> workerMap = completeMap.get(processType);
-			Worker worker = each.getWorker();
-			if(workerMap == null) {
-				workerMap = new HashMap<Worker, List<ProductionOrderDetail>>();
-				List<ProductionOrderDetail> list = new ArrayList<ProductionOrderDetail>();
-				list.add(each);
-				workerMap.put(worker, list);
-			} else {
-				List<ProductionOrderDetail> list = workerMap.get(worker);
-				if(list == null) {
-					list = new ArrayList<ProductionOrderDetail>();
-				} else {
-					list.add(each);
-				}
-				workerMap.put(worker, list);
-			}
-		}
-		return completeMap;
-	}*/
-
-	private Map<Worker, List<ProductionOrderDetail>> getWorkerMapByProcessType(ProcessType processType) {
-		//devuelve un map donde la llave son todos los empleados asignados al tipo de proceso y el valor son todos los detalles a los que el empleado esta asignado
-		Map<Worker, List<ProductionOrderDetail>> workerMap = new HashMap<Worker, List<ProductionOrderDetail>>();
-		for(ProductionOrderDetail each : productionOrderDetailList) {
-			if(each.getState() != ProcessState.Cancelado) {
-				if(each.getProcess().getType().equals(processType)) {
-					Worker worker = each.getWorker();
-					List<ProductionOrderDetail> list = workerMap.get(worker);
-					if(list == null) {
-						list = new ArrayList<ProductionOrderDetail>();
-						list.add(each);
-					} else {
-						list.add(each);
-					}
-					workerMap.put(worker, list);
-				}
-			}
-		}
-		return workerMap;
-	}
-
-	private List<ProcessType> getProcessTypeList() {
-		// devuelve una lista de todos los tipos de proceso asignados a la orden
-		Set<ProcessType> processTypeSet = new HashSet<ProcessType>();
-		for(ProductionOrderDetail eachProductionOrderDetail : productionOrderDetailList) {
-			if(eachProductionOrderDetail.getState() != ProcessState.Cancelado) {
-				processTypeSet.add(eachProductionOrderDetail.getProcess().getType());// garantiza que los tipo de procesos no se repitan
-			}
-		}
-		List<ProcessType> list = new ArrayList<ProcessType>();
-		for (ProcessType eachProcessType : processTypeSet) {
-			list.add(eachProcessType);
-		}
-		return list;
-	}
-
-	private void setAllDates() {
+	/*private void setAllDates() {
 		// recorre todos los procesos, por cada proceso recorre cada empleado y asigna la fechas a uno de ellos
 		// al siguiente empleado se verifica si tiene una maquina distinta o no se requiere maquina y en base a eso se asigna la fecha del inicio del proceso la misma que la del empleado anterior
 		// si alguna maquina es igual a otra, la pieza se realiza al finalizar el ultimo proceso del otro empleado
@@ -761,6 +699,16 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			}
 		}
 	}
+	
+	public void sortListBySequence(List<ProductionOrderDetail> details) {
+	Comparator<ProductionOrderDetail> comp = new Comparator<ProductionOrderDetail>() {
+		@Override
+		public int compare(ProductionOrderDetail a, ProductionOrderDetail b) {
+			return a.getProcess().getType().getSequence().compareTo(b.getProcess().getType().getSequence());
+		}
+	};
+	Collections.sort(details, comp);
+}
 
 	private Map<ProcessType, List<ProductionOrderDetail>> getProcessTypeMap() {
 		// devuelve un map que por cada tipo de proceso contiene un listado de los detalles que lo incluyen
@@ -782,48 +730,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		return processTypeMap;
 	}
 
-	private void assignAllDates() {
-		// hacemos una lista de todos los empleados asignados actualmente
-		// por cada empleado ordenamos todas las fechas de sus procesos en secuencia
-		// ordenamos todos los procesos en base a las fechas establecidas
-		for(Map.Entry<Worker, List<ProductionOrderDetail>> entry : getWorkerMap(productionOrderDetailList).entrySet()) {
-			//Worker worker = entry.getKey();
-			//System.out.println("- - - -  - - - - - - - - -  - - - -  recorriendo worker: " + worker.getName());
-			List<ProductionOrderDetail> list = entry.getValue();
-			sortListBySequence(list);
-			Date startDate = getDateTimeStartWork(productionOrderStartDatebox.getValue());
-			Date finishDate = null;
-			for(ProductionOrderDetail eachDetail : list) {
-				if(eachDetail.getState() != ProcessState.Cancelado) {// solo se calcula para los procesos que no esten cancelados
-					if(finishDate == null) {// si es la primera vez que ingresa
-						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, eachDetail.getDurationTotal());
-					} else {
-						// el inicio de la actual es al finalizar la ultima
-						startDate = finishDate;
-						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, eachDetail.getDurationTotal());
-					}
-					eachDetail.setDateStart(startDate);
-					eachDetail.setDateFinish(finishDate);
-				} else {
-					eachDetail.setDateStart(null);
-					eachDetail.setDateFinish(null);
-					// por las dudas borramos tambien las fechas reales
-					eachDetail.setDateStartReal(null);
-					eachDetail.setDateFinishReal(null);
-				}
-			}
-		}
-	}
-
-	public void sortListBySequence(List<ProductionOrderDetail> details) {
-		Comparator<ProductionOrderDetail> comp = new Comparator<ProductionOrderDetail>() {
-			@Override
-			public int compare(ProductionOrderDetail a, ProductionOrderDetail b) {
-				return a.getProcess().getType().getSequence().compareTo(b.getProcess().getType().getSequence());
-			}
-		};
-		Collections.sort(details, comp);
-	}
 
 	private Map<Worker, List<ProductionOrderDetail>> getWorkerMap(List<ProductionOrderDetail> detailList) {
 		// devuelve un map que por cada empleado contiene el listado de todos los procesos asignados a el
@@ -843,83 +749,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			}
 		}
 		return workerMap;
-	}
-
-	private void recalculateDates() {
-		// recalcula las fechas de los procesos basandose en los empleados asignados de tal forma que los procesos que tengan distintos empleados asignados se ejecuten en paralelo
-		// si varios empleados estan asignados a diferentes piezas del mismo proceso, todos iniciaran al mismo tiempo, y el proximo proceso iniciara al finalizar el ultimo de los procesos anteriores
-		//por cada tipo de proceso hacemos un map con todos los empleados asignados, y por cada empleado, una lista con todos los detalles en los q se le asigno
-		Date startDateProcess = null;//inicio proceso
-		Date finishDateProcess = null;//fin proceso
-		for(ProcessType eachProcessType : getProcessTypeList()) {
-			if(startDateProcess == null) {//la primera vez
-				startDateProcess = getDateTimeStartWork(productionOrderStartDatebox.getValue());
-			} else {//al iniciar otro proceso la fecha de inicio es la fecha fin del anterior
-				startDateProcess = finishDateProcess;
-			}
-			for(Map.Entry<Worker, List<ProductionOrderDetail>> entry : getWorkerMapByProcessType(eachProcessType).entrySet()) {
-				Date startDate = startDateProcess;
-				Date finishDate = null;
-				Worker worker = entry.getKey();
-				List<ProductionOrderDetail> list = entry.getValue();
-				for(ProductionOrderDetail eachDetail : list) {
-					if(finishDate == null) {// si es la primera vez que ingresa
-						finishDate = ProductionDateTimeHelper.getFinishDate(startDateProcess, eachDetail.getDurationTotal());
-					} else {
-						// el inicio de la actual es al finalizar la ultima
-						startDate = finishDate;
-						finishDate = ProductionDateTimeHelper.getFinishDate(startDate, eachDetail.getDurationTotal());
-					}
-					eachDetail.setDateStart(startDate);
-					eachDetail.setDateFinish(finishDate);
-					if(finishDateProcess==null || finishDate.after(finishDateProcess)) {//guardamos la ultima fecha de proceso q aparece
-						finishDateProcess = finishDate;
-					}
-				}
-			}
-		}
-	}
-
-	private ProductionOrderDetail getPreviousDetail(ProductionOrderDetail data) {
-		ProductionOrderDetail prevDetail = null;
-		int index = getIndex(data);
-		if(index > 0) {
-			prevDetail = productionOrderDetailList.get(index - 1);
-		}
-		return prevDetail;
-	}
-
-	private int getIndex(ProductionOrderDetail data) {
-		for(int i=0; i<productionOrderDetailList.size(); i++) {
-			if(productionOrderDetailList.get(i).getId() == data.getId()) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	private ProductionOrderDetail getFirstDetailOfProcess(ProductionOrderDetail data) {
-		// busca el primer detalle que sea del mismo proceso
-		ProductionOrderDetail currentDetail = null;
-		ProductionOrderDetail prevDetail = getPreviousDetail(data);
-		while(prevDetail!=null && prevDetail.getProcess().getType().equals(data.getProcess().getType())) {
-			currentDetail = prevDetail;
-			prevDetail = getPreviousDetail(prevDetail);
-		}
-		return currentDetail;
-	}
-
-	/*
-	private void sortProcessTypeListBySequence() {
-		Comparator<ProcessType> comp = new Comparator<ProcessType>() {
-			@Override
-			public int compare(ProcessType a, ProcessType b) {
-				return a.getSequence().compareTo(b.getSequence());
-			}
-		};
-		Collections.sort(processTypeList, comp);
-	}
-	 */
+	}*/
 
 	@Listen("onClick = #autoAssignButton")
 	public void autoAssignButtonClick() {
@@ -972,9 +802,10 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		Date startDate = getDateTimeStartWork(productionOrderStartDatebox.getValue());
 		// asigna el valor a la clase y hace que calcule todos los tiempos de los detalles
 		currentProductionOrder.setDateStart(startDate);
+		currentProductionOrder.sortDetailsByProcessTypeSequence();
 		currentProductionOrder.updateDetailDates(startDate);
 		productionOrderDetailList = currentProductionOrder.getDetails();
-		sortProductionOrderDetailListByProcessTypeSequence();
+		//sortProductionOrderDetailListByProcessTypeSequence();
 		productionOrderStartDatebox.setValue(currentProductionOrder.getDateStart());// modifica el valor del datebox para que contenga la hora de inicio
 		productionOrderFinishDatebox.setValue(currentProductionOrder.getDateFinish());
 		refreshProductionOrderDetailGridView();
@@ -991,16 +822,6 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			return calStartDate.getTime();
 		}
 		return null;
-	}
-
-	private void sortProductionOrderDetailListByProcessTypeSequence() {
-		Comparator<ProductionOrderDetail> comp = new Comparator<ProductionOrderDetail>() {
-			@Override
-			public int compare(ProductionOrderDetail a, ProductionOrderDetail b) {
-				return a.getProcess().getType().getSequence().compareTo(b.getProcess().getType().getSequence());
-			}
-		};
-		Collections.sort(productionOrderDetailList, comp);
 	}
 
 	public boolean isStateCancel(ProcessState processState) {
