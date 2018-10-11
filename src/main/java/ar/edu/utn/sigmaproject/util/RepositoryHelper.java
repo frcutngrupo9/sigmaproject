@@ -439,9 +439,9 @@ public class RepositoryHelper {
 			generateMachineType();
 			List<MachineType> listMachineType = machineTypeRepository.findAll();
 			for(MachineType each : listMachineType) {
-				list.add(new Machine(each, each.getName().toUpperCase() + " 1", null, null));
-				list.add(new Machine(each, each.getName().toUpperCase() + " 2", null, null));
-				list.add(new Machine(each, each.getName().toUpperCase() + " 3", null, null));
+				list.add(new Machine(each, each.getName().toUpperCase() + " 1", 2004, null));
+				list.add(new Machine(each, each.getName().toUpperCase() + " 2", 2008, null));
+				list.add(new Machine(each, each.getName().toUpperCase() + " 3", 2014, null));
 			}
 			machineRepository.save(list);
 		}

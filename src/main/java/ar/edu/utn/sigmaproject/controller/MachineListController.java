@@ -24,6 +24,10 @@
 
 package ar.edu.utn.sigmaproject.controller;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
@@ -65,7 +69,29 @@ public class MachineListController extends SelectorComposer<Component> {
 	}
 
 	private void refreshView() {
-		machineListbox.setModel(new ListModelList<Machine>(machineRepository.findAll()));
+		machineListbox.setModel(new ListModelList<Machine>(sortList(machineRepository.findAll())));
+	}
+	
+	private List <Machine> sortList(List <Machine> list) {
+		Comparator<Machine> comp = new Comparator<Machine>() {
+			@Override
+			public int compare(Machine a, Machine b) {
+				String obj1 = a.getMachineType().getName();
+				String obj2 = b.getMachineType().getName();
+				if (obj1 == obj2) {
+			        return 0;
+			    }
+			    if (obj1 == null) {
+			        return -1;
+			    }
+			    if (obj2 == null) {
+			        return 1;
+			    }
+			    return obj1.compareTo(obj2);
+			}
+		};
+		Collections.sort(list, comp);
+		return list;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -106,7 +132,7 @@ public class MachineListController extends SelectorComposer<Component> {
 	private boolean isMachineAssigned(Machine machine) {
 		for(ProductionOrder eachProductionOrder : productionOrderRepository.findAll()) {
 			for(ProductionOrderDetail eachProductionOrderDetail : eachProductionOrder.getDetails()) {
-				if(eachProductionOrderDetail.getMachine().getId() == machine.getId()) {
+				if(eachProductionOrderDetail.getMachine()!=null && eachProductionOrderDetail.getMachine().getId() == machine.getId()) {
 					return true;
 				}
 			}

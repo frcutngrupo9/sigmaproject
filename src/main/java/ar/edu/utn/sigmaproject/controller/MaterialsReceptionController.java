@@ -153,7 +153,7 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 			dateString = dateFormat.format(date);
 		}
 		materialsOrderCreationDateTextbox.setText(dateString);
-		receptionDatebox.setValue(null);
+		receptionDatebox.setValue(new Date());
 	}
 
 	@Listen("onClick = #cancelButton")
@@ -194,7 +194,10 @@ public class MaterialsReceptionController extends SelectorComposer<Component> {
 		currentMaterialsOrder.setDateReception(receptionDate);
 		currentMaterialsOrder.setReceiptNumber(receiptNumber);
 		currentMaterialsOrder = materialsOrderRepository.save(currentMaterialsOrder);
-		String observation = "Para el plan: " + currentMaterialsOrder.getProductionPlan().getName();
+		String observation = "";
+		if(currentMaterialsOrder.getProductionPlan() != null) {
+			observation = "Para el plan: " + currentMaterialsOrder.getProductionPlan().getName();
+		}
 		// crea stock movement con las cantidades recibidas
 		StockMovement stockMovementSupply = new StockMovement();
 		stockMovementSupply.setSign((short) 1);// signo de ingreso a stock

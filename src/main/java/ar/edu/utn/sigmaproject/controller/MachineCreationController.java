@@ -26,6 +26,7 @@ package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
+import java.util.Date;
 
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
@@ -43,14 +44,18 @@ import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 import javax.xml.datatype.Duration;
 
 import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
+import ar.edu.utn.sigmaproject.domain.ProductionOrder;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
+import ar.edu.utn.sigmaproject.service.ProductionOrderRepository;
 
 public class MachineCreationController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
@@ -70,6 +75,8 @@ public class MachineCreationController extends SelectorComposer<Component> {
 	private MachineRepository machineRepository;
 	@WireVariable
 	private MachineTypeRepository machineTypeRepository;
+	@WireVariable
+	private ProductionOrderRepository productionOrderRepository;
 
 	private Machine currentMachine;
 
@@ -82,17 +89,20 @@ public class MachineCreationController extends SelectorComposer<Component> {
 
 	private void refreshView() {
 		machineTypeListbox.setModel(new ListModelList<>(machineTypeRepository.findAll()));
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(new Date());
+		int currentYear = cal.get(Calendar.YEAR);
 		if(currentMachine != null) {
 			nameTextbox.setValue(currentMachine.getName());
 			if(currentMachine.getYear() != null) {
 				yearIntbox.setValue(currentMachine.getYear());
 			} else {
-				yearIntbox.setValue(Calendar.getInstance().get(Calendar.YEAR));
+				yearIntbox.setValue(currentYear);
 			}
 			machineTypeBandbox.setValue(currentMachine.getMachineType().getName());
 		} else {
 			nameTextbox.setValue(null);
-			yearIntbox.setValue(Calendar.getInstance().get(Calendar.YEAR));
+			yearIntbox.setValue(currentYear);
 			machineTypeBandbox.setValue(null);
 			machineTypeListbox.clearSelection();
 		}
@@ -119,7 +129,7 @@ public class MachineCreationController extends SelectorComposer<Component> {
 			return;
 		}
 		if(Strings.isBlank(machineTypeBandbox.getText())){
-			Clients.showNotification("Debe seleccionar un tipo de maquina", nameTextbox);
+			Clients.showNotification("Debe seleccionar un tipo de maquina", machineTypeBandbox);
 			return;
 		}
 		String name = nameTextbox.getText();
@@ -131,6 +141,10 @@ public class MachineCreationController extends SelectorComposer<Component> {
 			currentMachine = new Machine(machineType, name, year, duration);
 		} else {
 			// edicion
+			if(currentMachine.getMachineType().getId()!=machineType.getId() && isMachineAssigned(currentMachine)) {
+				Messagebox.show("No se puede modificar el tipo de maquina asignado, la maquina se encuentra asignada a uno o mas ordenes de produccion.", "Informacion", Messagebox.OK, Messagebox.ERROR);
+				return;
+			}
 			currentMachine.setName(name);
 			currentMachine.setYear(year);
 			currentMachine.setMachineType(machineType);
@@ -140,5 +154,15 @@ public class MachineCreationController extends SelectorComposer<Component> {
 		eq.publish(new Event("onMachineUpdate"));
 		machineCreationWindow.detach();
 	}
-
+	
+	private boolean isMachineAssigned(Machine machine) {
+		for(ProductionOrder eachProductionOrder : productionOrderRepository.findAll()) {
+			for(ProductionOrderDetail eachProductionOrderDetail : eachProductionOrder.getDetails()) {
+				if(eachProductionOrderDetail.getMachine()!=null && eachProductionOrderDetail.getMachine().getId() == machine.getId()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }

@@ -32,13 +32,13 @@ THE SOFTWARE.
             	</hbox>
                 <hbox hflex="1" pack="center">
                 	<label value="Modelo: " hflex="1"/>
-                    <combobox id="yearCombobox" hflex="1"/>
+                    <intbox id="yearIntbox" hflex="1"/>
             	</hbox>
             	<hbox hflex="1" pack="center">
                 	<label value="${labels.type}: " hflex="1"/>
                     <bandbox id="machineTypeBandbox" onClick="self.open()" readonly="true" buttonVisible="true" autodrop="false" hflex="1">
             			<bandpopup>
-	            			<listbox id="machineTypeListbox" onSelect="machineTypeBandbox.value=self.selectedItem.label; self.clearSelection(); machineTypeBandbox.close()" width="200px" span="true" sizedByContent="false">
+	            			<listbox id="machineTypeListbox" onSelect="machineTypeBandbox.value=self.selectedItem.label; self.clearSelection()" onClick="machineTypeBandbox.close()" width="200px" span="true" sizedByContent="false">
 						        <template name="model">
 						            <listitem>
 						                <listcell label="${each.name}"/>
