@@ -73,8 +73,8 @@ public class SidebarController extends SelectorComposer<Component> {
 
 		TreeNode<MenuTreeRow> rootNode = new DefaultTreeNode<MenuTreeRow>(null, Arrays.asList(
 			new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Productos"), Arrays.asList(
-				new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Paste.png", "Listado Productos", "/product_list.zul")),
-				new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("/img/Stationery.png", "Crear Producto", "/product_creation.zul"))
+				new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Productos", "/product_list.zul")),
+				new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Producto", "/product_creation.zul"))
 			)),
 			new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Pedidos"), Arrays.asList(
 				new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Pedidos", "/order_list.zul")),
@@ -104,7 +104,8 @@ public class SidebarController extends SelectorComposer<Component> {
 					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Maderas", "/raw_material.zul")),
 					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Tipos de Madera", "/wood_type_list.zul")),
 					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Insumos", "/supply.zul")),
-					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Maquinas", "/machine.zul")),
+					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Maquinas", "/machine_list.zul")),
+					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Tipos de Maquina", "/machine.zul")),
 					//new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Herramientas", "/tool.zul")),
 					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Procesos", "/process.zul")),
 					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Costos Mano de Obra", "/work_hour_list.zul")),

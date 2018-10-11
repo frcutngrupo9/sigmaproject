@@ -134,7 +134,7 @@ public class ProductDeliveryController extends SelectorComposer<Component> {
 			needDateString = dateFormat.format(needDate);
 		}
 		needDateTextbox.setText(needDateString);
-		deliveryDatebox.setValue(null);
+		deliveryDatebox.setValue(new Date());
 		numberBillTextbox.setValue(null);
 	}
 
