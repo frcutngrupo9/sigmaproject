@@ -461,6 +461,23 @@ public class ProductionOrder implements Serializable, Cloneable {
 		Comparator<ProductionOrderDetail> comp = new Comparator<ProductionOrderDetail>() {
 			@Override
 			public int compare(ProductionOrderDetail a, ProductionOrderDetail b) {
+				boolean isGroup1 = a.getProcess().getPiece().isGroup();
+				boolean isGroup2 = b.getProcess().getPiece().isGroup();
+				int compareBoolean = Boolean.compare(isGroup1, isGroup2);
+				if(compareBoolean != 0) {
+					return compareBoolean;
+				} else {
+					return a.getProcess().getType().getSequence().compareTo(b.getProcess().getType().getSequence());
+				}
+			}
+		};
+		Collections.sort(details, comp);
+	}
+
+	public void sortDetailsByProcessTypeSequenceAndNotGroup() {
+		Comparator<ProductionOrderDetail> comp = new Comparator<ProductionOrderDetail>() {
+			@Override
+			public int compare(ProductionOrderDetail a, ProductionOrderDetail b) {
 				return a.getProcess().getType().getSequence().compareTo(b.getProcess().getType().getSequence());
 			}
 		};
@@ -642,7 +659,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 		detail.setDateFinish(ProductionDateTimeHelper.getFinishDate(dateStart, detail.getTimeTotal()));
 		updateRemainDetailDatesAndNotClearResources(detail);
 	}
-	
+
 	private ProductionOrderDetail getDetailFromList(ProductionOrderDetail productionOrderDetail) {
 		for(ProductionOrderDetail each : getDetails()) {
 			if(productionOrderDetail.getId() == each.getId()) {

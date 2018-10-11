@@ -24,9 +24,10 @@
 
 package ar.edu.utn.sigmaproject.controller;
 
-import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
+
+import javax.xml.datatype.Duration;
 
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
@@ -40,14 +41,12 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Bandbox;
-import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
-import javax.xml.datatype.Duration;
 
 import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
@@ -154,7 +153,7 @@ public class MachineCreationController extends SelectorComposer<Component> {
 		eq.publish(new Event("onMachineUpdate"));
 		machineCreationWindow.detach();
 	}
-	
+
 	private boolean isMachineAssigned(Machine machine) {
 		for(ProductionOrder eachProductionOrder : productionOrderRepository.findAll()) {
 			for(ProductionOrderDetail eachProductionOrderDetail : eachProductionOrder.getDetails()) {
