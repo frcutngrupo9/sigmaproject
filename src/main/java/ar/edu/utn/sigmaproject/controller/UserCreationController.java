@@ -47,7 +47,9 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.User;
+import ar.edu.utn.sigmaproject.domain.UserRole;
 import ar.edu.utn.sigmaproject.domain.UserType;
+import ar.edu.utn.sigmaproject.domain.WorkerRole;
 import ar.edu.utn.sigmaproject.service.UserRepository;
 import ar.edu.utn.sigmaproject.service.UserTypeRepository;
 
@@ -71,7 +73,7 @@ public class UserCreationController extends SelectorComposer<Component> {
 	private UserTypeRepository userTypeRepository;
 
 	private User currentUser;
-	private List<UserType> currentUserTypeList;
+	private List<UserRole> currentUserRoleList;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
@@ -96,12 +98,12 @@ public class UserCreationController extends SelectorComposer<Component> {
 	private void refreshView() {
 		if(currentUser != null) {
 			currentUser = userRepository.findOne(currentUser.getId());
-			currentUserTypeList = currentUser.getUserTypeList();
+			currentUserRoleList = currentUser.getUserRoleList();
 			accountTextbox.setValue(currentUser.getAccount());
 			fullNameTextbox.setValue(currentUser.getFullName());
 			emailTextbox.setValue(currentUser.getEmail());
 		} else {
-			currentUserTypeList = new ArrayList<>();
+			currentUserRoleList = new ArrayList<>();
 			accountTextbox.setValue(null);
 			fullNameTextbox.setValue(null);
 			emailTextbox.setValue(null);
@@ -114,8 +116,8 @@ public class UserCreationController extends SelectorComposer<Component> {
 	}
 
 	public boolean isSelected(UserType userType) {
-		for(UserType each : currentUserTypeList) {
-			if(each.getId() == userType.getId()) {
+		for(UserRole each : currentUserRoleList) {
+			if(each.getUserType().getId() == userType.getId()) {
 				return true;
 			}
 		}
@@ -137,15 +139,15 @@ public class UserCreationController extends SelectorComposer<Component> {
 	private void modifyUserTypeList(UserType userType, boolean add) {
 		// agrega o elimina user type de la lista
 		if(add) {
-			currentUserTypeList.add(userType);
+			currentUserRoleList.add(new UserRole(userType));
 		} else {
-			UserType aux = null;
-			for(UserType each : currentUserTypeList) {
-				if(each.getId() == userType.getId()) {
+			UserRole aux = null;
+			for(UserRole each : currentUserRoleList) {
+				if(each.getUserType().getId() == userType.getId()) {
 					aux = each;
 				}
 			}
-			currentUserTypeList.remove(aux);
+			currentUserRoleList.remove(aux);
 		}
 	}
 
@@ -158,7 +160,7 @@ public class UserCreationController extends SelectorComposer<Component> {
 	public void cancelButtonClick() {
 		userCreationWindow.detach();
 	}
-	
+
 	private boolean isNameUsed(String name) {
 		for(User each : userRepository.findAll()) {
 			if(each.getAccount().equalsIgnoreCase(name)) {
@@ -184,12 +186,16 @@ public class UserCreationController extends SelectorComposer<Component> {
 			}
 			// nuevo
 			currentUser = new User(account, null, fullName, email);
-			currentUser.getUserTypeList().addAll(currentUserTypeList);
+			currentUser.getUserRoleList().addAll(currentUserRoleList);
 		} else {
 			// edicion
 			currentUser.setAccount(account);
 			currentUser.setFullName(fullName);
 			currentUser.setEmail(email);
+		}
+		// asignamos el usuario a todos los roles
+		for(UserRole each : currentUserRoleList) {
+			each.setUser(currentUser);
 		}
 		userRepository.save(currentUser);
 		EventQueue<Event> eq = EventQueues.lookup("User Update Queue", EventQueues.DESKTOP, true);

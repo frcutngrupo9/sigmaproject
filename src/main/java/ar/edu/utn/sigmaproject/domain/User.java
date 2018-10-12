@@ -28,6 +28,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -45,8 +46,8 @@ public class User implements Serializable, Cloneable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@OneToMany
-	private List<UserType> userTypeList = new ArrayList<>();
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "user", targetEntity = UserRole.class)
+	private List<UserRole> userRoleList = new ArrayList<>();
 
 	private String account = "";
 	private String email = "";
@@ -99,33 +100,33 @@ public class User implements Serializable, Cloneable {
 		this.hash = hash;
 	}
 
-	public List<UserType> getUserTypeList() {
-		return userTypeList;
+	public List<UserRole> getUserRoleList() {
+		return userRoleList;
 	}
 
-	public void setUserTypeList(List<UserType> userTypeList) {
-		this.userTypeList = userTypeList;
+	public void setUserRoleList(List<UserRole> userRoleList) {
+		this.userRoleList = userRoleList;
 	}
 
 	public boolean containsType(String userTypeName) {
-		for(UserType each : userTypeList) {
-			if(each.getName().equalsIgnoreCase(userTypeName)) {
+		for(UserRole each : userRoleList) {
+			if(each.getUserType().getName().equalsIgnoreCase(userTypeName)) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	public String getTypeString() {
 		String type = "";
 		boolean firstTime = true;
-		for(UserType each : userTypeList) {
+		for(UserRole each : userRoleList) {
 			if(firstTime) {
 				firstTime = false;
 			} else {
 				type = type + ", ";
 			}
-			type = type + each.getName();
+			type = type + each.getUserType().getName();
 		}
 		return type;
 	}

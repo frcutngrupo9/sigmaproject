@@ -36,11 +36,13 @@ THE SOFTWARE.
 		        <listhead>
 		            <listheader label="${labels.name}" align="center"/>
 		            <listheader label="${labels.date_employed}" align="center"/>
+		            <listheader label="${labels.role}" align="center"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
 		                <listcell label="${each.name}"/>
 		                <listcell label="${r:getFormattedDate(each.dateEmployed)}"/>
+		                <listcell label="${each.getWorkHourString()}"/>
 		            </listitem>
 		        </template>
 		    </listbox>
@@ -64,6 +66,25 @@ THE SOFTWARE.
 			            <row>
 			                <label>${labels.date_employed}:</label>
 			                <datebox id="dateEmployedDatebox" cols="12" format="${labels.date_format}" constraint="no future"/>
+			            </row>
+			            <row>
+			                <cell colspan="2" style="text-align:center">
+				                <grid id="workHourGrid" sizedByContent="true" span="true"  hflex="1">
+				        			<columns>
+				        				<column label="${labels.select}" align="center"/>
+							            <column label="${labels.role}" align="center"/>
+							            <column label="${labels.price_by_hour}" align="center"/>
+						            </columns>
+						            <template name="model">
+						                <row>
+						                	<custom-attributes is_selected="${win_worker$composer.isSelected(each)}"/>
+						                	<checkbox visible="true" disabled="false" checked="${is_selected}" forward="onCheck=workHourGrid.onSelectWorkHour(${each})"/>
+							            	<label value="${each.role}"/>
+							            	<label value="${each.price.doubleValue()}"/>
+										</row>
+						            </template>
+				    			</grid>
+			    			</cell>
 			            </row>
 			            <row>
 			                <cell colspan="2" style="text-align:center">
