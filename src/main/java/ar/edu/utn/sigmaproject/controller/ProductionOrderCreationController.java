@@ -28,15 +28,10 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.zkoss.image.AImage;
@@ -69,7 +64,6 @@ import ar.edu.utn.sigmaproject.domain.Machine;
 import ar.edu.utn.sigmaproject.domain.MachineType;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.ProcessState;
-import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
@@ -78,7 +72,9 @@ import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderStateType;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
+import ar.edu.utn.sigmaproject.domain.WorkHour;
 import ar.edu.utn.sigmaproject.domain.Worker;
+import ar.edu.utn.sigmaproject.domain.WorkerRole;
 import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
 import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
@@ -699,7 +695,7 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			}
 		}
 	}
-	
+
 	public void sortListBySequence(List<ProductionOrderDetail> details) {
 	Comparator<ProductionOrderDetail> comp = new Comparator<ProductionOrderDetail>() {
 		@Override
@@ -773,7 +769,13 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 					}
 				}
 				if(availableWorkerList.size() > 0) {
-					worker = availableWorkerList.get(0);
+					// de los empleados disponibles, busca el primero que posea el mismo rol necesario para el proceso, si no hay, se asigna el primero
+					Worker workerWithSameRole = findFirstWithSameRole(availableWorkerList, each.getProcess().getWorkHour());
+					if(workerWithSameRole != null) {
+						worker = workerWithSameRole;
+					} else {
+						worker = availableWorkerList.get(0);
+					}
 				}
 				each.setWorker(worker);
 				// recorre la lista de maquinas y solo agrega las que estan disponibles
@@ -791,6 +793,17 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 			}
 		}
 		refreshProductionOrderDetailGridView();
+	}
+
+	private Worker findFirstWithSameRole(List<Worker> availableWorkerList, WorkHour workHour) {
+		for(Worker eachWorker : availableWorkerList) {
+			for(WorkerRole eachWorkerRole : eachWorker.getWorkerRoleList()) {
+				if(eachWorkerRole.getWorkHour().getId() == workHour.getId()) {
+					return eachWorker;
+				}
+			}
+		}
+		return null;
 	}
 
 	@Listen("onChange = #productionOrderStartDatebox")

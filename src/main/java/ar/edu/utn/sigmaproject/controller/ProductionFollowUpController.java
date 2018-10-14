@@ -28,7 +28,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.zkoss.image.AImage;
@@ -61,6 +63,7 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Popup;
 import org.zkoss.zul.Row;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
@@ -92,6 +95,7 @@ import ar.edu.utn.sigmaproject.domain.StockMovementDetail;
 import ar.edu.utn.sigmaproject.domain.StockMovementType;
 import ar.edu.utn.sigmaproject.domain.SupplyType;
 import ar.edu.utn.sigmaproject.domain.Wood;
+import ar.edu.utn.sigmaproject.domain.Worker;
 import ar.edu.utn.sigmaproject.service.MachineRepository;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
 import ar.edu.utn.sigmaproject.service.MaterialRequirementRepository;
@@ -151,6 +155,12 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	Button materialsWithdrawalButton;
 	@Wire
 	Image productImage;
+	@Wire
+	Button printButton;
+	@Wire
+	Popup workerSelectionPopup;
+	@Wire
+	Listbox workerSelectionListbox;
 
 	// services
 	@WireVariable
@@ -208,6 +218,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		currentProductionOrder = (ProductionOrder) Executions.getCurrent().getAttribute("selected_production_order");
 		if(currentProductionOrder == null) {throw new RuntimeException("ProductionOrder not found");}
 		currentProductionPlan = currentProductionOrder.getProductionPlan();
+		workerSelectionListbox.setModel(new ListModelList<>(currentProductionOrder.getWorkerList()));
 		createListener();
 		refreshView();
 	}
@@ -756,11 +767,33 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #replanningButton")
 	public void replanningButtonClick() {
-		// muestra la ventana dondde se puede agregar la replanificacion
+		// muestra la ventana donde se puede agregar la replanificacion
 		Executions.getCurrent().setAttribute("selected_production_order", currentProductionOrder);
 		final Window win = (Window) Executions.createComponents("/replanning_list.zul", null, null);
 		win.setSizable(false);
 		win.setPosition("center");
 		win.doModal();
+	}
+
+	@Listen("onClick = #printButton")
+	public void printButtonClick() {
+		// muestra el popup para seleccionar el empleado y va a la pantalla de generar el reporte
+		workerSelectionPopup.open(printButton, "at_pointer");
+	}
+
+	@Listen("onSelect = #workerSelectionListbox")
+	public void workerSelectionListboxSelect() {
+		Worker workerSelected = workerSelectionListbox.getSelectedItem().getValue();
+		Executions.getCurrent().setAttribute("selected_production_plan", currentProductionPlan);
+		Executions.getCurrent().setAttribute("selected_production_order", currentProductionOrder);
+		Executions.getCurrent().setAttribute("selected_worker", workerSelected);
+
+		Executions.getCurrent().setAttribute("return_page_name", "production_follow_up");
+		Map<String, Object> returnParameters = new HashMap<String, Object>();
+		returnParameters.put("selected_production_order", currentProductionOrder);
+		Executions.getCurrent().setAttribute("return_parameters", returnParameters);
+
+		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
+		include.setSrc("/report_production_order.zul");
 	}
 }

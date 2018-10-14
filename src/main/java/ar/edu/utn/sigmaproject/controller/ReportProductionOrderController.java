@@ -85,15 +85,22 @@ public class ReportProductionOrderController extends SelectorComposer<Component>
 	private ProductionPlan productionPlanSelected;
 	private ProductionOrder productionOrderSelected;
 	private Worker workerSelected;
+	private String returnPageName;
+	private Map<String, Object> returnParameters;
 
 	// list
 	private List<ProductionOrderDetail> processList;
 
 	// list models
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
+		returnPageName = (String) Executions.getCurrent().getAttribute("return_page_name");
+		if(returnPageName == null) {throw new RuntimeException("returnPageName not found");}
+		returnParameters = (Map<String, Object>) Executions.getCurrent().getAttribute("return_parameters");
+
 		productionPlanSelected = (ProductionPlan) Executions.getCurrent().getAttribute("selected_production_plan");
 		productionOrderSelected = (ProductionOrder) Executions.getCurrent().getAttribute("selected_production_order");
 		workerSelected = (Worker) Executions.getCurrent().getAttribute("selected_worker");
@@ -105,8 +112,13 @@ public class ReportProductionOrderController extends SelectorComposer<Component>
 
 	@Listen("onClick = #returnButton")
 	public void returnButtonClick() {
+		if(returnParameters != null) {
+			for (Map.Entry<String, Object> entry : returnParameters.entrySet()) {
+				Executions.getCurrent().setAttribute(entry.getKey(), entry.getValue());
+			}
+		}
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
-		include.setSrc("report.zul");
+		include.setSrc("/"+ returnPageName + ".zul");
 	}
 
 	@Listen("onSelect = #productionPlanListbox")
@@ -189,7 +201,7 @@ public class ReportProductionOrderController extends SelectorComposer<Component>
 		}
 		ArrayList<ProductionOrderDetail> list = new ArrayList<ProductionOrderDetail>();
 		for(ProductionOrderDetail each : productionOrderDetailList) {
-			if(each.getWorker().getId().equals(workerSelected.getId())) {
+			if(each.getWorker()!=null && each.getWorker().getId()==workerSelected.getId()) {
 				list.add(each);
 			}
 		}

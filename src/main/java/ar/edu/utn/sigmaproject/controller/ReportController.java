@@ -53,10 +53,11 @@ public class ReportController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #productionOrderReportButton")
 	public void productionOrderReportButtonClick() {
+		Executions.getCurrent().setAttribute("return_page_name", "report");
 		Include include = (Include) Selectors.iterable(this.getPage(), "#mainInclude").iterator().next();
 		include.setSrc("/report_production_order.zul");
 	}
-	
+
 	@Listen("onClick = #showGraphicsModalButton")
 	public void showGraphicsModalButtonOnClick() {
 		final Window win = (Window) Executions.createComponents("/graphics.zul", null, null);
@@ -66,6 +67,5 @@ public class ReportController extends SelectorComposer<Component> {
 		win.setPosition("center,top");
 		win.doModal();
 	}
-
 
 }

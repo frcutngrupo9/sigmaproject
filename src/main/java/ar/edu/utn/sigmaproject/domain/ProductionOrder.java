@@ -700,4 +700,16 @@ public class ProductionOrder implements Serializable, Cloneable {
 			}
 		}
 	}
+
+	public List<Worker> getWorkerList() {
+		// devuelve una lista con los empleados asignados a los detalles
+		List<Worker> workerList = new ArrayList<Worker>();
+		for(ProductionOrderDetail each : getDetails()) {
+			if(each.getWorker() != null) {
+				workerList.add(each.getWorker());
+			}
+		}
+		Set<Worker> workerSet = new HashSet<Worker>(workerList);
+		return new ArrayList<Worker>(workerSet);
+	}
 }

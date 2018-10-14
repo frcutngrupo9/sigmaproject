@@ -43,11 +43,12 @@ import org.zkoss.zul.Window;
 import ar.edu.utn.sigmaproject.domain.Piece;
 import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.Product;
-import ar.edu.utn.sigmaproject.domain.User;
-import ar.edu.utn.sigmaproject.domain.UserType;
 import ar.edu.utn.sigmaproject.domain.WorkHour;
+import ar.edu.utn.sigmaproject.domain.Worker;
+import ar.edu.utn.sigmaproject.domain.WorkerRole;
 import ar.edu.utn.sigmaproject.service.ProductRepository;
 import ar.edu.utn.sigmaproject.service.WorkHourRepository;
+import ar.edu.utn.sigmaproject.service.WorkerRepository;
 
 public class WorkHourListController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
@@ -59,6 +60,8 @@ public class WorkHourListController extends SelectorComposer<Component> {
 	private WorkHourRepository workHourRepository;
 	@WireVariable
 	private ProductRepository productRepository;
+	@WireVariable
+	private WorkerRepository workerRepository;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
@@ -106,7 +109,7 @@ public class WorkHourListController extends SelectorComposer<Component> {
 		win.doModal();
 	}
 
-	private boolean isWorkHourAssigned(WorkHour workHour) {
+	private boolean isWorkHourAssignedToProcess(WorkHour workHour) {
 		for(Product eachProduct : productRepository.findAll()) {
 			for(Piece eachPiece : eachProduct.getPieces()) {
 				for(Process eachProcess : eachPiece.getProcesses()) {
@@ -119,12 +122,27 @@ public class WorkHourListController extends SelectorComposer<Component> {
 		return false;
 	}
 
+	private boolean isWorkHourAssignedToWorker(WorkHour workHour) {
+		for(Worker eachWorker : workerRepository.findAll()) {
+			for(WorkerRole eachWorkerRole : eachWorker.getWorkerRoleList()) {
+				if(eachWorkerRole.getWorkHour().getId() == workHour.getId()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Listen("onDeleteWorkHour = #workHourListbox")
 	public void deleteButtonClick(final ForwardEvent ForwEvt) {
 		final WorkHour workHour = (WorkHour) ForwEvt.getData();
-		if(isWorkHourAssigned(workHour)) {
+		if(isWorkHourAssignedToProcess(workHour)) {
 			Messagebox.show("No se puede eliminar, el rol se encuentra asignado a uno o mas procesos.", "Informacion", Messagebox.OK, Messagebox.ERROR);
+			return;
+		}
+		if(isWorkHourAssignedToWorker(workHour)) {
+			Messagebox.show("No se puede eliminar, el rol se encuentra asignado a uno o mas empleados.", "Informacion", Messagebox.OK, Messagebox.ERROR);
 			return;
 		}
 		Messagebox.show("Desea eliminar?", "Confirmar", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
@@ -136,5 +154,4 @@ public class WorkHourListController extends SelectorComposer<Component> {
 			}
 		});
 	}
-
 }
