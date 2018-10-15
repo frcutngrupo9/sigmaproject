@@ -115,5 +115,4 @@ public class WorkHourCreationController extends SelectorComposer<Component> {
 		eq.publish(new Event("onWorkHourUpdate"));
 		workHourCreationWindow.detach();
 	}
-
 }

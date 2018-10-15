@@ -24,12 +24,15 @@
 
 package ar.edu.utn.sigmaproject.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.zkoss.lang.Strings;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.event.ForwardEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -37,13 +40,18 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Grid;
+import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Paging;
 import org.zkoss.zul.Textbox;
 
+import ar.edu.utn.sigmaproject.domain.WorkHour;
 import ar.edu.utn.sigmaproject.domain.Worker;
+import ar.edu.utn.sigmaproject.domain.WorkerRole;
+import ar.edu.utn.sigmaproject.service.WorkHourRepository;
 import ar.edu.utn.sigmaproject.service.WorkerRepository;
 import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 
@@ -64,6 +72,8 @@ public class WorkerController extends SelectorComposer<Component> {
 	@Wire
 	Grid workerGrid;
 	@Wire
+	Grid workHourGrid;
+	@Wire
 	Textbox nameTextbox;
 	@Wire
 	Datebox dateEmployedDatebox;
@@ -79,10 +89,14 @@ public class WorkerController extends SelectorComposer<Component> {
 	// services
 	@WireVariable
 	private WorkerRepository workerRepository;
+	@WireVariable
+	private WorkHourRepository workHourRepository;
 
 	// attributes
 	private Worker currentWorker;
 	SortingPagingHelper<Worker> sortingPagingHelper;
+	private List<WorkHour> completeWorkHourList;
+	private List<WorkerRole> currentWorkerRoleList;
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
@@ -92,8 +106,12 @@ public class WorkerController extends SelectorComposer<Component> {
 		sortProperties.put(1, "dateEmployed");
 		sortingPagingHelper = new SortingPagingHelper<>(workerRepository, workerListbox, searchButton, searchTextbox, pager, sortProperties);
 		currentWorker = null;
-
+		completeWorkHourList = workHourRepository.findAll();
 		refreshView();
+	}
+
+	private void refreshGridView() {
+		workHourGrid.setModel(new ListModelList<WorkHour>(completeWorkHourList));
 	}
 
 	@Listen("onClick = #searchButton")
@@ -107,6 +125,15 @@ public class WorkerController extends SelectorComposer<Component> {
 		workerGrid.setVisible(true);
 	}
 
+	private boolean isNameUsed(String name) {
+		for(Worker each : workerRepository.findAll()) {
+			if(each.getName().equalsIgnoreCase(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	@Listen("onClick = #saveButton")
 	public void saveButtonClick() {
 		if(Strings.isBlank(nameTextbox.getText())){
@@ -116,12 +143,21 @@ public class WorkerController extends SelectorComposer<Component> {
 		String name = nameTextbox.getText().toUpperCase();
 		Date dateEmployed = dateEmployedDatebox.getValue();
 		if(currentWorker == null) {
-			// es un nuevo insumo
+			if(isNameUsed(name)) {
+				Clients.showNotification("El nombre del empleado ya existe", nameTextbox);
+				return;
+			}
+			// es un nuevo
 			currentWorker = new Worker(name, dateEmployed);
+			currentWorker.getWorkerRoleList().addAll(currentWorkerRoleList);
 		} else {
 			// es una edicion
 			currentWorker.setName(name);
 			currentWorker.setDateEmployed(dateEmployed);
+		}
+		// asignamos el empleado a todos los roles
+		for(WorkerRole each : currentWorkerRoleList) {
+			each.setWorker(currentWorker);
 		}
 		currentWorker = workerRepository.save(currentWorker);
 		sortingPagingHelper.reset();
@@ -172,14 +208,54 @@ public class WorkerController extends SelectorComposer<Component> {
 			workerGrid.setVisible(false);
 			nameTextbox.setValue(null);
 			dateEmployedDatebox.setValue(null);
+			currentWorkerRoleList = new ArrayList<>();
 			deleteButton.setDisabled(true);
 			resetButton.setDisabled(true);// al crear, el boton new cumple la misma funcion q el reset
-		}else {// editando
+		} else {// editando
+			currentWorker = workerRepository.findOne(currentWorker.getId());
 			workerGrid.setVisible(true);
 			nameTextbox.setValue(currentWorker.getName());
 			dateEmployedDatebox.setValue(currentWorker.getDateEmployed());
+			currentWorkerRoleList = currentWorker.getWorkerRoleList();
 			deleteButton.setDisabled(false);
 			resetButton.setDisabled(false);
+		}
+		refreshGridView();
+	}
+
+	public boolean isSelected(WorkHour workHour) {
+		for(WorkerRole each : currentWorkerRoleList) {
+			if(each.getWorkHour().getId() == workHour.getId()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Listen("onSelectWorkHour = #workHourGrid")
+	public void doSelectWorkHour(ForwardEvent evt) {
+		WorkHour data = (WorkHour) evt.getData();// obtenemos el objeto pasado por parametro
+		Checkbox element = (Checkbox) evt.getOrigin().getTarget();// obtenemos el elemento web
+		if(element.isChecked()) {
+			modifyWorkerRoleList(data, true);
+		} else {
+			modifyWorkerRoleList(data, false);
+		}
+		refreshGridView();
+	}
+
+	private void modifyWorkerRoleList(WorkHour workHour, boolean add) {
+		// agrega o elimina de la lista
+		if(add) {
+			currentWorkerRoleList.add(new WorkerRole(workHour));
+		} else {
+			WorkerRole aux = null;
+			for(WorkerRole each : currentWorkerRoleList) {
+				if(each.getWorkHour().getId() == workHour.getId()) {
+					aux = each;
+				}
+			}
+			currentWorkerRoleList.remove(aux);
 		}
 	}
 }

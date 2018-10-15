@@ -25,40 +25,35 @@
 package ar.edu.utn.sigmaproject.domain;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToOne;
 
 import org.hibernate.search.annotations.Indexed;
 
 @Entity
 @Indexed
-public class Worker  implements Serializable, Cloneable {
+public class WorkerRole implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
-	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "worker", targetEntity = WorkerRole.class)
-	private List<WorkerRole> workerRoleList = new ArrayList<>();
-
-	private String name = "";
-	private Date dateEmployed = new Date();
-
-	public Worker() {
+	
+	@ManyToOne(targetEntity = Worker.class)
+	private Worker worker = null;
+	
+	@ManyToOne
+	private WorkHour workHour = null;
+	
+	public WorkerRole() {
 	}
-
-	public Worker(String name, Date dateEmployed) {
-		this.name = name;
-		this.dateEmployed = dateEmployed;
+	
+	public WorkerRole(WorkHour workHour) {
+		this.workHour = workHour;
 	}
 
 	public Long getId() {
@@ -69,50 +64,19 @@ public class Worker  implements Serializable, Cloneable {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public Worker getWorker() {
+		return worker;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setWorker(Worker worker) {
+		this.worker = worker;
 	}
 
-	public Date getDateEmployed() {
-		return dateEmployed;
+	public WorkHour getWorkHour() {
+		return workHour;
 	}
 
-	public void setDateEmployed(Date dateEmployed) {
-		this.dateEmployed = dateEmployed;
-	}
-
-	public List<WorkerRole> getWorkerRoleList() {
-		return workerRoleList;
-	}
-
-	public void setWorkerRoleList(List<WorkerRole> workerRoleList) {
-		this.workerRoleList = workerRoleList;
-	}
-
-	public boolean containsWorkHour(String workHourRole) {
-		for(WorkerRole each : workerRoleList) {
-			if(each.getWorkHour().getRole().equalsIgnoreCase(workHourRole)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public String getWorkHourString() {
-		String type = "";
-		boolean firstTime = true;
-		for(WorkerRole each : workerRoleList) {
-			if(firstTime) {
-				firstTime = false;
-			} else {
-				type = type + ", ";
-			}
-			type = type + each.getWorkHour().getRole();
-		}
-		return type;
+	public void setWorkHour(WorkHour workHour) {
+		this.workHour = workHour;
 	}
 }

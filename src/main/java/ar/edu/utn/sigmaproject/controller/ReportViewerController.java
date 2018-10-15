@@ -74,9 +74,9 @@ public class ReportViewerController  extends SelectorComposer<Component> {
 		if(reportType == null) {throw new RuntimeException("reportType not found");}
 		reportParameters = (Map<String, Object>) Executions.getCurrent().getAttribute("report_parameters");
 		if(reportParameters == null) {throw new RuntimeException("reportParameters not found");}
-		
+
 		returnParameters = (Map<String, Object>) Executions.getCurrent().getAttribute("return_parameters");
-		
+
 		loadJasperreport();
 	}
 
@@ -86,7 +86,7 @@ public class ReportViewerController  extends SelectorComposer<Component> {
 		viewJasperreport.setType(reportType);
 		viewJasperreport.setDatasource(jRDataSource);
 	}
-	
+
 	@Listen("onClick = #cancelButton")
 	public void cancelButtonClick() {
 		if(returnParameters != null) {
@@ -98,4 +98,3 @@ public class ReportViewerController  extends SelectorComposer<Component> {
 		include.setSrc("/"+ returnPageName + ".zul");
 	}
 }
-

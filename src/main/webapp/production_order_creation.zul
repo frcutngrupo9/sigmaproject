@@ -102,11 +102,13 @@ THE SOFTWARE.
 			            				<listhead>
 					                    	<listheader align="left"  hflex="min"/>
 					                        <listheader align="center"  hflex="max"/>
+					                        <listheader align="center"  hflex="min"/>
 					                    </listhead>
 										<template name="model">
 											<listitem>
 												<listcell label="${each.name}"/>
 												<listcell label="${win_production_order_creation$composer.getWorkerAvailabilityDescription(each, current_detail)}"/>
+												<listcell label="${each.getWorkHourString()}"/>
 											</listitem>
 										</template>
 									</listbox>

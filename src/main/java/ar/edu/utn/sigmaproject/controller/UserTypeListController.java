@@ -41,6 +41,7 @@ import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Window;
 
 import ar.edu.utn.sigmaproject.domain.User;
+import ar.edu.utn.sigmaproject.domain.UserRole;
 import ar.edu.utn.sigmaproject.domain.UserType;
 import ar.edu.utn.sigmaproject.service.UserRepository;
 import ar.edu.utn.sigmaproject.service.UserTypeRepository;
@@ -104,8 +105,8 @@ public class UserTypeListController extends SelectorComposer<Component> {
 
 	private boolean isUserTypeAssigned(UserType userType) {
 		for(User eachUser : userRepository.findAll()) {
-			for(UserType eachUserType : eachUser.getUserTypeList()) {
-				if(eachUserType.getName().equalsIgnoreCase(userType.getName())) {
+			for(UserRole eachUserRole : eachUser.getUserRoleList()) {
+				if(eachUserRole.getUserType().getName().equalsIgnoreCase(userType.getName())) {
 					return true;
 				}
 			}
