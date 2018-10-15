@@ -308,7 +308,7 @@ public class RepositoryHelper {
 			List<SupplyType> list = new ArrayList<>();
 			list.add(new SupplyType("1", "Lija al Agua", "Lijado fino prelustrado", "Szumik", "", "Unidad", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("11")));
 			list.add(new SupplyType("2", "Adhesivo Vinilico", "Encolado de piezas para su union", "Lencisa", "Envase", "5 Kg", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("316")));
-			list.add(new SupplyType("3", "Pintura Asf·ltica", "Lustrado de muebles", "Szumik", "Lata", "18Lts", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("1200")));
+			list.add(new SupplyType("3", "Pintura Asf√°ltica", "Lustrado de muebles", "Szumik", "Lata", "18Lts", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("1200")));
 			list.add(new SupplyType("4", "Bulon Camero", "Di\u00e1metro 8 mm - Largo 110 mm", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("9")));
 			list.add(new SupplyType("5", "Tuerca", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("1.5")));
 			list.add(new SupplyType("6", "Arandela", "", "", "", "", new BigDecimal("200"), new BigDecimal("10"), new BigDecimal("20"), new BigDecimal("1.15")));
