@@ -265,6 +265,7 @@ public class ReportProductionOrderController extends SelectorComposer<Component>
 		returnParameters.put("selected_production_order", productionOrderSelected);
 		returnParameters.put("selected_production_plan", productionPlanSelected);
 		returnParameters.put("selected_worker", workerSelected);
+		returnParameters.put("return_page_name", returnPageName);
 		Executions.getCurrent().setAttribute("return_parameters", returnParameters);
 		Executions.getCurrent().setAttribute("report_src_name", reportFileName);
 		Executions.getCurrent().setAttribute("report_parameters", parameters);

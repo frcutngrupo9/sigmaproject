@@ -205,11 +205,13 @@ public class ProductDeliveryController extends SelectorComposer<Component> {
 	}
 
 	private ProductionOrder getCorrelativeProductionOrder(Order order, Product product) {
-		product = productRepository.findOne(product.getId());
-		order = orderRepository.findOne(order.getId());
 		ProductionPlan productionPlan = productionPlanRepository.findByPlanDetailsOrder(order); 
-		ProductionOrder productionOrder = productionOrderRepository.findByProductionPlanAndProduct(productionPlan, product);
-		return productionOrder;
+		for(ProductionOrder eachProductionOrder : productionPlan.getProductionOrderList()) {
+			if(eachProductionOrder.getProduct().getId() == product.getId()) {
+				return eachProductionOrder;
+			}
+		}
+		return null;
 	}
 
 	public String getPlanName(OrderDetail orderDetail) {

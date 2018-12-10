@@ -136,6 +136,11 @@ public class MaterialsOrderCreationController extends SelectorComposer<Component
 			// creamos el nuevo pedido
 			currentMaterialsOrder = new MaterialsOrder(materialsOrderNumber, materialsOrderDate);
 		} else { // se edita un pedido
+			//  si el pedido ya esta recibido se deshabilita las modificaciones
+			if(currentMaterialsOrder.isTotallyReceived()) {
+				alert("No se puede modificar un pedido e estado recibido");
+				return;
+			}
 			currentMaterialsOrder.setNumber(materialsOrderNumber);
 		}
 		for(MaterialsOrderDetail each : materialsOrderDetailList) {
@@ -228,7 +233,6 @@ public class MaterialsOrderCreationController extends SelectorComposer<Component
 			materialsOrderNumberIntbox.setValue(currentMaterialsOrder.getNumber());
 			materialsOrderDatebox.setValue(currentMaterialsOrder.getDate());
 			materialsOrderDetailList = currentMaterialsOrder.getDetails();
-			// TODO si el pedido ya esta recibido se deshabilita todas las modificaciones
 		}
 		materialsOrderDatebox.setDisabled(true);// nunca se debe poder modificar la fecha de creacion del pedido
 		currentMaterialsOrderDetail = null;

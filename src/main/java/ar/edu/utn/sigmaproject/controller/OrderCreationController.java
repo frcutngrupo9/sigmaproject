@@ -70,8 +70,6 @@ import ar.edu.utn.sigmaproject.domain.OrderDetail;
 import ar.edu.utn.sigmaproject.domain.OrderState;
 import ar.edu.utn.sigmaproject.domain.OrderStateType;
 import ar.edu.utn.sigmaproject.domain.Product;
-import ar.edu.utn.sigmaproject.domain.ProductMaterial;
-import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.service.ClientRepository;
 import ar.edu.utn.sigmaproject.service.OrderRepository;
 import ar.edu.utn.sigmaproject.service.OrderStateRepository;
@@ -149,6 +147,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	private OrderDetail currentOrderDetail;
 	private Product currentProduct;
 	private Client currentClient;
+	private boolean detailModified;
 
 	// list
 	private List<Client> clientPopupList;
@@ -217,7 +216,11 @@ public class OrderCreationController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #saveOrderButton")
 	public void saveOrderButtonClick() {
-		// TODO agregar comprobacion para ver si todavia no se guardo un detalle activo
+		// agregar comprobacion para ver si todavia no se guardo un detalle activo
+		if(detailModified == true) {
+			alert("Existe un detalle sin guardar.");
+			return;
+		}
 		if(currentClient == null) {
 			Clients.showNotification("Seleccionar Cliente", clientBandbox);
 			return;
@@ -268,6 +271,11 @@ public class OrderCreationController extends SelectorComposer<Component> {
 		} else {
 			saveOrder(orderStateType);
 		}
+	}
+	
+	@Listen("onChanging = #productBandbox, #productUnitsIntbox, #productPriceDoublebox")
+	public void pieceDetaisOnChanging() {
+		detailModified = true;
 	}
 
 	private void saveOrder(OrderStateType orderStateType) {
@@ -324,6 +332,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	@Listen("onClick = #resetOrderButton")
 	public void resetOrder() {
 		refreshViewOrder();
+		filterClients();
 	}
 
 	@Listen("onClick = #cancelOrderDetailButton")
@@ -464,6 +473,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	}
 
 	private void refreshViewOrderDetail() {
+		detailModified = false;
 		if(currentOrderDetail == null) {
 			// borramos el text del producto  seleccionado
 			// deseleccionamos la tabla y borramos la cantidad
@@ -621,6 +631,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	public void newOrderButtonClick() {
 		currentOrder = null;
 		refreshViewOrder();
+		filterClients();
 	}
 
 	public double totalPrice(Order order) {
