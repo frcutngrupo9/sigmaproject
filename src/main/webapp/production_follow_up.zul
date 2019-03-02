@@ -149,8 +149,7 @@ THE SOFTWARE.
 			                <listcell label="${each.item.description}"/>
 			                <listcell label="${each.quantity}"/>
 			                <listcell>
-			                	<doublebox disabled="false" inplace="true" value="${each.quantityUsed}" forward="onChanging=productionOrderSupplyListbox.onEditUsedMaterial(${each})"/>
-			                	<button disabled="false" label="${labels.complete}" forward="onClick=productionOrderSupplyListbox.onCompleteUsedMaterial(${each})"/>
+			                	<doublebox disabled="false" inplace="false" value="${each.quantityUsed}" forward="onChanging=productionOrderSupplyListbox.onUsedMaterialChange(${each})"/>
 			                </listcell>
 			                <listcell>
 			                	<textbox disabled="false" hflex="1" value="${each.observation}" forward="onChanging=productionOrderSupplyListbox.onEditUsedMaterialObservation(${each})"/>
@@ -174,8 +173,7 @@ THE SOFTWARE.
 			                <listcell label="${each.item.name}"/>
 			                <listcell label="${each.quantity}"/>
 			                <listcell>
-			                	<doublebox disabled="false" inplace="true" value="${each.quantityUsed}" forward="onChanging=productionOrderRawMaterialListbox.onEditUsedMaterial(${each})"/>
-			                	<button disabled="false" label="${labels.complete}" forward="onClick=productionOrderRawMaterialListbox.onCompleteUsedMaterial(${each})"/>
+			                	<doublebox disabled="false" inplace="false" value="${each.quantityUsed}" forward="onChanging=productionOrderRawMaterialListbox.onUsedMaterialChange(${each})"/>
 			                </listcell>
 			                <listcell>
 			                	<textbox value="${each.observation}" disabled="false" hflex="1" forward="onChanging=productionOrderRawMaterialListbox.onEditUsedMaterialObservation(${each})"/>
