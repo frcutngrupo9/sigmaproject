@@ -22,42 +22,18 @@
  * THE SOFTWARE.
  */
 
-package ar.edu.utn.sigmaproject.domain;
+package ar.edu.utn.sigmaproject.service;
 
-import javax.xml.datatype.Duration;
+import java.util.List;
 
-public class ProductTotal {
-	// clase con el objetivo de guardar el total de unidades de cada producto de un conjunto de pedidos
-	// que integran un plan de produccion
+import org.springframework.stereotype.Repository;
 
-	private Product product;
-	private Integer totalUnits;
+import ar.edu.utn.sigmaproject.domain.Process;
+import ar.edu.utn.sigmaproject.domain.ProcessType;
 
-	public ProductTotal(Product product, Integer totalUnits) {
-		super();
-		this.product = product;
-		this.totalUnits = totalUnits;
-	}
+@Repository
+public interface ProcessRepository extends SearchableRepository<Process, Long> {
+	
+	public List<Process> findByType(ProcessType type);
 
-	public Product getProduct() {
-		return product;
-	}
-
-	public void setProduct(Product product) {
-		this.product = product;
-	}
-
-	public Integer getTotalUnits() {
-		return totalUnits;
-	}
-
-	public void setTotalUnits(Integer totalUnits) {
-		this.totalUnits = totalUnits;
-	}
-
-	public Duration getTotalDuration() {
-		Duration duration = product.getDurationTotal();
-		Duration durationTotal = duration.multiply(totalUnits);
-		return durationTotal;
-	}
 }

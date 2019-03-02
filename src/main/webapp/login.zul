@@ -72,7 +72,6 @@ THE SOFTWARE.
 					</vbox>
 				</popup>
 			</window>
-			(use usuario='sigma' y password='1234' para ingresar)
 		</vlayout>
 	</hbox>
 </zk>
