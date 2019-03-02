@@ -102,6 +102,7 @@ public class UserListController extends SelectorComposer<Component> {
 		Executions.getCurrent().setAttribute("selected_user", object);
 		final Window win = (Window) Executions.createComponents("/user_creation.zul", null, null);
 		win.setSizable(false);
+		//win.setClosable(true);
 		win.setPosition("center");
 		win.doModal();
 	}

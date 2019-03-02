@@ -345,7 +345,7 @@ public class ChartHelper {
 		}
 		for(Product eachProduct : productList) {
 			if(eachProduct.getCostTotal() != BigDecimal.ZERO) {
-				model.setValue("Ingreso", eachProduct.getName(), eachProduct.getPrice().doubleValue());
+				model.setValue("Importe", eachProduct.getName(), eachProduct.getPrice().doubleValue());
 				model.setValue("Costo", eachProduct.getName(), eachProduct.getCostTotal().doubleValue());
 			}
 		}

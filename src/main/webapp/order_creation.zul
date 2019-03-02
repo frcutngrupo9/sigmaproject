@@ -149,7 +149,7 @@ THE SOFTWARE.
                     <button id="resetOrderButton" label="${labels.reset_order}"/>
                     <button id="deleteOrderButton" label="${labels.delete_order}"/>
                     <separator/>
-                    <button id="jasperReportButton" label="${labels.report}"/>
+                    <button id="jasperReportButton" label="Presupuesto"/>
                     <button id="deliveryNoteReportButton" label="Remito"/>
                     <hbox pack="center" align="center" hflex="1">
 			        	<button id="newOrderButton" label="${labels.new_order}"/>

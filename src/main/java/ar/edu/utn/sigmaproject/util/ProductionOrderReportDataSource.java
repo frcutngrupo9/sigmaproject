@@ -57,7 +57,7 @@ public class ProductionOrderReportDataSource implements JRDataSource {
 		} else if ("date_start".equals(fieldName)) {
 			Date date = productionOrderDetailList.get(index).getDateStart();
 			if(date != null) {
-				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+				DateFormat dateFormat = new SimpleDateFormat("HH:mm dd/MM/yy");
 				value = dateFormat.format(date);
 			} else {
 				value = "No seleccionado";
@@ -65,7 +65,7 @@ public class ProductionOrderReportDataSource implements JRDataSource {
 		} else if ("date_finish".equals(fieldName)) {
 			Date date = productionOrderDetailList.get(index).getDateFinish();
 			if(date != null) {
-				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+				DateFormat dateFormat = new SimpleDateFormat("HH:mm dd/MM/yy");
 				value = dateFormat.format(date);
 			} else {
 				value = "No seleccionado";
@@ -84,9 +84,9 @@ public class ProductionOrderReportDataSource implements JRDataSource {
 					hours = hours + 1;
 					minutes = minutes - 60;
 				}
-				value = String.format("%d hrs  %d min  %d seg", hours, minutes, seconds);
+				value = String.format("%d h  %d min  %d s", hours, minutes, seconds);
 			} else {
-				value = "0 hrs 0 min 0 seg";
+				value = "0 h 0 min 0 s";
 			}
 		} else if ("piece_name".equals(fieldName)) {
 			value = productionOrderDetailList.get(index).getProcess().getPiece().getName();

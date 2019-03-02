@@ -155,8 +155,6 @@ public class ReportProductionOrderController extends SelectorComposer<Component>
 		productionOrderDetailGrid.setModel(new ListModelList<ProductionOrderDetail>(new ArrayList<ProductionOrderDetail>(processList)));
 	}
 
-
-
 	private List<Worker> filterWorkerByProductionOrder(ProductionOrder productionOrder) {
 		// devuleve una lista conteniendo solo los empleados que esten asignados a la orden
 		ArrayList<Worker> list = new ArrayList<Worker>();
@@ -238,24 +236,23 @@ public class ReportProductionOrderController extends SelectorComposer<Component>
 	}
 
 	private void loadReportByWorker() {
-		Map<String, Object> parameters;
-		parameters = new HashMap<String, Object>();
-		parameters.put("productionPlanName", productionPlanSelected.getName());
-		parameters.put("productionOrderNumber", productionOrderSelected.getNumber());
-		parameters.put("productName", productionOrderSelected.getProduct().getDescription());
+		Map<String, Object> parameters = getParametersProductionOrder();
 		parameters.put("workerName", workerSelected.getName());
-		parameters.put("productUnits", productionOrderSelected.getUnits());
 		doJasperModal(parameters, "production_order_by_worker");
 	}
 
 	private void loadReport() {
-		Map<String, Object> parameters;
-		parameters = new HashMap<String, Object>();
-		parameters.put("reportTitle", "Orden de Produccion");
+		Map<String, Object> parameters = getParametersProductionOrder();
+		doJasperModal(parameters, "production_order");
+	}
+
+	private Map<String, Object> getParametersProductionOrder() {
+		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put("productionPlanName", productionPlanSelected.getName());
 		parameters.put("productionOrderNumber", productionOrderSelected.getNumber());
 		parameters.put("productName", productionOrderSelected.getProduct().getDescription());
-		doJasperModal(parameters, "production_order");
+		parameters.put("productUnits", productionOrderSelected.getUnits());
+		return parameters;
 	}
 
 	private void doJasperModal(Map<String, Object> parameters, String reportFileName) {

@@ -49,7 +49,6 @@ import org.zkoss.zul.Window;
 import ar.edu.utn.sigmaproject.domain.User;
 import ar.edu.utn.sigmaproject.domain.UserRole;
 import ar.edu.utn.sigmaproject.domain.UserType;
-import ar.edu.utn.sigmaproject.domain.WorkerRole;
 import ar.edu.utn.sigmaproject.service.UserRepository;
 import ar.edu.utn.sigmaproject.service.UserTypeRepository;
 

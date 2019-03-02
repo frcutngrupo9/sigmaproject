@@ -38,16 +38,12 @@ THE SOFTWARE.
 		            			width="600px" span="false" sizedByContent="false" emptyMessage="${labels.empty_production_plan_list}.">
 		            				<listhead>
 				                        <listheader label="${labels.production_plan}" hflex="min" align="center"/>
-							            <listheader label="${labels.date_start}" align="center"/>
-							            <listheader label="${labels.start_real}" align="center"/>
 							            <listheader label="${labels.quantity_order}" align="center"/>
 		            					<listheader label="${labels.quantity_product}" align="center"/>
 				                    </listhead>
 									<template name="model">
 										<listitem>
 											<listcell label="${each.name}"/>
-							                <listcell label="${r:getFormattedDate(each.dateStart)}"/>
-							                <listcell label="${r:getFormattedDate(each.getDateStartReal())}"/>
 							                <listcell label="${each.planDetails.size()}"/>
 		               						<listcell label="${each.getProductionOrderList().size()}"/>
 										</listitem>
