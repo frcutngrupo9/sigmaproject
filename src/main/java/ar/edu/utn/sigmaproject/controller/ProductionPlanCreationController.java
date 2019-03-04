@@ -72,6 +72,7 @@ import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderMaterial;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderState;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderStateType;
 import ar.edu.utn.sigmaproject.domain.ProductionPlan;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanDetail;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanState;
@@ -217,6 +218,10 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 	@Transactional
 	@Listen("onClick = #saveProductionPlanButton")
 	public void saveProductionPlan() {
+		if(currentProductionPlan != null && currentProductionPlan.getCurrentStateType().getName().compareTo("Registrado") != 0) {
+			alert("No se puede modificar:  el plan se encuentra en estado abastecido o posterior");
+			return;
+		}
 		if(Strings.isBlank(productionPlanNameTextbox.getValue())) {
 			Clients.showNotification("Ingresar Nombre Plan de Produccion", productionPlanNameTextbox);
 			return;
@@ -232,62 +237,73 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		} else {
 			productionPlanStateType = productionPlanStateTypeCombobox.getSelectedItem().getValue();
 		}
-		boolean isNewProductionPlan = false;
+		List<MaterialRequirement> materialRequirementList = null;
 		if(currentProductionPlan == null) { // es un plan nuevo
 			// creamos el nuevo plan
-			currentProductionPlan = new ProductionPlan(productionPlanName);
-			for(ProductionPlanDetail each : productionPlanDetailList) {
-				// se agregan todas las referencias hacia el nuevo plan
-				each.setProductionPlan(currentProductionPlan);
-			}
-			currentProductionPlan.getPlanDetails().addAll(productionPlanDetailList);
-			ProductionPlanState productionPlanState = new ProductionPlanState(productionPlanStateType, new Date());
-			productionPlanState = productionPlanStateRepository.save(productionPlanState);
-			currentProductionPlan.setState(productionPlanState);
+			//currentProductionPlan = new ProductionPlan(productionPlanName);
+			currentProductionPlan = createProductionPlan(productionPlanName, productionPlanStateType);
 			// cambia el estado de los pedidos
 			setProductionPlanDetailStates("Planificado");
-			isNewProductionPlan = true;
-		} else { // se edita un plan
-			currentProductionPlan.setName(productionPlanName);
-			//currentProductionPlan.setPlanDetails(productionPlanDetailList);
-			if (!currentProductionPlan.getCurrentStateType().equals(productionPlanStateType)) {
-				// si el estado ha cambiado
-				ProductionPlanState productionPlanState = new ProductionPlanState(productionPlanStateType, new Date());
-				productionPlanState = productionPlanStateRepository.save(productionPlanState);
-				currentProductionPlan.setState(productionPlanState);
-			}
-		}
-		currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
-		//TODO si no es nuevo pero se modificaron los detalles deberia actualizar las ordenes de produccion
-		if(isNewProductionPlan) {
-			// crea los requerimientos
-			List<MaterialRequirement> materialRequirementList = createMaterialRequirements(currentProductionPlan);
-			currentProductionPlan.getMaterialRequirements().addAll(materialRequirementList);
-			// crea ordenes de produccion
-			int sequence = 0;
-			List<ProductionOrder> productionOrderList = currentProductionPlan.getProductionOrderList();
-			for(ProductTotal each : getProductTotalList()) {
-				ProductionOrderState productionOrderState = new ProductionOrderState(productionOrderStateTypeRepository.findFirstByName("Registrada"), new Date());
-				productionOrderState = productionOrderStateRepository.save(productionOrderState);
-				sequence += 1;
-				ProductionOrder productionOrder = new ProductionOrder(sequence, currentProductionPlan, each.getProduct(), each.getTotalUnits(), productionOrderState);
-				//  agrega los detalles
-				productionOrder.setDetails(createProductionOrderDetailList(productionOrder));
-				// agrega los materiales a las ordenes de produccion
-				productionOrder.setProductionOrderMaterials(createProductionOrderMaterialList(productionOrder));
-				productionOrderList.add(productionOrder);
-			}
-			currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
-		}/* else {
-			// si se agrego o cambio alguno de los pedidos
-			int currentProductionOrderListSize = currentProductionPlan.getProductionOrderList().size();
-			int savedProductionOrderListSize = (productionPlanRepository.findOne(currentProductionPlan.getId())).getProductionOrderList().size();
-			if(currentProductionOrderListSize - savedProductionOrderListSize == 0) {
-
+			// crea los detalles
+			materialRequirementList = createMaterialRequirements(currentProductionPlan);
+		}/* else { // se edita un plan
+			// si se modificaron los detalles, se elimina el producto y se crea uno nuevo con los detalles actuales
+			if(detailsModified()) {
+				setProductionPlanDetailStates("Creado");
+				productionPlanRepository.delete(currentProductionPlan);
+				currentProductionPlan = createProductionPlan(productionPlanName, productionPlanStateType);
+				setProductionPlanDetailStates("Planificado");
+			} else { // si no se modificaron los detalles se modifica solo el nombre
+				currentProductionPlan.setName(productionPlanName);
 			}
 		}*/
+		currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
+
+		// si  es nuevo se crean los detalles
+		if(materialRequirementList != null) {
+			currentProductionPlan.getMaterialRequirements().addAll(materialRequirementList);
+			// crea las ordenes de produccion
+			currentProductionPlan.getProductionOrderList().addAll(createProductionOrderList(currentProductionPlan));
+			currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
+		}
 		refreshViewProductionPlan();
 		alert("Plan guardado.");
+	}
+	
+	private ProductionPlan createProductionPlan(String productionPlanName, ProductionPlanStateType productionPlanStateType) {
+		ProductionPlan productionPlan = new ProductionPlan(productionPlanName);
+		for(ProductionPlanDetail each : productionPlanDetailList) {
+			// se agregan todas las referencias hacia el nuevo plan
+			each.setProductionPlan(currentProductionPlan);
+		}
+		productionPlan.getPlanDetails().addAll(productionPlanDetailList);
+		ProductionPlanState productionPlanState = new ProductionPlanState(productionPlanStateType, new Date());
+		productionPlanState = productionPlanStateRepository.save(productionPlanState);
+		productionPlan.setState(productionPlanState);
+		return productionPlan;
+	}
+
+	private boolean detailsModified() {
+		// lee el plan de bd y si los detalles son iguales a los del current, se considera que no se modificaron los detalles
+		ProductionPlan dbProductionPlan = productionPlanRepository.getOne(currentProductionPlan.getId());
+		List<ProductionPlanDetail> dbDetails = dbProductionPlan.getPlanDetails();
+		List<ProductionPlanDetail> currentDetails = currentProductionPlan.getPlanDetails();
+		if(dbDetails.size() != currentDetails.size()) {
+			return true;
+		}
+		for(ProductionPlanDetail eachDB : dbDetails) {
+			// deberian existir 1 por cada detalle
+			boolean found = false;
+			for(ProductionPlanDetail eachCurrent : dbDetails) {
+				if(eachDB.getId()==eachCurrent.getId()) {
+					found = true;
+				}
+			}
+			if(found == false) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void setProductionPlanDetailStates(String stateName) {
@@ -350,6 +366,25 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		return list;
 	}
 
+	private List<ProductionOrder> createProductionOrderList(ProductionPlan productionPlan) {
+		// busca requerimientos de materias primas
+		List<ProductionOrder> list = new ArrayList<ProductionOrder>();
+		ProductionOrderStateType stateCreated = productionOrderStateTypeRepository.findFirstByName("Registrada");
+		int sequence = 0;
+		for(ProductTotal each : getProductTotalList()) {
+			sequence += 1;
+			ProductionOrderState productionOrderState = new ProductionOrderState(stateCreated, new Date());
+			productionOrderState = productionOrderStateRepository.save(productionOrderState);
+			ProductionOrder productionOrder = new ProductionOrder(sequence, currentProductionPlan, each.getProduct(), each.getTotalUnits(), productionOrderState);
+			//  agrega los detalles
+			productionOrder.setDetails(createProductionOrderDetailList(productionOrder));
+			// agrega los materiales a las ordenes de produccion
+			productionOrder.setProductionOrderMaterials(createProductionOrderMaterialList(productionOrder));
+			list.add(productionOrder);
+		}
+		return list;
+	}
+
 	private void addOrder(Order order) {
 		productionPlanDetailList.add(new ProductionPlanDetail(currentProductionPlan, order));
 		refreshProductionPlanDetailListGrid();
@@ -407,6 +442,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 			int planNumber = productionPlanRepository.findAll().size() + 1;
 			productionPlanNameTextbox.setText("PLAN " + planNumber);
 			productionPlanDetailList = new ArrayList<ProductionPlanDetail>();
+			saveProductionPlanButton.setDisabled(false);
 			deleteProductionPlanButton.setDisabled(true);
 			productionPlanStateTypeCombobox.setDisabled(true);
 			returnToProductionButton.setDisabled(true);
@@ -428,6 +464,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 				productionPlanNameTextbox.setText("");
 			}
 			productionPlanDetailList = currentProductionPlan.getPlanDetails();
+			saveProductionPlanButton.setDisabled(true);// no se permite modificar un plan creado
 			deleteProductionPlanButton.setDisabled(false);
 			productionPlanStateTypeCombobox.setDisabled(false);
 			returnToProductionButton.setDisabled(false);
