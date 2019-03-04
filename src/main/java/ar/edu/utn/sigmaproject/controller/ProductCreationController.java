@@ -319,6 +319,18 @@ public class ProductCreationController extends SelectorComposer<Component> {
 			Clients.showNotification("Ingresar Nombre Producto", productNameTextbox);
 			return;
 		}
+		if(supplyList.isEmpty()) {
+			Clients.showNotification("Ingresar Insumos", openSupplyListButton);
+			return;
+		}
+		if(rawMaterialList.isEmpty()) {
+			Clients.showNotification("Ingresar Materia Prima", openRawMaterialListButton);
+			return;
+		}
+		if(pieceList.isEmpty()) {
+			Clients.showNotification("Ingresar Piezas", createPieceButton);
+			return;
+		}
 		ProductCategory productCategory = null;
 		if (productCategoryCombobox.getSelectedIndex() == -1) {
 			String manuallyEnteredCategoryName = productCategoryCombobox.getValue();
@@ -787,7 +799,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	}
 
 	private void updateProcessValues(AbstractComponent abstractComponent) {
-		System.out.println("------------ instanceof " + abstractComponent.getClass().getCanonicalName());
+		//System.out.println("------------ instanceof " + abstractComponent.getClass().getCanonicalName());
 		if(abstractComponent instanceof Bandbox) {
 			Bandbox bandboxProcessWorkHour = (Bandbox) abstractComponent;
 			bandboxProcessWorkHour.setValue(workHourDefault.getRole());

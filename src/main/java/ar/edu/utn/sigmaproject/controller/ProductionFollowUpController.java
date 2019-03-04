@@ -27,6 +27,7 @@ package ar.edu.utn.sigmaproject.controller;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +62,6 @@ import org.zkoss.zul.Include;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Popup;
 import org.zkoss.zul.Row;
@@ -219,6 +219,19 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		if(currentProductionOrder == null) {throw new RuntimeException("ProductionOrder not found");}
 		currentProductionPlan = currentProductionOrder.getProductionPlan();
 		workerSelectionListbox.setModel(new ListModelList<>(currentProductionOrder.getWorkerList()));
+		boolean saveProductionOrder = false;
+		currentProductionOrder = productionOrderRepository.findOne(currentProductionOrder.getId());
+		for(ProductionOrderMaterial each : currentProductionOrder.getProductionOrderMaterials()) {
+			if(each.getQuantityUsed()==null || each.getQuantityUsed().compareTo(BigDecimal.ZERO)==0) {
+				each.setQuantityUsed(each.getQuantity());
+				if(saveProductionOrder == false) {
+					saveProductionOrder = true;
+				}
+			}
+		}
+		if(saveProductionOrder == true) {
+			currentProductionOrder = productionOrderRepository.save(currentProductionOrder);
+		}
 		createListener();
 		refreshView();
 	}
@@ -312,8 +325,8 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		// TODO si esta finalizada no se debe poder modificar.
 		ProductionOrderStateType newStateType = getProductionOrderStateType();
 		ProductionOrderStateType productionOrderStateType = null;
-		if(!lastStateType.equals(newStateType)) {// si el estado anterior es distindo del nuevo
-			if(newStateType.equals(productionOrderStateTypeRepository.findFirstByName("Finalizada"))) {
+		if(!lastStateType.getName().equals(newStateType.getName())) {// si el estado anterior es distindo del nuevo
+			if(newStateType.getName().equals("Finalizada")) {
 				// si esta Finalizada y aun no se retiraron los materiales de stock, se los retiran
 				if(currentProductionOrder.getDateMaterialsWithdrawal() == null) {
 					alert("Se registrara el Retiro de Materiales de Stock.");
@@ -392,18 +405,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 					orderRepository.save(order);
 				}
 			}
-			/*
-			// se modifica la cantidad en stock de los productos si el estado del plan es Finalizado
-			if(newProductionPlanStateType.getName().equalsIgnoreCase("Finalizado")) {
-				// TODO: Eliminar este metodo y hacer que el stock cambie al finalizar cada orden de produccion
-				for(ProductionOrder each : productionOrderList) {
-					Product product = each.getProduct();
-					// TODO: sumar las cantidades REALES que se produjeron
-					product.setStock(product.getStock() + each.getUnits());
-					product = productRepository.save(product);
-				}
-			}
-			 */
 		}
 	}
 
@@ -604,8 +605,8 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		return false;
 	}
 
-	@Listen("onEditUsedMaterial = #productionOrderSupplyListbox, #productionOrderRawMaterialListbox")
-	public void doEditUsedMaterial(ForwardEvent evt) {
+	@Listen("onUsedMaterialChange = #productionOrderSupplyListbox, #productionOrderRawMaterialListbox")
+	public void doUsedMaterialChange(ForwardEvent evt) {
 		ProductionOrderMaterial data = (ProductionOrderMaterial) evt.getData();// obtenemos el objeto pasado por parametro
 		InputEvent inputEvent = (InputEvent) evt.getOrigin();
 		String inputValue = inputEvent.getValue();
@@ -625,16 +626,6 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		InputEvent inputEvent = (InputEvent) evt.getOrigin();
 		origin.setValue(inputEvent.getValue());
 		data.setObservation(origin.getText());
-	}
-
-	@Listen("onCompleteUsedMaterial = #productionOrderSupplyListbox, #productionOrderRawMaterialListbox")
-	public void doCompleteUsedMaterial(ForwardEvent evt) {
-		ProductionOrderMaterial data = (ProductionOrderMaterial) evt.getData();// obtenemos el objeto pasado por parametro
-		Button element = (Button) evt.getOrigin().getTarget();
-		Listcell listcell = (Listcell)element.getParent();
-		Doublebox doublebox = (Doublebox)listcell.getChildren().get(listcell.getChildren().size()-2);
-		doublebox.setValue(data.getQuantity().doubleValue());
-		data.setQuantityUsed(data.getQuantity());
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -749,11 +740,39 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 		Datebox element = (Datebox) evt.getOrigin().getTarget();// obtenemos el elemento web
 		Date value = element.getValue();
 		if(value != null) {
-			data.setDateFinishReal(value);
+			// verificamos que la fecha ingresada no sea de un dia posterior a la fecha planificada y tampoco anterior a la de inicio real
+			if(isDateFinishRealValid(data, value)) {
+				data.setDateFinishReal(value);
+			} else {
+				alert("No se puede seleccionar una fecha futura o previa al inicio real.");
+				element.setValue(data.getDateFinishReal());
+			}
 		} else {
 			// no se modifica 
 			element.setValue(data.getDateFinishReal());
 		}
+	}
+
+	private boolean isDateFinishRealValid(ProductionOrderDetail productionOrderDetail, Date dateFinishReal) {
+		if(dateFinishReal.before(productionOrderDetail.getDateStartReal())) {
+			return false;
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(productionOrderDetail.getDateFinish());// se usa la fecha planificada de fin
+		cal.set(Calendar.HOUR_OF_DAY, ProductionDateTimeHelper.getFirstHourOfDay());
+		cal.set(Calendar.MINUTE, ProductionDateTimeHelper.getFirstMinuteOfDay());
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		int nextDay = cal.get(Calendar.DAY_OF_YEAR) + 1;
+		if(nextDay > 365) {
+			nextDay = 1;
+		}
+		cal.set(Calendar.DAY_OF_YEAR, nextDay);
+		Date oneDayAfter = cal.getTime();
+		if(dateFinishReal.after(oneDayAfter)) {
+			return false;
+		}
+		return true;
 	}
 
 	private MaterialReserved getMaterialReserved(MaterialRequirement materialRequirement) {

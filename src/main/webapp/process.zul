@@ -33,14 +33,18 @@ THE SOFTWARE.
 		    <separator/>
 		    <listbox id="processTypeListbox">
 		        <listhead>
-		            <listheader label="${labels.sequence}" align="center" hflex="min"/>
+		            <listheader label="${labels.sequence}" align="center" hflex="min">
+		            	<button id="saveSequencesButton" label="${labels.save}"/>
+		            </listheader>
 		            <listheader label="${labels.name}" align="center" hflex="min"/>
 		            <listheader label="${labels.detail_plural}" align="center" hflex="max"/>
 		            <listheader label="${labels.machine_necessary}" align="center" hflex="max"/>
 		        </listhead>
 		        <template name="model">
 		            <listitem>
-		                <listcell label="${each.sequence}"/>
+		                <listcell>
+                            <spinner constraint="no empty, min 1" readonly="true" forward="onChanging=processTypeListbox.onProcessTypeSequenceChange(${each})" value="${each.sequence}" width="70px"/>
+                        </listcell>
 		                <listcell label="${each.name}"/>
 		                <listcell label="${empty each.details ? '' : each.details}"/>
 		                <listcell label="${empty each.machineType.name ? labels.none : each.machineType.name}"/>
@@ -71,7 +75,7 @@ THE SOFTWARE.
 			            </row>
 			            <row>
 			                <label>${labels.sequence}:</label>
-			                <intbox id="sequenceIntbox" hflex="1"/>
+			                <intbox id="sequenceIntbox" hflex="1" disabled="true"/>
 			            </row>
 			            <row>
 			                <label>${labels.machine_necessary}:</label>

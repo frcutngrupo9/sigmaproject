@@ -169,6 +169,13 @@ public class Order implements Serializable, Cloneable {
 	public void setNumberBill(String numberBill) {
 		this.numberBill = numberBill;
 	}
+	
+	public Date getDateDelivery() {
+		if(currentStateType.getName().equals("Entregado")) {
+			return getCurrentState().getDate();
+		}
+		return null;
+	}
 
 	public List<Product> getProductList() {
 		List<Product> productList = new ArrayList<Product>();

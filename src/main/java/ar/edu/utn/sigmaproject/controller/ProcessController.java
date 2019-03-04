@@ -24,13 +24,21 @@
 
 package ar.edu.utn.sigmaproject.controller;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.Duration;
+
 import org.zkoss.lang.Strings;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.event.ForwardEvent;
+import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -43,12 +51,17 @@ import org.zkoss.zul.Grid;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Paging;
+import org.zkoss.zul.Spinner;
 import org.zkoss.zul.Textbox;
 
 import ar.edu.utn.sigmaproject.domain.MachineType;
+import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.service.MachineTypeRepository;
+import ar.edu.utn.sigmaproject.service.ProcessRepository;
 import ar.edu.utn.sigmaproject.service.ProcessTypeRepository;
 import ar.edu.utn.sigmaproject.util.SortingPagingHelper;
 
@@ -86,20 +99,24 @@ public class ProcessController extends SelectorComposer<Component> {
 	Button resetButton;
 	@Wire
 	Button deleteButton;
+	@Wire
+	Button saveSequencesButton;
 
 	// services
 	@WireVariable
 	private ProcessTypeRepository processTypeRepository;
+	@WireVariable
+	private ProcessRepository processRepository;
 	@WireVariable
 	private MachineTypeRepository machineTypeRepository;
 
 	// attributes
 	private ProcessType currentProcessType;
 	private MachineType selectedMachineType;
-	private SortingPagingHelper<ProcessType> sortingPagingHelper;
 
 	// list
 	private List<MachineType> machineTypeList;
+	private List<ProcessType> processTypeList;
 
 	// list models
 	private ListModelList<MachineType> machineTypeListModel;
@@ -110,13 +127,11 @@ public class ProcessController extends SelectorComposer<Component> {
 		machineTypeList = machineTypeRepository.findAll();
 		machineTypeListModel = new ListModelList<>(machineTypeList);
 		machineTypeListbox.setModel(machineTypeListModel);
-		Map<Integer, String> sortProperties = new HashMap<>();
-		sortProperties.put(0, "sequence");
-		sortProperties.put(1, "name");
-		sortProperties.put(2, "machineType");
-		sortingPagingHelper = new SortingPagingHelper<>(processTypeRepository, processTypeListbox, searchButton, searchTextbox, pager, sortProperties);
+		processTypeList = processTypeRepository.findAll();
+		processTypeListbox.setModel(new ListModelList<>(processTypeList));
 		currentProcessType = null;
 		selectedMachineType = null;
+		saveSequencesButton.setDisabled(true);
 		refreshView();
 	}
 
@@ -134,92 +149,31 @@ public class ProcessController extends SelectorComposer<Component> {
 			return;
 		}
 		Integer sequence = sequenceIntbox.getValue();
-		boolean isOverlapped = false;
-		if(sequence == null || sequence <= 0) {
-			Clients.showNotification("Debe ingresar un nro de secuencia mayor a cero", sequenceIntbox);
-			return;
-		}
 		String name = nameTextbox.getText();
 		String details = detailsTextbox.getText();
 		MachineType machineType = selectedMachineType;
-		List<ProcessType> processTypelist = processTypeRepository.findAll();
 		if(currentProcessType == null) {
-			// nuevo
-			if(sequence > getLastSequence() + 1) {
-				sequence = getLastSequence() + 1;// no deja que se la secuencia sea mayor q el ultimo mas 1
-			}
 			currentProcessType = new ProcessType(sequence, name, details, machineType);
-			// si el nro de secuencia es igual a otro, se lo sustituye y se corren ese y las otras secuencias a continuacion
-			if(sequence>0 && sequence<=getLastSequence()) {
-				Clients.showNotification("El nro de secuencia es igual al de otro proceso, se sustituira el mismo y ordenaran las restantes");
-				isOverlapped = true;
-			}
 		} else {
-			// edicion
-			if(sequence > getLastSequence()) {// como se esta modificando la ultima secuencia es el maximo
-				sequence = getLastSequence();// no deja que se la secuencia sea mayor q el ultimo mas 1
-			}
-			if(sequence != currentProcessType.getSequence()) {// si el nro de secuencia se modifico
-				Clients.showNotification("El nro de secuencia es igual al de otro proceso, se sustituira el mismo y ordenaran las restantes");
-				isOverlapped = true;
-			}
+			// en lugar de modificar el objeto de la tabla, se lo resetea, esto es pq quizas fue modificado su secuencia en la tabla
+			currentProcessType = processTypeRepository.findOne(currentProcessType.getId());
 			currentProcessType.setName(name);
-			currentProcessType.setSequence(sequence);
+			currentProcessType.setDetails(details);
+			//currentProcessType.setSequence(sequence);
 			currentProcessType.setMachineType(machineType);
 		}
-		if(isOverlapped) {
-			refreshSequences(currentProcessType, processTypelist);
-		} else {
-			processTypeRepository.save(currentProcessType);
-		}
-		sortingPagingHelper.reset();
+		processTypeRepository.save(currentProcessType);
 		currentProcessType = null;
+		processTypeList = processTypeRepository.findAll();
 		refreshView();
 	}
 
-	private void refreshSequences(ProcessType processToMove, List<ProcessType> processTypelist) {
-		if(processToMove.getId() != null) {// si es una edicion
-			processTypelist.remove(getProcessIndex(processToMove, processTypelist));
-		}
-		int newIndex = processToMove.getSequence() - 1;
-		processTypelist.add(newIndex, processToMove);
-		updateAllSequences(processTypelist);
-	}
-
-	private void updateAllSequences(List<ProcessType> processTypelist) {
-		for(int i = 0; i < processTypelist.size(); i++) {
-			ProcessType each = processTypelist.get(i);
+	private void resetSequences() {
+		for(int i = 0; i < processTypeList.size(); i++) {
+			ProcessType each = processTypeList.get(i);
 			each.setSequence(i + 1);
-			processTypeRepository.save(each);
 		}
-	}
-
-	private int getProcessIndex(ProcessType processType, List<ProcessType> processTypelist) {
-		for(int i = 0; i < processTypelist.size(); i++) {
-			ProcessType each = processTypelist.get(i);
-			if(each.getId() == processType.getId()) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	private void arrangeSequence(int oldSequence, int newSequence, List<ProcessType> processTypelist) {
-		if(oldSequence > newSequence) {
-			for(int i = newSequence-1; i < oldSequence; i++) {
-				ProcessType each = processTypelist.get(i);
-				each.setSequence(each.getSequence() + 1);
-				processTypeRepository.save(each);
-			}
-		} else if (oldSequence == newSequence) {
-			return;
-		} else if (oldSequence < newSequence) {
-			for(int i = oldSequence; i < newSequence-1; i++) {
-				ProcessType each = processTypelist.get(i);
-				each.setSequence(each.getSequence() - 1);
-				processTypeRepository.save(each);
-			}
-		}
+		processTypeList = processTypeRepository.save(processTypeList);
 	}
 
 	@Listen("onClick = #cancelButton")
@@ -235,9 +189,14 @@ public class ProcessController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #deleteButton")
 	public void deleteButtonClick() {
+		// verificamos que el proceso no este utilizado
+		if(processRepository.findByType(currentProcessType).isEmpty() == false) {
+			Messagebox.show("No se puede eliminar, el proceso se encuentra asignado a 1 o mas piezas.", "Informacion", Messagebox.OK, Messagebox.ERROR);
+			return;
+		}
 		processTypeRepository.delete(currentProcessType);
-		updateAllSequences(processTypeRepository.findAll());
-		sortingPagingHelper.reset();
+		processTypeList = processTypeRepository.findAll();
+		resetSequences();
 		currentProcessType = null;
 		refreshView();
 	}
@@ -245,10 +204,14 @@ public class ProcessController extends SelectorComposer<Component> {
 	@Listen("onSelect = #processTypeListbox")
 	public void doListBoxSelect() {
 		if(processTypeListbox.getSelectedItem() == null) {
-			//just in case for the no selection
 			currentProcessType = null;
 		} else {
 			if(currentProcessType == null) {// si no hay nada editandose
+				// en caso de que se hayan editado las secuencias se resetea la lista
+				if(saveSequencesButton.isDisabled() == false) {
+					processTypeList = processTypeRepository.findAll();
+					saveSequencesButton.setDisabled(true);
+				}
 				currentProcessType = processTypeListbox.getSelectedItem().getValue();
 				refreshView();
 			}
@@ -258,7 +221,9 @@ public class ProcessController extends SelectorComposer<Component> {
 
 	private void refreshView() {
 		processTypeListbox.clearSelection();
-		sortingPagingHelper.reset();// se actualiza la lista
+		processTypeList = sortProcessTypeListBySequence(processTypeList);
+		processTypeListbox.setModel(new ListModelList<>(processTypeList));
+		//sortingPagingHelper.reset();// se actualiza la lista
 		saveButton.setDisabled(false);
 		cancelButton.setDisabled(false);
 		newButton.setDisabled(false);
@@ -275,7 +240,7 @@ public class ProcessController extends SelectorComposer<Component> {
 		} else {// editando
 			processTypeGrid.setVisible(true);
 			nameTextbox.setValue(currentProcessType.getName());
-			sequenceIntbox.setValue(currentProcessType.getSequence());
+			sequenceIntbox.setValue(processTypeRepository.findOne(currentProcessType.getId()).getSequence());// se busca la secuencia de la bd
 			selectedMachineType = currentProcessType.getMachineType();
 			machineTypeBandbox.setValue(getMachineTypeName(selectedMachineType));
 			deleteButton.setDisabled(false);
@@ -311,5 +276,69 @@ public class ProcessController extends SelectorComposer<Component> {
 			machineTypeBandbox.setValue(getMachineTypeName(selectedMachineType));
 		}
 		machineTypeListbox.clearSelection();
+	}
+	
+	@Listen("onProcessTypeSequenceChange = #processTypeListbox")
+	public void doProcessTypeSequenceChange(ForwardEvent evt) {
+		saveSequencesButton.setDisabled(false);
+		ProcessType data = (ProcessType) evt.getData();// obtenemos el objeto pasado por parametro
+		Spinner origin = (Spinner) evt.getOrigin().getTarget();
+		InputEvent inputEvent = (InputEvent) evt.getOrigin();
+		int oldValue = data.getSequence();
+		if(inputEvent.getValue().compareTo("") != 0) {
+			int spinnerValue = Integer.valueOf(inputEvent.getValue());
+			if(oldValue == getLastSequence()) {
+				if(spinnerValue > oldValue) {
+					// si es el ultimo valor y se lo quiere aumentar, se lo impide
+					origin.setValue(oldValue);
+					processTypeListbox.setModel(new ListModelList<>(processTypeList));
+					return;
+				}
+			}
+			origin.setValue(spinnerValue);
+			// cambiamos el proceso que tiene la secuencia seleccionada y le asignamos esa secuencia al actual
+			ProcessType processTypeToChange = findProcessType(spinnerValue);
+			if(spinnerValue > oldValue) {// si se aumeta el valor
+				processTypeToChange.setSequence(processTypeToChange.getSequence() - 1);
+			} else {// si disminuye
+				processTypeToChange.setSequence(processTypeToChange.getSequence() + 1);
+			}
+			data.setSequence(spinnerValue);
+			processTypeList = sortProcessTypeListBySequence(processTypeList);
+			processTypeListbox.setModel(new ListModelList<>(processTypeList));
+			// si se estaba editando algo se cancela
+			if(processTypeGrid.isVisible() == true) {
+				currentProcessType = null;
+				processTypeGrid.setVisible(false);
+			}
+		}
+	}
+	
+	private ProcessType findProcessType(int sequence) {
+		// devuelve el ProcessType que contenga el nro de secuencia
+		for(ProcessType each : processTypeList) {
+			if(each.getSequence() == sequence) {
+				return each;
+			}
+		}
+		return null;
+	}
+	
+	public List<ProcessType> sortProcessTypeListBySequence(List<ProcessType> list) {
+		Comparator<ProcessType> comp = new Comparator<ProcessType>() {
+			@Override
+			public int compare(ProcessType a, ProcessType b) {
+				return a.getSequence().compareTo(b.getSequence());
+			}
+		};
+		Collections.sort(list, comp);
+		return list;
+	}
+	
+	@Listen("onClick = #saveSequencesButton")
+	public void saveSequencesButtonClick() {
+		// guarda los cambios a las secuencias
+		processTypeRepository.save(processTypeList);
+		saveSequencesButton.setDisabled(true);
 	}
 }

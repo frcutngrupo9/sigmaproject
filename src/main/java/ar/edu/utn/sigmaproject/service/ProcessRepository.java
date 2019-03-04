@@ -24,13 +24,16 @@
 
 package ar.edu.utn.sigmaproject.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
-import ar.edu.utn.sigmaproject.domain.SupplyType;
+import ar.edu.utn.sigmaproject.domain.Process;
+import ar.edu.utn.sigmaproject.domain.ProcessType;
 
 @Repository
-public interface SupplyTypeRepository extends SearchableRepository<SupplyType, Long> {
-
-	public SupplyType findFirstByDescription(String string);
+public interface ProcessRepository extends SearchableRepository<Process, Long> {
 	
+	public List<Process> findByType(ProcessType type);
+
 }

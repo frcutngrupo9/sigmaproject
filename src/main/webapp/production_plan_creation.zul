@@ -101,7 +101,7 @@ THE SOFTWARE.
     			<separator/>
     			<listbox id="productTotalListbox" mold="paging" pageSize="7" visible="true" sizedByContent="true" span="true">
     				<auxhead>
-						<auxheader label="${labels.product_plural}" colspan="5"/>
+						<auxheader label="${labels.product_plural}" colspan="6"/>
 					</auxhead>
         			<listhead>
         				<listheader label="${labels.image}" align="center"/>
@@ -109,6 +109,7 @@ THE SOFTWARE.
             			<listheader label="${labels.product}" align="center"/>
             			<listheader label="${labels.detail_plural}" align="center"/>
             			<listheader label="${labels.quantity}" align="center"/>
+            			<listheader label="${labels.duration}" align="center"/>
         			</listhead>
         			<template name="model">
             			<listitem>
@@ -121,6 +122,7 @@ THE SOFTWARE.
                 			<listcell label="${each.getProduct().getName()}"/>
                 			<listcell label="${each.getProduct().getDetails()}"/>
                 			<listcell label="${each.getTotalUnits()}"/>
+                			<listcell label="${r:getFormattedProcessTime(each.getTotalDuration())}"/>
             			</listitem>
         			</template>
     			</listbox>

@@ -24,6 +24,8 @@
 
 package ar.edu.utn.sigmaproject.domain;
 
+import javax.xml.datatype.Duration;
+
 public class ProductTotal {
 	// clase con el objetivo de guardar el total de unidades de cada producto de un conjunto de pedidos
 	// que integran un plan de produccion
@@ -51,5 +53,11 @@ public class ProductTotal {
 
 	public void setTotalUnits(Integer totalUnits) {
 		this.totalUnits = totalUnits;
+	}
+
+	public Duration getTotalDuration() {
+		Duration duration = product.getDurationTotal();
+		Duration durationTotal = duration.multiply(totalUnits);
+		return durationTotal;
 	}
 }
