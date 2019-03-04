@@ -274,7 +274,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		ProductionPlan productionPlan = new ProductionPlan(productionPlanName);
 		for(ProductionPlanDetail each : productionPlanDetailList) {
 			// se agregan todas las referencias hacia el nuevo plan
-			each.setProductionPlan(currentProductionPlan);
+			each.setProductionPlan(productionPlan);
 		}
 		productionPlan.getPlanDetails().addAll(productionPlanDetailList);
 		ProductionPlanState productionPlanState = new ProductionPlanState(productionPlanStateType, new Date());
