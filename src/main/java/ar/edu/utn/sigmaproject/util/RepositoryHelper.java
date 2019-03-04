@@ -55,6 +55,7 @@ import ar.edu.utn.sigmaproject.domain.Process;
 import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductCategory;
+import ar.edu.utn.sigmaproject.domain.ProductMaterial;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderStateType;
 import ar.edu.utn.sigmaproject.domain.ProductionPlanStateType;
 import ar.edu.utn.sigmaproject.domain.Settings;
@@ -144,18 +145,53 @@ public class RepositoryHelper {
 	@Autowired
 	private EntityManager entityManager;
 
-	private List<String> namesUserType = Arrays.asList("Admin", "Gerente General", "Jefe de Ventas", "Jefe de Produccion", "Encargado de Ventas", "Encargado de Compras", "Jefe de Personal");
+	private List<String> productLaptopShelf = Arrays.asList("1", "Estante Laptop 20cm Altura", "Medidas: Ancho: 35cm - Profundidad: 25cm - Alto: 20cm", "Estante", "300", "200");
+	private List<List<String>> namesPiecesLaptopShelf = Arrays.asList(
+			Arrays.asList("2", "Tapa", "18", "45", "340"),
+			Arrays.asList("2", "Taco Tapa", "18", "45", "210"),
+			Arrays.asList("2", "Travesa\u00f1o Frontal", "18", "45", "270"),
+			Arrays.asList("4", "Travesa\u00f1o Lateral", "18", "45", "210"),
+			Arrays.asList("4", "Pata", "18", "45", "180"),
+			Arrays.asList("2", "Ensamble Tapa", "", "", ""),
+			Arrays.asList("1", "Ensamble Travesa\u00f1os y Patas", "", "", "")
+			);
+	private List<List<String>> namesSuppliesLaptopShelf = Arrays.asList(
+			Arrays.asList("Tornillo 4x2 1/2 cabeza avellanada punta s bicromatado", "8"),
+			Arrays.asList("Tornillo 4x1 1/4 cabeza avellanada punta s bicromatado", "20"),
+			Arrays.asList("Papel de lija para madera granos 100", "0.25")
+			);
+	private List<String> productCubeSeat = Arrays.asList("2", "Cubo Asiento 40x40", "Medidas: Ancho: 40cm - Profundidad: 40cm - Alto: 40cm", "Banco", "500", "100");
+	private List<List<String>> namesPiecesCubeSeat= Arrays.asList(
+			Arrays.asList("1", "Tapa Superior", "18", "400", "400"),
+			Arrays.asList("2", "Taco Tapa Superior", "18", "45", "320"),
+			Arrays.asList("2", "Tapa Frontal y Posterior", "18", "365", "320"),
+			Arrays.asList("2", "Tapa Lateral", "18", "400", "320"),
+			Arrays.asList("4", "Taco Vertical", "18", "45", "300"),
+			Arrays.asList("2", "Taco Horizontal", "18", "45", "360"),
+			Arrays.asList("1", "Ensamble Tapa Superior", "", "", ""),
+			Arrays.asList("1", "Ensamble Tapas Inferiores", "", "", ""),
+			Arrays.asList("1", "Agregado Ruedas", "", "", "")
+			);
+	private List<List<String>> namesSuppliesCubeSeat = Arrays.asList(
+			Arrays.asList("Tornillo 4x1 1/4 cabeza avellanada punta s bicromatado", "64"),
+			Arrays.asList("Papel de lija para madera granos 100", "1"),
+			Arrays.asList("Rueda d50 pvc", "4")
+			);
+	private List<List<String>> namesProcesses = Arrays.asList(
+			Arrays.asList("Trazado", "0", "1", "30", "Control"),
+			Arrays.asList("Cortado", "0", "2", "0", "Operario"),
+			Arrays.asList("Lijado", "0", "1", "45", "General"),
+			Arrays.asList("Taladrado", "0", "3", "0", "General")
+			);
+	private List<List<String>> namesProcessesGroup = Arrays.asList(
+			Arrays.asList("Atornillado", "0", "30", "0", "Operario")
+			);
+
+	private List<String> namesUserType = Arrays.asList("Admin", "Gerente General", "Jefe de Produccion", "Encargado de Ventas", "Encargado de Compras", "Jefe de Personal");
 	private List<String> namesProductionPlanStateType = Arrays.asList("Registrado", "Parcialmente Abastecido", "Abastecido", "Lanzado", "En Ejecucion", "Finalizado", "Cancelado");
 	private List<String> namesProductionOrderStateType = Arrays.asList("Registrada", "Preparada", "Iniciada", "Finalizada", "Cancelada");
 	private List<String> namesOrderStateType = Arrays.asList("Creado", "Cancelado", "Planificado", "En Produccion", "Finalizado", "Entregado");
-	private List<String> namesProductCategory = Arrays.asList("Banco", "Biblioteca", "Cajonera", "Cama", "Mesa", "Silla");
-	private List<List<String>> namesDetailsMachineType = Arrays.asList(
-			Arrays.asList("Escuadradora", "Utilizado para dar largo y ancho de la madera."),
-			Arrays.asList("Sierra sin fin", "Utilizado para realizar los cortes curvos."),
-			Arrays.asList("Cepilladora", "Utilizado para dar el grosor a la cara de la madera."),
-			Arrays.asList("Tupi", "Utilizado para realizar fresado, canales y espigas a la madera."),
-			Arrays.asList("Lijadora", "Utilizado para lijar la superficie de la madera.")
-			);
+	private List<String> namesProductCategory = Arrays.asList("Banco", "Biblioteca", "Cajonera", "Cama", "Estante", "Mesa", "Silla");
 	private List<List<String>> namesDetailsWoodType = Arrays.asList(
 			Arrays.asList("Pino", "Semi-pesada, semi-dura."),
 			Arrays.asList("Caoba", "Tradicional y compacta."),
@@ -168,13 +204,37 @@ public class RepositoryHelper {
 			Arrays.asList("Control", "120")
 			);
 	private List<List<String>> namesSupplyType = Arrays.asList(
-			Arrays.asList("1", "Lija al Agua", "Lijado fino prelustrado", "Szumik", "", "Unidad", "200", "10", "20", "11"),
-			Arrays.asList("2", "Adhesivo Vinilico", "Encolado de piezas para su union", "Lencisa", "Envase", "5 Kg", "200", "10", "20", "316"),
-			Arrays.asList("3", "Pintura Asfáltica", "Lustrado de muebles", "Szumik", "Lata", "18Lts", "200", "10", "20", "1200"),
-			Arrays.asList("4", "Bulon Camero", "Di\u00e1metro 8 mm - Largo 110 mm", "", "", "", "200", "10", "20", "9"),
-			Arrays.asList("5", "Tuerca", "", "", "", "", "200", "10", "20", "1.5"),
-			Arrays.asList("6", "Arandela", "", "", "", "", "200", "10", "20", "1.15"),
-			Arrays.asList("7", "Clavo", "", "", "", "", "800", "10", "20", "1")
+			Arrays.asList("1", "Tornillo 4x2 1/2 cabeza avellanada punta s bicromatado", "Uni\u00f3n de maderas entre s\u00ed", "", "", "Unidad", "200", "10", "20", "3.35"),
+			Arrays.asList("2", "Tornillo 4x1 1/4 cabeza avellanada punta s bicromatado", "Uni\u00f3n de maderas entre s\u00ed", "", "", "Unidad", "200", "10", "20", "1.30"),
+			Arrays.asList("3", "Papel de lija para madera granos 150", "Perfeccionar la superficie", "", "", "Unidad", "200", "10", "20", "28"),
+			Arrays.asList("4", "Papel de lija para madera granos 100", "Perfeccionar la superficie", "", "", "Unidad", "200", "10", "20", "28"),
+			Arrays.asList("5", "Papel de lija para madera granos 60", "Perfeccionar la superficie", "", "", "Unidad", "200", "10", "20", "28"),
+			Arrays.asList("6", "Rueda d50 pvc", "", "", "", "Unidad", "20", "10", "20", "145")
+			//Arrays.asList("7", "Adhesivo Vinilico", "Uni\u00f3n de maderas entre s\u00ed", "Lencisa", "Envase", "5 Kg", "200", "10", "20", "316"),
+			//Arrays.asList("8", "Pintura Asfaltica", "Lustrar la superficie", "Szumik", "Lata", "18Lts", "200", "10", "20", "1200")
+			);
+	private List<List<String>> namesDetailsMachineType = Arrays.asList(
+			Arrays.asList("Escuadradora", "Utilizado para dar largo y ancho de la madera."),
+			Arrays.asList("Sierra sin fin", "Utilizado para realizar los cortes curvos."),
+			Arrays.asList("Cepilladora", "Utilizado para dar el grosor a la cara de la madera."),
+			Arrays.asList("Tupi", "Utilizado para realizar fresado, canales y espigas a la madera."),
+			Arrays.asList("Taladro de Banco", "Utilizado para realizar las perforaciones donde luego iran los tornillos."),
+			Arrays.asList("Sierra Caladora", "Utilizada para realizar el calado de la madera."),
+			Arrays.asList("Lijadora", "Utilizado para lijar la superficie de la madera.")
+			);
+	private List<List<String>> namesProcessType = Arrays.asList(
+			Arrays.asList("1", "Trazado", "Trazar maderas para el posterior cortado.", ""),
+			Arrays.asList("2", "Cortado", "Cortar maderas en las medidas trazadas.", "Escuadradora"),
+			Arrays.asList("3", "Cortado Curvo", "", "Sierra sin fin"),
+			Arrays.asList("4", "Calado", "", "Sierra Caladora"),
+			Arrays.asList("5", "Cepillado", "", "Cepilladora"),
+			Arrays.asList("6", "Espigado", "", "Tupi"),
+			Arrays.asList("7", "Acanalado", "", "Tupi"),
+			Arrays.asList("8", "Taladrado", "", "Taladro de Banco"),
+			Arrays.asList("9", "Lijado", "", "Lijadora"),
+			Arrays.asList("10", "Clavado", "Unir diferentes piezas con clavos.", ""),
+			Arrays.asList("11", "Atornillado", "Unir diferentes piezas con tornillos.", ""),
+			Arrays.asList("12", "Encolado", "Unir diferentes piezas con cola para maderas.", "")
 			);
 	private List<List<String>> namesWorker = Arrays.asList(
 			Arrays.asList("EMPLEADO 1", "22/5/2008"),
@@ -192,27 +252,6 @@ public class RepositoryHelper {
 			Arrays.asList("CLIENTE 4", "03514704414", "EMAIL4@MAILSERVER.COM", "DIRECCION 4", "DETALLES 4"),
 			Arrays.asList("CLIENTE 5", "03514704415", "EMAIL5@MAILSERVER.COM", "DIRECCION 5", "DETALLES 5")
 			);
-	private List<List<String>> namesProduct = Arrays.asList(
-			Arrays.asList("1", "C\u00f3moda 4 Cajones 1 Puerta", "Medidas: Ancho: 105cm - Profundidad: 45cm – Alto: 100cm", "Cajonera", "2300", "15"),
-			Arrays.asList("2", "Cama 1 Plaza", "Medidas: Ancho: 90cm - Profundidad: 200cm – Alto: 36cm", "Cama", "940","20"),
-			Arrays.asList("3", "Biblioteca 4 Estantes", "Medidas: Ancho: 100cm - Profundidad: 25cm – Alto: 175cm", "Biblioteca", "1100", "10"),
-			Arrays.asList("4", "Mesa Maciza Pata Recta", "Medidas: Ancho: 140cm - Profundidad: 80cm – Alto: 80cm", "Mesa", "1250", "15"),
-			Arrays.asList("5", "Silla", "Medidas: Ancho: 40cm - Profundidad: 38cm – Alto: 95cm", "Silla", "250", "150"),
-			Arrays.asList("6", "Mesa De Luz 1 Caj\u00f3n", "Medidas: Ancho: 49cm - Profundidad: 41cm – Alto: 63cm", "Mesa", "915", "40"),
-			Arrays.asList("7", "Banco Mediano", "Medidas: Ancho: 30cm - Profundidad: 30cm – Alto: 60cm", "Banco", "320", "100"),
-			Arrays.asList("8", "Cubo Asiento", "Medidas: Ancho: 40cm - Profundidad: 40cm – Alto: 40cm", "Banco", "500", "100")
-			);
-	private List<List<String>> namesProcessType = Arrays.asList(
-			Arrays.asList("1", "Trazado de Madera", "Trazar maderas para el posterior cortado.", ""),
-			Arrays.asList("2", "Cortado de Madera", "Cortar maderas en las medidas trazadas.", "Escuadradora"),
-			Arrays.asList("3", "Cortado Curvo", "", "Sierra sin fin"),
-			Arrays.asList("4", "Lijado", "", "Lijadora"),
-			Arrays.asList("5", "Cepillado", "", "Cepilladora"),
-			Arrays.asList("6", "Espigado", "", "Tupi"),
-			Arrays.asList("7", "Hacer Molduras", "", "Tupi"),
-			Arrays.asList("8", "Acanalado", "", "Tupi"),
-			Arrays.asList("9", "Ensamblado", "Unir diferentes piezas con tornillos, engrapado, pegamento, clavos, etc.", "")
-			);
 
 	@PostConstruct
 	public void afterConstruct() throws InterruptedException {
@@ -229,6 +268,7 @@ public class RepositoryHelper {
 		generateMachine();
 		generateSettings();
 		generateUserType();
+		generateProductCategory();
 		generateProduct();
 		hibernateSearchReIndex();
 	}
@@ -345,20 +385,6 @@ public class RepositoryHelper {
 		}
 	}
 
-	private void generateProduct() {
-		if (productRepository.count() == 0) {
-			generateProductCategory();
-			List<Product> list = new ArrayList<>();
-			for(List<String> each : namesProduct) {
-				Product product = new Product(each.get(0), each.get(1), each.get(2), productCategoryRepository.findFirstByName(each.get(3)), new BigDecimal(each.get(4)));
-				product.setStockMax(Integer.parseInt(each.get(5)));
-				list.add(product);
-			}
-			productRepository.save(list);
-			generateProductComplete();
-		}
-	}
-
 	private void generateWorker() {
 		if(workerRepository.count() == 0) {
 			List<Worker> list = new ArrayList<>();
@@ -444,7 +470,6 @@ public class RepositoryHelper {
 
 	private void generateWood() {
 		if (woodRepository.count() == 0) {
-			List<Wood> list = new ArrayList<>();
 			generateWoodType();
 			WoodType woodType = woodTypeRepository.findFirstByName("Pino");
 			generateMeasureUnitTypeList();
@@ -465,19 +490,36 @@ public class RepositoryHelper {
 					Arrays.asList("4", "4")
 					);
 			List<String> listWidth = Arrays.asList("2.40", "3.00", "3.60", "4.20");
+			List<Wood> list = new ArrayList<>();
 			for (List<String> each : listLengthAndDepth) {
 				String length = each.get(0);
 				String depth = each.get(1);
 				for (String width : listWidth) {
-					BigDecimal price = getWoodPrice(new BigDecimal(length), pulgadas, new BigDecimal(depth), pulgadas, new BigDecimal(width), metros, woodType);
-					list.add(new Wood("Tabla " + length + "x" + depth + " x " + width + "mts", new BigDecimal(length), pulgadas, new BigDecimal(depth), pulgadas, new BigDecimal(width), metros, woodType, new BigDecimal("50"), new BigDecimal("10"), new BigDecimal("20"), price));
+					BigDecimal price = getWoodPrice(true, new BigDecimal(length), pulgadas, new BigDecimal(depth), pulgadas, new BigDecimal(width), metros, woodType);
+					list.add(new Wood("Tabla " + length + "x" + depth + " x " + width + " mts", new BigDecimal(length), pulgadas, new BigDecimal(depth), pulgadas, new BigDecimal(width), metros, woodType, new BigDecimal("50"), new BigDecimal("10"), new BigDecimal("20"), price));
+				}
+			}
+			// los tableros de los mismos largos pero  ancho 1200mm, espesor 12mm, 18mm o 25mm 
+			MeasureUnit milimetros = measureUnitRepository.findFirstByName("Milimetros");
+			listLengthAndDepth = Arrays.asList(
+					Arrays.asList("12", "1200"),
+					Arrays.asList("18", "1200"),
+					Arrays.asList("25", "1200")
+					);
+			listWidth = Arrays.asList("2400", "3000", "3600", "4200");
+			for (List<String> each : listLengthAndDepth) {
+				String length = each.get(0);
+				String depth = each.get(1);
+				for (String width : listWidth) {
+					BigDecimal price = getWoodPrice(false, new BigDecimal(length), milimetros, new BigDecimal(depth), milimetros, new BigDecimal(width), milimetros, woodType);
+					list.add(new Wood("Tablero " + length + "x" + depth + "x" + width + " mm", new BigDecimal(length), milimetros, new BigDecimal(depth), milimetros, new BigDecimal(width), milimetros, woodType, new BigDecimal("50"), new BigDecimal("10"), new BigDecimal("20"), price));
 				}
 			}
 			woodRepository.save(list);
 		}
 	}
 
-	private BigDecimal getWoodPrice(BigDecimal length, MeasureUnit lengthMeasureUnit, BigDecimal depth, MeasureUnit depthMeasureUnit, BigDecimal width, MeasureUnit widthMeasureUnit, WoodType woodType) {
+	private BigDecimal getWoodPrice(boolean isTable, BigDecimal length, MeasureUnit lengthMeasureUnit, BigDecimal depth, MeasureUnit depthMeasureUnit, BigDecimal width, MeasureUnit widthMeasureUnit, WoodType woodType) {
 		// calcula los metros cubicos y el valor
 		BigDecimal lengthMeters = convertToMeters(length, lengthMeasureUnit);
 		BigDecimal depthMeters = convertToMeters(depth, depthMeasureUnit);
@@ -485,7 +527,11 @@ public class RepositoryHelper {
 		BigDecimal cubicMeters = lengthMeters.multiply(depthMeters).multiply(widthMeters);
 		String price = "0";
 		if(woodType.getName().equalsIgnoreCase("Pino")) {
-			price = "17000";
+			if(isTable) {
+				price = "17000";
+			} else {
+				price = "28000";
+			}
 		}
 		BigDecimal cubicMeterPrice = new BigDecimal(price);
 		return cubicMeters.multiply(cubicMeterPrice);
@@ -527,118 +573,89 @@ public class RepositoryHelper {
 		fullTextEntityManager.createIndexer().startAndWait();
 	}
 
-	private void generateProductComplete() {
-		Product product = null;
-		List<Piece> listPiece = new ArrayList<>();
-		product = new Product("8", "Cubo Asiento", "Medidas: Ancho: 40cm - Profundidad: 40cm – Alto: 40cm", productCategoryRepository.findFirstByName("Banco"), new BigDecimal("300"));
-		product.setStockMax(200);
-		
-
-		for(String each : namesPieces) {
-			listPiece.add(createPieceComplete(each, product));
+	private void generateProduct() {
+		if (productRepository.count() == 0) {
+			List<Product> list = new ArrayList<>();
+			list.add(generateProductWithStructure(productLaptopShelf, namesPiecesLaptopShelf, namesSuppliesLaptopShelf));
+			list.add(generateProductWithStructure(productCubeSeat, namesPiecesCubeSeat, namesSuppliesCubeSeat));
+			productRepository.save(list);
 		}
-		product.getPieces().addAll(listPiece);
-		productRepository.save(product);
 	}
 
-	private Piece createPieceComplete(Product product, String unitsPiece, String namePiece, String length, String width, String depth) {
+	private Product generateProductWithStructure(List<String> productNames, List<List<String>> pieceNames, List<List<String>> supplyNames) {
+		Product product = null;
+		product = new Product(productNames.get(0), productNames.get(1), productNames.get(2), productCategoryRepository.findFirstByName(productNames.get(3)), new BigDecimal(productNames.get(4)));
+		product.setStockMax(Integer.parseInt(productNames.get(5)));
+		List<Piece> listPiece = new ArrayList<>();
+		for(List<String> each : pieceNames) {
+			listPiece.add(createPieceWithProcesses(product, each.get(0), each.get(1), each.get(2), each.get(3), each.get(4)));
+		}
+		product.getPieces().addAll(listPiece);
+		List<ProductMaterial> listProductMaterial = new ArrayList<>();
+		for(List<String> each : supplyNames) {
+			listProductMaterial.add(new ProductMaterial(product, supplyTypeRepository.findFirstByDescription(each.get(0)), new BigDecimal(each.get(1))));
+		}
+		product.getMaterials().addAll(listProductMaterial);
+		return product;
+	}
+
+	private Piece createPieceWithProcesses(Product product, String unitsPiece, String namePiece, String length, String depth, String width) {
 		boolean isGroup = false;
-		if(length.equals("0") && width.equals("0") && depth.equals("0")) {
+		if(length.isEmpty() && width.isEmpty() && depth.isEmpty()) {
 			isGroup = true;
 		}
 		int units = Integer.parseInt(unitsPiece);
-		MeasureUnit centimeter = measureUnitRepository.findFirstByName("Centimetros");
-		Piece piece = new Piece(product, namePiece.toUpperCase(), new BigDecimal(length), centimeter, new BigDecimal(depth), centimeter, new BigDecimal(width), centimeter, "", isGroup, units);
+		MeasureUnit milimeter = measureUnitRepository.findFirstByName("Milimetros");
+		if(isGroup) {
+			length ="0";
+			depth ="0";
+			width ="0";
+		}
+		Piece piece = new Piece(product, namePiece.toUpperCase(), new BigDecimal(length), milimeter, new BigDecimal(depth), milimeter, new BigDecimal(width), milimeter, "", isGroup, units);
 		List<Process> listProcess = new ArrayList<>();
 		List<ProcessType> processTypeList = processTypeRepository.findAll();
 		List<WorkHour>workHourList = workHourRepository.findAll();
-		for(Integer each : randomNotDuplicates(processTypeList.size())) {
-			ProcessType randomProcessType = processTypeList.get(each);
-			WorkHour randomWorkHour = workHourList.get(new Random().nextInt(workHourList.size()));
-			int hours = 0;
-			int minutes = new Random().nextInt(15)+1;
-			int seconds = new Random().nextInt(59)+1;
-			// la suma de la duracion no puede ser cero
-			while(hours+minutes+seconds==0) {
-				// se vuelven a generar
-				hours = 0;
-				minutes = new Random().nextInt(59)+1;
-				seconds = new Random().nextInt(59)+1;
+		if(isGroup) {
+			for(List<String> each : namesProcessesGroup) {
+				listProcess.add(createProcess(piece, findProcessType(each.get(0), processTypeList), each.get(1), each.get(2), each.get(3), findWorkHour(each.get(4), workHourList)));
 			}
-			listProcess.add(createProcess(piece, randomProcessType, hours, minutes , seconds, randomWorkHour));
+		} else {
+			for(List<String> each : namesProcesses) {
+				listProcess.add(createProcess(piece, findProcessType(each.get(0), processTypeList), each.get(1), each.get(2), each.get(3), findWorkHour(each.get(4), workHourList)));
+			}
 		}
 		piece.getProcesses().addAll(listProcess);
 		return piece;
 	}
 
-	private List<Integer> randomNotDuplicates(int maxSize) {// necesario para los numeros de procesos, una pieza no puede tener procesos repetidos
-		// devuelve una lista sin duplicados y de cantidad menor a la maxima
-		int howMany = new Random().nextInt(maxSize-1)+1;// no puede ser cero
-		List<Integer> list = new ArrayList<>();
-		for (int i = 0; i < howMany; i++) {
-			Integer add = new Random().nextInt(maxSize);
-			while (list.contains(add)) {
-				add = new Random().nextInt(maxSize); //si existe duplicado se genera nuevamente
+	private ProcessType findProcessType(String name, List<ProcessType> processTypeList) {
+		for(ProcessType each : processTypeList) {
+			if(name.compareToIgnoreCase(each.getName()) == 0) {
+				return each;
 			}
-			//al llegar aca no sera duplicado
-			list.add(add);
 		}
-		return list;
+		return null;
 	}
 
-	private Process createProcess(Piece piece, ProcessType processType, int hours, int minutes, int seconds, WorkHour workHour) {
+	private WorkHour findWorkHour(String name, List<WorkHour> workHourList) {
+		for(WorkHour each : workHourList) {
+			if(name.compareToIgnoreCase(each.getRole()) == 0) {
+				return each;
+			}
+		}
+		return null;
+	}
+
+	private Process createProcess(Piece piece, ProcessType processType, String hours, String minutes, String seconds, WorkHour workHour) {
 		Duration duration = null;
 		try {
-			duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, 0, hours, minutes, seconds);
+			duration = DatatypeFactory.newInstance().newDuration(true, 0, 0, 0, Integer.parseInt(hours), Integer.parseInt(minutes), Integer.parseInt(seconds));
 		} catch (DatatypeConfigurationException e) {
 			System.out.println("Error en convertir a duracion: " + e.toString());
 		}
 		return new Process(piece, processType, "", duration, workHour);
 	}
 }
-
-/*
- * list.add(new ProcessType(1, "Trazado de Madera", "Trazar maderas para el posterior cortado.", null));
-			list.add(new ProcessType(2, "Cortado de Madera", "Cortar maderas en las medidas trazadas.", machineTypeRepository.findFirstByName("Escuadradora")));
-			list.add(new ProcessType(3, "Cortado Curvo", machineTypeRepository.findFirstByName("Sierra sin fin")));
-			list.add(new ProcessType(4, "Lijado", machineTypeRepository.findFirstByName("Lijadora")));
-			list.add(new ProcessType(5, "Cepillado", machineTypeRepository.findFirstByName("Cepilladora")));
-			list.add(new ProcessType(6, "Espigado", machineTypeRepository.findFirstByName("Tupi")));
-			list.add(new ProcessType(7, "Hacer Molduras", machineTypeRepository.findFirstByName("Tupi")));
-			list.add(new ProcessType(8, "Acanalado", machineTypeRepository.findFirstByName("Tupi")));
-			list.add(new ProcessType(9, "Ensamblado", "Unir diferentes piezas con tornillos, engrapado, pegamento, clavos, etc.", null));
-
-			list.add(new WorkHour("Operario", new BigDecimal("180")));
-			list.add(new WorkHour("General", new BigDecimal("145")));
-			list.add(new WorkHour("Control", new BigDecimal("120")));
-
-			piece = new Piece(product, "lateral derecho".toUpperCase(), BigDecimal.ZERO, null, BigDecimal.ZERO, null, BigDecimal.ZERO, null, "", false, 1);
-		listProcess = new ArrayList<>();
-		listProcess.add(createProcess(piece, "Trazado de Madera", 0, 0 , 35, "Operario"));
-		listProcess.add(createProcess(piece, "Cortado de Madera", 0, 1 , 15, "Operario"));
-		listProcess.add(createProcess(piece, "Lijado", 0, 0 , 35, "Control"));
-		piece.getProcesses().addAll(listProcess);
-		listPiece.add(piece);
-		piece = new Piece(product, "lateral izquierdo".toUpperCase(), BigDecimal.ZERO, null, BigDecimal.ZERO, null, BigDecimal.ZERO, null, "", false, 1);
-		listProcess = new ArrayList<>();
-		listProcess.add(createProcess(piece, "Trazado de Madera", 0, 0 , 35, "Operario"));
-		listProcess.add(createProcess(piece, "Cortado de Madera", 0, 1 , 15, "General"));
-		listProcess.add(createProcess(piece, "Lijado", 0, 0 , 35, "Operario"));
-		piece.getProcesses().addAll(listProcess);
-		listPiece.add(piece);
-		piece = new Piece(product, "base intermedia".toUpperCase(), BigDecimal.ZERO, null, BigDecimal.ZERO, null, BigDecimal.ZERO, null, "", false, 4);
-		listProcess = new ArrayList<>();
-		listProcess.add(createProcess(piece, "Trazado de Madera", 0, 0 , 45, "General"));
-		listProcess.add(createProcess(piece, "Cortado Curvo", 0, 1 , 3, "Operario"));
-		listProcess.add(createProcess(piece, "Lijado", 0, 2 , 5, "General"));
-		piece.getProcesses().addAll(listProcess);
-		listPiece.add(piece);
-		piece = new Piece(product, "estante completo".toUpperCase(), BigDecimal.ZERO, null, BigDecimal.ZERO, null, BigDecimal.ZERO, null, "", true, 4);
-		listProcess = new ArrayList<>();
-		listProcess.add(createProcess(piece, "Ensamblado", 0, 4 , 45, "Operario"));
-		piece.getProcesses().addAll(listProcess);
-		listPiece.add(piece);
- */
 
 /* 
 \u00e1 -> á

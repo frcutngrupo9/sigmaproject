@@ -31,4 +31,6 @@ import ar.edu.utn.sigmaproject.domain.SupplyType;
 @Repository
 public interface SupplyTypeRepository extends SearchableRepository<SupplyType, Long> {
 
+	public SupplyType findFirstByDescription(String string);
+	
 }

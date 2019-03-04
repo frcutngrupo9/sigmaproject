@@ -84,6 +84,7 @@ public class Piece implements Serializable, Cloneable {
 	private BigDecimal depth = BigDecimal.ZERO;
 	private BigDecimal width = BigDecimal.ZERO;
 	private String size = "";
+	private Integer sequence = 0;// esta secuencia se utiliza solo para cuando la pieza isGroup=true
 	private boolean isGroup;
 	private Integer units = 0;
 	private boolean isClone;
@@ -260,6 +261,14 @@ public class Piece implements Serializable, Cloneable {
 			cost = cost.add(each.getCost().multiply(new BigDecimal(units)));
 		}
 		return cost;
+	}
+
+	public Integer getSequence() {
+		return sequence;
+	}
+
+	public void setSequence(Integer sequence) {
+		this.sequence = sequence;
 	}
 
 	public boolean isClone() {
