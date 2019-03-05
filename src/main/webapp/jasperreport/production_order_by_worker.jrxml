@@ -40,14 +40,14 @@
 				<reportElement x="0" y="139" width="554" height="55" uuid="4bae77cf-ff06-4afd-aeaa-6c075e2d07ab"/>
 			</rectangle>
 			<textField>
-				<reportElement x="309" y="169" width="134" height="25" uuid="e6b19ba3-68b3-40a9-ba70-23b555cc68dc"/>
+				<reportElement x="309" y="169" width="69" height="25" uuid="e6b19ba3-68b3-40a9-ba70-23b555cc68dc"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{productionPlanName}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="443" y="169" width="61" height="25" uuid="9996f875-2ce1-4d79-b810-d53d28eeae17"/>
+				<reportElement x="378" y="169" width="61" height="25" uuid="9996f875-2ce1-4d79-b810-d53d28eeae17"/>
 				<box rightPadding="7"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" isBold="true"/>
@@ -55,7 +55,7 @@
 				<text><![CDATA[ORDEN N°]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="504" y="169" width="50" height="25" uuid="44888ce5-a0c9-4845-94fe-0c741884ed2f"/>
+				<reportElement x="439" y="169" width="115" height="25" uuid="44888ce5-a0c9-4845-94fe-0c741884ed2f"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial"/>
 				</textElement>

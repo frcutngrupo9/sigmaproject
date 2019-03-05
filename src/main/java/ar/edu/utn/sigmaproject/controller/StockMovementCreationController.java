@@ -25,6 +25,7 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import ar.edu.utn.sigmaproject.domain.Item;
+import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.StockMovement;
 import ar.edu.utn.sigmaproject.domain.StockMovementDetail;
 import ar.edu.utn.sigmaproject.domain.StockMovementType;
@@ -247,13 +248,14 @@ public abstract class StockMovementCreationController extends SelectorComposer<C
 	}
 
 	protected void filterItems(String searchString) {
-		Page items;
-		if (searchString != null && searchString.length() > 0) {
-			items = getItemRepository().findAll(searchString, new PageRequest(0, Integer.MAX_VALUE));
-		} else {
-			items = getItemRepository().findAll(new PageRequest(0, Integer.MAX_VALUE));
+		List<Item> someItems = new ArrayList<>();
+		String nameFilter = searchString.toLowerCase();
+		for(Item each : getItemRepository().findAll()) {
+			if(each.getDescription().toLowerCase().contains(nameFilter) || nameFilter.equals("")) {
+				someItems.add(each);
+			}
 		}
-		itemCombobox.setModel(new ListModelList<>(items.getContent()));
+		itemCombobox.setModel(new ListModelList<>(someItems));
 	}
 
 	protected void clearFilteredItems() {

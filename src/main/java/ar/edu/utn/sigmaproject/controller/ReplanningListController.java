@@ -92,6 +92,7 @@ public class ReplanningListController extends SelectorComposer<Component> {
 				return;
 			}
 		}
+		productionOrderDetailToReplan = null;
 	}
 
 	private List<ProductionOrderDetail> sortProductionOrderDetailListByProcessTypeSequence(List<ProductionOrderDetail> listParameter) {
@@ -141,6 +142,11 @@ public class ReplanningListController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #newButton")
 	public void newButtonClick() {
+		// verifica que no sea el ultimo proceso
+		if(productionOrderDetailToReplan == null) {
+			Messagebox.show("No se puede crear una nueva replanificacion, es el ultimo proceso.", "Informacion", Messagebox.OK, Messagebox.ERROR);
+			return;
+		}
 		// verifica que no exista una replanificacion para el detalle actual
 		if(findDetailReplanning() != null) {
 			Messagebox.show("No se puede crear una nueva replanificacion, ya existe una replanificacion para el proceso actual.", "Informacion", Messagebox.OK, Messagebox.ERROR);

@@ -41,6 +41,7 @@ import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Window;
 
+import ar.edu.utn.sigmaproject.domain.ProcessState;
 import ar.edu.utn.sigmaproject.domain.ProductionOrder;
 import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.domain.Replanning;
@@ -84,7 +85,7 @@ public class ReplanningCreationController extends SelectorComposer<Component> {
 		} else {
 			causeBandbox.setValue(null);
 			interruptionDatebox.setValue(productionOrderDetailToReplan.getDateStart());
-			resumptionDatebox.setValue(null);
+			resumptionDatebox.setValue(ProductionDateTimeHelper.getFirstHourOfDay(ProductionDateTimeHelper.addDays(1, productionOrderDetailToReplan.getDateStart())));
 		}
 	}
 
@@ -110,9 +111,13 @@ public class ReplanningCreationController extends SelectorComposer<Component> {
 		}
 		String cause = causeBandbox.getText();
 		Date dateInterruption = interruptionDatebox.getValue();
-		Date dateResumption = ProductionDateTimeHelper.getFirstHourOfDay(resumptionDatebox.getValue());
+		Date dateResumption = resumptionDatebox.getValue();//ProductionDateTimeHelper.getFirstHourOfDay(resumptionDatebox.getValue());
 		if(dateResumption.before(dateInterruption)) {
-			Clients.showNotification("La fecha de reanudacion no puede ser anterior a la fecha de interrupcion", resumptionDatebox);
+			Clients.showNotification("La fecha de reanudacion no puede ser previa a la fecha de interrupcion", resumptionDatebox);
+			return;
+		}
+		if(ProductionDateTimeHelper.isOutsideWorkingHours(dateInterruption)) {
+			Clients.showNotification("La fecha de reanudacion no puede estar fuera de las horas laborales", resumptionDatebox);
 			return;
 		}
 		if(currentReplanning == null) {

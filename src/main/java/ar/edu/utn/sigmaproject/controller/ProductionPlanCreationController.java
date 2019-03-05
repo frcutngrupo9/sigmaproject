@@ -240,23 +240,12 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		List<MaterialRequirement> materialRequirementList = null;
 		if(currentProductionPlan == null) { // es un plan nuevo
 			// creamos el nuevo plan
-			//currentProductionPlan = new ProductionPlan(productionPlanName);
 			currentProductionPlan = createProductionPlan(productionPlanName, productionPlanStateType);
 			// cambia el estado de los pedidos
 			setProductionPlanDetailStates("Planificado");
 			// crea los detalles
 			materialRequirementList = createMaterialRequirements(currentProductionPlan);
-		}/* else { // se edita un plan
-			// si se modificaron los detalles, se elimina el producto y se crea uno nuevo con los detalles actuales
-			if(detailsModified()) {
-				setProductionPlanDetailStates("Creado");
-				productionPlanRepository.delete(currentProductionPlan);
-				currentProductionPlan = createProductionPlan(productionPlanName, productionPlanStateType);
-				setProductionPlanDetailStates("Planificado");
-			} else { // si no se modificaron los detalles se modifica solo el nombre
-				currentProductionPlan.setName(productionPlanName);
-			}
-		}*/
+		}
 		currentProductionPlan = productionPlanRepository.save(currentProductionPlan);
 
 		// si  es nuevo se crean los detalles
@@ -269,7 +258,7 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		refreshViewProductionPlan();
 		alert("Plan guardado.");
 	}
-	
+
 	private ProductionPlan createProductionPlan(String productionPlanName, ProductionPlanStateType productionPlanStateType) {
 		ProductionPlan productionPlan = new ProductionPlan(productionPlanName);
 		for(ProductionPlanDetail each : productionPlanDetailList) {
@@ -281,29 +270,6 @@ public class ProductionPlanCreationController extends SelectorComposer<Component
 		productionPlanState = productionPlanStateRepository.save(productionPlanState);
 		productionPlan.setState(productionPlanState);
 		return productionPlan;
-	}
-
-	private boolean detailsModified() {
-		// lee el plan de bd y si los detalles son iguales a los del current, se considera que no se modificaron los detalles
-		ProductionPlan dbProductionPlan = productionPlanRepository.getOne(currentProductionPlan.getId());
-		List<ProductionPlanDetail> dbDetails = dbProductionPlan.getPlanDetails();
-		List<ProductionPlanDetail> currentDetails = currentProductionPlan.getPlanDetails();
-		if(dbDetails.size() != currentDetails.size()) {
-			return true;
-		}
-		for(ProductionPlanDetail eachDB : dbDetails) {
-			// deberian existir 1 por cada detalle
-			boolean found = false;
-			for(ProductionPlanDetail eachCurrent : dbDetails) {
-				if(eachDB.getId()==eachCurrent.getId()) {
-					found = true;
-				}
-			}
-			if(found == false) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	private void setProductionPlanDetailStates(String stateName) {

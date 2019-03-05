@@ -210,4 +210,12 @@ public class ProductionDateTimeHelper {
 		cal.set(Calendar.MILLISECOND, 0);
 		return cal.getTime();
 	}
+	
+	public static Date addDays(int number, Date dateStart) {
+		// devuelve el date sumado la cantidad de dias en number
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(dateStart);
+		cal.add(Calendar.DAY_OF_MONTH, number);
+		return cal.getTime();
+	}
 }
