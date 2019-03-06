@@ -117,6 +117,15 @@ public class User implements Serializable, Cloneable {
 		return false;
 	}
 
+	public boolean containsAnyOfTypes(String[] userTypeNames) {
+		for (String userTypeName : userTypeNames) {
+			if (containsType(userTypeName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public String getTypeString() {
 		String type = "";
 		boolean firstTime = true;
