@@ -915,10 +915,10 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 	private void loadJasperreport() {
 		Map<String, Object> parameters;
 		parameters = new HashMap<String, Object>();
-		parameters.put("reportTitle", "Orden de Produccion");
 		parameters.put("productionPlanName", currentProductionPlan.getName());
 		parameters.put("productionOrderNumber", currentProductionOrder.getNumber());
 		parameters.put("productName", currentProductionOrder.getProduct().getDescription());
+		parameters.put("productUnits", currentProductionOrder.getUnits());
 
 		Executions.getCurrent().setAttribute("jr_datasource", new ProductionOrderReportDataSource(productionOrderDetailList));
 		Executions.getCurrent().setAttribute("return_page_name", "production_order_creation");
@@ -930,8 +930,5 @@ public class ProductionOrderCreationController extends SelectorComposer<Componen
 		Executions.getCurrent().setAttribute("report_parameters", parameters);
 		Window window = (Window)Executions.createComponents("/report_selection_modal.zul", null, null);
 		window.doModal();
-		/*reportBlockJasperreport.setSrc("/jasperreport/production_order.jasper");
-		reportBlockJasperreport.setType(type);
-		reportBlockJasperreport.setDatasource(new ProductionOrderReportDataSource(productionOrderDetailList));*/
 	}
 }

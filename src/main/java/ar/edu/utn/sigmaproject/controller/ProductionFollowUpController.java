@@ -598,7 +598,7 @@ public class ProductionFollowUpController extends SelectorComposer<Component> {
 	private boolean isDetailReplanned(ProductionOrderDetail data) {
 		// busca en las replanificaciones si aparece el detalle que viene por parametro
 		for(Replanning each : currentProductionOrder.getReplanningList()) {
-			if(each.getProductionOrderDetail().getId() == data.getId()) {
+			if(each.getProductionOrderDetail().getId().equals(data.getId())) {
 				return true;
 			}
 		}

@@ -157,7 +157,7 @@ public class ReplanningListController extends SelectorComposer<Component> {
 
 	private Replanning findDetailReplanning() {
 		for(Replanning each : currentProductionOrder.getReplanningList()) {
-			if(each.getProductionOrderDetail().getId() == productionOrderDetailToReplan.getId()) {
+			if(each.getProductionOrderDetail().getId().equals(productionOrderDetailToReplan.getId())) {
 				return each;
 			}
 		}
