@@ -25,7 +25,10 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import ar.edu.utn.sigmaproject.domain.User;
+import ar.edu.utn.sigmaproject.domain.UserRole;
+import ar.edu.utn.sigmaproject.domain.UserType;
 import ar.edu.utn.sigmaproject.service.UserRepository;
+import ar.edu.utn.sigmaproject.service.UserTypeRepository;
 import ar.edu.utn.sigmaproject.web.Attributes;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.zkoss.zk.ui.Component;
@@ -63,6 +66,8 @@ public class LoginController extends SelectorComposer<Component> {
 	private PasswordEncoder passwordEncoder;
 	@WireVariable
 	private UserRepository userRepository;
+	@WireVariable
+	private UserTypeRepository userTypeRepository;
 
 	//attributes
 	private User currentUser;
@@ -92,6 +97,12 @@ public class LoginController extends SelectorComposer<Component> {
 	public void onSetNewPassword() {
 		String password = newPasswordTextbox.getText();
 		currentUser.setHash(passwordEncoder.encode(password));
+		if(userRepository.findAll().size() == 1 && currentUser.getUserRoleList().isEmpty()) {
+			UserType userType = userTypeRepository.findFirstByName("Admin");
+			UserRole userRole = new UserRole(userType);
+			userRole.setUser(currentUser);
+			currentUser.getUserRoleList().add(userRole);
+		}
 		currentUser = userRepository.save(currentUser);
 		showSuccessMessageAndRedirect();
 	}
