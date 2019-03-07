@@ -621,7 +621,7 @@ public class ProductionOrder implements Serializable, Cloneable {
 	private boolean existReplanning(Replanning replanning) {
 		//verifica si se encuentra ya en la lista
 		for(Replanning each : replanningList) {
-			if(each.getId() == replanning.getId()) {
+			if(each.getId().equals(replanning.getId())) {
 				return true;
 			}
 		}
@@ -640,13 +640,13 @@ public class ProductionOrder implements Serializable, Cloneable {
 		Date dateStart = replanning.getDateResumption();
 		detail.setDateStart(dateStart);
 		detail.setDateFinish(ProductionDateTimeHelper.getFinishDate(dateStart, detail.getTimeTotal()));
-		updateRemainDetailDatesAndNotClearResources(detail);
+		updateDetailDatesByReplanningAndNotClearResources();//updateRemainDetailDatesAndNotClearResources(detail);
 	}
 
 	public void deleteReplanning(Replanning replanning) {
 		int index = -1;
 		for(Replanning each : replanningList) {
-			if(each.getId() == replanning.getId()) {
+			if(each.getId().equals(replanning.getId())) {
 				index = replanningList.indexOf(each);
 			}
 		}
@@ -657,19 +657,19 @@ public class ProductionOrder implements Serializable, Cloneable {
 		Date dateStart = replanning.getDateInterruption();
 		detail.setDateStart(dateStart);
 		detail.setDateFinish(ProductionDateTimeHelper.getFinishDate(dateStart, detail.getTimeTotal()));
-		updateRemainDetailDatesAndNotClearResources(detail);
+		updateDetailDatesByReplanningAndNotClearResources();//updateRemainDetailDatesAndNotClearResources(detail);
 	}
 
 	private ProductionOrderDetail getDetailFromList(ProductionOrderDetail productionOrderDetail) {
 		for(ProductionOrderDetail each : getDetails()) {
-			if(productionOrderDetail.getId() == each.getId()) {
+			if(productionOrderDetail.getId().equals(each.getId())) {
 				return each;
 			}
 		}
 		return null;
 	}
 
-	public void updateRemainDetailDatesAndNotClearResources(ProductionOrderDetail changedDetail) {
+	/*public void updateRemainDetailDatesAndNotClearResources(ProductionOrderDetail changedDetail) {
 		// busca el detalle cambiado y modifica las fechas posteriores a el
 		boolean startUpdating = false;
 		Date finishDate = null;
@@ -694,11 +694,51 @@ public class ProductionOrder implements Serializable, Cloneable {
 					each.setDateFinishReal(null);
 				}
 			}
-			if(each.getProcess().equals(changedDetail.getProcess())) {
+			if(each.getId().equals(changedDetail.getId())) {
 				startUpdating = true;
 				startDate = changedDetail.getDateFinish();
 			}
 		}
+	}*/
+
+	public void updateDetailDatesByReplanningAndNotClearResources() {
+		// reinicia todos las fechas y por cada replanificacion continua en la fecha de reanudacion
+		Date finishDate = null;
+		Date startDate = dateStart;
+		sortDetailsByProcessTypeSequence();
+		for(ProductionOrderDetail each : getDetails()) {
+			if(each.getState() != ProcessState.Cancelado) {// solo se calcula para los procesos que no esten cancelados
+				Replanning replanning = findIfProcessIsInReplanning(each);
+				if(replanning != null) { //el proceso esta replanificado
+					startDate = replanning.getDateResumption();
+					finishDate = null;
+				}
+				if(finishDate == null) {// si es la primera vez que ingresa
+					finishDate = ProductionDateTimeHelper.getFinishDate(startDate, each.getTimeTotal());
+				} else {
+					// el inicio de la actual es al finalizar la ultima
+					startDate = finishDate;
+					finishDate = ProductionDateTimeHelper.getFinishDate(startDate, each.getTimeTotal());
+				}
+				each.setDateStart(startDate);
+				each.setDateFinish(finishDate);
+			} else {
+				each.setDateStart(null);
+				each.setDateFinish(null);
+				// por las dudas borramos tambien las fechas reales
+				each.setDateStartReal(null);
+				each.setDateFinishReal(null);
+			}
+		}
+	}
+
+	private Replanning findIfProcessIsInReplanning(ProductionOrderDetail detail) {
+		for(Replanning each : replanningList) {
+			if(each.getProductionOrderDetail().getId().equals(detail.getId())) {
+				return each;
+			}
+		}
+		return null;
 	}
 
 	public List<Worker> getWorkerList() {

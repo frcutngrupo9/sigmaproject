@@ -341,7 +341,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{process_name}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{process_name}.toUpperCase()]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="256" y="0" width="108" height="40" uuid="43c83d72-941e-4b1a-bd8f-7f009c495230">

@@ -44,7 +44,7 @@ THE SOFTWARE.
             	</hbox>
             	<hbox hflex="1" pack="center">
                 	<label value="Reanudacion: " hflex="1"/>
-                    <datebox id="resumptionDatebox" buttonVisible="true" disabled="false" format="${labels.date_format}" hflex="1"/>
+                    <datebox id="resumptionDatebox" buttonVisible="true" disabled="false" format="${labels.date_time_format}" cols="12" hflex="1"/>
             	</hbox>
             	<hbox hflex="1" pack="center">
             		<button id="saveButton" label="${labels.save}"/>

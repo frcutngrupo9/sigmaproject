@@ -27,6 +27,8 @@ package ar.edu.utn.sigmaproject.controller;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -88,6 +90,7 @@ import ar.edu.utn.sigmaproject.domain.ProcessType;
 import ar.edu.utn.sigmaproject.domain.Product;
 import ar.edu.utn.sigmaproject.domain.ProductCategory;
 import ar.edu.utn.sigmaproject.domain.ProductMaterial;
+import ar.edu.utn.sigmaproject.domain.ProductionOrderDetail;
 import ar.edu.utn.sigmaproject.domain.WorkHour;
 import ar.edu.utn.sigmaproject.service.MeasureUnitRepository;
 import ar.edu.utn.sigmaproject.service.MeasureUnitTypeRepository;
@@ -230,6 +233,7 @@ public class ProductCreationController extends SelectorComposer<Component> {
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		processTypeList = processTypeRepository.findAll();
+		sortBySequence(processTypeList);
 		processTypeListModel = new ListModelList<>(processTypeList);
 		processListbox.setModel(processTypeListModel);
 		workHourDefault = workHourRepository.findFirstByRole("Operario");
@@ -253,6 +257,16 @@ public class ProductCreationController extends SelectorComposer<Component> {
 		productCategoryListModel = new ListModelList<>(productCategoryRepository.findAll());
 		productCategoryCombobox.setModel(productCategoryListModel);
 		pieceChanged = false;
+	}
+
+	private void sortBySequence(List<ProcessType> list) {
+		Comparator<ProcessType> comp = new Comparator<ProcessType>() {
+			@Override
+			public int compare(ProcessType a, ProcessType b) {
+				return a.getSequence().compareTo(b.getSequence());
+			}
+		};
+		Collections.sort(list, comp);
 	}
 
 	public ListModelList<WorkHour> getWorkHourListModel() {

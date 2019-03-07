@@ -117,7 +117,7 @@ public class MachineController extends SelectorComposer<Component> {
 			Clients.showNotification("Debe ingresar un nombre", nameTextbox);
 			return;
 		}
-		String name = nameTextbox.getText().toUpperCase();
+		String name = nameTextbox.getText();
 		String details = detailsTextbox.getText();
 		Integer hours = deteriorationTimeIntboxHours.intValue();
 		Duration duration = null;
@@ -200,7 +200,7 @@ public class MachineController extends SelectorComposer<Component> {
 
 	public String getFormattedTime(Duration time) {
 		if(time != null) {
-			return String.format(Labels.getLabel("hours") + ": %d " + Labels.getLabel("minutes") + ": %d", time.getHours(), time.getMinutes());
+			return String.format(time.getHours() + " " + Labels.getLabel("hours"));
 		} else {
 			return "";
 		}

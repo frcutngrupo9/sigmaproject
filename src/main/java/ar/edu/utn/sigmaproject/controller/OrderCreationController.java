@@ -25,6 +25,7 @@
 package ar.edu.utn.sigmaproject.controller;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -500,7 +501,7 @@ public class OrderCreationController extends SelectorComposer<Component> {
 	}
 
 	public BigDecimal getSubTotal(int units, BigDecimal price) {
-		return price.multiply(new BigDecimal(units));
+		return price.multiply(new BigDecimal(units)).setScale(2, RoundingMode.HALF_UP);
 	}
 
 	public BigDecimal getTotalPrice() {

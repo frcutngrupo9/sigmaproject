@@ -37,8 +37,8 @@ THE SOFTWARE.
 						<auxheader label="${labels.supply_plural}" colspan="8"/>
 					</auxhead>
 			        <listhead>
-			            <listheader label="${labels.code}" align="center"/>
-			            <listheader label="${labels.description}" align="center"/>
+			            <listheader label="${labels.code}" align="center" sort="auto(code)"/>
+			            <listheader label="${labels.description}" align="center" sort="auto(description)"/>
 			            <listheader label="${labels.measure_plural}" align="center"/>
 			            <listheader label="${labels.stock_current}" align="center"/>
 			            <listheader label="${labels.stock_not_reserved}" align="center"/>
