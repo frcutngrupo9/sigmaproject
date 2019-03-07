@@ -93,7 +93,8 @@ public class SidebarController extends SelectorComposer<Component> {
 		List<DefaultTreeNode<MenuTreeRow>> array;
 
 		if (user.containsAnyOfTypes(new String[]{ userTypeAdmin, userTypeGeneralManager, userTypeProductionManager })) {
-			array = Arrays.asList(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Productos", "/product_list.zul")));
+			array = new ArrayList<>();
+			array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Productos", "/product_list.zul")));
 			if (user.containsAnyOfTypes(new String[]{ userTypeAdmin, userTypeProductionManager })) {
 				array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Producto", "/product_creation.zul")));
 			}
@@ -101,7 +102,8 @@ public class SidebarController extends SelectorComposer<Component> {
 		}
 
 		if (user.containsAnyOfTypes(new String[]{ userTypeAdmin, userTypeGeneralManager, userTypeSalesRepresentative })) {
-			array = Arrays.asList(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Pedidos", "/order_list.zul")));
+			array = new ArrayList<>();
+			array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Pedidos", "/order_list.zul")));
 			if (user.containsAnyOfTypes(new String[]{ userTypeAdmin, userTypeProductionManager })) {
 				array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Pedido", "/order_creation.zul")));
 			}
@@ -109,10 +111,10 @@ public class SidebarController extends SelectorComposer<Component> {
 		}
 
 		if (user.containsAnyOfTypes(new String[]{ userTypeAdmin, userTypeProductionManager })) {
-			firstLevelMenus.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Produccion"), Arrays.asList(
-					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Avance de Produccion", "/production_follow_up_list.zul")),
-					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Planes de Produccion", "/production_plan_list.zul")),
-					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Plan de Produccion", "/production_plan_creation.zul"))
+			firstLevelMenus.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Producci\u00f3n"), Arrays.asList(
+					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Avance de Producci\u00f3n", "/production_follow_up_list.zul")),
+					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Planes de Producci\u00f3n", "/production_plan_list.zul")),
+					new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Plan de Producci\u00f3n", "/production_plan_creation.zul"))
 			)));
 		}
 
@@ -126,7 +128,7 @@ public class SidebarController extends SelectorComposer<Component> {
 				array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Stock Insumos", "/supply_stock.zul")));
 			}
 			if (user.containsAnyOfTypes(new String[]{ userTypeAdmin, userTypeProductionManager })) {
-				array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Maquinas", "/machine_stock.zul")));
+				array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado M\u00e1quinas", "/machine_stock.zul")));
 			}
 			firstLevelMenus.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Stock"), array));
 		}
@@ -139,7 +141,8 @@ public class SidebarController extends SelectorComposer<Component> {
 		}
 
 		if (user.containsAnyOfTypes(new String[]{ userTypeAdmin, userTypeGeneralManager, userTypeAcquisitionsRepresentative })) {
-			array = Arrays.asList(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Pedidos de Materiales", "/materials_order_list.zul")));
+			array = new ArrayList<>();
+			array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Listado Pedidos de Materiales", "/materials_order_list.zul")));
 			if (user.containsAnyOfTypes(new String[]{ userTypeAdmin, userTypeAcquisitionsRepresentative })) {
 				array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Crear Pedido de Materiales", "/materials_order_creation.zul")));
 			}
@@ -155,8 +158,8 @@ public class SidebarController extends SelectorComposer<Component> {
 				array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Maderas", "/raw_material.zul")));
 				array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Tipos de Madera", "/wood_type_list.zul")));
 				array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Insumos", "/supply.zul")));
-				array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Maquinas", "/machine_list.zul")));
-				array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Tipos de Maquina", "/machine.zul")));
+				array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "M\u00e1quinas", "/machine_list.zul")));
+				array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Tipos de M\u00e1quina", "/machine.zul")));
 				array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Procesos", "/process.zul")));
 				array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Costos Mano de Obra", "/work_hour_list.zul")));
 			}
@@ -164,7 +167,7 @@ public class SidebarController extends SelectorComposer<Component> {
 				array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Empleados", "/worker.zul")));
 			}
 			if (user.containsAnyOfTypes(new String[]{ userTypeAdmin, userTypeProductionManager })) {
-				array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Categorias Producto", "/product_category_list.zul")));
+				array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Categor\u00edas Producto", "/product_category_list.zul")));
 			}
 			if (user.containsAnyOfTypes(new String[]{ userTypeAdmin, userTypeGeneralManager })) {
 				array.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Usuarios", "/user_list.zul")));
@@ -174,7 +177,7 @@ public class SidebarController extends SelectorComposer<Component> {
 		}
 
 		if (user.containsAnyOfTypes(new String[]{ userTypeAdmin, userTypeGeneralManager })) {
-			firstLevelMenus.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Reportes y Estadisticas", "/report.zul")));
+			firstLevelMenus.add(new DefaultTreeNode<MenuTreeRow>(new MenuTreeRow("", "Reportes y Estad\u00edsticas", "/report.zul")));
 		}
 
 		TreeNode<MenuTreeRow> rootNode = new DefaultTreeNode<MenuTreeRow>(null, firstLevelMenus);
