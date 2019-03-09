@@ -145,7 +145,7 @@ public class RepositoryHelper {
 	@Autowired
 	private EntityManager entityManager;
 
-	private List<String> productLaptopShelf = Arrays.asList("1", "Estante Laptop 20cm Altura", "Medidas: Ancho: 35cm - Profundidad: 25cm - Alto: 20cm", "Estante", "300", "200");
+	private List<String> productLaptopShelf = Arrays.asList("1", "Estante Laptop 20cm Altura", "Medidas: Ancho: 35cm - Profundidad: 25cm - Alto: 20cm", "Estante", "1000", "200");
 	private List<List<String>> namesPiecesLaptopShelf = Arrays.asList(
 			Arrays.asList("2", "Tapa", "18", "45", "340"),
 			Arrays.asList("2", "Taco Tapa", "18", "45", "210"),
@@ -160,7 +160,7 @@ public class RepositoryHelper {
 			Arrays.asList("Tornillo 4x1 1/4 cabeza avellanada punta s bicromatado", "20"),
 			Arrays.asList("Papel de lija para madera granos 100", "0.25")
 			);
-	private List<String> productCubeSeat = Arrays.asList("2", "Cubo Asiento 40x40", "Medidas: Ancho: 40cm - Profundidad: 40cm - Alto: 40cm", "Banco", "500", "100");
+	private List<String> productCubeSeat = Arrays.asList("2", "Cubo Asiento 40x40", "Medidas: Ancho: 40cm - Profundidad: 40cm - Alto: 40cm", "Banco", "2000", "100");
 	private List<List<String>> namesPiecesCubeSeat= Arrays.asList(
 			Arrays.asList("1", "Tapa Superior", "18", "400", "400"),
 			Arrays.asList("2", "Taco Tapa Superior", "18", "45", "320"),

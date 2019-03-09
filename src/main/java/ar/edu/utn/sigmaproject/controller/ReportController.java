@@ -29,11 +29,16 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Window;
 
+import ar.edu.utn.sigmaproject.service.OrderRepository;
+
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class ReportController extends SelectorComposer<Component> {
 	private static final long serialVersionUID = 1L;
 
@@ -41,6 +46,8 @@ public class ReportController extends SelectorComposer<Component> {
 	Button productionOrderReportButton;
 
 	// services
+	@WireVariable
+	private OrderRepository orderRepository;
 
 	// list
 
@@ -60,6 +67,10 @@ public class ReportController extends SelectorComposer<Component> {
 
 	@Listen("onClick = #showGraphicsModalButton")
 	public void showGraphicsModalButtonOnClick() {
+		if(orderRepository.findAll().size() < 2) {
+			alert("Deben existir al menos 2 pedidos para generar los graficos");
+			return;
+		}
 		final Window win = (Window) Executions.createComponents("/graphics.zul", null, null);
 		win.setMaximizable(true);
 		win.setClosable(true);
